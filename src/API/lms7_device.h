@@ -9,8 +9,10 @@
 #define	LMS7_DEVICE_H
 #include "LMS7002M.h"
 #include "lime/LimeSuite.h"
+/// \cond
 #include <vector>
 #include <string>
+/// \endcond
 #include "Streamer.h"
 #include "IConnection.h"
 
@@ -120,4 +122,3 @@ protected:
 }
 
 #endif	/* LMS7_DEVICE_H */
-
