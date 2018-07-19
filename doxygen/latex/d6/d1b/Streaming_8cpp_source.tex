@@ -1,0 +1,499 @@
+\subsection{Streaming.\+cpp}
+\label{Streaming_8cpp_source}\index{/home/erik/prefix/default/src/limesuite-\/dev/\+Soapy\+L\+M\+S7/\+Streaming.\+cpp@{/home/erik/prefix/default/src/limesuite-\/dev/\+Soapy\+L\+M\+S7/\+Streaming.\+cpp}}
+
+\begin{DoxyCode}
+00001 
+00007 \textcolor{preprocessor}{#include "SoapyLMS7.h"}
+00008 \textcolor{preprocessor}{#include "lms7_device.h"}
+00009 \textcolor{preprocessor}{#include <SoapySDR/Formats.hpp>}
+00010 \textcolor{preprocessor}{#include <SoapySDR/Logger.hpp>}
+00011 \textcolor{preprocessor}{#include <SoapySDR/Time.hpp>}
+00012 \textcolor{preprocessor}{#include <thread>}
+00013 \textcolor{preprocessor}{#include <iostream>}
+00014 \textcolor{preprocessor}{#include <algorithm>} \textcolor{comment}{//min/max}
+00015 \textcolor{preprocessor}{#include "Logger.h"}
+00016 \textcolor{preprocessor}{#include "Streamer.h"}
+00017 
+00018 \textcolor{keyword}{using namespace }lime;
+00019 
+00020 \textcolor{comment}{/*******************************************************************}
+00021 \textcolor{comment}{ * Stream data structure}
+00022 \textcolor{comment}{ ******************************************************************/}
+00023 \textcolor{keyword}{struct }IConnectionStream
+00024 \{
+00025     std::vector<StreamChannel*> streamID;
+00026     \textcolor{keywordtype}{int} direction;
+00027     \textcolor{keywordtype}{size\_t} elemSize;
+00028     \textcolor{keywordtype}{size\_t} elemMTU;
+00029     \textcolor{keywordtype}{bool} skipCal;
+00030 
+00031     \textcolor{comment}{//rx cmd requests}
+00032     \textcolor{keywordtype}{bool} hasCmd;
+00033     \textcolor{keywordtype}{int} flags;
+00034     \textcolor{keywordtype}{long} \textcolor{keywordtype}{long} timeNs;
+00035     \textcolor{keywordtype}{size\_t} numElems;
+00036 \};
+00037 
+00038 \textcolor{comment}{/*******************************************************************}
+00039 \textcolor{comment}{ * Stream information}
+00040 \textcolor{comment}{ ******************************************************************/}
+00041 std::vector<std::string> SoapyLMS7::getStreamFormats(\textcolor{keyword}{const} \textcolor{keywordtype}{int} direction, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} channel)\textcolor{keyword}{ const}
+00042 \textcolor{keyword}{}\{
+00043     std::vector<std::string> formats;
+00044     formats.push\_back(SOAPY\_SDR\_CF32);
+00045     formats.push\_back(SOAPY\_SDR\_CS12);
+00046     formats.push\_back(SOAPY\_SDR\_CS16);
+00047     \textcolor{keywordflow}{return} formats;
+00048 \}
+00049 
+00050 std::string SoapyLMS7::getNativeStreamFormat(\textcolor{keyword}{const} \textcolor{keywordtype}{int} direction, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} channel, \textcolor{keywordtype}{double} &fullScale)\textcolor{keyword}{
+       const}
+00051 \textcolor{keyword}{}\{
+00052     fullScale = 2048;
+00053     \textcolor{keywordflow}{return} SOAPY\_SDR\_CS16;
+00054 \}
+00055 
+00056 SoapySDR::ArgInfoList SoapyLMS7::getStreamArgsInfo(\textcolor{keyword}{const} \textcolor{keywordtype}{int} direction, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} channel)\textcolor{keyword}{ const}
+00057 \textcolor{keyword}{}\{
+00058     SoapySDR::ArgInfoList argInfos;
+00059 
+00060     \textcolor{comment}{//buffer length}
+00061     \{
+00062         SoapySDR::ArgInfo info;
+00063         info.value = \textcolor{stringliteral}{"0"};
+00064         info.key = \textcolor{stringliteral}{"bufferLength"};
+00065         info.name = \textcolor{stringliteral}{"Buffer Length"};
+00066         info.description = \textcolor{stringliteral}{"The buffer transfer size over the link."};
+00067         info.units = \textcolor{stringliteral}{"samples"};
+00068         info.type = SoapySDR::ArgInfo::INT;
+00069         argInfos.push\_back(info);
+00070     \}
+00071 
+00072     \textcolor{comment}{//link format}
+00073     \{
+00074         SoapySDR::ArgInfo info;
+00075         info.value = SOAPY\_SDR\_CS16;
+00076         info.key = \textcolor{stringliteral}{"linkFormat"};
+00077         info.name = \textcolor{stringliteral}{"Link Format"};
+00078         info.description = \textcolor{stringliteral}{"The format of the samples over the link."};
+00079         info.type = SoapySDR::ArgInfo::STRING;
+00080         info.options.push\_back(SOAPY\_SDR\_CS16);
+00081         info.options.push\_back(SOAPY\_SDR\_CS12);
+00082         info.optionNames.push\_back(\textcolor{stringliteral}{"Complex int16"});
+00083         info.optionNames.push\_back(\textcolor{stringliteral}{"Complex int12"});
+00084         argInfos.push\_back(info);
+00085     \}
+00086 
+00087     \textcolor{comment}{//link format}
+00088     \{
+00089         SoapySDR::ArgInfo info;
+00090         info.value = \textcolor{stringliteral}{"false"};
+00091         info.key = \textcolor{stringliteral}{"skipCal"};
+00092         info.name = \textcolor{stringliteral}{"Skip Calibration"};
+00093         info.description = \textcolor{stringliteral}{"Skip automatic activation calibration."};
+00094         info.type = SoapySDR::ArgInfo::BOOL;
+00095         argInfos.push\_back(info);
+00096     \}
+00097 
+00098     \textcolor{keywordflow}{return} argInfos;
+00099 \}
+00100 
+00101 \textcolor{comment}{/*******************************************************************}
+00102 \textcolor{comment}{ * Stream config}
+00103 \textcolor{comment}{ ******************************************************************/}
+00104 SoapySDR::Stream *SoapyLMS7::setupStream(
+00105     \textcolor{keyword}{const} \textcolor{keywordtype}{int} direction,
+00106     \textcolor{keyword}{const} std::string &format,
+00107     \textcolor{keyword}{const} std::vector<size\_t> &channels,
+00108     \textcolor{keyword}{const} SoapySDR::Kwargs &args)
+00109 \{
+00110     std::unique\_lock<std::recursive\_mutex> lock(\_accessMutex);
+00111     \textcolor{comment}{//store result into opaque stream object}
+00112     \textcolor{keyword}{auto} stream = \textcolor{keyword}{new} IConnectionStream;
+00113     stream->direction = direction;
+00114     stream->elemSize = SoapySDR::formatToSize(format);
+00115     stream->hasCmd = \textcolor{keyword}{false};
+00116     stream->skipCal = args.count(\textcolor{stringliteral}{"skipCal"}) != 0 and args.at(\textcolor{stringliteral}{"skipCal"}) == \textcolor{stringliteral}{"true"};
+00117 
+00118     StreamConfig config;
+00119     config.isTx = (direction == SOAPY\_SDR\_TX);
+00120     config.performanceLatency = 0.5;
+00121     config.bufferLength = 0; \textcolor{comment}{//auto}
+00122 
+00123     \textcolor{comment}{//default to channel 0, if none were specified}
+00124     \textcolor{keyword}{const} std::vector<size\_t> &channelIDs = channels.empty() ? std::vector<size\_t>\{0\} : channels;
+00125     \textcolor{keywordflow}{for}(\textcolor{keywordtype}{size\_t} i=0; i<channelIDs.size(); ++i)
+00126     \{
+00127         config.channelID = channelIDs[i];
+00128         \textcolor{keywordflow}{if} (format == SOAPY\_SDR\_CF32) config.format = StreamConfig::FMT_FLOAT32;
+00129         \textcolor{keywordflow}{else} \textcolor{keywordflow}{if} (format == SOAPY\_SDR\_CS16) config.format = 
+      StreamConfig::FMT_INT16;
+00130         \textcolor{keywordflow}{else} \textcolor{keywordflow}{if} (format == SOAPY\_SDR\_CS12) config.format = 
+      StreamConfig::FMT_INT12;
+00131         \textcolor{keywordflow}{else} \textcolor{keywordflow}{throw} std::runtime\_error(\textcolor{stringliteral}{"SoapyLMS7::setupStream(format="}+format+\textcolor{stringliteral}{") unsupported format"});
+00132 
+00133         \textcolor{comment}{//optional buffer length if specified (from device args)}
+00134         \textcolor{keyword}{const} \textcolor{keyword}{auto} devArgsBufferLength = \_deviceArgs.find(config.isTx?\textcolor{stringliteral}{"txBufferLength"}:\textcolor{stringliteral}{"rxBufferLength"});
+00135         \textcolor{keywordflow}{if} (devArgsBufferLength != \_deviceArgs.end())
+00136         \{
+00137             config.bufferLength = std::stoul(devArgsBufferLength->second);
+00138         \}
+00139 
+00140         \textcolor{comment}{//optional buffer length if specified (takes precedent)}
+00141         \textcolor{keywordflow}{if} (args.count(\textcolor{stringliteral}{"bufferLength"}) != 0)
+00142         \{
+00143             config.bufferLength = std::stoul(args.at(\textcolor{stringliteral}{"bufferLength"}));
+00144         \}
+00145 
+00146         \textcolor{comment}{//optional packets latency, 1-maximum throughput, 0-lowest latency}
+00147         \textcolor{keywordflow}{if} (args.count(\textcolor{stringliteral}{"latency"}) != 0)
+00148         \{
+00149             config.performanceLatency = std::stof(args.at(\textcolor{stringliteral}{"latency"}));
+00150             \textcolor{keywordflow}{if}(config.performanceLatency<0)
+00151                 config.performanceLatency = 0;
+00152             \textcolor{keywordflow}{else} \textcolor{keywordflow}{if}(config.performanceLatency > 1)
+00153                 config.performanceLatency = 1;
+00154         \}
+00155 
+00156         \textcolor{comment}{//create the stream}
+00157         StreamChannel* streamID = lms7Device->SetupStream(config);
+00158         \textcolor{keywordflow}{if} (streamID == 0)
+00159             \textcolor{keywordflow}{throw} std::runtime\_error(\textcolor{stringliteral}{"SoapyLMS7::setupStream() failed: "} + std::string(
+      GetLastErrorMessage()));
+00160         stream->streamID.push\_back(streamID);
+00161         stream->elemMTU = streamID->GetStreamSize();
+00162     \}
+00163 
+00164     \textcolor{comment}{//calibrate these channels when activated}
+00165     \textcolor{keywordflow}{for} (\textcolor{keyword}{const} \textcolor{keyword}{auto} &ch : channelIDs)
+00166     \{
+00167         \_channelsToCal.emplace(direction, ch);
+00168     \}
+00169     \textcolor{keywordflow}{return} (SoapySDR::Stream *)stream;
+00170 \}
+00171 
+00172 \textcolor{keywordtype}{void} SoapyLMS7::closeStream(SoapySDR::Stream *stream)
+00173 \{
+00174     std::unique\_lock<std::recursive\_mutex> lock(\_accessMutex);
+00175     \textcolor{keyword}{auto} icstream = (IConnectionStream *)stream;
+00176     \textcolor{keyword}{const} \textcolor{keyword}{auto} &streamID = icstream->streamID;
+00177 
+00178     \textcolor{comment}{//disable stream if left enabled}
+00179     \textcolor{keywordflow}{for}(\textcolor{keyword}{auto} i : streamID)
+00180         i->Stop();
+00181 
+00182     \textcolor{keywordflow}{for}(\textcolor{keyword}{auto} i : streamID)
+00183         lms7Device->DestroyStream(i);
+00184 \}
+00185 
+00186 \textcolor{keywordtype}{size\_t} SoapyLMS7::getStreamMTU(SoapySDR::Stream *stream)\textcolor{keyword}{ const}
+00187 \textcolor{keyword}{}\{
+00188     \textcolor{keyword}{auto} icstream = (IConnectionStream *)stream;
+00189     \textcolor{keywordflow}{return} icstream->elemMTU;
+00190 \}
+00191 
+00192 \textcolor{keywordtype}{int} SoapyLMS7::activateStream(
+00193     SoapySDR::Stream *stream,
+00194     \textcolor{keyword}{const} \textcolor{keywordtype}{int} flags,
+00195     \textcolor{keyword}{const} \textcolor{keywordtype}{long} \textcolor{keywordtype}{long} timeNs,
+00196     \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} numElems)
+00197 \{
+00198     std::unique\_lock<std::recursive\_mutex> lock(\_accessMutex);
+00199     \textcolor{keyword}{auto} icstream = (IConnectionStream *)stream;
+00200     \textcolor{keyword}{const} \textcolor{keyword}{auto} &streamID = icstream->streamID;
+00201     \textcolor{keywordflow}{if} (sampleRate == 0.0)
+00202         \textcolor{keywordflow}{throw} std::runtime\_error(\textcolor{stringliteral}{"SoapyLMS7::activateStream() - the sample rate has not been configured!"});
+00203     \textcolor{comment}{//perform self calibration with current bandwidth settings}
+00204     \textcolor{comment}{//this is for the set-it-and-forget-it style of use case}
+00205     \textcolor{comment}{//where boards are configured, the stream is setup,}
+00206     \textcolor{comment}{//and the configuration is maintained throughout the run}
+00207     \textcolor{keywordflow}{while} (not \_channelsToCal.empty() and not icstream->skipCal)
+00208     \{
+00209         \textcolor{keyword}{auto} dir  = \_channelsToCal.begin()->first;
+00210         \textcolor{keyword}{auto} ch  = \_channelsToCal.begin()->second;
+00211         lms7Device->Calibrate(dir== SOAPY\_SDR\_TX,ch,\_actualBw.at(dir).at(ch),0);
+00212         \_channelsToCal.erase(\_channelsToCal.begin());
+00213     \}
+00214     \textcolor{comment}{//stream requests used with rx}
+00215     icstream->flags = flags;
+00216     icstream->timeNs = timeNs;
+00217     icstream->numElems = numElems;
+00218     icstream->hasCmd = \textcolor{keyword}{true};
+00219 
+00220     \textcolor{keywordflow}{for}(\textcolor{keyword}{auto} i : streamID)
+00221     \{
+00222         \textcolor{keywordtype}{int} status = i->Start();
+00223         \textcolor{keywordflow}{if}(status != 0) \textcolor{keywordflow}{return} SOAPY\_SDR\_STREAM\_ERROR;
+00224     \}
+00225     \textcolor{keywordflow}{return} 0;
+00226 \}
+00227 
+00228 \textcolor{keywordtype}{int} SoapyLMS7::deactivateStream(
+00229     SoapySDR::Stream *stream,
+00230     \textcolor{keyword}{const} \textcolor{keywordtype}{int} flags,
+00231     \textcolor{keyword}{const} \textcolor{keywordtype}{long} \textcolor{keywordtype}{long} timeNs)
+00232 \{
+00233     std::unique\_lock<std::recursive\_mutex> lock(\_accessMutex);
+00234     \textcolor{keyword}{auto} icstream = (IConnectionStream *)stream;
+00235     \textcolor{keyword}{const} \textcolor{keyword}{auto} &streamID = icstream->streamID;
+00236     icstream->hasCmd = \textcolor{keyword}{false};
+00237 
+00238     \textcolor{keywordflow}{for}(\textcolor{keyword}{auto} i : streamID)
+00239     \{
+00240         \textcolor{keywordtype}{int} status = i->Stop();
+00241         \textcolor{keywordflow}{if}(status != 0) \textcolor{keywordflow}{return} SOAPY\_SDR\_STREAM\_ERROR;
+00242     \}
+00243 
+00244     \textcolor{keywordflow}{return} 0;
+00245 \}
+00246 
+00247 \textcolor{comment}{/*******************************************************************}
+00248 \textcolor{comment}{ * Stream alignment helper for multiple channels}
+00249 \textcolor{comment}{ ******************************************************************/}
+00250 \textcolor{keyword}{static} \textcolor{keyword}{inline} \textcolor{keywordtype}{void} fastForward(
+00251     \textcolor{keywordtype}{char} *buff, \textcolor{keywordtype}{size\_t} &numWritten, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} elemSize,
+00252     \textcolor{keyword}{const} uint64\_t oldHeadTime, \textcolor{keyword}{const} uint64\_t desiredHeadTime)
+00253 \{
+00254     \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} numPop = std::min<size\_t>(desiredHeadTime - oldHeadTime, numWritten);
+00255     \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} numMove = (numWritten-numPop);
+00256     numWritten -= numPop;
+00257     std::memmove(buff, buff+(numPop*elemSize), numMove*elemSize);
+00258 \}
+00259 
+00260 \textcolor{keywordtype}{int} SoapyLMS7::_readStreamAligned(
+00261     IConnectionStream *stream,
+00262     \textcolor{keywordtype}{char} * \textcolor{keyword}{const} *buffs,
+00263     \textcolor{keywordtype}{size\_t} numElems,
+00264     uint64\_t requestTime,
+00265     StreamChannel::Metadata &md,
+00266     \textcolor{keyword}{const} \textcolor{keywordtype}{long} timeoutMs)
+00267 \{
+00268     \textcolor{keyword}{const} \textcolor{keyword}{auto} &streamID = stream->streamID;
+00269     \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} elemSize = stream->elemSize;
+00270     std::vector<size\_t> numWritten(streamID.size(), 0);
+00271 
+00272     \textcolor{keywordflow}{for} (\textcolor{keywordtype}{size\_t} i = 0; i < streamID.size(); i += (numWritten[i]==numElems)?1:0)
+00273     \{
+00274         \textcolor{keywordtype}{size\_t} &N = numWritten[i];
+00275         \textcolor{keyword}{const} uint64\_t expectedTime(requestTime + N);
+00276 
+00277         \textcolor{keywordtype}{int} status = streamID[i]->Read(buffs[i]+(elemSize*N), numElems-N,&md, timeoutMs);
+00278         \textcolor{keywordflow}{if} (status == 0) \textcolor{keywordflow}{return} SOAPY\_SDR\_TIMEOUT;
+00279         \textcolor{keywordflow}{if} (status < 0) \textcolor{keywordflow}{return} SOAPY\_SDR\_STREAM\_ERROR;
+00280 
+00281         \textcolor{comment}{//update accounting}
+00282         \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} elemsRead = size\_t(status);
+00283         \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} prevN = N;
+00284         N += elemsRead; \textcolor{comment}{//num written total}
+00285 
+00286         \textcolor{comment}{//unspecified request time, set the new head condition}
+00287         \textcolor{keywordflow}{if} (requestTime == 0) \textcolor{keywordflow}{goto} updateHead;
+00288 
+00289         \textcolor{comment}{//good contiguous read, read again for remainder}
+00290         \textcolor{keywordflow}{if} (expectedTime == md.timestamp) \textcolor{keywordflow}{continue};
+00291 
+00292         \textcolor{comment}{//request time is later, fast forward buffer}
+00293         \textcolor{keywordflow}{if} (md.timestamp < expectedTime)
+00294         \{
+00295             \textcolor{keywordflow}{if} (prevN != 0)
+00296             \{
+00297                 SoapySDR::log(SOAPY\_SDR\_ERROR, \textcolor{stringliteral}{"readStream() experienced non-monotonic timestamp"});
+00298                 \textcolor{keywordflow}{return} SOAPY\_SDR\_CORRUPTION;
+00299             \}
+00300             fastForward(buffs[i], N, elemSize, md.timestamp, requestTime);
+00301             \textcolor{keywordflow}{if} (i == 0 and N != 0) numElems = N; \textcolor{comment}{//match size on other channels}
+00302             \textcolor{keywordflow}{continue}; \textcolor{comment}{//read again into the remaining buffer}
+00303         \}
+00304 
+00305         \textcolor{comment}{//overflow in the middle of a contiguous buffer}
+00306         \textcolor{comment}{//fast-forward all prior channels and restart loop}
+00307         \textcolor{keywordflow}{if} (md.timestamp > expectedTime)
+00308         \{
+00309             \textcolor{keywordflow}{for} (\textcolor{keywordtype}{size\_t} j = 0; j < i; j++)
+00310             \{
+00311                 fastForward(buffs[j], numWritten[j], elemSize, requestTime, md.
+      timestamp);
+00312             \}
+00313             fastForward(buffs[i], N, elemSize, md.timestamp-prevN, md.timestamp);
+00314             i = 0; \textcolor{comment}{//start over at ch0}
+00315         \}
+00316 
+00317         updateHead:
+00318         requestTime = md.timestamp;
+00319         numElems = elemsRead;
+00320     \}
+00321 
+00322     md.timestamp = requestTime;
+00323     \textcolor{keywordflow}{return} int(numElems);
+00324 \}
+00325 
+00326 \textcolor{comment}{/*******************************************************************}
+00327 \textcolor{comment}{ * Stream API}
+00328 \textcolor{comment}{ ******************************************************************/}
+00329 \textcolor{keywordtype}{int} SoapyLMS7::readStream(
+00330     SoapySDR::Stream *stream,
+00331     \textcolor{keywordtype}{void} * \textcolor{keyword}{const} *buffs,
+00332     \textcolor{keywordtype}{size\_t} numElems,
+00333     \textcolor{keywordtype}{int} &flags,
+00334     \textcolor{keywordtype}{long} \textcolor{keywordtype}{long} &timeNs,
+00335     \textcolor{keyword}{const} \textcolor{keywordtype}{long} timeoutUs)
+00336 \{
+00337     \textcolor{keyword}{auto} icstream = (IConnectionStream *)stream;
+00338 
+00339     \textcolor{keyword}{const} \textcolor{keyword}{auto} exitTime = std::chrono::high\_resolution\_clock::now() + std::chrono::microseconds(timeoutUs);
+00340 
+00341     \textcolor{comment}{//wait for a command from activate stream up to the timeout specified}
+00342     \textcolor{keywordflow}{if} (not icstream->hasCmd)
+00343     \{
+00344         \textcolor{keywordflow}{while} (std::chrono::high\_resolution\_clock::now() < exitTime)
+00345         \{
+00346             std::this\_thread::sleep\_for(std::chrono::milliseconds(10));
+00347         \}
+00348         \textcolor{keywordflow}{return} SOAPY\_SDR\_TIMEOUT;
+00349     \}
+00350 
+00351     \textcolor{comment}{//handle the one packet flag by clipping}
+00352     \textcolor{keywordflow}{if} ((flags & SOAPY\_SDR\_ONE\_PACKET) != 0)
+00353     \{
+00354         numElems = std::min(numElems, icstream->elemMTU);
+00355     \}
+00356 
+00357     StreamChannel::Metadata metadata;
+00358     \textcolor{keyword}{const} uint64\_t cmdTicks = ((icstream->flags & SOAPY\_SDR\_HAS\_TIME) != 0)?SoapySDR::timeNsToTicks(
+      icstream->timeNs, sampleRate):0;
+00359     \textcolor{keywordtype}{int} status = \_readStreamAligned(icstream, (\textcolor{keywordtype}{char} * \textcolor{keyword}{const} *)buffs, numElems, cmdTicks, metadata, 
+      timeoutUs/1000);
+00360     \textcolor{keywordflow}{if} (status < 0) \textcolor{keywordflow}{return} status;
+00361 
+00362     \textcolor{comment}{//the command had a time, so we need to compare it to received time}
+00363     \textcolor{keywordflow}{if} ((icstream->flags & SOAPY\_SDR\_HAS\_TIME) != 0 and (metadata.flags & 
+      RingFIFO::SYNC_TIMESTAMP) != 0)
+00364     \{
+00365         \textcolor{comment}{//our request time is now late, clear command and return error code}
+00366         \textcolor{keywordflow}{if} (cmdTicks < metadata.timestamp)
+00367         \{
+00368             icstream->hasCmd = \textcolor{keyword}{false};
+00369             \textcolor{keywordflow}{return} SOAPY\_SDR\_TIME\_ERROR;
+00370         \}
+00371 
+00372         \textcolor{comment}{//\_readStreamAligned should guarantee this condition}
+00373         \textcolor{keywordflow}{if} (cmdTicks != metadata.timestamp)
+00374         \{
+00375             SoapySDR::logf(SOAPY\_SDR\_ERROR,
+00376                 \textcolor{stringliteral}{"readStream() alignment algorithm failed\(\backslash\)n"}
+00377                 \textcolor{stringliteral}{"Request time = %lld, actual time = %lld"},
+00378                 (\textcolor{keywordtype}{long} \textcolor{keywordtype}{long})cmdTicks, (\textcolor{keywordtype}{long} \textcolor{keywordtype}{long})metadata.timestamp);
+00379             \textcolor{keywordflow}{return} SOAPY\_SDR\_STREAM\_ERROR;
+00380         \}
+00381 
+00382         icstream->flags &= ~SOAPY\_SDR\_HAS\_TIME; \textcolor{comment}{//clear for next read}
+00383     \}
+00384 
+00385     \textcolor{comment}{//handle finite burst request commands}
+00386     \textcolor{keywordflow}{if} (icstream->numElems != 0)
+00387     \{
+00388         \textcolor{comment}{//Clip to within the request size when over,}
+00389         \textcolor{comment}{//and reduce the number of elements requested.}
+00390         status = std::min<size\_t>(status, icstream->numElems);
+00391         icstream->numElems -= status;
+00392 
+00393         \textcolor{comment}{//the burst completed, done with the command}
+00394         \textcolor{keywordflow}{if} (icstream->numElems == 0)
+00395         \{
+00396             icstream->hasCmd = \textcolor{keyword}{false};
+00397             metadata.flags |= RingFIFO::END_BURST;
+00398         \}
+00399     \}
+00400 
+00401     \textcolor{comment}{//output metadata}
+00402     flags = 0;
+00403     \textcolor{keywordflow}{if} ((metadata.flags & RingFIFO::END_BURST) != 0) flags |= SOAPY\_SDR\_END\_BURST;
+00404     \textcolor{keywordflow}{if} ((metadata.flags & RingFIFO::SYNC_TIMESTAMP) != 0) flags |= SOAPY\_SDR\_HAS\_TIME;
+00405     timeNs = SoapySDR::ticksToTimeNs(metadata.timestamp, sampleRate);
+00406 
+00407     \textcolor{comment}{//return num read or error code}
+00408     \textcolor{keywordflow}{return} (status >= 0) ? status : SOAPY\_SDR\_STREAM\_ERROR;
+00409 \}
+00410 
+00411 \textcolor{keywordtype}{int} SoapyLMS7::writeStream(
+00412     SoapySDR::Stream *stream,
+00413     \textcolor{keyword}{const} \textcolor{keywordtype}{void} * \textcolor{keyword}{const} *buffs,
+00414     \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} numElems,
+00415     \textcolor{keywordtype}{int} &flags,
+00416     \textcolor{keyword}{const} \textcolor{keywordtype}{long} \textcolor{keywordtype}{long} timeNs,
+00417     \textcolor{keyword}{const} \textcolor{keywordtype}{long} timeoutUs)
+00418 \{
+00419     \textcolor{keyword}{auto} icstream = (IConnectionStream *)stream;
+00420     \textcolor{keyword}{const} \textcolor{keyword}{auto} &streamID = icstream->streamID;
+00421 
+00422     \textcolor{comment}{//input metadata}
+00423     StreamChannel::Metadata metadata;
+00424     metadata.timestamp = SoapySDR::timeNsToTicks(timeNs, sampleRate);
+00425     metadata.flags = (flags & SOAPY\_SDR\_HAS\_TIME) ? 
+      lime::RingFIFO::SYNC_TIMESTAMP : 0;
+00426     metadata.flags |= (flags & SOAPY\_SDR\_END\_BURST) ? lime::RingFIFO::END_BURST : 0;
+00427 
+00428     \textcolor{comment}{//write the 0th channel: get number of samples written}
+00429     \textcolor{keywordtype}{int} status = streamID[0]->Write(buffs[0], numElems, &metadata, timeoutUs/1000);
+00430     \textcolor{keywordflow}{if} (status == 0) \textcolor{keywordflow}{return} SOAPY\_SDR\_TIMEOUT;
+00431     \textcolor{keywordflow}{if} (status < 0) \textcolor{keywordflow}{return} SOAPY\_SDR\_STREAM\_ERROR;
+00432 
+00433     \textcolor{comment}{//write subsequent channels with the same size and large timeout}
+00434     \textcolor{comment}{//we should always be able to do a matching buffer write quickly}
+00435     \textcolor{comment}{//or there is an unknown internal issue with the stream fifo}
+00436     \textcolor{keywordflow}{for} (\textcolor{keywordtype}{size\_t} i = 1; i < streamID.size(); i++)
+00437     \{
+00438         \textcolor{keywordtype}{int} status\_i = streamID[i]->Write(buffs[i], status, &metadata, 1000\textcolor{comment}{/*1s*/});
+00439         \textcolor{keywordflow}{if} (status\_i != status)
+00440         \{
+00441             SoapySDR::logf(SOAPY\_SDR\_ERROR, \textcolor{stringliteral}{"Multi-channel stream alignment failed!"});
+00442             \textcolor{keywordflow}{return} SOAPY\_SDR\_CORRUPTION;
+00443         \}
+00444     \}
+00445 
+00446     \textcolor{comment}{//return num written}
+00447     \textcolor{keywordflow}{return} status;
+00448 \}
+00449 
+00450 \textcolor{keywordtype}{int} SoapyLMS7::readStreamStatus(
+00451     SoapySDR::Stream *stream,
+00452     \textcolor{keywordtype}{size\_t} &chanMask,
+00453     \textcolor{keywordtype}{int} &flags,
+00454     \textcolor{keywordtype}{long} \textcolor{keywordtype}{long} &timeNs,
+00455     \textcolor{keyword}{const} \textcolor{keywordtype}{long} timeoutUs)
+00456 \{
+00457     \textcolor{keyword}{auto} icstream = (IConnectionStream *)stream;
+00458     \textcolor{keyword}{const} \textcolor{keyword}{auto} &streamID = icstream->streamID;
+00459 
+00460     \textcolor{keywordtype}{int} ret = 0;
+00461     flags = 0;
+00462     lime::StreamChannel::Info metadata;
+00463     \textcolor{keyword}{auto} start = std::chrono::high\_resolution\_clock::now();
+00464     \textcolor{keywordflow}{while} (1)
+00465     \{
+00466         \textcolor{keywordflow}{for}(\textcolor{keyword}{auto} i : streamID)
+00467         \{
+00468             metadata = i->GetInfo();
+00469 
+00470             \textcolor{keywordflow}{if} (metadata.droppedPackets) ret = SOAPY\_SDR\_TIME\_ERROR;
+00471             \textcolor{keywordflow}{else} \textcolor{keywordflow}{if} (metadata.overrun) ret = SOAPY\_SDR\_OVERFLOW;
+00472             \textcolor{keywordflow}{else} \textcolor{keywordflow}{if} (metadata.underrun) ret = SOAPY\_SDR\_UNDERFLOW;
+00473         \}
+00474         \textcolor{keywordflow}{if} (ret) \textcolor{keywordflow}{break};
+00475         \textcolor{comment}{//check timeout}
+00476         std::chrono::duration<double> seconds = std::chrono::high\_resolution\_clock::now()-start;
+00477         \textcolor{keywordflow}{if} (seconds.count()> (double)timeoutUs/1e6)
+00478             \textcolor{keywordflow}{return} SOAPY\_SDR\_TIMEOUT;
+00479         \textcolor{comment}{//sleep to avoid high CPU load}
+00480         \textcolor{keywordflow}{if} (timeoutUs >= 2000)
+00481             std::this\_thread::sleep\_for(std::chrono::milliseconds(1));
+00482         \textcolor{keywordflow}{else}
+00483             std::this\_thread::sleep\_for(std::chrono::microseconds(1+timeoutUs/2));
+00484     \}
+00485 
+00486     timeNs = SoapySDR::ticksToTimeNs(metadata.timestamp, sampleRate);
+00487     \textcolor{comment}{//output metadata}
+00488     flags |= SOAPY\_SDR\_HAS\_TIME;
+00489     \textcolor{keywordflow}{return} ret;
+00490 \}
+\end{DoxyCode}

@@ -1,0 +1,72 @@
+\subsection{lms7002\+\_\+pnl\+B\+I\+S\+T\+\_\+view.\+cpp}
+\label{lms7002__pnlBIST__view_8cpp_source}\index{/home/erik/prefix/default/src/limesuite-\/dev/src/lms7002\+\_\+wxgui/lms7002\+\_\+pnl\+B\+I\+S\+T\+\_\+view.\+cpp@{/home/erik/prefix/default/src/limesuite-\/dev/src/lms7002\+\_\+wxgui/lms7002\+\_\+pnl\+B\+I\+S\+T\+\_\+view.\+cpp}}
+
+\begin{DoxyCode}
+00001 \textcolor{preprocessor}{#include "lms7002_pnlBIST_view.h"}
+00002 \textcolor{preprocessor}{#include <map>}
+00003 \textcolor{preprocessor}{#include "lms7002_gui_utilities.h"}
+00004 \textcolor{keyword}{using namespace }lime;
+00005 
+00006 lms7002_pnlBIST_view::lms7002_pnlBIST_view( wxWindow* parent )
+00007 :
+00008 pnlBIST_view( parent )
+00009 \{
+00010 
+00011 \}
+00012 
+00013 lms7002_pnlBIST_view::lms7002_pnlBIST_view( wxWindow* parent, wxWindowID \textcolor{keywordtype}{id}, \textcolor{keyword}{const} wxPoint& pos, \textcolor{keyword}{const} 
+      wxSize& size, \textcolor{keywordtype}{long} style )
+00014     : pnlBIST_view(parent, id, pos, size, style), lmsControl(nullptr)
+00015 \{
+00016     wndId2Enum[chkBENC] = LMS7param(BENC);
+00017     wndId2Enum[chkBENR] = LMS7param(BENR);
+00018     wndId2Enum[chkBENT] = LMS7param(BENT);
+00019     wndId2Enum[chkBSTART] = LMS7param(BSTART);
+00020     wndId2Enum[chkSDM_TSTO_CGEN] = LMS7param(EN_SDM_TSTO_CGEN);
+00021     wndId2Enum[chkSDM_TSTO_SXR] = LMS7param(EN_SDM_TSTO_SXR);
+00022     wndId2Enum[chkSDM_TSTO_SXT] = LMS7param(EN_SDM_TSTO_SXT);
+00023     LMS7002_WXGUI::UpdateTooltips(wndId2Enum, \textcolor{keyword}{true});
+00024 \}
+00025 
+00026 \textcolor{keywordtype}{void} lms7002_pnlBIST_view::Initialize(lms_device_t* pControl)
+00027 \{
+00028     lmsControl = pControl;
+00029     assert(lmsControl != \textcolor{keyword}{nullptr});
+00030 \}
+00031 
+00032 \textcolor{keywordtype}{void} lms7002_pnlBIST_view::ParameterChangeHandler(wxCommandEvent& event)
+00033 \{
+00034     assert(lmsControl != \textcolor{keyword}{nullptr});
+00035     LMS7Parameter parameter;
+00036     \textcolor{keywordflow}{try}
+00037     \{
+00038         parameter = wndId2Enum.at(reinterpret\_cast<wxWindow*>(event.GetEventObject()));
+00039     \}
+00040     \textcolor{keywordflow}{catch} (std::exception & e)
+00041     \{
+00042         std::cout << \textcolor{stringliteral}{"Control element(ID = "} << \textcolor{keyword}{event}.GetId() << \textcolor{stringliteral}{") don't have assigned LMS parameter."} << 
+      std::endl;
+00043         \textcolor{keywordflow}{return};
+00044     \}
+00045     LMS_WriteParam(lmsControl,parameter,event.GetInt());
+00046 \}
+00047 
+00048 \textcolor{keywordtype}{void} lms7002_pnlBIST_view::onbtnReadSignature( wxCommandEvent& event )
+00049 \{
+00050 
+00051     uint16\_t value;
+00052     LMS_ReadParam(lmsControl,LMS7param(BSIGC),&value);
+00053     lblBSIGC->SetLabel(wxString::Format(\_(\textcolor{stringliteral}{"0x%0.6X"}), value));
+00054     LMS_ReadParam(lmsControl,LMS7param(BSIGR),&value);
+00055     lblBSIGR->SetLabel(wxString::Format(\_(\textcolor{stringliteral}{"0x%0.6X"}), value));
+00056     LMS_ReadParam(lmsControl,LMS7param(BSIGT),&value);
+00057     lblBSIGT->SetLabel(wxString::Format(\_(\textcolor{stringliteral}{"0x%0.6X"}), value));
+00058     LMS_ReadParam(lmsControl,LMS7param(BSTATE),&value);
+00059     lblBSTATE->SetLabel(wxString::Format(\_(\textcolor{stringliteral}{"0x%X"}), value));
+00060 \}
+00061 
+00062 \textcolor{keywordtype}{void} lms7002_pnlBIST_view::UpdateGUI()
+00063 \{
+00064     LMS7002_WXGUI::UpdateControlsByMap(\textcolor{keyword}{this}, lmsControl, wndId2Enum);
+00065 \}
+\end{DoxyCode}

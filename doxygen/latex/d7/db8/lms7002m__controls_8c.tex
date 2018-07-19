@@ -1,0 +1,812 @@
+\subsection{/home/erik/prefix/default/src/limesuite-\/dev/mcu\+\_\+program/common\+\_\+src/lms7002m\+\_\+controls.c File Reference}
+\label{lms7002m__controls_8c}\index{/home/erik/prefix/default/src/limesuite-\/dev/mcu\+\_\+program/common\+\_\+src/lms7002m\+\_\+controls.\+c@{/home/erik/prefix/default/src/limesuite-\/dev/mcu\+\_\+program/common\+\_\+src/lms7002m\+\_\+controls.\+c}}
+{\ttfamily \#include \char`\"{}lms7002m\+\_\+controls.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}spi.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}L\+M\+S7002\+M\+\_\+parameters\+\_\+compact.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}math.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}typedefs.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}mcu\+\_\+defines.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}lms7002\+\_\+regx51.\+h\char`\"{}}\\*
+Include dependency graph for lms7002m\+\_\+controls.\+c\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{dc/d87/lms7002m__controls_8c__incl}
+\end{center}
+\end{figure}
+\subsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define {\bf V\+E\+R\+B\+O\+SE}~0
+\end{DoxyCompactItemize}
+\subsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+uint16\+\_\+t {\bf pow2} (const uint8\+\_\+t power)
+\item 
+{\bf void} {\bf Save\+Chip\+State} (bool wr)
+\item 
+{\bf void} {\bf Set\+Defaults\+SX} ()
+\item 
+{\bf void} {\bf Clock\+Logic\+Resets} ()
+\item 
+{\bf float\+\_\+type} {\bf Get\+Frequency\+C\+G\+EN} ()
+\item 
+uint8\+\_\+t {\bf Set\+Frequency\+C\+G\+EN} ({\bf float\+\_\+type} {\bf freq})
+\item 
+{\bf float\+\_\+type} {\bf Get\+Reference\+Clk\+\_\+\+T\+S\+P\+\_\+\+M\+Hz} (bool {\bf tx})
+\item 
+{\bf void} {\bf Set\+N\+C\+O\+Frequency} (const bool {\bf tx}, const float {\bf freq}, uint8\+\_\+t {\bf index})
+\item 
+{\bf float\+\_\+type} {\bf Get\+Frequency\+SX} (const bool Tx)
+\item 
+uint8\+\_\+t {\bf Set\+Frequency\+SX} (const bool {\bf tx}, const {\bf float\+\_\+type} freq\+\_\+\+Hz)
+\item 
+static uint8\+\_\+t {\bf Read\+C\+MP} (const bool SX)
+\begin{DoxyCompactList}\small\item\em Performs V\+CO tuning operations for C\+L\+K\+G\+EN, S\+XR, S\+XT modules. \end{DoxyCompactList}\item 
+uint8\+\_\+t {\bf Tune\+V\+CO} (bool SX)
+\item 
+{\bf void} {\bf Write\+Masked\+Regs} (const {\bf Register\+Batch} $\ast$regs)
+\item 
+uint8\+\_\+t {\bf Get\+Value\+Of\+\_\+c\+\_\+ctl\+\_\+pga\+\_\+rbb} (uint8\+\_\+t g\+\_\+pga\+\_\+rbb)
+\item 
+{\bf void} {\bf Enable\+Channel\+Power\+Controls} ()
+\item 
+{\bf void} {\bf Enable\+M\+I\+M\+O\+Buffers\+If\+Necessary} ()
+\end{DoxyCompactItemize}
+\subsubsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+uint16\+\_\+t {\bf g\+Comparator\+Delay\+Counter} = 0x\+F\+F00
+\item 
+{\bf float\+\_\+type} {\bf Ref\+Clk} = 30.\+72e6
+\item 
+uint16\+\_\+t {\bf x0020state}
+\item 
+const uint16\+\_\+t {\bf chip\+State\+Addr} [$\,$]
+\item 
+uint16\+\_\+t {\bf chip\+State\+Data} [500]
+\end{DoxyCompactItemize}
+
+
+\subsubsection{Macro Definition Documentation}
+\index{lms7002m\+\_\+controls.\+c@{lms7002m\+\_\+controls.\+c}!V\+E\+R\+B\+O\+SE@{V\+E\+R\+B\+O\+SE}}
+\index{V\+E\+R\+B\+O\+SE@{V\+E\+R\+B\+O\+SE}!lms7002m\+\_\+controls.\+c@{lms7002m\+\_\+controls.\+c}}
+\paragraph[{V\+E\+R\+B\+O\+SE}]{\setlength{\rightskip}{0pt plus 5cm}\#define V\+E\+R\+B\+O\+SE~0}\label{lms7002m__controls_8c_a42f8c497a1968074f38bf5055c650dca}
+
+
+Definition at line {\bf 19} of file {\bf lms7002m\+\_\+controls.\+c}.
+
+
+
+\subsubsection{Function Documentation}
+\index{lms7002m\+\_\+controls.\+c@{lms7002m\+\_\+controls.\+c}!Clock\+Logic\+Resets@{Clock\+Logic\+Resets}}
+\index{Clock\+Logic\+Resets@{Clock\+Logic\+Resets}!lms7002m\+\_\+controls.\+c@{lms7002m\+\_\+controls.\+c}}
+\paragraph[{Clock\+Logic\+Resets()}]{\setlength{\rightskip}{0pt plus 5cm}{\bf void} Clock\+Logic\+Resets (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}\label{lms7002m__controls_8c_a3a17e67ffb4d785d7f964c3e4653a670}
+
+
+Definition at line {\bf 139} of file {\bf lms7002m\+\_\+controls.\+c}.
+
+
+
+References {\bf S\+P\+I\+\_\+read()}, and {\bf S\+P\+I\+\_\+write()}.
+
+
+
+Referenced by {\bf Run\+A\+G\+C()}, and {\bf Save\+Chip\+State()}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=272pt]{d7/db8/lms7002m__controls_8c_a3a17e67ffb4d785d7f964c3e4653a670_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{d7/db8/lms7002m__controls_8c_a3a17e67ffb4d785d7f964c3e4653a670_icgraph}
+\end{center}
+\end{figure}
+
+
+\index{lms7002m\+\_\+controls.\+c@{lms7002m\+\_\+controls.\+c}!Enable\+Channel\+Power\+Controls@{Enable\+Channel\+Power\+Controls}}
+\index{Enable\+Channel\+Power\+Controls@{Enable\+Channel\+Power\+Controls}!lms7002m\+\_\+controls.\+c@{lms7002m\+\_\+controls.\+c}}
+\paragraph[{Enable\+Channel\+Power\+Controls()}]{\setlength{\rightskip}{0pt plus 5cm}{\bf void} Enable\+Channel\+Power\+Controls (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}\label{lms7002m__controls_8c_a31e8e152e3dd8db0b33ab0afe9fe0dfe}
+
+
+Definition at line {\bf 425} of file {\bf lms7002m\+\_\+controls.\+c}.
+
+
+
+References {\bf S\+P\+I\+\_\+read()}, and {\bf S\+P\+I\+\_\+write()}.
+
+
+
+Referenced by {\bf Calibrate\+Rx\+Setup()}, {\bf Calibrate\+Tx\+Setup()}, {\bf Tune\+Rx\+Filter\+Setup()}, and {\bf Tune\+Tx\+Filter\+Setup()}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=322pt]{d7/db8/lms7002m__controls_8c_a31e8e152e3dd8db0b33ab0afe9fe0dfe_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{d7/db8/lms7002m__controls_8c_a31e8e152e3dd8db0b33ab0afe9fe0dfe_icgraph}
+\end{center}
+\end{figure}
+
+
+\index{lms7002m\+\_\+controls.\+c@{lms7002m\+\_\+controls.\+c}!Enable\+M\+I\+M\+O\+Buffers\+If\+Necessary@{Enable\+M\+I\+M\+O\+Buffers\+If\+Necessary}}
+\index{Enable\+M\+I\+M\+O\+Buffers\+If\+Necessary@{Enable\+M\+I\+M\+O\+Buffers\+If\+Necessary}!lms7002m\+\_\+controls.\+c@{lms7002m\+\_\+controls.\+c}}
+\paragraph[{Enable\+M\+I\+M\+O\+Buffers\+If\+Necessary()}]{\setlength{\rightskip}{0pt plus 5cm}{\bf void} Enable\+M\+I\+M\+O\+Buffers\+If\+Necessary (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}\label{lms7002m__controls_8c_a750d732f1af936250aef94df6f56bf9b}
+
+
+Definition at line {\bf 443} of file {\bf lms7002m\+\_\+controls.\+c}.
+
+
+
+References {\bf E\+N\+\_\+\+N\+E\+X\+T\+R\+X\+\_\+\+R\+FE}, {\bf E\+N\+\_\+\+N\+E\+X\+T\+T\+X\+\_\+\+T\+RF}, {\bf M\+AC}, {\bf Modify\+\_\+\+S\+P\+I\+\_\+\+Reg\+\_\+bits()}, {\bf S\+P\+I\+\_\+read()}, and {\bf S\+P\+I\+\_\+write()}.
+
+
+
+Referenced by {\bf Calibrate\+Rx\+Setup()}, {\bf Calibrate\+Tx\+Setup()}, {\bf Tune\+Rx\+Filter\+Setup()}, and {\bf Tune\+Tx\+Filter\+Setup()}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{d7/db8/lms7002m__controls_8c_a750d732f1af936250aef94df6f56bf9b_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{d7/db8/lms7002m__controls_8c_a750d732f1af936250aef94df6f56bf9b_icgraph}
+\end{center}
+\end{figure}
+
+
+\index{lms7002m\+\_\+controls.\+c@{lms7002m\+\_\+controls.\+c}!Get\+Frequency\+C\+G\+EN@{Get\+Frequency\+C\+G\+EN}}
+\index{Get\+Frequency\+C\+G\+EN@{Get\+Frequency\+C\+G\+EN}!lms7002m\+\_\+controls.\+c@{lms7002m\+\_\+controls.\+c}}
+\paragraph[{Get\+Frequency\+C\+G\+E\+N()}]{\setlength{\rightskip}{0pt plus 5cm}{\bf float\+\_\+type} Get\+Frequency\+C\+G\+EN (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}\label{lms7002m__controls_8c_a595e621678235b67d352591a896d2376}
+
+
+Definition at line {\bf 152} of file {\bf lms7002m\+\_\+controls.\+c}.
+
+
+
+References {\bf D\+I\+V\+\_\+\+O\+U\+T\+C\+H\+\_\+\+C\+G\+EN}, {\bf Get\+\_\+\+S\+P\+I\+\_\+\+Reg\+\_\+bits()}, {\bf M\+S\+B\+\_\+\+L\+SB}, and {\bf Ref\+Clk}.
+
+
+
+Referenced by {\bf Get\+Reference\+Clk\+\_\+\+T\+S\+P\+\_\+\+M\+Hz()}, and {\bf Setup\+C\+G\+E\+N()}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{d7/db8/lms7002m__controls_8c_a595e621678235b67d352591a896d2376_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{d7/db8/lms7002m__controls_8c_a595e621678235b67d352591a896d2376_icgraph}
+\end{center}
+\end{figure}
+
+
+\index{lms7002m\+\_\+controls.\+c@{lms7002m\+\_\+controls.\+c}!Get\+Frequency\+SX@{Get\+Frequency\+SX}}
+\index{Get\+Frequency\+SX@{Get\+Frequency\+SX}!lms7002m\+\_\+controls.\+c@{lms7002m\+\_\+controls.\+c}}
+\paragraph[{Get\+Frequency\+S\+X(const bool Tx)}]{\setlength{\rightskip}{0pt plus 5cm}{\bf float\+\_\+type} Get\+Frequency\+SX (
+\begin{DoxyParamCaption}
+\item[{const bool}]{Tx}
+\end{DoxyParamCaption}
+)}\label{lms7002m__controls_8c_aeb1d40ef2cb6c1544facf83bfc0082e8}
+
+
+Definition at line {\bf 209} of file {\bf lms7002m\+\_\+controls.\+c}.
+
+
+
+References {\bf D\+I\+V\+\_\+\+L\+O\+CH}, {\bf E\+N\+\_\+\+D\+I\+V2\+\_\+\+D\+I\+V\+P\+R\+OG}, {\bf Get\+\_\+\+S\+P\+I\+\_\+\+Reg\+\_\+bits()}, {\bf M\+AC}, {\bf Modify\+\_\+\+S\+P\+I\+\_\+\+Reg\+\_\+bits()}, {\bf M\+S\+B\+\_\+\+L\+SB}, {\bf pow2()}, {\bf Ref\+Clk}, {\bf S\+P\+I\+\_\+read()}, and {\bf S\+P\+I\+\_\+write()}.
+
+
+
+Referenced by {\bf Calibrate\+Rx()}, {\bf lime\+::\+L\+M\+S7002\+M\+::\+Calibrate\+Rx()}, {\bf Calibrate\+Rx\+Setup()}, {\bf lime\+::\+L\+M\+S7002\+M\+::\+Calibrate\+Tx()}, and {\bf Calibrate\+Tx\+Setup()}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{d7/db8/lms7002m__controls_8c_aeb1d40ef2cb6c1544facf83bfc0082e8_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{d7/db8/lms7002m__controls_8c_aeb1d40ef2cb6c1544facf83bfc0082e8_icgraph}
+\end{center}
+\end{figure}
+
+
+\index{lms7002m\+\_\+controls.\+c@{lms7002m\+\_\+controls.\+c}!Get\+Reference\+Clk\+\_\+\+T\+S\+P\+\_\+\+M\+Hz@{Get\+Reference\+Clk\+\_\+\+T\+S\+P\+\_\+\+M\+Hz}}
+\index{Get\+Reference\+Clk\+\_\+\+T\+S\+P\+\_\+\+M\+Hz@{Get\+Reference\+Clk\+\_\+\+T\+S\+P\+\_\+\+M\+Hz}!lms7002m\+\_\+controls.\+c@{lms7002m\+\_\+controls.\+c}}
+\paragraph[{Get\+Reference\+Clk\+\_\+\+T\+S\+P\+\_\+\+M\+Hz(bool tx)}]{\setlength{\rightskip}{0pt plus 5cm}{\bf float\+\_\+type} Get\+Reference\+Clk\+\_\+\+T\+S\+P\+\_\+\+M\+Hz (
+\begin{DoxyParamCaption}
+\item[{bool}]{tx}
+\end{DoxyParamCaption}
+)}\label{lms7002m__controls_8c_aba69dada15c144130b08cff13cb54a4c}
+
+
+Definition at line {\bf 191} of file {\bf lms7002m\+\_\+controls.\+c}.
+
+
+
+References {\bf C\+L\+K\+H\+\_\+\+O\+V\+\_\+\+C\+L\+K\+L\+\_\+\+C\+G\+EN}, {\bf E\+N\+\_\+\+A\+D\+C\+C\+L\+K\+H\+\_\+\+C\+L\+K\+GN}, {\bf Get\+\_\+\+S\+P\+I\+\_\+\+Reg\+\_\+bits()}, {\bf Get\+Frequency\+C\+G\+E\+N()}, and {\bf pow2()}.
+
+
+
+Referenced by {\bf Set\+N\+C\+O\+Frequency()}, and {\bf Update\+R\+S\+S\+I\+Delay()}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{d7/db8/lms7002m__controls_8c_aba69dada15c144130b08cff13cb54a4c_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{d7/db8/lms7002m__controls_8c_aba69dada15c144130b08cff13cb54a4c_icgraph}
+\end{center}
+\end{figure}
+
+
+\index{lms7002m\+\_\+controls.\+c@{lms7002m\+\_\+controls.\+c}!Get\+Value\+Of\+\_\+c\+\_\+ctl\+\_\+pga\+\_\+rbb@{Get\+Value\+Of\+\_\+c\+\_\+ctl\+\_\+pga\+\_\+rbb}}
+\index{Get\+Value\+Of\+\_\+c\+\_\+ctl\+\_\+pga\+\_\+rbb@{Get\+Value\+Of\+\_\+c\+\_\+ctl\+\_\+pga\+\_\+rbb}!lms7002m\+\_\+controls.\+c@{lms7002m\+\_\+controls.\+c}}
+\paragraph[{Get\+Value\+Of\+\_\+c\+\_\+ctl\+\_\+pga\+\_\+rbb(uint8\+\_\+t g\+\_\+pga\+\_\+rbb)}]{\setlength{\rightskip}{0pt plus 5cm}uint8\+\_\+t Get\+Value\+Of\+\_\+c\+\_\+ctl\+\_\+pga\+\_\+rbb (
+\begin{DoxyParamCaption}
+\item[{uint8\+\_\+t}]{g\+\_\+pga\+\_\+rbb}
+\end{DoxyParamCaption}
+)}\label{lms7002m__controls_8c_aabf7aa45ca9ef38d1e76efff27aa4f2e}
+
+
+Definition at line {\bf 414} of file {\bf lms7002m\+\_\+controls.\+c}.
+
+
+
+Referenced by {\bf Run\+A\+G\+C()}, and {\bf Tune\+Rx\+Filter\+Setup()}.
+
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{d7/db8/lms7002m__controls_8c_aabf7aa45ca9ef38d1e76efff27aa4f2e_icgraph}
+\end{center}
+\end{figure}
+
+
+\index{lms7002m\+\_\+controls.\+c@{lms7002m\+\_\+controls.\+c}!pow2@{pow2}}
+\index{pow2@{pow2}!lms7002m\+\_\+controls.\+c@{lms7002m\+\_\+controls.\+c}}
+\paragraph[{pow2(const uint8\+\_\+t power)}]{\setlength{\rightskip}{0pt plus 5cm}uint16\+\_\+t pow2 (
+\begin{DoxyParamCaption}
+\item[{const uint8\+\_\+t}]{power}
+\end{DoxyParamCaption}
+)}\label{lms7002m__controls_8c_a90cb8ace2a72d2eb3609f2d1b50a0e39}
+
+
+Definition at line {\bf 24} of file {\bf lms7002m\+\_\+controls.\+c}.
+
+
+
+Referenced by {\bf Get\+Frequency\+S\+X()}, {\bf Get\+Reference\+Clk\+\_\+\+T\+S\+P\+\_\+\+M\+Hz()}, {\bf Rx\+Filter\+Search()}, {\bf Set\+Frequency\+S\+X()}, and {\bf Setup\+C\+G\+E\+N()}.
+
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{d7/db8/lms7002m__controls_8c_a90cb8ace2a72d2eb3609f2d1b50a0e39_icgraph}
+\end{center}
+\end{figure}
+
+
+\index{lms7002m\+\_\+controls.\+c@{lms7002m\+\_\+controls.\+c}!Read\+C\+MP@{Read\+C\+MP}}
+\index{Read\+C\+MP@{Read\+C\+MP}!lms7002m\+\_\+controls.\+c@{lms7002m\+\_\+controls.\+c}}
+\paragraph[{Read\+C\+M\+P(const bool S\+X)}]{\setlength{\rightskip}{0pt plus 5cm}static uint8\+\_\+t Read\+C\+MP (
+\begin{DoxyParamCaption}
+\item[{const bool}]{SX}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [static]}}\label{lms7002m__controls_8c_ac911f4b8718fda93faacd6f94699d564}
+
+
+Performs V\+CO tuning operations for C\+L\+K\+G\+EN, S\+XR, S\+XT modules. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em module} & module selection for tuning 0-\/cgen, 1-\/\+S\+XR, 2-\/\+S\+XT \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+0-\/success, other-\/failure 
+\end{DoxyReturn}
+
+
+Definition at line {\bf 289} of file {\bf lms7002m\+\_\+controls.\+c}.
+
+
+
+References {\bf g\+Comparator\+Delay\+Counter}, {\bf Get\+\_\+\+S\+P\+I\+\_\+\+Reg\+\_\+bits()}, {\bf M\+S\+B\+\_\+\+L\+SB}, {\bf T\+F0}, {\bf T\+H0}, {\bf T\+L0}, and {\bf T\+R0}.
+
+
+
+Referenced by {\bf Tune\+V\+C\+O()}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{d7/db8/lms7002m__controls_8c_ac911f4b8718fda93faacd6f94699d564_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{d7/db8/lms7002m__controls_8c_ac911f4b8718fda93faacd6f94699d564_icgraph}
+\end{center}
+\end{figure}
+
+
+\index{lms7002m\+\_\+controls.\+c@{lms7002m\+\_\+controls.\+c}!Save\+Chip\+State@{Save\+Chip\+State}}
+\index{Save\+Chip\+State@{Save\+Chip\+State}!lms7002m\+\_\+controls.\+c@{lms7002m\+\_\+controls.\+c}}
+\paragraph[{Save\+Chip\+State(bool wr)}]{\setlength{\rightskip}{0pt plus 5cm}{\bf void} Save\+Chip\+State (
+\begin{DoxyParamCaption}
+\item[{bool}]{wr}
+\end{DoxyParamCaption}
+)}\label{lms7002m__controls_8c_a1ed7dc939bfc16c3178b901647de0640}
+
+
+Definition at line {\bf 52} of file {\bf lms7002m\+\_\+controls.\+c}.
+
+
+
+References {\bf address}, {\bf chip\+State\+Addr}, {\bf chip\+State\+Data}, {\bf Clock\+Logic\+Resets()}, {\bf i}, {\bf R\+OM}, {\bf Set\+Defaults()}, {\bf S\+P\+I\+\_\+read()}, {\bf S\+P\+I\+\_\+write()}, {\bf S\+P\+I\+\_\+write\+\_\+batch()}, and {\bf x0020state}.
+
+
+
+Referenced by {\bf Calibrate\+Rx()}, {\bf Calibrate\+Tx()}, {\bf Tune\+Rx\+Filter()}, and {\bf Tune\+Tx\+Filter()}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{d7/db8/lms7002m__controls_8c_a1ed7dc939bfc16c3178b901647de0640_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{d7/db8/lms7002m__controls_8c_a1ed7dc939bfc16c3178b901647de0640_icgraph}
+\end{center}
+\end{figure}
+
+
+\index{lms7002m\+\_\+controls.\+c@{lms7002m\+\_\+controls.\+c}!Set\+Defaults\+SX@{Set\+Defaults\+SX}}
+\index{Set\+Defaults\+SX@{Set\+Defaults\+SX}!lms7002m\+\_\+controls.\+c@{lms7002m\+\_\+controls.\+c}}
+\paragraph[{Set\+Defaults\+S\+X()}]{\setlength{\rightskip}{0pt plus 5cm}{\bf void} Set\+Defaults\+SX (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}\label{lms7002m__controls_8c_a75b389cad766cf873450437f2d5fea65}
+
+
+Definition at line {\bf 127} of file {\bf lms7002m\+\_\+controls.\+c}.
+
+
+
+References {\bf i}, {\bf Modify\+\_\+\+S\+P\+I\+\_\+\+Reg\+\_\+bits()}, {\bf M\+S\+B\+\_\+\+L\+SB}, {\bf R\+OM}, and {\bf S\+P\+I\+\_\+write()}.
+
+
+
+Referenced by {\bf Calibrate\+Rx\+Setup()}, {\bf Calibrate\+Tx\+Setup()}, and {\bf Tune\+Rx\+Filter\+Setup()}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{d7/db8/lms7002m__controls_8c_a75b389cad766cf873450437f2d5fea65_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{d7/db8/lms7002m__controls_8c_a75b389cad766cf873450437f2d5fea65_icgraph}
+\end{center}
+\end{figure}
+
+
+\index{lms7002m\+\_\+controls.\+c@{lms7002m\+\_\+controls.\+c}!Set\+Frequency\+C\+G\+EN@{Set\+Frequency\+C\+G\+EN}}
+\index{Set\+Frequency\+C\+G\+EN@{Set\+Frequency\+C\+G\+EN}!lms7002m\+\_\+controls.\+c@{lms7002m\+\_\+controls.\+c}}
+\paragraph[{Set\+Frequency\+C\+G\+E\+N(float\+\_\+type freq)}]{\setlength{\rightskip}{0pt plus 5cm}uint8\+\_\+t Set\+Frequency\+C\+G\+EN (
+\begin{DoxyParamCaption}
+\item[{{\bf float\+\_\+type}}]{freq}
+\end{DoxyParamCaption}
+)}\label{lms7002m__controls_8c_a642726a10aa97f369c0dcb7d1480c875}
+
+
+Definition at line {\bf 160} of file {\bf lms7002m\+\_\+controls.\+c}.
+
+
+
+References {\bf D\+I\+V\+\_\+\+O\+U\+T\+C\+H\+\_\+\+C\+G\+EN}, {\bf freq}, {\bf I\+N\+T\+\_\+\+S\+D\+M\+\_\+\+C\+G\+EN}, {\bf M\+C\+U\+\_\+\+C\+G\+E\+N\+\_\+\+T\+U\+N\+E\+\_\+\+F\+A\+I\+L\+ED}, {\bf Modify\+\_\+\+S\+P\+I\+\_\+\+Reg\+\_\+bits()}, {\bf M\+S\+B\+\_\+\+L\+SB}, {\bf Ref\+Clk}, {\bf Tune\+V\+C\+O()}, and {\bf V\+C\+O\+\_\+\+C\+G\+EN}.
+
+
+
+Referenced by {\bf Config\+C\+G\+E\+N\+\_\+\+For\+L\+P\+F\+\_\+\+I\+F()}, and {\bf Setup\+C\+G\+E\+N()}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{d7/db8/lms7002m__controls_8c_a642726a10aa97f369c0dcb7d1480c875_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{d7/db8/lms7002m__controls_8c_a642726a10aa97f369c0dcb7d1480c875_icgraph}
+\end{center}
+\end{figure}
+
+
+\index{lms7002m\+\_\+controls.\+c@{lms7002m\+\_\+controls.\+c}!Set\+Frequency\+SX@{Set\+Frequency\+SX}}
+\index{Set\+Frequency\+SX@{Set\+Frequency\+SX}!lms7002m\+\_\+controls.\+c@{lms7002m\+\_\+controls.\+c}}
+\paragraph[{Set\+Frequency\+S\+X(const bool tx, const float\+\_\+type freq\+\_\+\+Hz)}]{\setlength{\rightskip}{0pt plus 5cm}uint8\+\_\+t Set\+Frequency\+SX (
+\begin{DoxyParamCaption}
+\item[{const bool}]{tx, }
+\item[{const {\bf float\+\_\+type}}]{freq\+\_\+\+Hz}
+\end{DoxyParamCaption}
+)}\label{lms7002m__controls_8c_abce6715205de56bbe62e2afe6eadeb30}
+
+
+Definition at line {\bf 224} of file {\bf lms7002m\+\_\+controls.\+c}.
+
+
+
+References {\bf C\+S\+W\+\_\+\+V\+CO}, {\bf D\+I\+V\+\_\+\+L\+O\+CH}, {\bf E\+N\+\_\+\+D\+I\+V2\+\_\+\+D\+I\+V\+P\+R\+OG}, {\bf Get\+\_\+\+S\+P\+I\+\_\+\+Reg\+\_\+bits()}, {\bf I\+N\+T\+\_\+\+S\+DM}, {\bf M\+AC}, {\bf M\+C\+U\+\_\+\+N\+O\+\_\+\+E\+R\+R\+OR}, {\bf M\+C\+U\+\_\+\+S\+X\+R\+\_\+\+T\+U\+N\+E\+\_\+\+F\+A\+I\+L\+ED}, {\bf M\+C\+U\+\_\+\+S\+X\+T\+\_\+\+T\+U\+N\+E\+\_\+\+F\+A\+I\+L\+ED}, {\bf Modify\+\_\+\+S\+P\+I\+\_\+\+Reg\+\_\+bits()}, {\bf M\+S\+B\+\_\+\+L\+SB}, {\bf pow2()}, {\bf Ref\+Clk}, {\bf S\+E\+L\+\_\+\+V\+CO}, {\bf S\+P\+I\+\_\+read()}, {\bf S\+P\+I\+\_\+write()}, {\bf temp}, and {\bf Tune\+V\+C\+O()}.
+
+
+
+Referenced by {\bf Calibrate\+Rx\+Setup()}, {\bf Calibrate\+Tx\+Setup()}, {\bf Tune\+Rx\+Filter()}, and {\bf Tune\+Rx\+Filter\+Setup()}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{d7/db8/lms7002m__controls_8c_abce6715205de56bbe62e2afe6eadeb30_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{d7/db8/lms7002m__controls_8c_abce6715205de56bbe62e2afe6eadeb30_icgraph}
+\end{center}
+\end{figure}
+
+
+\index{lms7002m\+\_\+controls.\+c@{lms7002m\+\_\+controls.\+c}!Set\+N\+C\+O\+Frequency@{Set\+N\+C\+O\+Frequency}}
+\index{Set\+N\+C\+O\+Frequency@{Set\+N\+C\+O\+Frequency}!lms7002m\+\_\+controls.\+c@{lms7002m\+\_\+controls.\+c}}
+\paragraph[{Set\+N\+C\+O\+Frequency(const bool tx, const float freq, uint8\+\_\+t index)}]{\setlength{\rightskip}{0pt plus 5cm}{\bf void} Set\+N\+C\+O\+Frequency (
+\begin{DoxyParamCaption}
+\item[{const bool}]{tx, }
+\item[{const float}]{freq, }
+\item[{uint8\+\_\+t}]{index}
+\end{DoxyParamCaption}
+)}\label{lms7002m__controls_8c_aaf5a942c74a7bb3044ffce5cd6f5829a}
+
+
+Definition at line {\bf 201} of file {\bf lms7002m\+\_\+controls.\+c}.
+
+
+
+References {\bf fcw}, {\bf Get\+Reference\+Clk\+\_\+\+T\+S\+P\+\_\+\+M\+Hz()}, and {\bf S\+P\+I\+\_\+write()}.
+
+
+
+Referenced by {\bf Calibrate\+Rx()}, {\bf Calibrate\+Rx\+Setup()}, {\bf Calibrate\+Tx()}, {\bf Calibrate\+Tx\+Setup()}, {\bf Check\+Saturation\+Rx()}, {\bf Check\+Saturation\+Tx\+Rx()}, {\bf Tune\+Rx\+Filter()}, {\bf Tune\+Rx\+Filter\+Setup()}, and {\bf Tune\+Tx\+Filter\+Setup()}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{d7/db8/lms7002m__controls_8c_aaf5a942c74a7bb3044ffce5cd6f5829a_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{d7/db8/lms7002m__controls_8c_aaf5a942c74a7bb3044ffce5cd6f5829a_icgraph}
+\end{center}
+\end{figure}
+
+
+\index{lms7002m\+\_\+controls.\+c@{lms7002m\+\_\+controls.\+c}!Tune\+V\+CO@{Tune\+V\+CO}}
+\index{Tune\+V\+CO@{Tune\+V\+CO}!lms7002m\+\_\+controls.\+c@{lms7002m\+\_\+controls.\+c}}
+\paragraph[{Tune\+V\+C\+O(bool S\+X)}]{\setlength{\rightskip}{0pt plus 5cm}uint8\+\_\+t Tune\+V\+CO (
+\begin{DoxyParamCaption}
+\item[{bool}]{SX}
+\end{DoxyParamCaption}
+)}\label{lms7002m__controls_8c_aaec3b1294b24c7f3b9db2c9af59402d4}
+
+
+Definition at line {\bf 304} of file {\bf lms7002m\+\_\+controls.\+c}.
+
+
+
+References {\bf g\+Comparator\+Delay\+Counter}, {\bf M\+C\+U\+\_\+\+E\+R\+R\+OR}, {\bf M\+C\+U\+\_\+\+N\+O\+\_\+\+E\+R\+R\+OR}, {\bf Modify\+\_\+\+S\+P\+I\+\_\+\+Reg\+\_\+bits()}, {\bf M\+S\+B\+\_\+\+L\+SB}, {\bf Read\+C\+M\+P()}, and {\bf Ref\+Clk}.
+
+
+
+Referenced by {\bf Is\+P\+L\+L\+Tuned()}, {\bf Set\+Frequency\+C\+G\+E\+N()}, and {\bf Set\+Frequency\+S\+X()}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{d7/db8/lms7002m__controls_8c_aaec3b1294b24c7f3b9db2c9af59402d4_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{d7/db8/lms7002m__controls_8c_aaec3b1294b24c7f3b9db2c9af59402d4_icgraph}
+\end{center}
+\end{figure}
+
+
+\index{lms7002m\+\_\+controls.\+c@{lms7002m\+\_\+controls.\+c}!Write\+Masked\+Regs@{Write\+Masked\+Regs}}
+\index{Write\+Masked\+Regs@{Write\+Masked\+Regs}!lms7002m\+\_\+controls.\+c@{lms7002m\+\_\+controls.\+c}}
+\paragraph[{Write\+Masked\+Regs(const Register\+Batch $\ast$regs)}]{\setlength{\rightskip}{0pt plus 5cm}{\bf void} Write\+Masked\+Regs (
+\begin{DoxyParamCaption}
+\item[{const {\bf Register\+Batch} $\ast$}]{regs}
+\end{DoxyParamCaption}
+)}\label{lms7002m__controls_8c_a6da6f3d264a9c184fe58dc2945efda1f}
+
+
+Definition at line {\bf 398} of file {\bf lms7002m\+\_\+controls.\+c}.
+
+
+
+References {\bf i}, {\bf index}, {\bf S\+P\+I\+\_\+read()}, and {\bf S\+P\+I\+\_\+write()}.
+
+
+
+Referenced by {\bf Calibrate\+Rx\+Setup()}, {\bf Calibrate\+Tx\+Setup()}, {\bf Tune\+Rx\+Filter\+Setup()}, and {\bf Tune\+Tx\+Filter\+Setup()}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=273pt]{d7/db8/lms7002m__controls_8c_a6da6f3d264a9c184fe58dc2945efda1f_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{d7/db8/lms7002m__controls_8c_a6da6f3d264a9c184fe58dc2945efda1f_icgraph}
+\end{center}
+\end{figure}
+
+
+
+
+\subsubsection{Variable Documentation}
+\index{lms7002m\+\_\+controls.\+c@{lms7002m\+\_\+controls.\+c}!chip\+State\+Addr@{chip\+State\+Addr}}
+\index{chip\+State\+Addr@{chip\+State\+Addr}!lms7002m\+\_\+controls.\+c@{lms7002m\+\_\+controls.\+c}}
+\paragraph[{chip\+State\+Addr}]{\setlength{\rightskip}{0pt plus 5cm}const uint16\+\_\+t chip\+State\+Addr[$\,$]}\label{lms7002m__controls_8c_a682de9bca1495e80e5cdc39f93762093}
+
+
+Definition at line {\bf 30} of file {\bf lms7002m\+\_\+controls.\+c}.
+
+
+
+Referenced by {\bf Save\+Chip\+State()}.
+
+\index{lms7002m\+\_\+controls.\+c@{lms7002m\+\_\+controls.\+c}!chip\+State\+Data@{chip\+State\+Data}}
+\index{chip\+State\+Data@{chip\+State\+Data}!lms7002m\+\_\+controls.\+c@{lms7002m\+\_\+controls.\+c}}
+\paragraph[{chip\+State\+Data}]{\setlength{\rightskip}{0pt plus 5cm}uint16\+\_\+t chip\+State\+Data[500]}\label{lms7002m__controls_8c_abd54bf616ade16f46d7ce116acb67927}
+
+
+Definition at line {\bf 50} of file {\bf lms7002m\+\_\+controls.\+c}.
+
+
+
+Referenced by {\bf Save\+Chip\+State()}.
+
+\index{lms7002m\+\_\+controls.\+c@{lms7002m\+\_\+controls.\+c}!g\+Comparator\+Delay\+Counter@{g\+Comparator\+Delay\+Counter}}
+\index{g\+Comparator\+Delay\+Counter@{g\+Comparator\+Delay\+Counter}!lms7002m\+\_\+controls.\+c@{lms7002m\+\_\+controls.\+c}}
+\paragraph[{g\+Comparator\+Delay\+Counter}]{\setlength{\rightskip}{0pt plus 5cm}uint16\+\_\+t g\+Comparator\+Delay\+Counter = 0x\+F\+F00}\label{lms7002m__controls_8c_a3fcfd3dbfb4516a5f3e5b742e84efbe7}
+
+
+Definition at line {\bf 16} of file {\bf lms7002m\+\_\+controls.\+c}.
+
+
+
+Referenced by {\bf Read\+C\+M\+P()}, and {\bf Tune\+V\+C\+O()}.
+
+\index{lms7002m\+\_\+controls.\+c@{lms7002m\+\_\+controls.\+c}!Ref\+Clk@{Ref\+Clk}}
+\index{Ref\+Clk@{Ref\+Clk}!lms7002m\+\_\+controls.\+c@{lms7002m\+\_\+controls.\+c}}
+\paragraph[{Ref\+Clk}]{\setlength{\rightskip}{0pt plus 5cm}{\bf float\+\_\+type} Ref\+Clk = 30.\+72e6}\label{lms7002m__controls_8c_ade9c63dab5fa56fdab2394edec268508}
+
+
+Definition at line {\bf 22} of file {\bf lms7002m\+\_\+controls.\+c}.
+
+
+
+Referenced by {\bf D\+C\+I\+Q()}, {\bf Filters()}, {\bf Get\+Frequency\+C\+G\+E\+N()}, {\bf Get\+Frequency\+S\+X()}, {\bf Get\+R\+S\+S\+I()}, {\bf Load\+D\+C\+\_\+\+R\+E\+G\+\_\+\+T\+X\+\_\+\+I\+Q()}, {\bf main()}, {\bf Set\+Frequency\+C\+G\+E\+N()}, {\bf Set\+Frequency\+S\+X()}, {\bf Tune\+V\+C\+O()}, {\bf Update\+Freq()}, and {\bf Update\+R\+S\+S\+I\+Delay()}.
+
+\index{lms7002m\+\_\+controls.\+c@{lms7002m\+\_\+controls.\+c}!x0020state@{x0020state}}
+\index{x0020state@{x0020state}!lms7002m\+\_\+controls.\+c@{lms7002m\+\_\+controls.\+c}}
+\paragraph[{x0020state}]{\setlength{\rightskip}{0pt plus 5cm}uint16\+\_\+t x0020state}\label{lms7002m__controls_8c_a4af70aaad1912a9f1ed989ec731d36f2}
+
+
+Definition at line {\bf 29} of file {\bf lms7002m\+\_\+controls.\+c}.
+
+
+
+Referenced by {\bf Save\+Chip\+State()}.
+

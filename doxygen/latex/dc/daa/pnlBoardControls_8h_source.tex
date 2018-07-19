@@ -1,0 +1,119 @@
+\subsection{pnl\+Board\+Controls.\+h}
+\label{pnlBoardControls_8h_source}\index{/home/erik/prefix/default/src/limesuite-\/dev/src/lms7002\+\_\+wxgui/pnl\+Board\+Controls.\+h@{/home/erik/prefix/default/src/limesuite-\/dev/src/lms7002\+\_\+wxgui/pnl\+Board\+Controls.\+h}}
+
+\begin{DoxyCode}
+00001 \textcolor{preprocessor}{#ifndef \_\_pnlAnalog\_view\_\_}
+00002 \textcolor{preprocessor}{#define \_\_pnlAnalog\_view\_\_}
+00003 
+00008 \textcolor{preprocessor}{#include <wx/artprov.h>}
+00009 \textcolor{preprocessor}{#include <wx/xrc/xmlres.h>}
+00010 \textcolor{preprocessor}{#include <wx/string.h>}
+00011 \textcolor{preprocessor}{#include <wx/button.h>}
+00012 \textcolor{preprocessor}{#include <wx/gdicmn.h>}
+00013 \textcolor{preprocessor}{#include <wx/font.h>}
+00014 \textcolor{preprocessor}{#include <wx/colour.h>}
+00015 \textcolor{preprocessor}{#include <wx/settings.h>}
+00016 \textcolor{preprocessor}{#include <wx/stattext.h>}
+00017 \textcolor{preprocessor}{#include <wx/choice.h>}
+00018 \textcolor{preprocessor}{#include <wx/sizer.h>}
+00019 \textcolor{preprocessor}{#include <wx/statbox.h>}
+00020 \textcolor{preprocessor}{#include <wx/frame.h>}
+00021 \textcolor{preprocessor}{#include <wx/spinctrl.h>}
+00022 \textcolor{preprocessor}{#include "lime/LimeSuite.h"}
+00023 \textcolor{preprocessor}{#include <vector>}
+00024 \textcolor{preprocessor}{#include <string>}
+00025 \textcolor{preprocessor}{#include <stdint.h>}
+00026 
+00027 \textcolor{keyword}{namespace }lime\{
+00028 \}
+00029 
+00030 \textcolor{keyword}{class }pnlBoardControls : \textcolor{keyword}{public} wxFrame
+00031 \{
+00032     \textcolor{keyword}{public}:
+00033         \textcolor{keyword}{struct }ADC_DAC
+00034         \{
+00035             std::string name;
+00036             \textcolor{keywordtype}{bool} writable;
+00037             \textcolor{keywordtype}{double} value;
+00038             uint8\_t channel;
+00039             std::string units;
+00040             int8\_t powerOf10;
+00041             \textcolor{keywordtype}{int} minValue;
+00042             \textcolor{keywordtype}{int} maxValue;
+00043         \};
+00044 
+00045         \textcolor{keyword}{class }Param_GUI
+00046         \{
+00047         \textcolor{keyword}{public}:
+00048             Param_GUI() : title(nullptr), units(nullptr),
+00049                 powerOf10(nullptr), rValue(nullptr),wValue(nullptr)\{\};
+00050             ~Param_GUI()
+00051             \{
+00052                 \textcolor{keywordflow}{if} (title)
+00053                     title->Destroy();
+00054                 \textcolor{keywordflow}{if} (units)
+00055                     units->Destroy();
+00056                 \textcolor{keywordflow}{if} (powerOf10)
+00057                     powerOf10->Destroy();
+00058                 \textcolor{keywordflow}{if} (rValue)
+00059                     rValue->Destroy();
+00060                 \textcolor{keywordflow}{if} (wValue)
+00061                     wValue->Destroy();
+00062             \}
+00063             wxStaticText* title;
+00064             wxStaticText* units;
+00065             wxStaticText* powerOf10;
+00066             wxStaticText* rValue;
+00067             wxSpinCtrl* wValue;
+00068         \};
+00069 
+00070         pnlBoardControls(wxWindow* parent, wxWindowID \textcolor{keywordtype}{id} = wxID\_ANY, \textcolor{keyword}{const} wxString &title = \_(\textcolor{stringliteral}{""}), \textcolor{keyword}{const} 
+      wxPoint& pos = wxDefaultPosition, \textcolor{keyword}{const} wxSize& size = wxDefaultSize, \textcolor{keywordtype}{long} style = wxTAB\_TRAVERSAL);
+00071         ~pnlBoardControls();
+00072 
+00073         \textcolor{keywordtype}{void} UpdatePanel();
+00074         \textcolor{keywordtype}{void} Initialize(lms_device_t* controlPort);
+00075         lms_device_t* lmsControl;
+00076 
+00077         \textcolor{keywordtype}{void} SetupControls(\textcolor{keyword}{const} std::string &boardID);
+00078         \textcolor{keywordtype}{void} OnSetDACvalues(wxSpinEvent &event);
+00079         \textcolor{keywordtype}{void} OnSetDACvaluesENTER(wxCommandEvent &event);
+00080     \textcolor{keyword}{protected}:
+00081         wxPanel* pnlCustomControls;
+00082         wxPanel* pnlReadControls;
+00083         wxSpinCtrl *spinCustomChannelRd;
+00084         wxStaticText *txtCustomValueRd;
+00085         wxStaticText *txtCustomUnitsRd;
+00086         wxStaticText *txtCustomPowerOf10Rd;
+00087         wxSpinCtrl *spinCustomChannelWr;
+00088         wxSpinCtrl *spinCustomValueWr;
+00089         wxChoice *cmbCustomUnitsWr;
+00090         wxChoice *cmbCustomPowerOf10Wr;
+00091         wxButton *btnCustomRd;
+00092         wxButton *btnCustomWr;
+00093         \textcolor{keywordtype}{void} OnCustomRead(wxCommandEvent& event);
+00094         \textcolor{keywordtype}{void} OnCustomWrite(wxCommandEvent& event);
+00095 
+00096         wxFlexGridSizer* sizerAnalogRd;
+00097 
+00098         wxFlexGridSizer* sizerAdditionalControls;
+00099         wxPanel* additionalControls;
+00100 
+00101         std::vector<ADC\_DAC> getBoardParams(\textcolor{keyword}{const} std::string &boardID);
+00102 
+00103         \textcolor{keywordtype}{void} OnUserChangedBoardType(wxCommandEvent& event);
+00104         \textcolor{keywordtype}{void} OnReadAll( wxCommandEvent& event );
+00105         \textcolor{keywordtype}{void} OnWriteAll( wxCommandEvent& event );
+00106 
+00107         wxButton* btnReadAll;
+00108         wxButton* btnWriteAll;
+00109         wxStaticText* m_staticText349;
+00110         wxChoice* cmbBoardSelection;
+00111 
+00112         std::vector<ADC\_DAC> mParameters;
+00113 
+00114         std::vector<Param\_GUI*> mGUI_widgets;
+00115 \};
+00116 
+00117 \textcolor{preprocessor}{#endif // \_\_pnlAnalog\_view\_\_}
+\end{DoxyCode}

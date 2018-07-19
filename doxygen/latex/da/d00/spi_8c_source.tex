@@ -1,0 +1,131 @@
+\subsection{spi.\+c}
+\label{spi_8c_source}\index{/home/erik/prefix/default/src/limesuite-\/dev/mcu\+\_\+program/mcu\+\_\+src/spi.\+c@{/home/erik/prefix/default/src/limesuite-\/dev/mcu\+\_\+program/mcu\+\_\+src/spi.\+c}}
+
+\begin{DoxyCode}
+00001 \textcolor{preprocessor}{#include "spi.h"}
+00002 \textcolor{preprocessor}{#include "LMS7002_REGx51.h"}
+00003 
+00004 \textcolor{keywordtype}{void} Delay()
+00005 \{
+00006     TR0 = 0; \textcolor{comment}{//stop timer 0}
+00007     TH0 = 0xFF;
+00008     TL0 = 0xF0;
+00009     TF0 = 0; \textcolor{comment}{//clear overflow}
+00010     TR0 = 1; \textcolor{comment}{//start timer}
+00011     \textcolor{keywordflow}{while}( !TF0 ); \textcolor{comment}{//wait for timer overflow}
+00012 \}
+00013 
+00014 \textcolor{keywordtype}{void} SPI_transferVariable(\textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{short} value)
+00015 \{                                 
+00016     uint8\_t spiIter;
+00017     \textcolor{keywordflow}{for}(spiIter = 16; spiIter>0; spiIter--) \textcolor{comment}{//MSB First}
+00018     \{
+00019         ucSCLK=0;   \textcolor{comment}{//set Clock low}
+00020         ucSDIN = value & 0x8000; \textcolor{comment}{//if current bit is 1 set Output High}
+00021         value <<= 1; \textcolor{comment}{//shift mask to right}
+00022         ucSCLK=1;   \textcolor{comment}{//set Clock high}
+00023     \}
+00024     ucSCLK=0;   \textcolor{comment}{//set Clock low}
+00025 \}
+00026 
+00027 \textcolor{keywordtype}{void} SPI_transferVariable_slow(\textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{short} value)
+00028 \{
+00029     uint8\_t spiIter;
+00030     \textcolor{keywordflow}{for}(spiIter = 16; spiIter>0; spiIter--) \textcolor{comment}{//MSB First}
+00031     \{
+00032         ucSCLK=0;   \textcolor{comment}{//set Clock low}
+00033         Delay();
+00034         ucSDIN = value & 0x8000; \textcolor{comment}{//if current bit is 1 set Output High}
+00035         Delay();
+00036         value <<= 1; \textcolor{comment}{//shift mask to right}
+00037         ucSCLK=1;   \textcolor{comment}{//set Clock high}
+00038         Delay();
+00039     \}
+00040     ucSCLK=0;   \textcolor{comment}{//set Clock low}
+00041 \}
+00042 
+00043 \textcolor{keywordtype}{void} SPI_write(\textcolor{keyword}{const} \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{short} spiAddrReg, \textcolor{keyword}{const} \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{short} spiDataReg)
+00044 \{
+00045     ucSCLK=0;
+00046     ucSEN=0;
+00047     \textcolor{comment}{//write addr}
+00048     SPI_transferVariable(spiAddrReg | 0x8000); \textcolor{comment}{//set write bit}
+00049     \textcolor{comment}{//write data}
+00050     SPI_transferVariable(spiDataReg);
+00051     ucSEN=1;
+00052     ucSDIN=1;
+00053 \}
+00054 
+00055 \textcolor{keywordtype}{void} SPI_write_slow(\textcolor{keyword}{const} \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{short} spiAddrReg, \textcolor{keyword}{const} \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{short} spiDataReg)
+00056 \{
+00057     ucSCLK=0;
+00058     ucSEN=0;
+00059     \textcolor{comment}{//write addr}
+00060     SPI_transferVariable_slow(spiAddrReg | 0x8000); \textcolor{comment}{//set write bit}
+00061     \textcolor{comment}{//write data}
+00062     SPI_transferVariable_slow(spiDataReg);
+00063     ucSEN=1;
+00064     ucSDIN=1;
+00065 \}
+00066 
+00067 \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{short} SPI_read_slow (\textcolor{keyword}{const} \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{short} spiAddrReg)
+00068 \{
+00069     uint8\_t spiIter;    
+00070     uint16\_t spiDataReg = 0;
+00071     ucSCLK=0;
+00072     ucSEN=0;
+00073     \textcolor{comment}{//write addr}
+00074     SPI_transferVariable_slow(spiAddrReg & ~0x8000);    \textcolor{comment}{//clear write bit}
+00075     ucSDIN=1;
+00076     \textcolor{comment}{//read data}
+00077     \textcolor{keywordflow}{for}(spiIter = 16; spiIter>0; spiIter--) \textcolor{comment}{//MSB First}
+00078     \{
+00079         ucSCLK=1;   \textcolor{comment}{//set Clock high}
+00080         Delay();
+00081         spiDataReg <<= 1;
+00082         \textcolor{keywordflow}{if} (ucSDOUT)
+00083             spiDataReg |= 1;
+00084         ucSCLK=0;   \textcolor{comment}{//set Clock low}
+00085         Delay();
+00086     \}
+00087     ucSEN=1;
+00088     ucSDIN=1;
+00089     \textcolor{keywordflow}{return} spiDataReg;
+00090 \}
+00091 
+00092 \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{short} SPI_read (\textcolor{keyword}{const} \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{short} spiAddrReg)
+00093 \{
+00094     uint8\_t spiIter;
+00095     uint16\_t spiDataReg = 0;
+00096     ucSCLK=0;
+00097     ucSEN=0;
+00098     \textcolor{comment}{//write addr}
+00099     SPI_transferVariable(spiAddrReg & ~0x8000); \textcolor{comment}{//clear write bit}
+00100     ucSDIN=1;
+00101     \textcolor{comment}{//read data}
+00102     \textcolor{keywordflow}{for}(spiIter = 16; spiIter>0; spiIter--) \textcolor{comment}{//MSB First}
+00103     \{
+00104         ucSCLK=1;   \textcolor{comment}{//set Clock high}
+00105         spiDataReg <<= 1;
+00106         \textcolor{keywordflow}{if} (ucSDOUT)
+00107             spiDataReg |= 1;
+00108         ucSCLK=0;   \textcolor{comment}{//set Clock low}
+00109     \}
+00110     ucSEN=1;
+00111     ucSDIN=1;
+00112     \textcolor{keywordflow}{return} spiDataReg;
+00113 \}
+00114 
+00115 \textcolor{keywordtype}{void} Modify_SPI_Reg_bits(\textcolor{keyword}{const} uint16\_t SPI\_reg\_addr, \textcolor{keyword}{const} uint8\_t bits, \textcolor{keyword}{const} uint16\_t new\_bits\_data)
+00116 \{
+00117     uint16\_t spiDataReg = SPI_read(SPI\_reg\_addr); \textcolor{comment}{//read current SPI reg data}
+00118     \textcolor{keyword}{const} uint16\_t spiMask = (~(~0 << ((bits>>4)-(bits&0xF)+1))) << (bits&0xF); \textcolor{comment}{// creates bit mask}
+00119     spiDataReg = (spiDataReg & (~spiMask)) | ((new\_bits\_data << (bits&0xF)) & spiMask) ;\textcolor{comment}{//clear bits}
+00120     SPI_write(SPI\_reg\_addr, spiDataReg); \textcolor{comment}{//write modified data back to SPI reg}
+00121 \}
+00122 
+00123 uint16\_t Get_SPI_Reg_bits(\textcolor{keyword}{const} uint16\_t SPI\_reg\_addr, \textcolor{keyword}{const} uint8\_t bits)
+00124 \{
+00125     \textcolor{keywordflow}{return} (SPI_read(SPI\_reg\_addr) & (~(~0<<((bits>>4)+1)))) >> (bits&0xF); \textcolor{comment}{//shift bits to LSB}
+00126 \}
+\end{DoxyCode}

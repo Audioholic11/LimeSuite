@@ -1,0 +1,192 @@
+\subsection{F\+P\+G\+A\+\_\+\+Mini.\+cpp}
+\label{FPGA__Mini_8cpp_source}\index{/home/erik/prefix/default/src/limesuite-\/dev/src/\+F\+P\+G\+A\+\_\+common/\+F\+P\+G\+A\+\_\+\+Mini.\+cpp@{/home/erik/prefix/default/src/limesuite-\/dev/src/\+F\+P\+G\+A\+\_\+common/\+F\+P\+G\+A\+\_\+\+Mini.\+cpp}}
+
+\begin{DoxyCode}
+00001 \textcolor{preprocessor}{#include "FPGA_Mini.h"}
+00002 \textcolor{preprocessor}{#include "IConnection.h"}
+00003 \textcolor{preprocessor}{#include "Logger.h"}
+00004 \textcolor{preprocessor}{#include "LMS64CProtocol.h"}
+00005 \textcolor{preprocessor}{#include <ciso646>}
+00006 \textcolor{preprocessor}{#include <vector>}
+00007 \textcolor{preprocessor}{#include <map>}
+00008 \textcolor{preprocessor}{#include <math.h>}
+00009 
+00010 \textcolor{keyword}{namespace }lime
+00011 \{
+00012 
+00013 FPGA_Mini::FPGA_Mini() : FPGA()\{\}
+00016 \textcolor{keywordtype}{int} FPGA_Mini::SetInterfaceFreq(\textcolor{keywordtype}{double} txRate\_Hz, \textcolor{keywordtype}{double} rxRate\_Hz, \textcolor{keywordtype}{double} txPhase, \textcolor{keywordtype}{double} rxPhase, \textcolor{keywordtype}{int} 
+      channel)
+00017 \{
+00018     \textcolor{keywordtype}{int} status = 0;
+00019 
+00020     FPGA_PLL_clock clocks[4];
+00021     \textcolor{keywordflow}{if} ((txRate\_Hz >= 5e6) && (rxRate\_Hz >= 5e6))
+00022     \{
+00023         clocks[0].bypass = \textcolor{keyword}{false};
+00024         clocks[0].index = 0;
+00025         clocks[0].outFrequency = txRate\_Hz;
+00026         clocks[0].phaseShift_deg = 0;
+00027         clocks[0].findPhase = \textcolor{keyword}{false};
+00028         clocks[1].bypass = \textcolor{keyword}{false};
+00029         clocks[1].index = 1;
+00030         clocks[1].outFrequency = txRate\_Hz;
+00031         clocks[1].findPhase = \textcolor{keyword}{false};
+00032         clocks[1].phaseShift_deg = txPhase;
+00033         clocks[2].bypass = \textcolor{keyword}{false};
+00034         clocks[2].index = 2;
+00035         clocks[2].outFrequency = rxRate\_Hz;
+00036         clocks[2].phaseShift_deg = 0;
+00037         clocks[2].findPhase = \textcolor{keyword}{false};
+00038         clocks[3].bypass = \textcolor{keyword}{false};
+00039         clocks[3].index = 3;
+00040         clocks[3].outFrequency = rxRate\_Hz;
+00041         clocks[3].findPhase = \textcolor{keyword}{false};
+00042         clocks[3].phaseShift_deg = rxPhase;
+00043 
+00044         status = SetPllFrequency(0, rxRate\_Hz, clocks, 4);
+00045     \}
+00046     \textcolor{keywordflow}{else}
+00047     \{
+00048         status = SetDirectClocking(0);
+00049         \textcolor{keywordflow}{if} (status == 0)
+00050             status = SetDirectClocking(1);
+00051     \}
+00052     \textcolor{keywordflow}{return} status;
+00053 \}
+00054 
+00057 \textcolor{keywordtype}{int} FPGA_Mini::SetInterfaceFreq(\textcolor{keywordtype}{double} txRate\_Hz, \textcolor{keywordtype}{double} rxRate\_Hz, \textcolor{keywordtype}{int} channel)
+00058 \{
+00059     \textcolor{keywordtype}{int} status = 0;
+00060     uint32\_t reg20;
+00061     \textcolor{keyword}{const} \textcolor{keywordtype}{double} rxPhC1 = 89.46;
+00062     \textcolor{keyword}{const} \textcolor{keywordtype}{double} rxPhC2 = 1.24e-6;
+00063     \textcolor{keyword}{const} \textcolor{keywordtype}{double} txPhC1 = 89.61;
+00064     \textcolor{keyword}{const} \textcolor{keywordtype}{double} txPhC2 = 2.71e-7;
+00065 
+00066     \textcolor{keyword}{const} std::vector<uint32\_t> spiAddr = \{ 0x0021, 0x0022, 0x0023, 0x0024, 0x0027, 0x002A,
+00067                                             0x0400, 0x040C, 0x040B, 0x0400, 0x040B, 0x0400 \};
+00068     \textcolor{keyword}{const} \textcolor{keywordtype}{int} bakRegCnt = spiAddr.size() - 4;
+00069 
+00070     \textcolor{keywordtype}{bool} phaseSearch = \textcolor{keyword}{false};
+00071     \textcolor{keywordflow}{if} (rxRate\_Hz >= 5e6 && txRate\_Hz >= 5e6)
+00072         phaseSearch = \textcolor{keyword}{true};
+00073 
+00074     \textcolor{keywordflow}{if} (!phaseSearch)
+00075         \textcolor{keywordflow}{return} SetInterfaceFreq(txRate\_Hz, rxRate\_Hz, txPhC1 + txPhC2 * txRate\_Hz, rxPhC1 + rxPhC2 * 
+      rxRate\_Hz, 0);
+00076 
+00077     std::vector<uint32\_t> dataRd;
+00078     std::vector<uint32\_t> dataWr;
+00079     dataWr.resize(spiAddr.size());
+00080     dataRd.resize(spiAddr.size());
+00081     lime::FPGA::FPGA_PLL_clock clocks[4];
+00082 
+00083     \textcolor{comment}{//backup registers}
+00084     dataWr[0] = (uint32\_t(0x0020) << 16);
+00085     connection->ReadLMS7002MSPI(dataWr.data(), &reg20, 1, 0);
+00086 
+00087     dataWr[0] = (1 << 31) | (uint32\_t(0x0020) << 16) | 0xFFFD; \textcolor{comment}{//msbit 1=SPI write}
+00088     connection->WriteLMS7002MSPI(dataWr.data(), 1, 0);
+00089 
+00090     \textcolor{keywordflow}{for} (\textcolor{keywordtype}{int} i = 0; i < bakRegCnt; ++i)
+00091         dataWr[i] = (spiAddr[i] << 16);
+00092         connection->ReadLMS7002MSPI(dataWr.data(),dataRd.data(), bakRegCnt, 0);
+00093 
+00094     \textcolor{comment}{//Config Rx}
+00095     \{
+00096         \textcolor{keyword}{const} std::vector<uint32\_t> spiData = \{ 0x0E9F, 0x07FF, 0x5550, 0xE4E4,
+00097                  0xE4E4, 0x0086, 0x028D, 0x00FF, 0x5555, 0x02CD, 0xAAAA, 0x02ED \};
+00098         \textcolor{comment}{//Load test config}
+00099         \textcolor{keyword}{const} \textcolor{keywordtype}{int} setRegCnt = spiData.size();
+00100         \textcolor{keywordflow}{for} (\textcolor{keywordtype}{int} i = 0; i < setRegCnt; ++i)
+00101             dataWr[i] = (1 << 31) | (uint32\_t(spiAddr[i]) << 16) | spiData[i]; \textcolor{comment}{//msbit 1=SPI write}
+00102         connection->WriteLMS7002MSPI(dataWr.data(), setRegCnt, 0);
+00103 
+00104         clocks[0].index = 3;
+00105         clocks[0].outFrequency = rxRate\_Hz;
+00106         clocks[0].phaseShift_deg = rxPhC1 + rxPhC2 * rxRate\_Hz;
+00107         clocks[0].findPhase = \textcolor{keyword}{true};
+00108         clocks[1] = clocks[0];
+00109         clocks[2] = clocks[0];
+00110         clocks[3] = clocks[0];
+00111         \textcolor{keywordflow}{if} (SetPllFrequency(0, rxRate\_Hz, clocks, 4)!=0)
+00112         \{
+00113             status = -1;
+00114             SetInterfaceFreq(txRate\_Hz, rxRate\_Hz, txPhC1 + txPhC2 * txRate\_Hz, rxPhC1 + rxPhC2 * rxRate\_Hz
+      , 0);
+00115         \}
+00116     \}
+00117 
+00118     \textcolor{comment}{//Config TX}
+00119     \textcolor{keywordflow}{if} (status == 0)
+00120     \{
+00121         \textcolor{keyword}{const} std::vector<uint32\_t> spiData = \{ 0x0E9F, 0x07FF, 0x5550, 0xE4E4, 0xE4E4, 0x0484 \};
+00122         connection->WriteRegister(0x000A, 0x0000);
+00123         \textcolor{comment}{//Load test config}
+00124         \textcolor{keyword}{const} \textcolor{keywordtype}{int} setRegCnt = spiData.size();
+00125         \textcolor{keywordflow}{for} (\textcolor{keywordtype}{int} i = 0; i < setRegCnt; ++i)
+00126             dataWr[i] = (1 << 31) | (uint32\_t(spiAddr[i]) << 16) | spiData[i]; \textcolor{comment}{//msbit 1=SPI write}
+00127                 connection->WriteLMS7002MSPI(dataWr.data(), setRegCnt, 0);
+00128 
+00129         clocks[0].index = 1;
+00130         clocks[0].outFrequency = txRate\_Hz;
+00131         clocks[0].phaseShift_deg = txPhC1 + txPhC2 * txRate\_Hz;
+00132         clocks[0].findPhase = \textcolor{keyword}{true};
+00133         clocks[1] = clocks[0];
+00134         clocks[2] = clocks[0];
+00135         clocks[3] = clocks[0];
+00136         connection->WriteRegister(0x000A, 0x0200);
+00137         \textcolor{keywordflow}{if} (SetPllFrequency(0, txRate\_Hz, clocks, 4)!=0)
+00138         \{
+00139             status = -1;
+00140             SetInterfaceFreq(txRate\_Hz, rxRate\_Hz, txPhC1 + txPhC2 * txRate\_Hz, rxPhC1 + rxPhC2 * rxRate\_Hz
+      , 0);
+00141         \}
+00142     \}
+00143 
+00144     \textcolor{comment}{//Restore registers}
+00145     \textcolor{keywordflow}{for} (\textcolor{keywordtype}{int} i = 0; i < bakRegCnt; ++i)
+00146         dataWr[i] = (1 << 31) | (uint32\_t(spiAddr[i]) << 16) | dataRd[i]; \textcolor{comment}{//msbit 1=SPI write}
+00147     connection->WriteLMS7002MSPI(dataWr.data(), bakRegCnt, channel);
+00148     dataWr[0] = (1 << 31) | (uint32\_t(0x0020) << 16) | reg20; \textcolor{comment}{//msbit 1=SPI write}
+00149     connection->WriteLMS7002MSPI(dataWr.data(), 1, channel);
+00150     connection->WriteRegister(0x000A, 0);
+00151 
+00152     \textcolor{keywordflow}{return} status;
+00153 \}
+00154 
+00155 \textcolor{keywordtype}{int} FPGA_Mini::UploadWFM(\textcolor{keyword}{const} \textcolor{keywordtype}{void}* \textcolor{keyword}{const}* samples, uint8\_t chCount, \textcolor{keywordtype}{size\_t} 
+      sample_count, StreamConfig::StreamDataFormat format, \textcolor{keywordtype}{int} epIndex)
+00156 \{
+00157    \textcolor{keywordflow}{return} ReportError(\textcolor{stringliteral}{"UploadWFM not supported on LimeSDR-Mini"});
+00158 \}
+00159 
+00160 
+00161 \textcolor{keywordtype}{int} FPGA_Mini::ReadRawStreamData(\textcolor{keywordtype}{char}* buffer, \textcolor{keywordtype}{unsigned} length, \textcolor{keywordtype}{int} epIndex, \textcolor{keywordtype}{int} 
+      timeout_ms)
+00162 \{
+00163     \textcolor{keywordtype}{int} totalBytesReceived = 0;
+00164     StopStreaming();
+00165 \textcolor{preprocessor}{#ifdef \_\_unix\_\_}
+00166     connection->ResetStreamBuffers();
+00167 \textcolor{preprocessor}{#endif}
+00168     connection->WriteRegister(0x0008, 0x0100 | 0x2);
+00169     connection->WriteRegister(0x0007, 1);
+00170 
+00171     StartStreaming();
+00172 
+00173     \textcolor{keywordtype}{int} handle = connection->BeginDataReading(buffer, length, 0);
+00174     \textcolor{keywordflow}{if} (connection->WaitForReading(handle, timeout\_ms))
+00175         totalBytesReceived = connection->FinishDataReading(buffer, length, handle);
+00176 
+00177     connection->AbortReading(0);
+00178     StopStreaming();
+00179 
+00180     \textcolor{keywordflow}{return} totalBytesReceived;
+00181 \}
+00182 
+00183 
+00184 
+00185 \} \textcolor{comment}{//namespace lime}
+\end{DoxyCode}

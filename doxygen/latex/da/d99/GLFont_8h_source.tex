@@ -1,0 +1,64 @@
+\subsection{G\+L\+Font.\+h}
+\label{GLFont_8h_source}\index{/home/erik/prefix/default/src/limesuite-\/dev/src/ogl\+Graph/\+G\+L\+Font.\+h@{/home/erik/prefix/default/src/limesuite-\/dev/src/ogl\+Graph/\+G\+L\+Font.\+h}}
+
+\begin{DoxyCode}
+00001 \textcolor{preprocessor}{#ifndef GL\_FONT\_H}
+00002 \textcolor{preprocessor}{#define GL\_FONT\_H}
+00003 
+00004 \textcolor{preprocessor}{#include "glew/GL/glew.h"}
+00005 \textcolor{preprocessor}{#if defined(\_\_APPLE\_\_)}
+00006 \textcolor{preprocessor}{#include <OpenGL/gl.h>}
+00007 \textcolor{preprocessor}{#else}
+00008 \textcolor{preprocessor}{#include <GL/gl.h>}
+00009 \textcolor{preprocessor}{#endif}
+00010 \textcolor{preprocessor}{#include <string>}
+00011 \textcolor{preprocessor}{#include <vector>}
+00012 
+00013 \textcolor{keyword}{struct }GLGlyph
+00014 \{
+00015     GLGlyph() : id(-1), width(0), height(0), u(0), v(0), offset_x(0), offset_y(0), 
+      advance_x(0) \{\};
+00016     \textcolor{keywordtype}{void} reset() \{ \textcolor{keywordtype}{id} = -1; width=0; height=0; u=0; v=0; offset_x=0, offset_y=0, 
+      advance_x=0; bitmap.clear();\};
+00017     std::vector<unsigned char> bitmap;
+00018     \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{short} id;
+00019     \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{short} width;
+00020     \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{short} height;
+00021     \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{short} u;
+00022     \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{short} v;
+00023     \textcolor{keywordtype}{short} offset_x;
+00024     \textcolor{keywordtype}{short} offset_y;
+00025     \textcolor{keywordtype}{short} advance_x;
+00026 \};
+00027 
+00028 \textcolor{keyword}{class }GLFont
+00029 \{
+00030 \textcolor{keyword}{public}:
+00031     GLFont();
+00032     ~GLFont();
+00033 
+00034     \textcolor{keywordtype}{bool} load(\textcolor{keyword}{const} \textcolor{keywordtype}{char}* file);
+00035     \textcolor{keywordtype}{bool} loadFromArray(\textcolor{keyword}{const} \textcolor{keywordtype}{char}* array, \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{int} size);
+00036     \textcolor{keywordtype}{void} render\_textWorldSpace(\textcolor{keyword}{const} \textcolor{keywordtype}{char} *text, \textcolor{keywordtype}{float} x, \textcolor{keywordtype}{float} y, \textcolor{keywordtype}{float} scale, \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{int} rgba = 0
+      x00000000);
+00037     \textcolor{keywordtype}{void} render\_textScreenSpace(\textcolor{keyword}{const} \textcolor{keywordtype}{char} *text, \textcolor{keywordtype}{float} x, \textcolor{keywordtype}{float} y, \textcolor{keywordtype}{float} scale, \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{int} rgba = 0
+      x00000000);
+00038 
+00039     \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{int} lineHeight() \textcolor{keyword}{const};
+00040     \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{int} char\_width(\textcolor{keyword}{const} \textcolor{keywordtype}{char} c) \textcolor{keyword}{const};
+00041     \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{int} string\_width(\textcolor{keyword}{const} \textcolor{keywordtype}{char} *str) \textcolor{keyword}{const};
+00042     \textcolor{keywordtype}{void} getTextSize(\textcolor{keyword}{const} \textcolor{keywordtype}{char}* str, \textcolor{keywordtype}{int}& width, \textcolor{keywordtype}{int} &height, \textcolor{keywordtype}{float} fontSize);
+00043 
+00044     \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{int} getTextureID() \{\textcolor{keywordflow}{return} m\_texID;\};
+00045 
+00046     \textcolor{keywordtype}{int} m_texwidth;
+00047     \textcolor{keywordtype}{int} m_texheight;
+00048     GLuint m_texID;
+00049     GLuint m_vboID;
+00050     GLGlyph *m_glyphs;
+00051     \textcolor{keyword}{const} \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{short} m_glyphCount;
+00052     \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{char} m_fontSize;
+00053 \};
+00054 
+00055 \textcolor{preprocessor}{#endif}
+\end{DoxyCode}

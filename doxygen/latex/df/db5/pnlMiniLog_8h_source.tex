@@ -1,0 +1,32 @@
+\subsection{pnl\+Mini\+Log.\+h}
+\label{pnlMiniLog_8h_source}\index{/home/erik/prefix/default/src/limesuite-\/dev/src/utilities\+\_\+gui/pnl\+Mini\+Log.\+h@{/home/erik/prefix/default/src/limesuite-\/dev/src/utilities\+\_\+gui/pnl\+Mini\+Log.\+h}}
+
+\begin{DoxyCode}
+00001 \textcolor{preprocessor}{#ifndef \_\_pnlMiniLog\_\_}
+00002 \textcolor{preprocessor}{#define \_\_pnlMiniLog\_\_}
+00003 
+00009 \textcolor{preprocessor}{#include "utilities_gui.h"}
+00011 \textcolor{preprocessor}{#include <deque>}
+00012 \textcolor{preprocessor}{#include <utility>} \textcolor{comment}{//pair}
+00013 \textcolor{preprocessor}{#include "Logger.h"}
+00014 
+00016 \textcolor{keyword}{class }pnlMiniLog : \textcolor{keyword}{public} pnlMiniLog_view
+00017 \{
+00018 \textcolor{keyword}{public}:
+00020     pnlMiniLog(wxWindow* parent, wxWindowID \textcolor{keywordtype}{id} = wxID\_ANY, \textcolor{keyword}{const} wxPoint& pos = wxDefaultPosition, \textcolor{keyword}{const} 
+      wxSize& size = wxDefaultSize, \textcolor{keywordtype}{long} style = wxTAB\_TRAVERSAL);
+00021     \textcolor{keywordtype}{void} OnBtnClearClicked(wxCommandEvent& event)\textcolor{keyword}{override};
+00022     \textcolor{keywordtype}{void} OnShowFullLog(wxCommandEvent& event)\textcolor{keyword}{override};
+00023     \textcolor{keywordtype}{void} onLogLvlChange(wxCommandEvent& event)\textcolor{keyword}{override};
+00025     \textcolor{keywordtype}{void} HandleMessage(wxCommandEvent &event);
+00026     \textcolor{keywordtype}{void} OnUpdateGUI(wxUpdateUIEvent& event);
+00027 
+00028 \textcolor{keyword}{private}:
+00029     wxTextAttr mDefaultStyle;
+00030     std::deque<wxString> mAllMessages;
+00031     std::deque<std::pair<lime::LogLevel, wxString>> mMessageList;
+00032     \textcolor{keywordtype}{int} log_level;
+00033 \};
+00034 
+00035 \textcolor{preprocessor}{#endif // \_\_pnlMiniLog\_\_}
+\end{DoxyCode}

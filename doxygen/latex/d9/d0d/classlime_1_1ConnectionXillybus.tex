@@ -1,0 +1,770 @@
+\subsection{lime\+:\+:Connection\+Xillybus Class Reference}
+\label{classlime_1_1ConnectionXillybus}\index{lime\+::\+Connection\+Xillybus@{lime\+::\+Connection\+Xillybus}}
+
+
+{\ttfamily \#include $<$Connection\+Xillybus.\+h$>$}
+
+
+
+Inheritance diagram for lime\+:\+:Connection\+Xillybus\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=550pt]{d7/d14/classlime_1_1ConnectionXillybus__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for lime\+:\+:Connection\+Xillybus\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=550pt]{dd/ddc/classlime_1_1ConnectionXillybus__coll__graph}
+\end{center}
+\end{figure}
+\subsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct {\bf E\+P\+Config}
+\end{DoxyCompactItemize}
+\subsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+{\bf Connection\+Xillybus} (const unsigned {\bf index})
+\begin{DoxyCompactList}\small\item\em Initializes port type and object necessary to communicate to usb device. \end{DoxyCompactList}\item 
+{\bf $\sim$\+Connection\+Xillybus} ({\bf void})
+\begin{DoxyCompactList}\small\item\em Closes connection to chip and deallocates used memory. \end{DoxyCompactList}\item 
+{\bf int} {\bf Open} (const unsigned {\bf index})
+\begin{DoxyCompactList}\small\item\em Tries to open connected U\+SB device and find communication endpoints. \end{DoxyCompactList}\item 
+{\bf void} {\bf Close} ()
+\begin{DoxyCompactList}\small\item\em Closes communication to device. \end{DoxyCompactList}\item 
+bool {\bf Is\+Open} ()
+\begin{DoxyCompactList}\small\item\em Returns connection status. \end{DoxyCompactList}\item 
+{\bf int} {\bf Get\+Opened\+Index} ()
+\item 
+{\bf int} {\bf Write} (const unsigned char $\ast${\bf buffer}, {\bf int} {\bf length}, {\bf int} {\bf timeout\+\_\+ms}=100) override
+\begin{DoxyCompactList}\small\item\em Sends given data buffer to chip through U\+SB port. \end{DoxyCompactList}\item 
+{\bf int} {\bf Read} (unsigned char $\ast${\bf buffer}, {\bf int} {\bf length}, {\bf int} {\bf timeout\+\_\+ms}=100) override
+\begin{DoxyCompactList}\small\item\em Reads data coming from the chip through U\+SB port. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsubsection*{Protected Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+{\bf int} {\bf Get\+Buffers\+Count} () const override
+\item 
+{\bf int} {\bf Check\+Stream\+Size} ({\bf int} {\bf size}) const override
+\item 
+{\bf int} {\bf Receive\+Data} (char $\ast${\bf buffer}, {\bf int} {\bf length}, {\bf int} ep\+Index, {\bf int} timeout=100) override
+\begin{DoxyCompactList}\small\item\em Reads data from board. \end{DoxyCompactList}\item 
+{\bf int} {\bf Send\+Data} (const char $\ast${\bf buffer}, {\bf int} {\bf length}, {\bf int} ep\+Index, {\bf int} timeout=100) override
+\begin{DoxyCompactList}\small\item\em sends data to board \end{DoxyCompactList}\item 
+{\bf int} {\bf Begin\+Data\+Reading} (char $\ast${\bf buffer}, uint32\+\_\+t {\bf length}, {\bf int} ep) override
+\item 
+bool {\bf Wait\+For\+Reading} ({\bf int} context\+Handle, unsigned {\bf int} {\bf timeout\+\_\+ms}) override
+\item 
+{\bf int} {\bf Finish\+Data\+Reading} (char $\ast${\bf buffer}, uint32\+\_\+t {\bf length}, {\bf int} context\+Handle) override
+\item 
+{\bf void} {\bf Abort\+Reading} ({\bf int} ep\+Index)
+\begin{DoxyCompactList}\small\item\em Aborts reading operations. \end{DoxyCompactList}\item 
+{\bf int} {\bf Begin\+Data\+Sending} (const char $\ast${\bf buffer}, uint32\+\_\+t {\bf length}, {\bf int} ep) override
+\item 
+bool {\bf Wait\+For\+Sending} ({\bf int} context\+Handle, uint32\+\_\+t {\bf timeout\+\_\+ms}) override
+\item 
+{\bf int} {\bf Finish\+Data\+Sending} (const char $\ast${\bf buffer}, uint32\+\_\+t {\bf length}, {\bf int} context\+Handle) override
+\item 
+{\bf void} {\bf Abort\+Sending} ({\bf int} ep\+Index)
+\begin{DoxyCompactList}\small\item\em Aborts sending operations. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsubsection*{Private Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+{\bf e\+Connection\+Type} {\bf Get\+Type} ({\bf void})
+\begin{DoxyCompactList}\small\item\em implement in base class \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsubsection*{Private Attributes}
+\begin{DoxyCompactItemize}
+\item 
+std\+::string {\bf m\+\_\+hardware\+Name}
+\item 
+{\bf int} {\bf m\+\_\+hardware\+Ver}
+\item 
+bool {\bf is\+Connected}
+\item 
+std\+::mutex {\bf m\+Transfer\+Lock}
+\item 
+{\bf H\+A\+N\+D\+LE} {\bf h\+Write}
+\item 
+{\bf H\+A\+N\+D\+LE} {\bf h\+Read}
+\item 
+{\bf H\+A\+N\+D\+LE} {\bf h\+Write\+Stream} [{\bf M\+A\+X\+\_\+\+E\+P\+\_\+\+C\+NT}]
+\item 
+{\bf H\+A\+N\+D\+LE} {\bf h\+Read\+Stream} [{\bf M\+A\+X\+\_\+\+E\+P\+\_\+\+C\+NT}]
+\item 
+std\+::string {\bf write\+Ctrl\+Port}
+\item 
+std\+::string {\bf read\+Ctrl\+Port}
+\item 
+std\+::string {\bf write\+Stream\+Port} [{\bf M\+A\+X\+\_\+\+E\+P\+\_\+\+C\+NT}]
+\item 
+std\+::string {\bf read\+Stream\+Port} [{\bf M\+A\+X\+\_\+\+E\+P\+\_\+\+C\+NT}]
+\end{DoxyCompactItemize}
+\subsubsection*{Static Private Attributes}
+\begin{DoxyCompactItemize}
+\item 
+static const {\bf int} {\bf M\+A\+X\+\_\+\+E\+P\+\_\+\+C\+NT} = 3
+\item 
+static const {\bf E\+P\+Config} {\bf device\+Configs} [$\,$]
+\end{DoxyCompactItemize}
+\subsubsection*{Additional Inherited Members}
+
+
+\subsubsection{Detailed Description}
+
+
+Definition at line {\bf 26} of file {\bf Connection\+Xillybus.\+h}.
+
+
+
+\subsubsection{Constructor \& Destructor Documentation}
+\index{lime\+::\+Connection\+Xillybus@{lime\+::\+Connection\+Xillybus}!Connection\+Xillybus@{Connection\+Xillybus}}
+\index{Connection\+Xillybus@{Connection\+Xillybus}!lime\+::\+Connection\+Xillybus@{lime\+::\+Connection\+Xillybus}}
+\paragraph[{Connection\+Xillybus(const unsigned index)}]{\setlength{\rightskip}{0pt plus 5cm}Connection\+Xillybus\+::\+Connection\+Xillybus (
+\begin{DoxyParamCaption}
+\item[{const unsigned}]{index}
+\end{DoxyParamCaption}
+)}\label{classlime_1_1ConnectionXillybus_ae02007a2a57ca3ca5628b318d4e65378}
+
+
+Initializes port type and object necessary to communicate to usb device. 
+
+
+
+Definition at line {\bf 63} of file {\bf Connection\+Xillybus.\+cpp}.
+
+
+
+References {\bf i}, {\bf status}, and {\bf lime\+::warning()}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{d9/d0d/classlime_1_1ConnectionXillybus_ae02007a2a57ca3ca5628b318d4e65378_cgraph}
+\end{center}
+\end{figure}
+
+
+\index{lime\+::\+Connection\+Xillybus@{lime\+::\+Connection\+Xillybus}!````~Connection\+Xillybus@{$\sim$\+Connection\+Xillybus}}
+\index{````~Connection\+Xillybus@{$\sim$\+Connection\+Xillybus}!lime\+::\+Connection\+Xillybus@{lime\+::\+Connection\+Xillybus}}
+\paragraph[{$\sim$\+Connection\+Xillybus(void)}]{\setlength{\rightskip}{0pt plus 5cm}Connection\+Xillybus\+::$\sim$\+Connection\+Xillybus (
+\begin{DoxyParamCaption}
+\item[{{\bf void}}]{}
+\end{DoxyParamCaption}
+)}\label{classlime_1_1ConnectionXillybus_a72a0f48893f9306489e69553d881e2a6}
+
+
+Closes connection to chip and deallocates used memory. 
+
+
+
+Definition at line {\bf 102} of file {\bf Connection\+Xillybus.\+cpp}.
+
+
+
+\subsubsection{Member Function Documentation}
+\index{lime\+::\+Connection\+Xillybus@{lime\+::\+Connection\+Xillybus}!Abort\+Reading@{Abort\+Reading}}
+\index{Abort\+Reading@{Abort\+Reading}!lime\+::\+Connection\+Xillybus@{lime\+::\+Connection\+Xillybus}}
+\paragraph[{Abort\+Reading(int ep\+Index)}]{\setlength{\rightskip}{0pt plus 5cm}{\bf void} Connection\+Xillybus\+::\+Abort\+Reading (
+\begin{DoxyParamCaption}
+\item[{{\bf int}}]{ep\+Index}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [protected]}, {\ttfamily [virtual]}}\label{classlime_1_1ConnectionXillybus_ad6e774776e7373deb8d00368e2e2d57a}
+
+
+Aborts reading operations. 
+
+
+
+Reimplemented from {\bf lime\+::\+I\+Connection} \doxyref{}{p.}{d2/de5/classlime_1_1IConnection_ae6bc7a7556e13862df14e98ccf4b9409}.
+
+
+
+Definition at line {\bf 492} of file {\bf Connection\+Xillybus.\+cpp}.
+
+\index{lime\+::\+Connection\+Xillybus@{lime\+::\+Connection\+Xillybus}!Abort\+Sending@{Abort\+Sending}}
+\index{Abort\+Sending@{Abort\+Sending}!lime\+::\+Connection\+Xillybus@{lime\+::\+Connection\+Xillybus}}
+\paragraph[{Abort\+Sending(int ep\+Index)}]{\setlength{\rightskip}{0pt plus 5cm}{\bf void} Connection\+Xillybus\+::\+Abort\+Sending (
+\begin{DoxyParamCaption}
+\item[{{\bf int}}]{ep\+Index}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [protected]}, {\ttfamily [virtual]}}\label{classlime_1_1ConnectionXillybus_a5d425ed9d86bb10c97ba087b780674ab}
+
+
+Aborts sending operations. 
+
+
+
+Reimplemented from {\bf lime\+::\+I\+Connection} \doxyref{}{p.}{d2/de5/classlime_1_1IConnection_a36928cc55493e86385e4ff582ef2c02b}.
+
+
+
+Definition at line {\bf 602} of file {\bf Connection\+Xillybus.\+cpp}.
+
+\index{lime\+::\+Connection\+Xillybus@{lime\+::\+Connection\+Xillybus}!Begin\+Data\+Reading@{Begin\+Data\+Reading}}
+\index{Begin\+Data\+Reading@{Begin\+Data\+Reading}!lime\+::\+Connection\+Xillybus@{lime\+::\+Connection\+Xillybus}}
+\paragraph[{Begin\+Data\+Reading(char $\ast$buffer, uint32\+\_\+t length, int ep) override}]{\setlength{\rightskip}{0pt plus 5cm}{\bf int} Connection\+Xillybus\+::\+Begin\+Data\+Reading (
+\begin{DoxyParamCaption}
+\item[{char $\ast$}]{buffer, }
+\item[{uint32\+\_\+t}]{length, }
+\item[{{\bf int}}]{ep}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [protected]}, {\ttfamily [virtual]}}\label{classlime_1_1ConnectionXillybus_a45274f1e8c7a22b4abc5a6e83148520f}
+
+
+Reimplemented from {\bf lime\+::\+I\+Connection} \doxyref{}{p.}{d2/de5/classlime_1_1IConnection_ac9ec0b2a4288d7732d7e2e03f5606401}.
+
+
+
+Definition at line {\bf 619} of file {\bf Connection\+Xillybus.\+cpp}.
+
+\index{lime\+::\+Connection\+Xillybus@{lime\+::\+Connection\+Xillybus}!Begin\+Data\+Sending@{Begin\+Data\+Sending}}
+\index{Begin\+Data\+Sending@{Begin\+Data\+Sending}!lime\+::\+Connection\+Xillybus@{lime\+::\+Connection\+Xillybus}}
+\paragraph[{Begin\+Data\+Sending(const char $\ast$buffer, uint32\+\_\+t length, int ep) override}]{\setlength{\rightskip}{0pt plus 5cm}{\bf int} Connection\+Xillybus\+::\+Begin\+Data\+Sending (
+\begin{DoxyParamCaption}
+\item[{const char $\ast$}]{buffer, }
+\item[{uint32\+\_\+t}]{length, }
+\item[{{\bf int}}]{ep}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [protected]}, {\ttfamily [virtual]}}\label{classlime_1_1ConnectionXillybus_a1b9d65ebf6a867ebe3d607ae691a4e98}
+
+
+Reimplemented from {\bf lime\+::\+I\+Connection} \doxyref{}{p.}{d2/de5/classlime_1_1IConnection_afdfa152ab699f516cd0fb479ec98bcc8}.
+
+
+
+Definition at line {\bf 632} of file {\bf Connection\+Xillybus.\+cpp}.
+
+\index{lime\+::\+Connection\+Xillybus@{lime\+::\+Connection\+Xillybus}!Check\+Stream\+Size@{Check\+Stream\+Size}}
+\index{Check\+Stream\+Size@{Check\+Stream\+Size}!lime\+::\+Connection\+Xillybus@{lime\+::\+Connection\+Xillybus}}
+\paragraph[{Check\+Stream\+Size(int size) const override}]{\setlength{\rightskip}{0pt plus 5cm}{\bf int} Connection\+Xillybus\+::\+Check\+Stream\+Size (
+\begin{DoxyParamCaption}
+\item[{{\bf int}}]{size}
+\end{DoxyParamCaption}
+) const\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [protected]}, {\ttfamily [virtual]}}\label{classlime_1_1ConnectionXillybus_a2b0ca6acf0b0c2d16d6cc5207a92bc62}
+
+
+Reimplemented from {\bf lime\+::\+I\+Connection} \doxyref{}{p.}{d2/de5/classlime_1_1IConnection_a533ff580f219bbec2b556b265c1e1355}.
+
+
+
+Definition at line {\bf 402} of file {\bf Connection\+Xillybus.\+cpp}.
+
+\index{lime\+::\+Connection\+Xillybus@{lime\+::\+Connection\+Xillybus}!Close@{Close}}
+\index{Close@{Close}!lime\+::\+Connection\+Xillybus@{lime\+::\+Connection\+Xillybus}}
+\paragraph[{Close()}]{\setlength{\rightskip}{0pt plus 5cm}{\bf void} Connection\+Xillybus\+::\+Close (
+\begin{DoxyParamCaption}
+\item[{{\bf void}}]{}
+\end{DoxyParamCaption}
+)}\label{classlime_1_1ConnectionXillybus_aae147bedb9e4cc6266b9fc997df2a7f7}
+
+
+Closes communication to device. 
+
+
+
+Definition at line {\bf 139} of file {\bf Connection\+Xillybus.\+cpp}.
+
+
+
+References {\bf i}.
+
+\index{lime\+::\+Connection\+Xillybus@{lime\+::\+Connection\+Xillybus}!Finish\+Data\+Reading@{Finish\+Data\+Reading}}
+\index{Finish\+Data\+Reading@{Finish\+Data\+Reading}!lime\+::\+Connection\+Xillybus@{lime\+::\+Connection\+Xillybus}}
+\paragraph[{Finish\+Data\+Reading(char $\ast$buffer, uint32\+\_\+t length, int context\+Handle) override}]{\setlength{\rightskip}{0pt plus 5cm}{\bf int} Connection\+Xillybus\+::\+Finish\+Data\+Reading (
+\begin{DoxyParamCaption}
+\item[{char $\ast$}]{buffer, }
+\item[{uint32\+\_\+t}]{length, }
+\item[{{\bf int}}]{context\+Handle}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [protected]}, {\ttfamily [virtual]}}\label{classlime_1_1ConnectionXillybus_a5da99779c67da8d966ed97d3ceabe6b7}
+
+
+Reimplemented from {\bf lime\+::\+I\+Connection} \doxyref{}{p.}{d2/de5/classlime_1_1IConnection_a900a18a24b131295005bd5bf88856840}.
+
+
+
+Definition at line {\bf 627} of file {\bf Connection\+Xillybus.\+cpp}.
+
+\index{lime\+::\+Connection\+Xillybus@{lime\+::\+Connection\+Xillybus}!Finish\+Data\+Sending@{Finish\+Data\+Sending}}
+\index{Finish\+Data\+Sending@{Finish\+Data\+Sending}!lime\+::\+Connection\+Xillybus@{lime\+::\+Connection\+Xillybus}}
+\paragraph[{Finish\+Data\+Sending(const char $\ast$buffer, uint32\+\_\+t length, int context\+Handle) override}]{\setlength{\rightskip}{0pt plus 5cm}{\bf int} Connection\+Xillybus\+::\+Finish\+Data\+Sending (
+\begin{DoxyParamCaption}
+\item[{const char $\ast$}]{buffer, }
+\item[{uint32\+\_\+t}]{length, }
+\item[{{\bf int}}]{context\+Handle}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [protected]}, {\ttfamily [virtual]}}\label{classlime_1_1ConnectionXillybus_a2edc7865edfaa217e5b68ce8011a60b2}
+
+
+Reimplemented from {\bf lime\+::\+I\+Connection} \doxyref{}{p.}{d2/de5/classlime_1_1IConnection_a7039b9d4f3b8fc03be3272dcabc51e09}.
+
+
+
+Definition at line {\bf 640} of file {\bf Connection\+Xillybus.\+cpp}.
+
+\index{lime\+::\+Connection\+Xillybus@{lime\+::\+Connection\+Xillybus}!Get\+Buffers\+Count@{Get\+Buffers\+Count}}
+\index{Get\+Buffers\+Count@{Get\+Buffers\+Count}!lime\+::\+Connection\+Xillybus@{lime\+::\+Connection\+Xillybus}}
+\paragraph[{Get\+Buffers\+Count() const override}]{\setlength{\rightskip}{0pt plus 5cm}{\bf int} Connection\+Xillybus\+::\+Get\+Buffers\+Count (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+) const\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [protected]}, {\ttfamily [virtual]}}\label{classlime_1_1ConnectionXillybus_a100404e9b359bcdb45b559a13a593d1b}
+
+
+Reimplemented from {\bf lime\+::\+I\+Connection} \doxyref{}{p.}{d2/de5/classlime_1_1IConnection_a5cf560f39a0b0fa2dc4079ae74f22925}.
+
+
+
+Definition at line {\bf 397} of file {\bf Connection\+Xillybus.\+cpp}.
+
+\index{lime\+::\+Connection\+Xillybus@{lime\+::\+Connection\+Xillybus}!Get\+Opened\+Index@{Get\+Opened\+Index}}
+\index{Get\+Opened\+Index@{Get\+Opened\+Index}!lime\+::\+Connection\+Xillybus@{lime\+::\+Connection\+Xillybus}}
+\paragraph[{Get\+Opened\+Index()}]{\setlength{\rightskip}{0pt plus 5cm}{\bf int} lime\+::\+Connection\+Xillybus\+::\+Get\+Opened\+Index (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}\label{classlime_1_1ConnectionXillybus_aabe88a407d6ad0cd4f7732bbed3940bc}
+\index{lime\+::\+Connection\+Xillybus@{lime\+::\+Connection\+Xillybus}!Get\+Type@{Get\+Type}}
+\index{Get\+Type@{Get\+Type}!lime\+::\+Connection\+Xillybus@{lime\+::\+Connection\+Xillybus}}
+\paragraph[{Get\+Type(void)}]{\setlength{\rightskip}{0pt plus 5cm}{\bf e\+Connection\+Type} lime\+::\+Connection\+Xillybus\+::\+Get\+Type (
+\begin{DoxyParamCaption}
+\item[{{\bf void}}]{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [private]}, {\ttfamily [virtual]}}\label{classlime_1_1ConnectionXillybus_a31e8ba57423e9b1b8e8b73c5abfca336}
+
+
+implement in base class 
+
+
+
+Implements {\bf lime\+::\+L\+M\+S64\+C\+Protocol} \doxyref{}{p.}{de/d46/classlime_1_1LMS64CProtocol_ab766d6322a66164891a296359c2b9019}.
+
+
+
+Definition at line {\bf 72} of file {\bf Connection\+Xillybus.\+h}.
+
+
+
+References {\bf lime\+::\+L\+M\+S64\+C\+Protocol\+::\+P\+C\+I\+E\+\_\+\+P\+O\+RT}.
+
+\index{lime\+::\+Connection\+Xillybus@{lime\+::\+Connection\+Xillybus}!Is\+Open@{Is\+Open}}
+\index{Is\+Open@{Is\+Open}!lime\+::\+Connection\+Xillybus@{lime\+::\+Connection\+Xillybus}}
+\paragraph[{Is\+Open()}]{\setlength{\rightskip}{0pt plus 5cm}bool Connection\+Xillybus\+::\+Is\+Open (
+\begin{DoxyParamCaption}
+\item[{{\bf void}}]{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [virtual]}}\label{classlime_1_1ConnectionXillybus_a18501d0ae9e2f5bbbed61fe591fa120a}
+
+
+Returns connection status. 
+
+\begin{DoxyReturn}{Returns}
+1-\/connection open, 0-\/connection closed. 
+\end{DoxyReturn}
+
+
+Reimplemented from {\bf lime\+::\+I\+Connection} \doxyref{}{p.}{d2/de5/classlime_1_1IConnection_abf1c25c85e31e262ded3e33e65cc58e3}.
+
+
+
+Definition at line {\bf 175} of file {\bf Connection\+Xillybus.\+cpp}.
+
+
+
+References {\bf callback}, {\bf device}, {\bf lime\+::\+Report\+Error()}, and {\bf status}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{d9/d0d/classlime_1_1ConnectionXillybus_a18501d0ae9e2f5bbbed61fe591fa120a_cgraph}
+\end{center}
+\end{figure}
+
+
+\index{lime\+::\+Connection\+Xillybus@{lime\+::\+Connection\+Xillybus}!Open@{Open}}
+\index{Open@{Open}!lime\+::\+Connection\+Xillybus@{lime\+::\+Connection\+Xillybus}}
+\paragraph[{Open(const unsigned index)}]{\setlength{\rightskip}{0pt plus 5cm}{\bf int} Connection\+Xillybus\+::\+Open (
+\begin{DoxyParamCaption}
+\item[{const unsigned}]{index}
+\end{DoxyParamCaption}
+)}\label{classlime_1_1ConnectionXillybus_a61e54a8536e0416fe93467e7e8d8ff12}
+
+
+Tries to open connected U\+SB device and find communication endpoints. 
+
+\begin{DoxyReturn}{Returns}
+Returns 0-\/\+Success, other-\/\+End\+Points not found or device didn\textquotesingle{}t connect. 
+\end{DoxyReturn}
+
+
+Definition at line {\bf 110} of file {\bf Connection\+Xillybus.\+cpp}.
+
+
+
+References {\bf i}, {\bf index}, and {\bf lime\+::\+Report\+Error()}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{d9/d0d/classlime_1_1ConnectionXillybus_a61e54a8536e0416fe93467e7e8d8ff12_cgraph}
+\end{center}
+\end{figure}
+
+
+\index{lime\+::\+Connection\+Xillybus@{lime\+::\+Connection\+Xillybus}!Read@{Read}}
+\index{Read@{Read}!lime\+::\+Connection\+Xillybus@{lime\+::\+Connection\+Xillybus}}
+\paragraph[{Read(unsigned char $\ast$buffer, int length, int timeout\+\_\+ms=100) override}]{\setlength{\rightskip}{0pt plus 5cm}{\bf int} Connection\+Xillybus\+::\+Read (
+\begin{DoxyParamCaption}
+\item[{unsigned char $\ast$}]{buffer, }
+\item[{{\bf int}}]{length, }
+\item[{{\bf int}}]{timeout\+\_\+ms = {\ttfamily 100}}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [virtual]}}\label{classlime_1_1ConnectionXillybus_a1b24af0f13cd154305bdba2fe2c6a232}
+
+
+Reads data coming from the chip through U\+SB port. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em buffer} & pointer to array where received data will be copied, array must be big enough to fit received data. \\
+\hline
+{\em length} & number of bytes to read from chip. \\
+\hline
+{\em timeout\+\_\+ms} & timeout limit for operation in milliseconds \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+number of bytes received. 
+\end{DoxyReturn}
+
+
+Implements {\bf lime\+::\+L\+M\+S64\+C\+Protocol} \doxyref{}{p.}{de/d46/classlime_1_1LMS64CProtocol_ab9e954443ee121eff8e1e6d4f8de3d4b}.
+
+
+
+Definition at line {\bf 326} of file {\bf Connection\+Xillybus.\+cpp}.
+
+
+
+References {\bf read()}, {\bf lime\+::\+Report\+Error()}, and {\bf t1}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{d9/d0d/classlime_1_1ConnectionXillybus_a1b24af0f13cd154305bdba2fe2c6a232_cgraph}
+\end{center}
+\end{figure}
+
+
+\index{lime\+::\+Connection\+Xillybus@{lime\+::\+Connection\+Xillybus}!Receive\+Data@{Receive\+Data}}
+\index{Receive\+Data@{Receive\+Data}!lime\+::\+Connection\+Xillybus@{lime\+::\+Connection\+Xillybus}}
+\paragraph[{Receive\+Data(char $\ast$buffer, int length, int ep\+Index, int timeout=100) override}]{\setlength{\rightskip}{0pt plus 5cm}{\bf int} Connection\+Xillybus\+::\+Receive\+Data (
+\begin{DoxyParamCaption}
+\item[{char $\ast$}]{buffer, }
+\item[{{\bf int}}]{length, }
+\item[{{\bf int}}]{ep\+Index, }
+\item[{{\bf int}}]{timeout\+\_\+ms = {\ttfamily 100}}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [protected]}, {\ttfamily [virtual]}}\label{classlime_1_1ConnectionXillybus_a61ab49528be4bd2821ca0561d473befb}
+
+
+Reads data from board. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em buffer} & array where to store received data \\
+\hline
+{\em length} & number of bytes to read \\
+\hline
+{\em timeout} & read timeout in milliseconds \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+number of bytes received 
+\end{DoxyReturn}
+
+
+Reimplemented from {\bf lime\+::\+I\+Connection} \doxyref{}{p.}{d2/de5/classlime_1_1IConnection_aaa0410a9c772fed64cd37bf8803f40a4}.
+
+
+
+Definition at line {\bf 414} of file {\bf Connection\+Xillybus.\+cpp}.
+
+
+
+References {\bf read()}, {\bf lime\+::\+Report\+Error()}, and {\bf t1}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{d9/d0d/classlime_1_1ConnectionXillybus_a61ab49528be4bd2821ca0561d473befb_cgraph}
+\end{center}
+\end{figure}
+
+
+\index{lime\+::\+Connection\+Xillybus@{lime\+::\+Connection\+Xillybus}!Send\+Data@{Send\+Data}}
+\index{Send\+Data@{Send\+Data}!lime\+::\+Connection\+Xillybus@{lime\+::\+Connection\+Xillybus}}
+\paragraph[{Send\+Data(const char $\ast$buffer, int length, int ep\+Index, int timeout=100) override}]{\setlength{\rightskip}{0pt plus 5cm}{\bf int} Connection\+Xillybus\+::\+Send\+Data (
+\begin{DoxyParamCaption}
+\item[{const char $\ast$}]{buffer, }
+\item[{{\bf int}}]{length, }
+\item[{{\bf int}}]{ep\+Index, }
+\item[{{\bf int}}]{timeout\+\_\+ms = {\ttfamily 100}}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [protected]}, {\ttfamily [virtual]}}\label{classlime_1_1ConnectionXillybus_a4948f4f4ea1e758ece49a9326d25eb25}
+
+
+sends data to board 
+
+
+\begin{DoxyParams}{Parameters}
+{\em $\ast$buffer} & buffer to send \\
+\hline
+{\em length} & number of bytes to send \\
+\hline
+{\em timeout} & data write timeout in milliseconds \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+number of bytes sent 
+\end{DoxyReturn}
+
+
+Reimplemented from {\bf lime\+::\+I\+Connection} \doxyref{}{p.}{d2/de5/classlime_1_1IConnection_a3f6aeab1032832330881d8c3401f86a5}.
+
+
+
+Definition at line {\bf 516} of file {\bf Connection\+Xillybus.\+cpp}.
+
+
+
+References {\bf lime\+::\+Report\+Error()}, and {\bf t1}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{d9/d0d/classlime_1_1ConnectionXillybus_a4948f4f4ea1e758ece49a9326d25eb25_cgraph}
+\end{center}
+\end{figure}
+
+
+\index{lime\+::\+Connection\+Xillybus@{lime\+::\+Connection\+Xillybus}!Wait\+For\+Reading@{Wait\+For\+Reading}}
+\index{Wait\+For\+Reading@{Wait\+For\+Reading}!lime\+::\+Connection\+Xillybus@{lime\+::\+Connection\+Xillybus}}
+\paragraph[{Wait\+For\+Reading(int context\+Handle, unsigned int timeout\+\_\+ms) override}]{\setlength{\rightskip}{0pt plus 5cm}bool Connection\+Xillybus\+::\+Wait\+For\+Reading (
+\begin{DoxyParamCaption}
+\item[{{\bf int}}]{context\+Handle, }
+\item[{unsigned {\bf int}}]{timeout\+\_\+ms}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [protected]}, {\ttfamily [virtual]}}\label{classlime_1_1ConnectionXillybus_abbd7376c5f2a53d9ea08bc6e60602ef1}
+
+
+Reimplemented from {\bf lime\+::\+I\+Connection} \doxyref{}{p.}{d2/de5/classlime_1_1IConnection_a5499673a78953387558d5d7ba3c19802}.
+
+
+
+Definition at line {\bf 623} of file {\bf Connection\+Xillybus.\+cpp}.
+
+\index{lime\+::\+Connection\+Xillybus@{lime\+::\+Connection\+Xillybus}!Wait\+For\+Sending@{Wait\+For\+Sending}}
+\index{Wait\+For\+Sending@{Wait\+For\+Sending}!lime\+::\+Connection\+Xillybus@{lime\+::\+Connection\+Xillybus}}
+\paragraph[{Wait\+For\+Sending(int context\+Handle, uint32\+\_\+t timeout\+\_\+ms) override}]{\setlength{\rightskip}{0pt plus 5cm}bool Connection\+Xillybus\+::\+Wait\+For\+Sending (
+\begin{DoxyParamCaption}
+\item[{{\bf int}}]{context\+Handle, }
+\item[{uint32\+\_\+t}]{timeout\+\_\+ms}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [protected]}, {\ttfamily [virtual]}}\label{classlime_1_1ConnectionXillybus_afc52407d2f76f32f29ae680074998cc1}
+
+
+Reimplemented from {\bf lime\+::\+I\+Connection} \doxyref{}{p.}{d2/de5/classlime_1_1IConnection_aa71b788a3a6735ed7169013dc719ebe2}.
+
+
+
+Definition at line {\bf 636} of file {\bf Connection\+Xillybus.\+cpp}.
+
+\index{lime\+::\+Connection\+Xillybus@{lime\+::\+Connection\+Xillybus}!Write@{Write}}
+\index{Write@{Write}!lime\+::\+Connection\+Xillybus@{lime\+::\+Connection\+Xillybus}}
+\paragraph[{Write(const unsigned char $\ast$buffer, int length, int timeout\+\_\+ms=100) override}]{\setlength{\rightskip}{0pt plus 5cm}{\bf int} Connection\+Xillybus\+::\+Write (
+\begin{DoxyParamCaption}
+\item[{const unsigned char $\ast$}]{buffer, }
+\item[{{\bf int}}]{length, }
+\item[{{\bf int}}]{timeout\+\_\+ms = {\ttfamily 100}}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [virtual]}}\label{classlime_1_1ConnectionXillybus_a48e1d516105d27d9d54af80c076369ac}
+
+
+Sends given data buffer to chip through U\+SB port. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em buffer} & data buffer, must not be longer than 64 bytes. \\
+\hline
+{\em length} & given buffer size. \\
+\hline
+{\em timeout\+\_\+ms} & timeout limit for operation in milliseconds \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+number of bytes sent. 
+\end{DoxyReturn}
+
+
+Implements {\bf lime\+::\+L\+M\+S64\+C\+Protocol} \doxyref{}{p.}{de/d46/classlime_1_1LMS64CProtocol_aa78b82a017792421b61bc6a99b4c55c0}.
+
+
+
+Definition at line {\bf 240} of file {\bf Connection\+Xillybus.\+cpp}.
+
+
+
+References {\bf lime\+::\+Report\+Error()}, and {\bf t1}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{d9/d0d/classlime_1_1ConnectionXillybus_a48e1d516105d27d9d54af80c076369ac_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+\subsubsection{Member Data Documentation}
+\index{lime\+::\+Connection\+Xillybus@{lime\+::\+Connection\+Xillybus}!device\+Configs@{device\+Configs}}
+\index{device\+Configs@{device\+Configs}!lime\+::\+Connection\+Xillybus@{lime\+::\+Connection\+Xillybus}}
+\paragraph[{device\+Configs}]{\setlength{\rightskip}{0pt plus 5cm}const {\bf Connection\+Xillybus\+::\+E\+P\+Config} Connection\+Xillybus\+::device\+Configs\hspace{0.3cm}{\ttfamily [static]}, {\ttfamily [private]}}\label{classlime_1_1ConnectionXillybus_a36825fb2458518dede64e6d5be4d08bb}
+
+
+Definition at line {\bf 71} of file {\bf Connection\+Xillybus.\+h}.
+
+\index{lime\+::\+Connection\+Xillybus@{lime\+::\+Connection\+Xillybus}!h\+Read@{h\+Read}}
+\index{h\+Read@{h\+Read}!lime\+::\+Connection\+Xillybus@{lime\+::\+Connection\+Xillybus}}
+\paragraph[{h\+Read}]{\setlength{\rightskip}{0pt plus 5cm}{\bf H\+A\+N\+D\+LE} lime\+::\+Connection\+Xillybus\+::h\+Read\hspace{0.3cm}{\ttfamily [private]}}\label{classlime_1_1ConnectionXillybus_a397ac096ee41572e1c7d4507e480255d}
+
+
+Definition at line {\bf 81} of file {\bf Connection\+Xillybus.\+h}.
+
+\index{lime\+::\+Connection\+Xillybus@{lime\+::\+Connection\+Xillybus}!h\+Read\+Stream@{h\+Read\+Stream}}
+\index{h\+Read\+Stream@{h\+Read\+Stream}!lime\+::\+Connection\+Xillybus@{lime\+::\+Connection\+Xillybus}}
+\paragraph[{h\+Read\+Stream}]{\setlength{\rightskip}{0pt plus 5cm}{\bf H\+A\+N\+D\+LE} lime\+::\+Connection\+Xillybus\+::h\+Read\+Stream[{\bf M\+A\+X\+\_\+\+E\+P\+\_\+\+C\+NT}]\hspace{0.3cm}{\ttfamily [private]}}\label{classlime_1_1ConnectionXillybus_aed3459f3f79ab8e38540fcfde5eb60d9}
+
+
+Definition at line {\bf 83} of file {\bf Connection\+Xillybus.\+h}.
+
+\index{lime\+::\+Connection\+Xillybus@{lime\+::\+Connection\+Xillybus}!h\+Write@{h\+Write}}
+\index{h\+Write@{h\+Write}!lime\+::\+Connection\+Xillybus@{lime\+::\+Connection\+Xillybus}}
+\paragraph[{h\+Write}]{\setlength{\rightskip}{0pt plus 5cm}{\bf H\+A\+N\+D\+LE} lime\+::\+Connection\+Xillybus\+::h\+Write\hspace{0.3cm}{\ttfamily [private]}}\label{classlime_1_1ConnectionXillybus_a5ca2d0b3a46b3180899d9c7be6b0d168}
+
+
+Definition at line {\bf 80} of file {\bf Connection\+Xillybus.\+h}.
+
+\index{lime\+::\+Connection\+Xillybus@{lime\+::\+Connection\+Xillybus}!h\+Write\+Stream@{h\+Write\+Stream}}
+\index{h\+Write\+Stream@{h\+Write\+Stream}!lime\+::\+Connection\+Xillybus@{lime\+::\+Connection\+Xillybus}}
+\paragraph[{h\+Write\+Stream}]{\setlength{\rightskip}{0pt plus 5cm}{\bf H\+A\+N\+D\+LE} lime\+::\+Connection\+Xillybus\+::h\+Write\+Stream[{\bf M\+A\+X\+\_\+\+E\+P\+\_\+\+C\+NT}]\hspace{0.3cm}{\ttfamily [private]}}\label{classlime_1_1ConnectionXillybus_a8b139a258a01df31c7dae261020250ac}
+
+
+Definition at line {\bf 82} of file {\bf Connection\+Xillybus.\+h}.
+
+\index{lime\+::\+Connection\+Xillybus@{lime\+::\+Connection\+Xillybus}!is\+Connected@{is\+Connected}}
+\index{is\+Connected@{is\+Connected}!lime\+::\+Connection\+Xillybus@{lime\+::\+Connection\+Xillybus}}
+\paragraph[{is\+Connected}]{\setlength{\rightskip}{0pt plus 5cm}bool lime\+::\+Connection\+Xillybus\+::is\+Connected\hspace{0.3cm}{\ttfamily [private]}}\label{classlime_1_1ConnectionXillybus_a2d769e71b6721178be08dd518bbb7fe6}
+
+
+Definition at line {\bf 77} of file {\bf Connection\+Xillybus.\+h}.
+
+\index{lime\+::\+Connection\+Xillybus@{lime\+::\+Connection\+Xillybus}!m\+\_\+hardware\+Name@{m\+\_\+hardware\+Name}}
+\index{m\+\_\+hardware\+Name@{m\+\_\+hardware\+Name}!lime\+::\+Connection\+Xillybus@{lime\+::\+Connection\+Xillybus}}
+\paragraph[{m\+\_\+hardware\+Name}]{\setlength{\rightskip}{0pt plus 5cm}std\+::string lime\+::\+Connection\+Xillybus\+::m\+\_\+hardware\+Name\hspace{0.3cm}{\ttfamily [private]}}\label{classlime_1_1ConnectionXillybus_abac55cb451fbc3494b89bb7847c638ac}
+
+
+Definition at line {\bf 74} of file {\bf Connection\+Xillybus.\+h}.
+
+\index{lime\+::\+Connection\+Xillybus@{lime\+::\+Connection\+Xillybus}!m\+\_\+hardware\+Ver@{m\+\_\+hardware\+Ver}}
+\index{m\+\_\+hardware\+Ver@{m\+\_\+hardware\+Ver}!lime\+::\+Connection\+Xillybus@{lime\+::\+Connection\+Xillybus}}
+\paragraph[{m\+\_\+hardware\+Ver}]{\setlength{\rightskip}{0pt plus 5cm}{\bf int} lime\+::\+Connection\+Xillybus\+::m\+\_\+hardware\+Ver\hspace{0.3cm}{\ttfamily [private]}}\label{classlime_1_1ConnectionXillybus_aea2bb67a64a19776dadb1d61c2e90b37}
+
+
+Definition at line {\bf 75} of file {\bf Connection\+Xillybus.\+h}.
+
+\index{lime\+::\+Connection\+Xillybus@{lime\+::\+Connection\+Xillybus}!M\+A\+X\+\_\+\+E\+P\+\_\+\+C\+NT@{M\+A\+X\+\_\+\+E\+P\+\_\+\+C\+NT}}
+\index{M\+A\+X\+\_\+\+E\+P\+\_\+\+C\+NT@{M\+A\+X\+\_\+\+E\+P\+\_\+\+C\+NT}!lime\+::\+Connection\+Xillybus@{lime\+::\+Connection\+Xillybus}}
+\paragraph[{M\+A\+X\+\_\+\+E\+P\+\_\+\+C\+NT}]{\setlength{\rightskip}{0pt plus 5cm}const {\bf int} lime\+::\+Connection\+Xillybus\+::\+M\+A\+X\+\_\+\+E\+P\+\_\+\+C\+NT = 3\hspace{0.3cm}{\ttfamily [static]}, {\ttfamily [private]}}\label{classlime_1_1ConnectionXillybus_aa8ba34ded2fc6d3c9e70f865e8fc116c}
+
+
+Definition at line {\bf 62} of file {\bf Connection\+Xillybus.\+h}.
+
+\index{lime\+::\+Connection\+Xillybus@{lime\+::\+Connection\+Xillybus}!m\+Transfer\+Lock@{m\+Transfer\+Lock}}
+\index{m\+Transfer\+Lock@{m\+Transfer\+Lock}!lime\+::\+Connection\+Xillybus@{lime\+::\+Connection\+Xillybus}}
+\paragraph[{m\+Transfer\+Lock}]{\setlength{\rightskip}{0pt plus 5cm}std\+::mutex lime\+::\+Connection\+Xillybus\+::m\+Transfer\+Lock\hspace{0.3cm}{\ttfamily [private]}}\label{classlime_1_1ConnectionXillybus_aa045d8a87976e413e176387d68bed9c3}
+
+
+Definition at line {\bf 78} of file {\bf Connection\+Xillybus.\+h}.
+
+\index{lime\+::\+Connection\+Xillybus@{lime\+::\+Connection\+Xillybus}!read\+Ctrl\+Port@{read\+Ctrl\+Port}}
+\index{read\+Ctrl\+Port@{read\+Ctrl\+Port}!lime\+::\+Connection\+Xillybus@{lime\+::\+Connection\+Xillybus}}
+\paragraph[{read\+Ctrl\+Port}]{\setlength{\rightskip}{0pt plus 5cm}std\+::string lime\+::\+Connection\+Xillybus\+::read\+Ctrl\+Port\hspace{0.3cm}{\ttfamily [private]}}\label{classlime_1_1ConnectionXillybus_af83b5c46f501ac38fb72a9ad343e3ff4}
+
+
+Definition at line {\bf 93} of file {\bf Connection\+Xillybus.\+h}.
+
+\index{lime\+::\+Connection\+Xillybus@{lime\+::\+Connection\+Xillybus}!read\+Stream\+Port@{read\+Stream\+Port}}
+\index{read\+Stream\+Port@{read\+Stream\+Port}!lime\+::\+Connection\+Xillybus@{lime\+::\+Connection\+Xillybus}}
+\paragraph[{read\+Stream\+Port}]{\setlength{\rightskip}{0pt plus 5cm}std\+::string lime\+::\+Connection\+Xillybus\+::read\+Stream\+Port[{\bf M\+A\+X\+\_\+\+E\+P\+\_\+\+C\+NT}]\hspace{0.3cm}{\ttfamily [private]}}\label{classlime_1_1ConnectionXillybus_ae9bfe3482362f8924ec68d71c19a5abc}
+
+
+Definition at line {\bf 95} of file {\bf Connection\+Xillybus.\+h}.
+
+\index{lime\+::\+Connection\+Xillybus@{lime\+::\+Connection\+Xillybus}!write\+Ctrl\+Port@{write\+Ctrl\+Port}}
+\index{write\+Ctrl\+Port@{write\+Ctrl\+Port}!lime\+::\+Connection\+Xillybus@{lime\+::\+Connection\+Xillybus}}
+\paragraph[{write\+Ctrl\+Port}]{\setlength{\rightskip}{0pt plus 5cm}std\+::string lime\+::\+Connection\+Xillybus\+::write\+Ctrl\+Port\hspace{0.3cm}{\ttfamily [private]}}\label{classlime_1_1ConnectionXillybus_a319829021f076795dad3ef3a93d243db}
+
+
+Definition at line {\bf 92} of file {\bf Connection\+Xillybus.\+h}.
+
+\index{lime\+::\+Connection\+Xillybus@{lime\+::\+Connection\+Xillybus}!write\+Stream\+Port@{write\+Stream\+Port}}
+\index{write\+Stream\+Port@{write\+Stream\+Port}!lime\+::\+Connection\+Xillybus@{lime\+::\+Connection\+Xillybus}}
+\paragraph[{write\+Stream\+Port}]{\setlength{\rightskip}{0pt plus 5cm}std\+::string lime\+::\+Connection\+Xillybus\+::write\+Stream\+Port[{\bf M\+A\+X\+\_\+\+E\+P\+\_\+\+C\+NT}]\hspace{0.3cm}{\ttfamily [private]}}\label{classlime_1_1ConnectionXillybus_adb429e5c420bcd4308d2292d3456973a}
+
+
+Definition at line {\bf 94} of file {\bf Connection\+Xillybus.\+h}.
+
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+/home/erik/prefix/default/src/limesuite-\/dev/src/\+Connection\+Xillybus/{\bf Connection\+Xillybus.\+h}\item 
+/home/erik/prefix/default/src/limesuite-\/dev/src/\+Connection\+Xillybus/{\bf Connection\+Xillybus.\+cpp}\end{DoxyCompactItemize}

@@ -1,0 +1,733 @@
+\subsection{fftviewer\+\_\+fr\+F\+F\+Tviewer.\+cpp}
+\label{fftviewer__frFFTviewer_8cpp_source}\index{/home/erik/prefix/default/src/limesuite-\/dev/src/fftviewer\+\_\+wxgui/fftviewer\+\_\+fr\+F\+F\+Tviewer.\+cpp@{/home/erik/prefix/default/src/limesuite-\/dev/src/fftviewer\+\_\+wxgui/fftviewer\+\_\+fr\+F\+F\+Tviewer.\+cpp}}
+
+\begin{DoxyCode}
+00001 \textcolor{preprocessor}{#include "fftviewer_frFFTviewer.h"}
+00002 \textcolor{preprocessor}{#include <wx/timer.h>}
+00003 \textcolor{preprocessor}{#include <vector>}
+00004 \textcolor{preprocessor}{#include "OpenGLGraph.h"}
+00005 \textcolor{preprocessor}{#include <LMSBoards.h>}
+00006 \textcolor{preprocessor}{#include "kiss\_fft.h"}
+00007 \textcolor{preprocessor}{#include "IConnection.h"}
+00008 \textcolor{preprocessor}{#include "dataTypes.h"}
+00009 \textcolor{preprocessor}{#include "LMS7002M.h"}
+00010 \textcolor{preprocessor}{#include "windowFunction.h"}
+00011 \textcolor{preprocessor}{#include <fstream>}
+00012 \textcolor{preprocessor}{#include "lms7suiteEvents.h"}
+00013 \textcolor{preprocessor}{#include "lms7_device.h"}
+00014 
+00015 \textcolor{keyword}{using namespace }std;
+00016 \textcolor{keyword}{using namespace }lime;
+00017 
+00018 \textcolor{keywordtype}{void} fftviewer_frFFTviewer::Initialize(lms_device_t* pDataPort)
+00019 \{
+00020     StopStreaming();
+00021     lmsControl = pDataPort;
+00022     lmsIndex = 0;
+00023     \textcolor{keywordflow}{for} (\textcolor{keywordtype}{unsigned} i =0; i < this->cMaxChCount ; i++)
+00024     \{
+00025         this->rxStreams[i].handle = 0;
+00026         this->txStreams[i].handle = 0;
+00027     \}
+00028     cmbStreamType->Clear();
+00029     \textcolor{keyword}{const} \textcolor{keywordtype}{int} num\_ch = LMS_GetNumChannels(lmsControl, \textcolor{keyword}{false});
+00030     \textcolor{keywordflow}{if} (num\_ch>2)
+00031     \{
+00032         cmbStreamType->Append(\_T(\textcolor{stringliteral}{"LMS1 SISO"}));
+00033         cmbStreamType->Append(\_T(\textcolor{stringliteral}{"LMS1 MIMO"}));
+00034         cmbStreamType->Append(\_T(\textcolor{stringliteral}{"LMS2 SISO"}));
+00035         cmbStreamType->Append(\_T(\textcolor{stringliteral}{"LMS2 MIMO"}));
+00036         cmbStreamType->Append(\_T(\textcolor{stringliteral}{"Ext. ADC/DAC"}));
+00037     \}
+00038     \textcolor{keywordflow}{else} \textcolor{keywordflow}{if} (num\_ch == 2)
+00039     \{
+00040         cmbStreamType->Append(\_T(\textcolor{stringliteral}{"LMS SISO"}));
+00041         cmbStreamType->Append(\_T(\textcolor{stringliteral}{"LMS MIMO"}));
+00042     \}
+00043     \textcolor{keywordflow}{else}
+00044     \{
+00045         cmbStreamType->Append(\_T(\textcolor{stringliteral}{"LMS SISO"}));
+00046     \}
+00047     cmbStreamType->SetSelection(0);
+00048     SetNyquistFrequency();
+00049 
+00050 \}
+00051 
+00052 fftviewer_frFFTviewer::fftviewer_frFFTviewer( wxWindow* parent )
+00053 :
+00054 frFFTviewer(parent),
+00055 mStreamRunning(false),
+00056 lmsControl(nullptr)
+00057 \{
+00058     captureSamples.store(\textcolor{keyword}{false});
+00059     averageCount.store(50);
+00060     spinAvgCount->SetValue(averageCount);
+00061     updateGUI.store(\textcolor{keyword}{true});
+00062 \textcolor{preprocessor}{#ifndef \_\_unix\_\_}
+00063     SetIcon(wxIcon(\_(\textcolor{stringliteral}{"aaaaAPPicon"})));
+00064 \textcolor{preprocessor}{#endif}
+00065     SetSize(1000, 700);
+00066     mFFTpanel->settings.useVBO = \textcolor{keyword}{true};
+00067     mFFTpanel->AddSerie(\textcolor{keyword}{new} cDataSerie());
+00068     mFFTpanel->AddSerie(\textcolor{keyword}{new} cDataSerie());
+00069     mFFTpanel->series[0]->color = 0xFF0000FF;
+00070     mFFTpanel->series[1]->color = 0x0000FFFF;
+00071     mFFTpanel->SetDrawingMode(GLG_LINE);
+00072     mFFTpanel->settings.gridXlines = 15;
+00073     mFFTpanel->SetInitialDisplayArea(-16000000, 16000000, -115, 0);
+00074 
+00075     mFFTpanel->settings.title = \textcolor{stringliteral}{"FFT"};
+00076     mFFTpanel->settings.titleXaxis = \textcolor{stringliteral}{"Frequency(MHz)"};
+00077     mFFTpanel->settings.titleYaxis = \textcolor{stringliteral}{"Amplitude(dBFS)"};
+00078     mFFTpanel->settings.xUnits = \textcolor{stringliteral}{""};
+00079     mFFTpanel->settings.gridXprec = 3;
+00080     \textcolor{comment}{//mFFTpanel->settings.yUnits = "dB";}
+00081     mFFTpanel->settings.markersEnabled = \textcolor{keyword}{true};
+00082 
+00083     mFFTpanel->settings.marginLeft = 40;
+00084     mFFTpanel->settings.staticGrid = \textcolor{keyword}{true};
+00085 
+00086     mTimeDomainPanel->settings.useVBO = \textcolor{keyword}{true};
+00087     mTimeDomainPanel->AddSerie(\textcolor{keyword}{new} cDataSerie());
+00088     mTimeDomainPanel->AddSerie(\textcolor{keyword}{new} cDataSerie());
+00089     mTimeDomainPanel->AddSerie(\textcolor{keyword}{new} cDataSerie());
+00090     mTimeDomainPanel->AddSerie(\textcolor{keyword}{new} cDataSerie());
+00091     mTimeDomainPanel->SetInitialDisplayArea(0, 1024, -2050, 2050);
+00092     mTimeDomainPanel->settings.title = \textcolor{stringliteral}{"IQ samples"};
+00093     mTimeDomainPanel->series[0]->color = 0xFF0000FF;
+00094     mTimeDomainPanel->series[1]->color = 0x0000FFFF;
+00095     mTimeDomainPanel->series[2]->color = 0xFF00FFFF;
+00096     mTimeDomainPanel->series[3]->color = 0x00FFFFFF;
+00097     mTimeDomainPanel->settings.marginLeft = 48;
+00098     mConstelationPanel->settings.useVBO = \textcolor{keyword}{true};
+00099     mConstelationPanel->AddSerie(\textcolor{keyword}{new} cDataSerie());
+00100     mConstelationPanel->AddSerie(\textcolor{keyword}{new} cDataSerie());
+00101     mConstelationPanel->series[0]->color = 0xFF0000FF;
+00102     mConstelationPanel->series[1]->color = 0x0000FFFF;
+00103     mConstelationPanel->SetInitialDisplayArea(-2050, 2050, -2050, 2050);
+00104     mConstelationPanel->SetDrawingMode(GLG_POINTS);
+00105     mConstelationPanel->settings.title = \textcolor{stringliteral}{"I versus Q"};
+00106     mConstelationPanel->settings.titleXaxis = \textcolor{stringliteral}{"I"};
+00107     mConstelationPanel->settings.titleYaxis = \textcolor{stringliteral}{"Q"};
+00108     mConstelationPanel->settings.gridXlines = 8;
+00109     mConstelationPanel->settings.gridYlines = 8;
+00110     mConstelationPanel->settings.marginLeft = 48;
+00111 
+00112     mGUIupdater = \textcolor{keyword}{new} wxTimer(\textcolor{keyword}{this}, wxID\_ANY); \textcolor{comment}{//timer for updating plots}
+00113     Connect(wxEVT\_THREAD, wxThreadEventHandler(
+      fftviewer_frFFTviewer::OnUpdatePlots), NULL, \textcolor{keyword}{this});
+00114     Connect(wxEVT\_TIMER, wxTimerEventHandler(
+      fftviewer_frFFTviewer::OnUpdateStats), NULL, \textcolor{keyword}{this});
+00115 
+00116     wxCommandEvent evt;
+00117     \textcolor{comment}{//show only A channel at startup}
+00118     evt.SetInt(0);
+00119     OnChannelVisibilityChange(evt);
+00120 \}
+00121 
+00122 fftviewer_frFFTviewer::~fftviewer_frFFTviewer()
+00123 \{
+00124     \textcolor{keywordflow}{if} (mStreamRunning == \textcolor{keyword}{true})
+00125         StopStreaming();
+00126 \}
+00127 
+00128 \textcolor{keywordtype}{void} fftviewer_frFFTviewer::OnWindowFunctionChanged( wxCommandEvent& event )
+00129 \{
+00130     windowFunctionID.store(cmbWindowFunc->GetSelection());
+00131 \}
+00132 
+00133 \textcolor{keywordtype}{void} fftviewer_frFFTviewer::OnbtnStartStop( wxCommandEvent& event )
+00134 \{
+00135     \textcolor{keywordflow}{if} (threadProcessing.joinable() == \textcolor{keyword}{false})
+00136         StartStreaming();
+00137     \textcolor{keywordflow}{else}
+00138         StopStreaming();
+00139 \}
+00140 
+00141 \textcolor{keywordtype}{void} fftviewer_frFFTviewer::StartStreaming()
+00142 \{
+00143     \textcolor{keyword}{auto} conn = ((LMS7_Device*)lmsControl)->GetConnection();
+00144     \textcolor{keywordflow}{if} (!conn || !conn->IsOpen())
+00145     \{
+00146         wxMessageBox(\_(\textcolor{stringliteral}{"FFTviewer: Connection not initialized"}), \_(\textcolor{stringliteral}{"ERROR"}));
+00147         \textcolor{keywordflow}{return};
+00148     \}
+00149 
+00150     txtNyquistFreqMHz->Disable();
+00151     cmbStreamType->Disable();
+00152     spinFFTsize->Disable();
+00153     chkEnSync->Disable();
+00154 
+00155     stopProcessing.store(\textcolor{keyword}{false});
+00156     updateGUI.store(\textcolor{keyword}{true});
+00157 
+00158     \textcolor{keyword}{const} \textcolor{keywordtype}{int} fftSize = spinFFTsize->GetValue();
+00159     fftFreqAxis.resize(fftSize);
+00160     \textcolor{keywordtype}{double} nyquistMHz;
+00161     txtNyquistFreqMHz->GetValue().ToDouble(&nyquistMHz);
+00162     \textcolor{keyword}{const} \textcolor{keywordtype}{float} step = 2*nyquistMHz / fftSize;
+00163     \textcolor{keywordflow}{for} (\textcolor{keywordtype}{int} i = 0; i < fftSize; ++i)
+00164         fftFreqAxis[i] = 1e6*(-nyquistMHz + (i+1)*step);
+00165     timeXAxis.resize(fftSize);
+00166     \textcolor{keywordflow}{for} (\textcolor{keywordtype}{int} i = 0; i < fftSize; ++i)
+00167         timeXAxis[i] = i;
+00168 
+00169     \textcolor{keywordflow}{if}(chkCaptureToFile->GetValue() == \textcolor{keyword}{true})
+00170     \{
+00171         captureSamples.store(\textcolor{keyword}{true});
+00172         wxFileDialog dlg(\textcolor{keyword}{this}, \_(\textcolor{stringliteral}{"Save samples file"}), \textcolor{stringliteral}{""}, \textcolor{stringliteral}{""}, \textcolor{stringliteral}{"Text (*.txt)|*.txt"}, wxFD\_SAVE | 
+      wxFD\_OVERWRITE\_PROMPT);
+00173         \textcolor{keywordflow}{if} (dlg.ShowModal() == wxID\_CANCEL)
+00174             captureSamples.store(\textcolor{keyword}{false});
+00175         \textcolor{keywordflow}{else}
+00176             captureFilename = dlg.GetPath().To8BitData();
+00177     \}
+00178     \textcolor{keywordflow}{else}
+00179         captureSamples.store(\textcolor{keyword}{false});
+00180     chkCaptureToFile->Disable();
+00181     spinCaptureCount->Disable();
+00182     cmbFmt->Disable();
+00183     chkEnTx->Disable();
+00184     lmsIndex = cmbStreamType->GetSelection()/2;
+00185     \textcolor{keywordflow}{if} (mStreamRunning.load() == \textcolor{keyword}{true})
+00186         \textcolor{keywordflow}{return};
+00187     \textcolor{keywordflow}{switch} (cmbStreamType->GetSelection()%2)
+00188     \{
+00189     \textcolor{keywordflow}{case} 0: \textcolor{comment}{//SISO}
+00190         \textcolor{keywordflow}{if} (cmbChannelVisibility->GetSelection() > 1)
+00191             cmbChannelVisibility->SetSelection(0);
+00192         cmbChannelVisibility->Disable();
+00193         threadProcessing = std::thread(StreamingLoop, \textcolor{keyword}{this}, fftSize, 1, 0);
+00194         \textcolor{keywordflow}{break};
+00195     \textcolor{keywordflow}{case} 1: \textcolor{comment}{//MIMO}
+00196         threadProcessing = std::thread(StreamingLoop, \textcolor{keyword}{this}, fftSize, 2, 0);
+00197         \textcolor{keywordflow}{break};
+00198     \}
+00199 
+00200     btnStartStop->SetLabel(\_(\textcolor{stringliteral}{"STOP"}));
+00201     mGUIupdater->Start(500);
+00202 \}
+00203 
+00204 \textcolor{keywordtype}{void} fftviewer_frFFTviewer::StopStreaming()
+00205 \{
+00206     txtNyquistFreqMHz->Enable();
+00207     mGUIupdater->Stop();
+00208     \textcolor{keywordflow}{if} (mStreamRunning.load() == \textcolor{keyword}{false})
+00209         \textcolor{keywordflow}{return};
+00210     stopProcessing.store(\textcolor{keyword}{true});
+00211     threadProcessing.join();
+00212     btnStartStop->SetLabel(\_(\textcolor{stringliteral}{"START"}));
+00213     cmbStreamType->Enable();
+00214     spinFFTsize->Enable();
+00215     chkCaptureToFile->Enable();
+00216     spinCaptureCount->Enable();
+00217     chkEnSync->Enable();
+00218     cmbFmt->Enable();
+00219     cmbChannelVisibility->Enable();
+00220     chkEnTx->Enable();
+00221 \}
+00222 
+00223 \textcolor{keywordtype}{void} fftviewer_frFFTviewer::OnUpdateStats(wxTimerEvent& event)
+00224 \{
+00225     \textcolor{keywordflow}{if} (mStreamRunning.load() == \textcolor{keyword}{false})
+00226         \textcolor{keywordflow}{return};
+00227     \textcolor{keywordflow}{if}(rxStreams[0].handle != 0)
+00228     \{
+00229         lms_stream_status_t rxStats;
+00230         LMS_GetStreamStatus(&rxStreams[0],&rxStats);
+00231         \textcolor{keywordtype}{float} RxFilled = 100*(float)rxStats.fifoFilledCount/rxStats.fifoSize;
+00232         gaugeRxBuffer->SetValue((\textcolor{keywordtype}{int})RxFilled);
+00233         lblRxDataRate->SetLabel(printDataRate(rxStats.linkRate));
+00234     \}
+00235     \textcolor{keywordflow}{else}
+00236     \{
+00237         gaugeRxBuffer->SetValue(0);
+00238         lblRxDataRate->SetLabel(printDataRate(0));
+00239     \}
+00240     \textcolor{keywordflow}{if}(txStreams[0].handle != 0)
+00241     \{
+00242         lms_stream_status_t txStats;
+00243         LMS_GetStreamStatus(&txStreams[0],&txStats);
+00244         \textcolor{keywordtype}{float} TxFilled = 100*(float)txStats.fifoFilledCount/txStats.fifoSize;
+00245         gaugeTxBuffer->SetValue((\textcolor{keywordtype}{int})TxFilled);
+00246         lblTxDataRate->SetLabel(printDataRate(txStats.linkRate));
+00247     \}
+00248     \textcolor{keywordflow}{else}
+00249     \{
+00250         gaugeTxBuffer->SetValue(0);
+00251         lblTxDataRate->SetLabel(printDataRate(0));
+00252     \}
+00253 \}
+00254 
+00255 \textcolor{keywordtype}{void} fftviewer_frFFTviewer::OnUpdatePlots(wxThreadEvent& event)
+00256 \{
+00257     \textcolor{keywordtype}{double} dbOffset = cmbFmt->GetSelection() == 1 ? 93.319 : 69.2369;
+00258     \textcolor{keywordflow}{if} (mStreamRunning.load() == \textcolor{keyword}{false})
+00259         \textcolor{keywordflow}{return};
+00260 
+00261     \textcolor{keyword}{const} \textcolor{keywordtype}{int} fftSize = streamData.fftBins[0].size();
+00262 
+00263     \textcolor{keywordflow}{if} (chkEnPwr->GetValue())
+00264     \{
+00265         \textcolor{keywordtype}{float} chPwr[2] = \{ 0, 0 \};
+00266         \textcolor{keywordtype}{double} cFreq[2] = \{ 0, 0 \};
+00267         txtCenterOffset1->GetValue().ToDouble(&cFreq[0]);
+00268         txtCenterOffset2->GetValue().ToDouble(&cFreq[1]);
+00269         \textcolor{keywordtype}{double} bw[2] = \{1, 1\};
+00270         txtBW1->GetValue().ToDouble(&bw[0]);
+00271         txtBW2->GetValue().ToDouble(&bw[1]);
+00272 
+00273         \textcolor{keywordflow}{for} (\textcolor{keywordtype}{int} c = 0; c<2; ++c)
+00274         \{
+00275             \textcolor{keywordtype}{float} f0 = (cFreq[c] - bw[c]/2) * 1e6;
+00276             \textcolor{keywordtype}{float} fn = (cFreq[c] + bw[c]/2) * 1e6;
+00277             \textcolor{keywordtype}{float} sum = 0;
+00278             \textcolor{keywordtype}{int} bins = 0;
+00279             \textcolor{keywordflow}{for} (\textcolor{keywordtype}{int} i = 0; i<fftSize; ++i)
+00280                 \textcolor{keywordflow}{if} (f0 <= fftFreqAxis[i] && fftFreqAxis[i] <= fn)
+00281                 \{
+00282                     sum += streamData.fftBins[0][i];
+00283                     ++bins;
+00284                 \}
+00285             chPwr[c] = sum;
+00286         \}
+00287 
+00288         \textcolor{keywordtype}{float} pwr1 = (chPwr[0] != 0 ? (10 * log10(chPwr[0])) - dbOffset : -300);
+00289         lblPower1->SetLabel(wxString::Format(\textcolor{stringliteral}{"%.3f"}, pwr1));
+00290         \textcolor{keywordtype}{float} pwr2 = (chPwr[1] != 0 ? (10 * log10(chPwr[1])) - dbOffset : -300);
+00291         lblPower2->SetLabel(wxString::Format(\textcolor{stringliteral}{"%.3f"}, pwr2));
+00292         lbldBc->SetLabel(wxString::Format(\textcolor{stringliteral}{"%.3f"}, pwr2-pwr1));
+00293     \}
+00294 
+00295     \textcolor{keywordflow}{if} (fftSize > 0)
+00296     \{
+00297         \textcolor{keywordflow}{if} (chkFreezeTimeDomain->IsChecked() == \textcolor{keyword}{false})
+00298         \{
+00299             mTimeDomainPanel->series[0]->AssignValues(&timeXAxis[0], &streamData.
+      samplesI[0][0], streamData.samplesI[0].size());
+00300             mTimeDomainPanel->series[1]->AssignValues(&timeXAxis[0], &streamData.
+      samplesQ[0][0], streamData.samplesQ[0].size());
+00301             mTimeDomainPanel->series[2]->AssignValues(&timeXAxis[0], &streamData.
+      samplesI[1][0], streamData.samplesI[1].size());
+00302             mTimeDomainPanel->series[3]->AssignValues(&timeXAxis[0], &streamData.
+      samplesQ[1][0], streamData.samplesQ[1].size());
+00303         \}
+00304         \textcolor{keywordflow}{if} (chkFreezeConstellation->IsChecked() == \textcolor{keyword}{false})
+00305         \{
+00306             mConstelationPanel->series[0]->AssignValues(&streamData.samplesI[0][0], &
+      streamData.samplesQ[0][0], streamData.samplesQ[0].size());
+00307             mConstelationPanel->series[1]->AssignValues(&streamData.samplesI[1][0], &
+      streamData.samplesQ[1][0], streamData.samplesQ[1].size());
+00308         \}
+00309         \textcolor{keywordflow}{if} (chkFreezeFFT->IsChecked() == \textcolor{keyword}{false})
+00310         \{
+00311             \textcolor{keywordflow}{for} (\textcolor{keywordtype}{int} ch = 0; ch<2; ++ch)
+00312             \{
+00313                 \textcolor{keywordflow}{for} (\textcolor{keywordtype}{int} s = 0; s < fftSize; ++s)
+00314                 \{
+00315                     streamData.fftBins[ch][s] = (streamData.fftBins[ch][s] != 0 ? (10 * log10(
+      streamData.fftBins[ch][s])) - dbOffset : -300);
+00316                 \}
+00317             \}
+00318             mFFTpanel->series[0]->AssignValues(&fftFreqAxis[0], &streamData.
+      fftBins[0][0], fftSize);
+00319             mFFTpanel->series[1]->AssignValues(&fftFreqAxis[0], &streamData.
+      fftBins[1][0], fftSize);
+00320         \}
+00321     \}
+00322 
+00323     \textcolor{keywordflow}{if} (chkFreezeTimeDomain->IsChecked() == \textcolor{keyword}{false})
+00324     \{
+00325         mTimeDomainPanel->Refresh();
+00326         mTimeDomainPanel->Draw();
+00327     \}
+00328 
+00329     \textcolor{keywordflow}{if} (chkFreezeConstellation->IsChecked() == \textcolor{keyword}{false})
+00330     \{
+00331         mConstelationPanel->Refresh();
+00332         mConstelationPanel->Draw();
+00333     \}
+00334 
+00335     \textcolor{keywordflow}{if} (chkFreezeFFT->IsChecked() == \textcolor{keyword}{false})
+00336     \{
+00337         mFFTpanel->Refresh();
+00338         mFFTpanel->Draw();
+00339         enableFFT.store(\textcolor{keyword}{true});
+00340     \}
+00341     \textcolor{keywordflow}{else} enableFFT.store(\textcolor{keyword}{false});
+00342 
+00343     updateGUI.store(\textcolor{keyword}{true});
+00344 \}
+00345 
+00346 \textcolor{keywordtype}{void} fftviewer_frFFTviewer::StreamingLoop(fftviewer_frFFTviewer* pthis, \textcolor{keyword}{const} \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{int} fftSize, \textcolor{keyword}{const} \textcolor{keywordtype}{
+      int} channelsCount, \textcolor{keyword}{const} uint32\_t format)
+00347 \{
+00348     \textcolor{keyword}{const} \textcolor{keywordtype}{bool} runTx = pthis->chkEnTx->GetValue();
+00349     \textcolor{keyword}{const} \textcolor{keywordtype}{int} fifoSize = fftSize*512;
+00350     \textcolor{keywordtype}{int} avgCount = pthis->spinAvgCount->GetValue();
+00351     \textcolor{keywordtype}{int} wndFunction = pthis->windowFunctionID.load();
+00352     \textcolor{keywordtype}{bool} fftEnabled = \textcolor{keyword}{true};
+00353     \textcolor{keywordtype}{int} ch\_offset = 0;
+00354     \textcolor{keywordtype}{bool} syncTx = pthis->chkEnSync->GetValue();
+00355     \textcolor{keywordflow}{if} (channelsCount == 1)
+00356     \{
+00357         \textcolor{keywordflow}{if} (pthis->cmbChannelVisibility->GetSelection() == 1)
+00358             ch\_offset = 1;
+00359     \}
+00360     vector<float> wndCoef;
+00361     GenerateWindowCoefficients(wndFunction, fftSize, wndCoef, 1);
+00362 
+00363     lime::complex16_t** buffers;
+00364 
+00365     DataToGUI localDataResults;
+00366     localDataResults.nyquist_Hz = 7.68e6;
+00367     \textcolor{keywordflow}{for} (\textcolor{keywordtype}{unsigned} i = 0; i < cMaxChCount; i++)
+00368     \{
+00369         localDataResults.samplesI[i].resize(fftSize, 0);
+00370         localDataResults.samplesQ[i].resize(fftSize, 0);
+00371         localDataResults.fftBins[i].resize(fftSize, 0);
+00372     \}
+00373     buffers = \textcolor{keyword}{new} lime::complex16_t*[channelsCount];
+00374     \textcolor{keywordflow}{for} (\textcolor{keywordtype}{int} i = 0; i < channelsCount; ++i)
+00375         buffers[i] = \textcolor{keyword}{new} complex16_t[fftSize];
+00376 
+00377     vector<complex16\_t> captureBuffer[cMaxChCount];
+00378     uint32\_t samplesToCapture[cMaxChCount];
+00379     uint32\_t samplesCaptured[cMaxChCount];
+00380     \textcolor{keywordflow}{if}(pthis->captureSamples.load() == \textcolor{keyword}{true})
+00381         \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} ch=0; ch<channelsCount; ++ch)
+00382         \{
+00383             samplesToCapture[ch] = pthis->spinCaptureCount->GetValue();
+00384             captureBuffer[ch].resize(samplesToCapture[ch]);
+00385             samplesCaptured[ch] = 0;
+00386         \}
+00387 
+00388     \textcolor{keywordflow}{if} (LMS_GetNumChannels(pthis->lmsControl, \textcolor{keyword}{false})>2)
+00389         ch\_offset += 2*pthis->lmsIndex;
+00390 
+00391     \textcolor{keyword}{auto} fmt = pthis->cmbFmt->GetSelection() == 1 ? lms_stream_t::LMS_FMT_I16 : 
+      lms_stream_t::LMS_FMT_I12;
+00392     \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} i=0; i<channelsCount; ++i)
+00393     \{
+00394         pthis->rxStreams[i].channel = i + ch\_offset;
+00395         pthis->rxStreams[i].fifoSize = fifoSize;
+00396         pthis->rxStreams[i].isTx = \textcolor{keyword}{false};
+00397         pthis->rxStreams[i].dataFmt = fmt;
+00398         pthis->rxStreams[i].throughputVsLatency = 0.8;
+00399         LMS_SetupStream(pthis->lmsControl, &pthis->rxStreams[i]);
+00400 
+00401         pthis->txStreams[i].handle = 0;
+00402         pthis->txStreams[i].channel = i + ch\_offset;
+00403         pthis->txStreams[i].fifoSize = fifoSize;
+00404         pthis->txStreams[i].isTx = \textcolor{keyword}{true};
+00405         pthis->txStreams[i].dataFmt = fmt;
+00406         pthis->txStreams[i].throughputVsLatency = 0.8;
+00407         \textcolor{keywordflow}{if}(runTx)
+00408             LMS_SetupStream(pthis->lmsControl, &pthis->txStreams[i]);
+00409     \}
+00410 
+00411     kiss\_fft\_cfg m\_fftCalcPlan = kiss\_fft\_alloc(fftSize, 0, 0, 0);
+00412     kiss\_fft\_cpx* m\_fftCalcIn = \textcolor{keyword}{new} kiss\_fft\_cpx[fftSize];
+00413     kiss\_fft\_cpx* m\_fftCalcOut = \textcolor{keyword}{new} kiss\_fft\_cpx[fftSize];
+00414 
+00415     \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} i=0; i<channelsCount; ++i)
+00416     \{
+00417         LMS_StartStream(&pthis->rxStreams[i]);
+00418         \textcolor{keywordflow}{if}(runTx)
+00419             LMS_StartStream(&pthis->txStreams[i]);
+00420     \}
+00421     wxCommandEvent evt;
+00422     evt.SetEventType(SAMPLE\_POS\_CHANGED);
+00423     wxPostEvent(pthis->GetParent(), evt);
+00424 
+00425     pthis->mStreamRunning.store(\textcolor{keyword}{true});
+00426     lms_stream_meta_t meta;
+00427     meta.waitForTimestamp = syncTx;
+00428     meta.flushPartialPacket = \textcolor{keyword}{false};
+00429     \textcolor{keywordtype}{int} fftCounter = 0;
+00430 
+00431     \textcolor{keywordflow}{while} (pthis->stopProcessing.load() == \textcolor{keyword}{false})
+00432     \{
+00433         \textcolor{keywordflow}{do}
+00434         \{
+00435             uint32\_t samplesPopped[cMaxChCount];
+00436             uint64\_t ts[cMaxChCount];
+00437             \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} i=0; i<channelsCount; ++i)
+00438             \{
+00439                 samplesPopped[i] = LMS_RecvStream(&pthis->rxStreams[i], &buffers[
+      i][0], fftSize, &meta, 1000);
+00440                 ts[i] = meta.timestamp + fifoSize/4;
+00441             \}
+00442 
+00443             \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} i=0; runTx && i<channelsCount; ++i)
+00444             \{
+00445                 meta.timestamp = ts[i];
+00446                 meta.waitForTimestamp = syncTx;
+00447                 LMS_SendStream(&pthis->txStreams[i], &buffers[i][0], samplesPopped[i], &meta, 1000);
+00448             \}
+00449 
+00450             \textcolor{keywordflow}{if}(pthis->captureSamples.load())
+00451             \{
+00452                 \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} ch=0; ch<channelsCount; ++ch)
+00453                 \{
+00454                     uint32\_t samplesToCopy = min(samplesPopped[ch], samplesToCapture[ch]);
+00455                     \textcolor{keywordflow}{if}(samplesToCopy <= 0)
+00456                         \textcolor{keywordflow}{break};
+00457                     memcpy((captureBuffer[ch].data() + samplesCaptured[ch]), buffers[ch], samplesToCopy*\textcolor{keyword}{
+      sizeof}(complex16_t));
+00458                     samplesToCapture[ch] -= samplesToCopy;
+00459                     samplesCaptured[ch] += samplesToCopy;
+00460                 \}
+00461             \}
+00462 
+00463             \textcolor{keywordflow}{for} (\textcolor{keywordtype}{int} ch = 0; ch < channelsCount; ++ch)
+00464             \{
+00465                 \textcolor{comment}{//take only first buffer for time domain display}
+00466                 \textcolor{comment}{//reset fftBins for accumulation}
+00467                 \textcolor{keywordflow}{for} (\textcolor{keywordtype}{unsigned} i = 0; fftCounter==0 && i < fftSize; ++i)
+00468                 \{
+00469                     \textcolor{keywordflow}{if} (fftEnabled)
+00470                         localDataResults.fftBins[ch][i] = 0;
+00471                     localDataResults.samplesI[ch][i] = buffers[ch][i].i;
+00472                     localDataResults.samplesQ[ch][i] = buffers[ch][i].q;
+00473                 \}
+00474                 \textcolor{keywordflow}{if} (fftEnabled)
+00475                 \{
+00476                     \textcolor{keywordflow}{if} (wndFunction == 0)
+00477                     \{
+00478                         \textcolor{keywordflow}{for} (\textcolor{keywordtype}{unsigned} i = 0; i < fftSize; ++i)
+00479                         \{
+00480                             m\_fftCalcIn[i].r = buffers[ch][i].i;
+00481                             m\_fftCalcIn[i].i = buffers[ch][i].q;
+00482                         \}
+00483                     \}
+00484                     \textcolor{keywordflow}{else}
+00485                     \{
+00486                         \textcolor{keywordflow}{for} (\textcolor{keywordtype}{unsigned} i = 0; i < fftSize; ++i)
+00487                         \{
+00488                             m\_fftCalcIn[i].r = buffers[ch][i].i * wndCoef[i];
+00489                             m\_fftCalcIn[i].i = buffers[ch][i].q * wndCoef[i];
+00490                         \}
+00491                     \}
+00492 
+00493                     kiss\_fft(m\_fftCalcPlan, m\_fftCalcIn, m\_fftCalcOut);
+00494 
+00495                     \textcolor{keywordtype}{int} output\_index = 0;
+00496                     \textcolor{keywordflow}{for} (\textcolor{keywordtype}{unsigned} i = fftSize / 2 + 1; i < fftSize; ++i)
+00497                         localDataResults.fftBins[ch][output\_index++] += m\_fftCalcOut[
+      i].r * m\_fftCalcOut[i].r + m\_fftCalcOut[i].i * m\_fftCalcOut[i].i;
+00498                     for (\textcolor{keywordtype}{unsigned} i = 0; i < fftSize / 2 + 1; ++i)
+00499                         localDataResults.fftBins[ch][output\_index++] += m\_fftCalcOut[
+      i].r * m\_fftCalcOut[i].r + m\_fftCalcOut[i].i * m\_fftCalcOut[i].i;
+00500                 \}
+00501             \}
+00502         \} \textcolor{keywordflow}{while} (++fftCounter < avgCount && pthis->stopProcessing.load() == \textcolor{keyword}{false});
+00503 
+00504         \textcolor{keywordflow}{if} (fftCounter >= avgCount && pthis->updateGUI.load() == \textcolor{keyword}{true})
+00505         \{
+00506             \textcolor{comment}{//shift fft}
+00507             \textcolor{keywordflow}{if} (fftEnabled)
+00508             \{
+00509                 \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} ch=0; ch<channelsCount; ++ch)
+00510                 \{
+00511                     \textcolor{keywordflow}{for} (\textcolor{keywordtype}{unsigned} s = 0; s < fftSize; ++s)
+00512                     \{
+00513                         \textcolor{keyword}{const} \textcolor{keywordtype}{float} div = (float)fftCounter*fftSize*fftSize;
+00514                         localDataResults.fftBins[ch][s] /= div;
+00515                     \}
+00516                 \}
+00517             \}
+00518             \textcolor{keywordflow}{if}(pthis->stopProcessing.load() == \textcolor{keyword}{false})
+00519             \{
+00520                 pthis->streamData = localDataResults;
+00521                 wxThreadEvent* evt = \textcolor{keyword}{new} wxThreadEvent;
+00522                 evt->SetEventObject(pthis);
+00523                 pthis->updateGUI.store(\textcolor{keyword}{false});
+00524                 pthis->QueueEvent(evt);
+00525             \}
+00526             fftCounter = 0;
+00527             fftEnabled = pthis->enableFFT.load();
+00528             avgCount = pthis->averageCount.load();
+00529             \textcolor{keywordtype}{int} wndFunctionSelection = pthis->windowFunctionID.load();
+00530             \textcolor{keywordflow}{if}(wndFunctionSelection != wndFunction)
+00531             \{
+00532                 wndFunction = wndFunctionSelection;
+00533                 GenerateWindowCoefficients(wndFunction, fftSize, wndCoef, 1);
+00534             \}
+00535         \}
+00536     \}
+00537 
+00538     \textcolor{keywordflow}{if}(pthis->captureSamples.load() == \textcolor{keyword}{true})
+00539     \{
+00540         ofstream fout;
+00541         fout.open(pthis->captureFilename.c\_str());
+00542         fout << \textcolor{stringliteral}{"AI\(\backslash\)tAQ"};
+00543         \textcolor{keywordflow}{if}(channelsCount > 1)
+00544             fout << \textcolor{stringliteral}{"\(\backslash\)tBI\(\backslash\)tBQ"};
+00545         fout << endl;
+00546 
+00547         \textcolor{keywordtype}{int} samplesCnt = captureBuffer[0].size();
+00548         \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} i=0; i<samplesCnt; ++i)
+00549         \{
+00550             \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} ch=0; ch<channelsCount; ++ch)
+00551             \{
+00552                 fout << captureBuffer[ch][i].i << \textcolor{stringliteral}{"\(\backslash\)t"} << captureBuffer[ch][i].q << \textcolor{stringliteral}{"\(\backslash\)t"};
+00553             \}
+00554             fout << endl;
+00555         \}
+00556         fout.close();
+00557 
+00558         \textcolor{keywordtype}{string} filename = pthis->captureFilename+\textcolor{stringliteral}{".absdbfs"};
+00559         fout.open(filename.c\_str());
+00560         fout << \textcolor{stringliteral}{"AI\(\backslash\)tAQ"};
+00561         \textcolor{keywordflow}{if}(channelsCount > 1)
+00562             fout << \textcolor{stringliteral}{"\(\backslash\)tBI\(\backslash\)tBQ"};
+00563         fout << endl;
+00564 
+00565         \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} i=0; i<samplesCnt; ++i)
+00566         \{
+00567             \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} ch=0; ch<channelsCount; ++ch)
+00568             \{
+00569                 fout
+00570                 << (captureBuffer[ch][i].i == 0 ? -67 : 20*log10(abs(captureBuffer[ch][
+      i].i)/2048))<< \textcolor{stringliteral}{"\(\backslash\)t"}
+00571                 << (captureBuffer[ch][i].q == 0 ? -67 : 20*log10(abs(captureBuffer[ch][i].q)/2048))<< \textcolor{stringliteral}{"\(\backslash\)t"};
+00572             \}
+00573             fout << endl;
+00574         \}
+00575     \}
+00576 
+00577     kiss\_fft\_free(m\_fftCalcPlan);
+00578     pthis->stopProcessing.store(\textcolor{keyword}{true});
+00579     pthis->mStreamRunning.store(\textcolor{keyword}{false});
+00580     \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} i=0; i<channelsCount; ++i)
+00581     \{
+00582         \textcolor{keywordflow}{if}(runTx)
+00583             LMS_StopStream(&pthis->txStreams[i]);
+00584         LMS_StopStream(&pthis->rxStreams[i]);
+00585     \}
+00586     \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} i=0; i<channelsCount; ++i)
+00587     \{
+00588         \textcolor{keywordflow}{if}(runTx)
+00589             LMS_DestroyStream(pthis->lmsControl, &pthis->txStreams[i]);
+00590         LMS_DestroyStream(pthis->lmsControl, &pthis->rxStreams[i]);
+00591     \}
+00592     \textcolor{keywordflow}{for} (\textcolor{keywordtype}{int} i = 0; i < channelsCount; ++i)
+00593         \textcolor{keyword}{delete} [] buffers[i];
+00594     \textcolor{keyword}{delete} [] buffers;
+00595     \textcolor{keyword}{delete} [] m\_fftCalcIn;
+00596     \textcolor{keyword}{delete} [] m\_fftCalcOut;
+00597 \}
+00598 
+00599 wxString fftviewer_frFFTviewer::printDataRate(\textcolor{keywordtype}{float} dataRate)
+00600 \{
+00601     \textcolor{keywordflow}{if} (dataRate > 1000000)
+00602         \textcolor{keywordflow}{return} wxString::Format(\_(\textcolor{stringliteral}{"%.3f MB/s"}), dataRate / 1000000.0);
+00603     \textcolor{keywordflow}{else} \textcolor{keywordflow}{if} (dataRate > 1000)
+00604         \textcolor{keywordflow}{return} wxString::Format(\_(\textcolor{stringliteral}{"%.3f KB/s"}), dataRate / 1000.0);
+00605     \textcolor{keywordflow}{else}
+00606         \textcolor{keywordflow}{return} wxString::Format(\_(\textcolor{stringliteral}{"%.0f B/s"}), dataRate / 1000.0);
+00607 \}
+00608 
+00609 \textcolor{keywordtype}{void} fftviewer_frFFTviewer::SetNyquistFrequency()
+00610 \{
+00611     \textcolor{keywordtype}{double} freqHz;
+00612     LMS_GetSampleRate(lmsControl,LMS_CH_RX,cmbStreamType->GetSelection()/2*2,&freqHz,\textcolor{keyword}{nullptr});
+00613     txtNyquistFreqMHz->SetValue(wxString::Format(\_(\textcolor{stringliteral}{"%2.5f"}), freqHz / 2e6));
+00614     mFFTpanel->SetInitialDisplayArea(-freqHz/2, freqHz/2, -115, 0);
+00615 \}
+00616 
+00617 \textcolor{keywordtype}{void} fftviewer_frFFTviewer::OnStreamChange(wxCommandEvent& event)
+00618 \{
+00619     SetNyquistFrequency();
+00620 
+00621 
+00622     \textcolor{keywordtype}{int} tmp = cmbChannelVisibility->GetSelection();
+00623     cmbChannelVisibility->Clear();
+00624     cmbChannelVisibility->Append(\_T(\textcolor{stringliteral}{"A"}));
+00625     cmbChannelVisibility->Append(\_T(\textcolor{stringliteral}{"B"}));
+00626     \textcolor{keywordflow}{if} (cmbStreamType->GetSelection()%2==1)
+00627         cmbChannelVisibility->Append(\_T(\textcolor{stringliteral}{"A&B"}));
+00628     \textcolor{keywordflow}{else} \textcolor{keywordflow}{if} (tmp > 1)
+00629         tmp = 0;
+00630     cmbChannelVisibility->SetSelection(tmp);
+00631 \}
+00632 
+00633 \textcolor{keywordtype}{void} fftviewer_frFFTviewer::OnFmtChange(wxCommandEvent& event)
+00634 \{
+00635     \textcolor{keywordtype}{int} max = \textcolor{keyword}{event}.GetInt() == 1 ? 32800 : 2050;
+00636     mTimeDomainPanel->SetInitialDisplayArea(0, 1024, -max, max);
+00637     mConstelationPanel->SetInitialDisplayArea(-max, max, -max, max);
+00638 \}
+00639 
+00640 \textcolor{keywordtype}{void} fftviewer_frFFTviewer::OnEnTx(wxCommandEvent& event)
+00641 \{
+00642     chkEnSync->Enable(event.GetInt());
+00643 \}
+00644 
+00645 \textcolor{keywordtype}{void} fftviewer_frFFTviewer::OnEnPwr(wxCommandEvent& event)
+00646 \{
+00647     \textcolor{keywordtype}{bool} en = \textcolor{keyword}{event}.GetInt();
+00648     txtCenterOffset1->Enable(en);
+00649     txtCenterOffset2->Enable(en);
+00650     txtBW1->Enable(en);
+00651     txtBW2->Enable(en);
+00652 \}
+00653 
+00654 
+00655 \textcolor{keywordtype}{void} fftviewer_frFFTviewer::OnChannelVisibilityChange(wxCommandEvent& event)
+00656 \{
+00657     \textcolor{keywordtype}{bool} visibilities[cMaxChCount];
+00658 
+00659     \textcolor{keywordflow}{if} (cmbStreamType->GetSelection()%2)
+00660     \{
+00661         \textcolor{keywordflow}{switch} (event.GetInt())
+00662         \{
+00663         \textcolor{keywordflow}{case} 0:
+00664             visibilities[0] = \textcolor{keyword}{true};
+00665             visibilities[1] = \textcolor{keyword}{false};
+00666             \textcolor{keywordflow}{break};
+00667         \textcolor{keywordflow}{case} 1:
+00668             visibilities[0] = \textcolor{keyword}{false};
+00669             visibilities[1] = \textcolor{keyword}{true};
+00670             \textcolor{keywordflow}{break};
+00671         \textcolor{keywordflow}{case} 2:
+00672             visibilities[0] = \textcolor{keyword}{true};
+00673             visibilities[1] = \textcolor{keyword}{true};
+00674             \textcolor{keywordflow}{break};
+00675         \textcolor{keywordflow}{default}:
+00676             visibilities[0] = \textcolor{keyword}{false};
+00677             visibilities[1] = \textcolor{keyword}{false};
+00678             \textcolor{keywordflow}{break};
+00679         \}
+00680     \}
+00681     \textcolor{keywordflow}{else}
+00682     \{
+00683         visibilities[0] = \textcolor{keyword}{true};
+00684         visibilities[1] = \textcolor{keyword}{false};
+00685     \}
+00686     mTimeDomainPanel->series[0]->visible = visibilities[0];
+00687     mTimeDomainPanel->series[1]->visible = visibilities[0];
+00688     mTimeDomainPanel->series[2]->visible = visibilities[1];
+00689     mTimeDomainPanel->series[3]->visible = visibilities[1];
+00690     mConstelationPanel->series[0]->visible = visibilities[0];
+00691     mConstelationPanel->series[1]->visible = visibilities[1];
+00692     mFFTpanel->series[0]->visible = visibilities[0];
+00693     mFFTpanel->series[1]->visible = visibilities[1];
+00694 \}
+00695 
+00696 \textcolor{keywordtype}{void} fftviewer_frFFTviewer::OnAvgChange(wxSpinEvent& event)
+00697 \{
+00698     averageCount.store(spinAvgCount->GetValue());
+00699 \}
+00700 
+00701 \textcolor{keywordtype}{void} fftviewer_frFFTviewer::OnAvgChangeEnter(wxCommandEvent& event)
+00702 \{
+00703     averageCount.store(spinAvgCount->GetValue());
+00704 \}
+00705 
+00706 \textcolor{keywordtype}{void} fftviewer_frFFTviewer::OnWindowFunctionChange(wxCommandEvent& event)
+00707 \{
+00708     windowFunctionID.store(cmbWindowFunc->GetSelection());
+00709 \}
+\end{DoxyCode}

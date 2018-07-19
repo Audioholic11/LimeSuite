@@ -1,0 +1,50 @@
+\subsection{L\+M\+S7002\+M\+\_\+\+Registers\+Map.\+h}
+\label{LMS7002M__RegistersMap_8h_source}\index{/home/erik/prefix/default/src/limesuite-\/dev/src/lms7002m/\+L\+M\+S7002\+M\+\_\+\+Registers\+Map.\+h@{/home/erik/prefix/default/src/limesuite-\/dev/src/lms7002m/\+L\+M\+S7002\+M\+\_\+\+Registers\+Map.\+h}}
+
+\begin{DoxyCode}
+00001 \textcolor{preprocessor}{#ifndef LMS7002M\_REGISTERS\_MAP\_H}
+00002 \textcolor{preprocessor}{#define LMS7002M\_REGISTERS\_MAP\_H}
+00003 
+00004 \textcolor{preprocessor}{#include <vector>}
+00005 \textcolor{preprocessor}{#include <map>}
+00006 \textcolor{preprocessor}{#include <cstdint>}
+00007 \textcolor{keyword}{struct }LMS7Parameter;
+00008 \textcolor{keyword}{namespace }lime\{
+00009 
+00010 
+00011 
+00012 \textcolor{keyword}{class }LMS7002M_RegistersMap
+00013 \{
+00014 \textcolor{keyword}{public}:
+00015     \textcolor{keyword}{struct }Register
+00016     \{
+00017         uint16\_t value;
+00018         uint16\_t defaultValue;
+00019         uint16\_t mask;
+00020     \};
+00021 
+00022     LMS7002M_RegistersMap();
+00023     ~LMS7002M_RegistersMap();
+00024 
+00025     uint16\_t GetValue(uint8\_t channel, uint16\_t address) \textcolor{keyword}{const};
+00026     \textcolor{keywordtype}{void} SetValue(uint8\_t channel, \textcolor{keyword}{const} uint16\_t address, \textcolor{keyword}{const} uint16\_t value);
+00027 
+00028     \textcolor{keywordtype}{void} InitializeDefaultValues(\textcolor{keyword}{const} std::vector<const LMS7Parameter*> parameterList);
+00029     uint16\_t GetDefaultValue(uint16\_t address) \textcolor{keyword}{const};
+00030     std::vector<uint16\_t> GetUsedAddresses(\textcolor{keyword}{const} uint8\_t channel) \textcolor{keyword}{const};
+00031 
+00032     LMS7002M_RegistersMap &operator=(\textcolor{keyword}{const} LMS7002M_RegistersMap &other)
+00033     \{
+00034         mChannelA.insert(other.mChannelA.begin(), other.mChannelA.end());
+00035         mChannelB.insert(other.mChannelB.begin(), other.mChannelB.end());
+00036         \textcolor{keywordflow}{return} *\textcolor{keyword}{this};
+00037     \}
+00038 
+00039 \textcolor{keyword}{protected}:
+00040     std::map<const uint16\_t, Register> mChannelA;
+00041     std::map<const uint16\_t, Register> mChannelB;
+00042 \};
+00043 
+00044 \}
+00045 \textcolor{preprocessor}{#endif}
+\end{DoxyCode}

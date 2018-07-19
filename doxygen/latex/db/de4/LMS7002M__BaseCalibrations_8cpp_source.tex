@@ -1,0 +1,97 @@
+\subsection{L\+M\+S7002\+M\+\_\+\+Base\+Calibrations.\+cpp}
+\label{LMS7002M__BaseCalibrations_8cpp_source}\index{/home/erik/prefix/default/src/limesuite-\/dev/src/lms7002m/\+L\+M\+S7002\+M\+\_\+\+Base\+Calibrations.\+cpp@{/home/erik/prefix/default/src/limesuite-\/dev/src/lms7002m/\+L\+M\+S7002\+M\+\_\+\+Base\+Calibrations.\+cpp}}
+
+\begin{DoxyCode}
+00001 \textcolor{preprocessor}{#include "LMS7002M.h"}
+00002 \textcolor{preprocessor}{#include "LMS7002M_RegistersMap.h"}
+00003 \textcolor{preprocessor}{#include <thread>}
+00004 \textcolor{preprocessor}{#include <chrono>}
+00005 \textcolor{preprocessor}{#include "Logger.h"}
+00006 
+00007 \textcolor{keyword}{using namespace }std;
+00008 
+00009 \textcolor{keyword}{using namespace }lime;
+00010 
+00011 \textcolor{keywordtype}{int} LMS7002M::CalibrateInternalADC(\textcolor{keywordtype}{int} clkDiv)
+00012 \{
+00013     \textcolor{keywordflow}{if}(Get_SPI_Reg_bits(LMS7_MASK) == 0)
+00014         \textcolor{keywordflow}{return} ReportError(ENOTSUP, \textcolor{stringliteral}{"Operation not supported"});
+00015     \textcolor{keywordflow}{if} (!controlPort)\{
+00016         lime::error(\textcolor{stringliteral}{"No device connected"});
+00017         \textcolor{keywordflow}{return} -1;
+00018     \}
+00019 
+00020     \textcolor{keyword}{const} uint16\_t biasMux = Get_SPI_Reg_bits(LMS7_MUX_BIAS_OUT);
+00021     Modify_SPI_Reg_bits(LMS7_MUX_BIAS_OUT, 1);
+00022 
+00023     SPI_write(0x0600, 0x0F01);
+00024     SPI_write(0x0602, 0x2000);
+00025     SPI_write(0x0603, 0x0000);
+00026     Modify_SPI_Reg_bits(LMS7_RSSI_PD, 0);
+00027     Modify_SPI_Reg_bits(LMS7_RSSI_RSSIMODE, 1);
+00028     Modify_SPI_Reg_bits(LMS7_DAC_CLKDIV, clkDiv);
+00029     Modify_SPI_Reg_bits(LMS7_RSSI_BIAS, 8);
+00030     Modify_SPI_Reg_bits(LMS7_RSSI_DAC_VAL, 170);
+00031 
+00032     uint8\_t bias = Get_SPI_Reg_bits(LMS7_RSSI_BIAS);
+00033     uint16\_t regValue = SPI_read(0x0601, \textcolor{keyword}{true});
+00034     \textcolor{keywordflow}{while}( ((regValue >> 5) & 0x1) != 1)
+00035     \{
+00036         ++bias;
+00037         Modify_SPI_Reg_bits(LMS7_RSSI_BIAS, bias);
+00038         regValue = SPI_read(0x0601, \textcolor{keyword}{true});
+00039     \}
+00040     Modify_SPI_Reg_bits(LMS7_RSSI_PD, 0);
+00041     Modify_SPI_Reg_bits(LMS7_MUX_BIAS_OUT, biasMux);
+00042     Modify_SPI_Reg_bits(LMS7_RSSI_RSSIMODE, 0);
+00043     \textcolor{keywordflow}{return} 0;
+00044 \}
+00045 
+00046 \textcolor{keywordtype}{int} LMS7002M::CalibrateRP\_BIAS()
+00047 \{
+00048     \textcolor{keywordflow}{if}(Get_SPI_Reg_bits(LMS7_MASK) == 0)
+00049         \textcolor{keywordflow}{return} ReportError(ENOTSUP, \textcolor{stringliteral}{"Operation not supported"});
+00050     \textcolor{keywordflow}{if} (!controlPort)\{
+00051         lime::error(\textcolor{stringliteral}{"No device connected"});
+00052         \textcolor{keywordflow}{return} -1;
+00053     \}
+00054 
+00055     CalibrateInternalADC(32);
+00056     Modify_SPI_Reg_bits(LMS7_RSSI_PD, 0);
+00057     Modify_SPI_Reg_bits(LMS7_RSSI_RSSIMODE, 0);
+00058 
+00059     \textcolor{keyword}{const} uint16\_t biasMux = Get_SPI_Reg_bits(LMS7_MUX_BIAS_OUT);
+00060     Modify_SPI_Reg_bits(LMS7_MUX_BIAS_OUT, 1);
+00061     this\_thread::sleep\_for(chrono::microseconds(250));
+00062     uint16\_t reg606 = SPI_read(0x0606, \textcolor{keyword}{true});
+00063     uint16\_t Vref = (reg606 >> 8) & 0xFF;
+00064     uint16\_t Vptat = reg606 & 0xFF;
+00065 
+00066     \textcolor{keywordflow}{if}(Vref > Vptat)
+00067     \{
+00068         uint16\_t rpCalib = Get_SPI_Reg_bits(LMS7_RP_CALIB_BIAS, \textcolor{keyword}{true});
+00069         \textcolor{keywordflow}{while}(Vref > Vptat)
+00070         \{
+00071             --rpCalib;
+00072             Modify_SPI_Reg_bits(LMS7_RP_CALIB_BIAS, rpCalib);
+00073             reg606 = SPI_read(0x0606, \textcolor{keyword}{true});
+00074             Vref = (reg606 >> 8) & 0xFF;
+00075             Vptat = reg606 & 0xFF;
+00076         \}
+00077     \}
+00078     \textcolor{keywordflow}{if}(Vref < Vptat)
+00079     \{
+00080         uint16\_t rpCalib = Get_SPI_Reg_bits(LMS7_RP_CALIB_BIAS, \textcolor{keyword}{true});
+00081         \textcolor{keywordflow}{while}(Vref < Vptat)
+00082         \{
+00083             ++rpCalib;
+00084             Modify_SPI_Reg_bits(LMS7_RP_CALIB_BIAS, rpCalib);
+00085             reg606 = SPI_read(0x0606, \textcolor{keyword}{true});
+00086             Vref = (reg606 >> 8) & 0xFF;
+00087             Vptat = reg606 & 0xFF;
+00088         \}
+00089     \}
+00090     Modify_SPI_Reg_bits(LMS7_MUX_BIAS_OUT, biasMux );
+00091     \textcolor{keywordflow}{return} 0;
+00092 \}
+\end{DoxyCode}

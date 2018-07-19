@@ -1,0 +1,1851 @@
+\subsection{lime\+:\+:I\+Connection Class Reference}
+\label{classlime_1_1IConnection}\index{lime\+::\+I\+Connection@{lime\+::\+I\+Connection}}
+
+
+{\ttfamily \#include $<$I\+Connection.\+h$>$}
+
+
+
+Inheritance diagram for lime\+:\+:I\+Connection\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{dd/d14/classlime_1_1IConnection__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for lime\+:\+:I\+Connection\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=550pt]{d9/de8/classlime_1_1IConnection__coll__graph}
+\end{center}
+\end{figure}
+\subsubsection*{Public Types}
+\begin{DoxyCompactItemize}
+\item 
+enum {\bf M\+C\+U\+\_\+\+P\+R\+O\+G\+\_\+\+M\+O\+DE} \{ {\bf R\+E\+S\+ET} = 0, 
+{\bf E\+E\+P\+R\+O\+M\+\_\+\+A\+N\+D\+\_\+\+S\+R\+AM}, 
+{\bf S\+R\+AM}, 
+{\bf B\+O\+O\+T\+\_\+\+S\+R\+A\+M\+\_\+\+F\+R\+O\+M\+\_\+\+E\+E\+P\+R\+OM}
+ \}
+\item 
+typedef std\+::function$<$ bool({\bf int} bsent, {\bf int} btotal, const char $\ast$progress\+Msg)$>$ {\bf Programming\+Callback}
+\end{DoxyCompactItemize}
+\subsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+{\bf I\+Connection} ({\bf void})
+\begin{DoxyCompactList}\small\item\em \doxyref{I\+Connection}{p.}{d2/de5/classlime_1_1IConnection} constructor. \end{DoxyCompactList}\item 
+virtual {\bf $\sim$\+I\+Connection} ({\bf void})
+\begin{DoxyCompactList}\small\item\em \doxyref{I\+Connection}{p.}{d2/de5/classlime_1_1IConnection} destructor. \end{DoxyCompactList}\item 
+const {\bf Connection\+Handle} \& {\bf Get\+Handle} ({\bf void}) const 
+\begin{DoxyCompactList}\small\item\em Get the connection handle that was used to create this connection. \end{DoxyCompactList}\item 
+virtual bool {\bf Is\+Open} ({\bf void})
+\item 
+virtual {\bf Device\+Info} {\bf Get\+Device\+Info} ({\bf void})
+\item 
+virtual {\bf int} {\bf Transact\+S\+PI} (const {\bf int} addr, const uint32\+\_\+t $\ast$write\+Data, uint32\+\_\+t $\ast$read\+Data, const size\+\_\+t {\bf size})
+\begin{DoxyCompactList}\small\item\em Bulk S\+PI write/read transaction. \end{DoxyCompactList}\item 
+virtual {\bf int} {\bf Write\+L\+M\+S7002\+M\+S\+PI} (const uint32\+\_\+t $\ast$write\+Data, size\+\_\+t {\bf size}, unsigned periph\+ID=0)=0
+\item 
+virtual {\bf int} {\bf Read\+L\+M\+S7002\+M\+S\+PI} (const uint32\+\_\+t $\ast$write\+Data, uint32\+\_\+t $\ast$read\+Data, size\+\_\+t {\bf size}, unsigned periph\+ID=0)=0
+\item 
+virtual {\bf int} {\bf Write\+I2C} (const {\bf int} addr, const std\+::string \&{\bf data})
+\item 
+virtual {\bf int} {\bf Read\+I2C} (const {\bf int} addr, const size\+\_\+t num\+Bytes, std\+::string \&{\bf data})
+\item 
+virtual {\bf int} {\bf Device\+Reset} ({\bf int} {\bf ind}=0)
+\item 
+virtual {\bf int} {\bf Reset\+Stream\+Buffers} ()
+\begin{DoxyCompactList}\small\item\em Read raw stream data from device streaming port. \end{DoxyCompactList}\item 
+virtual {\bf int} {\bf Get\+Buffers\+Count} () const 
+\item 
+virtual {\bf int} {\bf Check\+Stream\+Size} ({\bf int} {\bf size}) const 
+\item 
+virtual {\bf int} {\bf Receive\+Data} (char $\ast${\bf buffer}, {\bf int} {\bf length}, {\bf int} ep\+Index, {\bf int} timeout=100)
+\item 
+virtual {\bf int} {\bf Send\+Data} (const char $\ast${\bf buffer}, {\bf int} {\bf length}, {\bf int} ep\+Index, {\bf int} timeout=100)
+\item 
+virtual {\bf int} {\bf Begin\+Data\+Sending} (const char $\ast${\bf buffer}, uint32\+\_\+t {\bf length}, {\bf int} ep)
+\item 
+virtual bool {\bf Wait\+For\+Sending} ({\bf int} context\+Handle, uint32\+\_\+t {\bf timeout\+\_\+ms})
+\item 
+virtual {\bf int} {\bf Finish\+Data\+Sending} (const char $\ast${\bf buffer}, uint32\+\_\+t {\bf length}, {\bf int} context\+Handle)
+\item 
+virtual {\bf void} {\bf Abort\+Sending} ({\bf int} ep)
+\item 
+virtual {\bf int} {\bf Begin\+Data\+Reading} (char $\ast${\bf buffer}, uint32\+\_\+t {\bf length}, {\bf int} ep)
+\item 
+virtual bool {\bf Wait\+For\+Reading} ({\bf int} context\+Handle, unsigned {\bf int} {\bf timeout\+\_\+ms})
+\item 
+virtual {\bf int} {\bf Finish\+Data\+Reading} (char $\ast${\bf buffer}, uint32\+\_\+t {\bf length}, {\bf int} context\+Handle)
+\item 
+virtual {\bf void} {\bf Abort\+Reading} ({\bf int} ep)
+\item 
+virtual {\bf int} {\bf Program\+Write} (const char $\ast${\bf buffer}, const size\+\_\+t {\bf length}, const {\bf int} programming\+Mode, const {\bf int} {\bf index}, {\bf Programming\+Callback} {\bf callback}=0)
+\begin{DoxyCompactList}\small\item\em Uploads program to selected device. \end{DoxyCompactList}\item 
+virtual {\bf int} {\bf Program\+M\+CU} (const uint8\+\_\+t $\ast${\bf buffer}, const size\+\_\+t {\bf length}, const {\bf M\+C\+U\+\_\+\+P\+R\+O\+G\+\_\+\+M\+O\+DE} {\bf mode}, {\bf Programming\+Callback} {\bf callback}=0)
+\begin{DoxyCompactList}\small\item\em Uploads program to M\+CU. \end{DoxyCompactList}\item 
+virtual {\bf int} {\bf Program\+Update} (const bool download=true, {\bf Programming\+Callback} {\bf callback}=0)
+\item 
+virtual {\bf int} {\bf G\+P\+I\+O\+Write} (const uint8\+\_\+t $\ast${\bf buffer}, const size\+\_\+t buf\+Length)
+\begin{DoxyCompactList}\small\item\em Writes G\+P\+IO values to device. \end{DoxyCompactList}\item 
+virtual {\bf int} {\bf G\+P\+I\+O\+Read} (uint8\+\_\+t $\ast${\bf buffer}, const size\+\_\+t buf\+Length)
+\begin{DoxyCompactList}\small\item\em Reads G\+P\+IO values from device. \end{DoxyCompactList}\item 
+virtual {\bf int} {\bf G\+P\+I\+O\+Dir\+Write} (const uint8\+\_\+t $\ast${\bf buffer}, const size\+\_\+t buf\+Length)
+\begin{DoxyCompactList}\small\item\em Write G\+P\+IO direction control values to device. \end{DoxyCompactList}\item 
+virtual {\bf int} {\bf G\+P\+I\+O\+Dir\+Read} (uint8\+\_\+t $\ast${\bf buffer}, const size\+\_\+t buf\+Length)
+\begin{DoxyCompactList}\small\item\em Read G\+P\+IO direction configuration from device. \end{DoxyCompactList}\item 
+virtual {\bf int} {\bf Write\+Registers} (const uint32\+\_\+t $\ast$addrs, const uint32\+\_\+t $\ast${\bf data}, const size\+\_\+t {\bf size})
+\begin{DoxyCompactList}\small\item\em Bulk write device registers. \end{DoxyCompactList}\item 
+{\bf int} {\bf Write\+Register} (const uint32\+\_\+t addr, const uint32\+\_\+t {\bf data})
+\begin{DoxyCompactList}\small\item\em Write a single device register. \end{DoxyCompactList}\item 
+virtual {\bf int} {\bf Read\+Registers} (const uint32\+\_\+t $\ast$addrs, uint32\+\_\+t $\ast${\bf data}, const size\+\_\+t {\bf size})
+\begin{DoxyCompactList}\small\item\em Bulk read device registers. \end{DoxyCompactList}\item 
+{\footnotesize template$<$typename Read\+Type $>$ }\\{\bf int} {\bf Read\+Register} (const uint32\+\_\+t addr, Read\+Type \&{\bf data})
+\begin{DoxyCompactList}\small\item\em Read a single device register. \end{DoxyCompactList}\item 
+virtual {\bf int} {\bf Custom\+Parameter\+Write} (const uint8\+\_\+t $\ast${\bf ids}, const double $\ast$values, const size\+\_\+t {\bf count}, const std\+::string \&{\bf units})
+\begin{DoxyCompactList}\small\item\em Sets custom on board control to given value units. \end{DoxyCompactList}\item 
+virtual {\bf int} {\bf Custom\+Parameter\+Read} (const uint8\+\_\+t $\ast${\bf ids}, double $\ast$values, const size\+\_\+t {\bf count}, std\+::string $\ast${\bf units})
+\begin{DoxyCompactList}\small\item\em Returns value of custom on board control. \end{DoxyCompactList}\item 
+{\bf void} {\bf Set\+Data\+Log\+Callback} (std\+::function$<$ {\bf void}(bool, const unsigned char $\ast$, const unsigned {\bf int})$>$ {\bf callback})
+\begin{DoxyCompactList}\small\item\em Sets callback function which gets called each time data is sent or received. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsubsection*{Protected Attributes}
+\begin{DoxyCompactItemize}
+\item 
+std\+::function$<$ {\bf void}(bool, const unsigned char $\ast$, const unsigned {\bf int})$>$ {\bf callback\+\_\+log\+Data}
+\end{DoxyCompactItemize}
+\subsubsection*{Private Attributes}
+\begin{DoxyCompactItemize}
+\item 
+{\bf Connection\+Handle} {\bf \+\_\+handle}
+\end{DoxyCompactItemize}
+\subsubsection*{Friends}
+\begin{DoxyCompactItemize}
+\item 
+class {\bf Connection\+Registry}
+\end{DoxyCompactItemize}
+
+
+\subsubsection{Detailed Description}
+\doxyref{I\+Connection}{p.}{d2/de5/classlime_1_1IConnection} is the interface class for a device with 1 or more Lime R\+F\+I\+Cs. The \doxyref{L\+M\+S7002M}{p.}{db/d1d/classlime_1_1LMS7002M} driver class calls into \doxyref{I\+Connection}{p.}{d2/de5/classlime_1_1IConnection} to interface with the hardware to implement high level functions on top of low-\/level S\+PI and G\+P\+IO. Device developers will implement a custom \doxyref{I\+Connection}{p.}{d2/de5/classlime_1_1IConnection} for their hardware as an abstraction for streaming and low-\/level S\+PI and configuration access. 
+
+Definition at line {\bf 67} of file {\bf I\+Connection.\+h}.
+
+
+
+\subsubsection{Member Typedef Documentation}
+\index{lime\+::\+I\+Connection@{lime\+::\+I\+Connection}!Programming\+Callback@{Programming\+Callback}}
+\index{Programming\+Callback@{Programming\+Callback}!lime\+::\+I\+Connection@{lime\+::\+I\+Connection}}
+\paragraph[{Programming\+Callback}]{\setlength{\rightskip}{0pt plus 5cm}typedef std\+::function$<$bool({\bf int} bsent, {\bf int} btotal, const char$\ast$ progress\+Msg)$>$ {\bf lime\+::\+I\+Connection\+::\+Programming\+Callback}}\label{classlime_1_1IConnection_adafd3a33bc9575ab21b26c27a0d52423}
+Callback from programming processes 
+\begin{DoxyParams}{Parameters}
+{\em bsent} & number of bytes transferred \\
+\hline
+{\em btotal} & total number of bytes to send \\
+\hline
+{\em progress\+Msg} & string describing current progress state \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+0-\/continue programming, 1-\/abort operation 
+\end{DoxyReturn}
+
+
+Definition at line {\bf 175} of file {\bf I\+Connection.\+h}.
+
+
+
+\subsubsection{Member Enumeration Documentation}
+\index{lime\+::\+I\+Connection@{lime\+::\+I\+Connection}!M\+C\+U\+\_\+\+P\+R\+O\+G\+\_\+\+M\+O\+DE@{M\+C\+U\+\_\+\+P\+R\+O\+G\+\_\+\+M\+O\+DE}}
+\index{M\+C\+U\+\_\+\+P\+R\+O\+G\+\_\+\+M\+O\+DE@{M\+C\+U\+\_\+\+P\+R\+O\+G\+\_\+\+M\+O\+DE}!lime\+::\+I\+Connection@{lime\+::\+I\+Connection}}
+\paragraph[{M\+C\+U\+\_\+\+P\+R\+O\+G\+\_\+\+M\+O\+DE}]{\setlength{\rightskip}{0pt plus 5cm}enum {\bf lime\+::\+I\+Connection\+::\+M\+C\+U\+\_\+\+P\+R\+O\+G\+\_\+\+M\+O\+DE}}\label{classlime_1_1IConnection_a33a752b6152fc26337fbb488b2510863}
+\begin{Desc}
+\item[Enumerator]\par
+\begin{description}
+\index{R\+E\+S\+ET@{R\+E\+S\+ET}!lime\+::\+I\+Connection@{lime\+::\+I\+Connection}}\index{lime\+::\+I\+Connection@{lime\+::\+I\+Connection}!R\+E\+S\+ET@{R\+E\+S\+ET}}\item[{\em 
+R\+E\+S\+ET\label{classlime_1_1IConnection_a33a752b6152fc26337fbb488b2510863a46b5c87f0709cdfcc4e48b3ed345d22f}
+}]\index{E\+E\+P\+R\+O\+M\+\_\+\+A\+N\+D\+\_\+\+S\+R\+AM@{E\+E\+P\+R\+O\+M\+\_\+\+A\+N\+D\+\_\+\+S\+R\+AM}!lime\+::\+I\+Connection@{lime\+::\+I\+Connection}}\index{lime\+::\+I\+Connection@{lime\+::\+I\+Connection}!E\+E\+P\+R\+O\+M\+\_\+\+A\+N\+D\+\_\+\+S\+R\+AM@{E\+E\+P\+R\+O\+M\+\_\+\+A\+N\+D\+\_\+\+S\+R\+AM}}\item[{\em 
+E\+E\+P\+R\+O\+M\+\_\+\+A\+N\+D\+\_\+\+S\+R\+AM\label{classlime_1_1IConnection_a33a752b6152fc26337fbb488b2510863a86c6017925862f21fd2d224ac3964d3c}
+}]\index{S\+R\+AM@{S\+R\+AM}!lime\+::\+I\+Connection@{lime\+::\+I\+Connection}}\index{lime\+::\+I\+Connection@{lime\+::\+I\+Connection}!S\+R\+AM@{S\+R\+AM}}\item[{\em 
+S\+R\+AM\label{classlime_1_1IConnection_a33a752b6152fc26337fbb488b2510863aa1c3c9a7ddd9a69d76b493a6aebc71ca}
+}]\index{B\+O\+O\+T\+\_\+\+S\+R\+A\+M\+\_\+\+F\+R\+O\+M\+\_\+\+E\+E\+P\+R\+OM@{B\+O\+O\+T\+\_\+\+S\+R\+A\+M\+\_\+\+F\+R\+O\+M\+\_\+\+E\+E\+P\+R\+OM}!lime\+::\+I\+Connection@{lime\+::\+I\+Connection}}\index{lime\+::\+I\+Connection@{lime\+::\+I\+Connection}!B\+O\+O\+T\+\_\+\+S\+R\+A\+M\+\_\+\+F\+R\+O\+M\+\_\+\+E\+E\+P\+R\+OM@{B\+O\+O\+T\+\_\+\+S\+R\+A\+M\+\_\+\+F\+R\+O\+M\+\_\+\+E\+E\+P\+R\+OM}}\item[{\em 
+B\+O\+O\+T\+\_\+\+S\+R\+A\+M\+\_\+\+F\+R\+O\+M\+\_\+\+E\+E\+P\+R\+OM\label{classlime_1_1IConnection_a33a752b6152fc26337fbb488b2510863ae3c28bb4d6f518d8036297b795d2371f}
+}]\end{description}
+\end{Desc}
+
+
+Definition at line {\bf 203} of file {\bf I\+Connection.\+h}.
+
+
+
+\subsubsection{Constructor \& Destructor Documentation}
+\index{lime\+::\+I\+Connection@{lime\+::\+I\+Connection}!I\+Connection@{I\+Connection}}
+\index{I\+Connection@{I\+Connection}!lime\+::\+I\+Connection@{lime\+::\+I\+Connection}}
+\paragraph[{I\+Connection(void)}]{\setlength{\rightskip}{0pt plus 5cm}I\+Connection\+::\+I\+Connection (
+\begin{DoxyParamCaption}
+\item[{{\bf void}}]{}
+\end{DoxyParamCaption}
+)}\label{classlime_1_1IConnection_ab86aea8cd93d5d6c764db21a2a6d7b33}
+
+
+\doxyref{I\+Connection}{p.}{d2/de5/classlime_1_1IConnection} constructor. 
+
+
+
+Definition at line {\bf 13} of file {\bf I\+Connection.\+cpp}.
+
+
+
+References {\bf callback\+\_\+log\+Data}.
+
+\index{lime\+::\+I\+Connection@{lime\+::\+I\+Connection}!````~I\+Connection@{$\sim$\+I\+Connection}}
+\index{````~I\+Connection@{$\sim$\+I\+Connection}!lime\+::\+I\+Connection@{lime\+::\+I\+Connection}}
+\paragraph[{$\sim$\+I\+Connection(void)}]{\setlength{\rightskip}{0pt plus 5cm}I\+Connection\+::$\sim$\+I\+Connection (
+\begin{DoxyParamCaption}
+\item[{{\bf void}}]{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [virtual]}}\label{classlime_1_1IConnection_a70817f8468e78bca3f64cb58ae877771}
+
+
+\doxyref{I\+Connection}{p.}{d2/de5/classlime_1_1IConnection} destructor. 
+
+
+
+Definition at line {\bf 18} of file {\bf I\+Connection.\+cpp}.
+
+
+
+\subsubsection{Member Function Documentation}
+\index{lime\+::\+I\+Connection@{lime\+::\+I\+Connection}!Abort\+Reading@{Abort\+Reading}}
+\index{Abort\+Reading@{Abort\+Reading}!lime\+::\+I\+Connection@{lime\+::\+I\+Connection}}
+\paragraph[{Abort\+Reading(int ep)}]{\setlength{\rightskip}{0pt plus 5cm}virtual {\bf void} lime\+::\+I\+Connection\+::\+Abort\+Reading (
+\begin{DoxyParamCaption}
+\item[{{\bf int}}]{ep}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}\label{classlime_1_1IConnection_ae6bc7a7556e13862df14e98ccf4b9409}
+
+
+Reimplemented in {\bf lime\+::\+Connection\+F\+X3} \doxyref{}{p.}{d7/db8/classlime_1_1ConnectionFX3_a982efa3c389cf4964045ba0f5b3e5dc1}, {\bf lime\+::\+Connection\+F\+T601} \doxyref{}{p.}{da/db1/classlime_1_1ConnectionFT601_a91dd36e4e4dfe55c34a1485afc8160f5}, and {\bf lime\+::\+Connection\+Xillybus} \doxyref{}{p.}{d9/d0d/classlime_1_1ConnectionXillybus_ad6e774776e7373deb8d00368e2e2d57a}.
+
+
+
+Definition at line {\bf 175} of file {\bf I\+Connection.\+h}.
+
+
+
+Referenced by {\bf lime\+::\+Streamer\+::\+Align\+Rx\+T\+S\+P()}, {\bf lime\+::\+Streamer\+::\+Get\+Phase\+Offset()}, {\bf lime\+::\+F\+P\+G\+A\+\_\+\+Mini\+::\+Read\+Raw\+Stream\+Data()}, and {\bf lime\+::\+Streamer\+::\+Receive\+Packets\+Loop()}.
+
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{d2/de5/classlime_1_1IConnection_ae6bc7a7556e13862df14e98ccf4b9409_icgraph}
+\end{center}
+\end{figure}
+
+
+\index{lime\+::\+I\+Connection@{lime\+::\+I\+Connection}!Abort\+Sending@{Abort\+Sending}}
+\index{Abort\+Sending@{Abort\+Sending}!lime\+::\+I\+Connection@{lime\+::\+I\+Connection}}
+\paragraph[{Abort\+Sending(int ep)}]{\setlength{\rightskip}{0pt plus 5cm}virtual {\bf void} lime\+::\+I\+Connection\+::\+Abort\+Sending (
+\begin{DoxyParamCaption}
+\item[{{\bf int}}]{ep}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}\label{classlime_1_1IConnection_a36928cc55493e86385e4ff582ef2c02b}
+
+
+Reimplemented in {\bf lime\+::\+Connection\+F\+X3} \doxyref{}{p.}{d7/db8/classlime_1_1ConnectionFX3_a407a8eb6443a89c76c4a0fec1b34aeff}, {\bf lime\+::\+Connection\+F\+T601} \doxyref{}{p.}{da/db1/classlime_1_1ConnectionFT601_ac6ef14a56ccacc96fae3dc152bf8fb86}, and {\bf lime\+::\+Connection\+Xillybus} \doxyref{}{p.}{d9/d0d/classlime_1_1ConnectionXillybus_a5d425ed9d86bb10c97ba087b780674ab}.
+
+
+
+Definition at line {\bf 170} of file {\bf I\+Connection.\+h}.
+
+
+
+Referenced by {\bf lime\+::\+Streamer\+::\+Transmit\+Packets\+Loop()}.
+
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{d2/de5/classlime_1_1IConnection_a36928cc55493e86385e4ff582ef2c02b_icgraph}
+\end{center}
+\end{figure}
+
+
+\index{lime\+::\+I\+Connection@{lime\+::\+I\+Connection}!Begin\+Data\+Reading@{Begin\+Data\+Reading}}
+\index{Begin\+Data\+Reading@{Begin\+Data\+Reading}!lime\+::\+I\+Connection@{lime\+::\+I\+Connection}}
+\paragraph[{Begin\+Data\+Reading(char $\ast$buffer, uint32\+\_\+t length, int ep)}]{\setlength{\rightskip}{0pt plus 5cm}{\bf int} I\+Connection\+::\+Begin\+Data\+Reading (
+\begin{DoxyParamCaption}
+\item[{char $\ast$}]{buffer, }
+\item[{uint32\+\_\+t}]{length, }
+\item[{{\bf int}}]{ep}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [virtual]}}\label{classlime_1_1IConnection_ac9ec0b2a4288d7732d7e2e03f5606401}
+
+
+Reimplemented in {\bf lime\+::\+Connection\+F\+X3} \doxyref{}{p.}{d7/db8/classlime_1_1ConnectionFX3_a095dfc0be5abe09860653e31b8f22ac9}, {\bf lime\+::\+Connection\+F\+T601} \doxyref{}{p.}{da/db1/classlime_1_1ConnectionFT601_afc5a108646d70aa0b4b98c3a57a031c0}, and {\bf lime\+::\+Connection\+Xillybus} \doxyref{}{p.}{d9/d0d/classlime_1_1ConnectionXillybus_a45274f1e8c7a22b4abc5a6e83148520f}.
+
+
+
+Definition at line {\bf 97} of file {\bf I\+Connection.\+cpp}.
+
+
+
+Referenced by {\bf lime\+::\+F\+P\+G\+A\+\_\+\+Mini\+::\+Read\+Raw\+Stream\+Data()}, and {\bf lime\+::\+Streamer\+::\+Receive\+Packets\+Loop()}.
+
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{d2/de5/classlime_1_1IConnection_ac9ec0b2a4288d7732d7e2e03f5606401_icgraph}
+\end{center}
+\end{figure}
+
+
+\index{lime\+::\+I\+Connection@{lime\+::\+I\+Connection}!Begin\+Data\+Sending@{Begin\+Data\+Sending}}
+\index{Begin\+Data\+Sending@{Begin\+Data\+Sending}!lime\+::\+I\+Connection@{lime\+::\+I\+Connection}}
+\paragraph[{Begin\+Data\+Sending(const char $\ast$buffer, uint32\+\_\+t length, int ep)}]{\setlength{\rightskip}{0pt plus 5cm}{\bf int} I\+Connection\+::\+Begin\+Data\+Sending (
+\begin{DoxyParamCaption}
+\item[{const char $\ast$}]{buffer, }
+\item[{uint32\+\_\+t}]{length, }
+\item[{{\bf int}}]{ep}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [virtual]}}\label{classlime_1_1IConnection_afdfa152ab699f516cd0fb479ec98bcc8}
+
+
+Reimplemented in {\bf lime\+::\+Connection\+F\+X3} \doxyref{}{p.}{d7/db8/classlime_1_1ConnectionFX3_a1674541366642d9393cbc71357cfa160}, {\bf lime\+::\+Connection\+F\+T601} \doxyref{}{p.}{da/db1/classlime_1_1ConnectionFT601_ad5831c2ecfbb88522e94b8305c682ac0}, and {\bf lime\+::\+Connection\+Xillybus} \doxyref{}{p.}{d9/d0d/classlime_1_1ConnectionXillybus_a1b9d65ebf6a867ebe3d607ae691a4e98}.
+
+
+
+Definition at line {\bf 84} of file {\bf I\+Connection.\+cpp}.
+
+
+
+Referenced by {\bf lime\+::\+Streamer\+::\+Transmit\+Packets\+Loop()}.
+
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{d2/de5/classlime_1_1IConnection_afdfa152ab699f516cd0fb479ec98bcc8_icgraph}
+\end{center}
+\end{figure}
+
+
+\index{lime\+::\+I\+Connection@{lime\+::\+I\+Connection}!Check\+Stream\+Size@{Check\+Stream\+Size}}
+\index{Check\+Stream\+Size@{Check\+Stream\+Size}!lime\+::\+I\+Connection@{lime\+::\+I\+Connection}}
+\paragraph[{Check\+Stream\+Size(int size) const }]{\setlength{\rightskip}{0pt plus 5cm}{\bf int} I\+Connection\+::\+Check\+Stream\+Size (
+\begin{DoxyParamCaption}
+\item[{{\bf int}}]{size}
+\end{DoxyParamCaption}
+) const\hspace{0.3cm}{\ttfamily [virtual]}}\label{classlime_1_1IConnection_a533ff580f219bbec2b556b265c1e1355}
+
+
+Reimplemented in {\bf lime\+::\+Connection\+F\+X3} \doxyref{}{p.}{d7/db8/classlime_1_1ConnectionFX3_a135a1bc5e657f9d6b6d239112035d1b8}, {\bf lime\+::\+Connection\+F\+T601} \doxyref{}{p.}{da/db1/classlime_1_1ConnectionFT601_a5b3a29a90afba294c7cf4e535a701ac5}, and {\bf lime\+::\+Connection\+Xillybus} \doxyref{}{p.}{d9/d0d/classlime_1_1ConnectionXillybus_a2b0ca6acf0b0c2d16d6cc5207a92bc62}.
+
+
+
+Definition at line {\bf 122} of file {\bf I\+Connection.\+cpp}.
+
+
+
+Referenced by {\bf lime\+::\+Streamer\+::\+Receive\+Packets\+Loop()}, and {\bf lime\+::\+Streamer\+::\+Transmit\+Packets\+Loop()}.
+
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{d2/de5/classlime_1_1IConnection_a533ff580f219bbec2b556b265c1e1355_icgraph}
+\end{center}
+\end{figure}
+
+
+\index{lime\+::\+I\+Connection@{lime\+::\+I\+Connection}!Custom\+Parameter\+Read@{Custom\+Parameter\+Read}}
+\index{Custom\+Parameter\+Read@{Custom\+Parameter\+Read}!lime\+::\+I\+Connection@{lime\+::\+I\+Connection}}
+\paragraph[{Custom\+Parameter\+Read(const uint8\+\_\+t $\ast$ids, double $\ast$values, const size\+\_\+t count, std\+::string $\ast$units)}]{\setlength{\rightskip}{0pt plus 5cm}{\bf int} I\+Connection\+::\+Custom\+Parameter\+Read (
+\begin{DoxyParamCaption}
+\item[{const uint8\+\_\+t $\ast$}]{ids, }
+\item[{double $\ast$}]{values, }
+\item[{const size\+\_\+t}]{count, }
+\item[{std\+::string $\ast$}]{units}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [virtual]}}\label{classlime_1_1IConnection_aea7e5a3c5733772afd2c9eb80231f5e5}
+
+
+Returns value of custom on board control. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em ids} & indexes of controls to read \\
+\hline
+{\em values} & retrieved control values \\
+\hline
+{\em count} & number of values to read \\
+\hline
+{\em units} & (optional) when not null returns value units (e.\+g V, A, Ohm, C... ) \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+the operation success state 
+\end{DoxyReturn}
+
+
+Reimplemented in {\bf lime\+::\+L\+M\+S64\+C\+Protocol} \doxyref{}{p.}{de/d46/classlime_1_1LMS64CProtocol_a5c865b7d0d0c10a26266f5a28461dea6}.
+
+
+
+Definition at line {\bf 212} of file {\bf I\+Connection.\+cpp}.
+
+
+
+References {\bf lime\+::\+Report\+Error()}.
+
+
+
+Referenced by {\bf lime\+::\+L\+M\+S7\+\_\+\+Device\+::\+Set\+Clock\+Freq()}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{d2/de5/classlime_1_1IConnection_aea7e5a3c5733772afd2c9eb80231f5e5_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{d2/de5/classlime_1_1IConnection_aea7e5a3c5733772afd2c9eb80231f5e5_icgraph}
+\end{center}
+\end{figure}
+
+
+\index{lime\+::\+I\+Connection@{lime\+::\+I\+Connection}!Custom\+Parameter\+Write@{Custom\+Parameter\+Write}}
+\index{Custom\+Parameter\+Write@{Custom\+Parameter\+Write}!lime\+::\+I\+Connection@{lime\+::\+I\+Connection}}
+\paragraph[{Custom\+Parameter\+Write(const uint8\+\_\+t $\ast$ids, const double $\ast$values, const size\+\_\+t count, const std\+::string \&units)}]{\setlength{\rightskip}{0pt plus 5cm}{\bf int} I\+Connection\+::\+Custom\+Parameter\+Write (
+\begin{DoxyParamCaption}
+\item[{const uint8\+\_\+t $\ast$}]{ids, }
+\item[{const double $\ast$}]{values, }
+\item[{const size\+\_\+t}]{count, }
+\item[{const std\+::string \&}]{units}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [virtual]}}\label{classlime_1_1IConnection_a3a07677ca9eec0527bd9782f44aa2a0c}
+
+
+Sets custom on board control to given value units. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em ids} & indexes of selected controls \\
+\hline
+{\em values} & new control values \\
+\hline
+{\em count} & number of values to write \\
+\hline
+{\em units} & (optional) when not null specifies value units (e.\+g V, A, Ohm, C... ) \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+the operation success state 
+\end{DoxyReturn}
+
+
+Reimplemented in {\bf lime\+::\+L\+M\+S64\+C\+Protocol} \doxyref{}{p.}{de/d46/classlime_1_1LMS64CProtocol_a177087728724bd3c3b2b1f83580c2e23}.
+
+
+
+Definition at line {\bf 206} of file {\bf I\+Connection.\+cpp}.
+
+
+
+References {\bf lime\+::\+Report\+Error()}.
+
+
+
+Referenced by {\bf lime\+::\+L\+M\+S7\+\_\+\+Device\+::\+Set\+Clock\+Freq()}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{d2/de5/classlime_1_1IConnection_a3a07677ca9eec0527bd9782f44aa2a0c_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{d2/de5/classlime_1_1IConnection_a3a07677ca9eec0527bd9782f44aa2a0c_icgraph}
+\end{center}
+\end{figure}
+
+
+\index{lime\+::\+I\+Connection@{lime\+::\+I\+Connection}!Device\+Reset@{Device\+Reset}}
+\index{Device\+Reset@{Device\+Reset}!lime\+::\+I\+Connection@{lime\+::\+I\+Connection}}
+\paragraph[{Device\+Reset(int ind=0)}]{\setlength{\rightskip}{0pt plus 5cm}{\bf int} I\+Connection\+::\+Device\+Reset (
+\begin{DoxyParamCaption}
+\item[{{\bf int}}]{ind = {\ttfamily 0}}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [virtual]}}\label{classlime_1_1IConnection_ae6c47a61b1bc4dfd1094ac2ccc68a8e8}
+Perform reset sequence on the device. Typically this will reset the R\+F\+IC using a G\+P\+IO, and possibly other I\+Cs located on the device. 
+
+Reimplemented in {\bf lime\+::\+L\+M\+S64\+C\+Protocol} \doxyref{}{p.}{de/d46/classlime_1_1LMS64CProtocol_af86270bdb4f4c60ad2c2d1c225948d16}, and {\bf lime\+::\+Connection\+S\+T\+R\+E\+A\+M\+\_\+\+U\+N\+I\+TE} \doxyref{}{p.}{db/d7f/classlime_1_1ConnectionSTREAM__UNITE_a7e57b4e60497e0b20c2f10f2e48dbd9b}.
+
+
+
+Definition at line {\bf 66} of file {\bf I\+Connection.\+cpp}.
+
+
+
+References {\bf lime\+::\+Report\+Error()}.
+
+
+
+Referenced by {\bf lime\+::\+L\+M\+S7002\+M\+::\+Reset\+Chip()}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{d2/de5/classlime_1_1IConnection_ae6c47a61b1bc4dfd1094ac2ccc68a8e8_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{d2/de5/classlime_1_1IConnection_ae6c47a61b1bc4dfd1094ac2ccc68a8e8_icgraph}
+\end{center}
+\end{figure}
+
+
+\index{lime\+::\+I\+Connection@{lime\+::\+I\+Connection}!Finish\+Data\+Reading@{Finish\+Data\+Reading}}
+\index{Finish\+Data\+Reading@{Finish\+Data\+Reading}!lime\+::\+I\+Connection@{lime\+::\+I\+Connection}}
+\paragraph[{Finish\+Data\+Reading(char $\ast$buffer, uint32\+\_\+t length, int context\+Handle)}]{\setlength{\rightskip}{0pt plus 5cm}{\bf int} I\+Connection\+::\+Finish\+Data\+Reading (
+\begin{DoxyParamCaption}
+\item[{char $\ast$}]{buffer, }
+\item[{uint32\+\_\+t}]{length, }
+\item[{{\bf int}}]{context\+Handle}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [virtual]}}\label{classlime_1_1IConnection_a900a18a24b131295005bd5bf88856840}
+
+
+Reimplemented in {\bf lime\+::\+Connection\+F\+X3} \doxyref{}{p.}{d7/db8/classlime_1_1ConnectionFX3_ae0400bd216c3d22283df97562196734e}, {\bf lime\+::\+Connection\+F\+T601} \doxyref{}{p.}{da/db1/classlime_1_1ConnectionFT601_aab8b49d60f0856c6a91705d39e5c3448}, and {\bf lime\+::\+Connection\+Xillybus} \doxyref{}{p.}{d9/d0d/classlime_1_1ConnectionXillybus_a5da99779c67da8d966ed97d3ceabe6b7}.
+
+
+
+Definition at line {\bf 105} of file {\bf I\+Connection.\+cpp}.
+
+
+
+Referenced by {\bf lime\+::\+F\+P\+G\+A\+\_\+\+Mini\+::\+Read\+Raw\+Stream\+Data()}, and {\bf lime\+::\+Streamer\+::\+Receive\+Packets\+Loop()}.
+
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{d2/de5/classlime_1_1IConnection_a900a18a24b131295005bd5bf88856840_icgraph}
+\end{center}
+\end{figure}
+
+
+\index{lime\+::\+I\+Connection@{lime\+::\+I\+Connection}!Finish\+Data\+Sending@{Finish\+Data\+Sending}}
+\index{Finish\+Data\+Sending@{Finish\+Data\+Sending}!lime\+::\+I\+Connection@{lime\+::\+I\+Connection}}
+\paragraph[{Finish\+Data\+Sending(const char $\ast$buffer, uint32\+\_\+t length, int context\+Handle)}]{\setlength{\rightskip}{0pt plus 5cm}{\bf int} I\+Connection\+::\+Finish\+Data\+Sending (
+\begin{DoxyParamCaption}
+\item[{const char $\ast$}]{buffer, }
+\item[{uint32\+\_\+t}]{length, }
+\item[{{\bf int}}]{context\+Handle}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [virtual]}}\label{classlime_1_1IConnection_a7039b9d4f3b8fc03be3272dcabc51e09}
+
+
+Reimplemented in {\bf lime\+::\+Connection\+F\+X3} \doxyref{}{p.}{d7/db8/classlime_1_1ConnectionFX3_a4b3e4f88e76fd85b805561588158aeae}, {\bf lime\+::\+Connection\+F\+T601} \doxyref{}{p.}{da/db1/classlime_1_1ConnectionFT601_a931402012fe8d9142fdb70aaee31306b}, and {\bf lime\+::\+Connection\+Xillybus} \doxyref{}{p.}{d9/d0d/classlime_1_1ConnectionXillybus_a2edc7865edfaa217e5b68ce8011a60b2}.
+
+
+
+Definition at line {\bf 92} of file {\bf I\+Connection.\+cpp}.
+
+
+
+Referenced by {\bf lime\+::\+Streamer\+::\+Transmit\+Packets\+Loop()}.
+
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{d2/de5/classlime_1_1IConnection_a7039b9d4f3b8fc03be3272dcabc51e09_icgraph}
+\end{center}
+\end{figure}
+
+
+\index{lime\+::\+I\+Connection@{lime\+::\+I\+Connection}!Get\+Buffers\+Count@{Get\+Buffers\+Count}}
+\index{Get\+Buffers\+Count@{Get\+Buffers\+Count}!lime\+::\+I\+Connection@{lime\+::\+I\+Connection}}
+\paragraph[{Get\+Buffers\+Count() const }]{\setlength{\rightskip}{0pt plus 5cm}{\bf int} I\+Connection\+::\+Get\+Buffers\+Count (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+) const\hspace{0.3cm}{\ttfamily [virtual]}}\label{classlime_1_1IConnection_a5cf560f39a0b0fa2dc4079ae74f22925}
+
+
+Reimplemented in {\bf lime\+::\+Connection\+F\+X3} \doxyref{}{p.}{d7/db8/classlime_1_1ConnectionFX3_a0061517c8c692e506e4d626eec4efc87}, {\bf lime\+::\+Connection\+F\+T601} \doxyref{}{p.}{da/db1/classlime_1_1ConnectionFT601_ae655e7695f9ea40551d5f9e7a9934d85}, and {\bf lime\+::\+Connection\+Xillybus} \doxyref{}{p.}{d9/d0d/classlime_1_1ConnectionXillybus_a100404e9b359bcdb45b559a13a593d1b}.
+
+
+
+Definition at line {\bf 117} of file {\bf I\+Connection.\+cpp}.
+
+
+
+Referenced by {\bf lime\+::\+Streamer\+::\+Receive\+Packets\+Loop()}, and {\bf lime\+::\+Streamer\+::\+Transmit\+Packets\+Loop()}.
+
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{d2/de5/classlime_1_1IConnection_a5cf560f39a0b0fa2dc4079ae74f22925_icgraph}
+\end{center}
+\end{figure}
+
+
+\index{lime\+::\+I\+Connection@{lime\+::\+I\+Connection}!Get\+Device\+Info@{Get\+Device\+Info}}
+\index{Get\+Device\+Info@{Get\+Device\+Info}!lime\+::\+I\+Connection@{lime\+::\+I\+Connection}}
+\paragraph[{Get\+Device\+Info(void)}]{\setlength{\rightskip}{0pt plus 5cm}{\bf Device\+Info} I\+Connection\+::\+Get\+Device\+Info (
+\begin{DoxyParamCaption}
+\item[{{\bf void}}]{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [virtual]}}\label{classlime_1_1IConnection_a80aa127bb4300c5edc0b741ff3af97b7}
+Get information about a device for displaying helpful information or for making device-\/specific decisions. 
+
+Reimplemented in {\bf lime\+::\+Connection\+F\+T601} \doxyref{}{p.}{da/db1/classlime_1_1ConnectionFT601_a8b8e55feb9651092bc14b54b0295342c}, {\bf lime\+::\+L\+M\+S64\+C\+Protocol} \doxyref{}{p.}{de/d46/classlime_1_1LMS64CProtocol_a7ce609a043243a35fe13445380f5ada6}, and {\bf lime\+::\+Connection\+S\+T\+R\+E\+A\+M\+\_\+\+U\+N\+I\+TE} \doxyref{}{p.}{db/d7f/classlime_1_1ConnectionSTREAM__UNITE_a6284284eace955902e77d7df308fd125}.
+
+
+
+Definition at line {\bf 33} of file {\bf I\+Connection.\+cpp}.
+
+
+
+References {\bf lime\+::\+Device\+Info\+::device\+Name}, {\bf lime\+::\+E\+X\+P\+\_\+\+B\+O\+A\+R\+D\+\_\+\+U\+N\+K\+N\+O\+WN}, {\bf lime\+::\+Device\+Info\+::expansion\+Name}, {\bf lime\+::\+Get\+Device\+Name()}, {\bf lime\+::\+Get\+Expansion\+Board\+Name()}, {\bf lime\+::info()}, and {\bf lime\+::\+L\+M\+S\+\_\+\+D\+E\+V\+\_\+\+U\+N\+K\+N\+O\+WN}.
+
+
+
+Referenced by {\bf Get\+Ext\+Loop\+Pair()}, {\bf lime\+::\+L\+M\+S7\+\_\+\+Device\+::\+Get\+Info()}, {\bf main()}, {\bf Set\+Ext\+Loopback()}, and {\bf Streaming\+Fixture\+::\+Streaming\+Fixture()}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{d2/de5/classlime_1_1IConnection_a80aa127bb4300c5edc0b741ff3af97b7_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{d2/de5/classlime_1_1IConnection_a80aa127bb4300c5edc0b741ff3af97b7_icgraph}
+\end{center}
+\end{figure}
+
+
+\index{lime\+::\+I\+Connection@{lime\+::\+I\+Connection}!Get\+Handle@{Get\+Handle}}
+\index{Get\+Handle@{Get\+Handle}!lime\+::\+I\+Connection@{lime\+::\+I\+Connection}}
+\paragraph[{Get\+Handle(void) const }]{\setlength{\rightskip}{0pt plus 5cm}const {\bf Connection\+Handle} \& I\+Connection\+::\+Get\+Handle (
+\begin{DoxyParamCaption}
+\item[{{\bf void}}]{}
+\end{DoxyParamCaption}
+) const}\label{classlime_1_1IConnection_a14d5929884cdf930ce740048f206db98}
+
+
+Get the connection handle that was used to create this connection. 
+
+
+
+Definition at line {\bf 23} of file {\bf I\+Connection.\+cpp}.
+
+
+
+References {\bf \+\_\+handle}.
+
+\index{lime\+::\+I\+Connection@{lime\+::\+I\+Connection}!G\+P\+I\+O\+Dir\+Read@{G\+P\+I\+O\+Dir\+Read}}
+\index{G\+P\+I\+O\+Dir\+Read@{G\+P\+I\+O\+Dir\+Read}!lime\+::\+I\+Connection@{lime\+::\+I\+Connection}}
+\paragraph[{G\+P\+I\+O\+Dir\+Read(uint8\+\_\+t $\ast$buffer, const size\+\_\+t buf\+Length)}]{\setlength{\rightskip}{0pt plus 5cm}{\bf int} I\+Connection\+::\+G\+P\+I\+O\+Dir\+Read (
+\begin{DoxyParamCaption}
+\item[{uint8\+\_\+t $\ast$}]{buffer, }
+\item[{const size\+\_\+t}]{buf\+Length}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [virtual]}}\label{classlime_1_1IConnection_a79dfa9ba5d8f2f2fec7682f2825fc47e}
+
+
+Read G\+P\+IO direction configuration from device. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em buffer} & to put G\+P\+IO direction configuration (0 input, 1 output) \\
+\hline
+{\em buf\+Length} & buffer length to read \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+the operation success state 
+\end{DoxyReturn}
+
+
+Reimplemented in {\bf lime\+::\+L\+M\+S64\+C\+Protocol} \doxyref{}{p.}{de/d46/classlime_1_1LMS64CProtocol_aaad4dde642e30ec465e95c9120f220e4}.
+
+
+
+Definition at line {\bf 175} of file {\bf I\+Connection.\+cpp}.
+
+
+
+References {\bf lime\+::\+Report\+Error()}.
+
+
+
+Referenced by {\bf Soapy\+L\+M\+S7\+::read\+G\+P\+I\+O\+Dir()}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{d2/de5/classlime_1_1IConnection_a79dfa9ba5d8f2f2fec7682f2825fc47e_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=347pt]{d2/de5/classlime_1_1IConnection_a79dfa9ba5d8f2f2fec7682f2825fc47e_icgraph}
+\end{center}
+\end{figure}
+
+
+\index{lime\+::\+I\+Connection@{lime\+::\+I\+Connection}!G\+P\+I\+O\+Dir\+Write@{G\+P\+I\+O\+Dir\+Write}}
+\index{G\+P\+I\+O\+Dir\+Write@{G\+P\+I\+O\+Dir\+Write}!lime\+::\+I\+Connection@{lime\+::\+I\+Connection}}
+\paragraph[{G\+P\+I\+O\+Dir\+Write(const uint8\+\_\+t $\ast$buffer, const size\+\_\+t buf\+Length)}]{\setlength{\rightskip}{0pt plus 5cm}{\bf int} I\+Connection\+::\+G\+P\+I\+O\+Dir\+Write (
+\begin{DoxyParamCaption}
+\item[{const uint8\+\_\+t $\ast$}]{buffer, }
+\item[{const size\+\_\+t}]{buf\+Length}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [virtual]}}\label{classlime_1_1IConnection_aac3b3a5f96302b997d92d7bc5ab5f7df}
+
+
+Write G\+P\+IO direction control values to device. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em buffer} & with G\+P\+IO direction configuration (0 input, 1 output) \\
+\hline
+{\em buf\+Length} & buffer length \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+the operation success state 
+\end{DoxyReturn}
+
+
+Reimplemented in {\bf lime\+::\+L\+M\+S64\+C\+Protocol} \doxyref{}{p.}{de/d46/classlime_1_1LMS64CProtocol_a0aead462748bfa55a67aa8efe69e5610}.
+
+
+
+Definition at line {\bf 169} of file {\bf I\+Connection.\+cpp}.
+
+
+
+References {\bf lime\+::\+Report\+Error()}.
+
+
+
+Referenced by {\bf Soapy\+L\+M\+S7\+::write\+G\+P\+I\+O\+Dir()}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{d2/de5/classlime_1_1IConnection_aac3b3a5f96302b997d92d7bc5ab5f7df_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=349pt]{d2/de5/classlime_1_1IConnection_aac3b3a5f96302b997d92d7bc5ab5f7df_icgraph}
+\end{center}
+\end{figure}
+
+
+\index{lime\+::\+I\+Connection@{lime\+::\+I\+Connection}!G\+P\+I\+O\+Read@{G\+P\+I\+O\+Read}}
+\index{G\+P\+I\+O\+Read@{G\+P\+I\+O\+Read}!lime\+::\+I\+Connection@{lime\+::\+I\+Connection}}
+\paragraph[{G\+P\+I\+O\+Read(uint8\+\_\+t $\ast$buffer, const size\+\_\+t buf\+Length)}]{\setlength{\rightskip}{0pt plus 5cm}{\bf int} I\+Connection\+::\+G\+P\+I\+O\+Read (
+\begin{DoxyParamCaption}
+\item[{uint8\+\_\+t $\ast$}]{buffer, }
+\item[{const size\+\_\+t}]{buf\+Length}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [virtual]}}\label{classlime_1_1IConnection_a997f2ce2d62c997245dc41eedde82dbd}
+
+
+Reads G\+P\+IO values from device. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em buffer} & destination for G\+P\+IO values L\+SB first, each bit represent G\+P\+IO state \\
+\hline
+{\em buf\+Length} & buffer length to read \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+the operation success state 
+\end{DoxyReturn}
+
+
+Reimplemented in {\bf lime\+::\+L\+M\+S64\+C\+Protocol} \doxyref{}{p.}{de/d46/classlime_1_1LMS64CProtocol_a9b06a22215089746b2b33d6c007ac8c5}.
+
+
+
+Definition at line {\bf 163} of file {\bf I\+Connection.\+cpp}.
+
+
+
+References {\bf lime\+::\+Report\+Error()}.
+
+
+
+Referenced by {\bf Soapy\+L\+M\+S7\+::read\+G\+P\+I\+O()}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{d2/de5/classlime_1_1IConnection_a997f2ce2d62c997245dc41eedde82dbd_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=334pt]{d2/de5/classlime_1_1IConnection_a997f2ce2d62c997245dc41eedde82dbd_icgraph}
+\end{center}
+\end{figure}
+
+
+\index{lime\+::\+I\+Connection@{lime\+::\+I\+Connection}!G\+P\+I\+O\+Write@{G\+P\+I\+O\+Write}}
+\index{G\+P\+I\+O\+Write@{G\+P\+I\+O\+Write}!lime\+::\+I\+Connection@{lime\+::\+I\+Connection}}
+\paragraph[{G\+P\+I\+O\+Write(const uint8\+\_\+t $\ast$buffer, const size\+\_\+t buf\+Length)}]{\setlength{\rightskip}{0pt plus 5cm}{\bf int} I\+Connection\+::\+G\+P\+I\+O\+Write (
+\begin{DoxyParamCaption}
+\item[{const uint8\+\_\+t $\ast$}]{buffer, }
+\item[{const size\+\_\+t}]{buf\+Length}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [virtual]}}\label{classlime_1_1IConnection_a679df411ce77037e23f7ada96a4dabc6}
+
+
+Writes G\+P\+IO values to device. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em buffer} & for source of G\+P\+IO values L\+SB first, each bit sets G\+P\+IO state \\
+\hline
+{\em buf\+Length} & buffer length \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+the operation success state 
+\end{DoxyReturn}
+
+
+Reimplemented in {\bf lime\+::\+L\+M\+S64\+C\+Protocol} \doxyref{}{p.}{de/d46/classlime_1_1LMS64CProtocol_a5944fe5da904af1a70c9f4907bdc6195}.
+
+
+
+Definition at line {\bf 157} of file {\bf I\+Connection.\+cpp}.
+
+
+
+References {\bf lime\+::\+Report\+Error()}.
+
+
+
+Referenced by {\bf Soapy\+L\+M\+S7\+::write\+G\+P\+I\+O()}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{d2/de5/classlime_1_1IConnection_a679df411ce77037e23f7ada96a4dabc6_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=337pt]{d2/de5/classlime_1_1IConnection_a679df411ce77037e23f7ada96a4dabc6_icgraph}
+\end{center}
+\end{figure}
+
+
+\index{lime\+::\+I\+Connection@{lime\+::\+I\+Connection}!Is\+Open@{Is\+Open}}
+\index{Is\+Open@{Is\+Open}!lime\+::\+I\+Connection@{lime\+::\+I\+Connection}}
+\paragraph[{Is\+Open(void)}]{\setlength{\rightskip}{0pt plus 5cm}bool I\+Connection\+::\+Is\+Open (
+\begin{DoxyParamCaption}
+\item[{{\bf void}}]{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [virtual]}}\label{classlime_1_1IConnection_abf1c25c85e31e262ded3e33e65cc58e3}
+Is this connection open? The constructor should attempt to connect but may fail, or the connection may go down at a later time. \begin{DoxyReturn}{Returns}
+true when the connection is available 
+\end{DoxyReturn}
+
+
+Reimplemented in {\bf lime\+::\+Connection\+F\+X3} \doxyref{}{p.}{d7/db8/classlime_1_1ConnectionFX3_a72b6cce51601f2f7f691f97bfd029cd9}, {\bf lime\+::\+Connection\+F\+T601} \doxyref{}{p.}{da/db1/classlime_1_1ConnectionFT601_a42fe706ec4a35857de4d40ce532ae147}, {\bf lime\+::\+Connection\+Novena\+R\+F7} \doxyref{}{p.}{d0/d2c/classlime_1_1ConnectionNovenaRF7_a263d24435fd0a6b651360cb331aeb08f}, {\bf lime\+::\+Connection\+Xillybus} \doxyref{}{p.}{d9/d0d/classlime_1_1ConnectionXillybus_a18501d0ae9e2f5bbbed61fe591fa120a}, and {\bf lime\+::\+Connection\+E\+V\+B7\+C\+OM} \doxyref{}{p.}{d8/d66/classlime_1_1ConnectionEVB7COM_a9caede1b57dbe7653cfaddc269dfe5d3}.
+
+
+
+Definition at line {\bf 28} of file {\bf I\+Connection.\+cpp}.
+
+
+
+Referenced by {\bf lime\+::\+L\+M\+S64\+C\+Protocol\+::\+Device\+Reset()}, {\bf H\+P\+M7\+\_\+wxgui\+::\+Download\+All()}, {\bf lime\+::\+L\+M\+S7002\+M\+::\+Get\+G\+F\+I\+R\+Coefficients()}, {\bf lime\+::\+L\+M\+S7002\+M\+::\+Is\+Synced()}, {\bf L\+M\+S\+\_\+\+Is\+Open()}, {\bf main()}, {\bf H\+P\+M7\+\_\+wxgui\+::\+On\+D\+A\+Cchange()}, {\bf H\+P\+M7\+\_\+wxgui\+::\+On\+Tuner\+S\+S\+C1change()}, {\bf H\+P\+M7\+\_\+wxgui\+::\+On\+Tuner\+S\+S\+C2change()}, {\bf lime\+::\+L\+M\+S64\+C\+Protocol\+::\+Program\+Write()}, {\bf lime\+::\+L\+M\+S64\+C\+Protocol\+::\+Read\+I2\+C()}, {\bf Streaming\+Fixture\+::\+Set\+Up()}, {\bf Streaming\+Fixture\+::\+Streaming\+Fixture()}, {\bf lime\+::\+L\+M\+S64\+C\+Protocol\+::\+Transact\+S\+P\+I()}, {\bf lime\+::\+L\+M\+S64\+C\+Protocol\+::\+Transfer\+Packet()}, {\bf H\+P\+M7\+\_\+wxgui\+::\+Upload\+G\+P\+I\+O()}, and {\bf lime\+::\+L\+M\+S64\+C\+Protocol\+::\+Write\+I2\+C()}.
+
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=550pt]{d2/de5/classlime_1_1IConnection_abf1c25c85e31e262ded3e33e65cc58e3_icgraph}
+\end{center}
+\end{figure}
+
+
+\index{lime\+::\+I\+Connection@{lime\+::\+I\+Connection}!Program\+M\+CU@{Program\+M\+CU}}
+\index{Program\+M\+CU@{Program\+M\+CU}!lime\+::\+I\+Connection@{lime\+::\+I\+Connection}}
+\paragraph[{Program\+M\+C\+U(const uint8\+\_\+t $\ast$buffer, const size\+\_\+t length, const M\+C\+U\+\_\+\+P\+R\+O\+G\+\_\+\+M\+O\+D\+E mode, Programming\+Callback callback=0)}]{\setlength{\rightskip}{0pt plus 5cm}{\bf int} I\+Connection\+::\+Program\+M\+CU (
+\begin{DoxyParamCaption}
+\item[{const uint8\+\_\+t $\ast$}]{buffer, }
+\item[{const size\+\_\+t}]{length, }
+\item[{const {\bf M\+C\+U\+\_\+\+P\+R\+O\+G\+\_\+\+M\+O\+DE}}]{mode, }
+\item[{{\bf Programming\+Callback}}]{callback = {\ttfamily 0}}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [virtual]}}\label{classlime_1_1IConnection_a7881b9e66aeb2f29d1a35dc05d88faf6}
+
+
+Uploads program to M\+CU. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em buffer} & binary program data \\
+\hline
+{\em length} & buffer length \\
+\hline
+{\em mode} & M\+CU programing mode R\+E\+S\+ET, E\+E\+P\+R\+O\+M\+\_\+\+A\+N\+D\+\_\+\+S\+R\+AM, S\+R\+AM, B\+O\+O\+T\+\_\+\+S\+R\+A\+M\+\_\+\+F\+R\+O\+M\+\_\+\+E\+E\+P\+R\+OM \\
+\hline
+{\em callback} & callback for progress reporting or early termination \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+0-\/success
+\end{DoxyReturn}
+This could be a quite long operation, use callback to get progress info or to terminate early 
+
+Reimplemented in {\bf lime\+::\+L\+M\+S64\+C\+Protocol} \doxyref{}{p.}{de/d46/classlime_1_1LMS64CProtocol_a277372e22b33a455d808811c37f951bc}.
+
+
+
+Definition at line {\bf 141} of file {\bf I\+Connection.\+cpp}.
+
+
+
+References {\bf lime\+::\+Report\+Error()}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{d2/de5/classlime_1_1IConnection_a7881b9e66aeb2f29d1a35dc05d88faf6_cgraph}
+\end{center}
+\end{figure}
+
+
+\index{lime\+::\+I\+Connection@{lime\+::\+I\+Connection}!Program\+Update@{Program\+Update}}
+\index{Program\+Update@{Program\+Update}!lime\+::\+I\+Connection@{lime\+::\+I\+Connection}}
+\paragraph[{Program\+Update(const bool download=true, Programming\+Callback callback=0)}]{\setlength{\rightskip}{0pt plus 5cm}{\bf int} I\+Connection\+::\+Program\+Update (
+\begin{DoxyParamCaption}
+\item[{const bool}]{download = {\ttfamily true}, }
+\item[{{\bf Programming\+Callback}}]{callback = {\ttfamily 0}}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [virtual]}}\label{classlime_1_1IConnection_a2df4c866684ed9828976fb37be1b0862}
+Download up-\/to-\/date images files and flash the board when applicable.
+
+Program update is an implementation specific function that may handle several different use cases depending upon what options are applicable\+:
+
+
+\begin{DoxyItemize}
+\item If a board relies on certain firmware and gateware images, these images will be downloaded if not present on the system.
+\item If the board has a programmable flash for firmware and gateware, then up-\/to-\/date images will be written to the flash on the board.
+\end{DoxyItemize}
+
+
+\begin{DoxyParams}{Parameters}
+{\em download} & true to enable downloading missing images \\
+\hline
+{\em callback} & callback for progress reporting or early termination \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+0-\/success 
+\end{DoxyReturn}
+
+
+Reimplemented in {\bf lime\+::\+L\+M\+S64\+C\+Protocol} \doxyref{}{p.}{de/d46/classlime_1_1LMS64CProtocol_a0e567fef4b3dc5d08e28e4814004af79}.
+
+
+
+Definition at line {\bf 147} of file {\bf I\+Connection.\+cpp}.
+
+
+
+References {\bf lime\+::\+Report\+Error()}.
+
+
+
+Referenced by {\bf lime\+::\+L\+M\+S7\+\_\+\+Device\+::\+Program()}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{d2/de5/classlime_1_1IConnection_a2df4c866684ed9828976fb37be1b0862_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{d2/de5/classlime_1_1IConnection_a2df4c866684ed9828976fb37be1b0862_icgraph}
+\end{center}
+\end{figure}
+
+
+\index{lime\+::\+I\+Connection@{lime\+::\+I\+Connection}!Program\+Write@{Program\+Write}}
+\index{Program\+Write@{Program\+Write}!lime\+::\+I\+Connection@{lime\+::\+I\+Connection}}
+\paragraph[{Program\+Write(const char $\ast$buffer, const size\+\_\+t length, const int programming\+Mode, const int index, Programming\+Callback callback=0)}]{\setlength{\rightskip}{0pt plus 5cm}{\bf int} I\+Connection\+::\+Program\+Write (
+\begin{DoxyParamCaption}
+\item[{const char $\ast$}]{buffer, }
+\item[{const size\+\_\+t}]{length, }
+\item[{const {\bf int}}]{programming\+Mode, }
+\item[{const {\bf int}}]{index, }
+\item[{{\bf Programming\+Callback}}]{callback = {\ttfamily 0}}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [virtual]}}\label{classlime_1_1IConnection_adf4ca97b70925ee50e955187f7811fb2}
+
+
+Uploads program to selected device. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em buffer} & binary program data \\
+\hline
+{\em length} & buffer length \\
+\hline
+{\em programming\+Mode} & to R\+AM, to F\+L\+A\+SH, to E\+E\+P\+R\+OM, etc.. \\
+\hline
+{\em index} & target device number \\
+\hline
+{\em callback} & callback for progress reporting or early termination \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+the operation success state
+\end{DoxyReturn}
+Can be used to program M\+CU, \doxyref{F\+P\+GA}{p.}{db/dcf/classlime_1_1FPGA}, write external on board memory. This could be a quite long operation, use callback to get progress info or to terminate early 
+
+Reimplemented in {\bf lime\+::\+L\+M\+S64\+C\+Protocol} \doxyref{}{p.}{de/d46/classlime_1_1LMS64CProtocol_a286c211f73249bddb8a39da39c1b7f7a}, {\bf lime\+::\+Connection\+F\+X3} \doxyref{}{p.}{d7/db8/classlime_1_1ConnectionFX3_a496c66d0f286d3749a7762635d8ecab1}, and {\bf lime\+::\+Connection\+F\+T601} \doxyref{}{p.}{da/db1/classlime_1_1ConnectionFT601_a2d7b20e833efa2b82568494129dc1042}.
+
+
+
+Definition at line {\bf 135} of file {\bf I\+Connection.\+cpp}.
+
+
+
+References {\bf lime\+::\+Report\+Error()}.
+
+
+
+Referenced by {\bf lime\+::\+L\+M\+S7\+\_\+\+Lime\+S\+D\+R\+::\+Program()}, and {\bf lime\+::\+L\+M\+S7\+\_\+\+Device\+::\+Program()}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{d2/de5/classlime_1_1IConnection_adf4ca97b70925ee50e955187f7811fb2_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{d2/de5/classlime_1_1IConnection_adf4ca97b70925ee50e955187f7811fb2_icgraph}
+\end{center}
+\end{figure}
+
+
+\index{lime\+::\+I\+Connection@{lime\+::\+I\+Connection}!Read\+I2C@{Read\+I2C}}
+\index{Read\+I2C@{Read\+I2C}!lime\+::\+I\+Connection@{lime\+::\+I\+Connection}}
+\paragraph[{Read\+I2\+C(const int addr, const size\+\_\+t num\+Bytes, std\+::string \&data)}]{\setlength{\rightskip}{0pt plus 5cm}{\bf int} I\+Connection\+::\+Read\+I2C (
+\begin{DoxyParamCaption}
+\item[{const {\bf int}}]{addr, }
+\item[{const size\+\_\+t}]{num\+Bytes, }
+\item[{std\+::string \&}]{data}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [virtual]}}\label{classlime_1_1IConnection_af6938b707f320aaf2132f183cc4e298d}
+Read from an available I2C slave. The data parameter can be used to pass optional write data. Some implementations can combine a write + read transaction. If the device contains multiple I2C masters, the address bits can encode which master. 
+\begin{DoxyParams}[1]{Parameters}
+ & {\em addr} & the address of the slave \\
+\hline
+ & {\em num\+Bytes} & the number of bytes to read \\
+\hline
+\mbox{\tt in,out}  & {\em data} & an array of bytes read from the slave \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+the transaction success state 
+\end{DoxyReturn}
+
+
+Reimplemented in {\bf lime\+::\+L\+M\+S64\+C\+Protocol} \doxyref{}{p.}{de/d46/classlime_1_1LMS64CProtocol_a89b06bc220deeec9646d5bd844462bb0}.
+
+
+
+Definition at line {\bf 57} of file {\bf I\+Connection.\+cpp}.
+
+
+
+References {\bf lime\+::\+Report\+Error()}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{d2/de5/classlime_1_1IConnection_af6938b707f320aaf2132f183cc4e298d_cgraph}
+\end{center}
+\end{figure}
+
+
+\index{lime\+::\+I\+Connection@{lime\+::\+I\+Connection}!Read\+L\+M\+S7002\+M\+S\+PI@{Read\+L\+M\+S7002\+M\+S\+PI}}
+\index{Read\+L\+M\+S7002\+M\+S\+PI@{Read\+L\+M\+S7002\+M\+S\+PI}!lime\+::\+I\+Connection@{lime\+::\+I\+Connection}}
+\paragraph[{Read\+L\+M\+S7002\+M\+S\+P\+I(const uint32\+\_\+t $\ast$write\+Data, uint32\+\_\+t $\ast$read\+Data, size\+\_\+t size, unsigned periph\+I\+D=0)=0}]{\setlength{\rightskip}{0pt plus 5cm}virtual {\bf int} lime\+::\+I\+Connection\+::\+Read\+L\+M\+S7002\+M\+S\+PI (
+\begin{DoxyParamCaption}
+\item[{const uint32\+\_\+t $\ast$}]{write\+Data, }
+\item[{uint32\+\_\+t $\ast$}]{read\+Data, }
+\item[{size\+\_\+t}]{size, }
+\item[{unsigned}]{periph\+ID = {\ttfamily 0}}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [pure virtual]}}\label{classlime_1_1IConnection_a19573cf864645415907886dd71f8d020}
+
+
+Implemented in {\bf lime\+::\+L\+M\+S64\+C\+Protocol} \doxyref{}{p.}{de/d46/classlime_1_1LMS64CProtocol_a0fe788f90896b317b67a120968c78055}.
+
+
+
+Referenced by {\bf lime\+::\+Streamer\+::\+Align\+Rx\+T\+S\+P()}, {\bf lime\+::\+L\+M\+S7002\+M\+::\+Is\+Synced()}, {\bf lime\+::\+Streamer\+::\+Rst\+Rx\+I\+Q\+Gen()}, {\bf Set\+Ext\+Loopback()}, {\bf lime\+::\+F\+P\+G\+A\+\_\+\+Mini\+::\+Set\+Interface\+Freq()}, and {\bf lime\+::\+L\+M\+S7002\+M\+::\+S\+P\+I\+\_\+read\+\_\+batch()}.
+
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{d2/de5/classlime_1_1IConnection_a19573cf864645415907886dd71f8d020_icgraph}
+\end{center}
+\end{figure}
+
+
+\index{lime\+::\+I\+Connection@{lime\+::\+I\+Connection}!Read\+Register@{Read\+Register}}
+\index{Read\+Register@{Read\+Register}!lime\+::\+I\+Connection@{lime\+::\+I\+Connection}}
+\paragraph[{Read\+Register(const uint32\+\_\+t addr, Read\+Type \&data)}]{\setlength{\rightskip}{0pt plus 5cm}template$<$typename Read\+Type $>$ {\bf int} lime\+::\+I\+Connection\+::\+Read\+Register (
+\begin{DoxyParamCaption}
+\item[{const uint32\+\_\+t}]{addr, }
+\item[{Read\+Type \&}]{data}
+\end{DoxyParamCaption}
+)}\label{classlime_1_1IConnection_a791c33a7557f750c82ffc001f0fcb5ff}
+
+
+Read a single device register. 
+
+
+
+Definition at line {\bf 336} of file {\bf I\+Connection.\+h}.
+
+
+
+Referenced by {\bf Board\+Loopback\+Store\+::\+Board\+Loopback\+Store()}, {\bf compute\+Goertzel()}, {\bf lime\+::\+L\+M\+S7\+\_\+\+Lime\+S\+D\+R\+\_\+mini\+::\+Init()}, {\bf Soapy\+L\+M\+S7\+::read\+Register()}, {\bf lime\+::\+Connection\+Novena\+R\+F7\+::\+Receive\+Packets\+Loop()}, {\bf lime\+::\+Streamer\+::\+Receive\+Packets\+Loop()}, {\bf Set\+Ext\+Loopback()}, {\bf lime\+::\+L\+M\+S7\+\_\+\+Lime\+S\+D\+R\+\_\+mini\+::\+Set\+Path()}, and {\bf lime\+::\+Streamer\+::\+Update\+Threads()}.
+
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{d2/de5/classlime_1_1IConnection_a791c33a7557f750c82ffc001f0fcb5ff_icgraph}
+\end{center}
+\end{figure}
+
+
+\index{lime\+::\+I\+Connection@{lime\+::\+I\+Connection}!Read\+Registers@{Read\+Registers}}
+\index{Read\+Registers@{Read\+Registers}!lime\+::\+I\+Connection@{lime\+::\+I\+Connection}}
+\paragraph[{Read\+Registers(const uint32\+\_\+t $\ast$addrs, uint32\+\_\+t $\ast$data, const size\+\_\+t size)}]{\setlength{\rightskip}{0pt plus 5cm}{\bf int} I\+Connection\+::\+Read\+Registers (
+\begin{DoxyParamCaption}
+\item[{const uint32\+\_\+t $\ast$}]{addrs, }
+\item[{uint32\+\_\+t $\ast$}]{data, }
+\item[{const size\+\_\+t}]{size}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [virtual]}}\label{classlime_1_1IConnection_a302d984e7818367621e9afb67a75993b}
+
+
+Bulk read device registers. 
+
+\doxyref{Read\+Registers()}{p.}{d2/de5/classlime_1_1IConnection_a302d984e7818367621e9afb67a75993b} writes multiple registers and supports 32-\/bit addresses and data. \doxyref{Read\+Registers()}{p.}{d2/de5/classlime_1_1IConnection_a302d984e7818367621e9afb67a75993b} can support multiple devices by dispatching based on the address. 
+\begin{DoxyParams}[1]{Parameters}
+ & {\em addrs} & an array of 32-\/bit register addresses \\
+\hline
+\mbox{\tt out}  & {\em data} & an array of 32-\/bit register data \\
+\hline
+ & {\em size} & the number of entries in addrs and data \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+the operation success state 
+\end{DoxyReturn}
+
+
+Reimplemented in {\bf lime\+::\+L\+M\+S64\+C\+Protocol} \doxyref{}{p.}{de/d46/classlime_1_1LMS64CProtocol_a5ad4557e32f9584189381145f641fb65}.
+
+
+
+Definition at line {\bf 191} of file {\bf I\+Connection.\+cpp}.
+
+
+
+References {\bf lime\+::\+Report\+Error()}.
+
+
+
+Referenced by {\bf lime\+::\+Streamer\+::\+Align\+Rx\+R\+F()}, and {\bf read\+Goertzel\+Values()}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{d2/de5/classlime_1_1IConnection_a302d984e7818367621e9afb67a75993b_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{d2/de5/classlime_1_1IConnection_a302d984e7818367621e9afb67a75993b_icgraph}
+\end{center}
+\end{figure}
+
+
+\index{lime\+::\+I\+Connection@{lime\+::\+I\+Connection}!Receive\+Data@{Receive\+Data}}
+\index{Receive\+Data@{Receive\+Data}!lime\+::\+I\+Connection@{lime\+::\+I\+Connection}}
+\paragraph[{Receive\+Data(char $\ast$buffer, int length, int ep\+Index, int timeout=100)}]{\setlength{\rightskip}{0pt plus 5cm}{\bf int} I\+Connection\+::\+Receive\+Data (
+\begin{DoxyParamCaption}
+\item[{char $\ast$}]{buffer, }
+\item[{{\bf int}}]{length, }
+\item[{{\bf int}}]{ep\+Index, }
+\item[{{\bf int}}]{timeout = {\ttfamily 100}}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [virtual]}}\label{classlime_1_1IConnection_aaa0410a9c772fed64cd37bf8803f40a4}
+
+
+Reimplemented in {\bf lime\+::\+Connection\+F\+X3} \doxyref{}{p.}{d7/db8/classlime_1_1ConnectionFX3_abf4f8303337f86df200147363606a0a6}, and {\bf lime\+::\+Connection\+Xillybus} \doxyref{}{p.}{d9/d0d/classlime_1_1ConnectionXillybus_a61ab49528be4bd2821ca0561d473befb}.
+
+
+
+Definition at line {\bf 75} of file {\bf I\+Connection.\+cpp}.
+
+
+
+Referenced by {\bf lime\+::\+Streamer\+::\+Align\+Rx\+T\+S\+P()}, and {\bf lime\+::\+Streamer\+::\+Get\+Phase\+Offset()}.
+
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{d2/de5/classlime_1_1IConnection_aaa0410a9c772fed64cd37bf8803f40a4_icgraph}
+\end{center}
+\end{figure}
+
+
+\index{lime\+::\+I\+Connection@{lime\+::\+I\+Connection}!Reset\+Stream\+Buffers@{Reset\+Stream\+Buffers}}
+\index{Reset\+Stream\+Buffers@{Reset\+Stream\+Buffers}!lime\+::\+I\+Connection@{lime\+::\+I\+Connection}}
+\paragraph[{Reset\+Stream\+Buffers()}]{\setlength{\rightskip}{0pt plus 5cm}{\bf int} I\+Connection\+::\+Reset\+Stream\+Buffers (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [virtual]}}\label{classlime_1_1IConnection_a9be4843aa2121bac2d49eb60d0f45781}
+
+
+Read raw stream data from device streaming port. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em buffer} & read buffer pointer \\
+\hline
+{\em length} & number of bytes to read \\
+\hline
+{\em ep\+Index} & endpoint identifier? \\
+\hline
+{\em timeout\+\_\+ms} & timeout in milliseconds \\
+\hline
+\end{DoxyParams}
+
+
+Reimplemented in {\bf lime\+::\+Connection\+F\+X3} \doxyref{}{p.}{d7/db8/classlime_1_1ConnectionFX3_a205d8881019e475bf0766caf02de7e2c}, and {\bf lime\+::\+Connection\+F\+T601} \doxyref{}{p.}{da/db1/classlime_1_1ConnectionFT601_a54533443d66d618165d2d96ec70ed934}.
+
+
+
+Definition at line {\bf 127} of file {\bf I\+Connection.\+cpp}.
+
+
+
+Referenced by {\bf lime\+::\+Streamer\+::\+Align\+Rx\+T\+S\+P()}, {\bf lime\+::\+Streamer\+::\+Get\+Phase\+Offset()}, {\bf lime\+::\+F\+P\+G\+A\+\_\+\+Mini\+::\+Read\+Raw\+Stream\+Data()}, and {\bf lime\+::\+Streamer\+::\+Update\+Threads()}.
+
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{d2/de5/classlime_1_1IConnection_a9be4843aa2121bac2d49eb60d0f45781_icgraph}
+\end{center}
+\end{figure}
+
+
+\index{lime\+::\+I\+Connection@{lime\+::\+I\+Connection}!Send\+Data@{Send\+Data}}
+\index{Send\+Data@{Send\+Data}!lime\+::\+I\+Connection@{lime\+::\+I\+Connection}}
+\paragraph[{Send\+Data(const char $\ast$buffer, int length, int ep\+Index, int timeout=100)}]{\setlength{\rightskip}{0pt plus 5cm}{\bf int} I\+Connection\+::\+Send\+Data (
+\begin{DoxyParamCaption}
+\item[{const char $\ast$}]{buffer, }
+\item[{{\bf int}}]{length, }
+\item[{{\bf int}}]{ep\+Index, }
+\item[{{\bf int}}]{timeout = {\ttfamily 100}}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [virtual]}}\label{classlime_1_1IConnection_a3f6aeab1032832330881d8c3401f86a5}
+
+
+Reimplemented in {\bf lime\+::\+Connection\+F\+X3} \doxyref{}{p.}{d7/db8/classlime_1_1ConnectionFX3_a55763f712bcbb561ef8f57a4a8096cce}, and {\bf lime\+::\+Connection\+Xillybus} \doxyref{}{p.}{d9/d0d/classlime_1_1ConnectionXillybus_a4948f4f4ea1e758ece49a9326d25eb25}.
+
+
+
+Definition at line {\bf 79} of file {\bf I\+Connection.\+cpp}.
+
+\index{lime\+::\+I\+Connection@{lime\+::\+I\+Connection}!Set\+Data\+Log\+Callback@{Set\+Data\+Log\+Callback}}
+\index{Set\+Data\+Log\+Callback@{Set\+Data\+Log\+Callback}!lime\+::\+I\+Connection@{lime\+::\+I\+Connection}}
+\paragraph[{Set\+Data\+Log\+Callback(std\+::function$<$ void(bool, const unsigned char $\ast$, const unsigned int)$>$ callback)}]{\setlength{\rightskip}{0pt plus 5cm}{\bf void} I\+Connection\+::\+Set\+Data\+Log\+Callback (
+\begin{DoxyParamCaption}
+\item[{std\+::function$<$ {\bf void}(bool, const unsigned char $\ast$, const unsigned {\bf int})$>$}]{callback}
+\end{DoxyParamCaption}
+)}\label{classlime_1_1IConnection_a578b95f9913f25d514646cad2b99bf10}
+
+
+Sets callback function which gets called each time data is sent or received. 
+
+
+
+Definition at line {\bf 112} of file {\bf I\+Connection.\+cpp}.
+
+
+
+References {\bf callback}, and {\bf callback\+\_\+log\+Data}.
+
+\index{lime\+::\+I\+Connection@{lime\+::\+I\+Connection}!Transact\+S\+PI@{Transact\+S\+PI}}
+\index{Transact\+S\+PI@{Transact\+S\+PI}!lime\+::\+I\+Connection@{lime\+::\+I\+Connection}}
+\paragraph[{Transact\+S\+P\+I(const int addr, const uint32\+\_\+t $\ast$write\+Data, uint32\+\_\+t $\ast$read\+Data, const size\+\_\+t size)}]{\setlength{\rightskip}{0pt plus 5cm}{\bf int} I\+Connection\+::\+Transact\+S\+PI (
+\begin{DoxyParamCaption}
+\item[{const {\bf int}}]{addr, }
+\item[{const uint32\+\_\+t $\ast$}]{write\+Data, }
+\item[{uint32\+\_\+t $\ast$}]{read\+Data, }
+\item[{const size\+\_\+t}]{size}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [virtual]}}\label{classlime_1_1IConnection_af3dfb39cc643d88c1196ded5d5cbecea}
+
+
+Bulk S\+PI write/read transaction. 
+
+The transact\+S\+PI function is capable of bulk writes and bulk reads of S\+PI registers in an arbitrary IC (up to 32-\/bits per transaction).
+
+The read\+Data parameter may be N\+U\+LL to indicate a write-\/only operation, the underlying implementation may be able to optimize out the readback.
+
+
+\begin{DoxyParams}[1]{Parameters}
+ & {\em addr} & the S\+PI device address \\
+\hline
+ & {\em write\+Data} & S\+PI bits to write out \\
+\hline
+\mbox{\tt out}  & {\em read\+Data} & stores readback data \\
+\hline
+ & {\em size} & the number of S\+PI transactions \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+the transaction success state 
+\end{DoxyReturn}
+
+
+Reimplemented in {\bf lime\+::\+L\+M\+S64\+C\+Protocol} \doxyref{}{p.}{de/d46/classlime_1_1LMS64CProtocol_a00eb5e42b923a9261e3e87a9003718b9}, and {\bf lime\+::\+Connection\+S\+T\+R\+E\+A\+M\+\_\+\+U\+N\+I\+TE} \doxyref{}{p.}{db/d7f/classlime_1_1ConnectionSTREAM__UNITE_adc6c519f9e2e0091f1d80fe26ed4df9d}.
+
+
+
+Definition at line {\bf 47} of file {\bf I\+Connection.\+cpp}.
+
+
+
+References {\bf lime\+::\+Report\+Error()}.
+
+
+
+Referenced by {\bf lime\+::\+L\+M\+S7\+\_\+\+Device\+::\+Set\+Clock\+Freq()}, {\bf S\+P\+I\+\_\+read()}, {\bf S\+P\+I\+\_\+read\+\_\+batch()}, {\bf S\+P\+I\+\_\+write()}, and {\bf S\+P\+I\+\_\+write\+\_\+batch()}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{d2/de5/classlime_1_1IConnection_af3dfb39cc643d88c1196ded5d5cbecea_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{d2/de5/classlime_1_1IConnection_af3dfb39cc643d88c1196ded5d5cbecea_icgraph}
+\end{center}
+\end{figure}
+
+
+\index{lime\+::\+I\+Connection@{lime\+::\+I\+Connection}!Wait\+For\+Reading@{Wait\+For\+Reading}}
+\index{Wait\+For\+Reading@{Wait\+For\+Reading}!lime\+::\+I\+Connection@{lime\+::\+I\+Connection}}
+\paragraph[{Wait\+For\+Reading(int context\+Handle, unsigned int timeout\+\_\+ms)}]{\setlength{\rightskip}{0pt plus 5cm}bool I\+Connection\+::\+Wait\+For\+Reading (
+\begin{DoxyParamCaption}
+\item[{{\bf int}}]{context\+Handle, }
+\item[{unsigned {\bf int}}]{timeout\+\_\+ms}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [virtual]}}\label{classlime_1_1IConnection_a5499673a78953387558d5d7ba3c19802}
+
+
+Reimplemented in {\bf lime\+::\+Connection\+F\+X3} \doxyref{}{p.}{d7/db8/classlime_1_1ConnectionFX3_a061871f4a168bcb71c57a2f364c4e260}, {\bf lime\+::\+Connection\+F\+T601} \doxyref{}{p.}{da/db1/classlime_1_1ConnectionFT601_af9d270b2ae5655cd3b8d906530017d83}, and {\bf lime\+::\+Connection\+Xillybus} \doxyref{}{p.}{d9/d0d/classlime_1_1ConnectionXillybus_abbd7376c5f2a53d9ea08bc6e60602ef1}.
+
+
+
+Definition at line {\bf 101} of file {\bf I\+Connection.\+cpp}.
+
+
+
+Referenced by {\bf lime\+::\+F\+P\+G\+A\+\_\+\+Mini\+::\+Read\+Raw\+Stream\+Data()}, and {\bf lime\+::\+Streamer\+::\+Receive\+Packets\+Loop()}.
+
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{d2/de5/classlime_1_1IConnection_a5499673a78953387558d5d7ba3c19802_icgraph}
+\end{center}
+\end{figure}
+
+
+\index{lime\+::\+I\+Connection@{lime\+::\+I\+Connection}!Wait\+For\+Sending@{Wait\+For\+Sending}}
+\index{Wait\+For\+Sending@{Wait\+For\+Sending}!lime\+::\+I\+Connection@{lime\+::\+I\+Connection}}
+\paragraph[{Wait\+For\+Sending(int context\+Handle, uint32\+\_\+t timeout\+\_\+ms)}]{\setlength{\rightskip}{0pt plus 5cm}bool I\+Connection\+::\+Wait\+For\+Sending (
+\begin{DoxyParamCaption}
+\item[{{\bf int}}]{context\+Handle, }
+\item[{uint32\+\_\+t}]{timeout\+\_\+ms}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [virtual]}}\label{classlime_1_1IConnection_aa71b788a3a6735ed7169013dc719ebe2}
+
+
+Reimplemented in {\bf lime\+::\+Connection\+F\+X3} \doxyref{}{p.}{d7/db8/classlime_1_1ConnectionFX3_ad949b89249385f27bfdbd79181f5194e}, {\bf lime\+::\+Connection\+F\+T601} \doxyref{}{p.}{da/db1/classlime_1_1ConnectionFT601_a9b1dc492964b0b37faae089c556acc08}, and {\bf lime\+::\+Connection\+Xillybus} \doxyref{}{p.}{d9/d0d/classlime_1_1ConnectionXillybus_afc52407d2f76f32f29ae680074998cc1}.
+
+
+
+Definition at line {\bf 88} of file {\bf I\+Connection.\+cpp}.
+
+
+
+Referenced by {\bf lime\+::\+Streamer\+::\+Transmit\+Packets\+Loop()}.
+
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{d2/de5/classlime_1_1IConnection_aa71b788a3a6735ed7169013dc719ebe2_icgraph}
+\end{center}
+\end{figure}
+
+
+\index{lime\+::\+I\+Connection@{lime\+::\+I\+Connection}!Write\+I2C@{Write\+I2C}}
+\index{Write\+I2C@{Write\+I2C}!lime\+::\+I\+Connection@{lime\+::\+I\+Connection}}
+\paragraph[{Write\+I2\+C(const int addr, const std\+::string \&data)}]{\setlength{\rightskip}{0pt plus 5cm}{\bf int} I\+Connection\+::\+Write\+I2C (
+\begin{DoxyParamCaption}
+\item[{const {\bf int}}]{addr, }
+\item[{const std\+::string \&}]{data}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [virtual]}}\label{classlime_1_1IConnection_ab25d2a5719501fa53cca6e4b57ad6d61}
+Write to an available I2C slave. 
+\begin{DoxyParams}{Parameters}
+{\em addr} & the address of the slave \\
+\hline
+{\em data} & an array of bytes write out \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+the transaction success state 
+\end{DoxyReturn}
+
+
+Reimplemented in {\bf lime\+::\+L\+M\+S64\+C\+Protocol} \doxyref{}{p.}{de/d46/classlime_1_1LMS64CProtocol_aa69542373b372efe8a85684466b8c892}.
+
+
+
+Definition at line {\bf 52} of file {\bf I\+Connection.\+cpp}.
+
+
+
+References {\bf lime\+::\+Report\+Error()}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{d2/de5/classlime_1_1IConnection_ab25d2a5719501fa53cca6e4b57ad6d61_cgraph}
+\end{center}
+\end{figure}
+
+
+\index{lime\+::\+I\+Connection@{lime\+::\+I\+Connection}!Write\+L\+M\+S7002\+M\+S\+PI@{Write\+L\+M\+S7002\+M\+S\+PI}}
+\index{Write\+L\+M\+S7002\+M\+S\+PI@{Write\+L\+M\+S7002\+M\+S\+PI}!lime\+::\+I\+Connection@{lime\+::\+I\+Connection}}
+\paragraph[{Write\+L\+M\+S7002\+M\+S\+P\+I(const uint32\+\_\+t $\ast$write\+Data, size\+\_\+t size, unsigned periph\+I\+D=0)=0}]{\setlength{\rightskip}{0pt plus 5cm}virtual {\bf int} lime\+::\+I\+Connection\+::\+Write\+L\+M\+S7002\+M\+S\+PI (
+\begin{DoxyParamCaption}
+\item[{const uint32\+\_\+t $\ast$}]{write\+Data, }
+\item[{size\+\_\+t}]{size, }
+\item[{unsigned}]{periph\+ID = {\ttfamily 0}}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [pure virtual]}}\label{classlime_1_1IConnection_ad2f9f69f344e4c9acea10392f7fb500d}
+
+
+Implemented in {\bf lime\+::\+L\+M\+S64\+C\+Protocol} \doxyref{}{p.}{de/d46/classlime_1_1LMS64CProtocol_a10da66a3cb0651cba6b3ba5ab1e16a7e}.
+
+
+
+Referenced by {\bf lime\+::\+Streamer\+::\+Align\+Rx\+T\+S\+P()}, {\bf lime\+::\+Streamer\+::\+Rst\+Rx\+I\+Q\+Gen()}, {\bf lime\+::\+F\+P\+G\+A\+\_\+\+Mini\+::\+Set\+Interface\+Freq()}, and {\bf lime\+::\+L\+M\+S7002\+M\+::\+S\+P\+I\+\_\+write\+\_\+batch()}.
+
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{d2/de5/classlime_1_1IConnection_ad2f9f69f344e4c9acea10392f7fb500d_icgraph}
+\end{center}
+\end{figure}
+
+
+\index{lime\+::\+I\+Connection@{lime\+::\+I\+Connection}!Write\+Register@{Write\+Register}}
+\index{Write\+Register@{Write\+Register}!lime\+::\+I\+Connection@{lime\+::\+I\+Connection}}
+\paragraph[{Write\+Register(const uint32\+\_\+t addr, const uint32\+\_\+t data)}]{\setlength{\rightskip}{0pt plus 5cm}{\bf int} I\+Connection\+::\+Write\+Register (
+\begin{DoxyParamCaption}
+\item[{const uint32\+\_\+t}]{addr, }
+\item[{const uint32\+\_\+t}]{data}
+\end{DoxyParamCaption}
+)}\label{classlime_1_1IConnection_a039c7086b4261a12e5ee7a5f269e63ae}
+
+
+Write a single device register. 
+
+
+
+Definition at line {\bf 197} of file {\bf I\+Connection.\+cpp}.
+
+
+
+References {\bf Write\+Registers()}.
+
+
+
+Referenced by {\bf lime\+::\+Streamer\+::\+Align\+Quadrature()}, {\bf lime\+::\+Streamer\+::\+Align\+Rx\+R\+F()}, {\bf lime\+::\+Streamer\+::\+Align\+Rx\+T\+S\+P()}, {\bf lime\+::\+Streamer\+::\+Get\+Hardware\+Timestamp()}, {\bf lime\+::\+F\+P\+G\+A\+\_\+\+Mini\+::\+Read\+Raw\+Stream\+Data()}, {\bf lime\+::\+Connection\+Novena\+R\+F7\+::\+Receive\+Packets\+Loop()}, {\bf Set\+Ext\+Loopback()}, {\bf lime\+::\+F\+P\+G\+A\+\_\+\+Mini\+::\+Set\+Interface\+Freq()}, {\bf lime\+::\+L\+M\+S7\+\_\+\+Lime\+S\+D\+R\+\_\+mini\+::\+Set\+Path()}, {\bf lime\+::\+Streamer\+::\+Update\+Threads()}, and {\bf Soapy\+L\+M\+S7\+::write\+Register()}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{d2/de5/classlime_1_1IConnection_a039c7086b4261a12e5ee7a5f269e63ae_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{d2/de5/classlime_1_1IConnection_a039c7086b4261a12e5ee7a5f269e63ae_icgraph}
+\end{center}
+\end{figure}
+
+
+\index{lime\+::\+I\+Connection@{lime\+::\+I\+Connection}!Write\+Registers@{Write\+Registers}}
+\index{Write\+Registers@{Write\+Registers}!lime\+::\+I\+Connection@{lime\+::\+I\+Connection}}
+\paragraph[{Write\+Registers(const uint32\+\_\+t $\ast$addrs, const uint32\+\_\+t $\ast$data, const size\+\_\+t size)}]{\setlength{\rightskip}{0pt plus 5cm}{\bf int} I\+Connection\+::\+Write\+Registers (
+\begin{DoxyParamCaption}
+\item[{const uint32\+\_\+t $\ast$}]{addrs, }
+\item[{const uint32\+\_\+t $\ast$}]{data, }
+\item[{const size\+\_\+t}]{size}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [virtual]}}\label{classlime_1_1IConnection_a29486e2fa70f0a6005083660d5871454}
+
+
+Bulk write device registers. 
+
+\doxyref{Write\+Registers()}{p.}{d2/de5/classlime_1_1IConnection_a29486e2fa70f0a6005083660d5871454} writes multiple registers and supports 32-\/bit addresses and data. \doxyref{Write\+Registers()}{p.}{d2/de5/classlime_1_1IConnection_a29486e2fa70f0a6005083660d5871454} can support multiple devices by dispatching based on the address. 
+\begin{DoxyParams}{Parameters}
+{\em addrs} & an array of 32-\/bit register addresses \\
+\hline
+{\em data} & an array of 32-\/bit register data \\
+\hline
+{\em size} & the number of entries in addrs and data \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+the operation success state 
+\end{DoxyReturn}
+
+
+Reimplemented in {\bf lime\+::\+L\+M\+S64\+C\+Protocol} \doxyref{}{p.}{de/d46/classlime_1_1LMS64CProtocol_a1a0cd86562345d59273cfae0f20b55e3}.
+
+
+
+Definition at line {\bf 185} of file {\bf I\+Connection.\+cpp}.
+
+
+
+References {\bf lime\+::\+Report\+Error()}.
+
+
+
+Referenced by {\bf compute\+Goertzel()}, {\bf load\+Goertzel\+Coefficients()}, {\bf lime\+::\+Streamer\+::\+Receive\+Packets\+Loop()}, {\bf lime\+::\+Streamer\+::\+Update\+Threads()}, and {\bf Write\+Register()}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{d2/de5/classlime_1_1IConnection_a29486e2fa70f0a6005083660d5871454_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{d2/de5/classlime_1_1IConnection_a29486e2fa70f0a6005083660d5871454_icgraph}
+\end{center}
+\end{figure}
+
+
+
+
+\subsubsection{Friends And Related Function Documentation}
+\index{lime\+::\+I\+Connection@{lime\+::\+I\+Connection}!Connection\+Registry@{Connection\+Registry}}
+\index{Connection\+Registry@{Connection\+Registry}!lime\+::\+I\+Connection@{lime\+::\+I\+Connection}}
+\paragraph[{Connection\+Registry}]{\setlength{\rightskip}{0pt plus 5cm}friend class {\bf Connection\+Registry}\hspace{0.3cm}{\ttfamily [friend]}}\label{classlime_1_1IConnection_a5b57ba76779866199c2df82d0d91c445}
+
+
+Definition at line {\bf 331} of file {\bf I\+Connection.\+h}.
+
+
+
+\subsubsection{Member Data Documentation}
+\index{lime\+::\+I\+Connection@{lime\+::\+I\+Connection}!\+\_\+handle@{\+\_\+handle}}
+\index{\+\_\+handle@{\+\_\+handle}!lime\+::\+I\+Connection@{lime\+::\+I\+Connection}}
+\paragraph[{\+\_\+handle}]{\setlength{\rightskip}{0pt plus 5cm}{\bf Connection\+Handle} lime\+::\+I\+Connection\+::\+\_\+handle\hspace{0.3cm}{\ttfamily [private]}}\label{classlime_1_1IConnection_a5fb6253cea4cb4dc68a7aa66524be0e3}
+
+
+Definition at line {\bf 332} of file {\bf I\+Connection.\+h}.
+
+
+
+Referenced by {\bf Get\+Handle()}.
+
+\index{lime\+::\+I\+Connection@{lime\+::\+I\+Connection}!callback\+\_\+log\+Data@{callback\+\_\+log\+Data}}
+\index{callback\+\_\+log\+Data@{callback\+\_\+log\+Data}!lime\+::\+I\+Connection@{lime\+::\+I\+Connection}}
+\paragraph[{callback\+\_\+log\+Data}]{\setlength{\rightskip}{0pt plus 5cm}std\+::function$<${\bf void}(bool, const unsigned char$\ast$, const unsigned {\bf int})$>$ lime\+::\+I\+Connection\+::callback\+\_\+log\+Data\hspace{0.3cm}{\ttfamily [protected]}}\label{classlime_1_1IConnection_afc1e4c3cc9e2c5d7676f4e422c598739}
+
+
+Definition at line {\bf 328} of file {\bf I\+Connection.\+h}.
+
+
+
+Referenced by {\bf I\+Connection()}, {\bf Set\+Data\+Log\+Callback()}, and {\bf lime\+::\+L\+M\+S64\+C\+Protocol\+::\+Transfer\+Packet()}.
+
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+/home/erik/prefix/default/src/limesuite-\/dev/src/\+Connection\+Registry/{\bf I\+Connection.\+h}\item 
+/home/erik/prefix/default/src/limesuite-\/dev/src/\+Connection\+Registry/{\bf I\+Connection.\+cpp}\end{DoxyCompactItemize}

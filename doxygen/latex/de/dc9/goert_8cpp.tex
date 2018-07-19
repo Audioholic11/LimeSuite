@@ -1,0 +1,554 @@
+\subsection{/home/erik/prefix/default/src/limesuite-\/dev/src/lms7002m/goert.cpp File Reference}
+\label{goert_8cpp}\index{/home/erik/prefix/default/src/limesuite-\/dev/src/lms7002m/goert.\+cpp@{/home/erik/prefix/default/src/limesuite-\/dev/src/lms7002m/goert.\+cpp}}
+{\ttfamily \#include $<$iostream$>$}\\*
+{\ttfamily \#include \char`\"{}I\+Connection.\+h\char`\"{}}\\*
+{\ttfamily \#include $<$stdio.\+h$>$}\\*
+{\ttfamily \#include $<$math.\+h$>$}\\*
+{\ttfamily \#include $<$limits.\+h$>$}\\*
+{\ttfamily \#include $<$stdint.\+h$>$}\\*
+{\ttfamily \#include $<$chrono$>$}\\*
+{\ttfamily \#include \char`\"{}Logger.\+h\char`\"{}}\\*
+{\ttfamily \#include $<$string.\+h$>$}\\*
+Include dependency graph for goert.\+cpp\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{de/d13/goert_8cpp__incl}
+\end{center}
+\end{figure}
+\subsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+{\bf void} {\bf get\+Goertzel\+Coefficients} ({\bf int} k, {\bf int} {\bf SP}, int32\+\_\+t $\ast$c, int32\+\_\+t $\ast$s)
+\item 
+{\bf int} {\bf load\+Goertzel\+Coefficients} ({\bf I\+Connection} $\ast$data\+Port, int32\+\_\+t c)
+\item 
+{\bf int} {\bf read\+Goertzel\+Values} ({\bf I\+Connection} $\ast${\bf port}, int64\+\_\+t $\ast$real, int64\+\_\+t $\ast$imag, int32\+\_\+t c, int32\+\_\+t s)
+\begin{DoxyCompactList}\small\item\em Retrieves Goertzel computed I and Q values for the k-\/th bin from the F\+P\+GA. \end{DoxyCompactList}\item 
+{\bf int} {\bf compute\+Goertzel} ({\bf I\+Connection} $\ast$data\+Port)
+\item 
+int64\+\_\+t {\bf c64to48} (int64\+\_\+t {\bf x})
+\item 
+static int64\+\_\+t {\bf resize\+\_\+int} (int64\+\_\+t {\bf x}, int16\+\_\+t n)
+\item 
+{\bf void} {\bf check\+For\+Min\+Max} (int64\+\_\+t lr, int64\+\_\+t \&lr\+\_\+min, int64\+\_\+t \&lr\+\_\+max)
+\item 
+{\bf void} {\bf Calc\+GoertzelI} ({\bf int} {\bf x}[$\,$][2], int64\+\_\+t real[$\,$], int64\+\_\+t imag[$\,$], {\bf int} Sp)
+\item 
+{\bf void} {\bf Calc\+GoertzelF} ({\bf int} {\bf x}[$\,$][2], float real[$\,$], float imag[$\,$], {\bf int} Sp)
+\item 
+{\bf int} {\bf Select\+Goertzel\+Bin} ({\bf I\+Connection} $\ast${\bf port}, uint16\+\_\+t bin, uint16\+\_\+t samples\+Count)
+\item 
+{\bf int} {\bf Calculate\+Goertzel\+Bin} ({\bf I\+Connection} $\ast${\bf port}, int64\+\_\+t $\ast$real, int64\+\_\+t $\ast$imag)
+\end{DoxyCompactItemize}
+\subsubsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+static const double {\bf PI} = 3.\+14159265359
+\item 
+static const uint16\+\_\+t {\bf C\+\_\+\+C\+O\+S\+\_\+\+A\+D\+D\+R\+\_\+\+M\+SB} = 0x0081
+\item 
+static const uint16\+\_\+t {\bf C\+\_\+\+C\+O\+S\+\_\+\+A\+D\+D\+R\+\_\+\+L\+SB} = 0x0082
+\item 
+static const uint16\+\_\+t {\bf C\+\_\+\+C\+T\+R\+L\+\_\+\+A\+D\+DR} = 0x0080
+\item 
+static const uint16\+\_\+t {\bf C\+\_\+\+I\+N\+T\+\_\+\+A\+D\+D\+R\+\_\+\+S\+T\+A\+RT} = 0x0083
+\item 
+static const uint16\+\_\+t {\bf C\+\_\+\+I\+N\+T\+\_\+\+A\+D\+D\+R\+\_\+\+S\+T\+OP} = 0x008E
+\item 
+static const {\bf int} {\bf C\+\_\+\+T\+R\+I\+G\+\_\+\+L\+EN} = 32
+\item 
+static int32\+\_\+t {\bf cos\+\_\+value} = 1
+\item 
+static int32\+\_\+t {\bf sin\+\_\+value} = 0
+\item 
+static {\bf int} {\bf fft\+Bin}
+\end{DoxyCompactItemize}
+
+
+\subsubsection{Function Documentation}
+\index{goert.\+cpp@{goert.\+cpp}!c64to48@{c64to48}}
+\index{c64to48@{c64to48}!goert.\+cpp@{goert.\+cpp}}
+\paragraph[{c64to48(int64\+\_\+t x)}]{\setlength{\rightskip}{0pt plus 5cm}int64\+\_\+t c64to48 (
+\begin{DoxyParamCaption}
+\item[{int64\+\_\+t}]{x}
+\end{DoxyParamCaption}
+)}\label{goert_8cpp_acf6bcd38a1a8ae4c9f63731c2cac8a9e}
+
+
+Referenced by {\bf compute\+Goertzel()}.
+
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{de/dc9/goert_8cpp_acf6bcd38a1a8ae4c9f63731c2cac8a9e_icgraph}
+\end{center}
+\end{figure}
+
+
+\index{goert.\+cpp@{goert.\+cpp}!Calc\+GoertzelF@{Calc\+GoertzelF}}
+\index{Calc\+GoertzelF@{Calc\+GoertzelF}!goert.\+cpp@{goert.\+cpp}}
+\paragraph[{Calc\+Goertzel\+F(int x[][2], float real[], float imag[], int Sp)}]{\setlength{\rightskip}{0pt plus 5cm}{\bf void} Calc\+GoertzelF (
+\begin{DoxyParamCaption}
+\item[{{\bf int}}]{x[$\,$][2], }
+\item[{float}]{real[$\,$], }
+\item[{float}]{imag[$\,$], }
+\item[{{\bf int}}]{Sp}
+\end{DoxyParamCaption}
+)}\label{goert_8cpp_a592d6e0f61015f50905241ab556ffd17}
+
+
+Definition at line {\bf 264} of file {\bf goert.\+cpp}.
+
+
+
+References {\bf fft\+Bin}, {\bf i}, {\bf PI}, and {\bf temp}.
+
+\index{goert.\+cpp@{goert.\+cpp}!Calc\+GoertzelI@{Calc\+GoertzelI}}
+\index{Calc\+GoertzelI@{Calc\+GoertzelI}!goert.\+cpp@{goert.\+cpp}}
+\paragraph[{Calc\+Goertzel\+I(int x[][2], int64\+\_\+t real[], int64\+\_\+t imag[], int Sp)}]{\setlength{\rightskip}{0pt plus 5cm}{\bf void} Calc\+GoertzelI (
+\begin{DoxyParamCaption}
+\item[{{\bf int}}]{x[$\,$][2], }
+\item[{int64\+\_\+t}]{real[$\,$], }
+\item[{int64\+\_\+t}]{imag[$\,$], }
+\item[{{\bf int}}]{Sp}
+\end{DoxyParamCaption}
+)}\label{goert_8cpp_a1a1247728b12c4508090b818d671ea29}
+
+
+Definition at line {\bf 155} of file {\bf goert.\+cpp}.
+
+
+
+References {\bf check\+For\+Min\+Max()}, {\bf fft\+Bin}, {\bf PI}, {\bf resize\+\_\+int()}, and {\bf temp}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=285pt]{de/dc9/goert_8cpp_a1a1247728b12c4508090b818d671ea29_cgraph}
+\end{center}
+\end{figure}
+
+
+\index{goert.\+cpp@{goert.\+cpp}!Calculate\+Goertzel\+Bin@{Calculate\+Goertzel\+Bin}}
+\index{Calculate\+Goertzel\+Bin@{Calculate\+Goertzel\+Bin}!goert.\+cpp@{goert.\+cpp}}
+\paragraph[{Calculate\+Goertzel\+Bin(\+I\+Connection $\ast$port, int64\+\_\+t $\ast$real, int64\+\_\+t $\ast$imag)}]{\setlength{\rightskip}{0pt plus 5cm}{\bf int} Calculate\+Goertzel\+Bin (
+\begin{DoxyParamCaption}
+\item[{{\bf I\+Connection} $\ast$}]{port, }
+\item[{int64\+\_\+t $\ast$}]{real, }
+\item[{int64\+\_\+t $\ast$}]{imag}
+\end{DoxyParamCaption}
+)}\label{goert_8cpp_a1ecbf6493590009e690af407f2e1cbdd}
+
+
+Definition at line {\bf 325} of file {\bf goert.\+cpp}.
+
+
+
+References {\bf compute\+Goertzel()}, {\bf cos\+\_\+value}, {\bf read\+Goertzel\+Values()}, {\bf lime\+::\+Report\+Error()}, {\bf sin\+\_\+value}, and {\bf status}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{de/dc9/goert_8cpp_a1ecbf6493590009e690af407f2e1cbdd_cgraph}
+\end{center}
+\end{figure}
+
+
+\index{goert.\+cpp@{goert.\+cpp}!check\+For\+Min\+Max@{check\+For\+Min\+Max}}
+\index{check\+For\+Min\+Max@{check\+For\+Min\+Max}!goert.\+cpp@{goert.\+cpp}}
+\paragraph[{check\+For\+Min\+Max(int64\+\_\+t lr, int64\+\_\+t \&lr\+\_\+min, int64\+\_\+t \&lr\+\_\+max)}]{\setlength{\rightskip}{0pt plus 5cm}{\bf void} check\+For\+Min\+Max (
+\begin{DoxyParamCaption}
+\item[{int64\+\_\+t}]{lr, }
+\item[{int64\+\_\+t \&}]{lr\+\_\+min, }
+\item[{int64\+\_\+t \&}]{lr\+\_\+max}
+\end{DoxyParamCaption}
+)}\label{goert_8cpp_a996b1a3d16461ca807011abc1c2475cf}
+
+
+Definition at line {\bf 146} of file {\bf goert.\+cpp}.
+
+
+
+Referenced by {\bf Calc\+Goertzel\+I()}.
+
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=285pt]{de/dc9/goert_8cpp_a996b1a3d16461ca807011abc1c2475cf_icgraph}
+\end{center}
+\end{figure}
+
+
+\index{goert.\+cpp@{goert.\+cpp}!compute\+Goertzel@{compute\+Goertzel}}
+\index{compute\+Goertzel@{compute\+Goertzel}!goert.\+cpp@{goert.\+cpp}}
+\paragraph[{compute\+Goertzel(\+I\+Connection $\ast$data\+Port)}]{\setlength{\rightskip}{0pt plus 5cm}{\bf int} compute\+Goertzel (
+\begin{DoxyParamCaption}
+\item[{{\bf I\+Connection} $\ast$}]{data\+Port}
+\end{DoxyParamCaption}
+)}\label{goert_8cpp_a3b4bbb3ef316422c243fcdc5887c8ec7}
+
+
+Definition at line {\bf 96} of file {\bf goert.\+cpp}.
+
+
+
+References {\bf c64to48()}, {\bf C\+\_\+\+C\+T\+R\+L\+\_\+\+A\+D\+DR}, {\bf lime\+::\+I\+Connection\+::\+Read\+Register()}, {\bf lime\+::\+Report\+Error()}, {\bf status}, {\bf t1}, {\bf t2}, and {\bf lime\+::\+I\+Connection\+::\+Write\+Registers()}.
+
+
+
+Referenced by {\bf Calculate\+Goertzel\+Bin()}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{de/dc9/goert_8cpp_a3b4bbb3ef316422c243fcdc5887c8ec7_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=316pt]{de/dc9/goert_8cpp_a3b4bbb3ef316422c243fcdc5887c8ec7_icgraph}
+\end{center}
+\end{figure}
+
+
+\index{goert.\+cpp@{goert.\+cpp}!get\+Goertzel\+Coefficients@{get\+Goertzel\+Coefficients}}
+\index{get\+Goertzel\+Coefficients@{get\+Goertzel\+Coefficients}!goert.\+cpp@{goert.\+cpp}}
+\paragraph[{get\+Goertzel\+Coefficients(int k, int S\+P, int32\+\_\+t $\ast$c, int32\+\_\+t $\ast$s)}]{\setlength{\rightskip}{0pt plus 5cm}{\bf void} get\+Goertzel\+Coefficients (
+\begin{DoxyParamCaption}
+\item[{{\bf int}}]{k, }
+\item[{{\bf int}}]{SP, }
+\item[{int32\+\_\+t $\ast$}]{c, }
+\item[{int32\+\_\+t $\ast$}]{s}
+\end{DoxyParamCaption}
+)}\label{goert_8cpp_a5390c9d6e65c5a32f134655ba00d2f80}
+
+
+Definition at line {\bf 29} of file {\bf goert.\+cpp}.
+
+
+
+References {\bf C\+\_\+\+T\+R\+I\+G\+\_\+\+L\+EN}, {\bf PI}, and {\bf SP}.
+
+
+
+Referenced by {\bf Select\+Goertzel\+Bin()}.
+
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=330pt]{de/dc9/goert_8cpp_a5390c9d6e65c5a32f134655ba00d2f80_icgraph}
+\end{center}
+\end{figure}
+
+
+\index{goert.\+cpp@{goert.\+cpp}!load\+Goertzel\+Coefficients@{load\+Goertzel\+Coefficients}}
+\index{load\+Goertzel\+Coefficients@{load\+Goertzel\+Coefficients}!goert.\+cpp@{goert.\+cpp}}
+\paragraph[{load\+Goertzel\+Coefficients(\+I\+Connection $\ast$data\+Port, int32\+\_\+t c)}]{\setlength{\rightskip}{0pt plus 5cm}{\bf int} load\+Goertzel\+Coefficients (
+\begin{DoxyParamCaption}
+\item[{{\bf I\+Connection} $\ast$}]{data\+Port, }
+\item[{int32\+\_\+t}]{c}
+\end{DoxyParamCaption}
+)}\label{goert_8cpp_a0a7b70d5fdcf3124674372d642418905}
+
+
+Definition at line {\bf 41} of file {\bf goert.\+cpp}.
+
+
+
+References {\bf C\+\_\+\+C\+O\+S\+\_\+\+A\+D\+D\+R\+\_\+\+L\+SB}, {\bf C\+\_\+\+C\+O\+S\+\_\+\+A\+D\+D\+R\+\_\+\+M\+SB}, and {\bf lime\+::\+I\+Connection\+::\+Write\+Registers()}.
+
+
+
+Referenced by {\bf Select\+Goertzel\+Bin()}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{de/dc9/goert_8cpp_a0a7b70d5fdcf3124674372d642418905_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=335pt]{de/dc9/goert_8cpp_a0a7b70d5fdcf3124674372d642418905_icgraph}
+\end{center}
+\end{figure}
+
+
+\index{goert.\+cpp@{goert.\+cpp}!read\+Goertzel\+Values@{read\+Goertzel\+Values}}
+\index{read\+Goertzel\+Values@{read\+Goertzel\+Values}!goert.\+cpp@{goert.\+cpp}}
+\paragraph[{read\+Goertzel\+Values(\+I\+Connection $\ast$port, int64\+\_\+t $\ast$real, int64\+\_\+t $\ast$imag, int32\+\_\+t c, int32\+\_\+t s)}]{\setlength{\rightskip}{0pt plus 5cm}{\bf int} read\+Goertzel\+Values (
+\begin{DoxyParamCaption}
+\item[{{\bf I\+Connection} $\ast$}]{port, }
+\item[{int64\+\_\+t $\ast$}]{real, }
+\item[{int64\+\_\+t $\ast$}]{imag, }
+\item[{int32\+\_\+t}]{c, }
+\item[{int32\+\_\+t}]{s}
+\end{DoxyParamCaption}
+)}\label{goert_8cpp_aadc26df93e0f6e0ad65a93324e77af14}
+
+
+Retrieves Goertzel computed I and Q values for the k-\/th bin from the F\+P\+GA. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em port} & -\/ L\+M\+S7002M data port for communications with F\+P\+GA \\
+\hline
+{\em real} & -\/ real value of the k-\/th bin \\
+\hline
+{\em imag} & -\/ imag value of the k-\/th bin \\
+\hline
+{\em c} & -\/ cosine value \\
+\hline
+{\em s} & -\/ sine value Note\+: F\+P\+GA has to be streaming samples to the F\+X3. \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line {\bf 60} of file {\bf goert.\+cpp}.
+
+
+
+References {\bf C\+\_\+\+I\+N\+T\+\_\+\+A\+D\+D\+R\+\_\+\+S\+T\+A\+RT}, {\bf C\+\_\+\+I\+N\+T\+\_\+\+A\+D\+D\+R\+\_\+\+S\+T\+OP}, {\bf C\+\_\+\+T\+R\+I\+G\+\_\+\+L\+EN}, {\bf i}, {\bf lime\+::\+I\+Connection\+::\+Read\+Registers()}, {\bf lime\+::\+Report\+Error()}, and {\bf status}.
+
+
+
+Referenced by {\bf Calculate\+Goertzel\+Bin()}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{de/dc9/goert_8cpp_aadc26df93e0f6e0ad65a93324e77af14_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=327pt]{de/dc9/goert_8cpp_aadc26df93e0f6e0ad65a93324e77af14_icgraph}
+\end{center}
+\end{figure}
+
+
+\index{goert.\+cpp@{goert.\+cpp}!resize\+\_\+int@{resize\+\_\+int}}
+\index{resize\+\_\+int@{resize\+\_\+int}!goert.\+cpp@{goert.\+cpp}}
+\paragraph[{resize\+\_\+int(int64\+\_\+t x, int16\+\_\+t n)}]{\setlength{\rightskip}{0pt plus 5cm}static int64\+\_\+t resize\+\_\+int (
+\begin{DoxyParamCaption}
+\item[{int64\+\_\+t}]{x, }
+\item[{int16\+\_\+t}]{n}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [static]}}\label{goert_8cpp_a612401d1903a4ee5ea86383a614a50a4}
+
+
+Definition at line {\bf 135} of file {\bf goert.\+cpp}.
+
+
+
+Referenced by {\bf Calc\+Goertzel\+I()}.
+
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=252pt]{de/dc9/goert_8cpp_a612401d1903a4ee5ea86383a614a50a4_icgraph}
+\end{center}
+\end{figure}
+
+
+\index{goert.\+cpp@{goert.\+cpp}!Select\+Goertzel\+Bin@{Select\+Goertzel\+Bin}}
+\index{Select\+Goertzel\+Bin@{Select\+Goertzel\+Bin}!goert.\+cpp@{goert.\+cpp}}
+\paragraph[{Select\+Goertzel\+Bin(\+I\+Connection $\ast$port, uint16\+\_\+t bin, uint16\+\_\+t samples\+Count)}]{\setlength{\rightskip}{0pt plus 5cm}{\bf int} Select\+Goertzel\+Bin (
+\begin{DoxyParamCaption}
+\item[{{\bf I\+Connection} $\ast$}]{port, }
+\item[{uint16\+\_\+t}]{bin, }
+\item[{uint16\+\_\+t}]{samples\+Count}
+\end{DoxyParamCaption}
+)}\label{goert_8cpp_acf1aa2102c392ac6485803d006849e8c}
+
+
+Definition at line {\bf 316} of file {\bf goert.\+cpp}.
+
+
+
+References {\bf cos\+\_\+value}, {\bf get\+Goertzel\+Coefficients()}, {\bf load\+Goertzel\+Coefficients()}, {\bf sin\+\_\+value}, and {\bf status}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{de/dc9/goert_8cpp_acf1aa2102c392ac6485803d006849e8c_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+\subsubsection{Variable Documentation}
+\index{goert.\+cpp@{goert.\+cpp}!C\+\_\+\+C\+O\+S\+\_\+\+A\+D\+D\+R\+\_\+\+L\+SB@{C\+\_\+\+C\+O\+S\+\_\+\+A\+D\+D\+R\+\_\+\+L\+SB}}
+\index{C\+\_\+\+C\+O\+S\+\_\+\+A\+D\+D\+R\+\_\+\+L\+SB@{C\+\_\+\+C\+O\+S\+\_\+\+A\+D\+D\+R\+\_\+\+L\+SB}!goert.\+cpp@{goert.\+cpp}}
+\paragraph[{C\+\_\+\+C\+O\+S\+\_\+\+A\+D\+D\+R\+\_\+\+L\+SB}]{\setlength{\rightskip}{0pt plus 5cm}const uint16\+\_\+t C\+\_\+\+C\+O\+S\+\_\+\+A\+D\+D\+R\+\_\+\+L\+SB = 0x0082\hspace{0.3cm}{\ttfamily [static]}}\label{goert_8cpp_a5a7c2ec7d6851e85a7ab235d60e407b5}
+
+
+Definition at line {\bf 19} of file {\bf goert.\+cpp}.
+
+
+
+Referenced by {\bf load\+Goertzel\+Coefficients()}.
+
+\index{goert.\+cpp@{goert.\+cpp}!C\+\_\+\+C\+O\+S\+\_\+\+A\+D\+D\+R\+\_\+\+M\+SB@{C\+\_\+\+C\+O\+S\+\_\+\+A\+D\+D\+R\+\_\+\+M\+SB}}
+\index{C\+\_\+\+C\+O\+S\+\_\+\+A\+D\+D\+R\+\_\+\+M\+SB@{C\+\_\+\+C\+O\+S\+\_\+\+A\+D\+D\+R\+\_\+\+M\+SB}!goert.\+cpp@{goert.\+cpp}}
+\paragraph[{C\+\_\+\+C\+O\+S\+\_\+\+A\+D\+D\+R\+\_\+\+M\+SB}]{\setlength{\rightskip}{0pt plus 5cm}const uint16\+\_\+t C\+\_\+\+C\+O\+S\+\_\+\+A\+D\+D\+R\+\_\+\+M\+SB = 0x0081\hspace{0.3cm}{\ttfamily [static]}}\label{goert_8cpp_ab8272eca05dc49b9c11f06bf2842a900}
+
+
+Definition at line {\bf 18} of file {\bf goert.\+cpp}.
+
+
+
+Referenced by {\bf load\+Goertzel\+Coefficients()}.
+
+\index{goert.\+cpp@{goert.\+cpp}!C\+\_\+\+C\+T\+R\+L\+\_\+\+A\+D\+DR@{C\+\_\+\+C\+T\+R\+L\+\_\+\+A\+D\+DR}}
+\index{C\+\_\+\+C\+T\+R\+L\+\_\+\+A\+D\+DR@{C\+\_\+\+C\+T\+R\+L\+\_\+\+A\+D\+DR}!goert.\+cpp@{goert.\+cpp}}
+\paragraph[{C\+\_\+\+C\+T\+R\+L\+\_\+\+A\+D\+DR}]{\setlength{\rightskip}{0pt plus 5cm}const uint16\+\_\+t C\+\_\+\+C\+T\+R\+L\+\_\+\+A\+D\+DR = 0x0080\hspace{0.3cm}{\ttfamily [static]}}\label{goert_8cpp_ad4582d84ae8cd9f7b7d88f88160946f3}
+
+
+Definition at line {\bf 20} of file {\bf goert.\+cpp}.
+
+
+
+Referenced by {\bf compute\+Goertzel()}.
+
+\index{goert.\+cpp@{goert.\+cpp}!C\+\_\+\+I\+N\+T\+\_\+\+A\+D\+D\+R\+\_\+\+S\+T\+A\+RT@{C\+\_\+\+I\+N\+T\+\_\+\+A\+D\+D\+R\+\_\+\+S\+T\+A\+RT}}
+\index{C\+\_\+\+I\+N\+T\+\_\+\+A\+D\+D\+R\+\_\+\+S\+T\+A\+RT@{C\+\_\+\+I\+N\+T\+\_\+\+A\+D\+D\+R\+\_\+\+S\+T\+A\+RT}!goert.\+cpp@{goert.\+cpp}}
+\paragraph[{C\+\_\+\+I\+N\+T\+\_\+\+A\+D\+D\+R\+\_\+\+S\+T\+A\+RT}]{\setlength{\rightskip}{0pt plus 5cm}const uint16\+\_\+t C\+\_\+\+I\+N\+T\+\_\+\+A\+D\+D\+R\+\_\+\+S\+T\+A\+RT = 0x0083\hspace{0.3cm}{\ttfamily [static]}}\label{goert_8cpp_a529d83a94e89760e04032d1d98707fcd}
+
+
+Definition at line {\bf 21} of file {\bf goert.\+cpp}.
+
+
+
+Referenced by {\bf read\+Goertzel\+Values()}.
+
+\index{goert.\+cpp@{goert.\+cpp}!C\+\_\+\+I\+N\+T\+\_\+\+A\+D\+D\+R\+\_\+\+S\+T\+OP@{C\+\_\+\+I\+N\+T\+\_\+\+A\+D\+D\+R\+\_\+\+S\+T\+OP}}
+\index{C\+\_\+\+I\+N\+T\+\_\+\+A\+D\+D\+R\+\_\+\+S\+T\+OP@{C\+\_\+\+I\+N\+T\+\_\+\+A\+D\+D\+R\+\_\+\+S\+T\+OP}!goert.\+cpp@{goert.\+cpp}}
+\paragraph[{C\+\_\+\+I\+N\+T\+\_\+\+A\+D\+D\+R\+\_\+\+S\+T\+OP}]{\setlength{\rightskip}{0pt plus 5cm}const uint16\+\_\+t C\+\_\+\+I\+N\+T\+\_\+\+A\+D\+D\+R\+\_\+\+S\+T\+OP = 0x008E\hspace{0.3cm}{\ttfamily [static]}}\label{goert_8cpp_aaf0f234d6f41c260041b524b36a4b80e}
+
+
+Definition at line {\bf 22} of file {\bf goert.\+cpp}.
+
+
+
+Referenced by {\bf read\+Goertzel\+Values()}.
+
+\index{goert.\+cpp@{goert.\+cpp}!C\+\_\+\+T\+R\+I\+G\+\_\+\+L\+EN@{C\+\_\+\+T\+R\+I\+G\+\_\+\+L\+EN}}
+\index{C\+\_\+\+T\+R\+I\+G\+\_\+\+L\+EN@{C\+\_\+\+T\+R\+I\+G\+\_\+\+L\+EN}!goert.\+cpp@{goert.\+cpp}}
+\paragraph[{C\+\_\+\+T\+R\+I\+G\+\_\+\+L\+EN}]{\setlength{\rightskip}{0pt plus 5cm}const {\bf int} C\+\_\+\+T\+R\+I\+G\+\_\+\+L\+EN = 32\hspace{0.3cm}{\ttfamily [static]}}\label{goert_8cpp_a0e7a9da816caa7cc7f45ce90a0f3c043}
+
+
+Definition at line {\bf 24} of file {\bf goert.\+cpp}.
+
+
+
+Referenced by {\bf get\+Goertzel\+Coefficients()}, and {\bf read\+Goertzel\+Values()}.
+
+\index{goert.\+cpp@{goert.\+cpp}!cos\+\_\+value@{cos\+\_\+value}}
+\index{cos\+\_\+value@{cos\+\_\+value}!goert.\+cpp@{goert.\+cpp}}
+\paragraph[{cos\+\_\+value}]{\setlength{\rightskip}{0pt plus 5cm}int32\+\_\+t cos\+\_\+value = 1\hspace{0.3cm}{\ttfamily [static]}}\label{goert_8cpp_a07d48bd4712c9b399f8b40a3d0c26058}
+
+
+Definition at line {\bf 26} of file {\bf goert.\+cpp}.
+
+
+
+Referenced by {\bf Calculate\+Goertzel\+Bin()}, and {\bf Select\+Goertzel\+Bin()}.
+
+\index{goert.\+cpp@{goert.\+cpp}!fft\+Bin@{fft\+Bin}}
+\index{fft\+Bin@{fft\+Bin}!goert.\+cpp@{goert.\+cpp}}
+\paragraph[{fft\+Bin}]{\setlength{\rightskip}{0pt plus 5cm}{\bf int} fft\+Bin\hspace{0.3cm}{\ttfamily [static]}}\label{goert_8cpp_afe38a9fb1ed704a1ed66e086b6f00481}
+
+
+Definition at line {\bf 153} of file {\bf goert.\+cpp}.
+
+
+
+Referenced by {\bf Calc\+Goertzel\+F()}, and {\bf Calc\+Goertzel\+I()}.
+
+\index{goert.\+cpp@{goert.\+cpp}!PI@{PI}}
+\index{PI@{PI}!goert.\+cpp@{goert.\+cpp}}
+\paragraph[{PI}]{\setlength{\rightskip}{0pt plus 5cm}const double PI = 3.\+14159265359\hspace{0.3cm}{\ttfamily [static]}}\label{goert_8cpp_a952eac791b596a61bba0a133a3bb439f}
+
+
+Definition at line {\bf 16} of file {\bf goert.\+cpp}.
+
+
+
+Referenced by {\bf Calc\+Goertzel\+F()}, {\bf Calc\+Goertzel\+I()}, {\bf Generate\+Window\+Coefficients()}, {\bf get\+Goertzel\+Coefficients()}, and {\bf F\+P\+G\+Acontrols\+\_\+wxgui\+::\+Onbtn\+Load\+Onetone\+Click()}.
+
+\index{goert.\+cpp@{goert.\+cpp}!sin\+\_\+value@{sin\+\_\+value}}
+\index{sin\+\_\+value@{sin\+\_\+value}!goert.\+cpp@{goert.\+cpp}}
+\paragraph[{sin\+\_\+value}]{\setlength{\rightskip}{0pt plus 5cm}int32\+\_\+t sin\+\_\+value = 0\hspace{0.3cm}{\ttfamily [static]}}\label{goert_8cpp_a79f8b3bc41e9396222dd2f22368ce4a2}
+
+
+Definition at line {\bf 27} of file {\bf goert.\+cpp}.
+
+
+
+Referenced by {\bf Calculate\+Goertzel\+Bin()}, and {\bf Select\+Goertzel\+Bin()}.
+

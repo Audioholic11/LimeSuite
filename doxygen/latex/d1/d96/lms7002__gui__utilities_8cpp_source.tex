@@ -1,0 +1,159 @@
+\subsection{lms7002\+\_\+gui\+\_\+utilities.\+cpp}
+\label{lms7002__gui__utilities_8cpp_source}\index{/home/erik/prefix/default/src/limesuite-\/dev/src/lms7002\+\_\+wxgui/lms7002\+\_\+gui\+\_\+utilities.\+cpp@{/home/erik/prefix/default/src/limesuite-\/dev/src/lms7002\+\_\+wxgui/lms7002\+\_\+gui\+\_\+utilities.\+cpp}}
+
+\begin{DoxyCode}
+00001 
+00006 \textcolor{preprocessor}{#include "lms7002_gui_utilities.h"}
+00007 \textcolor{preprocessor}{#include <wx/defs.h>}
+00008 \textcolor{preprocessor}{#include <wx/panel.h>}
+00009 \textcolor{preprocessor}{#include <wx/combobox.h>}
+00010 \textcolor{preprocessor}{#include <wx/checkbox.h>}
+00011 \textcolor{preprocessor}{#include <wx/radiobox.h>}
+00012 \textcolor{preprocessor}{#include <wx/stattext.h>}
+00013 \textcolor{preprocessor}{#include <wx/msgdlg.h>}
+00014 \textcolor{preprocessor}{#include "numericSlider.h"}
+00015 \textcolor{preprocessor}{#include <wx/spinctrl.h>}
+00016 \textcolor{preprocessor}{#include <wx/object.h>}
+00017 \textcolor{preprocessor}{#include <wx/tooltip.h>}
+00018 \textcolor{preprocessor}{#include <lms7_device.h>}
+00019 
+00020 \textcolor{keyword}{using namespace }lime;
+00021 
+00022 \textcolor{keywordtype}{void} LMS7002_WXGUI::UpdateControlsByMap(wxPanel* panel, lms_device_t* lmsControl, \textcolor{keyword}{const} std::map<wxWindow*,
+       LMS7Parameter> &wndId2param)
+00023 \{
+00024     \textcolor{keywordflow}{if} (panel == \textcolor{keyword}{nullptr} || lmsControl == \textcolor{keyword}{nullptr})
+00025         \textcolor{keywordflow}{return};
+00026     panel->Freeze();
+00027 
+00028     wxObject *wnd;
+00029     uint16\_t value = 0;
+00030     wxClassInfo *wndClass;
+00031     wxClassInfo *cmbInfo = wxClassInfo::FindClass(\_(\textcolor{stringliteral}{"wxComboBox"}));
+00032     wxClassInfo *chkInfo = wxClassInfo::FindClass(\_(\textcolor{stringliteral}{"wxCheckBox"}));
+00033     wxClassInfo *rgrInfo = wxClassInfo::FindClass(\_(\textcolor{stringliteral}{"wxRadioBox"}));
+00034     wxClassInfo *numericSliderInfo = wxClassInfo::FindClass(\_(\textcolor{stringliteral}{"NumericSlider"}));
+00035     wxClassInfo *spinCtrlInfo = wxClassInfo::FindClass(\_(\textcolor{stringliteral}{"wxSpinCtrl"}));
+00036     wxClassInfo *labelInfo = wxClassInfo::FindClass(\_(\textcolor{stringliteral}{"wxStaticText"}));
+00037     wxClassInfo *radioBtnInfo = wxClassInfo::FindClass(\_(\textcolor{stringliteral}{"wxRadioButton"}));
+00038 
+00039     \textcolor{keywordflow}{for} (\textcolor{keyword}{auto} idParam : wndId2param)
+00040     \{
+00041         wnd = idParam.first;
+00042         \textcolor{keywordflow}{if} (wnd == \textcolor{keyword}{nullptr})
+00043             \textcolor{keywordflow}{continue};
+00044         wndClass = wnd->GetClassInfo();
+00045 
+00046         LMS7_Device* lms = (LMS7_Device*)lmsControl;
+00047         value = lms->ReadParam(idParam.second, -1, \textcolor{keyword}{true});
+00048         \textcolor{comment}{//cast window to specific control, to set value, or set selection}
+00049         \textcolor{keywordflow}{if} (wndClass->IsKindOf(cmbInfo))
+00050         \{
+00051             wxComboBox *box = wxStaticCast(wnd, wxComboBox);
+00052             \textcolor{keywordflow}{if} (box->GetCount() <= value)
+00053             \{
+00054                 wxString str;
+00055                 str = wxString::Format(\_(\textcolor{stringliteral}{"combobox value(%i) is out of range [0-%u]"}), value, box->GetCount
+      () - 1);
+00056                 \textcolor{comment}{//wxMessageBox(str, "WARNING!");}
+00057                 value = 0;
+00058             \}
+00059             box->SetSelection(value);
+00060         \}
+00061         \textcolor{keywordflow}{else} \textcolor{keywordflow}{if} (wndClass->IsKindOf(chkInfo))
+00062         \{
+00063             wxStaticCast(wnd, wxCheckBox)->SetValue(value);
+00064         \}
+00065         \textcolor{keywordflow}{else} \textcolor{keywordflow}{if} (wndClass->IsKindOf(rgrInfo))
+00066         \{
+00067             wxRadioBox *box = wxStaticCast(wnd, wxRadioBox);
+00068             \textcolor{keywordflow}{if} (box->GetCount() <= value)
+00069             \{
+00070                 wxString str;
+00071                 str = wxString::Format(\_(\textcolor{stringliteral}{"radiogroup value(%i) is out of range [0-%u]"}), value, box->
+      GetCount() - 1);
+00072                 \textcolor{comment}{//wxMessageBox(str, "WARNING!");}
+00073                 value = 0;
+00074                 \textcolor{keywordflow}{continue};
+00075             \}
+00076             box->SetSelection(value);
+00077         \}
+00078         \textcolor{keywordflow}{else} \textcolor{keywordflow}{if} (wndClass->IsKindOf(labelInfo))
+00079         \{
+00080             wxStaticCast(wnd, wxStaticText)->SetLabel(wxString::Format(\_(\textcolor{stringliteral}{"%i"}), value));
+00081         \}
+00082         \textcolor{keywordflow}{else} \textcolor{keywordflow}{if} (wndClass->IsKindOf(numericSliderInfo))
+00083         \{
+00084             wxStaticCast(wnd, NumericSlider)->SetValue(value);
+00085         \}
+00086         \textcolor{keywordflow}{else} \textcolor{keywordflow}{if} (wndClass->IsKindOf(spinCtrlInfo))
+00087         \{
+00088             wxStaticCast(wnd, wxSpinCtrl)->SetValue(value);
+00089         \}
+00090         \textcolor{keywordflow}{else} \textcolor{keywordflow}{if} (wndClass->IsKindOf(radioBtnInfo))
+00091         \{
+00092             wxStaticCast(wnd, wxRadioButton)->SetValue(value);
+00093         \}
+00094         \textcolor{keywordflow}{else}
+00095         \{
+00096             wxString str;
+00097 \textcolor{preprocessor}{#ifndef NDEBUG}
+00098             str = wxString::Format(\_(\textcolor{stringliteral}{"Unhandled control class type. className=%s, was assigned address %04X
+      "}), wndClass->GetClassName(), idParam.second.address);
+00099             wxMessageBox(str, \textcolor{stringliteral}{"ERROR!"});
+00100 \textcolor{preprocessor}{#endif}
+00101         \}
+00102     \}
+00103     panel->Thaw();
+00104 \}
+00105 
+00106 \textcolor{keywordtype}{int} LMS7002_WXGUI::index2value(\textcolor{keywordtype}{int} index, \textcolor{keyword}{const} indexValueMap &pairs)
+00107 \{
+00108     \textcolor{keywordflow}{for} (\textcolor{keywordtype}{size\_t} i = 0; i < pairs.size(); ++i)
+00109         \textcolor{keywordflow}{if} (index == pairs[i].first)
+00110             \textcolor{keywordflow}{return} pairs[i].second;
+00111     \textcolor{keywordflow}{return} 0;
+00112 \}
+00113 
+00114 \textcolor{keywordtype}{int} LMS7002_WXGUI::value2index(\textcolor{keywordtype}{int} value, \textcolor{keyword}{const} indexValueMap &pairs)
+00115 \{
+00116     \textcolor{keywordflow}{for} (\textcolor{keywordtype}{size\_t} i = 0; i < pairs.size(); ++i)
+00117         \textcolor{keywordflow}{if} (value == pairs[i].second)
+00118             \textcolor{keywordflow}{return} pairs[i].first;
+00119     \textcolor{keywordflow}{return} 0;
+00120 \}
+00121 
+00126 \textcolor{keywordtype}{void} LMS7002_WXGUI::UpdateTooltips(\textcolor{keyword}{const} std::map<wxWindow*, LMS7Parameter> &wndId2param, \textcolor{keywordtype}{bool} replace)
+00127 \{
+00128     wxString sttip = \_(\textcolor{stringliteral}{""});
+00129     std::map<wxWindow*, LMS7Parameter>::const\_iterator iter;
+00130     \textcolor{keywordflow}{for} (iter = wndId2param.begin(); iter != wndId2param.end(); ++iter)
+00131     \{
+00132         wxToolTip *ttip = NULL;
+00133         ttip = iter->first->GetToolTip();
+00134         \textcolor{keywordflow}{if} (ttip)
+00135             sttip = ttip->GetTip();
+00136         \textcolor{keywordflow}{else}
+00137             sttip = \_(\textcolor{stringliteral}{""});
+00138 
+00139         \textcolor{keywordflow}{if} (replace || sttip.length() == 0)
+00140             sttip = wxString::From8BitData(iter->second.tooltip);
+00141 
+00142         \textcolor{keywordflow}{if} (sttip.length() != 0)
+00143             sttip += \_(\textcolor{stringliteral}{"\(\backslash\)n"});
+00144 
+00145         \textcolor{keywordtype}{int} bitCount = iter->second.msb - iter->second.lsb +1;
+00146         \textcolor{keywordflow}{if} (bitCount == 1)
+00147             sttip += wxString::Format(\_(\textcolor{stringliteral}{"0x%.4X[%i]"}), iter->second.address, iter->second.lsb);
+00148         \textcolor{keywordflow}{else}
+00149             sttip += wxString::Format(\_(\textcolor{stringliteral}{"0x%.4X[%i:%i]"}), iter->second.address, iter->second.msb, iter->
+      second.lsb);
+00150         \textcolor{keywordflow}{if}(iter->first->IsKindOf(wxClassInfo::FindClass(\_(\textcolor{stringliteral}{"NumericSlider"})))) \textcolor{comment}{//set tooltip is not virtual
+       method, need to cast}
+00151             (reinterpret\_cast<NumericSlider*>(iter->first))->SetToolTip(sttip + wxString::From8BitData(iter
+      ->second.name));
+00152         \textcolor{keywordflow}{else}
+00153             iter->first->SetToolTip(sttip + wxString::From8BitData(iter->second.name));
+00154     \}
+00155 \}
+\end{DoxyCode}

@@ -1,0 +1,176 @@
+\subsection{Connection\+E\+V\+B7\+C\+O\+M\+Entry.\+cpp}
+\label{ConnectionEVB7COMEntry_8cpp_source}\index{/home/erik/prefix/default/src/limesuite-\/dev/src/\+Connection\+E\+V\+B7\+C\+O\+M/\+Connection\+E\+V\+B7\+C\+O\+M\+Entry.\+cpp@{/home/erik/prefix/default/src/limesuite-\/dev/src/\+Connection\+E\+V\+B7\+C\+O\+M/\+Connection\+E\+V\+B7\+C\+O\+M\+Entry.\+cpp}}
+
+\begin{DoxyCode}
+00001 
+00007 \textcolor{preprocessor}{#include "ConnectionEVB7COM.h"}
+00008 \textcolor{preprocessor}{#include <fstream>}
+00009 \textcolor{preprocessor}{#include <iostream>}
+00010 
+00011 \textcolor{keyword}{using namespace }std;
+00012 \textcolor{keyword}{using namespace }lime;
+00013 
+00014 \textcolor{keyword}{static} \textcolor{keyword}{const} \textcolor{keywordtype}{int} comBaudrate = 9600;
+00015 
+00017 \textcolor{keywordtype}{void} __loadConnectionEVB7COMEntry(\textcolor{keywordtype}{void}) \textcolor{comment}{//TODO fixme replace with LoadLibrary/dlopen}
+00018 \{
+00019 \textcolor{keyword}{static} ConnectionEVB7COMEntry EVB7COMEntry;
+00020 \}
+00021 
+00022 ConnectionEVB7COMEntry::ConnectionEVB7COMEntry(\textcolor{keywordtype}{void}):
+00023     ConnectionRegistryEntry(\textcolor{stringliteral}{"EVB7COM"})
+00024 \{
+00025     \textcolor{keywordflow}{return};
+00026 \}
+00027 
+00028 std::vector<ConnectionHandle> ConnectionEVB7COMEntry::enumerate(\textcolor{keyword}{const} 
+      ConnectionHandle &hint)
+00029 \{
+00030     std::vector<ConnectionHandle> result;
+00031     \textcolor{keyword}{auto} comPortList = this->FindAllComPorts();
+00032     \textcolor{keyword}{auto} availableComms = this->FilterDeviceList(comPortList);
+00033     \textcolor{keywordflow}{for} (\textcolor{keyword}{const} \textcolor{keyword}{auto} &comName : availableComms)
+00034     \{
+00035         ConnectionHandle handle;
+00036         handle.media = \textcolor{stringliteral}{"COM"};
+00037         handle.name = \textcolor{stringliteral}{"EVB7 ("}+comName+\textcolor{stringliteral}{")"};
+00038         handle.addr = comName;
+00039         \textcolor{keywordflow}{if}(hint.addr.length() == 0 || hint.addr == handle.addr)
+00040             result.push\_back(handle);
+00041     \}
+00042     \textcolor{keywordflow}{return} result;
+00043 \}
+00044 
+00045 IConnection *ConnectionEVB7COMEntry::make(\textcolor{keyword}{const} ConnectionHandle &handle)
+00046 \{
+00047     \textcolor{keywordflow}{return} \textcolor{keyword}{new} ConnectionEVB7COM(handle.addr.c\_str(), comBaudrate);
+00048 \}
+00049 
+00050 std::vector<std::string> ConnectionEVB7COMEntry::FindAllComPorts()
+00051 \{
+00052     std::vector<std::string> comPortList;
+00053 \textcolor{preprocessor}{    #ifndef \_\_unix\_\_}
+00054     HKEY hSERIALCOMM;
+00055     \textcolor{keywordflow}{if} (RegOpenKeyEx(HKEY\_LOCAL\_MACHINE, TEXT(\textcolor{stringliteral}{"HARDWARE\(\backslash\)\(\backslash\)DEVICEMAP\(\backslash\)\(\backslash\)SERIALCOMM"}),   0, KEY\_QUERY\_VALUE, &
+      hSERIALCOMM) == ERROR\_SUCCESS)
+00056     \{
+00057         \textcolor{comment}{// Get the max value name and max value lengths}
+00058         DWORD dwMaxValueNameLen;
+00059         DWORD dwMaxValueLen;
+00060         DWORD dwQueryInfo = RegQueryInfoKey(hSERIALCOMM, NULL, NULL, NULL, NULL, NULL, NULL, NULL, &
+      dwMaxValueNameLen, &dwMaxValueLen, NULL, NULL);
+00061         \textcolor{keywordflow}{if} (dwQueryInfo == ERROR\_SUCCESS)
+00062         \{
+00063             DWORD dwMaxValueNameSizeInChars = dwMaxValueNameLen + 1;
+00064             \textcolor{comment}{// Include space for the NULL terminator}
+00065             DWORD dwMaxValueNameSizeInBytes = dwMaxValueNameSizeInChars*\textcolor{keyword}{sizeof}(TCHAR);
+00066             DWORD dwMaxValueDataSizeInChars = dwMaxValueLen / \textcolor{keyword}{sizeof}(TCHAR) + 1;
+00067             \textcolor{comment}{// Include space for the NULL terminator}
+00068             DWORD dwMaxValueDataSizeInBytes = dwMaxValueDataSizeInChars*\textcolor{keyword}{sizeof}(TCHAR);
+00069 
+00070             \textcolor{comment}{// Allocate some space for the value name and value data}
+00071             TCHAR* szValueName = \textcolor{keyword}{new} TCHAR[dwMaxValueNameSizeInChars];
+00072             TCHAR* byValue = \textcolor{keyword}{new} TCHAR[dwMaxValueDataSizeInBytes];
+00073             \textcolor{keywordflow}{if} (szValueName && byValue)
+00074             \{
+00075                 \textcolor{comment}{// Enumerate all the values underneath HKEY\_LOCAL\_MACHINE\(\backslash\)HARDWARE\(\backslash\)DEVICEMAP\(\backslash\)SERIALCOMM}
+00076                 DWORD dwIndex = 0;
+00077                 DWORD dwType;
+00078                 DWORD dwValueNameSize = dwMaxValueNameSizeInChars;
+00079                 DWORD dwDataSize = dwMaxValueDataSizeInBytes;
+00080                 memset(szValueName, 0, dwMaxValueNameSizeInBytes);
+00081                 memset(byValue, 0, dwMaxValueDataSizeInBytes);
+00082                 LONG nEnum = RegEnumValue(hSERIALCOMM, dwIndex, szValueName, &dwValueNameSize, NULL, &
+      dwType, (LPBYTE)byValue, &dwDataSize);
+00083                 \textcolor{keywordflow}{while} (nEnum == ERROR\_SUCCESS)
+00084                 \{
+00085                     \textcolor{comment}{// If the value is of the correct type, then add it to the array}
+00086                     \textcolor{keywordflow}{if} (dwType == REG\_SZ)
+00087                     \{
+00088                         \textcolor{keywordtype}{char} portname[512];
+00089                         TCHAR* szPort = byValue;
+00090                         \textcolor{keywordtype}{int} nUserNameLenUnicode = lstrlen( szPort ); \textcolor{comment}{// Convert all UNICODE characters}
+00091                         \textcolor{keywordtype}{int} nUserNameLen = WideCharToMultiByte( CP\_ACP, \textcolor{comment}{// ANSI Code Page}
+00092                         0, \textcolor{comment}{// No special handling of unmapped chars}
+00093                         (LPCWSTR)szPort, \textcolor{comment}{// wide-character string to be converted}
+00094                         nUserNameLenUnicode,
+00095                         NULL, 0, \textcolor{comment}{// No output buffer since we are calculating length}
+00096                         NULL, NULL ); \textcolor{comment}{// Unrepresented char replacement - Use Default}
+00097                         TCHAR* pszUserName = \textcolor{keyword}{new} TCHAR[ nUserNameLen ]; \textcolor{comment}{// nUserNameLen includes the NULL
+       character}
+00098                         WideCharToMultiByte( CP\_ACP, \textcolor{comment}{// ANSI Code Page}
+00099                         0, \textcolor{comment}{// No special handling of unmapped chars}
+00100                         (LPCWSTR)szPort, \textcolor{comment}{// wide-character string to be converted}
+00101                         nUserNameLenUnicode,
+00102                         portname,
+00103                         nUserNameLen,
+00104                         NULL, NULL ); \textcolor{comment}{// Unrepresented char replacement - Use Default}
+00105                         portname[nUserNameLen] = 0;
+00106 \textcolor{preprocessor}{#ifdef UNICODE}
+00107                         comPortList.push\_back(portname);
+00108 \textcolor{preprocessor}{#else}
+00109                         comPortList.push\_back(szPort);
+00110 \textcolor{preprocessor}{#endif}
+00111                     \}
+00112                     \textcolor{comment}{// Prepare for the next time around}
+00113                     dwValueNameSize = dwMaxValueNameSizeInChars;
+00114                     dwDataSize = dwMaxValueDataSizeInBytes;
+00115                     memset(szValueName, 0, dwMaxValueNameSizeInBytes);
+00116                     memset(byValue, 0, dwMaxValueDataSizeInBytes);
+00117                     ++dwIndex;
+00118                     nEnum = RegEnumValue(hSERIALCOMM, dwIndex, szValueName, &dwValueNameSize, NULL, &dwType
+      , (LPBYTE)byValue, &dwDataSize);
+00119                 \}
+00120             \}
+00121             \textcolor{keyword}{delete} szValueName;
+00122             \textcolor{keyword}{delete} byValue;
+00123         \}
+00124         \textcolor{comment}{// Close the registry key now that we are finished with it}
+00125         RegCloseKey(hSERIALCOMM);
+00126 
+00127         \textcolor{keywordflow}{if} (dwQueryInfo != ERROR\_SUCCESS)
+00128             SetLastError(dwQueryInfo);
+00129     \}
+00130 \textcolor{preprocessor}{#else}
+00131     \textcolor{keywordtype}{char} tempBuffer[256];
+00132     \textcolor{keywordtype}{string} result = \textcolor{stringliteral}{""};
+00133     \textcolor{keywordflow}{if} (system( \textcolor{stringliteral}{"ls /dev | grep ttyACM > /tmp/foundSerialPorts.txt"}) == -1)
+00134         \textcolor{keywordflow}{return} comPortList;
+00135 
+00136     fstream fin;
+00137     fin.open(\textcolor{stringliteral}{"/tmp/foundSerialPorts.txt"}, ios::in);
+00138     \textcolor{keywordflow}{while}(!fin.eof())
+00139     \{
+00140         fin.getline(tempBuffer, 256);
+00141         result = \textcolor{stringliteral}{"/dev/"};
+00142         result.append(tempBuffer);
+00143         \textcolor{keywordflow}{if}( strlen(tempBuffer) > 3 ) \textcolor{comment}{//longer than tty}
+00144             comPortList.push\_back(result);
+00145     \}
+00146     fin.close();
+00147 \textcolor{preprocessor}{#endif}
+00148 
+00149     \textcolor{keywordflow}{return} comPortList;
+00150 \}
+00151 
+00152 std::vector<std::string> ConnectionEVB7COMEntry::FilterDeviceList(\textcolor{keyword}{const} std::vector<std::string> &
+      comPortList)
+00153 \{
+00154     std::vector<std::string> deviceNames;
+00155 
+00156     \textcolor{keywordtype}{string} comName;
+00157     \textcolor{keywordflow}{for}(\textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{int} i=0; i<comPortList.size(); i++)
+00158     \{
+00159         comName = comPortList[i];
+00160 
+00161         \textcolor{comment}{//when not on unix, perform a test open to validate the port}
+00162 \textcolor{preprocessor}{#ifndef \_\_unix\_\_}
+00163         ConnectionEVB7COM testConn(comName.c\_str(), comBaudrate);
+00164         \textcolor{keywordflow}{if} (testConn.IsOpen()) deviceNames.push\_back(comName);
+00165 \textcolor{preprocessor}{#else}
+00166         deviceNames.push\_back(comName);
+00167 \textcolor{preprocessor}{#endif}
+00168     \}
+00169     \textcolor{keywordflow}{return} deviceNames;
+00170 \}
+\end{DoxyCode}

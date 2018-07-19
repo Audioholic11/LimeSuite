@@ -1,0 +1,182 @@
+\subsection{Connection\+S\+T\+R\+E\+A\+M\+\_\+\+U\+N\+I\+T\+E\+Entry.\+cpp}
+\label{ConnectionSTREAM__UNITEEntry_8cpp_source}\index{/home/erik/prefix/default/src/limesuite-\/dev/src/\+Connection\+S\+T\+R\+E\+A\+M\+\_\+\+U\+N\+I\+T\+E/\+Connection\+S\+T\+R\+E\+A\+M\+\_\+\+U\+N\+I\+T\+E\+Entry.\+cpp@{/home/erik/prefix/default/src/limesuite-\/dev/src/\+Connection\+S\+T\+R\+E\+A\+M\+\_\+\+U\+N\+I\+T\+E/\+Connection\+S\+T\+R\+E\+A\+M\+\_\+\+U\+N\+I\+T\+E\+Entry.\+cpp}}
+
+\begin{DoxyCode}
+00001 
+00007 \textcolor{preprocessor}{#include "ConnectionSTREAM_UNITE.h"}
+00008 \textcolor{preprocessor}{#include <fstream>}
+00009 \textcolor{preprocessor}{#include <stdio.h>}
+00010 \textcolor{keyword}{using namespace }lime;
+00011 
+00013 \textcolor{keywordtype}{void} __loadConnectionSTREAM_UNITEEntry(\textcolor{keywordtype}{void}) \textcolor{comment}{//TODO fixme replace with LoadLibrary/dlopen}
+00014 \{
+00015 \textcolor{keyword}{static} ConnectionSTREAM_UNITEEntry STREAM\_UNITEEntry;
+00016 \}
+00017 
+00018 ConnectionSTREAM_UNITEEntry::ConnectionSTREAM_UNITEEntry(\textcolor{keywordtype}{void}):
+00019     ConnectionFX3Entry(\textcolor{stringliteral}{"STREAM+UNITE"})
+00020 \{
+00021 
+00022 \}
+00023 
+00024 ConnectionSTREAM_UNITEEntry::~ConnectionSTREAM_UNITEEntry(\textcolor{keywordtype}{void})
+00025 \{
+00026 
+00027 \}
+00028 
+00029 \textcolor{keyword}{static} std::vector<std::string> FindAllComPorts()
+00030 \{
+00031     std::vector<std::string> comPortList;
+00032 \textcolor{preprocessor}{#ifndef \_\_unix\_\_}
+00033     HKEY hSERIALCOMM;
+00034     \textcolor{keywordflow}{if} (RegOpenKeyEx(HKEY\_LOCAL\_MACHINE, TEXT(\textcolor{stringliteral}{"HARDWARE\(\backslash\)\(\backslash\)DEVICEMAP\(\backslash\)\(\backslash\)SERIALCOMM"}),   0, KEY\_QUERY\_VALUE, &
+      hSERIALCOMM) == ERROR\_SUCCESS)
+00035     \{
+00036         \textcolor{comment}{// Get the max value name and max value lengths}
+00037         DWORD dwMaxValueNameLen;
+00038         DWORD dwMaxValueLen;
+00039         DWORD dwQueryInfo = RegQueryInfoKey(hSERIALCOMM, NULL, NULL, NULL, NULL, NULL, NULL, NULL, &
+      dwMaxValueNameLen, &dwMaxValueLen, NULL, NULL);
+00040         \textcolor{keywordflow}{if} (dwQueryInfo == ERROR\_SUCCESS)
+00041         \{
+00042             DWORD dwMaxValueNameSizeInChars = dwMaxValueNameLen + 1;
+00043             \textcolor{comment}{// Include space for the NULL terminator}
+00044             DWORD dwMaxValueNameSizeInBytes = dwMaxValueNameSizeInChars*\textcolor{keyword}{sizeof}(TCHAR);
+00045             DWORD dwMaxValueDataSizeInChars = dwMaxValueLen / \textcolor{keyword}{sizeof}(TCHAR) + 1;
+00046             \textcolor{comment}{// Include space for the NULL terminator}
+00047             DWORD dwMaxValueDataSizeInBytes = dwMaxValueDataSizeInChars*\textcolor{keyword}{sizeof}(TCHAR);
+00048 
+00049             \textcolor{comment}{// Allocate some space for the value name and value data}
+00050             TCHAR* szValueName = \textcolor{keyword}{new} TCHAR[dwMaxValueNameSizeInChars];
+00051             TCHAR* byValue = \textcolor{keyword}{new} TCHAR[dwMaxValueDataSizeInBytes];
+00052             \textcolor{keywordflow}{if} (szValueName && byValue)
+00053             \{
+00054                 \textcolor{comment}{// Enumerate all the values underneath HKEY\_LOCAL\_MACHINE\(\backslash\)HARDWARE\(\backslash\)DEVICEMAP\(\backslash\)SERIALCOMM}
+00055                 DWORD dwIndex = 0;
+00056                 DWORD dwType;
+00057                 DWORD dwValueNameSize = dwMaxValueNameSizeInChars;
+00058                 DWORD dwDataSize = dwMaxValueDataSizeInBytes;
+00059                 memset(szValueName, 0, dwMaxValueNameSizeInBytes);
+00060                 memset(byValue, 0, dwMaxValueDataSizeInBytes);
+00061                 LONG nEnum = RegEnumValue(hSERIALCOMM, dwIndex, szValueName, &dwValueNameSize, NULL, &
+      dwType, (LPBYTE)byValue, &dwDataSize);
+00062                 \textcolor{keywordflow}{while} (nEnum == ERROR\_SUCCESS)
+00063                 \{
+00064                     \textcolor{comment}{// If the value is of the correct type, then add it to the array}
+00065                     \textcolor{keywordflow}{if} (dwType == REG\_SZ)
+00066                     \{
+00067                         \textcolor{keywordtype}{char} portname[512];
+00068                         TCHAR* szPort = byValue;
+00069                         \textcolor{keywordtype}{int} nUserNameLenUnicode = lstrlen( szPort ); \textcolor{comment}{// Convert all UNICODE characters}
+00070                         \textcolor{keywordtype}{int} nUserNameLen = WideCharToMultiByte( CP\_ACP, \textcolor{comment}{// ANSI Code Page}
+00071                         0, \textcolor{comment}{// No special handling of unmapped chars}
+00072                         (LPCWSTR)szPort, \textcolor{comment}{// wide-character string to be converted}
+00073                         nUserNameLenUnicode,
+00074                         NULL, 0, \textcolor{comment}{// No output buffer since we are calculating length}
+00075                         NULL, NULL ); \textcolor{comment}{// Unrepresented char replacement - Use Default}
+00076                         TCHAR* pszUserName = \textcolor{keyword}{new} TCHAR[ nUserNameLen ]; \textcolor{comment}{// nUserNameLen includes the NULL
+       character}
+00077                         WideCharToMultiByte( CP\_ACP, \textcolor{comment}{// ANSI Code Page}
+00078                         0, \textcolor{comment}{// No special handling of unmapped chars}
+00079                         (LPCWSTR)szPort, \textcolor{comment}{// wide-character string to be converted}
+00080                         nUserNameLenUnicode,
+00081                         portname,
+00082                         nUserNameLen,
+00083                         NULL, NULL ); \textcolor{comment}{// Unrepresented char replacement - Use Default}
+00084                         portname[nUserNameLen] = 0;
+00085 \textcolor{preprocessor}{#ifdef UNICODE}
+00086                         comPortList.push\_back(portname);
+00087 \textcolor{preprocessor}{#else}
+00088                         comPortList.push\_back(szPort);
+00089 \textcolor{preprocessor}{#endif}
+00090                     \}
+00091                     \textcolor{comment}{// Prepare for the next time around}
+00092                     dwValueNameSize = dwMaxValueNameSizeInChars;
+00093                     dwDataSize = dwMaxValueDataSizeInBytes;
+00094                     memset(szValueName, 0, dwMaxValueNameSizeInBytes);
+00095                     memset(byValue, 0, dwMaxValueDataSizeInBytes);
+00096                     ++dwIndex;
+00097                     nEnum = RegEnumValue(hSERIALCOMM, dwIndex, szValueName, &dwValueNameSize, NULL, &dwType
+      , (LPBYTE)byValue, &dwDataSize);
+00098                 \}
+00099             \}
+00100             \textcolor{keyword}{delete} szValueName;
+00101             \textcolor{keyword}{delete} byValue;
+00102         \}
+00103         \textcolor{comment}{// Close the registry key now that we are finished with it}
+00104         RegCloseKey(hSERIALCOMM);
+00105 
+00106         \textcolor{keywordflow}{if} (dwQueryInfo != ERROR\_SUCCESS)
+00107             SetLastError(dwQueryInfo);
+00108     \}
+00109 \textcolor{preprocessor}{#else}
+00110     FILE *lsPipe;
+00111     lsPipe = popen(\textcolor{stringliteral}{"ls /dev/* -d -1 | grep ttyACM"}, \textcolor{stringliteral}{"r"});
+00112     \textcolor{keywordtype}{char} tempBuffer[512];
+00113     \textcolor{keywordflow}{while}(fscanf(lsPipe, \textcolor{stringliteral}{"%s"}, tempBuffer) == 1)
+00114         comPortList.push\_back(tempBuffer);
+00115     pclose(lsPipe);
+00116 \textcolor{preprocessor}{#endif // \_\_unix\_\_}
+00117     \textcolor{keywordflow}{return} comPortList;
+00118 \}
+00119 
+00120 std::vector<ConnectionHandle> ConnectionSTREAM_UNITEEntry::enumerate(\textcolor{keyword}{const} 
+      ConnectionHandle &hint)
+00121 \{
+00122     std::vector<ConnectionHandle> usbHandles;
+00123     std::vector<ConnectionHandle> comHandles;
+00124     std::vector<ConnectionHandle> handles;
+00125 
+00126     usbHandles = ConnectionFX3Entry::enumerate(hint);
+00127 
+00128     std::vector<std::string> comPorts = FindAllComPorts();
+00129     \textcolor{keywordflow}{for}(\textcolor{keyword}{auto} comName : comPorts)
+00130     \{
+00131         ConnectionEVB7COM port(comName.c\_str(), 9600);
+00132         \textcolor{keywordflow}{if}(port.IsOpen() == \textcolor{keyword}{false})
+00133             \textcolor{keywordflow}{continue};
+00134 
+00135         \textcolor{keywordflow}{if} (hint.index >= 0 && hint.name.find(comName) == std::string::npos)
+00136             \textcolor{keywordflow}{continue};
+00137 
+00138         DeviceInfo info;
+00139         \textcolor{keywordflow}{if} (hint.index >= 0)
+00140             info = port.GetDeviceInfo();
+00141         \textcolor{keywordflow}{else}
+00142             info.deviceName = \textcolor{stringliteral}{""};
+00143 
+00144         ConnectionHandle hnd;
+00145         hnd.media = \textcolor{stringliteral}{"COM"};
+00146         hnd.name = info.deviceName+\textcolor{stringliteral}{"("}+comName+\textcolor{stringliteral}{")"};
+00147         hnd.addr = comName;
+00148         comHandles.push\_back(hnd);
+00149     \}
+00150 
+00151     \textcolor{keywordflow}{for}(\textcolor{keyword}{auto} usb : usbHandles)
+00152     \{
+00153         \textcolor{keywordflow}{if} (usb.name.find(\textcolor{stringliteral}{"Stream"}) != std::string::npos)
+00154             \textcolor{keywordflow}{for}(\textcolor{keyword}{auto} com : comHandles)
+00155             \{
+00156                 ConnectionHandle hnd(usb); \textcolor{comment}{//copy the usb index and serial}
+00157                 hnd.module = \textcolor{stringliteral}{"STREAM+UNITE"};
+00158                 hnd.media = \textcolor{stringliteral}{"USB+COM"};
+00159                 hnd.name = usb.name+\textcolor{stringliteral}{"+"}+com.name;
+00160                 hnd.addr = usb.addr+\textcolor{stringliteral}{"+"}+com.addr;
+00161                 handles.push\_back(hnd);
+00162             \}
+00163     \}
+00164     \textcolor{keywordflow}{return} handles;
+00165 \}
+00166 
+00167 IConnection *ConnectionSTREAM_UNITEEntry::make(\textcolor{keyword}{const} ConnectionHandle &handle)
+00168 \{
+00169     \textcolor{comment}{//separate the addr field into usb IDs and com device}
+00170     \textcolor{keyword}{const} \textcolor{keyword}{auto} idsPlusCom = handle.addr;
+00171     \textcolor{keyword}{const} \textcolor{keyword}{auto} comAddrPos = idsPlusCom.find(\textcolor{stringliteral}{"+"});
+00172     \textcolor{keyword}{const} \textcolor{keyword}{auto} vidPid = idsPlusCom.substr(0, comAddrPos);
+00173     \textcolor{keyword}{const} \textcolor{keyword}{auto} comName = idsPlusCom.substr(comAddrPos+1);
+00174 
+00175     \textcolor{comment}{//now make the hybrid connection with com device}
+00176     \textcolor{keywordflow}{return} \textcolor{keyword}{new} ConnectionSTREAM_UNITE(ctx, vidPid, handle.serial, handle.index, comName.c\_str());
+00177 \}
+\end{DoxyCode}

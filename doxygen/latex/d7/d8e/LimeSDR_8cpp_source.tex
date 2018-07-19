@@ -1,0 +1,91 @@
+\subsection{Lime\+S\+D\+R.\+cpp}
+\label{LimeSDR_8cpp_source}\index{/home/erik/prefix/default/src/limesuite-\/dev/src/\+A\+P\+I/\+Lime\+S\+D\+R.\+cpp@{/home/erik/prefix/default/src/limesuite-\/dev/src/\+A\+P\+I/\+Lime\+S\+D\+R.\+cpp}}
+
+\begin{DoxyCode}
+00001 \textcolor{comment}{/*}
+00002 \textcolor{comment}{ * File:   LimeSDR.cpp}
+00003 \textcolor{comment}{ * Author: Ignas J}
+00004 \textcolor{comment}{ *}
+00005 \textcolor{comment}{ * Created on September 18, 2016}
+00006 \textcolor{comment}{ */}
+00007 \textcolor{preprocessor}{#include "LimeSDR.h"}
+00008 \textcolor{preprocessor}{#include "FPGA_common.h"}
+00009 \textcolor{preprocessor}{#include "device_constants.h"}
+00010 
+00011 \textcolor{keyword}{namespace }lime
+00012 \{
+00013 
+00014 LMS7_LimeSDR::LMS7_LimeSDR(lime::IConnection* conn, LMS7_Device *obj) : 
+      LMS7_Generic(conn, obj)
+00015 \{
+00016 \}
+00017 
+00018 std::vector<std::string> LMS7_LimeSDR::GetProgramModes()\textcolor{keyword}{ const}
+00019 \textcolor{keyword}{}\{
+00020     \textcolor{keywordflow}{return} \{program_mode::autoUpdate,
+00021             program_mode::fpgaFlash, program_mode::fpgaReset,
+00022             program_mode::fx3Flash, program_mode::fx3Reset,
+00023             program_mode::mcuRAM, program_mode::mcuEEPROM, 
+      program_mode::mcuReset\};
+00024 \}
+00025 
+00026 \textcolor{keywordtype}{int} LMS7_LimeSDR::SetRate(\textcolor{keywordtype}{double} f\_Hz, \textcolor{keywordtype}{int} oversample)
+00027 \{
+00028     \textcolor{keywordtype}{bool} bypass = (oversample == 1);
+00029     \textcolor{keywordflow}{for} (\textcolor{keywordtype}{unsigned} i = 0; i < GetNumChannels(\textcolor{keyword}{false});i++)
+00030     \{
+00031         \textcolor{keywordflow}{if} (rx_channels[i].cF\_offset\_nco != 0.0 || tx_channels[i].cF\_offset\_nco != 0.0)
+00032         \{
+00033             bypass = \textcolor{keyword}{false};
+00034             \textcolor{keywordflow}{break};
+00035         \}
+00036     \}
+00037 
+00038     lime::LMS7002M* lms = lms_list[0];
+00039 
+00040     \textcolor{keywordflow}{if} (!bypass)
+00041         \textcolor{keywordflow}{return} LMS7_Device::SetRate(f\_Hz,oversample);
+00042 
+00043     \textcolor{keywordflow}{if} ((lms->SetFrequencyCGEN(f\_Hz*4) != 0)
+00044        || (lms->Modify_SPI_Reg_bits(LMS7param(EN_ADCCLKH_CLKGN), 0) != 0)
+00045        || (lms->Modify_SPI_Reg_bits(LMS7param(CLKH_OV_CLKL_CGEN), 2) != 0)
+00046        || (lms->Modify_SPI_Reg_bits(LMS7param(MAC), 2) != 0)
+00047        || (lms->Modify_SPI_Reg_bits(LMS7param(HBD_OVR_RXTSP), 7) != 0)
+00048        || (lms->Modify_SPI_Reg_bits(LMS7param(HBI_OVR_TXTSP), 7) != 0)
+00049        || (lms->Modify_SPI_Reg_bits(LMS7param(MAC), 1) != 0)
+00050        || (lms->SetInterfaceFrequency(lms->GetFrequencyCGEN(), 7, 7) != 0))
+00051        \textcolor{keywordflow}{return} -1;
+00052 
+00053     \textcolor{keywordflow}{return} SetFPGAInterfaceFreq(7, 7);
+00054 \}
+00055 
+00056 \textcolor{keywordtype}{int} LMS7_LimeSDR::Program(\textcolor{keyword}{const} std::string& mode, \textcolor{keyword}{const} \textcolor{keywordtype}{char}* data, \textcolor{keywordtype}{size\_t} len, 
+      lime::IConnection::ProgrammingCallback callback)\textcolor{keyword}{ const}
+00057 \textcolor{keyword}{}\{
+00058     \textcolor{keywordtype}{int} ret = LMS7_Device::Program(mode, data, len, callback);
+00059 
+00060     \textcolor{keywordflow}{if} ((mode == program_mode::fx3Flash) || (mode == program_mode::fpgaFlash))
+00061         connection->ProgramWrite(\textcolor{keyword}{nullptr}, 0, 0, 1, \textcolor{keyword}{nullptr});
+00062     \textcolor{keywordflow}{return} ret;
+00063 \}
+00064 
+00065 LMS7_LimeSDR_PCIE::LMS7_LimeSDR_PCIE(lime::IConnection* conn, LMS7_Device *obj) : 
+      LMS7_Generic(conn, obj)
+00066 \{
+00067 \}
+00068 
+00069 std::vector<std::string> LMS7_LimeSDR_PCIE::GetProgramModes()\textcolor{keyword}{ const}
+00070 \textcolor{keyword}{}\{
+00071     \textcolor{keywordflow}{return} \{program_mode::fpgaFlash, program_mode::fpgaReset,
+00072             program_mode::mcuRAM, program_mode::mcuEEPROM, 
+      program_mode::mcuReset\};
+00073 \}
+00074 
+00075 \}
+00076 
+00077 
+00078 
+00079 
+00080 
+00081 
+\end{DoxyCode}

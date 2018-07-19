@@ -1,0 +1,44 @@
+\subsection{spi.\+h}
+\label{spi_8h_source}\index{/home/erik/prefix/default/src/limesuite-\/dev/mcu\+\_\+program/common\+\_\+src/spi.\+h@{/home/erik/prefix/default/src/limesuite-\/dev/mcu\+\_\+program/common\+\_\+src/spi.\+h}}
+
+\begin{DoxyCode}
+00001 \textcolor{preprocessor}{#ifndef SPI\_H}
+00002 \textcolor{preprocessor}{#define SPI\_H}
+00003 
+00004 \textcolor{preprocessor}{#include "typedefs.h"}
+00005 
+00006 \textcolor{preprocessor}{#ifdef \_\_cplusplus}
+00007 \textcolor{keyword}{extern} \textcolor{stringliteral}{"C"}
+00008 \{
+00009 \textcolor{preprocessor}{#endif}
+00010 
+00011 \textcolor{keyword}{extern} \textcolor{keywordtype}{void} SPI_write_slow(uint16\_t spiAddrReg, uint16\_t spiDataReg);
+00012 \textcolor{keyword}{extern} uint16\_t SPI_read_slow (uint16\_t spiAddrReg);
+00013 
+00014 \textcolor{keyword}{extern} \textcolor{keywordtype}{void} SPI_write(uint16\_t spiAddrReg, uint16\_t spiDataReg);
+00015 \textcolor{keyword}{extern} uint16\_t SPI_read (uint16\_t spiAddrReg);
+00016 
+00017 \textcolor{keyword}{extern} \textcolor{keywordtype}{void} SPI_writeSlow(uint16\_t spiAddrReg, uint16\_t spiDataReg);
+00018 \textcolor{keyword}{extern} uint16\_t SPI_readSlow(uint16\_t spiAddrReg);
+00019 
+00020 \textcolor{keyword}{extern} \textcolor{keywordtype}{void} Modify_SPI_Reg_bits_WrOnly(\textcolor{keyword}{const} uint16\_t SPI\_reg\_addr, \textcolor{keyword}{const} uint8\_t bits, \textcolor{keyword}{const} uint16\_t 
+      new\_bits\_data, \textcolor{keyword}{const} uint16\_t initialValue);
+00021 \textcolor{keyword}{extern} \textcolor{keywordtype}{void} Modify_SPI_Reg_bits(\textcolor{keyword}{const} uint16\_t SPI\_reg\_addr, \textcolor{keyword}{const} uint8\_t bits, \textcolor{keyword}{const} uint16\_t 
+      new\_bits\_data);
+00022 \textcolor{keyword}{extern} uint16\_t Get_SPI_Reg_bits(\textcolor{keyword}{const} uint16\_t SPI\_reg\_addr, \textcolor{keyword}{const} uint8\_t bits);
+00023 
+00024 \textcolor{keyword}{extern} \textcolor{keywordtype}{void} SPI_read_batch(\textcolor{keyword}{const} uint16\_t *addr, uint16\_t *values, uint8\_t cnt);
+00025 \textcolor{keyword}{extern} \textcolor{keywordtype}{void} SPI_write_batch(\textcolor{keyword}{const} uint16\_t * addr, \textcolor{keyword}{const} uint16\_t * values, uint8\_t cnt);
+00026 
+00027 \textcolor{keyword}{extern} \textcolor{keywordtype}{void} Modify_SPI_Reg_mask(\textcolor{keyword}{const} uint16\_t *addr, \textcolor{keyword}{const} uint16\_t *values, \textcolor{keyword}{const} uint16\_t *masks, 
+      uint8\_t cnt);
+00028 
+00029 \textcolor{keyword}{extern} \textcolor{keywordtype}{int} BeginBatch(\textcolor{keyword}{const} \textcolor{keywordtype}{char}* name);
+00030 \textcolor{keyword}{extern} \textcolor{keywordtype}{void} EndBatch();
+00031 
+00032 \textcolor{preprocessor}{#ifdef \_\_cplusplus}
+00033 \}
+00034 \textcolor{preprocessor}{#endif}
+00035 
+00036 \textcolor{preprocessor}{#endif}
+\end{DoxyCode}

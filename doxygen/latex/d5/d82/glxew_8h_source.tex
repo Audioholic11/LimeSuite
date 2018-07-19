@@ -1,0 +1,1886 @@
+\subsection{glxew.\+h}
+\label{glxew_8h_source}\index{/home/erik/prefix/default/src/limesuite-\/dev/src/ogl\+Graph/glew/\+G\+L/glxew.\+h@{/home/erik/prefix/default/src/limesuite-\/dev/src/ogl\+Graph/glew/\+G\+L/glxew.\+h}}
+
+\begin{DoxyCode}
+00001 \textcolor{comment}{/*}
+00002 \textcolor{comment}{** The OpenGL Extension Wrangler Library}
+00003 \textcolor{comment}{** Copyright (C) 2008-2015, Nigel Stewart <nigels[]users sourceforge net>}
+00004 \textcolor{comment}{** Copyright (C) 2002-2008, Milan Ikits <milan ikits[]ieee org>}
+00005 \textcolor{comment}{** Copyright (C) 2002-2008, Marcelo E. Magallon <mmagallo[]debian org>}
+00006 \textcolor{comment}{** Copyright (C) 2002, Lev Povalahev}
+00007 \textcolor{comment}{** All rights reserved.}
+00008 \textcolor{comment}{** }
+00009 \textcolor{comment}{** Redistribution and use in source and binary forms, with or without }
+00010 \textcolor{comment}{** modification, are permitted provided that the following conditions are met:}
+00011 \textcolor{comment}{** }
+00012 \textcolor{comment}{** * Redistributions of source code must retain the above copyright notice, }
+00013 \textcolor{comment}{**   this list of conditions and the following disclaimer.}
+00014 \textcolor{comment}{** * Redistributions in binary form must reproduce the above copyright notice, }
+00015 \textcolor{comment}{**   this list of conditions and the following disclaimer in the documentation }
+00016 \textcolor{comment}{**   and/or other materials provided with the distribution.}
+00017 \textcolor{comment}{** * The name of the author may be used to endorse or promote products }
+00018 \textcolor{comment}{**   derived from this software without specific prior written permission.}
+00019 \textcolor{comment}{**}
+00020 \textcolor{comment}{** THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" }
+00021 \textcolor{comment}{** AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE }
+00022 \textcolor{comment}{** IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE}
+00023 \textcolor{comment}{** ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE }
+00024 \textcolor{comment}{** LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR }
+00025 \textcolor{comment}{** CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF }
+00026 \textcolor{comment}{** SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS}
+00027 \textcolor{comment}{** INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN}
+00028 \textcolor{comment}{** CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)}
+00029 \textcolor{comment}{** ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF}
+00030 \textcolor{comment}{** THE POSSIBILITY OF SUCH DAMAGE.}
+00031 \textcolor{comment}{*/}
+00032 
+00033 \textcolor{comment}{/*}
+00034 \textcolor{comment}{ * Mesa 3-D graphics library}
+00035 \textcolor{comment}{ * Version:  7.0}
+00036 \textcolor{comment}{ *}
+00037 \textcolor{comment}{ * Copyright (C) 1999-2007  Brian Paul   All Rights Reserved.}
+00038 \textcolor{comment}{ *}
+00039 \textcolor{comment}{ * Permission is hereby granted, free of charge, to any person obtaining a}
+00040 \textcolor{comment}{ * copy of this software and associated documentation files (the "Software"),}
+00041 \textcolor{comment}{ * to deal in the Software without restriction, including without limitation}
+00042 \textcolor{comment}{ * the rights to use, copy, modify, merge, publish, distribute, sublicense,}
+00043 \textcolor{comment}{ * and/or sell copies of the Software, and to permit persons to whom the}
+00044 \textcolor{comment}{ * Software is furnished to do so, subject to the following conditions:}
+00045 \textcolor{comment}{ *}
+00046 \textcolor{comment}{ * The above copyright notice and this permission notice shall be included}
+00047 \textcolor{comment}{ * in all copies or substantial portions of the Software.}
+00048 \textcolor{comment}{ *}
+00049 \textcolor{comment}{ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS}
+00050 \textcolor{comment}{ * OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,}
+00051 \textcolor{comment}{ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.  IN NO EVENT SHALL}
+00052 \textcolor{comment}{ * BRIAN PAUL BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN}
+00053 \textcolor{comment}{ * AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN}
+00054 \textcolor{comment}{ * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.}
+00055 \textcolor{comment}{ */}
+00056 
+00057 \textcolor{comment}{/*}
+00058 \textcolor{comment}{** Copyright (c) 2007 The Khronos Group Inc.}
+00059 \textcolor{comment}{** }
+00060 \textcolor{comment}{** Permission is hereby granted, free of charge, to any person obtaining a}
+00061 \textcolor{comment}{** copy of this software and/or associated documentation files (the}
+00062 \textcolor{comment}{** "Materials"), to deal in the Materials without restriction, including}
+00063 \textcolor{comment}{** without limitation the rights to use, copy, modify, merge, publish,}
+00064 \textcolor{comment}{** distribute, sublicense, and/or sell copies of the Materials, and to}
+00065 \textcolor{comment}{** permit persons to whom the Materials are furnished to do so, subject to}
+00066 \textcolor{comment}{** the following conditions:}
+00067 \textcolor{comment}{** }
+00068 \textcolor{comment}{** The above copyright notice and this permission notice shall be included}
+00069 \textcolor{comment}{** in all copies or substantial portions of the Materials.}
+00070 \textcolor{comment}{** }
+00071 \textcolor{comment}{** THE MATERIALS ARE PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,}
+00072 \textcolor{comment}{** EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF}
+00073 \textcolor{comment}{** MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.}
+00074 \textcolor{comment}{** IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY}
+00075 \textcolor{comment}{** CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,}
+00076 \textcolor{comment}{** TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE}
+00077 \textcolor{comment}{** MATERIALS OR THE USE OR OTHER DEALINGS IN THE MATERIALS.}
+00078 \textcolor{comment}{*/}
+00079 
+00080 \textcolor{preprocessor}{#ifndef \_\_glxew\_h\_\_}
+00081 \textcolor{preprocessor}{#define \_\_glxew\_h\_\_}
+00082 \textcolor{preprocessor}{#define \_\_GLXEW\_H\_\_}
+00083 
+00084 \textcolor{preprocessor}{#ifdef \_\_glxext\_h\_}
+00085 \textcolor{preprocessor}{#error glxext.h included before glxew.h}
+00086 \textcolor{preprocessor}{#endif}
+00087 
+00088 \textcolor{preprocessor}{#if defined(GLX\_H) || defined(\_\_GLX\_glx\_h\_\_) || defined(\_\_glx\_h\_\_)}
+00089 \textcolor{preprocessor}{#error glx.h included before glxew.h}
+00090 \textcolor{preprocessor}{#endif}
+00091 
+00092 \textcolor{preprocessor}{#define \_\_glxext\_h\_}
+00093 
+00094 \textcolor{preprocessor}{#define GLX\_H}
+00095 \textcolor{preprocessor}{#define \_\_GLX\_glx\_h\_\_}
+00096 \textcolor{preprocessor}{#define \_\_glx\_h\_\_}
+00097 
+00098 \textcolor{preprocessor}{#include <X11/Xlib.h>}
+00099 \textcolor{preprocessor}{#include <X11/Xutil.h>}
+00100 \textcolor{preprocessor}{#include <X11/Xmd.h>}
+00101 \textcolor{preprocessor}{#include <GL/glew.h>}
+00102 
+00103 \textcolor{preprocessor}{#ifdef \_\_cplusplus}
+00104 \textcolor{keyword}{extern} \textcolor{stringliteral}{"C"} \{
+00105 \textcolor{preprocessor}{#endif}
+00106 
+00107 \textcolor{comment}{/* ---------------------------- GLX\_VERSION\_1\_0 --------------------------- */}
+00108 
+00109 \textcolor{preprocessor}{#ifndef GLX\_VERSION\_1\_0}
+00110 \textcolor{preprocessor}{#define GLX\_VERSION\_1\_0 1}
+00111 
+00112 \textcolor{preprocessor}{#define GLX\_USE\_GL 1}
+00113 \textcolor{preprocessor}{#define GLX\_BUFFER\_SIZE 2}
+00114 \textcolor{preprocessor}{#define GLX\_LEVEL 3}
+00115 \textcolor{preprocessor}{#define GLX\_RGBA 4}
+00116 \textcolor{preprocessor}{#define GLX\_DOUBLEBUFFER 5}
+00117 \textcolor{preprocessor}{#define GLX\_STEREO 6}
+00118 \textcolor{preprocessor}{#define GLX\_AUX\_BUFFERS 7}
+00119 \textcolor{preprocessor}{#define GLX\_RED\_SIZE 8}
+00120 \textcolor{preprocessor}{#define GLX\_GREEN\_SIZE 9}
+00121 \textcolor{preprocessor}{#define GLX\_BLUE\_SIZE 10}
+00122 \textcolor{preprocessor}{#define GLX\_ALPHA\_SIZE 11}
+00123 \textcolor{preprocessor}{#define GLX\_DEPTH\_SIZE 12}
+00124 \textcolor{preprocessor}{#define GLX\_STENCIL\_SIZE 13}
+00125 \textcolor{preprocessor}{#define GLX\_ACCUM\_RED\_SIZE 14}
+00126 \textcolor{preprocessor}{#define GLX\_ACCUM\_GREEN\_SIZE 15}
+00127 \textcolor{preprocessor}{#define GLX\_ACCUM\_BLUE\_SIZE 16}
+00128 \textcolor{preprocessor}{#define GLX\_ACCUM\_ALPHA\_SIZE 17}
+00129 \textcolor{preprocessor}{#define GLX\_BAD\_SCREEN 1}
+00130 \textcolor{preprocessor}{#define GLX\_BAD\_ATTRIBUTE 2}
+00131 \textcolor{preprocessor}{#define GLX\_NO\_EXTENSION 3}
+00132 \textcolor{preprocessor}{#define GLX\_BAD\_VISUAL 4}
+00133 \textcolor{preprocessor}{#define GLX\_BAD\_CONTEXT 5}
+00134 \textcolor{preprocessor}{#define GLX\_BAD\_VALUE 6}
+00135 \textcolor{preprocessor}{#define GLX\_BAD\_ENUM 7}
+00136 
+00137 \textcolor{keyword}{typedef} XID GLXDrawable;
+00138 \textcolor{keyword}{typedef} XID GLXPixmap;
+00139 \textcolor{preprocessor}{#ifdef \_\_sun}
+00140 \textcolor{keyword}{typedef} \textcolor{keyword}{struct }\_\_glXContextRec *GLXContext;
+00141 \textcolor{preprocessor}{#else}
+00142 \textcolor{keyword}{typedef} \textcolor{keyword}{struct }\_\_GLXcontextRec *GLXContext;
+00143 \textcolor{preprocessor}{#endif}
+00144 
+00145 \textcolor{keyword}{typedef} \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{int} GLXVideoDeviceNV; 
+00146 
+00147 \textcolor{keyword}{extern} Bool glXQueryExtension (Display *dpy, \textcolor{keywordtype}{int} *errorBase, \textcolor{keywordtype}{int} *eventBase);
+00148 \textcolor{keyword}{extern} Bool glXQueryVersion (Display *dpy, \textcolor{keywordtype}{int} *major, \textcolor{keywordtype}{int} *minor);
+00149 \textcolor{keyword}{extern} \textcolor{keywordtype}{int} glXGetConfig (Display *dpy, XVisualInfo *vis, \textcolor{keywordtype}{int} attrib, \textcolor{keywordtype}{int} *value);
+00150 \textcolor{keyword}{extern} XVisualInfo* glXChooseVisual (Display *dpy, \textcolor{keywordtype}{int} screen, \textcolor{keywordtype}{int} *attribList);
+00151 \textcolor{keyword}{extern} GLXPixmap glXCreateGLXPixmap (Display *dpy, XVisualInfo *vis, Pixmap pixmap);
+00152 \textcolor{keyword}{extern} \textcolor{keywordtype}{void} glXDestroyGLXPixmap (Display *dpy, GLXPixmap pix);
+00153 \textcolor{keyword}{extern} GLXContext glXCreateContext (Display *dpy, XVisualInfo *vis, GLXContext shareList, Bool direct);
+00154 \textcolor{keyword}{extern} \textcolor{keywordtype}{void} glXDestroyContext (Display *dpy, GLXContext ctx);
+00155 \textcolor{keyword}{extern} Bool glXIsDirect (Display *dpy, GLXContext ctx);
+00156 \textcolor{keyword}{extern} \textcolor{keywordtype}{void} glXCopyContext (Display *dpy, GLXContext src, GLXContext dst, 
+      GLulong mask);
+00157 \textcolor{keyword}{extern} Bool glXMakeCurrent (Display *dpy, GLXDrawable drawable, GLXContext ctx);
+00158 \textcolor{keyword}{extern} GLXContext glXGetCurrentContext (\textcolor{keywordtype}{void});
+00159 \textcolor{keyword}{extern} GLXDrawable glXGetCurrentDrawable (\textcolor{keywordtype}{void});
+00160 \textcolor{keyword}{extern} \textcolor{keywordtype}{void} glXWaitGL (\textcolor{keywordtype}{void});
+00161 \textcolor{keyword}{extern} \textcolor{keywordtype}{void} glXWaitX (\textcolor{keywordtype}{void});
+00162 \textcolor{keyword}{extern} \textcolor{keywordtype}{void} glXSwapBuffers (Display *dpy, GLXDrawable drawable);
+00163 \textcolor{keyword}{extern} \textcolor{keywordtype}{void} glXUseXFont (Font font, \textcolor{keywordtype}{int} first, \textcolor{keywordtype}{int} count, \textcolor{keywordtype}{int} listBase);
+00164 
+00165 \textcolor{preprocessor}{#define GLXEW\_VERSION\_1\_0 GLXEW\_GET\_VAR(\_\_GLXEW\_VERSION\_1\_0)}
+00166 
+00167 \textcolor{preprocessor}{#endif }\textcolor{comment}{/* GLX\_VERSION\_1\_0 */}\textcolor{preprocessor}{}
+00168 
+00169 \textcolor{comment}{/* ---------------------------- GLX\_VERSION\_1\_1 --------------------------- */}
+00170 
+00171 \textcolor{preprocessor}{#ifndef GLX\_VERSION\_1\_1}
+00172 \textcolor{preprocessor}{#define GLX\_VERSION\_1\_1}
+00173 
+00174 \textcolor{preprocessor}{#define GLX\_VENDOR 0x1}
+00175 \textcolor{preprocessor}{#define GLX\_VERSION 0x2}
+00176 \textcolor{preprocessor}{#define GLX\_EXTENSIONS 0x3}
+00177 
+00178 \textcolor{keyword}{extern} \textcolor{keyword}{const} \textcolor{keywordtype}{char}* glXQueryExtensionsString (Display *dpy, \textcolor{keywordtype}{int} screen);
+00179 \textcolor{keyword}{extern} \textcolor{keyword}{const} \textcolor{keywordtype}{char}* glXGetClientString (Display *dpy, \textcolor{keywordtype}{int} name);
+00180 \textcolor{keyword}{extern} \textcolor{keyword}{const} \textcolor{keywordtype}{char}* glXQueryServerString (Display *dpy, \textcolor{keywordtype}{int} screen, \textcolor{keywordtype}{int} name);
+00181 
+00182 \textcolor{preprocessor}{#define GLXEW\_VERSION\_1\_1 GLXEW\_GET\_VAR(\_\_GLXEW\_VERSION\_1\_1)}
+00183 
+00184 \textcolor{preprocessor}{#endif }\textcolor{comment}{/* GLX\_VERSION\_1\_1 */}\textcolor{preprocessor}{}
+00185 
+00186 \textcolor{comment}{/* ---------------------------- GLX\_VERSION\_1\_2 ---------------------------- */}
+00187 
+00188 \textcolor{preprocessor}{#ifndef GLX\_VERSION\_1\_2}
+00189 \textcolor{preprocessor}{#define GLX\_VERSION\_1\_2 1}
+00190 
+00191 \textcolor{keyword}{typedef} Display* ( * PFNGLXGETCURRENTDISPLAYPROC) (void);
+00192 
+00193 \textcolor{preprocessor}{#define glXGetCurrentDisplay GLXEW\_GET\_FUN(\_\_glewXGetCurrentDisplay)}
+00194 
+00195 \textcolor{preprocessor}{#define GLXEW\_VERSION\_1\_2 GLXEW\_GET\_VAR(\_\_GLXEW\_VERSION\_1\_2)}
+00196 
+00197 \textcolor{preprocessor}{#endif }\textcolor{comment}{/* GLX\_VERSION\_1\_2 */}\textcolor{preprocessor}{}
+00198 
+00199 \textcolor{comment}{/* ---------------------------- GLX\_VERSION\_1\_3 ---------------------------- */}
+00200 
+00201 \textcolor{preprocessor}{#ifndef GLX\_VERSION\_1\_3}
+00202 \textcolor{preprocessor}{#define GLX\_VERSION\_1\_3 1}
+00203 
+00204 \textcolor{preprocessor}{#define GLX\_FRONT\_LEFT\_BUFFER\_BIT 0x00000001}
+00205 \textcolor{preprocessor}{#define GLX\_RGBA\_BIT 0x00000001}
+00206 \textcolor{preprocessor}{#define GLX\_WINDOW\_BIT 0x00000001}
+00207 \textcolor{preprocessor}{#define GLX\_COLOR\_INDEX\_BIT 0x00000002}
+00208 \textcolor{preprocessor}{#define GLX\_FRONT\_RIGHT\_BUFFER\_BIT 0x00000002}
+00209 \textcolor{preprocessor}{#define GLX\_PIXMAP\_BIT 0x00000002}
+00210 \textcolor{preprocessor}{#define GLX\_BACK\_LEFT\_BUFFER\_BIT 0x00000004}
+00211 \textcolor{preprocessor}{#define GLX\_PBUFFER\_BIT 0x00000004}
+00212 \textcolor{preprocessor}{#define GLX\_BACK\_RIGHT\_BUFFER\_BIT 0x00000008}
+00213 \textcolor{preprocessor}{#define GLX\_AUX\_BUFFERS\_BIT 0x00000010}
+00214 \textcolor{preprocessor}{#define GLX\_CONFIG\_CAVEAT 0x20}
+00215 \textcolor{preprocessor}{#define GLX\_DEPTH\_BUFFER\_BIT 0x00000020}
+00216 \textcolor{preprocessor}{#define GLX\_X\_VISUAL\_TYPE 0x22}
+00217 \textcolor{preprocessor}{#define GLX\_TRANSPARENT\_TYPE 0x23}
+00218 \textcolor{preprocessor}{#define GLX\_TRANSPARENT\_INDEX\_VALUE 0x24}
+00219 \textcolor{preprocessor}{#define GLX\_TRANSPARENT\_RED\_VALUE 0x25}
+00220 \textcolor{preprocessor}{#define GLX\_TRANSPARENT\_GREEN\_VALUE 0x26}
+00221 \textcolor{preprocessor}{#define GLX\_TRANSPARENT\_BLUE\_VALUE 0x27}
+00222 \textcolor{preprocessor}{#define GLX\_TRANSPARENT\_ALPHA\_VALUE 0x28}
+00223 \textcolor{preprocessor}{#define GLX\_STENCIL\_BUFFER\_BIT 0x00000040}
+00224 \textcolor{preprocessor}{#define GLX\_ACCUM\_BUFFER\_BIT 0x00000080}
+00225 \textcolor{preprocessor}{#define GLX\_NONE 0x8000}
+00226 \textcolor{preprocessor}{#define GLX\_SLOW\_CONFIG 0x8001}
+00227 \textcolor{preprocessor}{#define GLX\_TRUE\_COLOR 0x8002}
+00228 \textcolor{preprocessor}{#define GLX\_DIRECT\_COLOR 0x8003}
+00229 \textcolor{preprocessor}{#define GLX\_PSEUDO\_COLOR 0x8004}
+00230 \textcolor{preprocessor}{#define GLX\_STATIC\_COLOR 0x8005}
+00231 \textcolor{preprocessor}{#define GLX\_GRAY\_SCALE 0x8006}
+00232 \textcolor{preprocessor}{#define GLX\_STATIC\_GRAY 0x8007}
+00233 \textcolor{preprocessor}{#define GLX\_TRANSPARENT\_RGB 0x8008}
+00234 \textcolor{preprocessor}{#define GLX\_TRANSPARENT\_INDEX 0x8009}
+00235 \textcolor{preprocessor}{#define GLX\_VISUAL\_ID 0x800B}
+00236 \textcolor{preprocessor}{#define GLX\_SCREEN 0x800C}
+00237 \textcolor{preprocessor}{#define GLX\_NON\_CONFORMANT\_CONFIG 0x800D}
+00238 \textcolor{preprocessor}{#define GLX\_DRAWABLE\_TYPE 0x8010}
+00239 \textcolor{preprocessor}{#define GLX\_RENDER\_TYPE 0x8011}
+00240 \textcolor{preprocessor}{#define GLX\_X\_RENDERABLE 0x8012}
+00241 \textcolor{preprocessor}{#define GLX\_FBCONFIG\_ID 0x8013}
+00242 \textcolor{preprocessor}{#define GLX\_RGBA\_TYPE 0x8014}
+00243 \textcolor{preprocessor}{#define GLX\_COLOR\_INDEX\_TYPE 0x8015}
+00244 \textcolor{preprocessor}{#define GLX\_MAX\_PBUFFER\_WIDTH 0x8016}
+00245 \textcolor{preprocessor}{#define GLX\_MAX\_PBUFFER\_HEIGHT 0x8017}
+00246 \textcolor{preprocessor}{#define GLX\_MAX\_PBUFFER\_PIXELS 0x8018}
+00247 \textcolor{preprocessor}{#define GLX\_PRESERVED\_CONTENTS 0x801B}
+00248 \textcolor{preprocessor}{#define GLX\_LARGEST\_PBUFFER 0x801C}
+00249 \textcolor{preprocessor}{#define GLX\_WIDTH 0x801D}
+00250 \textcolor{preprocessor}{#define GLX\_HEIGHT 0x801E}
+00251 \textcolor{preprocessor}{#define GLX\_EVENT\_MASK 0x801F}
+00252 \textcolor{preprocessor}{#define GLX\_DAMAGED 0x8020}
+00253 \textcolor{preprocessor}{#define GLX\_SAVED 0x8021}
+00254 \textcolor{preprocessor}{#define GLX\_WINDOW 0x8022}
+00255 \textcolor{preprocessor}{#define GLX\_PBUFFER 0x8023}
+00256 \textcolor{preprocessor}{#define GLX\_PBUFFER\_HEIGHT 0x8040}
+00257 \textcolor{preprocessor}{#define GLX\_PBUFFER\_WIDTH 0x8041}
+00258 \textcolor{preprocessor}{#define GLX\_PBUFFER\_CLOBBER\_MASK 0x08000000}
+00259 \textcolor{preprocessor}{#define GLX\_DONT\_CARE 0xFFFFFFFF}
+00260 
+00261 \textcolor{keyword}{typedef} XID GLXFBConfigID;
+00262 \textcolor{keyword}{typedef} XID GLXPbuffer;
+00263 \textcolor{keyword}{typedef} XID GLXWindow;
+00264 \textcolor{keyword}{typedef} \textcolor{keyword}{struct }\_\_GLXFBConfigRec *GLXFBConfig;
+00265 
+00266 \textcolor{keyword}{typedef} \textcolor{keyword}{struct }\{
+00267   \textcolor{keywordtype}{int} event_type; 
+00268   \textcolor{keywordtype}{int} draw_type; 
+00269   \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{long} serial; 
+00270   Bool send_event; 
+00271   Display *display; 
+00272   GLXDrawable drawable; 
+00273   \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{int} buffer_mask; 
+00274   \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{int} aux_buffer; 
+00275   \textcolor{keywordtype}{int} x, y; 
+00276   \textcolor{keywordtype}{int} width, height; 
+00277   \textcolor{keywordtype}{int} count; 
+00278 \} GLXPbufferClobberEvent;
+00279 \textcolor{keyword}{typedef} \textcolor{keyword}{union }__GLXEvent \{
+00280   GLXPbufferClobberEvent glxpbufferclobber; 
+00281   \textcolor{keywordtype}{long} pad[24]; 
+00282 \} GLXEvent;
+00283 
+00284 \textcolor{keyword}{typedef} GLXFBConfig* ( * PFNGLXCHOOSEFBCONFIGPROC) (Display *dpy, \textcolor{keywordtype}{int} screen, \textcolor{keyword}{const} \textcolor{keywordtype}{int} *attrib\_list, \textcolor{keywordtype}{int} *
+      nelements);
+00285 \textcolor{keyword}{typedef} GLXContext ( * PFNGLXCREATENEWCONTEXTPROC) (Display *dpy, GLXFBConfig config, \textcolor{keywordtype}{int} render\_type, 
+      GLXContext share\_list, Bool direct);
+00286 \textcolor{keyword}{typedef} GLXPbuffer ( * PFNGLXCREATEPBUFFERPROC) (Display *dpy, GLXFBConfig config, \textcolor{keyword}{const} \textcolor{keywordtype}{int} *attrib\_list);
+00287 \textcolor{keyword}{typedef} GLXPixmap ( * PFNGLXCREATEPIXMAPPROC) (Display *dpy, GLXFBConfig config, Pixmap pixmap, \textcolor{keyword}{const} \textcolor{keywordtype}{int} *
+      attrib\_list);
+00288 \textcolor{keyword}{typedef} GLXWindow ( * PFNGLXCREATEWINDOWPROC) (Display *dpy, GLXFBConfig config, Window win, \textcolor{keyword}{const} \textcolor{keywordtype}{int} *
+      attrib\_list);
+00289 \textcolor{keyword}{typedef} void ( * PFNGLXDESTROYPBUFFERPROC) (Display *dpy, GLXPbuffer pbuf);
+00290 \textcolor{keyword}{typedef} void ( * PFNGLXDESTROYPIXMAPPROC) (Display *dpy, GLXPixmap pixmap);
+00291 \textcolor{keyword}{typedef} void ( * PFNGLXDESTROYWINDOWPROC) (Display *dpy, GLXWindow win);
+00292 \textcolor{keyword}{typedef} GLXDrawable ( * PFNGLXGETCURRENTREADDRAWABLEPROC) (void);
+00293 \textcolor{keyword}{typedef} int ( * PFNGLXGETFBCONFIGATTRIBPROC) (Display *dpy, GLXFBConfig config, \textcolor{keywordtype}{int} attribute, \textcolor{keywordtype}{int} *value);
+00294 \textcolor{keyword}{typedef} GLXFBConfig* ( * PFNGLXGETFBCONFIGSPROC) (Display *dpy, \textcolor{keywordtype}{int} screen, \textcolor{keywordtype}{int} *nelements);
+00295 \textcolor{keyword}{typedef} void ( * PFNGLXGETSELECTEDEVENTPROC) (Display *dpy, GLXDrawable draw, \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{long} *event\_mask);
+00296 \textcolor{keyword}{typedef} XVisualInfo* ( * PFNGLXGETVISUALFROMFBCONFIGPROC) (Display *dpy, GLXFBConfig config);
+00297 \textcolor{keyword}{typedef} Bool ( * PFNGLXMAKECONTEXTCURRENTPROC) (Display *display, GLXDrawable draw, GLXDrawable 
+      read, GLXContext ctx);
+00298 \textcolor{keyword}{typedef} int ( * PFNGLXQUERYCONTEXTPROC) (Display *dpy, GLXContext ctx, \textcolor{keywordtype}{int} attribute, \textcolor{keywordtype}{int} *value);
+00299 \textcolor{keyword}{typedef} void ( * PFNGLXQUERYDRAWABLEPROC) (Display *dpy, GLXDrawable draw, \textcolor{keywordtype}{int} attribute, \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{int} *
+      value);
+00300 \textcolor{keyword}{typedef} void ( * PFNGLXSELECTEVENTPROC) (Display *dpy, GLXDrawable draw, \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{long} event\_mask);
+00301 
+00302 \textcolor{preprocessor}{#define glXChooseFBConfig GLXEW\_GET\_FUN(\_\_glewXChooseFBConfig)}
+00303 \textcolor{preprocessor}{#define glXCreateNewContext GLXEW\_GET\_FUN(\_\_glewXCreateNewContext)}
+00304 \textcolor{preprocessor}{#define glXCreatePbuffer GLXEW\_GET\_FUN(\_\_glewXCreatePbuffer)}
+00305 \textcolor{preprocessor}{#define glXCreatePixmap GLXEW\_GET\_FUN(\_\_glewXCreatePixmap)}
+00306 \textcolor{preprocessor}{#define glXCreateWindow GLXEW\_GET\_FUN(\_\_glewXCreateWindow)}
+00307 \textcolor{preprocessor}{#define glXDestroyPbuffer GLXEW\_GET\_FUN(\_\_glewXDestroyPbuffer)}
+00308 \textcolor{preprocessor}{#define glXDestroyPixmap GLXEW\_GET\_FUN(\_\_glewXDestroyPixmap)}
+00309 \textcolor{preprocessor}{#define glXDestroyWindow GLXEW\_GET\_FUN(\_\_glewXDestroyWindow)}
+00310 \textcolor{preprocessor}{#define glXGetCurrentReadDrawable GLXEW\_GET\_FUN(\_\_glewXGetCurrentReadDrawable)}
+00311 \textcolor{preprocessor}{#define glXGetFBConfigAttrib GLXEW\_GET\_FUN(\_\_glewXGetFBConfigAttrib)}
+00312 \textcolor{preprocessor}{#define glXGetFBConfigs GLXEW\_GET\_FUN(\_\_glewXGetFBConfigs)}
+00313 \textcolor{preprocessor}{#define glXGetSelectedEvent GLXEW\_GET\_FUN(\_\_glewXGetSelectedEvent)}
+00314 \textcolor{preprocessor}{#define glXGetVisualFromFBConfig GLXEW\_GET\_FUN(\_\_glewXGetVisualFromFBConfig)}
+00315 \textcolor{preprocessor}{#define glXMakeContextCurrent GLXEW\_GET\_FUN(\_\_glewXMakeContextCurrent)}
+00316 \textcolor{preprocessor}{#define glXQueryContext GLXEW\_GET\_FUN(\_\_glewXQueryContext)}
+00317 \textcolor{preprocessor}{#define glXQueryDrawable GLXEW\_GET\_FUN(\_\_glewXQueryDrawable)}
+00318 \textcolor{preprocessor}{#define glXSelectEvent GLXEW\_GET\_FUN(\_\_glewXSelectEvent)}
+00319 
+00320 \textcolor{preprocessor}{#define GLXEW\_VERSION\_1\_3 GLXEW\_GET\_VAR(\_\_GLXEW\_VERSION\_1\_3)}
+00321 
+00322 \textcolor{preprocessor}{#endif }\textcolor{comment}{/* GLX\_VERSION\_1\_3 */}\textcolor{preprocessor}{}
+00323 
+00324 \textcolor{comment}{/* ---------------------------- GLX\_VERSION\_1\_4 ---------------------------- */}
+00325 
+00326 \textcolor{preprocessor}{#ifndef GLX\_VERSION\_1\_4}
+00327 \textcolor{preprocessor}{#define GLX\_VERSION\_1\_4 1}
+00328 
+00329 \textcolor{preprocessor}{#define GLX\_SAMPLE\_BUFFERS 100000}
+00330 \textcolor{preprocessor}{#define GLX\_SAMPLES 100001}
+00331 
+00332 \textcolor{keyword}{extern} void ( * glXGetProcAddress (\textcolor{keyword}{const} GLubyte *procName)) (void);
+00333 
+00334 \textcolor{preprocessor}{#define GLXEW\_VERSION\_1\_4 GLXEW\_GET\_VAR(\_\_GLXEW\_VERSION\_1\_4)}
+00335 
+00336 \textcolor{preprocessor}{#endif }\textcolor{comment}{/* GLX\_VERSION\_1\_4 */}\textcolor{preprocessor}{}
+00337 
+00338 \textcolor{comment}{/* -------------------------- GLX\_3DFX\_multisample ------------------------- */}
+00339 
+00340 \textcolor{preprocessor}{#ifndef GLX\_3DFX\_multisample}
+00341 \textcolor{preprocessor}{#define GLX\_3DFX\_multisample 1}
+00342 
+00343 \textcolor{preprocessor}{#define GLX\_SAMPLE\_BUFFERS\_3DFX 0x8050}
+00344 \textcolor{preprocessor}{#define GLX\_SAMPLES\_3DFX 0x8051}
+00345 
+00346 \textcolor{preprocessor}{#define GLXEW\_3DFX\_multisample GLXEW\_GET\_VAR(\_\_GLXEW\_3DFX\_multisample)}
+00347 
+00348 \textcolor{preprocessor}{#endif }\textcolor{comment}{/* GLX\_3DFX\_multisample */}\textcolor{preprocessor}{}
+00349 
+00350 \textcolor{comment}{/* ------------------------ GLX\_AMD\_gpu\_association ------------------------ */}
+00351 
+00352 \textcolor{preprocessor}{#ifndef GLX\_AMD\_gpu\_association}
+00353 \textcolor{preprocessor}{#define GLX\_AMD\_gpu\_association 1}
+00354 
+00355 \textcolor{preprocessor}{#define GLX\_GPU\_VENDOR\_AMD 0x1F00}
+00356 \textcolor{preprocessor}{#define GLX\_GPU\_RENDERER\_STRING\_AMD 0x1F01}
+00357 \textcolor{preprocessor}{#define GLX\_GPU\_OPENGL\_VERSION\_STRING\_AMD 0x1F02}
+00358 \textcolor{preprocessor}{#define GLX\_GPU\_FASTEST\_TARGET\_GPUS\_AMD 0x21A2}
+00359 \textcolor{preprocessor}{#define GLX\_GPU\_RAM\_AMD 0x21A3}
+00360 \textcolor{preprocessor}{#define GLX\_GPU\_CLOCK\_AMD 0x21A4}
+00361 \textcolor{preprocessor}{#define GLX\_GPU\_NUM\_PIPES\_AMD 0x21A5}
+00362 \textcolor{preprocessor}{#define GLX\_GPU\_NUM\_SIMD\_AMD 0x21A6}
+00363 \textcolor{preprocessor}{#define GLX\_GPU\_NUM\_RB\_AMD 0x21A7}
+00364 \textcolor{preprocessor}{#define GLX\_GPU\_NUM\_SPI\_AMD 0x21A8}
+00365 
+00366 \textcolor{keyword}{typedef} void ( * PFNGLXBLITCONTEXTFRAMEBUFFERAMDPROC) (GLXContext dstCtx, GLint 
+      srcX0, GLint srcY0, GLint srcX1, GLint srcY1, GLint dstX0, GLint dstY0, GLint 
+      dstX1, GLint dstY1, GLbitfield mask, GLenum filter);
+00367 \textcolor{keyword}{typedef} GLXContext ( * PFNGLXCREATEASSOCIATEDCONTEXTAMDPROC) (\textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{int} id, GLXContext share\_list);
+00368 \textcolor{keyword}{typedef} GLXContext ( * PFNGLXCREATEASSOCIATEDCONTEXTATTRIBSAMDPROC) (\textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{int} 
+      id, GLXContext share\_context, \textcolor{keyword}{const} \textcolor{keywordtype}{int}* attribList);
+00369 \textcolor{keyword}{typedef} Bool ( * PFNGLXDELETEASSOCIATEDCONTEXTAMDPROC) (GLXContext ctx);
+00370 \textcolor{keyword}{typedef} \textcolor{keywordtype}{unsigned} int ( * PFNGLXGETCONTEXTGPUIDAMDPROC) (GLXContext ctx);
+00371 \textcolor{keyword}{typedef} GLXContext ( * PFNGLXGETCURRENTASSOCIATEDCONTEXTAMDPROC) (void);
+00372 \textcolor{keyword}{typedef} \textcolor{keywordtype}{unsigned} int ( * PFNGLXGETGPUIDSAMDPROC) (\textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{int} maxCount, \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{int}* 
+      ids);
+00373 \textcolor{keyword}{typedef} int ( * PFNGLXGETGPUINFOAMDPROC) (\textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{int} id, \textcolor{keywordtype}{int} property, GLenum 
+      dataType, \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{int} size, \textcolor{keywordtype}{void}* data);
+00374 \textcolor{keyword}{typedef} Bool ( * PFNGLXMAKEASSOCIATEDCONTEXTCURRENTAMDPROC) (GLXContext ctx);
+00375 
+00376 \textcolor{preprocessor}{#define glXBlitContextFramebufferAMD GLXEW\_GET\_FUN(\_\_glewXBlitContextFramebufferAMD)}
+00377 \textcolor{preprocessor}{#define glXCreateAssociatedContextAMD GLXEW\_GET\_FUN(\_\_glewXCreateAssociatedContextAMD)}
+00378 \textcolor{preprocessor}{#define glXCreateAssociatedContextAttribsAMD GLXEW\_GET\_FUN(\_\_glewXCreateAssociatedContextAttribsAMD)}
+00379 \textcolor{preprocessor}{#define glXDeleteAssociatedContextAMD GLXEW\_GET\_FUN(\_\_glewXDeleteAssociatedContextAMD)}
+00380 \textcolor{preprocessor}{#define glXGetContextGPUIDAMD GLXEW\_GET\_FUN(\_\_glewXGetContextGPUIDAMD)}
+00381 \textcolor{preprocessor}{#define glXGetCurrentAssociatedContextAMD GLXEW\_GET\_FUN(\_\_glewXGetCurrentAssociatedContextAMD)}
+00382 \textcolor{preprocessor}{#define glXGetGPUIDsAMD GLXEW\_GET\_FUN(\_\_glewXGetGPUIDsAMD)}
+00383 \textcolor{preprocessor}{#define glXGetGPUInfoAMD GLXEW\_GET\_FUN(\_\_glewXGetGPUInfoAMD)}
+00384 \textcolor{preprocessor}{#define glXMakeAssociatedContextCurrentAMD GLXEW\_GET\_FUN(\_\_glewXMakeAssociatedContextCurrentAMD)}
+00385 
+00386 \textcolor{preprocessor}{#define GLXEW\_AMD\_gpu\_association GLXEW\_GET\_VAR(\_\_GLXEW\_AMD\_gpu\_association)}
+00387 
+00388 \textcolor{preprocessor}{#endif }\textcolor{comment}{/* GLX\_AMD\_gpu\_association */}\textcolor{preprocessor}{}
+00389 
+00390 \textcolor{comment}{/* --------------------- GLX\_ARB\_context\_flush\_control --------------------- */}
+00391 
+00392 \textcolor{preprocessor}{#ifndef GLX\_ARB\_context\_flush\_control}
+00393 \textcolor{preprocessor}{#define GLX\_ARB\_context\_flush\_control 1}
+00394 
+00395 \textcolor{preprocessor}{#define GLX\_CONTEXT\_RELEASE\_BEHAVIOR\_NONE\_ARB 0x0000}
+00396 \textcolor{preprocessor}{#define GLX\_CONTEXT\_RELEASE\_BEHAVIOR\_ARB 0x2097}
+00397 \textcolor{preprocessor}{#define GLX\_CONTEXT\_RELEASE\_BEHAVIOR\_FLUSH\_ARB 0x2098}
+00398 
+00399 \textcolor{preprocessor}{#define GLXEW\_ARB\_context\_flush\_control GLXEW\_GET\_VAR(\_\_GLXEW\_ARB\_context\_flush\_control)}
+00400 
+00401 \textcolor{preprocessor}{#endif }\textcolor{comment}{/* GLX\_ARB\_context\_flush\_control */}\textcolor{preprocessor}{}
+00402 
+00403 \textcolor{comment}{/* ------------------------- GLX\_ARB\_create\_context ------------------------ */}
+00404 
+00405 \textcolor{preprocessor}{#ifndef GLX\_ARB\_create\_context}
+00406 \textcolor{preprocessor}{#define GLX\_ARB\_create\_context 1}
+00407 
+00408 \textcolor{preprocessor}{#define GLX\_CONTEXT\_DEBUG\_BIT\_ARB 0x0001}
+00409 \textcolor{preprocessor}{#define GLX\_CONTEXT\_FORWARD\_COMPATIBLE\_BIT\_ARB 0x0002}
+00410 \textcolor{preprocessor}{#define GLX\_CONTEXT\_MAJOR\_VERSION\_ARB 0x2091}
+00411 \textcolor{preprocessor}{#define GLX\_CONTEXT\_MINOR\_VERSION\_ARB 0x2092}
+00412 \textcolor{preprocessor}{#define GLX\_CONTEXT\_FLAGS\_ARB 0x2094}
+00413 
+00414 \textcolor{keyword}{typedef} GLXContext ( * PFNGLXCREATECONTEXTATTRIBSARBPROC) (Display* dpy, GLXFBConfig config, GLXContext 
+      share\_context, Bool direct, \textcolor{keyword}{const} \textcolor{keywordtype}{int} *attrib\_list);
+00415 
+00416 \textcolor{preprocessor}{#define glXCreateContextAttribsARB GLXEW\_GET\_FUN(\_\_glewXCreateContextAttribsARB)}
+00417 
+00418 \textcolor{preprocessor}{#define GLXEW\_ARB\_create\_context GLXEW\_GET\_VAR(\_\_GLXEW\_ARB\_create\_context)}
+00419 
+00420 \textcolor{preprocessor}{#endif }\textcolor{comment}{/* GLX\_ARB\_create\_context */}\textcolor{preprocessor}{}
+00421 
+00422 \textcolor{comment}{/* --------------------- GLX\_ARB\_create\_context\_profile -------------------- */}
+00423 
+00424 \textcolor{preprocessor}{#ifndef GLX\_ARB\_create\_context\_profile}
+00425 \textcolor{preprocessor}{#define GLX\_ARB\_create\_context\_profile 1}
+00426 
+00427 \textcolor{preprocessor}{#define GLX\_CONTEXT\_CORE\_PROFILE\_BIT\_ARB 0x00000001}
+00428 \textcolor{preprocessor}{#define GLX\_CONTEXT\_COMPATIBILITY\_PROFILE\_BIT\_ARB 0x00000002}
+00429 \textcolor{preprocessor}{#define GLX\_CONTEXT\_PROFILE\_MASK\_ARB 0x9126}
+00430 
+00431 \textcolor{preprocessor}{#define GLXEW\_ARB\_create\_context\_profile GLXEW\_GET\_VAR(\_\_GLXEW\_ARB\_create\_context\_profile)}
+00432 
+00433 \textcolor{preprocessor}{#endif }\textcolor{comment}{/* GLX\_ARB\_create\_context\_profile */}\textcolor{preprocessor}{}
+00434 
+00435 \textcolor{comment}{/* ------------------- GLX\_ARB\_create\_context\_robustness ------------------- */}
+00436 
+00437 \textcolor{preprocessor}{#ifndef GLX\_ARB\_create\_context\_robustness}
+00438 \textcolor{preprocessor}{#define GLX\_ARB\_create\_context\_robustness 1}
+00439 
+00440 \textcolor{preprocessor}{#define GLX\_CONTEXT\_ROBUST\_ACCESS\_BIT\_ARB 0x00000004}
+00441 \textcolor{preprocessor}{#define GLX\_LOSE\_CONTEXT\_ON\_RESET\_ARB 0x8252}
+00442 \textcolor{preprocessor}{#define GLX\_CONTEXT\_RESET\_NOTIFICATION\_STRATEGY\_ARB 0x8256}
+00443 \textcolor{preprocessor}{#define GLX\_NO\_RESET\_NOTIFICATION\_ARB 0x8261}
+00444 
+00445 \textcolor{preprocessor}{#define GLXEW\_ARB\_create\_context\_robustness GLXEW\_GET\_VAR(\_\_GLXEW\_ARB\_create\_context\_robustness)}
+00446 
+00447 \textcolor{preprocessor}{#endif }\textcolor{comment}{/* GLX\_ARB\_create\_context\_robustness */}\textcolor{preprocessor}{}
+00448 
+00449 \textcolor{comment}{/* ------------------------- GLX\_ARB\_fbconfig\_float ------------------------ */}
+00450 
+00451 \textcolor{preprocessor}{#ifndef GLX\_ARB\_fbconfig\_float}
+00452 \textcolor{preprocessor}{#define GLX\_ARB\_fbconfig\_float 1}
+00453 
+00454 \textcolor{preprocessor}{#define GLX\_RGBA\_FLOAT\_BIT\_ARB 0x00000004}
+00455 \textcolor{preprocessor}{#define GLX\_RGBA\_FLOAT\_TYPE\_ARB 0x20B9}
+00456 
+00457 \textcolor{preprocessor}{#define GLXEW\_ARB\_fbconfig\_float GLXEW\_GET\_VAR(\_\_GLXEW\_ARB\_fbconfig\_float)}
+00458 
+00459 \textcolor{preprocessor}{#endif }\textcolor{comment}{/* GLX\_ARB\_fbconfig\_float */}\textcolor{preprocessor}{}
+00460 
+00461 \textcolor{comment}{/* ------------------------ GLX\_ARB\_framebuffer\_sRGB ----------------------- */}
+00462 
+00463 \textcolor{preprocessor}{#ifndef GLX\_ARB\_framebuffer\_sRGB}
+00464 \textcolor{preprocessor}{#define GLX\_ARB\_framebuffer\_sRGB 1}
+00465 
+00466 \textcolor{preprocessor}{#define GLX\_FRAMEBUFFER\_SRGB\_CAPABLE\_ARB 0x20B2}
+00467 
+00468 \textcolor{preprocessor}{#define GLXEW\_ARB\_framebuffer\_sRGB GLXEW\_GET\_VAR(\_\_GLXEW\_ARB\_framebuffer\_sRGB)}
+00469 
+00470 \textcolor{preprocessor}{#endif }\textcolor{comment}{/* GLX\_ARB\_framebuffer\_sRGB */}\textcolor{preprocessor}{}
+00471 
+00472 \textcolor{comment}{/* ------------------------ GLX\_ARB\_get\_proc\_address ----------------------- */}
+00473 
+00474 \textcolor{preprocessor}{#ifndef GLX\_ARB\_get\_proc\_address}
+00475 \textcolor{preprocessor}{#define GLX\_ARB\_get\_proc\_address 1}
+00476 
+00477 \textcolor{keyword}{extern} void ( * glXGetProcAddressARB (\textcolor{keyword}{const} GLubyte *procName)) (void);
+00478 
+00479 \textcolor{preprocessor}{#define GLXEW\_ARB\_get\_proc\_address GLXEW\_GET\_VAR(\_\_GLXEW\_ARB\_get\_proc\_address)}
+00480 
+00481 \textcolor{preprocessor}{#endif }\textcolor{comment}{/* GLX\_ARB\_get\_proc\_address */}\textcolor{preprocessor}{}
+00482 
+00483 \textcolor{comment}{/* -------------------------- GLX\_ARB\_multisample -------------------------- */}
+00484 
+00485 \textcolor{preprocessor}{#ifndef GLX\_ARB\_multisample}
+00486 \textcolor{preprocessor}{#define GLX\_ARB\_multisample 1}
+00487 
+00488 \textcolor{preprocessor}{#define GLX\_SAMPLE\_BUFFERS\_ARB 100000}
+00489 \textcolor{preprocessor}{#define GLX\_SAMPLES\_ARB 100001}
+00490 
+00491 \textcolor{preprocessor}{#define GLXEW\_ARB\_multisample GLXEW\_GET\_VAR(\_\_GLXEW\_ARB\_multisample)}
+00492 
+00493 \textcolor{preprocessor}{#endif }\textcolor{comment}{/* GLX\_ARB\_multisample */}\textcolor{preprocessor}{}
+00494 
+00495 \textcolor{comment}{/* ---------------- GLX\_ARB\_robustness\_application\_isolation --------------- */}
+00496 
+00497 \textcolor{preprocessor}{#ifndef GLX\_ARB\_robustness\_application\_isolation}
+00498 \textcolor{preprocessor}{#define GLX\_ARB\_robustness\_application\_isolation 1}
+00499 
+00500 \textcolor{preprocessor}{#define GLX\_CONTEXT\_RESET\_ISOLATION\_BIT\_ARB 0x00000008}
+00501 
+00502 \textcolor{preprocessor}{#define GLXEW\_ARB\_robustness\_application\_isolation
+       GLXEW\_GET\_VAR(\_\_GLXEW\_ARB\_robustness\_application\_isolation)}
+00503 
+00504 \textcolor{preprocessor}{#endif }\textcolor{comment}{/* GLX\_ARB\_robustness\_application\_isolation */}\textcolor{preprocessor}{}
+00505 
+00506 \textcolor{comment}{/* ---------------- GLX\_ARB\_robustness\_share\_group\_isolation --------------- */}
+00507 
+00508 \textcolor{preprocessor}{#ifndef GLX\_ARB\_robustness\_share\_group\_isolation}
+00509 \textcolor{preprocessor}{#define GLX\_ARB\_robustness\_share\_group\_isolation 1}
+00510 
+00511 \textcolor{preprocessor}{#define GLX\_CONTEXT\_RESET\_ISOLATION\_BIT\_ARB 0x00000008}
+00512 
+00513 \textcolor{preprocessor}{#define GLXEW\_ARB\_robustness\_share\_group\_isolation
+       GLXEW\_GET\_VAR(\_\_GLXEW\_ARB\_robustness\_share\_group\_isolation)}
+00514 
+00515 \textcolor{preprocessor}{#endif }\textcolor{comment}{/* GLX\_ARB\_robustness\_share\_group\_isolation */}\textcolor{preprocessor}{}
+00516 
+00517 \textcolor{comment}{/* ---------------------- GLX\_ARB\_vertex\_buffer\_object --------------------- */}
+00518 
+00519 \textcolor{preprocessor}{#ifndef GLX\_ARB\_vertex\_buffer\_object}
+00520 \textcolor{preprocessor}{#define GLX\_ARB\_vertex\_buffer\_object 1}
+00521 
+00522 \textcolor{preprocessor}{#define GLX\_CONTEXT\_ALLOW\_BUFFER\_BYTE\_ORDER\_MISMATCH\_ARB 0x2095}
+00523 
+00524 \textcolor{preprocessor}{#define GLXEW\_ARB\_vertex\_buffer\_object GLXEW\_GET\_VAR(\_\_GLXEW\_ARB\_vertex\_buffer\_object)}
+00525 
+00526 \textcolor{preprocessor}{#endif }\textcolor{comment}{/* GLX\_ARB\_vertex\_buffer\_object */}\textcolor{preprocessor}{}
+00527 
+00528 \textcolor{comment}{/* ----------------------- GLX\_ATI\_pixel\_format\_float ---------------------- */}
+00529 
+00530 \textcolor{preprocessor}{#ifndef GLX\_ATI\_pixel\_format\_float}
+00531 \textcolor{preprocessor}{#define GLX\_ATI\_pixel\_format\_float 1}
+00532 
+00533 \textcolor{preprocessor}{#define GLX\_RGBA\_FLOAT\_ATI\_BIT 0x00000100}
+00534 
+00535 \textcolor{preprocessor}{#define GLXEW\_ATI\_pixel\_format\_float GLXEW\_GET\_VAR(\_\_GLXEW\_ATI\_pixel\_format\_float)}
+00536 
+00537 \textcolor{preprocessor}{#endif }\textcolor{comment}{/* GLX\_ATI\_pixel\_format\_float */}\textcolor{preprocessor}{}
+00538 
+00539 \textcolor{comment}{/* ------------------------- GLX\_ATI\_render\_texture ------------------------ */}
+00540 
+00541 \textcolor{preprocessor}{#ifndef GLX\_ATI\_render\_texture}
+00542 \textcolor{preprocessor}{#define GLX\_ATI\_render\_texture 1}
+00543 
+00544 \textcolor{preprocessor}{#define GLX\_BIND\_TO\_TEXTURE\_RGB\_ATI 0x9800}
+00545 \textcolor{preprocessor}{#define GLX\_BIND\_TO\_TEXTURE\_RGBA\_ATI 0x9801}
+00546 \textcolor{preprocessor}{#define GLX\_TEXTURE\_FORMAT\_ATI 0x9802}
+00547 \textcolor{preprocessor}{#define GLX\_TEXTURE\_TARGET\_ATI 0x9803}
+00548 \textcolor{preprocessor}{#define GLX\_MIPMAP\_TEXTURE\_ATI 0x9804}
+00549 \textcolor{preprocessor}{#define GLX\_TEXTURE\_RGB\_ATI 0x9805}
+00550 \textcolor{preprocessor}{#define GLX\_TEXTURE\_RGBA\_ATI 0x9806}
+00551 \textcolor{preprocessor}{#define GLX\_NO\_TEXTURE\_ATI 0x9807}
+00552 \textcolor{preprocessor}{#define GLX\_TEXTURE\_CUBE\_MAP\_ATI 0x9808}
+00553 \textcolor{preprocessor}{#define GLX\_TEXTURE\_1D\_ATI 0x9809}
+00554 \textcolor{preprocessor}{#define GLX\_TEXTURE\_2D\_ATI 0x980A}
+00555 \textcolor{preprocessor}{#define GLX\_MIPMAP\_LEVEL\_ATI 0x980B}
+00556 \textcolor{preprocessor}{#define GLX\_CUBE\_MAP\_FACE\_ATI 0x980C}
+00557 \textcolor{preprocessor}{#define GLX\_TEXTURE\_CUBE\_MAP\_POSITIVE\_X\_ATI 0x980D}
+00558 \textcolor{preprocessor}{#define GLX\_TEXTURE\_CUBE\_MAP\_NEGATIVE\_X\_ATI 0x980E}
+00559 \textcolor{preprocessor}{#define GLX\_TEXTURE\_CUBE\_MAP\_POSITIVE\_Y\_ATI 0x980F}
+00560 \textcolor{preprocessor}{#define GLX\_TEXTURE\_CUBE\_MAP\_NEGATIVE\_Y\_ATI 0x9810}
+00561 \textcolor{preprocessor}{#define GLX\_TEXTURE\_CUBE\_MAP\_POSITIVE\_Z\_ATI 0x9811}
+00562 \textcolor{preprocessor}{#define GLX\_TEXTURE\_CUBE\_MAP\_NEGATIVE\_Z\_ATI 0x9812}
+00563 \textcolor{preprocessor}{#define GLX\_FRONT\_LEFT\_ATI 0x9813}
+00564 \textcolor{preprocessor}{#define GLX\_FRONT\_RIGHT\_ATI 0x9814}
+00565 \textcolor{preprocessor}{#define GLX\_BACK\_LEFT\_ATI 0x9815}
+00566 \textcolor{preprocessor}{#define GLX\_BACK\_RIGHT\_ATI 0x9816}
+00567 \textcolor{preprocessor}{#define GLX\_AUX0\_ATI 0x9817}
+00568 \textcolor{preprocessor}{#define GLX\_AUX1\_ATI 0x9818}
+00569 \textcolor{preprocessor}{#define GLX\_AUX2\_ATI 0x9819}
+00570 \textcolor{preprocessor}{#define GLX\_AUX3\_ATI 0x981A}
+00571 \textcolor{preprocessor}{#define GLX\_AUX4\_ATI 0x981B}
+00572 \textcolor{preprocessor}{#define GLX\_AUX5\_ATI 0x981C}
+00573 \textcolor{preprocessor}{#define GLX\_AUX6\_ATI 0x981D}
+00574 \textcolor{preprocessor}{#define GLX\_AUX7\_ATI 0x981E}
+00575 \textcolor{preprocessor}{#define GLX\_AUX8\_ATI 0x981F}
+00576 \textcolor{preprocessor}{#define GLX\_AUX9\_ATI 0x9820}
+00577 \textcolor{preprocessor}{#define GLX\_BIND\_TO\_TEXTURE\_LUMINANCE\_ATI 0x9821}
+00578 \textcolor{preprocessor}{#define GLX\_BIND\_TO\_TEXTURE\_INTENSITY\_ATI 0x9822}
+00579 
+00580 \textcolor{keyword}{typedef} void ( * PFNGLXBINDTEXIMAGEATIPROC) (Display *dpy, GLXPbuffer pbuf, \textcolor{keywordtype}{int} 
+      buffer);
+00581 \textcolor{keyword}{typedef} void ( * PFNGLXDRAWABLEATTRIBATIPROC) (Display *dpy, GLXDrawable draw, \textcolor{keyword}{const} \textcolor{keywordtype}{int} *attrib\_list);
+00582 \textcolor{keyword}{typedef} void ( * PFNGLXRELEASETEXIMAGEATIPROC) (Display *dpy, GLXPbuffer pbuf, \textcolor{keywordtype}{int} 
+      buffer);
+00583 
+00584 \textcolor{preprocessor}{#define glXBindTexImageATI GLXEW\_GET\_FUN(\_\_glewXBindTexImageATI)}
+00585 \textcolor{preprocessor}{#define glXDrawableAttribATI GLXEW\_GET\_FUN(\_\_glewXDrawableAttribATI)}
+00586 \textcolor{preprocessor}{#define glXReleaseTexImageATI GLXEW\_GET\_FUN(\_\_glewXReleaseTexImageATI)}
+00587 
+00588 \textcolor{preprocessor}{#define GLXEW\_ATI\_render\_texture GLXEW\_GET\_VAR(\_\_GLXEW\_ATI\_render\_texture)}
+00589 
+00590 \textcolor{preprocessor}{#endif }\textcolor{comment}{/* GLX\_ATI\_render\_texture */}\textcolor{preprocessor}{}
+00591 
+00592 \textcolor{comment}{/* --------------------------- GLX\_EXT\_buffer\_age -------------------------- */}
+00593 
+00594 \textcolor{preprocessor}{#ifndef GLX\_EXT\_buffer\_age}
+00595 \textcolor{preprocessor}{#define GLX\_EXT\_buffer\_age 1}
+00596 
+00597 \textcolor{preprocessor}{#define GLX\_BACK\_BUFFER\_AGE\_EXT 0x20F4}
+00598 
+00599 \textcolor{preprocessor}{#define GLXEW\_EXT\_buffer\_age GLXEW\_GET\_VAR(\_\_GLXEW\_EXT\_buffer\_age)}
+00600 
+00601 \textcolor{preprocessor}{#endif }\textcolor{comment}{/* GLX\_EXT\_buffer\_age */}\textcolor{preprocessor}{}
+00602 
+00603 \textcolor{comment}{/* ------------------- GLX\_EXT\_create\_context\_es2\_profile ------------------ */}
+00604 
+00605 \textcolor{preprocessor}{#ifndef GLX\_EXT\_create\_context\_es2\_profile}
+00606 \textcolor{preprocessor}{#define GLX\_EXT\_create\_context\_es2\_profile 1}
+00607 
+00608 \textcolor{preprocessor}{#define GLX\_CONTEXT\_ES2\_PROFILE\_BIT\_EXT 0x00000004}
+00609 
+00610 \textcolor{preprocessor}{#define GLXEW\_EXT\_create\_context\_es2\_profile GLXEW\_GET\_VAR(\_\_GLXEW\_EXT\_create\_context\_es2\_profile)}
+00611 
+00612 \textcolor{preprocessor}{#endif }\textcolor{comment}{/* GLX\_EXT\_create\_context\_es2\_profile */}\textcolor{preprocessor}{}
+00613 
+00614 \textcolor{comment}{/* ------------------- GLX\_EXT\_create\_context\_es\_profile ------------------- */}
+00615 
+00616 \textcolor{preprocessor}{#ifndef GLX\_EXT\_create\_context\_es\_profile}
+00617 \textcolor{preprocessor}{#define GLX\_EXT\_create\_context\_es\_profile 1}
+00618 
+00619 \textcolor{preprocessor}{#define GLX\_CONTEXT\_ES\_PROFILE\_BIT\_EXT 0x00000004}
+00620 
+00621 \textcolor{preprocessor}{#define GLXEW\_EXT\_create\_context\_es\_profile GLXEW\_GET\_VAR(\_\_GLXEW\_EXT\_create\_context\_es\_profile)}
+00622 
+00623 \textcolor{preprocessor}{#endif }\textcolor{comment}{/* GLX\_EXT\_create\_context\_es\_profile */}\textcolor{preprocessor}{}
+00624 
+00625 \textcolor{comment}{/* --------------------- GLX\_EXT\_fbconfig\_packed\_float --------------------- */}
+00626 
+00627 \textcolor{preprocessor}{#ifndef GLX\_EXT\_fbconfig\_packed\_float}
+00628 \textcolor{preprocessor}{#define GLX\_EXT\_fbconfig\_packed\_float 1}
+00629 
+00630 \textcolor{preprocessor}{#define GLX\_RGBA\_UNSIGNED\_FLOAT\_BIT\_EXT 0x00000008}
+00631 \textcolor{preprocessor}{#define GLX\_RGBA\_UNSIGNED\_FLOAT\_TYPE\_EXT 0x20B1}
+00632 
+00633 \textcolor{preprocessor}{#define GLXEW\_EXT\_fbconfig\_packed\_float GLXEW\_GET\_VAR(\_\_GLXEW\_EXT\_fbconfig\_packed\_float)}
+00634 
+00635 \textcolor{preprocessor}{#endif }\textcolor{comment}{/* GLX\_EXT\_fbconfig\_packed\_float */}\textcolor{preprocessor}{}
+00636 
+00637 \textcolor{comment}{/* ------------------------ GLX\_EXT\_framebuffer\_sRGB ----------------------- */}
+00638 
+00639 \textcolor{preprocessor}{#ifndef GLX\_EXT\_framebuffer\_sRGB}
+00640 \textcolor{preprocessor}{#define GLX\_EXT\_framebuffer\_sRGB 1}
+00641 
+00642 \textcolor{preprocessor}{#define GLX\_FRAMEBUFFER\_SRGB\_CAPABLE\_EXT 0x20B2}
+00643 
+00644 \textcolor{preprocessor}{#define GLXEW\_EXT\_framebuffer\_sRGB GLXEW\_GET\_VAR(\_\_GLXEW\_EXT\_framebuffer\_sRGB)}
+00645 
+00646 \textcolor{preprocessor}{#endif }\textcolor{comment}{/* GLX\_EXT\_framebuffer\_sRGB */}\textcolor{preprocessor}{}
+00647 
+00648 \textcolor{comment}{/* ------------------------- GLX\_EXT\_import\_context ------------------------ */}
+00649 
+00650 \textcolor{preprocessor}{#ifndef GLX\_EXT\_import\_context}
+00651 \textcolor{preprocessor}{#define GLX\_EXT\_import\_context 1}
+00652 
+00653 \textcolor{preprocessor}{#define GLX\_SHARE\_CONTEXT\_EXT 0x800A}
+00654 \textcolor{preprocessor}{#define GLX\_VISUAL\_ID\_EXT 0x800B}
+00655 \textcolor{preprocessor}{#define GLX\_SCREEN\_EXT 0x800C}
+00656 
+00657 \textcolor{keyword}{typedef} XID GLXContextID;
+00658 
+00659 \textcolor{keyword}{typedef} void ( * PFNGLXFREECONTEXTEXTPROC) (Display* dpy, GLXContext context);
+00660 \textcolor{keyword}{typedef} GLXContextID ( * PFNGLXGETCONTEXTIDEXTPROC) (\textcolor{keyword}{const} GLXContext context);
+00661 \textcolor{keyword}{typedef} GLXContext ( * PFNGLXIMPORTCONTEXTEXTPROC) (Display* dpy, GLXContextID contextID);
+00662 \textcolor{keyword}{typedef} int ( * PFNGLXQUERYCONTEXTINFOEXTPROC) (Display* dpy, GLXContext context, \textcolor{keywordtype}{int} attribute,\textcolor{keywordtype}{int} *value)
+      ;
+00663 
+00664 \textcolor{preprocessor}{#define glXFreeContextEXT GLXEW\_GET\_FUN(\_\_glewXFreeContextEXT)}
+00665 \textcolor{preprocessor}{#define glXGetContextIDEXT GLXEW\_GET\_FUN(\_\_glewXGetContextIDEXT)}
+00666 \textcolor{preprocessor}{#define glXImportContextEXT GLXEW\_GET\_FUN(\_\_glewXImportContextEXT)}
+00667 \textcolor{preprocessor}{#define glXQueryContextInfoEXT GLXEW\_GET\_FUN(\_\_glewXQueryContextInfoEXT)}
+00668 
+00669 \textcolor{preprocessor}{#define GLXEW\_EXT\_import\_context GLXEW\_GET\_VAR(\_\_GLXEW\_EXT\_import\_context)}
+00670 
+00671 \textcolor{preprocessor}{#endif }\textcolor{comment}{/* GLX\_EXT\_import\_context */}\textcolor{preprocessor}{}
+00672 
+00673 \textcolor{comment}{/* -------------------------- GLX\_EXT\_scene\_marker ------------------------- */}
+00674 
+00675 \textcolor{preprocessor}{#ifndef GLX\_EXT\_scene\_marker}
+00676 \textcolor{preprocessor}{#define GLX\_EXT\_scene\_marker 1}
+00677 
+00678 \textcolor{preprocessor}{#define GLXEW\_EXT\_scene\_marker GLXEW\_GET\_VAR(\_\_GLXEW\_EXT\_scene\_marker)}
+00679 
+00680 \textcolor{preprocessor}{#endif }\textcolor{comment}{/* GLX\_EXT\_scene\_marker */}\textcolor{preprocessor}{}
+00681 
+00682 \textcolor{comment}{/* -------------------------- GLX\_EXT\_stereo\_tree -------------------------- */}
+00683 
+00684 \textcolor{preprocessor}{#ifndef GLX\_EXT\_stereo\_tree}
+00685 \textcolor{preprocessor}{#define GLX\_EXT\_stereo\_tree 1}
+00686 
+00687 \textcolor{preprocessor}{#define GLX\_STEREO\_NOTIFY\_EXT 0x00000000}
+00688 \textcolor{preprocessor}{#define GLX\_STEREO\_NOTIFY\_MASK\_EXT 0x00000001}
+00689 \textcolor{preprocessor}{#define GLX\_STEREO\_TREE\_EXT 0x20F5}
+00690 
+00691 \textcolor{preprocessor}{#define GLXEW\_EXT\_stereo\_tree GLXEW\_GET\_VAR(\_\_GLXEW\_EXT\_stereo\_tree)}
+00692 
+00693 \textcolor{preprocessor}{#endif }\textcolor{comment}{/* GLX\_EXT\_stereo\_tree */}\textcolor{preprocessor}{}
+00694 
+00695 \textcolor{comment}{/* -------------------------- GLX\_EXT\_swap\_control ------------------------- */}
+00696 
+00697 \textcolor{preprocessor}{#ifndef GLX\_EXT\_swap\_control}
+00698 \textcolor{preprocessor}{#define GLX\_EXT\_swap\_control 1}
+00699 
+00700 \textcolor{preprocessor}{#define GLX\_SWAP\_INTERVAL\_EXT 0x20F1}
+00701 \textcolor{preprocessor}{#define GLX\_MAX\_SWAP\_INTERVAL\_EXT 0x20F2}
+00702 
+00703 \textcolor{keyword}{typedef} void ( * PFNGLXSWAPINTERVALEXTPROC) (Display* dpy, GLXDrawable drawable, \textcolor{keywordtype}{int} interval);
+00704 
+00705 \textcolor{preprocessor}{#define glXSwapIntervalEXT GLXEW\_GET\_FUN(\_\_glewXSwapIntervalEXT)}
+00706 
+00707 \textcolor{preprocessor}{#define GLXEW\_EXT\_swap\_control GLXEW\_GET\_VAR(\_\_GLXEW\_EXT\_swap\_control)}
+00708 
+00709 \textcolor{preprocessor}{#endif }\textcolor{comment}{/* GLX\_EXT\_swap\_control */}\textcolor{preprocessor}{}
+00710 
+00711 \textcolor{comment}{/* ----------------------- GLX\_EXT\_swap\_control\_tear ----------------------- */}
+00712 
+00713 \textcolor{preprocessor}{#ifndef GLX\_EXT\_swap\_control\_tear}
+00714 \textcolor{preprocessor}{#define GLX\_EXT\_swap\_control\_tear 1}
+00715 
+00716 \textcolor{preprocessor}{#define GLX\_LATE\_SWAPS\_TEAR\_EXT 0x20F3}
+00717 
+00718 \textcolor{preprocessor}{#define GLXEW\_EXT\_swap\_control\_tear GLXEW\_GET\_VAR(\_\_GLXEW\_EXT\_swap\_control\_tear)}
+00719 
+00720 \textcolor{preprocessor}{#endif }\textcolor{comment}{/* GLX\_EXT\_swap\_control\_tear */}\textcolor{preprocessor}{}
+00721 
+00722 \textcolor{comment}{/* ---------------------- GLX\_EXT\_texture\_from\_pixmap ---------------------- */}
+00723 
+00724 \textcolor{preprocessor}{#ifndef GLX\_EXT\_texture\_from\_pixmap}
+00725 \textcolor{preprocessor}{#define GLX\_EXT\_texture\_from\_pixmap 1}
+00726 
+00727 \textcolor{preprocessor}{#define GLX\_TEXTURE\_1D\_BIT\_EXT 0x00000001}
+00728 \textcolor{preprocessor}{#define GLX\_TEXTURE\_2D\_BIT\_EXT 0x00000002}
+00729 \textcolor{preprocessor}{#define GLX\_TEXTURE\_RECTANGLE\_BIT\_EXT 0x00000004}
+00730 \textcolor{preprocessor}{#define GLX\_BIND\_TO\_TEXTURE\_RGB\_EXT 0x20D0}
+00731 \textcolor{preprocessor}{#define GLX\_BIND\_TO\_TEXTURE\_RGBA\_EXT 0x20D1}
+00732 \textcolor{preprocessor}{#define GLX\_BIND\_TO\_MIPMAP\_TEXTURE\_EXT 0x20D2}
+00733 \textcolor{preprocessor}{#define GLX\_BIND\_TO\_TEXTURE\_TARGETS\_EXT 0x20D3}
+00734 \textcolor{preprocessor}{#define GLX\_Y\_INVERTED\_EXT 0x20D4}
+00735 \textcolor{preprocessor}{#define GLX\_TEXTURE\_FORMAT\_EXT 0x20D5}
+00736 \textcolor{preprocessor}{#define GLX\_TEXTURE\_TARGET\_EXT 0x20D6}
+00737 \textcolor{preprocessor}{#define GLX\_MIPMAP\_TEXTURE\_EXT 0x20D7}
+00738 \textcolor{preprocessor}{#define GLX\_TEXTURE\_FORMAT\_NONE\_EXT 0x20D8}
+00739 \textcolor{preprocessor}{#define GLX\_TEXTURE\_FORMAT\_RGB\_EXT 0x20D9}
+00740 \textcolor{preprocessor}{#define GLX\_TEXTURE\_FORMAT\_RGBA\_EXT 0x20DA}
+00741 \textcolor{preprocessor}{#define GLX\_TEXTURE\_1D\_EXT 0x20DB}
+00742 \textcolor{preprocessor}{#define GLX\_TEXTURE\_2D\_EXT 0x20DC}
+00743 \textcolor{preprocessor}{#define GLX\_TEXTURE\_RECTANGLE\_EXT 0x20DD}
+00744 \textcolor{preprocessor}{#define GLX\_FRONT\_LEFT\_EXT 0x20DE}
+00745 \textcolor{preprocessor}{#define GLX\_FRONT\_RIGHT\_EXT 0x20DF}
+00746 \textcolor{preprocessor}{#define GLX\_BACK\_LEFT\_EXT 0x20E0}
+00747 \textcolor{preprocessor}{#define GLX\_BACK\_RIGHT\_EXT 0x20E1}
+00748 \textcolor{preprocessor}{#define GLX\_AUX0\_EXT 0x20E2}
+00749 \textcolor{preprocessor}{#define GLX\_AUX1\_EXT 0x20E3}
+00750 \textcolor{preprocessor}{#define GLX\_AUX2\_EXT 0x20E4}
+00751 \textcolor{preprocessor}{#define GLX\_AUX3\_EXT 0x20E5}
+00752 \textcolor{preprocessor}{#define GLX\_AUX4\_EXT 0x20E6}
+00753 \textcolor{preprocessor}{#define GLX\_AUX5\_EXT 0x20E7}
+00754 \textcolor{preprocessor}{#define GLX\_AUX6\_EXT 0x20E8}
+00755 \textcolor{preprocessor}{#define GLX\_AUX7\_EXT 0x20E9}
+00756 \textcolor{preprocessor}{#define GLX\_AUX8\_EXT 0x20EA}
+00757 \textcolor{preprocessor}{#define GLX\_AUX9\_EXT 0x20EB}
+00758 
+00759 \textcolor{keyword}{typedef} void ( * PFNGLXBINDTEXIMAGEEXTPROC) (Display* display, GLXDrawable drawable, \textcolor{keywordtype}{int} 
+      buffer, \textcolor{keyword}{const} \textcolor{keywordtype}{int} *attrib\_list);
+00760 \textcolor{keyword}{typedef} void ( * PFNGLXRELEASETEXIMAGEEXTPROC) (Display* display, GLXDrawable drawable, \textcolor{keywordtype}{int} 
+      buffer);
+00761 
+00762 \textcolor{preprocessor}{#define glXBindTexImageEXT GLXEW\_GET\_FUN(\_\_glewXBindTexImageEXT)}
+00763 \textcolor{preprocessor}{#define glXReleaseTexImageEXT GLXEW\_GET\_FUN(\_\_glewXReleaseTexImageEXT)}
+00764 
+00765 \textcolor{preprocessor}{#define GLXEW\_EXT\_texture\_from\_pixmap GLXEW\_GET\_VAR(\_\_GLXEW\_EXT\_texture\_from\_pixmap)}
+00766 
+00767 \textcolor{preprocessor}{#endif }\textcolor{comment}{/* GLX\_EXT\_texture\_from\_pixmap */}\textcolor{preprocessor}{}
+00768 
+00769 \textcolor{comment}{/* -------------------------- GLX\_EXT\_visual\_info -------------------------- */}
+00770 
+00771 \textcolor{preprocessor}{#ifndef GLX\_EXT\_visual\_info}
+00772 \textcolor{preprocessor}{#define GLX\_EXT\_visual\_info 1}
+00773 
+00774 \textcolor{preprocessor}{#define GLX\_X\_VISUAL\_TYPE\_EXT 0x22}
+00775 \textcolor{preprocessor}{#define GLX\_TRANSPARENT\_TYPE\_EXT 0x23}
+00776 \textcolor{preprocessor}{#define GLX\_TRANSPARENT\_INDEX\_VALUE\_EXT 0x24}
+00777 \textcolor{preprocessor}{#define GLX\_TRANSPARENT\_RED\_VALUE\_EXT 0x25}
+00778 \textcolor{preprocessor}{#define GLX\_TRANSPARENT\_GREEN\_VALUE\_EXT 0x26}
+00779 \textcolor{preprocessor}{#define GLX\_TRANSPARENT\_BLUE\_VALUE\_EXT 0x27}
+00780 \textcolor{preprocessor}{#define GLX\_TRANSPARENT\_ALPHA\_VALUE\_EXT 0x28}
+00781 \textcolor{preprocessor}{#define GLX\_NONE\_EXT 0x8000}
+00782 \textcolor{preprocessor}{#define GLX\_TRUE\_COLOR\_EXT 0x8002}
+00783 \textcolor{preprocessor}{#define GLX\_DIRECT\_COLOR\_EXT 0x8003}
+00784 \textcolor{preprocessor}{#define GLX\_PSEUDO\_COLOR\_EXT 0x8004}
+00785 \textcolor{preprocessor}{#define GLX\_STATIC\_COLOR\_EXT 0x8005}
+00786 \textcolor{preprocessor}{#define GLX\_GRAY\_SCALE\_EXT 0x8006}
+00787 \textcolor{preprocessor}{#define GLX\_STATIC\_GRAY\_EXT 0x8007}
+00788 \textcolor{preprocessor}{#define GLX\_TRANSPARENT\_RGB\_EXT 0x8008}
+00789 \textcolor{preprocessor}{#define GLX\_TRANSPARENT\_INDEX\_EXT 0x8009}
+00790 
+00791 \textcolor{preprocessor}{#define GLXEW\_EXT\_visual\_info GLXEW\_GET\_VAR(\_\_GLXEW\_EXT\_visual\_info)}
+00792 
+00793 \textcolor{preprocessor}{#endif }\textcolor{comment}{/* GLX\_EXT\_visual\_info */}\textcolor{preprocessor}{}
+00794 
+00795 \textcolor{comment}{/* ------------------------- GLX\_EXT\_visual\_rating ------------------------- */}
+00796 
+00797 \textcolor{preprocessor}{#ifndef GLX\_EXT\_visual\_rating}
+00798 \textcolor{preprocessor}{#define GLX\_EXT\_visual\_rating 1}
+00799 
+00800 \textcolor{preprocessor}{#define GLX\_VISUAL\_CAVEAT\_EXT 0x20}
+00801 \textcolor{preprocessor}{#define GLX\_SLOW\_VISUAL\_EXT 0x8001}
+00802 \textcolor{preprocessor}{#define GLX\_NON\_CONFORMANT\_VISUAL\_EXT 0x800D}
+00803 
+00804 \textcolor{preprocessor}{#define GLXEW\_EXT\_visual\_rating GLXEW\_GET\_VAR(\_\_GLXEW\_EXT\_visual\_rating)}
+00805 
+00806 \textcolor{preprocessor}{#endif }\textcolor{comment}{/* GLX\_EXT\_visual\_rating */}\textcolor{preprocessor}{}
+00807 
+00808 \textcolor{comment}{/* -------------------------- GLX\_INTEL\_swap\_event ------------------------- */}
+00809 
+00810 \textcolor{preprocessor}{#ifndef GLX\_INTEL\_swap\_event}
+00811 \textcolor{preprocessor}{#define GLX\_INTEL\_swap\_event 1}
+00812 
+00813 \textcolor{preprocessor}{#define GLX\_EXCHANGE\_COMPLETE\_INTEL 0x8180}
+00814 \textcolor{preprocessor}{#define GLX\_COPY\_COMPLETE\_INTEL 0x8181}
+00815 \textcolor{preprocessor}{#define GLX\_FLIP\_COMPLETE\_INTEL 0x8182}
+00816 \textcolor{preprocessor}{#define GLX\_BUFFER\_SWAP\_COMPLETE\_INTEL\_MASK 0x04000000}
+00817 
+00818 \textcolor{preprocessor}{#define GLXEW\_INTEL\_swap\_event GLXEW\_GET\_VAR(\_\_GLXEW\_INTEL\_swap\_event)}
+00819 
+00820 \textcolor{preprocessor}{#endif }\textcolor{comment}{/* GLX\_INTEL\_swap\_event */}\textcolor{preprocessor}{}
+00821 
+00822 \textcolor{comment}{/* -------------------------- GLX\_MESA\_agp\_offset -------------------------- */}
+00823 
+00824 \textcolor{preprocessor}{#ifndef GLX\_MESA\_agp\_offset}
+00825 \textcolor{preprocessor}{#define GLX\_MESA\_agp\_offset 1}
+00826 
+00827 \textcolor{keyword}{typedef} \textcolor{keywordtype}{unsigned} int ( * PFNGLXGETAGPOFFSETMESAPROC) (\textcolor{keyword}{const} \textcolor{keywordtype}{void}* pointer);
+00828 
+00829 \textcolor{preprocessor}{#define glXGetAGPOffsetMESA GLXEW\_GET\_FUN(\_\_glewXGetAGPOffsetMESA)}
+00830 
+00831 \textcolor{preprocessor}{#define GLXEW\_MESA\_agp\_offset GLXEW\_GET\_VAR(\_\_GLXEW\_MESA\_agp\_offset)}
+00832 
+00833 \textcolor{preprocessor}{#endif }\textcolor{comment}{/* GLX\_MESA\_agp\_offset */}\textcolor{preprocessor}{}
+00834 
+00835 \textcolor{comment}{/* ------------------------ GLX\_MESA\_copy\_sub\_buffer ----------------------- */}
+00836 
+00837 \textcolor{preprocessor}{#ifndef GLX\_MESA\_copy\_sub\_buffer}
+00838 \textcolor{preprocessor}{#define GLX\_MESA\_copy\_sub\_buffer 1}
+00839 
+00840 \textcolor{keyword}{typedef} void ( * PFNGLXCOPYSUBBUFFERMESAPROC) (Display* dpy, GLXDrawable drawable, \textcolor{keywordtype}{int} 
+      x, \textcolor{keywordtype}{int} y, \textcolor{keywordtype}{int} width, \textcolor{keywordtype}{int} height);
+00841 
+00842 \textcolor{preprocessor}{#define glXCopySubBufferMESA GLXEW\_GET\_FUN(\_\_glewXCopySubBufferMESA)}
+00843 
+00844 \textcolor{preprocessor}{#define GLXEW\_MESA\_copy\_sub\_buffer GLXEW\_GET\_VAR(\_\_GLXEW\_MESA\_copy\_sub\_buffer)}
+00845 
+00846 \textcolor{preprocessor}{#endif }\textcolor{comment}{/* GLX\_MESA\_copy\_sub\_buffer */}\textcolor{preprocessor}{}
+00847 
+00848 \textcolor{comment}{/* ------------------------ GLX\_MESA\_pixmap\_colormap ----------------------- */}
+00849 
+00850 \textcolor{preprocessor}{#ifndef GLX\_MESA\_pixmap\_colormap}
+00851 \textcolor{preprocessor}{#define GLX\_MESA\_pixmap\_colormap 1}
+00852 
+00853 \textcolor{keyword}{typedef} GLXPixmap ( * PFNGLXCREATEGLXPIXMAPMESAPROC) (Display* dpy, XVisualInfo *visual, Pixmap pixmap, 
+      Colormap cmap);
+00854 
+00855 \textcolor{preprocessor}{#define glXCreateGLXPixmapMESA GLXEW\_GET\_FUN(\_\_glewXCreateGLXPixmapMESA)}
+00856 
+00857 \textcolor{preprocessor}{#define GLXEW\_MESA\_pixmap\_colormap GLXEW\_GET\_VAR(\_\_GLXEW\_MESA\_pixmap\_colormap)}
+00858 
+00859 \textcolor{preprocessor}{#endif }\textcolor{comment}{/* GLX\_MESA\_pixmap\_colormap */}\textcolor{preprocessor}{}
+00860 
+00861 \textcolor{comment}{/* ------------------------ GLX\_MESA\_query\_renderer ------------------------ */}
+00862 
+00863 \textcolor{preprocessor}{#ifndef GLX\_MESA\_query\_renderer}
+00864 \textcolor{preprocessor}{#define GLX\_MESA\_query\_renderer 1}
+00865 
+00866 \textcolor{preprocessor}{#define GLX\_RENDERER\_VENDOR\_ID\_MESA 0x8183}
+00867 \textcolor{preprocessor}{#define GLX\_RENDERER\_DEVICE\_ID\_MESA 0x8184}
+00868 \textcolor{preprocessor}{#define GLX\_RENDERER\_VERSION\_MESA 0x8185}
+00869 \textcolor{preprocessor}{#define GLX\_RENDERER\_ACCELERATED\_MESA 0x8186}
+00870 \textcolor{preprocessor}{#define GLX\_RENDERER\_VIDEO\_MEMORY\_MESA 0x8187}
+00871 \textcolor{preprocessor}{#define GLX\_RENDERER\_UNIFIED\_MEMORY\_ARCHITECTURE\_MESA 0x8188}
+00872 \textcolor{preprocessor}{#define GLX\_RENDERER\_PREFERRED\_PROFILE\_MESA 0x8189}
+00873 \textcolor{preprocessor}{#define GLX\_RENDERER\_OPENGL\_CORE\_PROFILE\_VERSION\_MESA 0x818A}
+00874 \textcolor{preprocessor}{#define GLX\_RENDERER\_OPENGL\_COMPATIBILITY\_PROFILE\_VERSION\_MESA 0x818B}
+00875 \textcolor{preprocessor}{#define GLX\_RENDERER\_OPENGL\_ES\_PROFILE\_VERSION\_MESA 0x818C}
+00876 \textcolor{preprocessor}{#define GLX\_RENDERER\_OPENGL\_ES2\_PROFILE\_VERSION\_MESA 0x818D}
+00877 \textcolor{preprocessor}{#define GLX\_RENDERER\_ID\_MESA 0x818E}
+00878 
+00879 \textcolor{keyword}{typedef} Bool ( * PFNGLXQUERYCURRENTRENDERERINTEGERMESAPROC) (\textcolor{keywordtype}{int} attribute, \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{int}* value);
+00880 \textcolor{keyword}{typedef} \textcolor{keyword}{const} \textcolor{keywordtype}{char}* ( * PFNGLXQUERYCURRENTRENDERERSTRINGMESAPROC) (\textcolor{keywordtype}{int} attribute);
+00881 \textcolor{keyword}{typedef} Bool ( * PFNGLXQUERYRENDERERINTEGERMESAPROC) (Display* dpy, \textcolor{keywordtype}{int} screen, \textcolor{keywordtype}{int} renderer, \textcolor{keywordtype}{int} attribute
+      , \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{int} *value);
+00882 \textcolor{keyword}{typedef} \textcolor{keyword}{const} \textcolor{keywordtype}{char}* ( * PFNGLXQUERYRENDERERSTRINGMESAPROC) (Display *dpy, \textcolor{keywordtype}{int} screen, \textcolor{keywordtype}{int} renderer, \textcolor{keywordtype}{int} 
+      attribute);
+00883 
+00884 \textcolor{preprocessor}{#define glXQueryCurrentRendererIntegerMESA GLXEW\_GET\_FUN(\_\_glewXQueryCurrentRendererIntegerMESA)}
+00885 \textcolor{preprocessor}{#define glXQueryCurrentRendererStringMESA GLXEW\_GET\_FUN(\_\_glewXQueryCurrentRendererStringMESA)}
+00886 \textcolor{preprocessor}{#define glXQueryRendererIntegerMESA GLXEW\_GET\_FUN(\_\_glewXQueryRendererIntegerMESA)}
+00887 \textcolor{preprocessor}{#define glXQueryRendererStringMESA GLXEW\_GET\_FUN(\_\_glewXQueryRendererStringMESA)}
+00888 
+00889 \textcolor{preprocessor}{#define GLXEW\_MESA\_query\_renderer GLXEW\_GET\_VAR(\_\_GLXEW\_MESA\_query\_renderer)}
+00890 
+00891 \textcolor{preprocessor}{#endif }\textcolor{comment}{/* GLX\_MESA\_query\_renderer */}\textcolor{preprocessor}{}
+00892 
+00893 \textcolor{comment}{/* ------------------------ GLX\_MESA\_release\_buffers ----------------------- */}
+00894 
+00895 \textcolor{preprocessor}{#ifndef GLX\_MESA\_release\_buffers}
+00896 \textcolor{preprocessor}{#define GLX\_MESA\_release\_buffers 1}
+00897 
+00898 \textcolor{keyword}{typedef} Bool ( * PFNGLXRELEASEBUFFERSMESAPROC) (Display* dpy, GLXDrawable d);
+00899 
+00900 \textcolor{preprocessor}{#define glXReleaseBuffersMESA GLXEW\_GET\_FUN(\_\_glewXReleaseBuffersMESA)}
+00901 
+00902 \textcolor{preprocessor}{#define GLXEW\_MESA\_release\_buffers GLXEW\_GET\_VAR(\_\_GLXEW\_MESA\_release\_buffers)}
+00903 
+00904 \textcolor{preprocessor}{#endif }\textcolor{comment}{/* GLX\_MESA\_release\_buffers */}\textcolor{preprocessor}{}
+00905 
+00906 \textcolor{comment}{/* ------------------------- GLX\_MESA\_set\_3dfx\_mode ------------------------ */}
+00907 
+00908 \textcolor{preprocessor}{#ifndef GLX\_MESA\_set\_3dfx\_mode}
+00909 \textcolor{preprocessor}{#define GLX\_MESA\_set\_3dfx\_mode 1}
+00910 
+00911 \textcolor{preprocessor}{#define GLX\_3DFX\_WINDOW\_MODE\_MESA 0x1}
+00912 \textcolor{preprocessor}{#define GLX\_3DFX\_FULLSCREEN\_MODE\_MESA 0x2}
+00913 
+00914 \textcolor{keyword}{typedef} GLboolean ( * PFNGLXSET3DFXMODEMESAPROC) (GLint mode);
+00915 
+00916 \textcolor{preprocessor}{#define glXSet3DfxModeMESA GLXEW\_GET\_FUN(\_\_glewXSet3DfxModeMESA)}
+00917 
+00918 \textcolor{preprocessor}{#define GLXEW\_MESA\_set\_3dfx\_mode GLXEW\_GET\_VAR(\_\_GLXEW\_MESA\_set\_3dfx\_mode)}
+00919 
+00920 \textcolor{preprocessor}{#endif }\textcolor{comment}{/* GLX\_MESA\_set\_3dfx\_mode */}\textcolor{preprocessor}{}
+00921 
+00922 \textcolor{comment}{/* ------------------------- GLX\_MESA\_swap\_control ------------------------- */}
+00923 
+00924 \textcolor{preprocessor}{#ifndef GLX\_MESA\_swap\_control}
+00925 \textcolor{preprocessor}{#define GLX\_MESA\_swap\_control 1}
+00926 
+00927 \textcolor{keyword}{typedef} int ( * PFNGLXGETSWAPINTERVALMESAPROC) (void);
+00928 \textcolor{keyword}{typedef} int ( * PFNGLXSWAPINTERVALMESAPROC) (\textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{int} interval);
+00929 
+00930 \textcolor{preprocessor}{#define glXGetSwapIntervalMESA GLXEW\_GET\_FUN(\_\_glewXGetSwapIntervalMESA)}
+00931 \textcolor{preprocessor}{#define glXSwapIntervalMESA GLXEW\_GET\_FUN(\_\_glewXSwapIntervalMESA)}
+00932 
+00933 \textcolor{preprocessor}{#define GLXEW\_MESA\_swap\_control GLXEW\_GET\_VAR(\_\_GLXEW\_MESA\_swap\_control)}
+00934 
+00935 \textcolor{preprocessor}{#endif }\textcolor{comment}{/* GLX\_MESA\_swap\_control */}\textcolor{preprocessor}{}
+00936 
+00937 \textcolor{comment}{/* --------------------------- GLX\_NV\_copy\_buffer -------------------------- */}
+00938 
+00939 \textcolor{preprocessor}{#ifndef GLX\_NV\_copy\_buffer}
+00940 \textcolor{preprocessor}{#define GLX\_NV\_copy\_buffer 1}
+00941 
+00942 \textcolor{keyword}{typedef} void ( * PFNGLXCOPYBUFFERSUBDATANVPROC) (Display* dpy, GLXContext readCtx, GLXContext writeCtx, 
+      GLenum readTarget, GLenum writeTarget, GLintptr readOffset, GLintptr writeOffset, 
+      GLsizeiptr size);
+00943 \textcolor{keyword}{typedef} void ( * PFNGLXNAMEDCOPYBUFFERSUBDATANVPROC) (Display* dpy, GLXContext readCtx, GLXContext writeCtx
+      , GLuint readBuffer, GLuint writeBuffer, GLintptr readOffset, GLintptr writeOffset, 
+      GLsizeiptr size);
+00944 
+00945 \textcolor{preprocessor}{#define glXCopyBufferSubDataNV GLXEW\_GET\_FUN(\_\_glewXCopyBufferSubDataNV)}
+00946 \textcolor{preprocessor}{#define glXNamedCopyBufferSubDataNV GLXEW\_GET\_FUN(\_\_glewXNamedCopyBufferSubDataNV)}
+00947 
+00948 \textcolor{preprocessor}{#define GLXEW\_NV\_copy\_buffer GLXEW\_GET\_VAR(\_\_GLXEW\_NV\_copy\_buffer)}
+00949 
+00950 \textcolor{preprocessor}{#endif }\textcolor{comment}{/* GLX\_NV\_copy\_buffer */}\textcolor{preprocessor}{}
+00951 
+00952 \textcolor{comment}{/* --------------------------- GLX\_NV\_copy\_image --------------------------- */}
+00953 
+00954 \textcolor{preprocessor}{#ifndef GLX\_NV\_copy\_image}
+00955 \textcolor{preprocessor}{#define GLX\_NV\_copy\_image 1}
+00956 
+00957 \textcolor{keyword}{typedef} void ( * PFNGLXCOPYIMAGESUBDATANVPROC) (Display *dpy, GLXContext srcCtx, 
+      GLuint srcName, GLenum srcTarget, GLint srcLevel, GLint srcX, GLint srcY, GLint 
+      srcZ, GLXContext dstCtx, GLuint dstName, GLenum dstTarget, GLint dstLevel, GLint 
+      dstX, GLint dstY, GLint dstZ, GLsizei width, GLsizei height, GLsizei depth);
+00958 
+00959 \textcolor{preprocessor}{#define glXCopyImageSubDataNV GLXEW\_GET\_FUN(\_\_glewXCopyImageSubDataNV)}
+00960 
+00961 \textcolor{preprocessor}{#define GLXEW\_NV\_copy\_image GLXEW\_GET\_VAR(\_\_GLXEW\_NV\_copy\_image)}
+00962 
+00963 \textcolor{preprocessor}{#endif }\textcolor{comment}{/* GLX\_NV\_copy\_image */}\textcolor{preprocessor}{}
+00964 
+00965 \textcolor{comment}{/* ------------------------ GLX\_NV\_delay\_before\_swap ----------------------- */}
+00966 
+00967 \textcolor{preprocessor}{#ifndef GLX\_NV\_delay\_before\_swap}
+00968 \textcolor{preprocessor}{#define GLX\_NV\_delay\_before\_swap 1}
+00969 
+00970 \textcolor{keyword}{typedef} Bool ( * PFNGLXDELAYBEFORESWAPNVPROC) (Display* dpy, GLXDrawable drawable, 
+      GLfloat seconds);
+00971 
+00972 \textcolor{preprocessor}{#define glXDelayBeforeSwapNV GLXEW\_GET\_FUN(\_\_glewXDelayBeforeSwapNV)}
+00973 
+00974 \textcolor{preprocessor}{#define GLXEW\_NV\_delay\_before\_swap GLXEW\_GET\_VAR(\_\_GLXEW\_NV\_delay\_before\_swap)}
+00975 
+00976 \textcolor{preprocessor}{#endif }\textcolor{comment}{/* GLX\_NV\_delay\_before\_swap */}\textcolor{preprocessor}{}
+00977 
+00978 \textcolor{comment}{/* -------------------------- GLX\_NV\_float\_buffer -------------------------- */}
+00979 
+00980 \textcolor{preprocessor}{#ifndef GLX\_NV\_float\_buffer}
+00981 \textcolor{preprocessor}{#define GLX\_NV\_float\_buffer 1}
+00982 
+00983 \textcolor{preprocessor}{#define GLX\_FLOAT\_COMPONENTS\_NV 0x20B0}
+00984 
+00985 \textcolor{preprocessor}{#define GLXEW\_NV\_float\_buffer GLXEW\_GET\_VAR(\_\_GLXEW\_NV\_float\_buffer)}
+00986 
+00987 \textcolor{preprocessor}{#endif }\textcolor{comment}{/* GLX\_NV\_float\_buffer */}\textcolor{preprocessor}{}
+00988 
+00989 \textcolor{comment}{/* ---------------------- GLX\_NV\_multisample\_coverage ---------------------- */}
+00990 
+00991 \textcolor{preprocessor}{#ifndef GLX\_NV\_multisample\_coverage}
+00992 \textcolor{preprocessor}{#define GLX\_NV\_multisample\_coverage 1}
+00993 
+00994 \textcolor{preprocessor}{#define GLX\_COLOR\_SAMPLES\_NV 0x20B3}
+00995 \textcolor{preprocessor}{#define GLX\_COVERAGE\_SAMPLES\_NV 100001}
+00996 
+00997 \textcolor{preprocessor}{#define GLXEW\_NV\_multisample\_coverage GLXEW\_GET\_VAR(\_\_GLXEW\_NV\_multisample\_coverage)}
+00998 
+00999 \textcolor{preprocessor}{#endif }\textcolor{comment}{/* GLX\_NV\_multisample\_coverage */}\textcolor{preprocessor}{}
+01000 
+01001 \textcolor{comment}{/* -------------------------- GLX\_NV\_present\_video ------------------------- */}
+01002 
+01003 \textcolor{preprocessor}{#ifndef GLX\_NV\_present\_video}
+01004 \textcolor{preprocessor}{#define GLX\_NV\_present\_video 1}
+01005 
+01006 \textcolor{preprocessor}{#define GLX\_NUM\_VIDEO\_SLOTS\_NV 0x20F0}
+01007 
+01008 \textcolor{keyword}{typedef} int ( * PFNGLXBINDVIDEODEVICENVPROC) (Display* dpy, \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{int} video\_slot, \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{int} 
+      video\_device, \textcolor{keyword}{const} \textcolor{keywordtype}{int} *attrib\_list);
+01009 \textcolor{keyword}{typedef} \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{int}* ( * PFNGLXENUMERATEVIDEODEVICESNVPROC) (Display *dpy, \textcolor{keywordtype}{int} screen, \textcolor{keywordtype}{int} *nelements);
+01010 
+01011 \textcolor{preprocessor}{#define glXBindVideoDeviceNV GLXEW\_GET\_FUN(\_\_glewXBindVideoDeviceNV)}
+01012 \textcolor{preprocessor}{#define glXEnumerateVideoDevicesNV GLXEW\_GET\_FUN(\_\_glewXEnumerateVideoDevicesNV)}
+01013 
+01014 \textcolor{preprocessor}{#define GLXEW\_NV\_present\_video GLXEW\_GET\_VAR(\_\_GLXEW\_NV\_present\_video)}
+01015 
+01016 \textcolor{preprocessor}{#endif }\textcolor{comment}{/* GLX\_NV\_present\_video */}\textcolor{preprocessor}{}
+01017 
+01018 \textcolor{comment}{/* --------------------------- GLX\_NV\_swap\_group --------------------------- */}
+01019 
+01020 \textcolor{preprocessor}{#ifndef GLX\_NV\_swap\_group}
+01021 \textcolor{preprocessor}{#define GLX\_NV\_swap\_group 1}
+01022 
+01023 \textcolor{keyword}{typedef} Bool ( * PFNGLXBINDSWAPBARRIERNVPROC) (Display* dpy, GLuint group, 
+      GLuint barrier);
+01024 \textcolor{keyword}{typedef} Bool ( * PFNGLXJOINSWAPGROUPNVPROC) (Display* dpy, GLXDrawable drawable, 
+      GLuint group);
+01025 \textcolor{keyword}{typedef} Bool ( * PFNGLXQUERYFRAMECOUNTNVPROC) (Display* dpy, \textcolor{keywordtype}{int} screen, GLuint *
+      count);
+01026 \textcolor{keyword}{typedef} Bool ( * PFNGLXQUERYMAXSWAPGROUPSNVPROC) (Display* dpy, \textcolor{keywordtype}{int} screen, 
+      GLuint *maxGroups, GLuint *maxBarriers);
+01027 \textcolor{keyword}{typedef} Bool ( * PFNGLXQUERYSWAPGROUPNVPROC) (Display* dpy, GLXDrawable drawable, 
+      GLuint *group, GLuint *barrier);
+01028 \textcolor{keyword}{typedef} Bool ( * PFNGLXRESETFRAMECOUNTNVPROC) (Display* dpy, \textcolor{keywordtype}{int} screen);
+01029 
+01030 \textcolor{preprocessor}{#define glXBindSwapBarrierNV GLXEW\_GET\_FUN(\_\_glewXBindSwapBarrierNV)}
+01031 \textcolor{preprocessor}{#define glXJoinSwapGroupNV GLXEW\_GET\_FUN(\_\_glewXJoinSwapGroupNV)}
+01032 \textcolor{preprocessor}{#define glXQueryFrameCountNV GLXEW\_GET\_FUN(\_\_glewXQueryFrameCountNV)}
+01033 \textcolor{preprocessor}{#define glXQueryMaxSwapGroupsNV GLXEW\_GET\_FUN(\_\_glewXQueryMaxSwapGroupsNV)}
+01034 \textcolor{preprocessor}{#define glXQuerySwapGroupNV GLXEW\_GET\_FUN(\_\_glewXQuerySwapGroupNV)}
+01035 \textcolor{preprocessor}{#define glXResetFrameCountNV GLXEW\_GET\_FUN(\_\_glewXResetFrameCountNV)}
+01036 
+01037 \textcolor{preprocessor}{#define GLXEW\_NV\_swap\_group GLXEW\_GET\_VAR(\_\_GLXEW\_NV\_swap\_group)}
+01038 
+01039 \textcolor{preprocessor}{#endif }\textcolor{comment}{/* GLX\_NV\_swap\_group */}\textcolor{preprocessor}{}
+01040 
+01041 \textcolor{comment}{/* ----------------------- GLX\_NV\_vertex\_array\_range ----------------------- */}
+01042 
+01043 \textcolor{preprocessor}{#ifndef GLX\_NV\_vertex\_array\_range}
+01044 \textcolor{preprocessor}{#define GLX\_NV\_vertex\_array\_range 1}
+01045 
+01046 \textcolor{keyword}{typedef} \textcolor{keywordtype}{void} * ( * PFNGLXALLOCATEMEMORYNVPROC) (GLsizei size, GLfloat readFrequency, 
+      GLfloat writeFrequency, GLfloat priority);
+01047 \textcolor{keyword}{typedef} void ( * PFNGLXFREEMEMORYNVPROC) (\textcolor{keywordtype}{void} *pointer);
+01048 
+01049 \textcolor{preprocessor}{#define glXAllocateMemoryNV GLXEW\_GET\_FUN(\_\_glewXAllocateMemoryNV)}
+01050 \textcolor{preprocessor}{#define glXFreeMemoryNV GLXEW\_GET\_FUN(\_\_glewXFreeMemoryNV)}
+01051 
+01052 \textcolor{preprocessor}{#define GLXEW\_NV\_vertex\_array\_range GLXEW\_GET\_VAR(\_\_GLXEW\_NV\_vertex\_array\_range)}
+01053 
+01054 \textcolor{preprocessor}{#endif }\textcolor{comment}{/* GLX\_NV\_vertex\_array\_range */}\textcolor{preprocessor}{}
+01055 
+01056 \textcolor{comment}{/* -------------------------- GLX\_NV\_video\_capture ------------------------- */}
+01057 
+01058 \textcolor{preprocessor}{#ifndef GLX\_NV\_video\_capture}
+01059 \textcolor{preprocessor}{#define GLX\_NV\_video\_capture 1}
+01060 
+01061 \textcolor{preprocessor}{#define GLX\_DEVICE\_ID\_NV 0x20CD}
+01062 \textcolor{preprocessor}{#define GLX\_UNIQUE\_ID\_NV 0x20CE}
+01063 \textcolor{preprocessor}{#define GLX\_NUM\_VIDEO\_CAPTURE\_SLOTS\_NV 0x20CF}
+01064 
+01065 \textcolor{keyword}{typedef} XID GLXVideoCaptureDeviceNV;
+01066 
+01067 \textcolor{keyword}{typedef} int ( * PFNGLXBINDVIDEOCAPTUREDEVICENVPROC) (Display* dpy, \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{int} video\_capture\_slot, 
+      GLXVideoCaptureDeviceNV device);
+01068 \textcolor{keyword}{typedef} GLXVideoCaptureDeviceNV * ( * PFNGLXENUMERATEVIDEOCAPTUREDEVICESNVPROC) (Display* dpy, \textcolor{keywordtype}{int} screen, \textcolor{keywordtype}{
+      int} *nelements);
+01069 \textcolor{keyword}{typedef} void ( * PFNGLXLOCKVIDEOCAPTUREDEVICENVPROC) (Display* dpy, GLXVideoCaptureDeviceNV 
+      device);
+01070 \textcolor{keyword}{typedef} int ( * PFNGLXQUERYVIDEOCAPTUREDEVICENVPROC) (Display* dpy, GLXVideoCaptureDeviceNV 
+      device, \textcolor{keywordtype}{int} attribute, \textcolor{keywordtype}{int} *value);
+01071 \textcolor{keyword}{typedef} void ( * PFNGLXRELEASEVIDEOCAPTUREDEVICENVPROC) (Display* dpy, GLXVideoCaptureDeviceNV 
+      device);
+01072 
+01073 \textcolor{preprocessor}{#define glXBindVideoCaptureDeviceNV GLXEW\_GET\_FUN(\_\_glewXBindVideoCaptureDeviceNV)}
+01074 \textcolor{preprocessor}{#define glXEnumerateVideoCaptureDevicesNV GLXEW\_GET\_FUN(\_\_glewXEnumerateVideoCaptureDevicesNV)}
+01075 \textcolor{preprocessor}{#define glXLockVideoCaptureDeviceNV GLXEW\_GET\_FUN(\_\_glewXLockVideoCaptureDeviceNV)}
+01076 \textcolor{preprocessor}{#define glXQueryVideoCaptureDeviceNV GLXEW\_GET\_FUN(\_\_glewXQueryVideoCaptureDeviceNV)}
+01077 \textcolor{preprocessor}{#define glXReleaseVideoCaptureDeviceNV GLXEW\_GET\_FUN(\_\_glewXReleaseVideoCaptureDeviceNV)}
+01078 
+01079 \textcolor{preprocessor}{#define GLXEW\_NV\_video\_capture GLXEW\_GET\_VAR(\_\_GLXEW\_NV\_video\_capture)}
+01080 
+01081 \textcolor{preprocessor}{#endif }\textcolor{comment}{/* GLX\_NV\_video\_capture */}\textcolor{preprocessor}{}
+01082 
+01083 \textcolor{comment}{/* ---------------------------- GLX\_NV\_video\_out --------------------------- */}
+01084 
+01085 \textcolor{preprocessor}{#ifndef GLX\_NV\_video\_out}
+01086 \textcolor{preprocessor}{#define GLX\_NV\_video\_out 1}
+01087 
+01088 \textcolor{preprocessor}{#define GLX\_VIDEO\_OUT\_COLOR\_NV 0x20C3}
+01089 \textcolor{preprocessor}{#define GLX\_VIDEO\_OUT\_ALPHA\_NV 0x20C4}
+01090 \textcolor{preprocessor}{#define GLX\_VIDEO\_OUT\_DEPTH\_NV 0x20C5}
+01091 \textcolor{preprocessor}{#define GLX\_VIDEO\_OUT\_COLOR\_AND\_ALPHA\_NV 0x20C6}
+01092 \textcolor{preprocessor}{#define GLX\_VIDEO\_OUT\_COLOR\_AND\_DEPTH\_NV 0x20C7}
+01093 \textcolor{preprocessor}{#define GLX\_VIDEO\_OUT\_FRAME\_NV 0x20C8}
+01094 \textcolor{preprocessor}{#define GLX\_VIDEO\_OUT\_FIELD\_1\_NV 0x20C9}
+01095 \textcolor{preprocessor}{#define GLX\_VIDEO\_OUT\_FIELD\_2\_NV 0x20CA}
+01096 \textcolor{preprocessor}{#define GLX\_VIDEO\_OUT\_STACKED\_FIELDS\_1\_2\_NV 0x20CB}
+01097 \textcolor{preprocessor}{#define GLX\_VIDEO\_OUT\_STACKED\_FIELDS\_2\_1\_NV 0x20CC}
+01098 
+01099 \textcolor{keyword}{typedef} int ( * PFNGLXBINDVIDEOIMAGENVPROC) (Display* dpy, GLXVideoDeviceNV VideoDevice, GLXPbuffer pbuf, \textcolor{keywordtype}{
+      int} iVideoBuffer);
+01100 \textcolor{keyword}{typedef} int ( * PFNGLXGETVIDEODEVICENVPROC) (Display* dpy, \textcolor{keywordtype}{int} screen, \textcolor{keywordtype}{int} numVideoDevices, 
+      GLXVideoDeviceNV *pVideoDevice);
+01101 \textcolor{keyword}{typedef} int ( * PFNGLXGETVIDEOINFONVPROC) (Display* dpy, \textcolor{keywordtype}{int} screen, GLXVideoDeviceNV VideoDevice, \textcolor{keywordtype}{unsigned}
+       \textcolor{keywordtype}{long} *pulCounterOutputPbuffer, \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{long} *pulCounterOutputVideo);
+01102 \textcolor{keyword}{typedef} int ( * PFNGLXRELEASEVIDEODEVICENVPROC) (Display* dpy, \textcolor{keywordtype}{int} screen, GLXVideoDeviceNV VideoDevice);
+01103 \textcolor{keyword}{typedef} int ( * PFNGLXRELEASEVIDEOIMAGENVPROC) (Display* dpy, GLXPbuffer pbuf);
+01104 \textcolor{keyword}{typedef} int ( * PFNGLXSENDPBUFFERTOVIDEONVPROC) (Display* dpy, GLXPbuffer pbuf, \textcolor{keywordtype}{int} 
+      iBufferType, \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{long} *pulCounterPbuffer, GLboolean bBlock);
+01105 
+01106 \textcolor{preprocessor}{#define glXBindVideoImageNV GLXEW\_GET\_FUN(\_\_glewXBindVideoImageNV)}
+01107 \textcolor{preprocessor}{#define glXGetVideoDeviceNV GLXEW\_GET\_FUN(\_\_glewXGetVideoDeviceNV)}
+01108 \textcolor{preprocessor}{#define glXGetVideoInfoNV GLXEW\_GET\_FUN(\_\_glewXGetVideoInfoNV)}
+01109 \textcolor{preprocessor}{#define glXReleaseVideoDeviceNV GLXEW\_GET\_FUN(\_\_glewXReleaseVideoDeviceNV)}
+01110 \textcolor{preprocessor}{#define glXReleaseVideoImageNV GLXEW\_GET\_FUN(\_\_glewXReleaseVideoImageNV)}
+01111 \textcolor{preprocessor}{#define glXSendPbufferToVideoNV GLXEW\_GET\_FUN(\_\_glewXSendPbufferToVideoNV)}
+01112 
+01113 \textcolor{preprocessor}{#define GLXEW\_NV\_video\_out GLXEW\_GET\_VAR(\_\_GLXEW\_NV\_video\_out)}
+01114 
+01115 \textcolor{preprocessor}{#endif }\textcolor{comment}{/* GLX\_NV\_video\_out */}\textcolor{preprocessor}{}
+01116 
+01117 \textcolor{comment}{/* -------------------------- GLX\_OML\_swap\_method -------------------------- */}
+01118 
+01119 \textcolor{preprocessor}{#ifndef GLX\_OML\_swap\_method}
+01120 \textcolor{preprocessor}{#define GLX\_OML\_swap\_method 1}
+01121 
+01122 \textcolor{preprocessor}{#define GLX\_SWAP\_METHOD\_OML 0x8060}
+01123 \textcolor{preprocessor}{#define GLX\_SWAP\_EXCHANGE\_OML 0x8061}
+01124 \textcolor{preprocessor}{#define GLX\_SWAP\_COPY\_OML 0x8062}
+01125 \textcolor{preprocessor}{#define GLX\_SWAP\_UNDEFINED\_OML 0x8063}
+01126 
+01127 \textcolor{preprocessor}{#define GLXEW\_OML\_swap\_method GLXEW\_GET\_VAR(\_\_GLXEW\_OML\_swap\_method)}
+01128 
+01129 \textcolor{preprocessor}{#endif }\textcolor{comment}{/* GLX\_OML\_swap\_method */}\textcolor{preprocessor}{}
+01130 
+01131 \textcolor{comment}{/* -------------------------- GLX\_OML\_sync\_control ------------------------- */}
+01132 
+01133 \textcolor{preprocessor}{#ifndef GLX\_OML\_sync\_control}
+01134 \textcolor{preprocessor}{#define GLX\_OML\_sync\_control 1}
+01135 
+01136 \textcolor{keyword}{typedef} Bool ( * PFNGLXGETMSCRATEOMLPROC) (Display* dpy, GLXDrawable drawable, int32\_t* 
+      numerator, int32\_t* denominator);
+01137 \textcolor{keyword}{typedef} Bool ( * PFNGLXGETSYNCVALUESOMLPROC) (Display* dpy, GLXDrawable drawable, int64\_t* 
+      ust, int64\_t* msc, int64\_t* sbc);
+01138 \textcolor{keyword}{typedef} int64\_t ( * PFNGLXSWAPBUFFERSMSCOMLPROC) (Display* dpy, GLXDrawable drawable, int64\_t 
+      target_msc, int64\_t divisor, int64\_t remainder);
+01139 \textcolor{keyword}{typedef} Bool ( * PFNGLXWAITFORMSCOMLPROC) (Display* dpy, GLXDrawable drawable, int64\_t 
+      target_msc, int64\_t divisor, int64\_t remainder, int64\_t* ust, int64\_t* msc, int64\_t* 
+      sbc);
+01140 \textcolor{keyword}{typedef} Bool ( * PFNGLXWAITFORSBCOMLPROC) (Display* dpy, GLXDrawable drawable, int64\_t 
+      target_sbc, int64\_t* ust, int64\_t* msc, int64\_t* sbc);
+01141 
+01142 \textcolor{preprocessor}{#define glXGetMscRateOML GLXEW\_GET\_FUN(\_\_glewXGetMscRateOML)}
+01143 \textcolor{preprocessor}{#define glXGetSyncValuesOML GLXEW\_GET\_FUN(\_\_glewXGetSyncValuesOML)}
+01144 \textcolor{preprocessor}{#define glXSwapBuffersMscOML GLXEW\_GET\_FUN(\_\_glewXSwapBuffersMscOML)}
+01145 \textcolor{preprocessor}{#define glXWaitForMscOML GLXEW\_GET\_FUN(\_\_glewXWaitForMscOML)}
+01146 \textcolor{preprocessor}{#define glXWaitForSbcOML GLXEW\_GET\_FUN(\_\_glewXWaitForSbcOML)}
+01147 
+01148 \textcolor{preprocessor}{#define GLXEW\_OML\_sync\_control GLXEW\_GET\_VAR(\_\_GLXEW\_OML\_sync\_control)}
+01149 
+01150 \textcolor{preprocessor}{#endif }\textcolor{comment}{/* GLX\_OML\_sync\_control */}\textcolor{preprocessor}{}
+01151 
+01152 \textcolor{comment}{/* ------------------------ GLX\_SGIS\_blended\_overlay ----------------------- */}
+01153 
+01154 \textcolor{preprocessor}{#ifndef GLX\_SGIS\_blended\_overlay}
+01155 \textcolor{preprocessor}{#define GLX\_SGIS\_blended\_overlay 1}
+01156 
+01157 \textcolor{preprocessor}{#define GLX\_BLENDED\_RGBA\_SGIS 0x8025}
+01158 
+01159 \textcolor{preprocessor}{#define GLXEW\_SGIS\_blended\_overlay GLXEW\_GET\_VAR(\_\_GLXEW\_SGIS\_blended\_overlay)}
+01160 
+01161 \textcolor{preprocessor}{#endif }\textcolor{comment}{/* GLX\_SGIS\_blended\_overlay */}\textcolor{preprocessor}{}
+01162 
+01163 \textcolor{comment}{/* -------------------------- GLX\_SGIS\_color\_range ------------------------- */}
+01164 
+01165 \textcolor{preprocessor}{#ifndef GLX\_SGIS\_color\_range}
+01166 \textcolor{preprocessor}{#define GLX\_SGIS\_color\_range 1}
+01167 
+01168 \textcolor{preprocessor}{#define GLXEW\_SGIS\_color\_range GLXEW\_GET\_VAR(\_\_GLXEW\_SGIS\_color\_range)}
+01169 
+01170 \textcolor{preprocessor}{#endif }\textcolor{comment}{/* GLX\_SGIS\_color\_range */}\textcolor{preprocessor}{}
+01171 
+01172 \textcolor{comment}{/* -------------------------- GLX\_SGIS\_multisample ------------------------- */}
+01173 
+01174 \textcolor{preprocessor}{#ifndef GLX\_SGIS\_multisample}
+01175 \textcolor{preprocessor}{#define GLX\_SGIS\_multisample 1}
+01176 
+01177 \textcolor{preprocessor}{#define GLX\_SAMPLE\_BUFFERS\_SGIS 100000}
+01178 \textcolor{preprocessor}{#define GLX\_SAMPLES\_SGIS 100001}
+01179 
+01180 \textcolor{preprocessor}{#define GLXEW\_SGIS\_multisample GLXEW\_GET\_VAR(\_\_GLXEW\_SGIS\_multisample)}
+01181 
+01182 \textcolor{preprocessor}{#endif }\textcolor{comment}{/* GLX\_SGIS\_multisample */}\textcolor{preprocessor}{}
+01183 
+01184 \textcolor{comment}{/* ---------------------- GLX\_SGIS\_shared\_multisample ---------------------- */}
+01185 
+01186 \textcolor{preprocessor}{#ifndef GLX\_SGIS\_shared\_multisample}
+01187 \textcolor{preprocessor}{#define GLX\_SGIS\_shared\_multisample 1}
+01188 
+01189 \textcolor{preprocessor}{#define GLX\_MULTISAMPLE\_SUB\_RECT\_WIDTH\_SGIS 0x8026}
+01190 \textcolor{preprocessor}{#define GLX\_MULTISAMPLE\_SUB\_RECT\_HEIGHT\_SGIS 0x8027}
+01191 
+01192 \textcolor{preprocessor}{#define GLXEW\_SGIS\_shared\_multisample GLXEW\_GET\_VAR(\_\_GLXEW\_SGIS\_shared\_multisample)}
+01193 
+01194 \textcolor{preprocessor}{#endif }\textcolor{comment}{/* GLX\_SGIS\_shared\_multisample */}\textcolor{preprocessor}{}
+01195 
+01196 \textcolor{comment}{/* --------------------------- GLX\_SGIX\_fbconfig --------------------------- */}
+01197 
+01198 \textcolor{preprocessor}{#ifndef GLX\_SGIX\_fbconfig}
+01199 \textcolor{preprocessor}{#define GLX\_SGIX\_fbconfig 1}
+01200 
+01201 \textcolor{preprocessor}{#define GLX\_RGBA\_BIT\_SGIX 0x00000001}
+01202 \textcolor{preprocessor}{#define GLX\_WINDOW\_BIT\_SGIX 0x00000001}
+01203 \textcolor{preprocessor}{#define GLX\_COLOR\_INDEX\_BIT\_SGIX 0x00000002}
+01204 \textcolor{preprocessor}{#define GLX\_PIXMAP\_BIT\_SGIX 0x00000002}
+01205 \textcolor{preprocessor}{#define GLX\_SCREEN\_EXT 0x800C}
+01206 \textcolor{preprocessor}{#define GLX\_DRAWABLE\_TYPE\_SGIX 0x8010}
+01207 \textcolor{preprocessor}{#define GLX\_RENDER\_TYPE\_SGIX 0x8011}
+01208 \textcolor{preprocessor}{#define GLX\_X\_RENDERABLE\_SGIX 0x8012}
+01209 \textcolor{preprocessor}{#define GLX\_FBCONFIG\_ID\_SGIX 0x8013}
+01210 \textcolor{preprocessor}{#define GLX\_RGBA\_TYPE\_SGIX 0x8014}
+01211 \textcolor{preprocessor}{#define GLX\_COLOR\_INDEX\_TYPE\_SGIX 0x8015}
+01212 
+01213 \textcolor{keyword}{typedef} XID GLXFBConfigIDSGIX;
+01214 \textcolor{keyword}{typedef} \textcolor{keyword}{struct }\_\_GLXFBConfigRec *GLXFBConfigSGIX;
+01215 
+01216 \textcolor{keyword}{typedef} GLXFBConfigSGIX* ( * PFNGLXCHOOSEFBCONFIGSGIXPROC) (Display *dpy, \textcolor{keywordtype}{int} screen, \textcolor{keyword}{const} \textcolor{keywordtype}{int} *
+      attrib\_list, \textcolor{keywordtype}{int} *nelements);
+01217 \textcolor{keyword}{typedef} GLXContext ( * PFNGLXCREATECONTEXTWITHCONFIGSGIXPROC) (Display* dpy, GLXFBConfig config, \textcolor{keywordtype}{int} 
+      render\_type, GLXContext share\_list, Bool direct);
+01218 \textcolor{keyword}{typedef} GLXPixmap ( * PFNGLXCREATEGLXPIXMAPWITHCONFIGSGIXPROC) (Display* dpy, GLXFBConfig config, Pixmap 
+      pixmap);
+01219 \textcolor{keyword}{typedef} int ( * PFNGLXGETFBCONFIGATTRIBSGIXPROC) (Display* dpy, GLXFBConfigSGIX config, \textcolor{keywordtype}{int} attribute, \textcolor{keywordtype}{int} 
+      *value);
+01220 \textcolor{keyword}{typedef} GLXFBConfigSGIX ( * PFNGLXGETFBCONFIGFROMVISUALSGIXPROC) (Display* dpy, XVisualInfo *vis);
+01221 \textcolor{keyword}{typedef} XVisualInfo* ( * PFNGLXGETVISUALFROMFBCONFIGSGIXPROC) (Display *dpy, GLXFBConfig config);
+01222 
+01223 \textcolor{preprocessor}{#define glXChooseFBConfigSGIX GLXEW\_GET\_FUN(\_\_glewXChooseFBConfigSGIX)}
+01224 \textcolor{preprocessor}{#define glXCreateContextWithConfigSGIX GLXEW\_GET\_FUN(\_\_glewXCreateContextWithConfigSGIX)}
+01225 \textcolor{preprocessor}{#define glXCreateGLXPixmapWithConfigSGIX GLXEW\_GET\_FUN(\_\_glewXCreateGLXPixmapWithConfigSGIX)}
+01226 \textcolor{preprocessor}{#define glXGetFBConfigAttribSGIX GLXEW\_GET\_FUN(\_\_glewXGetFBConfigAttribSGIX)}
+01227 \textcolor{preprocessor}{#define glXGetFBConfigFromVisualSGIX GLXEW\_GET\_FUN(\_\_glewXGetFBConfigFromVisualSGIX)}
+01228 \textcolor{preprocessor}{#define glXGetVisualFromFBConfigSGIX GLXEW\_GET\_FUN(\_\_glewXGetVisualFromFBConfigSGIX)}
+01229 
+01230 \textcolor{preprocessor}{#define GLXEW\_SGIX\_fbconfig GLXEW\_GET\_VAR(\_\_GLXEW\_SGIX\_fbconfig)}
+01231 
+01232 \textcolor{preprocessor}{#endif }\textcolor{comment}{/* GLX\_SGIX\_fbconfig */}\textcolor{preprocessor}{}
+01233 
+01234 \textcolor{comment}{/* --------------------------- GLX\_SGIX\_hyperpipe -------------------------- */}
+01235 
+01236 \textcolor{preprocessor}{#ifndef GLX\_SGIX\_hyperpipe}
+01237 \textcolor{preprocessor}{#define GLX\_SGIX\_hyperpipe 1}
+01238 
+01239 \textcolor{preprocessor}{#define GLX\_HYPERPIPE\_DISPLAY\_PIPE\_SGIX 0x00000001}
+01240 \textcolor{preprocessor}{#define GLX\_PIPE\_RECT\_SGIX 0x00000001}
+01241 \textcolor{preprocessor}{#define GLX\_HYPERPIPE\_RENDER\_PIPE\_SGIX 0x00000002}
+01242 \textcolor{preprocessor}{#define GLX\_PIPE\_RECT\_LIMITS\_SGIX 0x00000002}
+01243 \textcolor{preprocessor}{#define GLX\_HYPERPIPE\_STEREO\_SGIX 0x00000003}
+01244 \textcolor{preprocessor}{#define GLX\_HYPERPIPE\_PIXEL\_AVERAGE\_SGIX 0x00000004}
+01245 \textcolor{preprocessor}{#define GLX\_HYPERPIPE\_PIPE\_NAME\_LENGTH\_SGIX 80}
+01246 \textcolor{preprocessor}{#define GLX\_BAD\_HYPERPIPE\_CONFIG\_SGIX 91}
+01247 \textcolor{preprocessor}{#define GLX\_BAD\_HYPERPIPE\_SGIX 92}
+01248 \textcolor{preprocessor}{#define GLX\_HYPERPIPE\_ID\_SGIX 0x8030}
+01249 
+01250 \textcolor{keyword}{typedef} \textcolor{keyword}{struct }\{
+01251   \textcolor{keywordtype}{char} pipeName[GLX_HYPERPIPE_PIPE_NAME_LENGTH_SGIX]; 
+01252   \textcolor{keywordtype}{int}  networkId; 
+01253 \} GLXHyperpipeNetworkSGIX;
+01254 \textcolor{keyword}{typedef} \textcolor{keyword}{struct }\{
+01255   \textcolor{keywordtype}{char} pipeName[GLX_HYPERPIPE_PIPE_NAME_LENGTH_SGIX]; 
+01256   \textcolor{keywordtype}{int} XOrigin; 
+01257   \textcolor{keywordtype}{int} YOrigin; 
+01258   \textcolor{keywordtype}{int} maxHeight; 
+01259   \textcolor{keywordtype}{int} maxWidth; 
+01260 \} GLXPipeRectLimits;
+01261 \textcolor{keyword}{typedef} \textcolor{keyword}{struct }\{
+01262   \textcolor{keywordtype}{char} pipeName[GLX_HYPERPIPE_PIPE_NAME_LENGTH_SGIX]; 
+01263   \textcolor{keywordtype}{int} channel; 
+01264   \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{int} participationType; 
+01265   \textcolor{keywordtype}{int} timeSlice; 
+01266 \} GLXHyperpipeConfigSGIX;
+01267 \textcolor{keyword}{typedef} \textcolor{keyword}{struct }\{
+01268   \textcolor{keywordtype}{char} pipeName[GLX_HYPERPIPE_PIPE_NAME_LENGTH_SGIX]; 
+01269   \textcolor{keywordtype}{int} srcXOrigin; 
+01270   \textcolor{keywordtype}{int} srcYOrigin; 
+01271   \textcolor{keywordtype}{int} srcWidth; 
+01272   \textcolor{keywordtype}{int} srcHeight; 
+01273   \textcolor{keywordtype}{int} destXOrigin; 
+01274   \textcolor{keywordtype}{int} destYOrigin; 
+01275   \textcolor{keywordtype}{int} destWidth; 
+01276   \textcolor{keywordtype}{int} destHeight; 
+01277 \} GLXPipeRect;
+01278 
+01279 \textcolor{keyword}{typedef} int ( * PFNGLXBINDHYPERPIPESGIXPROC) (Display *dpy, \textcolor{keywordtype}{int} hpId);
+01280 \textcolor{keyword}{typedef} int ( * PFNGLXDESTROYHYPERPIPECONFIGSGIXPROC) (Display *dpy, \textcolor{keywordtype}{int} hpId);
+01281 \textcolor{keyword}{typedef} int ( * PFNGLXHYPERPIPEATTRIBSGIXPROC) (Display *dpy, \textcolor{keywordtype}{int} timeSlice, \textcolor{keywordtype}{int} attrib, \textcolor{keywordtype}{int} 
+      size, \textcolor{keywordtype}{void} *attribList);
+01282 \textcolor{keyword}{typedef} int ( * PFNGLXHYPERPIPECONFIGSGIXPROC) (Display *dpy, \textcolor{keywordtype}{int} networkId, \textcolor{keywordtype}{int} npipes, 
+      GLXHyperpipeConfigSGIX *cfg, \textcolor{keywordtype}{int} *hpId);
+01283 \textcolor{keyword}{typedef} int ( * PFNGLXQUERYHYPERPIPEATTRIBSGIXPROC) (Display *dpy, \textcolor{keywordtype}{int} timeSlice, \textcolor{keywordtype}{int} attrib, \textcolor{keywordtype}{int} 
+      size, \textcolor{keywordtype}{void} *returnAttribList);
+01284 \textcolor{keyword}{typedef} int ( * PFNGLXQUERYHYPERPIPEBESTATTRIBSGIXPROC) (Display *dpy, \textcolor{keywordtype}{int} timeSlice, \textcolor{keywordtype}{int} attrib, \textcolor{keywordtype}{int} 
+      size, \textcolor{keywordtype}{void} *attribList, \textcolor{keywordtype}{void} *returnAttribList);
+01285 \textcolor{keyword}{typedef} GLXHyperpipeConfigSGIX * ( * PFNGLXQUERYHYPERPIPECONFIGSGIXPROC) (Display *dpy, \textcolor{keywordtype}{int} hpId, \textcolor{keywordtype}{int} *
+      npipes);
+01286 \textcolor{keyword}{typedef} GLXHyperpipeNetworkSGIX * ( * PFNGLXQUERYHYPERPIPENETWORKSGIXPROC) (Display *dpy, \textcolor{keywordtype}{int} *npipes);
+01287 
+01288 \textcolor{preprocessor}{#define glXBindHyperpipeSGIX GLXEW\_GET\_FUN(\_\_glewXBindHyperpipeSGIX)}
+01289 \textcolor{preprocessor}{#define glXDestroyHyperpipeConfigSGIX GLXEW\_GET\_FUN(\_\_glewXDestroyHyperpipeConfigSGIX)}
+01290 \textcolor{preprocessor}{#define glXHyperpipeAttribSGIX GLXEW\_GET\_FUN(\_\_glewXHyperpipeAttribSGIX)}
+01291 \textcolor{preprocessor}{#define glXHyperpipeConfigSGIX GLXEW\_GET\_FUN(\_\_glewXHyperpipeConfigSGIX)}
+01292 \textcolor{preprocessor}{#define glXQueryHyperpipeAttribSGIX GLXEW\_GET\_FUN(\_\_glewXQueryHyperpipeAttribSGIX)}
+01293 \textcolor{preprocessor}{#define glXQueryHyperpipeBestAttribSGIX GLXEW\_GET\_FUN(\_\_glewXQueryHyperpipeBestAttribSGIX)}
+01294 \textcolor{preprocessor}{#define glXQueryHyperpipeConfigSGIX GLXEW\_GET\_FUN(\_\_glewXQueryHyperpipeConfigSGIX)}
+01295 \textcolor{preprocessor}{#define glXQueryHyperpipeNetworkSGIX GLXEW\_GET\_FUN(\_\_glewXQueryHyperpipeNetworkSGIX)}
+01296 
+01297 \textcolor{preprocessor}{#define GLXEW\_SGIX\_hyperpipe GLXEW\_GET\_VAR(\_\_GLXEW\_SGIX\_hyperpipe)}
+01298 
+01299 \textcolor{preprocessor}{#endif }\textcolor{comment}{/* GLX\_SGIX\_hyperpipe */}\textcolor{preprocessor}{}
+01300 
+01301 \textcolor{comment}{/* ---------------------------- GLX\_SGIX\_pbuffer --------------------------- */}
+01302 
+01303 \textcolor{preprocessor}{#ifndef GLX\_SGIX\_pbuffer}
+01304 \textcolor{preprocessor}{#define GLX\_SGIX\_pbuffer 1}
+01305 
+01306 \textcolor{preprocessor}{#define GLX\_FRONT\_LEFT\_BUFFER\_BIT\_SGIX 0x00000001}
+01307 \textcolor{preprocessor}{#define GLX\_FRONT\_RIGHT\_BUFFER\_BIT\_SGIX 0x00000002}
+01308 \textcolor{preprocessor}{#define GLX\_BACK\_LEFT\_BUFFER\_BIT\_SGIX 0x00000004}
+01309 \textcolor{preprocessor}{#define GLX\_PBUFFER\_BIT\_SGIX 0x00000004}
+01310 \textcolor{preprocessor}{#define GLX\_BACK\_RIGHT\_BUFFER\_BIT\_SGIX 0x00000008}
+01311 \textcolor{preprocessor}{#define GLX\_AUX\_BUFFERS\_BIT\_SGIX 0x00000010}
+01312 \textcolor{preprocessor}{#define GLX\_DEPTH\_BUFFER\_BIT\_SGIX 0x00000020}
+01313 \textcolor{preprocessor}{#define GLX\_STENCIL\_BUFFER\_BIT\_SGIX 0x00000040}
+01314 \textcolor{preprocessor}{#define GLX\_ACCUM\_BUFFER\_BIT\_SGIX 0x00000080}
+01315 \textcolor{preprocessor}{#define GLX\_SAMPLE\_BUFFERS\_BIT\_SGIX 0x00000100}
+01316 \textcolor{preprocessor}{#define GLX\_MAX\_PBUFFER\_WIDTH\_SGIX 0x8016}
+01317 \textcolor{preprocessor}{#define GLX\_MAX\_PBUFFER\_HEIGHT\_SGIX 0x8017}
+01318 \textcolor{preprocessor}{#define GLX\_MAX\_PBUFFER\_PIXELS\_SGIX 0x8018}
+01319 \textcolor{preprocessor}{#define GLX\_OPTIMAL\_PBUFFER\_WIDTH\_SGIX 0x8019}
+01320 \textcolor{preprocessor}{#define GLX\_OPTIMAL\_PBUFFER\_HEIGHT\_SGIX 0x801A}
+01321 \textcolor{preprocessor}{#define GLX\_PRESERVED\_CONTENTS\_SGIX 0x801B}
+01322 \textcolor{preprocessor}{#define GLX\_LARGEST\_PBUFFER\_SGIX 0x801C}
+01323 \textcolor{preprocessor}{#define GLX\_WIDTH\_SGIX 0x801D}
+01324 \textcolor{preprocessor}{#define GLX\_HEIGHT\_SGIX 0x801E}
+01325 \textcolor{preprocessor}{#define GLX\_EVENT\_MASK\_SGIX 0x801F}
+01326 \textcolor{preprocessor}{#define GLX\_DAMAGED\_SGIX 0x8020}
+01327 \textcolor{preprocessor}{#define GLX\_SAVED\_SGIX 0x8021}
+01328 \textcolor{preprocessor}{#define GLX\_WINDOW\_SGIX 0x8022}
+01329 \textcolor{preprocessor}{#define GLX\_PBUFFER\_SGIX 0x8023}
+01330 \textcolor{preprocessor}{#define GLX\_BUFFER\_CLOBBER\_MASK\_SGIX 0x08000000}
+01331 
+01332 \textcolor{keyword}{typedef} XID GLXPbufferSGIX;
+01333 \textcolor{keyword}{typedef} \textcolor{keyword}{struct }\{ \textcolor{keywordtype}{int} type; \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{long} serial; Bool send\_event; Display *display; GLXDrawable drawable; \textcolor{keywordtype}{
+      int} event\_type; \textcolor{keywordtype}{int} draw\_type; \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{int} mask; \textcolor{keywordtype}{int} x, y; \textcolor{keywordtype}{int} width, height; \textcolor{keywordtype}{int} 
+      count; \} GLXBufferClobberEventSGIX;
+01334 
+01335 \textcolor{keyword}{typedef} GLXPbuffer ( * PFNGLXCREATEGLXPBUFFERSGIXPROC) (Display* dpy, GLXFBConfig config, \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{int} 
+      width, \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{int} height, \textcolor{keywordtype}{int} *attrib\_list);
+01336 \textcolor{keyword}{typedef} void ( * PFNGLXDESTROYGLXPBUFFERSGIXPROC) (Display* dpy, GLXPbuffer pbuf);
+01337 \textcolor{keyword}{typedef} void ( * PFNGLXGETSELECTEDEVENTSGIXPROC) (Display* dpy, GLXDrawable drawable, \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{long} *
+      mask);
+01338 \textcolor{keyword}{typedef} void ( * PFNGLXQUERYGLXPBUFFERSGIXPROC) (Display* dpy, GLXPbuffer pbuf, \textcolor{keywordtype}{int} attribute, \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{int}
+       *value);
+01339 \textcolor{keyword}{typedef} void ( * PFNGLXSELECTEVENTSGIXPROC) (Display* dpy, GLXDrawable drawable, \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{long} 
+      mask);
+01340 
+01341 \textcolor{preprocessor}{#define glXCreateGLXPbufferSGIX GLXEW\_GET\_FUN(\_\_glewXCreateGLXPbufferSGIX)}
+01342 \textcolor{preprocessor}{#define glXDestroyGLXPbufferSGIX GLXEW\_GET\_FUN(\_\_glewXDestroyGLXPbufferSGIX)}
+01343 \textcolor{preprocessor}{#define glXGetSelectedEventSGIX GLXEW\_GET\_FUN(\_\_glewXGetSelectedEventSGIX)}
+01344 \textcolor{preprocessor}{#define glXQueryGLXPbufferSGIX GLXEW\_GET\_FUN(\_\_glewXQueryGLXPbufferSGIX)}
+01345 \textcolor{preprocessor}{#define glXSelectEventSGIX GLXEW\_GET\_FUN(\_\_glewXSelectEventSGIX)}
+01346 
+01347 \textcolor{preprocessor}{#define GLXEW\_SGIX\_pbuffer GLXEW\_GET\_VAR(\_\_GLXEW\_SGIX\_pbuffer)}
+01348 
+01349 \textcolor{preprocessor}{#endif }\textcolor{comment}{/* GLX\_SGIX\_pbuffer */}\textcolor{preprocessor}{}
+01350 
+01351 \textcolor{comment}{/* ------------------------- GLX\_SGIX\_swap\_barrier ------------------------- */}
+01352 
+01353 \textcolor{preprocessor}{#ifndef GLX\_SGIX\_swap\_barrier}
+01354 \textcolor{preprocessor}{#define GLX\_SGIX\_swap\_barrier 1}
+01355 
+01356 \textcolor{keyword}{typedef} void ( * PFNGLXBINDSWAPBARRIERSGIXPROC) (Display *dpy, GLXDrawable drawable, \textcolor{keywordtype}{int} 
+      barrier);
+01357 \textcolor{keyword}{typedef} Bool ( * PFNGLXQUERYMAXSWAPBARRIERSSGIXPROC) (Display *dpy, \textcolor{keywordtype}{int} screen, \textcolor{keywordtype}{int} *max);
+01358 
+01359 \textcolor{preprocessor}{#define glXBindSwapBarrierSGIX GLXEW\_GET\_FUN(\_\_glewXBindSwapBarrierSGIX)}
+01360 \textcolor{preprocessor}{#define glXQueryMaxSwapBarriersSGIX GLXEW\_GET\_FUN(\_\_glewXQueryMaxSwapBarriersSGIX)}
+01361 
+01362 \textcolor{preprocessor}{#define GLXEW\_SGIX\_swap\_barrier GLXEW\_GET\_VAR(\_\_GLXEW\_SGIX\_swap\_barrier)}
+01363 
+01364 \textcolor{preprocessor}{#endif }\textcolor{comment}{/* GLX\_SGIX\_swap\_barrier */}\textcolor{preprocessor}{}
+01365 
+01366 \textcolor{comment}{/* -------------------------- GLX\_SGIX\_swap\_group -------------------------- */}
+01367 
+01368 \textcolor{preprocessor}{#ifndef GLX\_SGIX\_swap\_group}
+01369 \textcolor{preprocessor}{#define GLX\_SGIX\_swap\_group 1}
+01370 
+01371 \textcolor{keyword}{typedef} void ( * PFNGLXJOINSWAPGROUPSGIXPROC) (Display *dpy, GLXDrawable drawable, GLXDrawable member);
+01372 
+01373 \textcolor{preprocessor}{#define glXJoinSwapGroupSGIX GLXEW\_GET\_FUN(\_\_glewXJoinSwapGroupSGIX)}
+01374 
+01375 \textcolor{preprocessor}{#define GLXEW\_SGIX\_swap\_group GLXEW\_GET\_VAR(\_\_GLXEW\_SGIX\_swap\_group)}
+01376 
+01377 \textcolor{preprocessor}{#endif }\textcolor{comment}{/* GLX\_SGIX\_swap\_group */}\textcolor{preprocessor}{}
+01378 
+01379 \textcolor{comment}{/* ------------------------- GLX\_SGIX\_video\_resize ------------------------- */}
+01380 
+01381 \textcolor{preprocessor}{#ifndef GLX\_SGIX\_video\_resize}
+01382 \textcolor{preprocessor}{#define GLX\_SGIX\_video\_resize 1}
+01383 
+01384 \textcolor{preprocessor}{#define GLX\_SYNC\_FRAME\_SGIX 0x00000000}
+01385 \textcolor{preprocessor}{#define GLX\_SYNC\_SWAP\_SGIX 0x00000001}
+01386 
+01387 \textcolor{keyword}{typedef} int ( * PFNGLXBINDCHANNELTOWINDOWSGIXPROC) (Display* display, \textcolor{keywordtype}{int} screen, \textcolor{keywordtype}{int} channel, Window 
+      window);
+01388 \textcolor{keyword}{typedef} int ( * PFNGLXCHANNELRECTSGIXPROC) (Display* display, \textcolor{keywordtype}{int} screen, \textcolor{keywordtype}{int} channel, \textcolor{keywordtype}{int} 
+      x, \textcolor{keywordtype}{int} y, \textcolor{keywordtype}{int} w, \textcolor{keywordtype}{int} h);
+01389 \textcolor{keyword}{typedef} int ( * PFNGLXCHANNELRECTSYNCSGIXPROC) (Display* display, \textcolor{keywordtype}{int} screen, \textcolor{keywordtype}{int} channel, 
+      GLenum synctype);
+01390 \textcolor{keyword}{typedef} int ( * PFNGLXQUERYCHANNELDELTASSGIXPROC) (Display* display, \textcolor{keywordtype}{int} screen, \textcolor{keywordtype}{int} channel, \textcolor{keywordtype}{int} *
+      x, \textcolor{keywordtype}{int} *y, \textcolor{keywordtype}{int} *w, \textcolor{keywordtype}{int} *h);
+01391 \textcolor{keyword}{typedef} int ( * PFNGLXQUERYCHANNELRECTSGIXPROC) (Display* display, \textcolor{keywordtype}{int} screen, \textcolor{keywordtype}{int} channel, \textcolor{keywordtype}{int} *dx, \textcolor{keywordtype}{int} *
+      dy, \textcolor{keywordtype}{int} *dw, \textcolor{keywordtype}{int} *dh);
+01392 
+01393 \textcolor{preprocessor}{#define glXBindChannelToWindowSGIX GLXEW\_GET\_FUN(\_\_glewXBindChannelToWindowSGIX)}
+01394 \textcolor{preprocessor}{#define glXChannelRectSGIX GLXEW\_GET\_FUN(\_\_glewXChannelRectSGIX)}
+01395 \textcolor{preprocessor}{#define glXChannelRectSyncSGIX GLXEW\_GET\_FUN(\_\_glewXChannelRectSyncSGIX)}
+01396 \textcolor{preprocessor}{#define glXQueryChannelDeltasSGIX GLXEW\_GET\_FUN(\_\_glewXQueryChannelDeltasSGIX)}
+01397 \textcolor{preprocessor}{#define glXQueryChannelRectSGIX GLXEW\_GET\_FUN(\_\_glewXQueryChannelRectSGIX)}
+01398 
+01399 \textcolor{preprocessor}{#define GLXEW\_SGIX\_video\_resize GLXEW\_GET\_VAR(\_\_GLXEW\_SGIX\_video\_resize)}
+01400 
+01401 \textcolor{preprocessor}{#endif }\textcolor{comment}{/* GLX\_SGIX\_video\_resize */}\textcolor{preprocessor}{}
+01402 
+01403 \textcolor{comment}{/* ---------------------- GLX\_SGIX\_visual\_select\_group --------------------- */}
+01404 
+01405 \textcolor{preprocessor}{#ifndef GLX\_SGIX\_visual\_select\_group}
+01406 \textcolor{preprocessor}{#define GLX\_SGIX\_visual\_select\_group 1}
+01407 
+01408 \textcolor{preprocessor}{#define GLX\_VISUAL\_SELECT\_GROUP\_SGIX 0x8028}
+01409 
+01410 \textcolor{preprocessor}{#define GLXEW\_SGIX\_visual\_select\_group GLXEW\_GET\_VAR(\_\_GLXEW\_SGIX\_visual\_select\_group)}
+01411 
+01412 \textcolor{preprocessor}{#endif }\textcolor{comment}{/* GLX\_SGIX\_visual\_select\_group */}\textcolor{preprocessor}{}
+01413 
+01414 \textcolor{comment}{/* ---------------------------- GLX\_SGI\_cushion ---------------------------- */}
+01415 
+01416 \textcolor{preprocessor}{#ifndef GLX\_SGI\_cushion}
+01417 \textcolor{preprocessor}{#define GLX\_SGI\_cushion 1}
+01418 
+01419 \textcolor{keyword}{typedef} void ( * PFNGLXCUSHIONSGIPROC) (Display* dpy, Window window, \textcolor{keywordtype}{float} cushion);
+01420 
+01421 \textcolor{preprocessor}{#define glXCushionSGI GLXEW\_GET\_FUN(\_\_glewXCushionSGI)}
+01422 
+01423 \textcolor{preprocessor}{#define GLXEW\_SGI\_cushion GLXEW\_GET\_VAR(\_\_GLXEW\_SGI\_cushion)}
+01424 
+01425 \textcolor{preprocessor}{#endif }\textcolor{comment}{/* GLX\_SGI\_cushion */}\textcolor{preprocessor}{}
+01426 
+01427 \textcolor{comment}{/* ----------------------- GLX\_SGI\_make\_current\_read ----------------------- */}
+01428 
+01429 \textcolor{preprocessor}{#ifndef GLX\_SGI\_make\_current\_read}
+01430 \textcolor{preprocessor}{#define GLX\_SGI\_make\_current\_read 1}
+01431 
+01432 \textcolor{keyword}{typedef} GLXDrawable ( * PFNGLXGETCURRENTREADDRAWABLESGIPROC) (void);
+01433 \textcolor{keyword}{typedef} Bool ( * PFNGLXMAKECURRENTREADSGIPROC) (Display* dpy, GLXDrawable draw, GLXDrawable 
+      read, GLXContext ctx);
+01434 
+01435 \textcolor{preprocessor}{#define glXGetCurrentReadDrawableSGI GLXEW\_GET\_FUN(\_\_glewXGetCurrentReadDrawableSGI)}
+01436 \textcolor{preprocessor}{#define glXMakeCurrentReadSGI GLXEW\_GET\_FUN(\_\_glewXMakeCurrentReadSGI)}
+01437 
+01438 \textcolor{preprocessor}{#define GLXEW\_SGI\_make\_current\_read GLXEW\_GET\_VAR(\_\_GLXEW\_SGI\_make\_current\_read)}
+01439 
+01440 \textcolor{preprocessor}{#endif }\textcolor{comment}{/* GLX\_SGI\_make\_current\_read */}\textcolor{preprocessor}{}
+01441 
+01442 \textcolor{comment}{/* -------------------------- GLX\_SGI\_swap\_control ------------------------- */}
+01443 
+01444 \textcolor{preprocessor}{#ifndef GLX\_SGI\_swap\_control}
+01445 \textcolor{preprocessor}{#define GLX\_SGI\_swap\_control 1}
+01446 
+01447 \textcolor{keyword}{typedef} int ( * PFNGLXSWAPINTERVALSGIPROC) (\textcolor{keywordtype}{int} interval);
+01448 
+01449 \textcolor{preprocessor}{#define glXSwapIntervalSGI GLXEW\_GET\_FUN(\_\_glewXSwapIntervalSGI)}
+01450 
+01451 \textcolor{preprocessor}{#define GLXEW\_SGI\_swap\_control GLXEW\_GET\_VAR(\_\_GLXEW\_SGI\_swap\_control)}
+01452 
+01453 \textcolor{preprocessor}{#endif }\textcolor{comment}{/* GLX\_SGI\_swap\_control */}\textcolor{preprocessor}{}
+01454 
+01455 \textcolor{comment}{/* --------------------------- GLX\_SGI\_video\_sync -------------------------- */}
+01456 
+01457 \textcolor{preprocessor}{#ifndef GLX\_SGI\_video\_sync}
+01458 \textcolor{preprocessor}{#define GLX\_SGI\_video\_sync 1}
+01459 
+01460 \textcolor{keyword}{typedef} int ( * PFNGLXGETVIDEOSYNCSGIPROC) (\textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{int}* count);
+01461 \textcolor{keyword}{typedef} int ( * PFNGLXWAITVIDEOSYNCSGIPROC) (\textcolor{keywordtype}{int} divisor, \textcolor{keywordtype}{int} remainder, \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{int}* 
+      count);
+01462 
+01463 \textcolor{preprocessor}{#define glXGetVideoSyncSGI GLXEW\_GET\_FUN(\_\_glewXGetVideoSyncSGI)}
+01464 \textcolor{preprocessor}{#define glXWaitVideoSyncSGI GLXEW\_GET\_FUN(\_\_glewXWaitVideoSyncSGI)}
+01465 
+01466 \textcolor{preprocessor}{#define GLXEW\_SGI\_video\_sync GLXEW\_GET\_VAR(\_\_GLXEW\_SGI\_video\_sync)}
+01467 
+01468 \textcolor{preprocessor}{#endif }\textcolor{comment}{/* GLX\_SGI\_video\_sync */}\textcolor{preprocessor}{}
+01469 
+01470 \textcolor{comment}{/* --------------------- GLX\_SUN\_get\_transparent\_index --------------------- */}
+01471 
+01472 \textcolor{preprocessor}{#ifndef GLX\_SUN\_get\_transparent\_index}
+01473 \textcolor{preprocessor}{#define GLX\_SUN\_get\_transparent\_index 1}
+01474 
+01475 \textcolor{keyword}{typedef} Status ( * PFNGLXGETTRANSPARENTINDEXSUNPROC) (Display* dpy, Window overlay, Window underlay, \textcolor{keywordtype}{
+      unsigned} \textcolor{keywordtype}{long} *pTransparentIndex);
+01476 
+01477 \textcolor{preprocessor}{#define glXGetTransparentIndexSUN GLXEW\_GET\_FUN(\_\_glewXGetTransparentIndexSUN)}
+01478 
+01479 \textcolor{preprocessor}{#define GLXEW\_SUN\_get\_transparent\_index GLXEW\_GET\_VAR(\_\_GLXEW\_SUN\_get\_transparent\_index)}
+01480 
+01481 \textcolor{preprocessor}{#endif }\textcolor{comment}{/* GLX\_SUN\_get\_transparent\_index */}\textcolor{preprocessor}{}
+01482 
+01483 \textcolor{comment}{/* -------------------------- GLX\_SUN\_video\_resize ------------------------- */}
+01484 
+01485 \textcolor{preprocessor}{#ifndef GLX\_SUN\_video\_resize}
+01486 \textcolor{preprocessor}{#define GLX\_SUN\_video\_resize 1}
+01487 
+01488 \textcolor{preprocessor}{#define GLX\_VIDEO\_RESIZE\_SUN 0x8171}
+01489 \textcolor{preprocessor}{#define GL\_VIDEO\_RESIZE\_COMPENSATION\_SUN 0x85CD}
+01490 
+01491 \textcolor{keyword}{typedef} int ( * PFNGLXGETVIDEORESIZESUNPROC) (Display* display, GLXDrawable window, \textcolor{keywordtype}{float}* factor);
+01492 \textcolor{keyword}{typedef} int ( * PFNGLXVIDEORESIZESUNPROC) (Display* display, GLXDrawable window, \textcolor{keywordtype}{float} factor);
+01493 
+01494 \textcolor{preprocessor}{#define glXGetVideoResizeSUN GLXEW\_GET\_FUN(\_\_glewXGetVideoResizeSUN)}
+01495 \textcolor{preprocessor}{#define glXVideoResizeSUN GLXEW\_GET\_FUN(\_\_glewXVideoResizeSUN)}
+01496 
+01497 \textcolor{preprocessor}{#define GLXEW\_SUN\_video\_resize GLXEW\_GET\_VAR(\_\_GLXEW\_SUN\_video\_resize)}
+01498 
+01499 \textcolor{preprocessor}{#endif }\textcolor{comment}{/* GLX\_SUN\_video\_resize */}\textcolor{preprocessor}{}
+01500 
+01501 \textcolor{comment}{/* ------------------------------------------------------------------------- */}
+01502 
+01503 \textcolor{preprocessor}{#ifdef GLEW\_MX}
+01504 \textcolor{preprocessor}{#define GLXEW\_FUN\_EXPORT GLEW\_FUN\_EXPORT}
+01505 \textcolor{preprocessor}{#define GLXEW\_VAR\_EXPORT}
+01506 \textcolor{preprocessor}{#else}
+01507 \textcolor{preprocessor}{#define GLXEW\_FUN\_EXPORT GLEW\_FUN\_EXPORT}
+01508 \textcolor{preprocessor}{#define GLXEW\_VAR\_EXPORT GLEW\_VAR\_EXPORT}
+01509 \textcolor{preprocessor}{#endif }\textcolor{comment}{/* GLEW\_MX */}\textcolor{preprocessor}{}
+01510 
+01511 GLXEW_FUN_EXPORT PFNGLXGETCURRENTDISPLAYPROC __glewXGetCurrentDisplay;
+01512 
+01513 GLXEW_FUN_EXPORT PFNGLXCHOOSEFBCONFIGPROC __glewXChooseFBConfig;
+01514 GLXEW_FUN_EXPORT PFNGLXCREATENEWCONTEXTPROC __glewXCreateNewContext;
+01515 GLXEW_FUN_EXPORT PFNGLXCREATEPBUFFERPROC __glewXCreatePbuffer;
+01516 GLXEW_FUN_EXPORT PFNGLXCREATEPIXMAPPROC __glewXCreatePixmap;
+01517 GLXEW_FUN_EXPORT PFNGLXCREATEWINDOWPROC __glewXCreateWindow;
+01518 GLXEW_FUN_EXPORT PFNGLXDESTROYPBUFFERPROC __glewXDestroyPbuffer;
+01519 GLXEW_FUN_EXPORT PFNGLXDESTROYPIXMAPPROC __glewXDestroyPixmap;
+01520 GLXEW_FUN_EXPORT PFNGLXDESTROYWINDOWPROC __glewXDestroyWindow;
+01521 GLXEW_FUN_EXPORT PFNGLXGETCURRENTREADDRAWABLEPROC __glewXGetCurrentReadDrawable;
+01522 GLXEW_FUN_EXPORT PFNGLXGETFBCONFIGATTRIBPROC __glewXGetFBConfigAttrib;
+01523 GLXEW_FUN_EXPORT PFNGLXGETFBCONFIGSPROC __glewXGetFBConfigs;
+01524 GLXEW_FUN_EXPORT PFNGLXGETSELECTEDEVENTPROC __glewXGetSelectedEvent;
+01525 GLXEW_FUN_EXPORT PFNGLXGETVISUALFROMFBCONFIGPROC __glewXGetVisualFromFBConfig;
+01526 GLXEW_FUN_EXPORT PFNGLXMAKECONTEXTCURRENTPROC __glewXMakeContextCurrent;
+01527 GLXEW_FUN_EXPORT PFNGLXQUERYCONTEXTPROC __glewXQueryContext;
+01528 GLXEW_FUN_EXPORT PFNGLXQUERYDRAWABLEPROC __glewXQueryDrawable;
+01529 GLXEW_FUN_EXPORT PFNGLXSELECTEVENTPROC __glewXSelectEvent;
+01530 
+01531 GLXEW_FUN_EXPORT PFNGLXBLITCONTEXTFRAMEBUFFERAMDPROC 
+      __glewXBlitContextFramebufferAMD;
+01532 GLXEW_FUN_EXPORT PFNGLXCREATEASSOCIATEDCONTEXTAMDPROC 
+      __glewXCreateAssociatedContextAMD;
+01533 GLXEW_FUN_EXPORT PFNGLXCREATEASSOCIATEDCONTEXTATTRIBSAMDPROC 
+      __glewXCreateAssociatedContextAttribsAMD;
+01534 GLXEW_FUN_EXPORT PFNGLXDELETEASSOCIATEDCONTEXTAMDPROC 
+      __glewXDeleteAssociatedContextAMD;
+01535 GLXEW_FUN_EXPORT PFNGLXGETCONTEXTGPUIDAMDPROC __glewXGetContextGPUIDAMD;
+01536 GLXEW_FUN_EXPORT PFNGLXGETCURRENTASSOCIATEDCONTEXTAMDPROC 
+      __glewXGetCurrentAssociatedContextAMD;
+01537 GLXEW_FUN_EXPORT PFNGLXGETGPUIDSAMDPROC __glewXGetGPUIDsAMD;
+01538 GLXEW_FUN_EXPORT PFNGLXGETGPUINFOAMDPROC __glewXGetGPUInfoAMD;
+01539 GLXEW_FUN_EXPORT PFNGLXMAKEASSOCIATEDCONTEXTCURRENTAMDPROC 
+      __glewXMakeAssociatedContextCurrentAMD;
+01540 
+01541 GLXEW_FUN_EXPORT PFNGLXCREATECONTEXTATTRIBSARBPROC 
+      __glewXCreateContextAttribsARB;
+01542 
+01543 GLXEW_FUN_EXPORT PFNGLXBINDTEXIMAGEATIPROC __glewXBindTexImageATI;
+01544 GLXEW_FUN_EXPORT PFNGLXDRAWABLEATTRIBATIPROC __glewXDrawableAttribATI;
+01545 GLXEW_FUN_EXPORT PFNGLXRELEASETEXIMAGEATIPROC __glewXReleaseTexImageATI;
+01546 
+01547 GLXEW_FUN_EXPORT PFNGLXFREECONTEXTEXTPROC __glewXFreeContextEXT;
+01548 GLXEW_FUN_EXPORT PFNGLXGETCONTEXTIDEXTPROC __glewXGetContextIDEXT;
+01549 GLXEW_FUN_EXPORT PFNGLXIMPORTCONTEXTEXTPROC __glewXImportContextEXT;
+01550 GLXEW_FUN_EXPORT PFNGLXQUERYCONTEXTINFOEXTPROC __glewXQueryContextInfoEXT;
+01551 
+01552 GLXEW_FUN_EXPORT PFNGLXSWAPINTERVALEXTPROC __glewXSwapIntervalEXT;
+01553 
+01554 GLXEW_FUN_EXPORT PFNGLXBINDTEXIMAGEEXTPROC __glewXBindTexImageEXT;
+01555 GLXEW_FUN_EXPORT PFNGLXRELEASETEXIMAGEEXTPROC __glewXReleaseTexImageEXT;
+01556 
+01557 GLXEW_FUN_EXPORT PFNGLXGETAGPOFFSETMESAPROC __glewXGetAGPOffsetMESA;
+01558 
+01559 GLXEW_FUN_EXPORT PFNGLXCOPYSUBBUFFERMESAPROC __glewXCopySubBufferMESA;
+01560 
+01561 GLXEW_FUN_EXPORT PFNGLXCREATEGLXPIXMAPMESAPROC __glewXCreateGLXPixmapMESA;
+01562 
+01563 GLXEW_FUN_EXPORT PFNGLXQUERYCURRENTRENDERERINTEGERMESAPROC 
+      __glewXQueryCurrentRendererIntegerMESA;
+01564 GLXEW_FUN_EXPORT PFNGLXQUERYCURRENTRENDERERSTRINGMESAPROC 
+      __glewXQueryCurrentRendererStringMESA;
+01565 GLXEW_FUN_EXPORT PFNGLXQUERYRENDERERINTEGERMESAPROC 
+      __glewXQueryRendererIntegerMESA;
+01566 GLXEW_FUN_EXPORT PFNGLXQUERYRENDERERSTRINGMESAPROC 
+      __glewXQueryRendererStringMESA;
+01567 
+01568 GLXEW_FUN_EXPORT PFNGLXRELEASEBUFFERSMESAPROC __glewXReleaseBuffersMESA;
+01569 
+01570 GLXEW_FUN_EXPORT PFNGLXSET3DFXMODEMESAPROC __glewXSet3DfxModeMESA;
+01571 
+01572 GLXEW_FUN_EXPORT PFNGLXGETSWAPINTERVALMESAPROC __glewXGetSwapIntervalMESA;
+01573 GLXEW_FUN_EXPORT PFNGLXSWAPINTERVALMESAPROC __glewXSwapIntervalMESA;
+01574 
+01575 GLXEW_FUN_EXPORT PFNGLXCOPYBUFFERSUBDATANVPROC __glewXCopyBufferSubDataNV;
+01576 GLXEW_FUN_EXPORT PFNGLXNAMEDCOPYBUFFERSUBDATANVPROC 
+      __glewXNamedCopyBufferSubDataNV;
+01577 
+01578 GLXEW_FUN_EXPORT PFNGLXCOPYIMAGESUBDATANVPROC __glewXCopyImageSubDataNV;
+01579 
+01580 GLXEW_FUN_EXPORT PFNGLXDELAYBEFORESWAPNVPROC __glewXDelayBeforeSwapNV;
+01581 
+01582 GLXEW_FUN_EXPORT PFNGLXBINDVIDEODEVICENVPROC __glewXBindVideoDeviceNV;
+01583 GLXEW_FUN_EXPORT PFNGLXENUMERATEVIDEODEVICESNVPROC 
+      __glewXEnumerateVideoDevicesNV;
+01584 
+01585 GLXEW_FUN_EXPORT PFNGLXBINDSWAPBARRIERNVPROC __glewXBindSwapBarrierNV;
+01586 GLXEW_FUN_EXPORT PFNGLXJOINSWAPGROUPNVPROC __glewXJoinSwapGroupNV;
+01587 GLXEW_FUN_EXPORT PFNGLXQUERYFRAMECOUNTNVPROC __glewXQueryFrameCountNV;
+01588 GLXEW_FUN_EXPORT PFNGLXQUERYMAXSWAPGROUPSNVPROC __glewXQueryMaxSwapGroupsNV;
+01589 GLXEW_FUN_EXPORT PFNGLXQUERYSWAPGROUPNVPROC __glewXQuerySwapGroupNV;
+01590 GLXEW_FUN_EXPORT PFNGLXRESETFRAMECOUNTNVPROC __glewXResetFrameCountNV;
+01591 
+01592 GLXEW_FUN_EXPORT PFNGLXALLOCATEMEMORYNVPROC __glewXAllocateMemoryNV;
+01593 GLXEW_FUN_EXPORT PFNGLXFREEMEMORYNVPROC __glewXFreeMemoryNV;
+01594 
+01595 GLXEW_FUN_EXPORT PFNGLXBINDVIDEOCAPTUREDEVICENVPROC 
+      __glewXBindVideoCaptureDeviceNV;
+01596 GLXEW_FUN_EXPORT PFNGLXENUMERATEVIDEOCAPTUREDEVICESNVPROC 
+      __glewXEnumerateVideoCaptureDevicesNV;
+01597 GLXEW_FUN_EXPORT PFNGLXLOCKVIDEOCAPTUREDEVICENVPROC 
+      __glewXLockVideoCaptureDeviceNV;
+01598 GLXEW_FUN_EXPORT PFNGLXQUERYVIDEOCAPTUREDEVICENVPROC 
+      __glewXQueryVideoCaptureDeviceNV;
+01599 GLXEW_FUN_EXPORT PFNGLXRELEASEVIDEOCAPTUREDEVICENVPROC 
+      __glewXReleaseVideoCaptureDeviceNV;
+01600 
+01601 GLXEW_FUN_EXPORT PFNGLXBINDVIDEOIMAGENVPROC __glewXBindVideoImageNV;
+01602 GLXEW_FUN_EXPORT PFNGLXGETVIDEODEVICENVPROC __glewXGetVideoDeviceNV;
+01603 GLXEW_FUN_EXPORT PFNGLXGETVIDEOINFONVPROC __glewXGetVideoInfoNV;
+01604 GLXEW_FUN_EXPORT PFNGLXRELEASEVIDEODEVICENVPROC __glewXReleaseVideoDeviceNV;
+01605 GLXEW_FUN_EXPORT PFNGLXRELEASEVIDEOIMAGENVPROC __glewXReleaseVideoImageNV;
+01606 GLXEW_FUN_EXPORT PFNGLXSENDPBUFFERTOVIDEONVPROC __glewXSendPbufferToVideoNV;
+01607 
+01608 GLXEW_FUN_EXPORT PFNGLXGETMSCRATEOMLPROC __glewXGetMscRateOML;
+01609 GLXEW_FUN_EXPORT PFNGLXGETSYNCVALUESOMLPROC __glewXGetSyncValuesOML;
+01610 GLXEW_FUN_EXPORT PFNGLXSWAPBUFFERSMSCOMLPROC __glewXSwapBuffersMscOML;
+01611 GLXEW_FUN_EXPORT PFNGLXWAITFORMSCOMLPROC __glewXWaitForMscOML;
+01612 GLXEW_FUN_EXPORT PFNGLXWAITFORSBCOMLPROC __glewXWaitForSbcOML;
+01613 
+01614 GLXEW_FUN_EXPORT PFNGLXCHOOSEFBCONFIGSGIXPROC __glewXChooseFBConfigSGIX;
+01615 GLXEW_FUN_EXPORT PFNGLXCREATECONTEXTWITHCONFIGSGIXPROC 
+      __glewXCreateContextWithConfigSGIX;
+01616 GLXEW_FUN_EXPORT PFNGLXCREATEGLXPIXMAPWITHCONFIGSGIXPROC 
+      __glewXCreateGLXPixmapWithConfigSGIX;
+01617 GLXEW_FUN_EXPORT PFNGLXGETFBCONFIGATTRIBSGIXPROC __glewXGetFBConfigAttribSGIX;
+01618 GLXEW_FUN_EXPORT PFNGLXGETFBCONFIGFROMVISUALSGIXPROC 
+      __glewXGetFBConfigFromVisualSGIX;
+01619 GLXEW_FUN_EXPORT PFNGLXGETVISUALFROMFBCONFIGSGIXPROC 
+      __glewXGetVisualFromFBConfigSGIX;
+01620 
+01621 GLXEW_FUN_EXPORT PFNGLXBINDHYPERPIPESGIXPROC __glewXBindHyperpipeSGIX;
+01622 GLXEW_FUN_EXPORT PFNGLXDESTROYHYPERPIPECONFIGSGIXPROC 
+      __glewXDestroyHyperpipeConfigSGIX;
+01623 GLXEW_FUN_EXPORT PFNGLXHYPERPIPEATTRIBSGIXPROC __glewXHyperpipeAttribSGIX;
+01624 GLXEW_FUN_EXPORT PFNGLXHYPERPIPECONFIGSGIXPROC __glewXHyperpipeConfigSGIX;
+01625 GLXEW_FUN_EXPORT PFNGLXQUERYHYPERPIPEATTRIBSGIXPROC 
+      __glewXQueryHyperpipeAttribSGIX;
+01626 GLXEW_FUN_EXPORT PFNGLXQUERYHYPERPIPEBESTATTRIBSGIXPROC 
+      __glewXQueryHyperpipeBestAttribSGIX;
+01627 GLXEW_FUN_EXPORT PFNGLXQUERYHYPERPIPECONFIGSGIXPROC 
+      __glewXQueryHyperpipeConfigSGIX;
+01628 GLXEW_FUN_EXPORT PFNGLXQUERYHYPERPIPENETWORKSGIXPROC 
+      __glewXQueryHyperpipeNetworkSGIX;
+01629 
+01630 GLXEW_FUN_EXPORT PFNGLXCREATEGLXPBUFFERSGIXPROC __glewXCreateGLXPbufferSGIX;
+01631 GLXEW_FUN_EXPORT PFNGLXDESTROYGLXPBUFFERSGIXPROC __glewXDestroyGLXPbufferSGIX;
+01632 GLXEW_FUN_EXPORT PFNGLXGETSELECTEDEVENTSGIXPROC __glewXGetSelectedEventSGIX;
+01633 GLXEW_FUN_EXPORT PFNGLXQUERYGLXPBUFFERSGIXPROC __glewXQueryGLXPbufferSGIX;
+01634 GLXEW_FUN_EXPORT PFNGLXSELECTEVENTSGIXPROC __glewXSelectEventSGIX;
+01635 
+01636 GLXEW_FUN_EXPORT PFNGLXBINDSWAPBARRIERSGIXPROC __glewXBindSwapBarrierSGIX;
+01637 GLXEW_FUN_EXPORT PFNGLXQUERYMAXSWAPBARRIERSSGIXPROC 
+      __glewXQueryMaxSwapBarriersSGIX;
+01638 
+01639 GLXEW_FUN_EXPORT PFNGLXJOINSWAPGROUPSGIXPROC __glewXJoinSwapGroupSGIX;
+01640 
+01641 GLXEW_FUN_EXPORT PFNGLXBINDCHANNELTOWINDOWSGIXPROC 
+      __glewXBindChannelToWindowSGIX;
+01642 GLXEW_FUN_EXPORT PFNGLXCHANNELRECTSGIXPROC __glewXChannelRectSGIX;
+01643 GLXEW_FUN_EXPORT PFNGLXCHANNELRECTSYNCSGIXPROC __glewXChannelRectSyncSGIX;
+01644 GLXEW_FUN_EXPORT PFNGLXQUERYCHANNELDELTASSGIXPROC __glewXQueryChannelDeltasSGIX;
+01645 GLXEW_FUN_EXPORT PFNGLXQUERYCHANNELRECTSGIXPROC __glewXQueryChannelRectSGIX;
+01646 
+01647 GLXEW_FUN_EXPORT PFNGLXCUSHIONSGIPROC __glewXCushionSGI;
+01648 
+01649 GLXEW_FUN_EXPORT PFNGLXGETCURRENTREADDRAWABLESGIPROC 
+      __glewXGetCurrentReadDrawableSGI;
+01650 GLXEW_FUN_EXPORT PFNGLXMAKECURRENTREADSGIPROC __glewXMakeCurrentReadSGI;
+01651 
+01652 GLXEW_FUN_EXPORT PFNGLXSWAPINTERVALSGIPROC __glewXSwapIntervalSGI;
+01653 
+01654 GLXEW_FUN_EXPORT PFNGLXGETVIDEOSYNCSGIPROC __glewXGetVideoSyncSGI;
+01655 GLXEW_FUN_EXPORT PFNGLXWAITVIDEOSYNCSGIPROC __glewXWaitVideoSyncSGI;
+01656 
+01657 GLXEW_FUN_EXPORT PFNGLXGETTRANSPARENTINDEXSUNPROC __glewXGetTransparentIndexSUN;
+01658 
+01659 GLXEW_FUN_EXPORT PFNGLXGETVIDEORESIZESUNPROC __glewXGetVideoResizeSUN;
+01660 GLXEW_FUN_EXPORT PFNGLXVIDEORESIZESUNPROC __glewXVideoResizeSUN;
+01661 
+01662 \textcolor{preprocessor}{#if defined(GLEW\_MX)}
+01663 \textcolor{keyword}{struct }GLXEWContextStruct
+01664 \{
+01665 \textcolor{preprocessor}{#endif }\textcolor{comment}{/* GLEW\_MX */}\textcolor{preprocessor}{}
+01666 
+01667 GLXEW_VAR_EXPORT GLboolean __GLXEW_VERSION_1_0;
+01668 GLXEW_VAR_EXPORT GLboolean __GLXEW_VERSION_1_1;
+01669 GLXEW_VAR_EXPORT GLboolean __GLXEW_VERSION_1_2;
+01670 GLXEW_VAR_EXPORT GLboolean __GLXEW_VERSION_1_3;
+01671 GLXEW_VAR_EXPORT GLboolean __GLXEW_VERSION_1_4;
+01672 GLXEW_VAR_EXPORT GLboolean __GLXEW_3DFX_multisample;
+01673 GLXEW_VAR_EXPORT GLboolean __GLXEW_AMD_gpu_association;
+01674 GLXEW_VAR_EXPORT GLboolean __GLXEW_ARB_context_flush_control;
+01675 GLXEW_VAR_EXPORT GLboolean __GLXEW_ARB_create_context;
+01676 GLXEW_VAR_EXPORT GLboolean __GLXEW_ARB_create_context_profile;
+01677 GLXEW_VAR_EXPORT GLboolean __GLXEW_ARB_create_context_robustness;
+01678 GLXEW_VAR_EXPORT GLboolean __GLXEW_ARB_fbconfig_float;
+01679 GLXEW_VAR_EXPORT GLboolean __GLXEW_ARB_framebuffer_sRGB;
+01680 GLXEW_VAR_EXPORT GLboolean __GLXEW_ARB_get_proc_address;
+01681 GLXEW_VAR_EXPORT GLboolean __GLXEW_ARB_multisample;
+01682 GLXEW_VAR_EXPORT GLboolean __GLXEW_ARB_robustness_application_isolation;
+01683 GLXEW_VAR_EXPORT GLboolean __GLXEW_ARB_robustness_share_group_isolation;
+01684 GLXEW_VAR_EXPORT GLboolean __GLXEW_ARB_vertex_buffer_object;
+01685 GLXEW_VAR_EXPORT GLboolean __GLXEW_ATI_pixel_format_float;
+01686 GLXEW_VAR_EXPORT GLboolean __GLXEW_ATI_render_texture;
+01687 GLXEW_VAR_EXPORT GLboolean __GLXEW_EXT_buffer_age;
+01688 GLXEW_VAR_EXPORT GLboolean __GLXEW_EXT_create_context_es2_profile;
+01689 GLXEW_VAR_EXPORT GLboolean __GLXEW_EXT_create_context_es_profile;
+01690 GLXEW_VAR_EXPORT GLboolean __GLXEW_EXT_fbconfig_packed_float;
+01691 GLXEW_VAR_EXPORT GLboolean __GLXEW_EXT_framebuffer_sRGB;
+01692 GLXEW_VAR_EXPORT GLboolean __GLXEW_EXT_import_context;
+01693 GLXEW_VAR_EXPORT GLboolean __GLXEW_EXT_scene_marker;
+01694 GLXEW_VAR_EXPORT GLboolean __GLXEW_EXT_stereo_tree;
+01695 GLXEW_VAR_EXPORT GLboolean __GLXEW_EXT_swap_control;
+01696 GLXEW_VAR_EXPORT GLboolean __GLXEW_EXT_swap_control_tear;
+01697 GLXEW_VAR_EXPORT GLboolean __GLXEW_EXT_texture_from_pixmap;
+01698 GLXEW_VAR_EXPORT GLboolean __GLXEW_EXT_visual_info;
+01699 GLXEW_VAR_EXPORT GLboolean __GLXEW_EXT_visual_rating;
+01700 GLXEW_VAR_EXPORT GLboolean __GLXEW_INTEL_swap_event;
+01701 GLXEW_VAR_EXPORT GLboolean __GLXEW_MESA_agp_offset;
+01702 GLXEW_VAR_EXPORT GLboolean __GLXEW_MESA_copy_sub_buffer;
+01703 GLXEW_VAR_EXPORT GLboolean __GLXEW_MESA_pixmap_colormap;
+01704 GLXEW_VAR_EXPORT GLboolean __GLXEW_MESA_query_renderer;
+01705 GLXEW_VAR_EXPORT GLboolean __GLXEW_MESA_release_buffers;
+01706 GLXEW_VAR_EXPORT GLboolean __GLXEW_MESA_set_3dfx_mode;
+01707 GLXEW_VAR_EXPORT GLboolean __GLXEW_MESA_swap_control;
+01708 GLXEW_VAR_EXPORT GLboolean __GLXEW_NV_copy_buffer;
+01709 GLXEW_VAR_EXPORT GLboolean __GLXEW_NV_copy_image;
+01710 GLXEW_VAR_EXPORT GLboolean __GLXEW_NV_delay_before_swap;
+01711 GLXEW_VAR_EXPORT GLboolean __GLXEW_NV_float_buffer;
+01712 GLXEW_VAR_EXPORT GLboolean __GLXEW_NV_multisample_coverage;
+01713 GLXEW_VAR_EXPORT GLboolean __GLXEW_NV_present_video;
+01714 GLXEW_VAR_EXPORT GLboolean __GLXEW_NV_swap_group;
+01715 GLXEW_VAR_EXPORT GLboolean __GLXEW_NV_vertex_array_range;
+01716 GLXEW_VAR_EXPORT GLboolean __GLXEW_NV_video_capture;
+01717 GLXEW_VAR_EXPORT GLboolean __GLXEW_NV_video_out;
+01718 GLXEW_VAR_EXPORT GLboolean __GLXEW_OML_swap_method;
+01719 GLXEW_VAR_EXPORT GLboolean __GLXEW_OML_sync_control;
+01720 GLXEW_VAR_EXPORT GLboolean __GLXEW_SGIS_blended_overlay;
+01721 GLXEW_VAR_EXPORT GLboolean __GLXEW_SGIS_color_range;
+01722 GLXEW_VAR_EXPORT GLboolean __GLXEW_SGIS_multisample;
+01723 GLXEW_VAR_EXPORT GLboolean __GLXEW_SGIS_shared_multisample;
+01724 GLXEW_VAR_EXPORT GLboolean __GLXEW_SGIX_fbconfig;
+01725 GLXEW_VAR_EXPORT GLboolean __GLXEW_SGIX_hyperpipe;
+01726 GLXEW_VAR_EXPORT GLboolean __GLXEW_SGIX_pbuffer;
+01727 GLXEW_VAR_EXPORT GLboolean __GLXEW_SGIX_swap_barrier;
+01728 GLXEW_VAR_EXPORT GLboolean __GLXEW_SGIX_swap_group;
+01729 GLXEW_VAR_EXPORT GLboolean __GLXEW_SGIX_video_resize;
+01730 GLXEW_VAR_EXPORT GLboolean __GLXEW_SGIX_visual_select_group;
+01731 GLXEW_VAR_EXPORT GLboolean __GLXEW_SGI_cushion;
+01732 GLXEW_VAR_EXPORT GLboolean __GLXEW_SGI_make_current_read;
+01733 GLXEW_VAR_EXPORT GLboolean __GLXEW_SGI_swap_control;
+01734 GLXEW_VAR_EXPORT GLboolean __GLXEW_SGI_video_sync;
+01735 GLXEW_VAR_EXPORT GLboolean __GLXEW_SUN_get_transparent_index;
+01736 GLXEW_VAR_EXPORT GLboolean __GLXEW_SUN_video_resize;
+01737 
+01738 \textcolor{preprocessor}{#ifdef GLEW\_MX}
+01739 \}; \textcolor{comment}{/* GLXEWContextStruct */}
+01740 \textcolor{preprocessor}{#endif }\textcolor{comment}{/* GLEW\_MX */}\textcolor{preprocessor}{}
+01741 
+01742 \textcolor{comment}{/* ------------------------------------------------------------------------ */}
+01743 
+01744 \textcolor{preprocessor}{#ifdef GLEW\_MX}
+01745 
+01746 \textcolor{keyword}{typedef} \textcolor{keyword}{struct }GLXEWContextStruct GLXEWContext;
+01747 GLEWAPI GLenum GLEWAPIENTRY glxewContextInit (GLXEWContext *ctx);
+01748 GLEWAPI GLboolean GLEWAPIENTRY glxewContextIsSupported (\textcolor{keyword}{const} GLXEWContext *ctx, \textcolor{keyword}{const} \textcolor{keywordtype}{char} *
+      name);
+01749 
+01750 \textcolor{preprocessor}{#define glxewInit() glxewContextInit(glxewGetContext())}
+01751 \textcolor{preprocessor}{#define glxewIsSupported(x) glxewContextIsSupported(glxewGetContext(), x)}
+01752 
+01753 \textcolor{preprocessor}{#define GLXEW\_GET\_VAR(x) (*(const GLboolean*)&(glxewGetContext()->x))}
+01754 \textcolor{preprocessor}{#define GLXEW\_GET\_FUN(x) x}
+01755 
+01756 \textcolor{preprocessor}{#else }\textcolor{comment}{/* GLEW\_MX */}\textcolor{preprocessor}{}
+01757 
+01758 GLEWAPI GLenum GLEWAPIENTRY glxewInit ();
+01759 GLEWAPI GLboolean GLEWAPIENTRY glxewIsSupported (\textcolor{keyword}{const} \textcolor{keywordtype}{char} *name);
+01760 
+01761 \textcolor{preprocessor}{#define GLXEW\_GET\_VAR(x) (*(const GLboolean*)&x)}
+01762 \textcolor{preprocessor}{#define GLXEW\_GET\_FUN(x) x}
+01763 
+01764 \textcolor{preprocessor}{#endif }\textcolor{comment}{/* GLEW\_MX */}\textcolor{preprocessor}{}
+01765 
+01766 GLEWAPI GLboolean GLEWAPIENTRY glxewGetExtension (\textcolor{keyword}{const} \textcolor{keywordtype}{char} *name);
+01767 
+01768 \textcolor{preprocessor}{#ifdef \_\_cplusplus}
+01769 \}
+01770 \textcolor{preprocessor}{#endif}
+01771 
+01772 \textcolor{preprocessor}{#endif }\textcolor{comment}{/* \_\_glxew\_h\_\_ */}\textcolor{preprocessor}{}
+\end{DoxyCode}

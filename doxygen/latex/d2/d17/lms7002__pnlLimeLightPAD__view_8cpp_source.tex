@@ -1,0 +1,214 @@
+\subsection{lms7002\+\_\+pnl\+Lime\+Light\+P\+A\+D\+\_\+view.\+cpp}
+\label{lms7002__pnlLimeLightPAD__view_8cpp_source}\index{/home/erik/prefix/default/src/limesuite-\/dev/src/lms7002\+\_\+wxgui/lms7002\+\_\+pnl\+Lime\+Light\+P\+A\+D\+\_\+view.\+cpp@{/home/erik/prefix/default/src/limesuite-\/dev/src/lms7002\+\_\+wxgui/lms7002\+\_\+pnl\+Lime\+Light\+P\+A\+D\+\_\+view.\+cpp}}
+
+\begin{DoxyCode}
+00001 \textcolor{preprocessor}{#include "lms7002_pnlLimeLightPAD_view.h"}
+00002 \textcolor{preprocessor}{#include <map>}
+00003 \textcolor{preprocessor}{#include "lms7002_gui_utilities.h"}
+00004 \textcolor{keyword}{using namespace }lime;
+00005 
+00006 lms7002_pnlLimeLightPAD_view::lms7002_pnlLimeLightPAD_view( wxWindow* parent )
+00007 :
+00008 pnlLimeLightPAD_view( parent )
+00009 \{
+00010 
+00011 \}
+00012 
+00013 lms7002_pnlLimeLightPAD_view::lms7002_pnlLimeLightPAD_view( wxWindow* parent, wxWindowID \textcolor{keywordtype}{id}, \textcolor{keyword}{const} wxPoint&
+       pos, \textcolor{keyword}{const} wxSize& size, \textcolor{keywordtype}{long} style )
+00014     : pnlLimeLightPAD_view(parent, id, pos, size, style), lmsControl(nullptr)
+00015 \{
+00016     \textcolor{comment}{//ids for updating from chip}
+00017     wndId2Enum[rgrDIQ1_DS] = LMS7param(DIQ1_DS);
+00018     wndId2Enum[chkDIQ1_PE] = LMS7param(DIQ1_PE);
+00019     wndId2Enum[rgrDIQ2_DS] = LMS7param(DIQ2_DS);
+00020     wndId2Enum[chkDIQ2_PE] = LMS7param(DIQ2_PE);
+00021     wndId2Enum[rgrRX_MUX] = LMS7param(RX_MUX);
+00022     wndId2Enum[chkFCLK1_PE] = LMS7param(FCLK1_PE);
+00023     wndId2Enum[chkFCLK2_PE] = LMS7param(FCLK2_PE);
+00024     wndId2Enum[chkIQ_SEL_EN_1_PE] = LMS7param(IQ_SEL_EN_1_PE);
+00025     wndId2Enum[chkIQ_SEL_EN_2_PE] = LMS7param(IQ_SEL_EN_2_PE);
+00026     wndId2Enum[cmbLML1_AIP] = LMS7param(LML1_AIP);
+00027     wndId2Enum[cmbLML1_AQP] = LMS7param(LML1_AQP);
+00028     wndId2Enum[cmbLML1_BIP] = LMS7param(LML1_BIP);
+00029     wndId2Enum[cmbLML1_BQP] = LMS7param(LML1_BQP);
+00030     wndId2Enum[cmbLML1_RX_PRE] = LMS7param(LML1_RF2BB_PRE);
+00031     wndId2Enum[cmbLML1_RX_PST] = LMS7param(LML1_RF2BB_PST);
+00032     wndId2Enum[cmbLML1_S0S] = LMS7param(LML1_S0S);
+00033     wndId2Enum[cmbLML1_S1S] = LMS7param(LML1_S1S);
+00034     wndId2Enum[cmbLML1_S2S] = LMS7param(LML1_S2S);
+00035     wndId2Enum[cmbLML1_S3S] = LMS7param(LML1_S3S);
+00036     wndId2Enum[cmbLML1_TX_PRE] = LMS7param(LML1_BB2RF_PRE);
+00037     wndId2Enum[cmbLML1_TX_PST] = LMS7param(LML1_BB2RF_PST);
+00038     wndId2Enum[cmbLML2_AIP] = LMS7param(LML2_AIP);
+00039     wndId2Enum[cmbLML2_AQP] = LMS7param(LML2_AQP);
+00040     wndId2Enum[cmbLML2_BIP] = LMS7param(LML2_BIP);
+00041     wndId2Enum[cmbLML2_BQP] = LMS7param(LML2_BQP);
+00042     wndId2Enum[cmbLML2_RX_PRE] = LMS7param(LML2_RF2BB_PRE);
+00043     wndId2Enum[cmbLML2_RX_PST] = LMS7param(LML2_RF2BB_PST);
+00044     wndId2Enum[cmbLML2_S0S] = LMS7param(LML2_S0S);
+00045     wndId2Enum[cmbLML2_S1S] = LMS7param(LML2_S1S);
+00046     wndId2Enum[cmbLML2_S2S] = LMS7param(LML2_S2S);
+00047     wndId2Enum[cmbLML2_S3S] = LMS7param(LML2_S3S);
+00048     wndId2Enum[cmbLML2_TX_PRE] = LMS7param(LML2_BB2RF_PRE);
+00049     wndId2Enum[cmbLML2_TX_PST] = LMS7param(LML2_BB2RF_PST);
+00050     wndId2Enum[rgrLML_MODE1] = LMS7param(LML1_MODE);
+00051     wndId2Enum[rgrLML_MODE2] = LMS7param(LML2_MODE);
+00052     wndId2Enum[rgrLML_TXNRXIQ1] = LMS7param(LML1_TXNRXIQ);
+00053     wndId2Enum[rgrLML_TXNRXIQ2] = LMS7param(LML2_TXNRXIQ);
+00054     wndId2Enum[chkLRST_RX_A] = LMS7param(LRST_RX_A);
+00055     wndId2Enum[chkLRST_RX_B] = LMS7param(LRST_RX_B);
+00056     wndId2Enum[chkLRST_TX_A] = LMS7param(LRST_TX_A);
+00057     wndId2Enum[chkLRST_TX_B] = LMS7param(LRST\_TX\_B);
+00058     wndId2Enum[cmbMCLK1SRC] = LMS7param(MCLK1SRC);
+00059     wndId2Enum[cmbRXTSPCLKA_DIV] = LMS7param(RXTSPCLKA_DIV);
+00060     wndId2Enum[chkMCLK1_PE] = LMS7param(MCLK1_PE);
+00061     wndId2Enum[cmbMCLK2SRC] = LMS7param(MCLK2SRC);
+00062     wndId2Enum[cmbTXTSPCLKA_DIV] = LMS7param(TXTSPCLKA_DIV);
+00063     wndId2Enum[chkMCLK2_PE] = LMS7param(MCLK2_PE);
+00064     wndId2Enum[chkMIMO_SISO] = LMS7param(MIMO_SISO);
+00065     wndId2Enum[chkMOD_EN] = LMS7param(MOD_EN);
+00066     wndId2Enum[chkMRST_RX_A] = LMS7param(MRST_RX_A);
+00067     wndId2Enum[chkMRST_RX_B] = LMS7param(MRST_RX_B);
+00068     wndId2Enum[chkMRST_TX_A] = LMS7param(MRST_TX_A);
+00069     wndId2Enum[chkMRST_TX_B] = LMS7param(MRST_TX_B);
+00070     wndId2Enum[chkRXDIVEN] = LMS7param(RXDIVEN);
+00071     wndId2Enum[chkRXEN_A] = LMS7param(RXEN_A);
+00072     wndId2Enum[chkRXEN_B] = LMS7param(RXEN_B);
+00073     wndId2Enum[cmbRXRDCLK_MUX] = LMS7param(RXRDCLK_MUX);
+00074     wndId2Enum[cmbRXWRCLK_MUX] = LMS7param(RXWRCLK_MUX);
+00075     wndId2Enum[chkRX_CLK_PE] = LMS7param(RX_CLK_PE);
+00076     wndId2Enum[chkSCLK_PE] = LMS7param(SCLK_PE);
+00077     wndId2Enum[rgrSCL_DS] = LMS7param(SCL_DS);
+00078     wndId2Enum[chkSCL_PE] = LMS7param(SCL_PE);
+00079     wndId2Enum[rgrSDA_DS] = LMS7param(SDA_DS);
+00080     wndId2Enum[chkSDA_PE] = LMS7param(SDA_PE);
+00081     wndId2Enum[rgrSDIO_DS] = LMS7param(SDIO_DS);
+00082     wndId2Enum[chkSDIO_PE] = LMS7param(SDIO_PE);
+00083     wndId2Enum[chkSDO_PE] = LMS7param(SDO_PE);
+00084     wndId2Enum[chkSEN_PE] = LMS7param(SEN_PE);
+00085     wndId2Enum[rgrSPIMODE] = LMS7param(SPIMODE);
+00086     wndId2Enum[chkSRST_RXFIFO] = LMS7param(SRST_RXFIFO);
+00087     wndId2Enum[chkSRST_TXFIFO] = LMS7param(SRST_TXFIFO);
+00088     wndId2Enum[chkTXDIVEN] = LMS7param(TXDIVEN);
+00089     wndId2Enum[chkTXEN_A] = LMS7param(TXEN_A);
+00090     wndId2Enum[chkTXEN_B] = LMS7param(TXEN_B);
+00091     wndId2Enum[rgrTX_MUX] = LMS7param(TX_MUX);
+00092     wndId2Enum[chkTXNRX1_PE] = LMS7param(TXNRX1_PE);
+00093     wndId2Enum[chkTXNRX2_PE] = LMS7param(TXNRX2_PE);
+00094     wndId2Enum[cmbTXRDCLK_MUX] = LMS7param(TXRDCLK_MUX);
+00095     wndId2Enum[cmbTXWRCLK_MUX] = LMS7param(TXWRCLK_MUX);
+00096     wndId2Enum[chkTX_CLK_PE] = LMS7param(TX_CLK_PE);
+00097     wndId2Enum[rgrLML_FIDM1] = LMS7param(LML1_FIDM);
+00098     wndId2Enum[rgrLML_FIDM2] = LMS7param(LML2_FIDM);
+00099     wndId2Enum[chkFCLK1_INV] = LMS7param(FCLK1_INV);
+00100     wndId2Enum[chkFCLK2_INV] = LMS7param(FCLK2_INV);
+00101     wndId2Enum[cmbMCLK1DLY] = LMS7param(MCLK1DLY);
+00102     wndId2Enum[cmbMCLK2DLY] = LMS7param(MCLK2DLY);
+00103     wndId2Enum[rgrDIQDIRCTR2] = LMS7param(DIQDIRCTR2);
+00104     wndId2Enum[rgrDIQDIR2] = LMS7param(DIQDIR2);
+00105     wndId2Enum[rgrDIQDIRCTR1] = LMS7param(DIQDIRCTR1);
+00106     wndId2Enum[rgrDIQDIR1] = LMS7param(DIQDIR1);
+00107     wndId2Enum[rgrENABLEDIRCTR2] = LMS7param(ENABLEDIRCTR2);
+00108     wndId2Enum[rgrENABLEDIR2] = LMS7param(ENABLEDIR2);
+00109     wndId2Enum[rgrENABLEDIRCTR1] = LMS7param(ENABLEDIRCTR1);
+00110     wndId2Enum[rgrENABLEDIR1] = LMS7param(ENABLEDIR1);
+00111     wndId2Enum[chkMCLK1_INV] = LMS7param(MCLK1\_INV);
+00112     wndId2Enum[chkMCLK2_INV] = LMS7param(MCLK2\_INV);
+00113     wndId2Enum[cmbFCLK1_DLY] = LMS7param(FCLK1\_DLY);
+00114     wndId2Enum[cmbFCLK2_DLY] = LMS7param(FCLK2\_DLY);
+00115     wndId2Enum[cmbMCLK1_DLY] = LMS7param(MCLK1\_DLY);
+00116     wndId2Enum[cmbMCLK2_DLY] = LMS7param(MCLK2\_DLY);
+00117     wndId2Enum[chkLML1_TRXIQPULSE] = LMS7param(LML1\_TRXIQPULSE);
+00118     wndId2Enum[chkLML2_TRXIQPULSE] = LMS7param(LML2\_TRXIQPULSE);
+00119     wndId2Enum[chkLML1_SISODDR] = LMS7param(LML1\_SISODDR);
+00120     wndId2Enum[chkLML2_SISODDR] = LMS7param(LML2\_SISODDR);
+00121 
+00122     LMS7002_WXGUI::UpdateTooltips(wndId2Enum, \textcolor{keyword}{true});
+00123 \}
+00124 
+00125 \textcolor{keywordtype}{void} lms7002_pnlLimeLightPAD_view::Initialize(lms_device_t* pControl)
+00126 \{
+00127     lmsControl = pControl;
+00128     assert(lmsControl != \textcolor{keyword}{nullptr});
+00129     uint16\_t value;
+00130     \textcolor{keywordflow}{if} (LMS_ReadParam(lmsControl,LMS7param(MASK),&value)!=0  || value != 0)
+00131          value = 1;
+00132     chkMCLK1_INV->Enable(value);
+00133     chkMCLK2_INV->Enable(value);
+00134     cmbFCLK1_DLY->Enable(value);
+00135     cmbFCLK2_DLY->Enable(value);
+00136     cmbMCLK1_DLY->Enable(value);
+00137     cmbMCLK2_DLY->Enable(value);
+00138     chkLML1_TRXIQPULSE->Enable(value);
+00139     chkLML2_TRXIQPULSE->Enable(value);
+00140     chkLML1_SISODDR->Enable(value);
+00141     chkLML2_SISODDR->Enable(value);
+00142 
+00143 \}
+00144 
+00145 \textcolor{keywordtype}{void} lms7002_pnlLimeLightPAD_view::ParameterChangeHandler(wxSpinEvent& event)
+00146 \{
+00147     wxCommandEvent evt;
+00148     evt.SetInt(event.GetInt());
+00149     evt.SetId(event.GetId());
+00150     evt.SetEventObject(event.GetEventObject());
+00151     ParameterChangeHandler(evt);
+00152 \}
+00153 
+00154 \textcolor{keywordtype}{void} lms7002_pnlLimeLightPAD_view::ParameterChangeHandler(wxCommandEvent& event)
+00155 \{
+00156     assert(lmsControl != \textcolor{keyword}{nullptr});
+00157     LMS7Parameter parameter;
+00158     \textcolor{keywordflow}{try}
+00159     \{
+00160         parameter = wndId2Enum.at(reinterpret\_cast<wxWindow*>(event.GetEventObject()));
+00161     \}
+00162     \textcolor{keywordflow}{catch} (std::exception & e)
+00163     \{
+00164         std::cout << \textcolor{stringliteral}{"Control element(ID = "} << \textcolor{keyword}{event}.GetId() << \textcolor{stringliteral}{") don't have assigned LMS parameter."} << 
+      std::endl;
+00165         \textcolor{keywordflow}{return};
+00166     \}
+00167     LMS_WriteParam(lmsControl,parameter,event.GetInt());
+00168 \}
+00169 
+00170 \textcolor{keywordtype}{void} lms7002_pnlLimeLightPAD_view::onbtnReadVerRevMask( wxCommandEvent& event )
+00171 \{
+00172     uint16\_t value = 0;
+00173 
+00174     LMS_ReadParam(lmsControl,LMS7param(VER),&value);
+00175     lblVER->SetLabel(wxString::Format(\_(\textcolor{stringliteral}{"%i"}), value));
+00176 
+00177     LMS_ReadParam(lmsControl,LMS7param(REV),&value);
+00178     lblREV->SetLabel(wxString::Format(\_(\textcolor{stringliteral}{"%i"}), value));
+00179 
+00180     LMS_ReadParam(lmsControl,LMS7param(MASK),&value);
+00181     lblMASK->SetLabel(wxString::Format(\_(\textcolor{stringliteral}{"%i"}), value));
+00182 \}
+00183 
+00184 \textcolor{keywordtype}{void} lms7002_pnlLimeLightPAD_view::UpdateGUI()
+00185 \{
+00186     wxArrayString padStrenghts;
+00187     uint16\_t value = 0;
+00188     LMS_ReadParam(lmsControl, LMS7_MASK, &value);
+00189     \textcolor{keywordflow}{if}(value == 0)
+00190     \{
+00191         padStrenghts.push\_back(\textcolor{stringliteral}{"4 mA"});
+00192         padStrenghts.push\_back(\textcolor{stringliteral}{"8 mA"});
+00193     \}
+00194     \textcolor{keywordflow}{else}
+00195     \{
+00196         padStrenghts.push\_back(\textcolor{stringliteral}{"8 mA"});
+00197         padStrenghts.push\_back(\textcolor{stringliteral}{"12 mA"});
+00198     \}
+00199     wxRadioBox* padStrenghtCtrl[] = \{rgrSDA_DS, rgrSCL_DS, rgrSDIO_DS, 
+      rgrDIQ2_DS, rgrDIQ1_DS\};
+00200     \textcolor{keywordflow}{for}(\textcolor{keyword}{auto} i : padStrenghtCtrl)
+00201     \{
+00202         i->SetString(0, padStrenghts[0]);
+00203         i->SetString(1, padStrenghts[1]);
+00204     \}
+00205     LMS7002_WXGUI::UpdateControlsByMap(\textcolor{keyword}{this}, lmsControl, wndId2Enum);
+00206 \}
+\end{DoxyCode}

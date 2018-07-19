@@ -1,0 +1,185 @@
+\subsection{lms7002\+\_\+dlg\+V\+C\+Ofrequencies.\+cpp}
+\label{lms7002__dlgVCOfrequencies_8cpp_source}\index{/home/erik/prefix/default/src/limesuite-\/dev/src/lms7002\+\_\+wxgui/lms7002\+\_\+dlg\+V\+C\+Ofrequencies.\+cpp@{/home/erik/prefix/default/src/limesuite-\/dev/src/lms7002\+\_\+wxgui/lms7002\+\_\+dlg\+V\+C\+Ofrequencies.\+cpp}}
+
+\begin{DoxyCode}
+00001 \textcolor{preprocessor}{#include "lms7002_dlgVCOfrequencies.h"}
+00002 \textcolor{preprocessor}{#include <wx/filedlg.h>}
+00003 \textcolor{preprocessor}{#include <vector>}
+00004 \textcolor{preprocessor}{#include <fstream>}
+00005 \textcolor{preprocessor}{#include "lms7_device.h"}
+00006 
+00007 \textcolor{keyword}{using namespace }std;
+00008 \textcolor{keyword}{using namespace }lime;
+00009 
+00010 lms7002_dlgVCOfrequencies::lms7002_dlgVCOfrequencies( wxWindow* parent , 
+      lms_device_t* plmsControl)
+00011 :
+00012 dlgVCOfrequencies( parent )
+00013 \{
+00014     lmsControl = plmsControl;
+00015     \textcolor{keywordtype}{double} multiplier = 0.000000001;
+00016     LMS7002M* lms = ((LMS7_Device*)lmsControl)->GetLMS();
+00017 
+00018     txtVCOL_low->SetValue(wxString::Format(\_(\textcolor{stringliteral}{"%.3f"}), lms->gVCO_frequency_table[0][0] * multiplier));
+00019     txtVCOL_high->SetValue(wxString::Format(\_(\textcolor{stringliteral}{"%.3f"}), lms->gVCO_frequency_table[0][1] * multiplier));
+00020     txtVCOM_low->SetValue(wxString::Format(\_(\textcolor{stringliteral}{"%.3f"}), lms->gVCO_frequency_table[1][0] * multiplier));
+00021     txtVCOM_high->SetValue(wxString::Format(\_(\textcolor{stringliteral}{"%.3f"}), lms->gVCO_frequency_table[1][1] * multiplier));
+00022     txtVCOH_low->SetValue(wxString::Format(\_(\textcolor{stringliteral}{"%.3f"}), lms->gVCO_frequency_table[2][0] * multiplier));
+00023     txtVCOH_high->SetValue(wxString::Format(\_(\textcolor{stringliteral}{"%.3f"}), lms->gVCO_frequency_table[2][1] * multiplier));
+00024     txtVCOCGEN_low->SetValue(wxString::Format(\_(\textcolor{stringliteral}{"%.3f"}), lms->
+      gCGEN_VCO_frequencies[0] * multiplier));
+00025     txtVCOCGEN_high->SetValue(wxString::Format(\_(\textcolor{stringliteral}{"%.3f"}), lms->
+      gCGEN_VCO_frequencies[1] * multiplier));
+00026 \}
+00027 
+00028 \textcolor{keywordtype}{void} lms7002_dlgVCOfrequencies::OnBtnOkClick( wxCommandEvent& event )
+00029 \{
+00030     \textcolor{keywordtype}{double} multiplier = 1e9;
+00031     \textcolor{keywordtype}{double} value;
+00032     LMS7002M* lms = ((LMS7_Device*)lmsControl)->GetLMS();
+00033 
+00034     txtVCOL_low->GetValue().ToDouble(&value);
+00035     lms->gVCO_frequency_table[0][0]=value*multiplier;
+00036     txtVCOL_high->GetValue().ToDouble(&value);
+00037     lms->gVCO_frequency_table[0][1]=value*multiplier;
+00038 
+00039     txtVCOM_low->GetValue().ToDouble(&value);
+00040     lms->gVCO_frequency_table[1][0]=value*multiplier;
+00041     txtVCOM_high->GetValue().ToDouble(&value);
+00042     lms->gVCO_frequency_table[1][1]=value*multiplier;
+00043 
+00044     txtVCOH_low->GetValue().ToDouble(&value);
+00045     lms->gVCO_frequency_table[2][0]=value*multiplier;
+00046     txtVCOH_high->GetValue().ToDouble(&value);
+00047     lms->gVCO_frequency_table[2][1]=value*multiplier;
+00048 
+00049     txtVCOCGEN_low->GetValue().ToDouble(&value);
+00050     lms->gCGEN_VCO_frequencies[0] = value*multiplier;
+00051     txtVCOCGEN_high->GetValue().ToDouble(&value);
+00052     lms->gCGEN_VCO_frequencies[1] = value*multiplier;
+00053 
+00054     EndModal(wxID\_OK);
+00055 \}
+00056 
+00057 \textcolor{keywordtype}{void} lms7002_dlgVCOfrequencies::OnBtnCancelClick( wxCommandEvent& event )
+00058 \{
+00059     EndModal(wxID\_CANCEL);
+00060 \}
+00061 
+00062 \textcolor{keywordtype}{void} lms7002_dlgVCOfrequencies::OnSaveFile(wxCommandEvent& event)
+00063 \{
+00064     wxFileDialog dlg(\textcolor{keyword}{this}, \_(\textcolor{stringliteral}{"Save vco file"}), \textcolor{stringliteral}{""}, \textcolor{stringliteral}{""}, \textcolor{stringliteral}{"text (*.txt)|*.txt"}, wxFD\_SAVE | 
+      wxFD\_OVERWRITE\_PROMPT);
+00065     \textcolor{keywordflow}{if} (dlg.ShowModal() == wxID\_CANCEL)
+00066         \textcolor{keywordflow}{return};
+00067     fstream fout;
+00068     fout.open(dlg.GetPath().mb\_str(), ios::out);
+00069 
+00070     fout << \textcolor{stringliteral}{"[VCOH] count: "} << 2 << \textcolor{stringliteral}{","} << endl;
+00071     fout << txtVCOH_low->GetValue() << \textcolor{charliteral}{' '} << \textcolor{stringliteral}{"GHz,"} << endl;
+00072     fout << txtVCOH_high->GetValue() << \textcolor{charliteral}{' '} << \textcolor{stringliteral}{"GHz,"} << endl;
+00073 
+00074     fout << \textcolor{stringliteral}{"[VCOM] count: "} << 2 << \textcolor{stringliteral}{","} << endl;
+00075     fout << txtVCOM_low->GetValue() << \textcolor{charliteral}{' '} << \textcolor{stringliteral}{"GHz,"} << endl;
+00076     fout << txtVCOM_high->GetValue() << \textcolor{charliteral}{' '} << \textcolor{stringliteral}{"GHz,"} << endl;
+00077 
+00078     fout << \textcolor{stringliteral}{"[VCOL] count: "} << 2 << \textcolor{stringliteral}{","} << endl;
+00079     fout << txtVCOL_low->GetValue() << \textcolor{charliteral}{' '} << \textcolor{stringliteral}{"GHz,"} << endl;
+00080     fout << txtVCOL_high->GetValue() << \textcolor{charliteral}{' '} << \textcolor{stringliteral}{"GHz,"} << endl;
+00081 
+00082     fout << \textcolor{stringliteral}{"[VCO\_CGEN] count: "} << 2 << \textcolor{stringliteral}{","} << endl;
+00083     fout << txtVCOCGEN_low->GetValue() << \textcolor{charliteral}{' '} << \textcolor{stringliteral}{"GHz,"} << endl;
+00084     fout << txtVCOCGEN_high->GetValue() << \textcolor{charliteral}{' '} << \textcolor{stringliteral}{"GHz,"} << endl;
+00085     fout.close();
+00086 \}
+00087 
+00088 \textcolor{keywordtype}{void} lms7002_dlgVCOfrequencies::OnLoadFile(wxCommandEvent& event)
+00089 \{
+00090     wxFileDialog dlg(\textcolor{keyword}{this}, \_(\textcolor{stringliteral}{"Open vco file"}), \textcolor{stringliteral}{""}, \textcolor{stringliteral}{""}, \textcolor{stringliteral}{"text (*.txt)|*.txt"}, wxFD\_OPEN | 
+      wxFD\_FILE\_MUST\_EXIST);
+00091     \textcolor{keywordflow}{if} (dlg.ShowModal() == wxID\_CANCEL)
+00092         \textcolor{keywordflow}{return};
+00093     fstream fin;
+00094     fin.open(dlg.GetPath().ToStdString().c\_str(), ios::in);
+00095 
+00096     \textcolor{keywordtype}{char} cline[128];
+00097     \textcolor{keywordtype}{int} lineLen = 128;
+00098 
+00099     \textcolor{keywordtype}{char} vconame[80];
+00100     \textcolor{keywordtype}{char} ctemp[80];
+00101     \textcolor{keywordtype}{double} freq = 0;
+00102     \textcolor{keywordtype}{int} freqCount = 0;
+00103 
+00104     std::vector<double> frequencies;
+00105 
+00106     \textcolor{keywordflow}{while} (!fin.eof())
+00107     \{
+00108         freqCount = 0;
+00109         fin.getline(cline, lineLen);
+00110         \textcolor{comment}{//find name and frequency count}
+00111         sscanf(cline, \textcolor{stringliteral}{"%s %s %i"}, vconame, ctemp, &freqCount);
+00112         \textcolor{keywordflow}{if} (strcmp(vconame, \textcolor{stringliteral}{"[VCOH]"}) == 0)
+00113         \{
+00114             frequencies.clear();
+00115             \textcolor{keywordflow}{for} (\textcolor{keywordtype}{int} i = 0; i<freqCount; ++i)
+00116             \{
+00117                 fin.getline(cline, lineLen);
+00118                 sscanf(cline, \textcolor{stringliteral}{"%lf %s"}, &freq, ctemp);
+00119                 frequencies.push\_back(freq);
+00120             \}
+00121             \textcolor{keywordflow}{if} (frequencies.size() >= 2)
+00122             \{
+00123                 txtVCOH_low->SetValue(wxString::Format(\_(\textcolor{stringliteral}{"%.3f"}), frequencies[0]));
+00124                 txtVCOH_high->SetValue(wxString::Format(\_(\textcolor{stringliteral}{"%.3f"}), frequencies[frequencies.size() - 1]));
+00125             \}
+00126         \}
+00127         \textcolor{keywordflow}{if} (strcmp(vconame, \textcolor{stringliteral}{"[VCOM]"}) == 0)
+00128         \{
+00129             frequencies.clear();
+00130             \textcolor{keywordflow}{for} (\textcolor{keywordtype}{int} i = 0; i<freqCount; ++i)
+00131             \{
+00132                 fin.getline(cline, lineLen);
+00133                 sscanf(cline, \textcolor{stringliteral}{"%lf %s"}, &freq, ctemp);
+00134                 frequencies.push\_back(freq);
+00135             \}
+00136             \textcolor{keywordflow}{if} (frequencies.size() >= 2)
+00137             \{
+00138                 txtVCOM_low->SetValue(wxString::Format(\_(\textcolor{stringliteral}{"%.3f"}), frequencies[0]));
+00139                 txtVCOM_high->SetValue(wxString::Format(\_(\textcolor{stringliteral}{"%.3f"}), frequencies[frequencies.size() - 1]));
+00140             \}
+00141         \}
+00142         \textcolor{keywordflow}{if} (strcmp(vconame, \textcolor{stringliteral}{"[VCOL]"}) == 0)
+00143         \{
+00144             frequencies.clear();
+00145             \textcolor{keywordflow}{for} (\textcolor{keywordtype}{int} i = 0; i<freqCount; ++i)
+00146             \{
+00147                 fin.getline(cline, lineLen);
+00148                 sscanf(cline, \textcolor{stringliteral}{"%lf %s"}, &freq, ctemp);
+00149                 frequencies.push\_back(freq);
+00150             \}
+00151             \textcolor{keywordflow}{if} (frequencies.size() >= 2)
+00152             \{
+00153                 txtVCOL_low->SetValue(wxString::Format(\_(\textcolor{stringliteral}{"%.3f"}), frequencies[0]));
+00154                 txtVCOL_high->SetValue(wxString::Format(\_(\textcolor{stringliteral}{"%.3f"}), frequencies[frequencies.size() - 1]));
+00155             \}
+00156         \}
+00157         \textcolor{keywordflow}{if} (strcmp(vconame, \textcolor{stringliteral}{"[VCO\_CGEN]"}) == 0)
+00158         \{
+00159             frequencies.clear();
+00160             \textcolor{keywordflow}{for} (\textcolor{keywordtype}{int} i = 0; i<freqCount; ++i)
+00161             \{
+00162                 fin.getline(cline, lineLen);
+00163                 sscanf(cline, \textcolor{stringliteral}{"%lf %s"}, &freq, ctemp);
+00164                 frequencies.push\_back(freq);
+00165             \}
+00166             \textcolor{keywordflow}{if} (frequencies.size() >= 2)
+00167             \{
+00168                 txtVCOCGEN_low->SetValue(wxString::Format(\_(\textcolor{stringliteral}{"%.3f"}), frequencies[0]));
+00169                 txtVCOCGEN_high->SetValue(wxString::Format(\_(\textcolor{stringliteral}{"%.3f"}), frequencies[frequencies.size() - 1]))
+      ;
+00170             \}
+00171         \}
+00172     \}
+00173     fin.close();
+00174 \}
+\end{DoxyCode}

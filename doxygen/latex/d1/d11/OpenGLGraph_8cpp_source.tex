@@ -1,0 +1,1641 @@
+\subsection{Open\+G\+L\+Graph.\+cpp}
+\label{OpenGLGraph_8cpp_source}\index{/home/erik/prefix/default/src/limesuite-\/dev/src/ogl\+Graph/\+Open\+G\+L\+Graph.\+cpp@{/home/erik/prefix/default/src/limesuite-\/dev/src/ogl\+Graph/\+Open\+G\+L\+Graph.\+cpp}}
+
+\begin{DoxyCode}
+00001 
+00007 \textcolor{preprocessor}{#include "OpenGLGraph.h"}
+00008 \textcolor{preprocessor}{#include <stdio.h>}
+00009 \textcolor{preprocessor}{#include <stdarg.h>}
+00010 \textcolor{preprocessor}{#include <cmath>}
+00011 \textcolor{preprocessor}{#include <iostream>}
+00012 \textcolor{preprocessor}{#if defined(\_\_APPLE\_\_)}
+00013 \textcolor{preprocessor}{#include <OpenGL/gl.h>}
+00014 \textcolor{preprocessor}{#include <OpenGL/glu.h>}
+00015 \textcolor{preprocessor}{#else}
+00016 \textcolor{preprocessor}{#include <GL/gl.h>}
+00017 \textcolor{preprocessor}{#include <GL/glu.h>}
+00018 \textcolor{preprocessor}{#endif}
+00019 \textcolor{preprocessor}{#include "GLFont.h"}
+00020 \textcolor{preprocessor}{#include "StaticFontHeader.h"}
+00021 \textcolor{preprocessor}{#include "dlgMarkers.h"}
+00022 \textcolor{keyword}{using namespace }std;
+00023 
+00024 \textcolor{preprocessor}{#define OGL\_REDRAW\_ENABLED 1}
+00025 \textcolor{preprocessor}{#define OGL\_INVERT\_MOUSE\_Y 1}
+00026 \textcolor{keyword}{const} \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{int} OpenGLGraph::mMarkerColors[] = \{0x000000FF, 0x0000FFFF, 0xFF0000FF, 0xFF7F00FF, 
+      0x007FFFFF, 0xFF00FFFF, 0x007F00FF, 0x00007FFF, 0x7F0000FF, 0x00FF00FF\};
+00027 \textcolor{keyword}{const} \textcolor{keywordtype}{long} markers_timer_id = wxNewId();
+00028 
+00029 \textcolor{keyword}{const} \textcolor{keywordtype}{int} OpenGLGraph::GLCanvasAttributes[8] = \{
+00030     WX\_GL\_RGBA,
+00031     WX\_GL\_DOUBLEBUFFER,
+00032     WX\_GL\_DEPTH\_SIZE, 16,
+00033     WX\_GL\_STENCIL\_SIZE, 0,
+00034     0, 0 \} ;
+00035 
+00036 GLG_settings::GLG_settings() :
+00037     title(\textcolor{stringliteral}{""}), titleXaxis(\textcolor{stringliteral}{""}), titleYaxis(\textcolor{stringliteral}{""}),
+00038     xUnits(\textcolor{stringliteral}{""}), yUnits(\textcolor{stringliteral}{""}),
+00039     drawGridX(true), drawGridY(true),
+00040     drawTitle(true), drawTitleX(true), drawTitleY(true),
+00041     windowWidth(100),   windowHeight(100),
+00042     dataViewWidth(95), dataViewHeight(95),
+00043     marginTop(0), marginBottom(10), marginLeft(10), marginRight(0),
+00044     useVBO(true),
+00045     backgroundColor(0xffffffff),titlesColor(0x000000ff),
+00046     dataViewBackgroundColor(0xfdfdfdff), dataViewPerimeterColor(0x00ff00ff),
+00047     gridColor(0xD0D0D0ff), graphType(GLG_LINE),
+00048     visibleArea(-100, 100, -100, 100),
+00049     gridXstart(0), gridYstart(0),
+00050     gridXspacing(1), gridYspacing(1),
+00051     gridXlines(4), gridYlines(4),
+00052     gridXprec(0), gridYprec(0),
+00053     gridValuesHeight(14),
+00054     pointsSize(3), fontSize(1),
+00055     staticGrid(false),
+00056     lock\_aspect(false), markersEnabled(false),
+00057     gridXoffset(0)
+00058     \{\}
+00059 
+00060 OpenGLGraph::OpenGLGraph(wxWindow* parent,  wxWindowID \textcolor{keywordtype}{id} = -1,
+00061                     \textcolor{keyword}{const} wxPoint& pos = wxDefaultPosition,
+00062                     \textcolor{keyword}{const} wxSize& size = wxDefaultSize,
+00063                     \textcolor{keywordtype}{long} style=0, \textcolor{keyword}{const} wxString& name,
+00064                     \textcolor{keyword}{const} \textcolor{keywordtype}{int}* args)
+00065     : wxGLCanvas(parent, id, args, pos, size, wxNO\_FULL\_REPAINT\_ON\_RESIZE),
+00066 oglOk(true),
+00067 initialDisplayArea(-100, 100, -100, 100),
+00068 m\_MouseCoord(0, 0, 0, 0)
+00069 \{
+00070     m_font = NULL;
+00071     m_glContext = \textcolor{keyword}{new} wxGLContext(\textcolor{keyword}{this});
+00072     SetBackgroundStyle(wxBG\_STYLE\_CUSTOM);
+00073     \textcolor{keywordtype}{int} w, h;
+00074     this->GetSize(&w, &h);
+00075     setupViewport(w, h);
+00076 
+00077     m_selectedMarker = -1;
+00078     m_maxMarkers = 10;
+00079     m_actionState = OGLG_IDLE;
+00080     initialized = \textcolor{keyword}{false};
+00081     \textcolor{comment}{//Initialize(w, h);}
+00082     m_popmenu.Append( OGLG_SHOW_MARKERS_MENU, \_(\textcolor{stringliteral}{"Markers menu.."}), \_(\textcolor{stringliteral}{"Shows markers settings"}));
+00083     m_popmenu.Append( OGLG_SEARCH_PEAK, \_(\textcolor{stringliteral}{"Add marker on peak value"}), \_(\textcolor{stringliteral}{"Adds marker to peak value"}));
+00084     m_popmenu.Append( OGLG_ADD_MARK, \_(\textcolor{stringliteral}{"Add marker"}), \_(\textcolor{stringliteral}{"Adds measuring marker"}));
+00085     m_popmenu.Append( OGLG_REMOVE_MARKER, \_(\textcolor{stringliteral}{"Remove marker"}), \_(\textcolor{stringliteral}{"Removes measuring marker"}));
+00086     m_popmenu.Append( OGLG_FIT, \_(\textcolor{stringliteral}{"Fit"}),\_(\textcolor{stringliteral}{"Set plot view to show all items"}));
+00087     m_popmenu.Append( OGLG_RESET, \_(\textcolor{stringliteral}{"Reset"}),\_(\textcolor{stringliteral}{"Resets view to initial state"}));
+00088     m_popmenu.AppendCheckItem( OGLG_LOCKASPECT, \_(\textcolor{stringliteral}{"Lock aspect"}), \_(\textcolor{stringliteral}{"Lock horizontal and vertical zoom
+       aspect."}));
+00089     wxMenuItem *chkbox = m_popmenu.FindItem(OGLG_LOCKASPECT);
+00090     chkbox->Check(settings.lock_aspect);
+00091     m_popmenu.Append( OGLG_HELP_MOUSE, \_(\textcolor{stringliteral}{"Show mouse commands..."}), \_(\textcolor{stringliteral}{"Show help about the mouse commands."}
+      ));
+00092     \textcolor{keywordflow}{for}(\textcolor{keywordtype}{size\_t} i=0; i<m_maxMarkers; ++i)
+00093     \{
+00094         markers.push\_back(OGLMarker());
+00095         markers[i].color = mMarkerColors[i];
+00096         markers[i].id = i;
+00097     \}
+00098 
+00099     mMarkersDlg = \textcolor{keyword}{new} dlgMarkers(\textcolor{keyword}{this});
+00100     mMarkersDlg->parent_graph = \textcolor{keyword}{this};
+00101     \textcolor{keywordflow}{for}(\textcolor{keywordtype}{size\_t} i=0; i<m_maxMarkers; ++i)
+00102         mMarkersDlg->AddMarker(i);
+00103     mMarkersDlg->AddDeltas();
+00104 
+00105     \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} i=0; i<3; ++i)
+00106     \{
+00107         info_msg.push\_back(\textcolor{stringliteral}{""});
+00108         info_msg_toDisplay.push\_back(\textcolor{stringliteral}{""});
+00109     \}
+00110 
+00111     m_timer = \textcolor{keyword}{new} wxTimer(\textcolor{keyword}{this}, markers_timer_id);
+00112     m_timer->Start(500);
+00113 \}
+00114 
+00115 
+00116 OpenGLGraph::~OpenGLGraph()
+00117 \{
+00118   \textcolor{keywordflow}{if}(m_timer->IsRunning()) \{
+00119       m_timer->Stop();
+00120   \}
+00121   \textcolor{keywordflow}{if}(m_font) \{
+00122     \textcolor{keyword}{delete} m_font;
+00123   \}
+00124 \}
+00125 
+00126 \textcolor{keywordtype}{bool} OpenGLGraph::Initialize(\textcolor{keywordtype}{int} width, \textcolor{keywordtype}{int} height)
+00127 \{
+00128     \textcolor{keywordtype}{char} tempc[256];
+00129     GLenum err = glewInit();
+00130     \textcolor{keywordflow}{if} (GLEW_OK != err)
+00131     \{
+00132         sprintf(tempc, \textcolor{stringliteral}{"GLEW ERROR %s"}, glewGetErrorString(err));
+00133         cout << tempc << endl;
+00134     \}
+00135 
+00136     \textcolor{keywordtype}{char} userOGLversion[255];
+00137     strcpy(userOGLversion, (\textcolor{keyword}{const} \textcolor{keywordtype}{char}*)glGetString(GL_VERSION));
+00138 
+00139     oglOk = glewIsSupported(\textcolor{stringliteral}{"GL\_VERSION\_2\_0"});
+00140 
+00141     \textcolor{keywordflow}{if}(!oglOk)
+00142     \{
+00143         wxMessageBox(wxString::Format(\textcolor{stringliteral}{"Your OpenGL version is %s, required version is 2.0\(\backslash\)nPlease update
+       your graphics card drivers"},
+00144                                       wxString(userOGLversion)),\_(\textcolor{stringliteral}{"WARNING"}),wxOK,\textcolor{keyword}{this});
+00145         \textcolor{keywordflow}{return} \textcolor{keyword}{false};
+00146     \}
+00147 
+00148     glEnable( GL_TEXTURE_2D );
+00149     glAlphaFunc(GL_GEQUAL, 0.3);
+00150     glEnable(GL_ALPHA_TEST);
+00151     glEnable(GL_BLEND);
+00152     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+00153 
+00154     glClearColor(settings.backgroundColor.red, settings.backgroundColor.green,
+00155                 settings.backgroundColor.blue, settings.backgroundColor.alpha);
+00156     glClear(GL_COLOR_BUFFER_BIT);
+00157 
+00158     Resize(width, height);
+00159     settings.fontSize = 10;
+00160 
+00161     viewChanged = \textcolor{keyword}{true};
+00162     initialized = \textcolor{keyword}{true};
+00163 
+00164     m_font = \textcolor{keyword}{new} GLFont();
+00165     m_font->loadFromArray((\textcolor{keyword}{const} \textcolor{keywordtype}{char} *)standardStaticFont, \textcolor{keyword}{sizeof}(
+      standardStaticFont));
+00166     \textcolor{keywordflow}{return} \textcolor{keyword}{true};
+00167 \}
+00168 
+00169 
+00175 \textcolor{keywordtype}{void} OpenGLGraph::Resize(\textcolor{keywordtype}{int} w, \textcolor{keywordtype}{int} h)
+00176 \{
+00177   \textcolor{keywordflow}{if}(w <= 0 || h <=0 )
+00178     \textcolor{keywordflow}{return};
+00179   settings.windowWidth = w;
+00180   settings.windowHeight = h;
+00181   settings.dataViewHeight = settings.windowHeight-settings.marginTop-settings.
+      marginBottom;
+00182   \textcolor{keywordflow}{if}(settings.dataViewHeight <= 0)
+00183     settings.dataViewHeight = 1;
+00184   settings.dataViewWidth = settings.windowWidth-settings.marginLeft-settings.
+      marginRight;
+00185   \textcolor{keywordflow}{if}(settings.dataViewWidth <= 0)
+00186     settings.dataViewWidth = 1;
+00187   SettingsChanged();
+00188 \}
+00189 
+00193 \textcolor{keywordtype}{void} OpenGLGraph::AddSerie(cDataSerie* serie)
+00194 \{
+00195     \textcolor{keywordflow}{if}(serie != NULL)
+00196         series.push\_back(serie);
+00197 \}
+00198 
+00203 \textcolor{keywordtype}{void} OpenGLGraph::RemoveSeries(\textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{int} i)
+00204 \{
+00205     \textcolor{keywordflow}{if}(i < series.size())
+00206         series.erase (series.begin()+i);
+00207 \}
+00208 
+00216 \textcolor{keywordtype}{void} OpenGLGraph::SetInitialDisplayArea(\textcolor{keywordtype}{float} minx, \textcolor{keywordtype}{float} maxx, \textcolor{keywordtype}{float} miny, \textcolor{keywordtype}{float} maxy)
+00217 \{
+00218     initialDisplayArea.set(minx, maxx, miny, maxy);
+00219     SetDisplayArea( minx, maxx, miny, maxy);
+00220 \}
+00221 
+00229 \textcolor{keywordtype}{void} OpenGLGraph::SetDisplayArea(\textcolor{keywordtype}{float} minx, \textcolor{keywordtype}{float} maxx, \textcolor{keywordtype}{float} miny, \textcolor{keywordtype}{float} maxy)
+00230 \{
+00231   \textcolor{keywordflow}{if}((minx == maxx) || (miny == maxy))
+00232     \textcolor{keywordflow}{return};
+00233   settings.visibleArea.set(minx, maxx, miny, maxy);
+00234   SettingsChanged();
+00235 \textcolor{preprocessor}{#ifdef OGL\_REDRAW\_ENABLED}
+00236   Refresh();
+00237 \textcolor{preprocessor}{#endif}
+00238 \}
+00239 
+00245 \textcolor{keywordtype}{void} OpenGLGraph::ZoomY( \textcolor{keywordtype}{float} centerY, \textcolor{keywordtype}{float} spanY)
+00246 \{
+00247     SetDisplayArea( settings.visibleArea.x1, settings.visibleArea.x2, centerY - spanY/2, centerY + spanY/2)
+      ;
+00248 \textcolor{preprocessor}{#ifdef OGL\_REDRAW\_ENABLED}
+00249     Refresh();
+00250 \textcolor{preprocessor}{#endif}
+00251 \}
+00252 
+00258 \textcolor{keywordtype}{void} OpenGLGraph::ZoomX( \textcolor{keywordtype}{float} centerX, \textcolor{keywordtype}{float} spanX)
+00259 \{
+00260     SetDisplayArea(centerX - spanX/2, centerX + spanX/2, settings.visibleArea.y1, 
+      settings.visibleArea.y2);
+00261 \textcolor{preprocessor}{#ifdef OGL\_REDRAW\_ENABLED}
+00262     Refresh();
+00263 \textcolor{preprocessor}{#endif}
+00264 \}
+00265 
+00273 \textcolor{keywordtype}{void} OpenGLGraph::Zoom( \textcolor{keywordtype}{float} centerX, \textcolor{keywordtype}{float} centerY, \textcolor{keywordtype}{float} spanX, \textcolor{keywordtype}{float} spanY)
+00274 \{
+00275     \textcolor{keywordflow}{if}(spanX > 1E-03 && spanY > 1E-03)
+00276     \{
+00277         \textcolor{keywordflow}{if}(settings.lock_aspect)
+00278         \{
+00279             \textcolor{keywordflow}{if}(spanX < spanY)
+00280                 spanX = spanY;
+00281             \textcolor{keywordflow}{else}
+00282                 spanY = spanX;
+00283         \}
+00284         SetDisplayArea(centerX - spanX/2, centerX + spanX/2, centerY - spanY/2, centerY + spanY/2);
+00285     \}
+00286 \textcolor{preprocessor}{#ifdef OGL\_REDRAW\_ENABLED}
+00287     Refresh();
+00288 \textcolor{preprocessor}{#endif}
+00289 \}
+00290 
+00300 \textcolor{keywordtype}{void} OpenGLGraph::ZoomRect( \textcolor{keywordtype}{int} x1, \textcolor{keywordtype}{int} x2, \textcolor{keywordtype}{int} y1, \textcolor{keywordtype}{int} y2)
+00301 \{
+00302     \textcolor{keywordtype}{float} minx, maxx, miny, maxy;
+00303     \textcolor{keywordtype}{float} temp;
+00304     dataViewPixelToValue(x1 - settings.marginLeft, y1 - settings.marginBottom, minx, miny);
+00305     dataViewPixelToValue(x2 - settings.marginLeft, y2 - settings.marginBottom, maxx, maxy);
+00306     \textcolor{keywordflow}{if}( minx > maxx)
+00307     \{
+00308         temp = maxx;
+00309         maxx = minx;
+00310         minx = temp;
+00311     \}
+00312     \textcolor{keywordflow}{if}( miny > maxy)
+00313     \{
+00314         temp = maxy;
+00315         maxy = miny;
+00316         miny = temp;
+00317     \}
+00318     \textcolor{keywordflow}{if}(maxx - minx > 1E-03 && maxy - miny > 1E-03)
+00319     \{
+00320         SetDisplayArea( minx, maxx, miny, maxy );
+00321     \}
+00322 
+00323 \textcolor{preprocessor}{#ifdef OGL\_REDRAW\_ENABLED}
+00324     Refresh();
+00325 \textcolor{preprocessor}{#endif}
+00326 \}
+00327 
+00333 \textcolor{keywordtype}{void} OpenGLGraph::Pan( \textcolor{keywordtype}{float} dx, \textcolor{keywordtype}{float} dy)
+00334 \{
+00335     \textcolor{keywordtype}{float} deltaX = (settings.visibleArea.x2 - settings.visibleArea.x1) / 
+      settings.dataViewWidth;
+00336     \textcolor{keywordtype}{float} deltaY = (settings.visibleArea.y2 - settings.visibleArea.y1) / 
+      settings.dataViewHeight;
+00337     settings.visibleArea.x1 += dx * deltaX;
+00338     settings.visibleArea.x2 += dx * deltaX;
+00339     settings.visibleArea.y1 += dy * deltaY;
+00340     settings.visibleArea.y2 += dy * deltaY;
+00341     SettingsChanged();
+00342 \textcolor{preprocessor}{#ifdef OGL\_REDRAW\_ENABLED}
+00343     Refresh();
+00344 \textcolor{preprocessor}{#endif}
+00345 \}
+00346 
+00350 \textcolor{keywordtype}{void} OpenGLGraph::SetDrawingMode( eDrawingMode mode )
+00351 \{
+00352     settings.graphType = mode;
+00353 \}
+00354 
+00358 \textcolor{keywordtype}{void} OpenGLGraph::DrawStaticElements()
+00359 \{
+00360     switchToWindowView();
+00361     \textcolor{comment}{//draw data view background}
+00362     glBegin(GL_QUADS);
+00363         glColor4f(settings.dataViewBackgroundColor.red, settings.
+      dataViewBackgroundColor.green,  settings.dataViewBackgroundColor.blue, settings.
+      dataViewBackgroundColor.alpha);
+00364         glVertex3f( 0, 0, -5);
+00365         glVertex3f( settings.windowWidth, 0, -5);
+00366         glVertex3f( settings.windowWidth, settings.windowHeight, -5);
+00367         glVertex3f( 0, settings.windowHeight, -5);
+00368     glEnd();
+00369     glFlush();
+00370 
+00371     \textcolor{comment}{//draw title}
+00372     \textcolor{keywordtype}{int} tw = 0, th = 0;
+00373     \textcolor{keywordtype}{float} fheight = 32;
+00374 
+00375     glColor4f(settings.titlesColor.red, settings.titlesColor.green, settings.
+      titlesColor.blue, settings.titlesColor.alpha);
+00376     m_font->getTextSize(settings.title.c\_str(), tw, th, fheight);
+00377     glRenderText(settings.windowWidth/2+settings.marginLeft - tw/2, settings.
+      windowHeight-th-1, 0, fheight, 0, \textcolor{stringliteral}{"%s"}, settings.title.c\_str() );
+00378 
+00379     \textcolor{comment}{//draw axis titles and units}
+00380     glColor4f(settings.titlesColor.red, settings.titlesColor.green, settings.
+      titlesColor.blue, settings.titlesColor.alpha);
+00381     m_font->getTextSize(settings.titleXaxis.c\_str(), tw, th, fheight);
+00382     glRenderText(settings.windowWidth-tw-settings.marginRight-1, settings.
+      marginBottom+1, 0, fheight, 0, settings.titleXaxis.c\_str());
+00383     m_font->getTextSize(settings.titleYaxis.c\_str(), tw, th, fheight);
+00384     glRenderText(settings.marginLeft+1, settings.windowHeight-th-1, 0, fheight, 0, 
+      settings.titleYaxis.c\_str());
+00385 
+00386     \textcolor{keywordtype}{double} pixelXvalue = 0;
+00387     \textcolor{keywordtype}{double} pixelYvalue = 0;
+00388     pixelXvalue =(settings.visibleArea.x2 - settings.visibleArea.x1) / settings.
+      dataViewWidth;
+00389     pixelYvalue = (settings.visibleArea.y2 - settings.visibleArea.y1)/  settings.
+      dataViewHeight;
+00390 
+00391     \textcolor{keywordflow}{if}(viewChanged)
+00392     \{
+00393         CalculateGrid();
+00394         viewChanged = \textcolor{keyword}{false};
+00395     \}
+00396 
+00397     \textcolor{keywordtype}{char} text[32];
+00398     \textcolor{comment}{//draw axis lines}
+00399     glBegin(GL_LINES);
+00400         glColor3f(0.0,0.0,0.0);
+00401         glVertex2d(settings.marginLeft, settings.windowHeight);
+00402         glVertex2d(settings.marginLeft, 0);
+00403         glVertex2d(0, settings.marginBottom);
+00404         glVertex2d(settings.windowWidth, settings.marginBottom);
+00405     glEnd();
+00406 
+00407     \textcolor{comment}{//print X axis}
+00408     \textcolor{keywordtype}{int} posX = 0;
+00409     \textcolor{keywordtype}{int} posY = 0;
+00410     \textcolor{keywordtype}{double} value = 0;
+00411     \textcolor{keywordtype}{double} gridXstart = settings.gridXstart;
+00412 
+00413     \textcolor{keywordtype}{char} format[10];
+00414     \textcolor{keywordflow}{if}(settings.staticGrid)
+00415           sprintf(format, \textcolor{stringliteral}{"%%.3f %%s"});
+00416     \textcolor{keywordflow}{else}
+00417           sprintf(format, \textcolor{stringliteral}{"%%.%if %%s"}, settings.gridXprec);
+00418 
+00419     \textcolor{keywordtype}{float} numbersH = 16;
+00420     \textcolor{comment}{// X axis grid lines}
+00421     posY = settings.marginBottom;
+00422     posX = 0;
+00423     \textcolor{keywordtype}{float} gridpx = gridXstart;
+00424 
+00425     \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} i=0; i< settings.windowWidth && posX < settings.windowWidth-settings.
+      marginRight; ++i)
+00426     \{
+00427         posX = settings.marginLeft + ((gridpx-settings.visibleArea.x1)/pixelXvalue);
+00428         \textcolor{keywordflow}{if}(posX > settings.marginLeft && posX < settings.windowWidth-settings.
+      marginRight)
+00429         \{
+00430             \textcolor{keywordflow}{if}(settings.staticGrid)
+00431                 value = gridpx/1000000.0+settings.gridXoffset;
+00432             \textcolor{keywordflow}{else}
+00433                 value = gridpx+settings.gridXoffset;
+00434             sprintf(text, format, value, settings.xUnits.c\_str());
+00435             m_font->getTextSize(text, tw, th, numbersH);
+00436             glRenderText(posX - tw/2, posY-th-2, 0, numbersH, 0, \textcolor{stringliteral}{"%s"}, text);
+00437         \}
+00438         gridpx += settings.gridXspacing;
+00439     \}
+00440 
+00441     \textcolor{comment}{//Y axis grid}
+00442     \textcolor{comment}{//print Y axis}
+00443     posX = 0;
+00444     posY = 0;
+00445     value = 0;
+00446     \textcolor{keywordtype}{double} gridYstart = settings.gridYstart;
+00447 
+00448     sprintf(format, \textcolor{stringliteral}{"%%.%if %%s"}, settings.gridYprec);
+00449 
+00450     \textcolor{comment}{// Y axis grid lines}
+00451     posY = settings.marginBottom;
+00452     posX = settings.marginLeft;
+00453     \textcolor{keywordtype}{float} gridpy = gridYstart;
+00454 
+00455     \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} i=0; i< settings.windowHeight && posY < settings.windowHeight-
+      settings.marginTop; ++i)
+00456     \{
+00457         posY = settings.marginBottom + ((gridpy-settings.visibleArea.y1)/pixelYvalue);
+00458         \textcolor{keywordflow}{if}(posY > settings.marginBottom && posY < settings.windowHeight-settings.
+      marginTop)
+00459         \{
+00460             value = gridpy;
+00461             sprintf(text, format, value, settings.yUnits.c\_str());
+00462             m_font->getTextSize(text, tw, th, numbersH);
+00463             glRenderText(posX - tw-2, posY - th/2, 0, numbersH, 0, \textcolor{stringliteral}{"%s"}, text);
+00464         \}
+00465         gridpy += settings.gridYspacing;
+00466     \}
+00467 
+00468 
+00469     \textcolor{comment}{//change to data view and start drawing grid}
+00470     switchToDataView();
+00471 
+00472     glBegin(GL_LINES);
+00473     glColor4f(settings.gridColor.red, settings.gridColor.green, settings.
+      gridColor.blue, settings.gridColor.alpha);
+00474 
+00475     \textcolor{comment}{//draw x grid lines}
+00476     \textcolor{keywordtype}{float} linePos = settings.gridXstart;
+00477     \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} i = 0; linePos <= settings.visibleArea.x2; ++i)
+00478     \{
+00479         glVertex3d(linePos, settings.visibleArea.y1, -2);
+00480         glVertex3d(linePos, settings.visibleArea.y2, -2);
+00481         linePos += settings.gridXspacing;
+00482     \}
+00483 
+00484     \textcolor{comment}{//draw y grid lines}
+00485     linePos = settings.gridYstart;
+00486     \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} i = 0; linePos <= settings.visibleArea.y2; ++i)
+00487     \{
+00488         glVertex3d(settings.visibleArea.x1, linePos, -2);
+00489         glVertex3d(settings.visibleArea.x2, linePos, -2);
+00490         linePos += settings.gridYspacing;
+00491     \}
+00492 
+00493     glEnd();
+00494     glFlush();
+00495 
+00496 \}
+00497 
+00501 \textcolor{keywordtype}{void} OpenGLGraph::CalculateGrid()
+00502 \{
+00503     \textcolor{keywordflow}{if}(settings.staticGrid)
+00504     \{
+00505         settings.gridXlines = 10;
+00506         settings.gridYlines = 10;
+00507         \textcolor{comment}{//settings.gridXprec = 1;}
+00508         \textcolor{comment}{//settings.gridYprec = 1;}
+00509         settings.gridXstart = settings.visibleArea.x1;
+00510         settings.gridXspacing = (settings.visibleArea.x2 - settings.visibleArea.
+      x1)/settings.gridXlines;
+00511         settings.gridYstart = settings.visibleArea.y1;
+00512         settings.gridYspacing = (settings.visibleArea.y2 - settings.visibleArea.
+      y1)/settings.gridYlines;
+00513 
+00514         \textcolor{keywordflow}{return};
+00515     \}
+00516     \textcolor{comment}{// find the widest number of x axis values}
+00517     \textcolor{keywordtype}{float} widerNumber = settings.gridXstart < settings.gridXstart+settings.
+      gridXlines*settings.gridXspacing ?
+00518                          settings.gridXstart+settings.gridXlines*settings.
+      gridXspacing :
+00519                          settings.gridXstart;
+00520 
+00521 
+00522     \textcolor{comment}{//set values printing format}
+00523     \textcolor{keywordtype}{char} format[10];
+00524 
+00525     sprintf(format, \textcolor{stringliteral}{"%%.%if %%s"}, settings.gridXprec);
+00526 
+00527     \textcolor{keywordtype}{char} ctemp[32];
+00528     \textcolor{keywordtype}{int} tw=0, th=0;
+00529     \textcolor{keywordtype}{float} fonth = 10;
+00530     sprintf(ctemp, format, widerNumber, settings.xUnits.c\_str());
+00531     m_font->getTextSize(ctemp, tw, th, fonth);
+00532     \textcolor{keywordtype}{int} nmbWidth = tw;
+00533     \textcolor{keywordtype}{float} pixelXvalue =(settings.visibleArea.x2 - settings.visibleArea.x1) / 
+      settings.dataViewWidth;
+00534     \textcolor{keywordtype}{float} nmbSpan = nmbWidth*pixelXvalue;
+00535 
+00536     \textcolor{keywordtype}{int} xlines = settings.gridXlines;  \textcolor{comment}{// guide of how many grid lines to use}
+00537     \textcolor{keywordtype}{float} interval = settings.visibleArea.x2 - settings.visibleArea.x1; \textcolor{comment}{// span of x axis}
+00538     \textcolor{keywordtype}{float} intervalPart = interval / xlines; \textcolor{comment}{// span of grid spacing}
+00539     \textcolor{keywordtype}{float} divisor = 1; \textcolor{comment}{// current grid spacing}
+00540 
+00541     \textcolor{keywordtype}{int} divs[2] = \{ 2, 5 \};  \textcolor{comment}{// divisors used for changing grid spacing}
+00542     \textcolor{keywordtype}{int} curDiv = 0; \textcolor{comment}{//currently used divisor}
+00543 
+00544     settings.gridXprec = 0;
+00545 
+00546     \textcolor{comment}{//determine if grid spacing needs to be decreased}
+00547     \textcolor{keywordflow}{if}( intervalPart > 1 )
+00548     \{
+00549         \textcolor{keywordflow}{while}( interval / divisor > xlines && divisor < nmbSpan)
+00550         \{
+00551             divisor *= 10;
+00552         \}
+00553         settings.gridXspacing = divisor;
+00554         nmbSpan *= 2;
+00555         \textcolor{keywordflow}{while}( settings.gridXspacing/divs[curDiv] > nmbSpan)
+00556         \{
+00557             settings.gridXspacing /= divs[curDiv];
+00558             curDiv = (curDiv + 1) & 0x1;
+00559         \}
+00560         \textcolor{keywordflow}{if}(settings.gridXspacing < 1.0)
+00561             ++settings.gridXprec;
+00562         settings.gridXstart = (int)(settings.visibleArea.x1 / settings.
+      gridXspacing) * settings.gridXspacing;
+00563     \}
+00564     \textcolor{keywordflow}{else}
+00565     \{
+00566         \textcolor{keywordflow}{while}( interval / divisor < xlines && divisor > nmbSpan)
+00567         \{
+00568             divisor /= 10;
+00569             ++settings.gridXprec;
+00570         \}
+00571         ++settings.gridXprec;
+00572         settings.gridXspacing = divisor;
+00573         nmbSpan *= 2;
+00574         \textcolor{keywordflow}{while}( settings.gridXspacing*divs[curDiv] < nmbSpan)
+00575         \{
+00576             settings.gridXspacing *= divs[curDiv];
+00577             curDiv = (curDiv + 1) & 0x1;
+00578         \}
+00579         \textcolor{keywordflow}{if}(settings.gridXspacing > interval )
+00580             settings.gridXspacing = interval/2;
+00581         settings.gridXstart = (int)(settings.visibleArea.x1 / settings.
+      gridXspacing) * settings.gridXspacing;
+00582     \}
+00583 
+00584     \textcolor{comment}{// Y axis}
+00585     \textcolor{keywordtype}{int} nmbHeight = settings.gridValuesHeight;
+00586     \textcolor{keywordtype}{float} pixelYvalue = (settings.visibleArea.y2 - settings.visibleArea.y1) / 
+      settings.dataViewHeight;
+00587     nmbSpan = nmbHeight*pixelYvalue;
+00588 
+00589     \textcolor{keywordtype}{int} ylines = settings.gridYlines;
+00590     interval = settings.visibleArea.y2 - settings.visibleArea.y1;
+00591     intervalPart = interval / ylines;
+00592     divisor = 1;
+00593 
+00594     curDiv = 0;
+00595 
+00596     settings.gridYprec = 0;
+00597 
+00598     \textcolor{keywordflow}{if}( intervalPart > 1 )
+00599     \{
+00600         \textcolor{keywordflow}{while}( interval / divisor > ylines && divisor < nmbSpan)
+00601         \{
+00602             divisor *= 10;
+00603         \}
+00604         settings.gridYspacing = divisor;
+00605         nmbSpan *= 2;
+00606         \textcolor{keywordflow}{while}( settings.gridYspacing/divs[curDiv] > nmbSpan)
+00607         \{
+00608             settings.gridYspacing /= divs[curDiv];
+00609             curDiv = (curDiv + 1) & 0x1;
+00610         \}
+00611         \textcolor{keywordflow}{if}(settings.gridYspacing < 1.0)
+00612             ++settings.gridYprec;
+00613         settings.gridYstart = (int)(settings.visibleArea.y1 / settings.
+      gridYspacing) * settings.gridYspacing;
+00614     \}
+00615     \textcolor{keywordflow}{else}
+00616     \{
+00617         \textcolor{keywordflow}{while}( interval / divisor < ylines && divisor > nmbSpan)
+00618         \{
+00619             divisor /= 10;
+00620             ++settings.gridYprec;
+00621         \}
+00622         ++settings.gridYprec;
+00623         settings.gridYspacing = divisor;
+00624         nmbSpan *= 2;
+00625         \textcolor{keywordflow}{while}( settings.gridYspacing*divs[curDiv] < nmbSpan)
+00626         \{
+00627             settings.gridYspacing *= divs[curDiv];
+00628             curDiv = (curDiv + 1) & 0x1;
+00629         \}
+00630         settings.gridYstart = (int)(settings.visibleArea.y1 / settings.
+      gridYspacing) * settings.gridYspacing;
+00631     \}
+00632     SettingsChanged();
+00633 \}
+00634 
+00638 \textcolor{keywordtype}{void} OpenGLGraph::Draw()
+00639 \{
+00640     \textcolor{keywordflow}{if}(!IsShownOnScreen())
+00641     \{
+00642         \textcolor{keywordflow}{return};
+00643     \}
+00644     SetCurrent(*m_glContext);
+00645     \textcolor{keywordtype}{int} w, h;
+00646     \textcolor{keywordflow}{if}(oglOk == \textcolor{keyword}{false})
+00647     \{
+00648         GetSize(&w, &h);
+00649         setupViewport(w, h);
+00650         glClearColor(settings.backgroundColor.red, settings.backgroundColor.
+      green,
+00651                 settings.backgroundColor.blue, settings.backgroundColor.alpha);
+00652         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+00653         SwapBuffers();
+00654         \textcolor{keywordflow}{return};
+00655     \}
+00656     \textcolor{keywordflow}{if}(!initialized)
+00657     \{
+00658         \textcolor{keywordtype}{int} w, h;
+00659         this->GetSize(&w, &h);
+00660         \textcolor{keywordflow}{if}(Initialize(w, h) == \textcolor{keyword}{false})
+00661             \textcolor{keywordflow}{return};
+00662     \}
+00663     GetSize(&w, &h);
+00664     setupViewport(w, h);
+00665     glLoadIdentity();
+00666 
+00667     switchToWindowView();
+00668     glLoadIdentity();
+00669     glClearColor(settings.backgroundColor.red, settings.backgroundColor.green,
+00670                 settings.backgroundColor.blue, settings.backgroundColor.alpha);
+00671     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+00672 
+00673     \textcolor{comment}{//draw static view elements}
+00674     DrawStaticElements();
+00675     switchToWindowView();
+00676     \textcolor{comment}{//while zomming in draw selection rectangle}
+00677     \textcolor{keywordflow}{if}(m_actionState == OGLG_ZOOMIN)
+00678     \{
+00679         glColor3f(1.0, 0, 0);
+00680         glBegin(GL_LINE_STRIP);
+00681             glVertex2d(m_MouseCoord.x1, m_MouseCoord.y1);
+00682             glVertex2d(m_MouseCoord.x2, m_MouseCoord.y1);
+00683             glVertex2d(m_MouseCoord.x2, m_MouseCoord.y2);
+00684             glVertex2d(m_MouseCoord.x1, m_MouseCoord.y2);
+00685             glVertex2d(m_MouseCoord.x1, m_MouseCoord.y1);
+00686         glEnd();
+00687         glFlush();
+00688     \}
+00689     \textcolor{comment}{//draw series data}
+00690 
+00691     switchToDataView();
+00692     \textcolor{keywordflow}{if}(settings.useVBO && GLEW_VERSION_1_5)
+00693     \{
+00694         \textcolor{keywordflow}{for}(\textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{int} i=0; i<series.size(); i++)
+00695         \{
+00696             glColor3f(series[i]->color.red, series[i]->color.green, series[i]->color.blue);
+00697             \textcolor{keywordflow}{if}(series[i]->size > 0 && series[i]->visible)
+00698             \{
+00699                 \textcolor{keywordflow}{if}( series[i]->vboIndex == 0) \textcolor{comment}{//check if data series buffer is initialized}
+00700                 \{
+00701                     glGenBuffersARB(1, &series[i]->vboIndex);
+00702                 \}
+00703                 \textcolor{comment}{//bind buffer for filling}
+00704                 glBindBufferARB(GL_ARRAY_BUFFER_ARB, series[i]->vboIndex);
+00705                 \textcolor{keywordflow}{if}(series[i]->modified) \textcolor{comment}{//check if buffer needs to be modified}
+00706                 \{
+00707                     glBufferDataARB(GL_ARRAY_BUFFER_ARB, \textcolor{keyword}{sizeof}(\textcolor{keywordtype}{float})*series[i]->
+      size*2, NULL, GL_DYNAMIC_DRAW_ARB);
+00708                     glBufferDataARB(GL_ARRAY_BUFFER_ARB, \textcolor{keyword}{sizeof}(\textcolor{keywordtype}{float})*series[i]->
+      size*2, series[i]->values, GL_DYNAMIC_DRAW_ARB);
+00709                     series[i]->modified = \textcolor{keyword}{false};
+00710                 \}
+00711                 glEnableClientState(GL_VERTEX_ARRAY);
+00712                 glEnableClientState(GL_COLOR);
+00713                 glVertexPointer(2, GL_FLOAT, 0, 0);
+00714                 \textcolor{keywordflow}{if}(settings.graphType == GLG_POINTS)
+00715                 \{
+00716                     glPointSize(settings.pointsSize);
+00717                     glDrawArrays(GL_POINTS, 0, series[i]->size);
+00718                 \}
+00719                 \textcolor{keywordflow}{else}
+00720                 \{
+00721                     glPointSize(1);
+00722                     glDrawArrays(GL_LINE_STRIP, 0, series[i]->size);
+00723                 \}
+00724                 glDisableClientState(GL_VERTEX_ARRAY);
+00725                 glDisableClientState(GL_COLOR);
+00726                 glBindBufferARB(GL_ARRAY_BUFFER, 0);
+00727             \}
+00728         \}
+00729     \}
+00730     \textcolor{keywordflow}{else}  \textcolor{comment}{//backup case if VBO is not supported}
+00731     \{
+00732         \textcolor{keywordflow}{for}(\textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{int} i=0; i<series.size(); i++)
+00733         \{
+00734             glColor3f(series[i]->color.red, series[i]->color.green, series[i]->color.blue);
+00735             \textcolor{keywordflow}{if}(series[i]->size > 0 && series[i]->visible)
+00736             \{
+00737                 \textcolor{keywordflow}{if}(settings.graphType == GLG_POINTS)
+00738                 \{
+00739                     glPointSize(settings.pointsSize);
+00740                     glBegin(GL_POINTS);
+00741                 \}
+00742                 \textcolor{keywordflow}{else}
+00743                 \{
+00744                     glPointSize(1);
+00745                     glBegin(GL_LINE_STRIP);
+00746                 \}
+00747                 \textcolor{keywordflow}{for}(\textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{int} j=0; j<series[i]->size; j++)
+00748                 \{
+00749                     glVertex3f( series[i]->values[2*j], series[i]->values[2*j+1], 1.0);
+00750                 \}
+00751                 glEnd();
+00752             \}
+00753         \}
+00754         glFlush();
+00755     \}
+00756     \textcolor{comment}{//draw measuring markers}
+00757     DrawMarkers();
+00758     switchToWindowView();
+00759     \textcolor{keywordtype}{int} fontSz = 16;
+00760     \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{int} clrs[] \{0xFF000000, 0x0000FF00, 0x00FF0000\};
+00761     \textcolor{keywordflow}{for}(\textcolor{keywordtype}{size\_t} i=0; i<info_msg_toDisplay.size(); ++i)
+00762     \{
+00763         glRenderText(settings.marginLeft, settings.marginBottom+i*20+fontSz, 0, fontSz, clrs[
+      i], \textcolor{stringliteral}{"%s"}, info_msg_toDisplay[i].c\_str());
+00764     \}
+00765     SwapBuffers();
+00766 \}
+00767 
+00768 \textcolor{keywordtype}{bool} OpenGLGraph::SaveConfig(\textcolor{keywordtype}{char} *file)
+00769 \{
+00770     \textcolor{keywordflow}{return} \textcolor{keyword}{false};
+00771 \}
+00772 \textcolor{keywordtype}{bool} OpenGLGraph::LoadConfig(\textcolor{keywordtype}{char} *file)
+00773 \{
+00774     \textcolor{keywordflow}{return} \textcolor{keyword}{false};
+00775 \}
+00776 
+00780 \textcolor{keywordtype}{void} OpenGLGraph::SettingsChanged()
+00781 \{
+00782     viewChanged = \textcolor{keyword}{true};
+00783 \}
+00784 
+00788 \textcolor{keywordtype}{void} OpenGLGraph::switchToWindowView()
+00789 \{
+00790     glViewport(0, 0, settings.windowWidth, settings.windowHeight);
+00791     glMatrixMode(GL_PROJECTION);    \textcolor{comment}{// add perspective to scene}
+00792     glLoadIdentity();               \textcolor{comment}{// restore matrix to original state}
+00793     glOrtho (0, settings.windowWidth, 0, settings.windowHeight, -100, 100);
+00794     glMatrixMode(GL_MODELVIEW);
+00795 \}
+00796 
+00800 \textcolor{keywordtype}{void} OpenGLGraph::switchToDataView()
+00801 \{
+00802 
+00803     glViewport(settings.marginLeft, settings.marginBottom,
+00804                 settings.windowWidth-settings.marginRight-settings.marginLeft,
+00805                 settings.windowHeight-settings.marginTop-settings.marginBottom);
+00806 
+00807     glMatrixMode(GL_PROJECTION);
+00808     glLoadIdentity();               \textcolor{comment}{// restore matrix to original state}
+00809     glOrtho (settings.visibleArea.x1, settings.visibleArea.x2, settings.
+      visibleArea.y1, settings.visibleArea.y2, -100, 100);
+00810     glMatrixMode(GL_MODELVIEW);
+00811 \}
+00812 
+00821 GLvoid OpenGLGraph::glRenderText(\textcolor{keywordtype}{float} posx, \textcolor{keywordtype}{float} posy, \textcolor{keywordtype}{float} angle, \textcolor{keywordtype}{float} scale, \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{int} rgba, \textcolor{keyword}{const}
+       \textcolor{keywordtype}{char} *fmt, ...)
+00822 \{
+00823     \textcolor{keywordtype}{char} text[256];                 \textcolor{comment}{// Holds our string}
+00824     va\_list ap;             \textcolor{comment}{// Pointer to list of arguments}
+00825 
+00826     \textcolor{keywordflow}{if} (fmt == NULL)        \textcolor{comment}{// If there's no text}
+00827         \textcolor{keywordflow}{return};         \textcolor{comment}{// Do nothing}
+00828 
+00829     va\_start(ap, fmt);      \textcolor{comment}{// Parses the string for variables}
+00830         vsprintf(text, fmt, ap);    \textcolor{comment}{// And converts symbols to actual numbers}
+00831     va\_end(ap);         \textcolor{comment}{// Results are stored in text}
+00832 
+00833     glPushMatrix();
+00834     glTranslatef(posx, posy, 0);
+00835     glRotatef(angle, 0, 0, 1);
+00836 
+00837     \textcolor{comment}{//if font has been loaded}
+00838     glEnable(GL_TEXTURE_2D);
+00839     \textcolor{keywordflow}{if}(m_font != NULL)
+00840             m_font->render_textWorldSpace(text, 0, 0, scale, rgba);
+00841 
+00842     glPopMatrix();
+00843     glDisable(GL_TEXTURE_2D);
+00844 \}
+00845 
+00849 \textcolor{keywordtype}{void} OpenGLGraph::ResetView()
+00850 \{
+00851     SetDisplayArea(initialDisplayArea.x1, initialDisplayArea.x2, 
+      initialDisplayArea.y1, initialDisplayArea.y2);
+00852 \textcolor{preprocessor}{#ifdef OGL\_REDRAW\_ENABLED}
+00853     Refresh();
+00854 \textcolor{preprocessor}{#endif}
+00855 \}
+00856 
+00857 \textcolor{keywordtype}{void} OpenGLGraph::Fit()
+00858 \{
+00859     \textcolor{keywordtype}{float} minx=-1, maxx=1, miny=-1, maxy=1;
+00860     \textcolor{keywordtype}{float} valx, valy;
+00861     \textcolor{keywordflow}{for}(\textcolor{keywordtype}{unsigned} i=0; i<series.size() && series[i]->visible; ++i) \textcolor{comment}{//set boundary limits to first value}
+00862     \{
+00863         \textcolor{keywordflow}{if}(series[i]->size > 0)
+00864         \{
+00865             minx = maxx = series[i]->values[0];
+00866             miny = maxy = series[i]->values[1];
+00867             \textcolor{keywordflow}{break};
+00868         \}
+00869     \}
+00870     \textcolor{keywordflow}{for}(\textcolor{keywordtype}{unsigned} i=0; i<series.size(); ++i)
+00871     \{
+00872         \textcolor{keywordflow}{for}(\textcolor{keywordtype}{unsigned} j=0; j<series[i]->size && series[i]->visible; ++j)
+00873         \{
+00874             valx = series[i]->values[2*j];
+00875             valy = series[i]->values[2*j+1];
+00876             \textcolor{keywordflow}{if}(valx < minx)
+00877                 minx = valx;
+00878             \textcolor{keywordflow}{else} \textcolor{keywordflow}{if}(valx > maxx)
+00879                 maxx = valx;
+00880             \textcolor{keywordflow}{if}(valy < miny)
+00881                 miny = valy;
+00882             \textcolor{keywordflow}{else} \textcolor{keywordflow}{if}(valy > maxy)
+00883                 maxy = valy;
+00884         \}
+00885     \}
+00886     SetDisplayArea(minx, maxx, miny, maxy);
+00887 \}
+00888 
+00897 \textcolor{keywordtype}{void} OpenGLGraph::OnMouseDown(\textcolor{keywordtype}{int} mouseButton, \textcolor{keywordtype}{int} X, \textcolor{keywordtype}{int} Y)
+00898 \{
+00899 \textcolor{preprocessor}{#ifdef OGL\_INVERT\_MOUSE\_Y}
+00900     Y = settings.windowHeight - Y;
+00901 \textcolor{preprocessor}{#endif // OGL\_INVERT\_MOUSE\_Y}
+00902     m_MouseCoord.x1 = X;
+00903     m_MouseCoord.y1 = Y;
+00904 
+00905     \textcolor{keywordflow}{switch}(mouseButton)
+00906     \{
+00907     \textcolor{keywordflow}{case} OGLG_LEFT:
+00908         \textcolor{comment}{//move markers}
+00909         \textcolor{keywordflow}{if}( (m_selectedMarker = clickedOnMarker(X, Y)) >= 0)
+00910         \{
+00911             m_actionState = OGLG_MOVE_MARKER;
+00912         \}
+00913         \textcolor{keywordflow}{else} \textcolor{comment}{//start zooming in}
+00914         \{
+00915             m_actionState = OGLG_ZOOMIN;
+00916             m_MouseCoord.x2 = X;
+00917             m_MouseCoord.y2 = Y;
+00918         \}
+00919         \textcolor{keywordflow}{break};
+00920     \textcolor{keywordflow}{case} OGLG_MIDDLE: \textcolor{comment}{// change axis span}
+00921         m_actionState = OGLG_SCALE;
+00922         m_lastSpanX = settings.visibleArea.x2 - settings.visibleArea.x1;
+00923         m_lastSpanY = settings.visibleArea.y2 - settings.visibleArea.y1;
+00924         m_MouseCoord.x2 = X;
+00925         m_MouseCoord.y2 = Y;
+00926         \textcolor{keywordflow}{break};
+00927 
+00928     \textcolor{keywordflow}{case} OGLG_RIGHT: \textcolor{comment}{// move display area}
+00929         m_actionState = OGLG_PAN;
+00930         m_MouseCoord.x2 = X;
+00931         m_MouseCoord.y2 = Y;
+00932         m_MouseCoord.x1 = X;
+00933         m_MouseCoord.y1 = Y;
+00934         \textcolor{keywordflow}{break};
+00935     \}
+00936 \}
+00937 
+00946 \textcolor{keywordtype}{void} OpenGLGraph::OnMouseUp(\textcolor{keywordtype}{int} mouseButton, \textcolor{keywordtype}{int} X, \textcolor{keywordtype}{int} Y)
+00947 \{
+00948     \textcolor{keywordflow}{switch}(mouseButton)
+00949     \{
+00950     \textcolor{keywordflow}{case} OGLG_LEFT:
+00951         \textcolor{keywordflow}{if}( m_actionState == OGLG_ZOOMIN)
+00952         \{
+00953             m_actionState = OGLG_IDLE;
+00954             \textcolor{keywordflow}{if}( isInsideDataView(X, Y))         \textcolor{comment}{//finish zooming in}
+00955             \{
+00956                 ZoomRect(m_MouseCoord.x1, m_MouseCoord.x2, m_MouseCoord.y1, 
+      m_MouseCoord.y2);
+00957 \textcolor{preprocessor}{                #ifdef OGL\_REDRAW\_ENABLED}
+00958                 Refresh();
+00959 \textcolor{preprocessor}{                #endif}
+00960             \}
+00961             \textcolor{keywordflow}{else} \textcolor{comment}{// if zoomed outside data view border, then reset to initial view}
+00962             \{
+00963                 ResetView();
+00964 \textcolor{preprocessor}{                #ifdef OGL\_REDRAW\_ENABLED}
+00965                 Refresh();
+00966 \textcolor{preprocessor}{                #endif}
+00967             \}
+00968         \}
+00969         \textcolor{keywordflow}{break};
+00970     \textcolor{keywordflow}{case} OGLG_MIDDLE:
+00971 
+00972         \textcolor{keywordflow}{break};
+00973 
+00974     \textcolor{keywordflow}{case} OGLG_RIGHT:
+00975         \textcolor{keywordflow}{if}((m_MouseCoord.x2 == m_MouseCoord.x1) &&
+00976         (m_MouseCoord.y2 == m_MouseCoord.y1))
+00977             ShowMenu(X, Y);
+00978         \textcolor{keywordflow}{break};
+00979     \}
+00980     m_actionState = OGLG_IDLE;
+00981 \}
+00982 
+00990 \textcolor{keywordtype}{void} OpenGLGraph::OnMouseMove(\textcolor{keywordtype}{int} X, \textcolor{keywordtype}{int} Y)
+00991 \{
+00992     \textcolor{keywordtype}{float} spanx, spany, sx, sy;
+00993 \textcolor{preprocessor}{#ifdef OGL\_INVERT\_MOUSE\_Y}
+00994     Y = settings.windowHeight - Y;
+00995 \textcolor{preprocessor}{#endif // OGL\_INVERT\_MOUSE\_Y}
+00996     \textcolor{keywordflow}{switch}(m_actionState)
+00997     \{
+00998     \textcolor{keywordflow}{case} OGLG_IDLE:
+00999 
+01000         \textcolor{keywordflow}{break};
+01001     \textcolor{keywordflow}{case} OGLG_MOVE_MARKER:
+01002         MoveMarker(m_selectedMarker, X);
+01003         \textcolor{keywordflow}{break};
+01004     \textcolor{keywordflow}{case} OGLG_PAN:
+01005         \textcolor{comment}{//if mouse leaves data view, stop panning}
+01006         \textcolor{keywordflow}{if}( !isInsideDataView(X, Y) )
+01007         \{
+01008             m_actionState = OGLG_IDLE;
+01009             \textcolor{keywordflow}{break};
+01010         \}
+01011         m_MouseCoord.x2 = m_MouseCoord.x1 - X;
+01012         m_MouseCoord.y2 = m_MouseCoord.y1 - Y;
+01013         Pan(m_MouseCoord.x2, m_MouseCoord.y2);
+01014         m_MouseCoord.x1 = X;
+01015         m_MouseCoord.y1 = Y;
+01016         \textcolor{keywordflow}{break};
+01017     \textcolor{keywordflow}{case} OGLG_ZOOMIN:
+01018         \textcolor{comment}{//update coordinates for zoom in rectangle drawing}
+01019         m_MouseCoord.x2 = X;
+01020         m_MouseCoord.y2 = Y;
+01021 \textcolor{preprocessor}{#ifdef OGL\_REDRAW\_ENABLED}
+01022         Refresh();
+01023 \textcolor{preprocessor}{#endif}
+01024         \textcolor{keywordflow}{break};
+01025     \textcolor{keywordflow}{case} OGLG_SCALE:
+01026         \textcolor{comment}{//change axis span while mouse is inside data view}
+01027         \textcolor{keywordflow}{if}(!isInsideDataView(X,Y))
+01028         \{
+01029             m_actionState = OGLG_IDLE;
+01030             \textcolor{keywordflow}{break};
+01031         \}
+01032         m_MouseCoord.x2 = X;
+01033         m_MouseCoord.y2 = Y;
+01034         spanx = settings.visibleArea.x2 - settings.visibleArea.x1;
+01035         spany = settings.visibleArea.y2 - settings.visibleArea.y1;
+01036         sx = 1+((float)(m_MouseCoord.x1 - m_MouseCoord.x2))/settings.
+      dataViewWidth;
+01037         sy = 1+((\textcolor{keywordtype}{float})(m_MouseCoord.y1 - m_MouseCoord.y2))/settings.
+      dataViewHeight;
+01038         Zoom( settings.visibleArea.x1 + spanx/2, settings.visibleArea.y1 + spany/2, 
+      m_lastSpanX*sx, m_lastSpanY*sy);
+01039         \textcolor{keywordflow}{break};
+01040     \textcolor{keywordflow}{default}:
+01041         m_MouseCoord.x2 = X;
+01042         m_MouseCoord.y2 = Y;
+01043         \textcolor{keywordflow}{break};
+01044     \}
+01045 \}
+01046 
+01056 \textcolor{keywordtype}{void} OpenGLGraph::dataViewPixelToValue(\textcolor{keywordtype}{int} x, \textcolor{keywordtype}{int} y, \textcolor{keywordtype}{float} &valX, \textcolor{keywordtype}{float} &valY)
+01057 \{
+01058     \textcolor{keywordtype}{float} deltaX = (settings.visibleArea.x2 - settings.visibleArea.x1) / 
+      settings.dataViewWidth;
+01059     \textcolor{keywordtype}{float} deltaY = (settings.visibleArea.y2 - settings.visibleArea.y1) / 
+      settings.dataViewHeight;
+01060 
+01061     valX = settings.visibleArea.x1 + deltaX * x;
+01062     valY = settings.visibleArea.y1 + deltaY * y;
+01063 \}
+01064 
+01073 \textcolor{keywordtype}{bool} OpenGLGraph::isInsideDataView(\textcolor{keywordtype}{int} X, \textcolor{keywordtype}{int} Y)
+01074 \{
+01075     \textcolor{keywordflow}{if}( X > settings.marginLeft && X < (settings.windowWidth-settings.
+      marginRight) )
+01076     \{
+01077         \textcolor{keywordflow}{if}( Y > settings.marginTop && Y < (settings.windowHeight-settings.
+      marginBottom) )
+01078             \textcolor{keywordflow}{return} \textcolor{keyword}{true};
+01079     \}
+01080     \textcolor{keywordflow}{return} \textcolor{keyword}{false};
+01081 \}
+01082 
+01088 \textcolor{keywordtype}{int} OpenGLGraph::TextWidthInPixels(\textcolor{keyword}{const} \textcolor{keywordtype}{char} *str)
+01089 \{
+01090     \textcolor{keywordflow}{return} m_font->string_width(str);
+01091 \}
+01092 
+01099 \textcolor{keywordtype}{int} OpenGLGraph::NumberWidthInPixels(\textcolor{keywordtype}{float} num, \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{int} prec)
+01100 \{
+01101     \textcolor{keywordtype}{char} format[20];
+01102     sprintf(format, \textcolor{stringliteral}{"%%.%if"}, prec);
+01103     \textcolor{keywordtype}{char} ctemp[20];
+01104     sprintf(ctemp, format, num);
+01105     \textcolor{keywordflow}{return} TextWidthInPixels(ctemp);
+01106 \}
+01107 
+01111 \textcolor{keywordtype}{int} OpenGLGraph::LineHeight()
+01112 \{
+01113     \textcolor{keywordflow}{return} m_font->lineHeight();
+01114 \}
+01115 
+01121 \textcolor{keywordtype}{int} OpenGLGraph::AddMarker(\textcolor{keywordtype}{int} posX)
+01122 \{
+01123     \textcolor{keywordtype}{bool} found = \textcolor{keyword}{false};
+01124     \textcolor{comment}{//check if allowed to add more markers}
+01125     \textcolor{comment}{//check if series have any data to mark}
+01126     \textcolor{keywordflow}{if}(series[0]->size > 0)
+01127     \{
+01128         OGLMarker *mark = NULL;
+01129         \textcolor{keywordflow}{for}(\textcolor{keywordtype}{size\_t} i=0; i<markers.size(); ++i)
+01130             \textcolor{keywordflow}{if}(markers[i].used == \textcolor{keyword}{false})
+01131             \{
+01132                 mark = &markers[i];
+01133                 \textcolor{keywordflow}{break};
+01134             \}
+01135         \textcolor{keywordflow}{if}(mark == NULL)
+01136             \textcolor{keywordflow}{return} -1;
+01137         \textcolor{comment}{//calculate marker position in data view}
+01138         \textcolor{keywordtype}{float} pixelXvalue =(settings.visibleArea.x2 - settings.visibleArea.x1) / 
+      settings.dataViewWidth;
+01139         mark->posX = settings.visibleArea.x1+(posX-settings.marginLeft)*pixelXvalue;
+01140 
+01141         \textcolor{comment}{//find closest data point index}
+01142         \textcolor{keywordflow}{for}(\textcolor{keywordtype}{unsigned} i=0; i<series[0]->size; ++i)
+01143         \{
+01144             \textcolor{keywordflow}{if} ( series[0]->values[2*i] > mark->posX )
+01145             \{
+01146                 \textcolor{keywordtype}{float} toLeft = mark->posX-series[0]->values[2*(i-1)];
+01147                 \textcolor{keywordtype}{float} toRight = series[0]->values[2*i]-mark->posX;
+01148                 \textcolor{keywordflow}{if}( toRight < toLeft)
+01149                 \{
+01150                     mark->dataValueIndex = 2*i;
+01151                 \}
+01152                 \textcolor{keywordflow}{else}
+01153                 \{
+01154                     mark->dataValueIndex = 2*(i-1);
+01155                 \}
+01156                 found = \textcolor{keyword}{true};
+01157                 \textcolor{keywordflow}{break};
+01158             \}
+01159         \}
+01160         \textcolor{keywordflow}{if}(!found) \textcolor{comment}{//if no closest point found, add marker to middle point}
+01161         \{
+01162             mark->dataValueIndex = series[0]->size;
+01163         \}
+01164         mark->used = \textcolor{keyword}{true};
+01165         mark->show = \textcolor{keyword}{true};
+01166         mark->posX = series[0]->values[mark->dataValueIndex];
+01167         mark->posY = series[0]->values[mark->dataValueIndex+1];
+01168         mark->color = mMarkerColors[markers.size()];
+01169         \textcolor{keywordflow}{return} mark->id;
+01170     \}
+01171     \textcolor{keywordflow}{return} -1;
+01172 \}
+01173 
+01178 \textcolor{keywordtype}{int} OpenGLGraph::AddMarkerAtValue(\textcolor{keywordtype}{float} xValue)
+01179 \{
+01180     \textcolor{keywordtype}{bool} found = \textcolor{keyword}{false};
+01181     \textcolor{comment}{//check if series have any data to mark}
+01182     \textcolor{keywordflow}{if}(series[0]->size > 0)
+01183     \{
+01184         OGLMarker *mark = NULL;
+01185         \textcolor{keywordflow}{for}(\textcolor{keywordtype}{size\_t} i=0; i<markers.size(); ++i)
+01186             \textcolor{keywordflow}{if}(markers[i].used == \textcolor{keyword}{false})
+01187             \{
+01188                 mark = &markers[i];
+01189                 \textcolor{keywordflow}{break};
+01190             \}
+01191         \textcolor{keywordflow}{if}(mark == NULL)
+01192             \textcolor{keywordflow}{return} -1;
+01193         mark->posX = xValue;
+01194 
+01195         \textcolor{comment}{//find closest data point index}
+01196         \textcolor{keywordflow}{for}(\textcolor{keywordtype}{unsigned} i=0; i<series[0]->size; ++i)
+01197         \{
+01198             \textcolor{keywordflow}{if} ( series[0]->values[2*i] >= mark->posX )
+01199             \{
+01200                 \textcolor{keywordtype}{float} toLeft = mark->posX-series[0]->values[2*(i-1)];
+01201                 \textcolor{keywordtype}{float} toRight = series[0]->values[2*i]-mark->posX;
+01202                 \textcolor{keywordflow}{if}( toRight < toLeft)
+01203                 \{
+01204                     mark->dataValueIndex = 2*i;
+01205                 \}
+01206                 \textcolor{keywordflow}{else}
+01207                 \{
+01208                     mark->dataValueIndex = 2*(i-1);
+01209                 \}
+01210                 found = \textcolor{keyword}{true};
+01211                 \textcolor{keywordflow}{break};
+01212             \}
+01213         \}
+01214         \textcolor{keywordflow}{if}(!found) \textcolor{comment}{//if no closest point found, add marker to middle point}
+01215         \{
+01216             mark->dataValueIndex = series[0]->size;
+01217         \}
+01218         mark->used = \textcolor{keyword}{true};
+01219         mark->posX = series[0]->values[mark->dataValueIndex];
+01220         mark->posY = series[0]->values[mark->dataValueIndex+1];
+01221         mark->color = mMarkerColors[markers.size()];
+01222         mMarkersDlg->refreshMarkFreq = \textcolor{keyword}{true};
+01223         \textcolor{keywordflow}{return} mark->id;
+01224     \}
+01225     \textcolor{keywordflow}{return} -1;
+01226 \}
+01227 
+01231 \textcolor{keywordtype}{void} OpenGLGraph::RemoveMarker()
+01232 \{
+01233     \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} i=markers.size()-1; i>=0; --i)
+01234         \textcolor{keywordflow}{if}(markers[i].used == \textcolor{keyword}{true})
+01235         \{
+01236             markers[i].used = \textcolor{keyword}{false};
+01237             \textcolor{keywordflow}{break};
+01238         \}
+01239     Refresh();
+01240 \}
+01241 
+01242 \textcolor{keywordtype}{void} OpenGLGraph::RemoveMarker(\textcolor{keywordtype}{int} \textcolor{keywordtype}{id})
+01243 \{
+01244     \textcolor{keywordflow}{for}(\textcolor{keywordtype}{size\_t} i=0; i<markers.size(); ++i)
+01245     \{
+01246         \textcolor{keywordflow}{if}(markers[i].\textcolor{keywordtype}{id} == \textcolor{keywordtype}{id})
+01247         \{
+01248             markers[i].used = \textcolor{keyword}{false};
+01249             \textcolor{keywordflow}{break};
+01250         \}
+01251     \}
+01252     Refresh();
+01253 \}
+01254 
+01258 \textcolor{keywordtype}{void} OpenGLGraph::DrawMarkers()
+01259 \{
+01260         \textcolor{keywordflow}{if}(series.size() <= 0)
+01261             \textcolor{keywordflow}{return};
+01262 
+01263     \textcolor{keywordflow}{if}(settings.markersEnabled && series[0]->size > 0 && series[0] != NULL)
+01264     \{
+01265         switchToWindowView();
+01266 
+01267         \textcolor{keywordtype}{float} pixelXvalue =(settings.visibleArea.x2 - settings.visibleArea.x1) / 
+      settings.dataViewWidth;
+01268         \textcolor{keywordtype}{float} pixelYvalue = (settings.visibleArea.y2 - settings.visibleArea.y1)/  
+      settings.dataViewHeight;
+01269 
+01270         glBegin(GL_TRIANGLES);
+01271         \textcolor{keywordtype}{int} posX, posY;
+01272         \textcolor{keywordflow}{for}(\textcolor{keywordtype}{unsigned} i=0; i<markers.size(); ++i)
+01273         \{
+01274             \textcolor{keywordflow}{if}(markers[i].used == \textcolor{keyword}{false})
+01275                         \textcolor{keywordflow}{continue};
+01276                     \textcolor{keywordflow}{for}(\textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{int} j=0; j<series.size(); j++)
+01277                     \{
+01278                         \textcolor{keywordflow}{if}(series[j]->size > 0 && series[j]->visible)
+01279                         \{
+01280                             markers[i].posY = series[j]->values[markers[i].dataValueIndex+1];
+01281                             \textcolor{comment}{// X axis grid lines}
+01282                             posY = settings.marginBottom + ((series[j]->values[
+      markers[i].dataValueIndex+1]-settings.visibleArea.y1)/pixelYvalue);
+01283                             posX = settings.marginLeft + ((markers[i].posX-
+      settings.visibleArea.x1)/pixelXvalue);
+01284                             markers[i].iposX = posX;
+01285                             markers[i].iposY = posY;
+01286                             markers[i].size = 10;
+01287 
+01288                             \textcolor{keywordflow}{if}(posX >= settings.marginLeft && posX <= settings.
+      windowWidth-settings.marginRight)
+01289                             \{
+01290                                 markers[i].color = mMarkerColors[i];
+01291                                     glColor4f(markers[i].color.red, markers[i].color.green, 
+      markers[i].color.blue, markers[i].color.alpha);
+01292                                     \textcolor{keywordflow}{if}( posY >= settings.marginBottom && posY <= 
+      settings.windowHeight-settings.marginTop)
+01293                                     \{
+01294                                             glVertex3f( posX, posY, 10);
+01295                                             glVertex3f( posX+markers[i].size, posY+
+      markers[i].size, 10);
+01296                                             glVertex3f( posX-markers[i].size, posY+
+      markers[i].size, 10);
+01297                                     \}
+01298                                     glVertex3f( posX, settings.marginBottom+
+      markers[i].size, 10);
+01299                                     glVertex3f( posX-markers[i].size, settings.
+      marginBottom, 10);
+01300                                     glVertex3f( posX+markers[i].size, settings.
+      marginBottom, 10);
+01301                             \}
+01302                         \}
+01303                     \}
+01304         \}
+01305         glEnd();
+01306         glFlush();
+01307 
+01308         \textcolor{comment}{//draw marker data at the right upper corner of data view}
+01309         \textcolor{keywordtype}{char} text[256];
+01310         \textcolor{keywordtype}{float} textScale = 1;
+01311         \textcolor{keywordtype}{int} hpos = textScale*m_font->lineHeight()*2.5;
+01312         \textcolor{keywordflow}{for}(\textcolor{keywordtype}{unsigned} i=0; i<markers.size(); ++i)
+01313         \{
+01314             \textcolor{keywordflow}{if}(markers[i].used == \textcolor{keyword}{false})
+01315                         \textcolor{keywordflow}{continue};
+01316                     glColor4f(markers[i].color.red, markers[i].color.green, 
+      markers[i].color.blue, markers[i].color.alpha);
+01317                     \textcolor{keywordtype}{int} cnt = sprintf(text, \textcolor{stringliteral}{"M%i: % .3f MHz "}, i, series[0]->values[
+      markers[i].dataValueIndex]/1000000);
+01318 
+01319                     \textcolor{keywordflow}{for}(\textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{int} j=0; j<series.size(); j++)
+01320                         \textcolor{keywordflow}{if}(series[j]->size > 0 && series[j]->visible)
+01321                             cnt += sprintf(text+cnt, \textcolor{stringliteral}{"/ Ch %c: %#+3.1f dBFS "}, 65+j, 
+      series[j]->values[markers[i].dataValueIndex+1]);
+01322 
+01323                     markers[i].posY = series[0]->values[markers[i].dataValueIndex+1];
+01324                     posX = settings.marginLeft;
+01325                     posY = settings.windowHeight-settings.marginTop - hpos;
+01326                     \textcolor{comment}{//glPrint(posX, posY, 0, textScale, "%s", text);}
+01327                     \textcolor{keywordflow}{if}(markers[i].show == \textcolor{keyword}{false})
+01328                         \textcolor{keywordflow}{continue};
+01329                     hpos += textScale*m_font->lineHeight();
+01330             glRenderText(posX, posY, 0, textScale*m_font->lineHeight(), markers[
+      i].color.getColor4b(), \textcolor{stringliteral}{"%s"}, text);
+01331         \}
+01332     \}
+01333 \}
+01334 
+01341 \textcolor{keywordtype}{int} OpenGLGraph::clickedOnMarker(\textcolor{keywordtype}{int} X, \textcolor{keywordtype}{int} Y)
+01342 \{
+01343     \textcolor{keywordflow}{for}(\textcolor{keywordtype}{unsigned} i=0; i<markers.size(); ++i)
+01344     \{
+01345         \textcolor{keywordflow}{if}(markers[i].used == \textcolor{keyword}{false})
+01346             \textcolor{keywordflow}{continue};
+01347         \textcolor{keywordflow}{if}( X > markers[i].iposX-markers[i].size &&  X < markers[i].iposX+
+      markers[i].size )
+01348         \{
+01349             \textcolor{keywordflow}{if}(Y > settings.marginBottom && Y < settings.marginBottom+markers[i].size)
+01350             \{
+01351                 printf(\textcolor{stringliteral}{"selected %i marker\(\backslash\)n"}, i);
+01352                                 \textcolor{keywordflow}{return} i;
+01353                         \}
+01354 
+01355                         \textcolor{keywordflow}{for}(\textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{int} j=0; j<series.size(); j++)
+01356                         \{
+01357                             \textcolor{keywordflow}{if}(series[j]->size > 0 && series[j]->visible)
+01358                             \{
+01359                               \textcolor{keywordtype}{float} pixelYvalue = (settings.visibleArea.y2 - 
+      settings.visibleArea.y1)/  settings.dataViewHeight;
+01360                               \textcolor{keywordtype}{int} posY = settings.marginBottom + ((series[j]->values[
+      markers[i].dataValueIndex+1]-settings.visibleArea.y1)/pixelYvalue);
+01361                               \textcolor{keywordflow}{if}(Y > posY && Y < posY+markers[i].size)
+01362                               \{
+01363                                 printf(\textcolor{stringliteral}{"selected %i marker\(\backslash\)n"}, i);
+01364                                 \textcolor{keywordflow}{return} i;
+01365                               \}
+01366                             \}
+01367                         \}
+01368 
+01369         \}
+01370     \}
+01371     \textcolor{keywordflow}{return} -1;
+01372 \}
+01373 
+01379 \textcolor{keywordtype}{void} OpenGLGraph::MoveMarker(\textcolor{keywordtype}{int} markerID, \textcolor{keywordtype}{int} posX)
+01380 \{
+01381     \textcolor{keywordflow}{if}(series[0]->size > 0 && markerID >= 0)
+01382     \{
+01383         \textcolor{keywordflow}{if}(markers[markerID].used == \textcolor{keyword}{false})
+01384             \textcolor{keywordflow}{return};
+01385         \textcolor{keywordtype}{float} tempY = 0;
+01386         dataViewPixelToValue(posX-settings.marginLeft, 0, markers[markerID].posX, tempY);
+01387 
+01388         \textcolor{comment}{//determine which way marker was moved, search for closest data point}
+01389         \textcolor{keywordflow}{if}( posX < markers[markerID].iposX )
+01390         \{
+01391             \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} i=markers[markerID].dataValueIndex; i>0; i-=2)
+01392             \{
+01393                 \textcolor{keywordflow}{if} ( series[0]->values[i] <= markers[markerID].posX )
+01394                 \{
+01395                     \textcolor{keywordtype}{float} toLeft = markers[markerID].posX-series[0]->values[i-2];
+01396                     \textcolor{keywordtype}{float} toRight = series[0]->values[i]-markers[markerID].posX;
+01397                     \textcolor{keywordflow}{if}( toRight < toLeft)
+01398                     \{
+01399                         markers[markerID].dataValueIndex = i;
+01400                     \}
+01401                     \textcolor{keywordflow}{else}
+01402                     \{
+01403                         markers[markerID].dataValueIndex = i-2;
+01404                     \}
+01405                     \textcolor{keywordflow}{break};
+01406                 \}
+01407             \}
+01408         \}
+01409         \textcolor{keywordflow}{else}
+01410         \{
+01411             \textcolor{keywordflow}{for}(\textcolor{keywordtype}{unsigned} i=markers[markerID].dataValueIndex; i<series[0]->size*2 ; 
+      i+=2)
+01412             \{
+01413                 \textcolor{keywordflow}{if} ( series[0]->values[i] >= markers[markerID].posX )
+01414                 \{
+01415                     \textcolor{keywordtype}{float} toLeft = markers[markerID].posX-series[0]->values[i-2];
+01416                     \textcolor{keywordtype}{float} toRight = series[0]->values[i]-markers[markerID].posX;
+01417                     \textcolor{keywordflow}{if}( toRight < toLeft)
+01418                     \{
+01419                         markers[markerID].dataValueIndex = i;
+01420                     \}
+01421                     \textcolor{keywordflow}{else}
+01422                     \{
+01423                         markers[markerID].dataValueIndex = i-2;
+01424                     \}
+01425                     \textcolor{keywordflow}{break};
+01426                 \}
+01427             \}
+01428         \}
+01429         \textcolor{keywordtype}{float} pixelXvalue = (settings.visibleArea.x2 - settings.visibleArea.x1)/  
+      settings.dataViewWidth;
+01430         \textcolor{keywordtype}{float} pixelYvalue = (settings.visibleArea.y2 - settings.visibleArea.y1)/  
+      settings.dataViewHeight;
+01431         markers[markerID].posX = series[0]->values[markers[markerID].dataValueIndex];
+01432         markers[markerID].posY = series[0]->values[markers[markerID].dataValueIndex+1];
+01433         \textcolor{keywordtype}{int} posY = settings.marginBottom + ((series[0]->values[markers[markerID].dataValueIndex+1]-
+      settings.visibleArea.y1)/pixelYvalue);
+01434         \textcolor{keywordtype}{int} posX = settings.marginLeft + ((markers[markerID].posX-settings.
+      visibleArea.x1)/pixelXvalue);
+01435         markers[markerID].iposX = posX;
+01436         markers[markerID].iposY = posY;
+01437     \}
+01438     mMarkersDlg->refreshMarkFreq = \textcolor{keyword}{true};
+01439 \textcolor{preprocessor}{    #ifdef OGL\_REDRAW\_ENABLED}
+01440         Refresh();
+01441 \textcolor{preprocessor}{    #endif}
+01442 \}
+01443 
+01449 \textcolor{keywordtype}{void} OpenGLGraph::ChangeMarker(\textcolor{keywordtype}{int} markerID, \textcolor{keywordtype}{float} xValue)
+01450 \{
+01451     \textcolor{keywordflow}{if}(series[0]->size > 0 && markerID >= 0)
+01452     \{
+01453         OGLMarker* mark = NULL;
+01454         \textcolor{keywordflow}{for}(\textcolor{keywordtype}{size\_t} i=0; i<markers.size(); ++i)
+01455             \textcolor{keywordflow}{if}(markers[i].\textcolor{keywordtype}{id} == markerID)
+01456                 mark = &markers[i];
+01457         \textcolor{keywordflow}{if}(mark == NULL)
+01458             \textcolor{keywordflow}{return};
+01459 
+01460         mark->posX = xValue;
+01461         \textcolor{keywordtype}{bool} found = \textcolor{keyword}{false};
+01462         \textcolor{comment}{//find closest data point index}
+01463         \textcolor{keywordflow}{for}(\textcolor{keywordtype}{unsigned} i=0; i<series[0]->size; ++i)
+01464         \{
+01465             \textcolor{keywordflow}{if} ( series[0]->values[2*i] > mark->posX )
+01466             \{
+01467                 \textcolor{keywordtype}{float} toLeft = mark->posX-series[0]->values[2*(i-1)];
+01468                 \textcolor{keywordtype}{float} toRight = series[0]->values[2*i]-mark->posX;
+01469                 \textcolor{keywordflow}{if}( toRight < toLeft)
+01470                 \{
+01471                     mark->dataValueIndex = 2*i;
+01472                 \}
+01473                 \textcolor{keywordflow}{else}
+01474                 \{
+01475                     mark->dataValueIndex = 2*(i-1);
+01476                 \}
+01477                 found = \textcolor{keyword}{true};
+01478                 \textcolor{keywordflow}{break};
+01479             \}
+01480         \}
+01481         \textcolor{keywordflow}{if}(!found) \textcolor{comment}{//if no closest point found, add marker to middle point}
+01482         \{
+01483             mark->dataValueIndex = series[0]->size;
+01484         \}
+01485         mark->posX = series[0]->values[mark->dataValueIndex];
+01486         mark->posY = series[0]->values[mark->dataValueIndex+1];
+01487     \}
+01488     Refresh();
+01489 \textcolor{preprocessor}{    #ifdef OGL\_REDRAW\_ENABLED}
+01490         Refresh();
+01491 \textcolor{preprocessor}{    #endif}
+01492 \}
+01493 
+01494 \textcolor{keywordtype}{void} OpenGLGraph::setupViewport(\textcolor{keywordtype}{int} w, \textcolor{keywordtype}{int} h)
+01495 \{
+01496     glClearColor(0.0f, 0.0f, 0.0f, 1.0f); \textcolor{comment}{// Black Background}
+01497     glEnable(GL_DEPTH_TEST);
+01498 
+01499     glViewport(0, 0, w, h);
+01500     glMatrixMode(GL_PROJECTION);
+01501     glLoadIdentity();
+01502 
+01503     glOrtho(0, w, h, 0, -1, 1);
+01504     glMatrixMode(GL_MODELVIEW);
+01505     glLoadIdentity();
+01506 \}
+01507 
+01508 \textcolor{keywordtype}{void} OpenGLGraph::render(wxPaintEvent& evt)
+01509 \{
+01510     Draw();
+01511 \}
+01512 
+01513 \textcolor{keywordtype}{void} OpenGLGraph::resized(wxSizeEvent& evt)
+01514 \{
+01515     wxSize wh;
+01516     wh = evt.GetSize();
+01517     Resize(wh.GetWidth() , wh.GetHeight());
+01518     Refresh();
+01519 \}
+01520 
+01521 \textcolor{keywordtype}{void} OpenGLGraph::mouseMoved(wxMouseEvent& event)
+01522 \{
+01523     OnMouseMove(event.GetX(), \textcolor{keyword}{event}.GetY());
+01524 \}
+01525 
+01526 \textcolor{keywordtype}{void} OpenGLGraph::mouseWheelMoved(wxMouseEvent& event)
+01527 \{
+01528 
+01529 \}
+01530 
+01531 \textcolor{keywordtype}{void} OpenGLGraph::mouseReleased(wxMouseEvent& event)
+01532 \{
+01533     \textcolor{keywordflow}{if}(event.LeftUp())
+01534         OnMouseUp(OGLG_LEFT, event.GetX(), \textcolor{keyword}{event}.GetY());
+01535     \textcolor{keywordflow}{else} \textcolor{keywordflow}{if}(event.RightUp())
+01536         OnMouseUp(OGLG_RIGHT, event.GetX(), \textcolor{keyword}{event}.GetY());
+01537     \textcolor{keywordflow}{else} \textcolor{keywordflow}{if}(event.MiddleUp())
+01538         OnMouseUp(OGLG_MIDDLE, event.GetX(), \textcolor{keyword}{event}.GetY());
+01539 \}
+01540 \textcolor{keywordtype}{void} OpenGLGraph::rightClick(wxMouseEvent& event)
+01541 \{
+01542     OnMouseDown(OGLG_RIGHT, event.GetX(), \textcolor{keyword}{event}.GetY());
+01543 \}
+01544 \textcolor{keywordtype}{void} OpenGLGraph::leftClick(wxMouseEvent& event)
+01545 \{
+01546     OnMouseDown(OGLG_LEFT, event.GetX(), \textcolor{keyword}{event}.GetY());
+01547 \}
+01548 \textcolor{keywordtype}{void} OpenGLGraph::middleClick(wxMouseEvent& event)
+01549 \{
+01550     OnMouseDown(OGLG_MIDDLE, event.GetX(), \textcolor{keyword}{event}.GetY());
+01551 \}
+01552 \textcolor{keywordtype}{void} OpenGLGraph::mouseLeftWindow(wxMouseEvent& event)
+01553 \{
+01554 
+01555 \}
+01556 \textcolor{keywordtype}{void} OpenGLGraph::keyPressed(wxKeyEvent& event)
+01557 \{
+01558 
+01559 \}
+01560 \textcolor{keywordtype}{void} OpenGLGraph::keyReleased(wxKeyEvent& event)
+01561 \{
+01562 
+01563 \}
+01564 
+01565 \textcolor{keywordtype}{void} OpenGLGraph::onFit(wxCommandEvent& event)
+01566 \{
+01567     Fit();
+01568 \}
+01569 
+01570 \textcolor{keywordtype}{void} OpenGLGraph::onMouseHelp(wxCommandEvent& event)
+01571 \{
+01572     wxMessageBox(\_(\textcolor{stringliteral}{"Supported Mouse commands:\(\backslash\)n \(\backslash\)}
+01573 \textcolor{stringliteral}{        - Left button down + Mark area: Rectangular zoom\(\backslash\)n \(\backslash\)}
+01574 \textcolor{stringliteral}{        - Right button down + Move: Pan (Move)\(\backslash\)n \(\backslash\)}
+01575 \textcolor{stringliteral}{        - Wheel button down + Move: vertical & horizontal zooming\(\backslash\)n"}
+01576         ),\_(\textcolor{stringliteral}{"plot controls"}),wxOK,\textcolor{keyword}{this});
+01577 \}
+01578 
+01579 \textcolor{keywordtype}{void} OpenGLGraph::onAddMarker(wxCommandEvent& event)
+01580 \{
+01581     AddMarker(m_MouseCoord.x2);
+01582     Refresh();
+01583 \}
+01584 \textcolor{keywordtype}{void} OpenGLGraph::onRemoveMarker(wxCommandEvent& event)
+01585 \{
+01586     RemoveMarker();
+01587     Refresh();
+01588 \}
+01589 
+01590 \textcolor{keywordtype}{void} OpenGLGraph::onShowMarkersMenu(wxCommandEvent& event)
+01591 \{
+01592     \textcolor{keywordflow}{if}(m_timer->IsRunning() == \textcolor{keyword}{false})
+01593         m_timer->Start(500);
+01594     mMarkersDlg->Show();
+01595     mMarkersDlg->refreshMarkFreq = \textcolor{keyword}{true};;
+01596 \}
+01597 
+01598 \textcolor{keywordtype}{void} OpenGLGraph::onLockAspect(wxCommandEvent& event)
+01599 \{
+01600     settings.lock_aspect = \textcolor{keyword}{event}.GetInt();
+01601 \}
+01602 
+01603 \textcolor{keywordtype}{void} OpenGLGraph::ShowMenu(\textcolor{keywordtype}{int} x, \textcolor{keywordtype}{int} y)
+01604 \{
+01605     \textcolor{comment}{//modify menu}
+01606     wxMenuItem *item = NULL;
+01607     \textcolor{keywordflow}{if}(settings.markersEnabled == \textcolor{keyword}{false})
+01608     \{
+01609         item = m_popmenu.FindItem(OGLG_ADD_MARK);
+01610         item->Enable(\textcolor{keyword}{false});
+01611         item = m_popmenu.FindItem(OGLG_REMOVE_MARKER);
+01612         item->Enable(\textcolor{keyword}{false});
+01613         item = m_popmenu.FindItem(OGLG_SEARCH_PEAK);
+01614         item->Enable(\textcolor{keyword}{false});
+01615         item = m_popmenu.FindItem(OGLG_SHOW_MARKERS_MENU);
+01616         item->Enable(\textcolor{keyword}{false});
+01617     \}
+01618     PopupMenu( &m_popmenu, x, y);
+01619 \}
+01620 
+01621 \textcolor{keywordtype}{void} OpenGLGraph::onSearchPeak(wxCommandEvent& event)
+01622 \{
+01623     SearchPeak();
+01624     Refresh();
+01625     mMarkersDlg->refreshMarkFreq = \textcolor{keyword}{true};;
+01626 \}
+01627 
+01628 \textcolor{keywordtype}{void} OpenGLGraph::onReset(wxCommandEvent& event)
+01629 \{
+01630     ResetView();
+01631     Refresh();
+01632 \}
+01633 
+01634 \textcolor{keywordtype}{bool} OpenGLGraph::SearchPeak()
+01635 \{
+01636     \textcolor{keywordtype}{bool} found = \textcolor{keyword}{false};
+01637     \textcolor{keywordtype}{double} maxValue(0.0);
+01638     \textcolor{keywordtype}{unsigned} maxPos(0);
+01639     \textcolor{comment}{//Init max value}
+01640     \textcolor{keywordflow}{for}(\textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{int} i=0; i<series.size(); i++)
+01641     \{
+01642         \textcolor{keywordflow}{if}(series[i]->size > 0 && series[i]->visible)
+01643         \{
+01644             maxValue = series[i]->values[1];
+01645             found = \textcolor{keyword}{true};
+01646             \textcolor{keywordflow}{break};
+01647         \}
+01648     \}
+01649     \textcolor{comment}{//Find max position}
+01650     \textcolor{keywordflow}{for}(\textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{int} i=0; i<series.size(); i++)
+01651     \{
+01652         \textcolor{keywordflow}{if}(series[i]->size > 0 && series[i]->visible)
+01653         \{
+01654             \textcolor{keywordflow}{for}(\textcolor{keywordtype}{unsigned} j=0; j<series[i]->size; ++j)
+01655             \{
+01656                 \textcolor{keywordflow}{if}(maxValue < series[i]->values[2*j+1])
+01657                 \{
+01658                     maxValue = series[i]->values[2*j+1];
+01659                     maxPos = 2*j+1;
+01660                 \}
+01661             \}
+01662         \}
+01663     \}
+01664 
+01665     \textcolor{comment}{//Mark max position}
+01666     \textcolor{keywordflow}{for}(\textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{int} i=0; i<series.size(); i++)
+01667     \{
+01668         \textcolor{keywordflow}{if}(series[i]->size > 0 && series[i]->visible)
+01669         \{
+01670             AddMarkerAtValue(series[i]->values[maxPos-1]);
+01671             \textcolor{keywordflow}{break};
+01672         \}
+01673     \}
+01674     \textcolor{keywordflow}{return} found;
+01675 \}
+01676 
+01677 \textcolor{keywordtype}{void} OpenGLGraph::SetMarker(\textcolor{keywordtype}{int} \textcolor{keywordtype}{id}, \textcolor{keywordtype}{float} xValue, \textcolor{keywordtype}{bool} enabled, \textcolor{keywordtype}{bool} show)
+01678 \{
+01679     \textcolor{keywordflow}{if}(\textcolor{keywordtype}{id} >=0 && \textcolor{keywordtype}{id} < (\textcolor{keywordtype}{int})markers.size())
+01680     \{
+01681         ChangeMarker(\textcolor{keywordtype}{id}, xValue);
+01682         markers[id].used = enabled;
+01683         markers[id].show = show;
+01684     \}
+01685 \}
+01686 
+01687 \textcolor{keywordtype}{void} OpenGLGraph::GetMarker(\textcolor{keywordtype}{int} \textcolor{keywordtype}{id}, \textcolor{keywordtype}{float} &xValue, \textcolor{keywordtype}{float} &yValue, \textcolor{keywordtype}{bool} &enabled, \textcolor{keywordtype}{bool} &show)
+01688 \{
+01689     \textcolor{keywordflow}{if}(\textcolor{keywordtype}{id} >=0 && \textcolor{keywordtype}{id} < (\textcolor{keywordtype}{int})markers.size())
+01690     \{
+01691         xValue = markers[id].posX;
+01692         yValue = markers[id].posY;
+01693         enabled = markers[id].used;
+01694         show = markers[id].show;
+01695     \}
+01696 \}
+01697 
+01698 \textcolor{keywordtype}{void} OpenGLGraph::OnTimer(wxTimerEvent& event)
+01699 \{
+01700     mMarkersDlg->UpdateValues();
+01701     UpdateInfoDisplay();
+01702 \}
+01703 
+01704 \textcolor{keywordtype}{void} OpenGLGraph::UpdateInfoDisplay()
+01705 \{
+01706     \textcolor{keywordflow}{for}(\textcolor{keywordtype}{size\_t} i=0; i<info_msg.size(); ++i)
+01707     \{
+01708         info_msg_toDisplay[i] = info_msg[i];
+01709     \}
+01710 \}
+01711 
+01712 \textcolor{keywordtype}{void} OpenGLGraph::SetInfoMessage(\textcolor{keyword}{const} \textcolor{keywordtype}{char}* msg, \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{int} index)
+01713 \{
+01714     \textcolor{keywordflow}{if}(index < info_msg.size())
+01715         info_msg[index] = msg;
+01716 \}
+01717 
+01718 BEGIN\_EVENT\_TABLE(OpenGLGraph, wxGLCanvas)
+01719 EVT\_MOTION(OpenGLGraph::mouseMoved)
+01720 EVT\_RIGHT\_DOWN(OpenGLGraph::rightClick)
+01721 EVT\_RIGHT\_UP(OpenGLGraph::mouseReleased)
+01722 EVT\_LEFT\_DOWN(OpenGLGraph::leftClick)
+01723 EVT\_LEFT\_UP(OpenGLGraph::mouseReleased)
+01724 EVT\_MIDDLE\_UP(OpenGLGraph::mouseReleased)
+01725 EVT\_MIDDLE\_DOWN(OpenGLGraph::middleClick)
+01726 EVT\_LEAVE\_WINDOW(OpenGLGraph::mouseLeftWindow)
+01727 EVT\_SIZE(OpenGLGraph::resized)
+01728 EVT\_MOUSEWHEEL(OpenGLGraph::mouseWheelMoved)
+01729 EVT\_PAINT(OpenGLGraph::render)
+01730 EVT\_TIMER(wxID\_ANY, OpenGLGraph::OnTimer)
+01731 
+01732 EVT\_MENU( OGLG_FIT,       OpenGLGraph::onFit)
+01733 EVT\_MENU( OGLG_HELP_MOUSE, OpenGLGraph::onMouseHelp)
+01734 EVT\_MENU( OGLG_ADD_MARK, OpenGLGraph::onAddMarker)
+01735 EVT\_MENU( OGLG_REMOVE_MARKER, OpenGLGraph::onRemoveMarker)
+01736 EVT\_MENU( OGLG_SHOW_MARKERS_MENU, OpenGLGraph::onShowMarkersMenu)
+01737 EVT\_MENU( OGLG_LOCKASPECT, OpenGLGraph::onLockAspect)
+01738 EVT\_MENU( OGLG_SEARCH_PEAK, OpenGLGraph::onSearchPeak)
+01739 EVT\_MENU( OGLG_RESET, OpenGLGraph::onReset)
+01740 END\_EVENT\_TABLE()
+\end{DoxyCode}

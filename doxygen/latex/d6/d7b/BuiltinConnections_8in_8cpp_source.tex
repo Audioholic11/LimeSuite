@@ -1,0 +1,50 @@
+\subsection{Builtin\+Connections.\+in.\+cpp}
+\label{BuiltinConnections_8in_8cpp_source}\index{/home/erik/prefix/default/src/limesuite-\/dev/src/\+Connection\+Registry/\+Builtin\+Connections.\+in.\+cpp@{/home/erik/prefix/default/src/limesuite-\/dev/src/\+Connection\+Registry/\+Builtin\+Connections.\+in.\+cpp}}
+
+\begin{DoxyCode}
+00001 \textcolor{comment}{/***********************************************************************}
+00002 \textcolor{comment}{ * This is a collection of all built-in connections that are included}
+00003 \textcolor{comment}{ * with the library. Additional connections can be added dynamically.}
+00004 \textcolor{comment}{ **********************************************************************/}
+00005 
+00006 \textcolor{preprocessor}{#cmakedefine ENABLE\_EVB7COM}
+00007 \textcolor{preprocessor}{#cmakedefine ENABLE\_FX3}
+00008 \textcolor{preprocessor}{#cmakedefine ENABLE\_STREAM\_UNITE}
+00009 \textcolor{preprocessor}{#cmakedefine ENABLE\_NOVENARF7}
+00010 \textcolor{preprocessor}{#cmakedefine ENABLE\_FTDI}
+00011 \textcolor{preprocessor}{#cmakedefine ENABLE\_PCIE\_XILLYBUS}
+00012 
+00013 \textcolor{keywordtype}{void} __loadConnectionEVB7COMEntry(\textcolor{keywordtype}{void});
+00014 \textcolor{keywordtype}{void} __loadConnectionFX3Entry(\textcolor{keywordtype}{void});
+00015 \textcolor{keywordtype}{void} __loadConnectionSTREAM_UNITEEntry(\textcolor{keywordtype}{void});
+00016 \textcolor{keywordtype}{void} __loadConnectionNovenaRF7Entry(\textcolor{keywordtype}{void});
+00017 \textcolor{keywordtype}{void} __loadConnectionFT601Entry(\textcolor{keywordtype}{void});
+00018 \textcolor{keywordtype}{void} __loadConnectionXillybusEntry(\textcolor{keywordtype}{void});
+00019 
+00020 \textcolor{keywordtype}{void} __loadAllConnections(\textcolor{keywordtype}{void})
+00021 \{
+00022 \textcolor{preprocessor}{    #ifdef ENABLE\_EVB7COM}
+00023     __loadConnectionEVB7COMEntry();
+00024 \textcolor{preprocessor}{    #endif}
+00025 
+00026 \textcolor{preprocessor}{    #ifdef ENABLE\_FX3}
+00027     __loadConnectionFX3Entry();
+00028 \textcolor{preprocessor}{    #endif}
+00029 
+00030 \textcolor{preprocessor}{    #ifdef ENABLE\_STREAM\_UNITE}
+00031     __loadConnectionSTREAM_UNITEEntry();
+00032 \textcolor{preprocessor}{    #endif}
+00033 
+00034 \textcolor{preprocessor}{    #ifdef ENABLE\_FTDI}
+00035     __loadConnectionFT601Entry();
+00036 \textcolor{preprocessor}{    #endif}
+00037 
+00038 \textcolor{preprocessor}{    #ifdef ENABLE\_NOVENARF7}
+00039     __loadConnectionNovenaRF7Entry();
+00040 \textcolor{preprocessor}{    #endif}
+00041 
+00042 \textcolor{preprocessor}{    #ifdef ENABLE\_PCIE\_XILLYBUS}
+00043     __loadConnectionXillybusEntry();
+00044 \textcolor{preprocessor}{    #endif}
+00045 \}
+\end{DoxyCode}

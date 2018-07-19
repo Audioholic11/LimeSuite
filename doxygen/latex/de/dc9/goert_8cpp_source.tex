@@ -1,0 +1,347 @@
+\subsection{goert.\+cpp}
+\label{goert_8cpp_source}\index{/home/erik/prefix/default/src/limesuite-\/dev/src/lms7002m/goert.\+cpp@{/home/erik/prefix/default/src/limesuite-\/dev/src/lms7002m/goert.\+cpp}}
+
+\begin{DoxyCode}
+00001 \textcolor{comment}{//****************************************************************************}
+00002 \textcolor{comment}{//   GOERTZEL ALGORITHM       For complex input data}
+00003 \textcolor{comment}{//****************************************************************************}
+00004 \textcolor{preprocessor}{#include <iostream>}
+00005 \textcolor{preprocessor}{#include "IConnection.h"}
+00006 \textcolor{preprocessor}{#include <stdio.h>}
+00007 \textcolor{preprocessor}{#include <math.h>}
+00008 \textcolor{preprocessor}{#include <limits.h>}
+00009 \textcolor{preprocessor}{#include <stdint.h>}
+00010 \textcolor{preprocessor}{#include <chrono>}
+00011 \textcolor{preprocessor}{#include "Logger.h"}
+00012 
+00013 \textcolor{keyword}{using namespace }std;
+00014 \textcolor{keyword}{using namespace }lime;
+00015 
+00016 \textcolor{keyword}{static} \textcolor{keyword}{const} \textcolor{keywordtype}{double} PI = 3.14159265359;
+00017 
+00018 \textcolor{keyword}{static} \textcolor{keyword}{const} uint16\_t C_COS_ADDR_MSB   = 0x0081;   \textcolor{comment}{// FPGA SPI cosine[31:16] register address}
+00019 \textcolor{keyword}{static} \textcolor{keyword}{const} uint16\_t C_COS_ADDR_LSB   = 0x0082;   \textcolor{comment}{// FPGA SPI cosine[15:0] register address}
+00020 \textcolor{keyword}{static} \textcolor{keyword}{const} uint16\_t C_CTRL_ADDR      = 0x0080;   \textcolor{comment}{// FPGA SPI control register address}
+00021 \textcolor{keyword}{static} \textcolor{keyword}{const} uint16\_t C_INT_ADDR_START = 0x0083;   \textcolor{comment}{// FPGA SPI internal register starting address}
+00022 \textcolor{keyword}{static} \textcolor{keyword}{const} uint16\_t C_INT_ADDR_STOP  = 0x008E;   \textcolor{comment}{// FPGA SPI internal register ending address}
+00023 
+00024 \textcolor{keyword}{static} \textcolor{keyword}{const} \textcolor{keywordtype}{int} C_TRIG_LEN = 32;   \textcolor{comment}{// cosine/sine register length in FPGA}
+00025 
+00026 \textcolor{keyword}{static} int32\_t cos_value = 1;
+00027 \textcolor{keyword}{static} int32\_t sin_value = 0;
+00028 
+00029 \textcolor{keywordtype}{void} getGoertzelCoefficients(\textcolor{keywordtype}{int} k, \textcolor{keywordtype}{int} SP, int32\_t *c, int32\_t *s)
+00030 \{
+00031     \textcolor{keywordtype}{float} phi, wn; \textcolor{comment}{// algorithm variables for sine and cosine computation}
+00032     wn = PI/SP;
+00033     phi = wn * k;
+00034 
+00035     \textcolor{keywordflow}{if}(c)
+00036         *c =  cos(phi) * (~(1 << (C_TRIG_LEN-1)) );
+00037     \textcolor{keywordflow}{if}(s)
+00038         *s =  sin(phi) * (~(1 << (C_TRIG_LEN-1)) );
+00039 \}
+00040 
+00041 \textcolor{keywordtype}{int} loadGoertzelCoefficients(IConnection *dataPort, int32\_t c)
+00042 \{
+00043     \textcolor{keyword}{const} uint16\_t c\_msb = (c >> 16) & 0xFFFF;
+00044     \textcolor{keyword}{const} uint16\_t c\_lsb =  c & 0x0000FFFF;
+00045     \textcolor{comment}{//dataPort->WriteRegister(C\_COS\_ADDR\_MSB, c\_msb);}
+00046     \textcolor{comment}{//dataPort->WriteRegister(C\_COS\_ADDR\_LSB, c\_lsb);}
+00047     \textcolor{keyword}{const} uint32\_t addrs[] = \{C_COS_ADDR_MSB, C_COS_ADDR_LSB\};
+00048     \textcolor{keyword}{const} uint32\_t values[] = \{c\_msb, c\_lsb\};
+00049     \textcolor{keywordflow}{return} dataPort->WriteRegisters(addrs, values, 2);
+00050 \}
+00051 
+00060 \textcolor{keywordtype}{int} readGoertzelValues(IConnection *port, int64\_t *real, int64\_t *imag, int32\_t c, int32\_t s)
+00061 \{
+00062     \textcolor{comment}{// read Goertzel values from the HW}
+00063     std::vector<int64\_t> lr;  \textcolor{comment}{// lr1 lr2 li1 li2}
+00064     int64\_t l\_msb, l\_mid, l\_lsb;
+00065 
+00066     vector<uint32\_t> addrs;
+00067     \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} addr=C_INT_ADDR_START; addr<=C_INT_ADDR_STOP; ++addr)
+00068         addrs.push\_back(addr);
+00069 
+00070     vector<uint32\_t> values(addrs.size(), 0);
+00071     \textcolor{keywordtype}{int} status = port->ReadRegisters(addrs.data(), values.data(), addrs.size());
+00072     \textcolor{keywordflow}{if}(status != 0)
+00073         \textcolor{keywordflow}{return} ReportError(EIO, \textcolor{stringliteral}{"readGoertzelValues: Failed to read values"});
+00074 
+00075     \textcolor{keywordflow}{for}(\textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{int} i=0; i<values.size(); i+=3)
+00076     \{
+00077         l\_msb = values[i];
+00078         l\_mid = values[i+1];
+00079         l\_lsb = values[i+2];
+00080         l\_msb = (l\_msb << 48);
+00081         l\_msb = (l\_msb >> 16) & 0xFFFFFFFF00000000;
+00082         l\_mid = (l\_mid << 48);
+00083         l\_mid = (l\_mid >> 32) & 0x00000000FFFF0000;
+00084         l\_lsb = (l\_lsb) & 0x000000000000FFFF;
+00085         l\_msb += l\_mid;
+00086         l\_msb += l\_lsb;
+00087         lr.push\_back(l\_msb);
+00088     \}
+00089     \textcolor{keywordflow}{if}(real)
+00090         *real = int64\_t((int64\_t(c)*lr[0]) >> (C_TRIG_LEN-1)) - lr[1] - ((int64\_t(s) * lr[2]) >> (
+      C_TRIG_LEN-1));
+00091     \textcolor{keywordflow}{if}(imag)
+00092         *imag = int64\_t((int64\_t(c)*lr[2]) >> (C_TRIG_LEN-1)) - lr[3] + ((int64\_t(s) * lr[0]) >> (
+      C_TRIG_LEN-1));
+00093     \textcolor{keywordflow}{return} status;
+00094 \}
+00095 
+00096 \textcolor{keywordtype}{int} computeGoertzel(IConnection *dataPort)
+00097 \{
+00098     \textcolor{keywordtype}{int} status;
+00099     uint16\_t regValue = 0;
+00100     \textcolor{comment}{/*status = dataPort->ReadRegister(C\_CTRL\_ADDR, regValue);}
+00101 \textcolor{comment}{    if(status != 0)}
+00102 \textcolor{comment}{        return ReportError(EIO, "computeGoertzel: failed to read control register");}
+00103 \textcolor{comment}{    */}
+00104 
+00105     uint32\_t addrs[] = \{C_CTRL_ADDR, C_CTRL_ADDR\};
+00106     uint32\_t values[] = \{regValue & uint32\_t(~0x1), regValue | uint32\_t(0x1)\};
+00107 
+00108     status = dataPort->WriteRegisters(addrs, values, 2);
+00109     \textcolor{keywordflow}{if}(status != 0)
+00110         \textcolor{keywordflow}{return} ReportError(EIO, \textcolor{stringliteral}{"computeGoertzel: failed to write control register"});
+00111 
+00112     \textcolor{keywordtype}{bool} busy = \textcolor{keyword}{true};
+00113     \textcolor{keyword}{const} \textcolor{keyword}{auto} t1 = std::chrono::high\_resolution\_clock::now();
+00114     \textcolor{keyword}{auto} t2 = std::chrono::high\_resolution\_clock::now();
+00115     \textcolor{keywordflow}{while}(busy && (t2-t1 < std::chrono::seconds(1)))
+00116     \{
+00117         uint16\_t busyCheck = 0;
+00118         dataPort->ReadRegister(C\_CTRL\_ADDR, busyCheck);
+00119         busyCheck = busyCheck & 0x0002;
+00120         \textcolor{keywordflow}{if}(busyCheck != 0x0002)
+00121             busy = \textcolor{keyword}{false};
+00122         t2 = std::chrono::high\_resolution\_clock::now();
+00123     \}
+00124     \textcolor{keywordflow}{if}(t2-t1 >= std::chrono::seconds(1))
+00125         \textcolor{keywordflow}{return} ReportError(EBUSY, \textcolor{stringliteral}{"computeGoertzel: timeout"});
+00126     \textcolor{comment}{/*status = dataPort->WriteRegister(C\_CTRL\_ADDR, regValue & ~0x1);}
+00127 \textcolor{comment}{    if(status != 0)}
+00128 \textcolor{comment}{        return ReportError(EIO, "computeGoertzel: failed to write control register");}
+00129 \textcolor{comment}{    */}
+00130     \textcolor{keywordflow}{return} 0;
+00131 \}
+00132 
+00133 int64\_t c64to48(int64\_t x);
+00134 
+00135 \textcolor{keyword}{static} int64\_t resize_int(int64\_t x, int16\_t n)
+00136 \{
+00137     \textcolor{comment}{//int64\_t mask = ~(0xFFFFFFFFFFFFFFFF << (n-1));}
+00138     \textcolor{comment}{//int64\_t sign = (x >> (n+1)) & ~mask;}
+00139     \textcolor{comment}{// print out masks}
+00140     \textcolor{comment}{/*cout << hex << setw(16) << right << setfill('0') << sign << " | ";}
+00141 \textcolor{comment}{    cout << hex << setw(16) << right << setfill('0') << mask << endl;*/}
+00142     \textcolor{keywordflow}{return} x; \textcolor{comment}{//sign + (mask & x);}
+00143 \}
+00144 
+00145 \textcolor{preprocessor}{#include <string.h>}
+00146 \textcolor{keywordtype}{void} checkForMinMax(int64\_t lr, int64\_t & lr\_min, int64\_t & lr\_max)
+00147 \{
+00148     \textcolor{keywordflow}{if}(lr < lr\_min)
+00149         lr\_min = lr;
+00150     \textcolor{keywordflow}{if}(lr > lr\_max)
+00151         lr\_max = lr;
+00152 \}
+00153 \textcolor{keyword}{static} \textcolor{keywordtype}{int} fftBin;
+00154 
+00155 \textcolor{keywordtype}{void} CalcGoertzelI(\textcolor{keywordtype}{int} x[][2], int64\_t real[], int64\_t imag[], \textcolor{keywordtype}{int} Sp)
+00156 \{
+00157   \textcolor{keyword}{const} int16\_t a = 0;
+00158   \textcolor{keyword}{const} int16\_t b = 0;
+00159   \textcolor{keyword}{const} int16\_t register\_length = 64;
+00160   \textcolor{keyword}{const} int16\_t trig\_length = 32;
+00161   \textcolor{keyword}{const} int16\_t mul\_length  = register\_length+trig\_length-a-b;
+00162   \textcolor{keyword}{const} int16\_t add\_length  = register\_length+1;
+00163 
+00164   memset(real, Sp, \textcolor{keyword}{sizeof}(int64\_t)*Sp);
+00165   memset(imag, Sp, \textcolor{keyword}{sizeof}(int64\_t)*Sp);
+00166 
+00167 \textcolor{preprocessor}{  #ifdef DEBUG\_MODE}
+00168       int64\_t lr1\_min, lr1\_max;
+00169       int64\_t li1\_min, li1\_max;
+00170       int64\_t lr2\_min, lr2\_max;
+00171       int64\_t li2\_min, li2\_max;
+00172 
+00173       lr1\_min = LLONG\_MAX;
+00174       lr1\_max = LLONG\_MIN;
+00175       li1\_min = LLONG\_MAX;
+00176       li1\_max = LLONG\_MIN;
+00177       lr2\_min = LLONG\_MAX;
+00178       lr2\_max = LLONG\_MIN;
+00179       li2\_min = LLONG\_MAX;
+00180       li2\_max = LLONG\_MIN;
+00181 \textcolor{preprocessor}{  #endif}
+00182   int32\_t c, s;     \textcolor{comment}{// cosine and sine 16 bits registers}
+00183   int32\_t x\_n;      \textcolor{comment}{// sample (bin)}
+00184 
+00185   int64\_t lr1, lr2, li1, li2, temp; \textcolor{comment}{// algorithm registers}
+00186 
+00187   int64\_t mul;
+00188   \textcolor{keywordtype}{float} phi, wn;    \textcolor{comment}{// algorithm variables for sine and cosine computation}
+00189   \textcolor{keywordtype}{int} n;         \textcolor{comment}{// loop variables}
+00190 
+00191   \textcolor{comment}{// Prepare for computation}
+00192   wn = PI/Sp;
+00193   \textcolor{comment}{// Loop through all the bins}
+00194   \textcolor{comment}{//for(k=0; k<Sp; k++)}
+00195   \textcolor{comment}{/*if(fftBin != 0)}
+00196 \textcolor{comment}{    k = fftBin-1;}
+00197 \textcolor{comment}{  else*/}
+00198     \textcolor{keyword}{const} \textcolor{keywordtype}{int} span = 60;
+00199 \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} k = fftBin-span; k <= fftBin+span; k++)
+00200   \textcolor{comment}{//k = fftBin;}
+00201   \{
+00202       \textcolor{keywordflow}{if}(k < 0)
+00203         \textcolor{keywordflow}{continue};
+00204     \textcolor{keywordflow}{if}(k>= Sp)
+00205         \textcolor{keywordflow}{break};
+00206     lr1 = lr2 = 0;
+00207     li1 = li2 = 0;
+00208     temp = 0;
+00209     mul = 0;
+00210     \textcolor{comment}{// Precompute the constants for the current bin}
+00211     phi = wn * k;
+00212     c = cos(phi) * (~(1 << (trig\_length-1)) );
+00213     s = sin(phi) * (~(1 << (trig\_length-1)) );
+00214     \textcolor{comment}{// Emulate data shift}
+00215     \textcolor{keywordflow}{for}(n=0; n<Sp; n++)
+00216     \{
+00217       \textcolor{comment}{// first channel}
+00218       x\_n = x[n][0];
+00219 
+00220       temp = resize_int(lr1, register\_length);
+00221 
+00222       mul  = (c >> a) * (lr1 >> b);
+00223       mul  = resize_int(mul, mul\_length);
+00224       mul  = (mul >> (trig\_length-a-b-1)) << 1;
+00225 
+00226       lr1 = resize_int(mul, add\_length) - resize_int(lr2, add\_length) + 
+      resize_int(x\_n, add\_length);
+00227       lr2 = temp;
+00228 \textcolor{preprocessor}{      #ifdef DEBUG\_MODE}
+00229         checkForMinMax(lr1, lr1\_min, lr1\_max);
+00230         checkForMinMax(lr2, lr2\_min, lr2\_max);
+00231 \textcolor{preprocessor}{      #endif}
+00232       lr1 = resize_int(lr1, register\_length);
+00233 
+00234       \textcolor{comment}{// second channel}
+00235       x\_n = x[n][1];
+00236 
+00237       temp = resize_int(li1, register\_length);
+00238 
+00239       mul  = (c >> a) * (li1 >> b);
+00240       mul  = resize_int(mul, mul\_length);
+00241       mul  = (mul >> (trig\_length-a-b-1)) << 1;
+00242 
+00243       li1 = resize_int(mul, add\_length) - resize_int(li2, add\_length) + 
+      resize_int(x\_n, add\_length);
+00244       li2 = temp;
+00245 \textcolor{preprocessor}{      #ifdef DEBUG\_MODE}
+00246         checkForMinMax(li1, li1\_min, li1\_max);
+00247         checkForMinMax(li2, li2\_min, li2\_max);
+00248 \textcolor{preprocessor}{      #endif}
+00249       li1 = resize_int(li1, register\_length);
+00250     \}
+00251     real[k] = (int64\_t)( resize_int( resize_int( (c >> a)*(lr1 >> b), mul\_length) >> (trig\_length-a-b-1), 
+      add\_length) - resize_int(lr2, add\_length) - resize_int( resize_int((s >> a) * (li1 >> b), mul\_length )>> (
+      trig\_length-a-b-1), add\_length) );
+00252     imag[k] = (int64\_t)( resize_int( resize_int( (c >> a)*(li1 >> b), mul\_length) >> (trig\_length-a-b-1), 
+      add\_length) - resize_int(li2, add\_length) + resize_int( resize_int((s >> a) * (lr1 >> b), mul\_length )>> (
+      trig\_length-a-b-1), add\_length) );
+00253   \}
+00254 \textcolor{preprocessor}{  #ifdef DEBUG\_MODE}
+00255     \textcolor{comment}{/*}
+00256 \textcolor{comment}{    cout << lr1\_min << " | " << lr1\_max << endl;}
+00257 \textcolor{comment}{    cout << li1\_min << " | " << lr1\_max << endl;}
+00258 \textcolor{comment}{    cout << lr2\_min << " | " << lr1\_max << endl;}
+00259 \textcolor{comment}{    cout << li2\_min << " | " << lr1\_max << endl;}
+00260 \textcolor{comment}{    */}
+00261 \textcolor{preprocessor}{  #endif}
+00262 \};
+00263 \textcolor{comment}{/* Goertzel Algorithm Implementation, float numbers*/}
+00264 \textcolor{keywordtype}{void} CalcGoertzelF(\textcolor{keywordtype}{int} x[][2], \textcolor{keywordtype}{float} real[], \textcolor{keywordtype}{float} imag[], \textcolor{keywordtype}{int} Sp)
+00265 \{
+00266   \textcolor{keywordtype}{double} lr1, lr2, li1, li2, temp;
+00267   \textcolor{keywordtype}{double} c, s, phi, wn;
+00268   \textcolor{keywordtype}{int} n, k;
+00269 
+00270     \textcolor{keywordflow}{for} (\textcolor{keywordtype}{int} i = 0; i < Sp; i++)\{
+00271         real[i] = 0.0;
+00272         imag[i] = 0.0;
+00273     \}
+00274   wn = PI/Sp;
+00275 
+00276   \textcolor{comment}{// Loop through all the bins}
+00277   \textcolor{keywordtype}{int} span = 60;
+00278   \textcolor{keywordflow}{for}(k=fftBin-span; k<fftBin+span; k++)
+00279   \textcolor{comment}{//k = fftBin;}
+00280   \{
+00281       \textcolor{keywordflow}{if}(k < 0)
+00282         \textcolor{keywordflow}{continue};
+00283       \textcolor{keywordflow}{if}(k >= Sp)
+00284         \textcolor{keywordflow}{break};
+00285     lr1 = lr2 = 0;
+00286     li1 = li2 = 0;
+00287 
+00288     \textcolor{comment}{// Precompute the constants for the current bin}
+00289     phi = wn * k;
+00290     c = cos(phi);
+00291     s = sin(phi);
+00292 
+00293     \textcolor{comment}{// Emulate data shift}
+00294     \textcolor{keywordflow}{for}(n=0; n<Sp; n++)
+00295     \{
+00296       temp = lr1;
+00297       lr1 = 2.0*c*lr1 - lr2 + ((float)x[n][0]);
+00298       lr2 = temp;
+00299 
+00300       temp = li1;
+00301       li1 = 2.0*c*li1 - li2 + ((float)x[n][1]);
+00302       li2 = temp;
+00303 
+00304       \textcolor{comment}{//if(k == 100) fprintf(fp, "%15f, %15f, %15f, %15f\(\backslash\)n", lr1, lr2, li1, li2);}
+00305     \}
+00306 
+00307     \textcolor{comment}{// Compute real and imaginary parts for the current bin}
+00308     real[k] = c*lr1 - lr2 - s*li1;
+00309     imag[k] = c*li1 - li2 + s*lr1;
+00310   \}
+00311 
+00312   \textcolor{comment}{//fclose(fp);}
+00313 \};
+00314 
+00315 
+00316 \textcolor{keywordtype}{int} SelectGoertzelBin(IConnection* port, uint16\_t bin, uint16\_t samplesCount)
+00317 \{
+00318     getGoertzelCoefficients(bin, samplesCount, &cos_value, &sin_value);
+00319     \textcolor{keywordtype}{int} status = loadGoertzelCoefficients(port, cos_value);
+00320     \textcolor{keywordflow}{if}(status != 0)
+00321         \textcolor{keywordflow}{return} status;
+00322     \textcolor{keywordflow}{return} 0;
+00323 \}
+00324 
+00325 \textcolor{keywordtype}{int} CalculateGoertzelBin(IConnection *port, int64\_t *real, int64\_t *imag)
+00326 \{
+00327     \textcolor{keywordflow}{if}(port == \textcolor{keyword}{nullptr})
+00328         \textcolor{keywordflow}{return} ReportError(EINVAL, \textcolor{stringliteral}{"CalculateGoertzelBin: port == nullptr"});
+00329     int64\_t real\_hw =0;
+00330     int64\_t imag\_hw = 0;
+00331     \textcolor{keywordtype}{int} status = computeGoertzel(port);
+00332     \textcolor{keywordflow}{if}(status != 0)
+00333         \textcolor{keywordflow}{return} status;
+00334     status = readGoertzelValues(port, &real\_hw, &imag\_hw, cos_value, sin_value);
+00335     \textcolor{keywordflow}{if}(status != 0)
+00336         \textcolor{keywordflow}{return} status;
+00337     \textcolor{keywordflow}{if}(real)
+00338         *real = real\_hw;
+00339     \textcolor{keywordflow}{if}(imag)
+00340         *imag = imag\_hw;
+00341     \textcolor{keywordflow}{return} 0;
+00342 \}
+\end{DoxyCode}

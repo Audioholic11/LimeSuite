@@ -1,0 +1,44 @@
+\subsection{wfm.\+m}
+\label{wfm_8m_source}\index{/home/erik/prefix/default/src/limesuite-\/dev/octave/wfm.\+m@{/home/erik/prefix/default/src/limesuite-\/dev/octave/wfm.\+m}}
+
+\begin{DoxyCode}
+00001 %imports shared library functions
+00002 LoadLimeSuite
+00003 
+00004 %Generate waveform
+00005 phase = pi/8;
+00006 src = 0.7*complex(sin(0:phase:1000*pi-phase), cos(0:phase:1000*pi-phase));
+00007 
+00008 %%initialize LimeSuite
+00009 %\textcolor{keywordflow}{if} several boards are connected
+00010 %deviceList = LimeGetDeviceList();
+00011 %selectedDevice = 1;
+00012 %LimeInitialize(deviceList(selectedDevice));
+00013 %otherwise initialization uses first available device
+00014 LimeInitialize();
+00015 
+00016 %load initial chip configuration
+00017 LimeLoadConfig(\textcolor{stringliteral}{'rxTest.ini'});
+00018 
+00019 %activate Tx and Rx streaming
+00020 LimeStartStreaming(1000000);
+00021 
+00022 %Load waveform to be continuosly transmitted
+00023 LimeLoopWFMStart(src);
+00024 
+00025 %receive samples
+00026 \textcolor{keywordflow}{for} i=1:10000
+00027     samples = LimeReceiveSamples(1360);
+00028     %plot(samples);
+00029     pause(0.001);
+00030 end
+00031 
+00032 %stop streaming
+00033 LimeLoopWFMStop();
+00034 LimeStopStreaming(); %also resets Rx Tx buffers
+00035 
+00036 
+00037 
+00038 %deallocate resources
+00039 LimeDestroy();
+\end{DoxyCode}

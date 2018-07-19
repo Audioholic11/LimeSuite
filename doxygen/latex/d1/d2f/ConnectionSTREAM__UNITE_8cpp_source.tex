@@ -1,0 +1,79 @@
+\subsection{Connection\+S\+T\+R\+E\+A\+M\+\_\+\+U\+N\+I\+T\+E.\+cpp}
+\label{ConnectionSTREAM__UNITE_8cpp_source}\index{/home/erik/prefix/default/src/limesuite-\/dev/src/\+Connection\+S\+T\+R\+E\+A\+M\+\_\+\+U\+N\+I\+T\+E/\+Connection\+S\+T\+R\+E\+A\+M\+\_\+\+U\+N\+I\+T\+E.\+cpp@{/home/erik/prefix/default/src/limesuite-\/dev/src/\+Connection\+S\+T\+R\+E\+A\+M\+\_\+\+U\+N\+I\+T\+E/\+Connection\+S\+T\+R\+E\+A\+M\+\_\+\+U\+N\+I\+T\+E.\+cpp}}
+
+\begin{DoxyCode}
+00001 
+00007 \textcolor{preprocessor}{#include "ConnectionSTREAM_UNITE.h"}
+00008 \textcolor{preprocessor}{#include "ErrorReporting.h"}
+00009 \textcolor{keyword}{using namespace }std;
+00010 \textcolor{keyword}{namespace }lime
+00011 \{
+00012 
+00013 ConnectionSTREAM\_UNITE::ConnectionSTREAM\_UNITE(\textcolor{keywordtype}{void}* ctx, \textcolor{keyword}{const} std::string &vidpid, \textcolor{keyword}{const} std::string &
+      serial, \textcolor{keyword}{const} \textcolor{keywordtype}{unsigned} index, \textcolor{keyword}{const} \textcolor{keywordtype}{char}* comPortName)
+00014     : ConnectionFX3(ctx, vidpid, serial, index), comPort(nullptr)
+00015 \{
+00016     \textcolor{keywordflow}{if}(comPortName && strlen(comPortName))
+00017     \{
+00018         comPort = \textcolor{keyword}{new} ConnectionEVB7COM(comPortName, 9600);
+00019         \textcolor{keywordflow}{if}(comPort->IsOpen() == \textcolor{keyword}{false})
+00020         \{
+00021             \textcolor{keyword}{delete} comPort;
+00022             comPort = \textcolor{keyword}{nullptr};
+00023             \textcolor{keywordflow}{return};
+00024         \}
+00025     \}
+00026 \}
+00027 
+00028 ConnectionSTREAM_UNITE::~ConnectionSTREAM_UNITE(\textcolor{keywordtype}{void})
+00029 \{
+00030     \textcolor{keywordflow}{if}(comPort)
+00031         \textcolor{keyword}{delete} comPort;
+00032 \}
+00033 
+00034 DeviceInfo ConnectionSTREAM_UNITE::GetDeviceInfo(\textcolor{keywordtype}{void})
+00035 \{
+00036     DeviceInfo usbInfo = ConnectionFX3::GetDeviceInfo();
+00037     \textcolor{keywordflow}{if}(comPort)
+00038     \{
+00039         DeviceInfo comInfo;
+00040         comInfo = comPort->GetDeviceInfo();
+00041         usbInfo.deviceName += std::string(\textcolor{stringliteral}{"+"})+comInfo.deviceName;
+00042     \}
+00043     \textcolor{keywordflow}{return} usbInfo;
+00044 \}
+00045 
+00046 \textcolor{keywordtype}{int} ConnectionSTREAM_UNITE::TransactSPI(\textcolor{keyword}{const} \textcolor{keywordtype}{int} addr, \textcolor{keyword}{const} uint32\_t *writeData, uint32\_t *readData, \textcolor{keyword}{
+      const} \textcolor{keywordtype}{size\_t} size)
+00047 \{
+00048     \textcolor{keywordflow}{if}(comPort && (addr == 0x10 || addr == 0x30)) \textcolor{comment}{//redirect LMS7002M SPI, ADF4002}
+00049     \{
+00050         \textcolor{keywordflow}{return} comPort->TransactSPI(addr, writeData, readData, size);
+00051     \}
+00052     \textcolor{keywordflow}{else}
+00053         \textcolor{keywordflow}{return} ConnectionFX3::TransactSPI(addr, writeData, readData, size);
+00054 \}
+00055 
+00056 \textcolor{keywordtype}{int} ConnectionSTREAM_UNITE::DeviceReset(\textcolor{keywordtype}{int} ind)
+00057 \{
+00058     \textcolor{keywordflow}{if}(comPort)
+00059     \{
+00060         \textcolor{keywordtype}{int} status = comPort->DeviceReset();
+00061         \textcolor{keywordflow}{if}(status != 0)
+00062             \textcolor{keywordflow}{return} status;
+00063     \}
+00064     \textcolor{keywordflow}{return} ConnectionFX3::DeviceReset();
+00065 \}
+00066 
+00067 \textcolor{keywordtype}{int} ConnectionSTREAM_UNITE::TransferPacket(GenericPacket &pkt)
+00068 \{
+00069     \textcolor{keywordflow}{if}(comPort && (pkt.cmd == CMD_PROG_MCU ||
+00070                    pkt.cmd == CMD_LMS7002_WR ||
+00071                    pkt.cmd == CMD_LMS7002_RD ))
+00072         \textcolor{keywordflow}{return} comPort->TransferPacket(pkt);
+00073     \textcolor{keywordflow}{else}
+00074         \textcolor{keywordflow}{return} ConnectionFX3::TransferPacket(pkt);
+00075 \}
+00076 
+00077 \}
+\end{DoxyCode}

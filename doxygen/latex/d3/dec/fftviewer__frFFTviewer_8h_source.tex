@@ -1,0 +1,100 @@
+\subsection{fftviewer\+\_\+fr\+F\+F\+Tviewer.\+h}
+\label{fftviewer__frFFTviewer_8h_source}\index{/home/erik/prefix/default/src/limesuite-\/dev/src/fftviewer\+\_\+wxgui/fftviewer\+\_\+fr\+F\+F\+Tviewer.\+h@{/home/erik/prefix/default/src/limesuite-\/dev/src/fftviewer\+\_\+wxgui/fftviewer\+\_\+fr\+F\+F\+Tviewer.\+h}}
+
+\begin{DoxyCode}
+00001 \textcolor{preprocessor}{#ifndef \_\_fftviewer\_frFFTviewer\_\_}
+00002 \textcolor{preprocessor}{#define \_\_fftviewer\_frFFTviewer\_\_}
+00003 
+00008 \textcolor{preprocessor}{#include <thread>}
+00009 \textcolor{preprocessor}{#include <atomic>}
+00010 \textcolor{preprocessor}{#include <vector>}
+00011 \textcolor{preprocessor}{#include "fftviewer_wxgui.h"}
+00012 \textcolor{preprocessor}{#include "lime/LimeSuite.h"}
+00013 \textcolor{preprocessor}{#include <wx/timer.h>}
+00014 \textcolor{preprocessor}{#include <mutex>}
+00016 
+00018 \textcolor{keyword}{class }fftviewer_frFFTviewer : \textcolor{keyword}{public} frFFTviewer
+00019 \{
+00020 \textcolor{keyword}{protected}:
+00021     std::atomic<bool> enableTransmitter;
+00022     std::atomic<int> windowFunctionID;
+00023     std::atomic<bool> captureSamples;
+00024     std::atomic<int> averageCount;
+00025     std::atomic<bool> updateGUI;
+00026     std::atomic<bool> enableFFT;
+00027     std::string captureFilename;
+00028     \textcolor{comment}{// Handlers for frFFTviewer events.}
+00029     \textcolor{keywordtype}{void} OnWindowFunctionChanged( wxCommandEvent& event );
+00030     \textcolor{keywordtype}{void} OnbtnStartStop( wxCommandEvent& event );
+00031     \textcolor{keywordtype}{void} OnChannelVisibilityChange(wxCommandEvent& event);
+00032     \textcolor{keywordtype}{void} OnStreamChange(wxCommandEvent& event);
+00033     \textcolor{keywordtype}{void} OnEnTx( wxCommandEvent& event); 
+00034     \textcolor{keywordtype}{void} OnEnPwr(wxCommandEvent& event);
+00035     \textcolor{keywordtype}{void} OnFmtChange(wxCommandEvent& event);
+00036     \textcolor{keywordtype}{void} OnAvgChange(wxSpinEvent& event);
+00037     \textcolor{keywordtype}{void} OnAvgChangeEnter(wxCommandEvent& event);
+00038     \textcolor{keywordtype}{void} OnWindowFunctionChange(wxCommandEvent& event);
+00039     \textcolor{keyword}{static} \textcolor{keywordtype}{void} StreamingLoop(fftviewer_frFFTviewer* pthis, \textcolor{keyword}{const} \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{int} fftSize, \textcolor{keyword}{const} \textcolor{keywordtype}{int} 
+      channelsCount, \textcolor{keyword}{const} uint32\_t format);
+00040 
+00041     \textcolor{keywordtype}{void} OnUpdateStats(wxTimerEvent& event);
+00042     \textcolor{keywordtype}{void} OnUpdatePlots(wxThreadEvent& event);
+00043 \textcolor{keyword}{public}:
+00045     fftviewer_frFFTviewer( wxWindow* parent );
+00046     ~fftviewer_frFFTviewer();
+00048     \textcolor{keywordtype}{void} Initialize(lms_device_t* pDataPort);
+00049     \textcolor{keywordtype}{void} SetNyquistFrequency();
+00050 
+00051     \textcolor{keywordtype}{void} StartStreaming();
+00052     \textcolor{keywordtype}{void} StopStreaming();
+00053     \textcolor{keywordtype}{void} OnbtnCaptureClick(wxCommandEvent& event);
+00054 
+00055 \textcolor{keyword}{protected}:
+00056     \textcolor{keyword}{static} \textcolor{keyword}{const} \textcolor{keywordtype}{int} cMaxChCount = 2;
+00057     \textcolor{keyword}{struct }DataToGUI
+00058     \{
+00059         std::vector<float> samplesI[cMaxChCount];
+00060         std::vector<float> samplesQ[cMaxChCount];
+00061         std::vector<float> fftBins[cMaxChCount];
+00062         \textcolor{keywordtype}{float} nyquist_Hz;
+00063         \textcolor{keywordtype}{float} rxDataRate_Bps;
+00064         \textcolor{keywordtype}{float} txDataRate_Bps;
+00065 
+00066         DataToGUI& operator=(\textcolor{keyword}{const} DataToGUI& src)
+00067         \{
+00068             \textcolor{keywordflow}{for} (\textcolor{keywordtype}{int} ch = 0; ch < cMaxChCount; ++ch)
+00069             \{
+00070                 this->samplesI[ch].clear();
+00071                 this->samplesI[ch].reserve(src.samplesI[ch].size());
+00072                 this->samplesI[ch] = src.samplesI[ch];
+00073                 this->samplesQ[ch].clear();
+00074                 this->samplesQ[ch].reserve(src.samplesQ[ch].size());
+00075                 this->samplesQ[ch] = src.samplesQ[ch];
+00076                 this->fftBins[ch].clear();
+00077                 this->fftBins[ch].reserve(src.fftBins[ch].size());
+00078                 this->fftBins[ch] = src.fftBins[ch];
+00079                 this->nyquist\_Hz = src.nyquist_Hz;
+00080                 this->rxDataRate\_Bps = src.rxDataRate_Bps;
+00081                 this->txDataRate\_Bps = src.txDataRate_Bps;
+00082             \}
+00083             \textcolor{keywordflow}{return} *\textcolor{keyword}{this};
+00084         \}
+00085     \}streamData;
+00086 
+00087     std::vector<float> fftFreqAxis;
+00088     std::vector<float> timeXAxis;
+00089     std::atomic<bool> mStreamRunning;
+00090     std::atomic<bool> stopProcessing;
+00091     std::thread threadProcessing;
+00092     wxString printDataRate(\textcolor{keywordtype}{float} dataRate);
+00093 
+00094     lms_stream_t rxStreams[cMaxChCount];
+00095     lms_stream_t txStreams[cMaxChCount];
+00096 
+00097     lms_device_t* lmsControl;
+00098     wxTimer* mGUIupdater;
+00099     \textcolor{keywordtype}{unsigned} lmsIndex;
+00100 \};
+00101 
+00102 \textcolor{preprocessor}{#endif // \_\_fftviewer\_frFFTviewer\_\_}
+\end{DoxyCode}

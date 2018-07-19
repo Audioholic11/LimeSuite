@@ -1,0 +1,194 @@
+\subsection{Lime\+Util\+Timing.\+cpp}
+\label{LimeUtilTiming_8cpp_source}\index{/home/erik/prefix/default/src/limesuite-\/dev/\+Lime\+Util/\+Lime\+Util\+Timing.\+cpp@{/home/erik/prefix/default/src/limesuite-\/dev/\+Lime\+Util/\+Lime\+Util\+Timing.\+cpp}}
+
+\begin{DoxyCode}
+00001 
+00007 \textcolor{preprocessor}{#include <VersionInfo.h>}
+00008 \textcolor{preprocessor}{#include <ConnectionRegistry.h>}
+00009 \textcolor{preprocessor}{#include <IConnection.h>}
+00010 \textcolor{preprocessor}{#include <LMS7002M.h>}
+00011 \textcolor{preprocessor}{#include <iostream>}
+00012 \textcolor{preprocessor}{#include <chrono>}
+00013 
+00014 \textcolor{keyword}{using namespace }lime;
+00015 
+00016 \textcolor{keyword}{struct }LMS7002M_quiet : LMS7002M
+00017 \{
+00018     \textcolor{keywordtype}{void} Log(\textcolor{keyword}{const} \textcolor{keywordtype}{char}* text, LogType type)
+00019     \{
+00020         \textcolor{keywordflow}{if} (type == LOG\_INFO) \textcolor{keywordflow}{return};
+00021         LMS7002M::Log(text, type);
+00022     \}
+00023 \};
+00024 
+00025 \textcolor{keywordtype}{int} deviceTestTiming(\textcolor{keyword}{const} std::string &argStr)
+00026 \{
+00027     \textcolor{keyword}{auto} handles = ConnectionRegistry::findConnections(argStr);
+00028     \textcolor{keywordflow}{if}(handles.size() == 0)
+00029     \{
+00030         std::cout << \textcolor{stringliteral}{"No devices found"} << std::endl;
+00031         \textcolor{keywordflow}{return} EXIT\_FAILURE;
+00032     \}
+00033     std::cout << \textcolor{stringliteral}{"Connected to ["} << handles[0].serialize() << \textcolor{stringliteral}{"]"} << std::endl;
+00034     \textcolor{keyword}{auto} conn = ConnectionRegistry::makeConnection(handles[0]);
+00035 
+00036     std::cout << \textcolor{stringliteral}{"Creating instance of LMS7002M:"} << std::endl;
+00037     \textcolor{keyword}{auto} lms7 = \textcolor{keyword}{new} LMS7002M_quiet;
+00038     lms7->SetConnection(conn);
+00039 
+00040     std::cout << std::endl;
+00041     std::cout << \textcolor{stringliteral}{"Timing basic operations:"} << std::endl;
+00042 
+00043     \textcolor{comment}{//time spi write access}
+00044     \{
+00045         \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} numIters(1000);
+00046         \textcolor{keyword}{auto} t0 = std::chrono::high\_resolution\_clock::now();
+00047         \textcolor{keywordflow}{for} (\textcolor{keywordtype}{size\_t} i = 0; i < numIters; i++)
+00048         \{
+00049             lms7->SPI\_write(0x0000, 0x0000);
+00050         \}
+00051         \textcolor{keyword}{auto} t1 = std::chrono::high\_resolution\_clock::now();
+00052         \textcolor{keyword}{const} \textcolor{keyword}{auto} secsPerOp = std::chrono::duration<double>(t1-t0).count()/numIters;
+00053         std::cout << \textcolor{stringliteral}{"  >>> SPI write register:\(\backslash\)t"} << (secsPerOp/1e-6) << \textcolor{stringliteral}{" us"} << std::endl;
+00054     \}
+00055 
+00056     \textcolor{comment}{//time spi read access}
+00057     \{
+00058         \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} numIters(1000);
+00059         \textcolor{keyword}{auto} t0 = std::chrono::high\_resolution\_clock::now();
+00060         \textcolor{keywordflow}{for} (\textcolor{keywordtype}{size\_t} i = 0; i < numIters; i++)
+00061         \{
+00062             lms7->SPI\_read(0x0000, \textcolor{keyword}{true});
+00063         \}
+00064         \textcolor{keyword}{auto} t1 = std::chrono::high\_resolution\_clock::now();
+00065         \textcolor{keyword}{const} \textcolor{keyword}{auto} secsPerOp = std::chrono::duration<double>(t1-t0).count()/numIters;
+00066         std::cout << \textcolor{stringliteral}{"  >>> SPI read register:\(\backslash\)t"} << (secsPerOp/1e-6) << \textcolor{stringliteral}{" us"} << std::endl;
+00067     \}
+00068 
+00069     \textcolor{comment}{//time NCO setting}
+00070     \{
+00071         \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} numIters(1000);
+00072         \textcolor{keyword}{auto} t0 = std::chrono::high\_resolution\_clock::now();
+00073         \textcolor{keywordflow}{for} (\textcolor{keywordtype}{size\_t} i = 0; i < numIters; i++)
+00074         \{
+00075             lms7->SetNCOFrequency(LMS7002M::Tx, 0, i*(1e6/numIters));
+00076         \}
+00077         \textcolor{keyword}{auto} t1 = std::chrono::high\_resolution\_clock::now();
+00078         \textcolor{keyword}{const} \textcolor{keyword}{auto} secsPerOp = std::chrono::duration<double>(t1-t0).count()/numIters;
+00079         std::cout << \textcolor{stringliteral}{"  >>> TSP NCO setting:\(\backslash\)t\(\backslash\)t"} << (secsPerOp/1e-6) << \textcolor{stringliteral}{" us"} << std::endl;
+00080     \}
+00081 
+00082     \textcolor{comment}{//time LNA setting}
+00083     \{
+00084         \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} numIters(1000);
+00085         \textcolor{keyword}{auto} t0 = std::chrono::high\_resolution\_clock::now();
+00086         \textcolor{keywordflow}{for} (\textcolor{keywordtype}{size\_t} i = 0; i < numIters; i++)
+00087         \{
+00088             lms7->SetRFELNA\_dB(0);
+00089         \}
+00090         \textcolor{keyword}{auto} t1 = std::chrono::high\_resolution\_clock::now();
+00091         \textcolor{keyword}{const} \textcolor{keyword}{auto} secsPerOp = std::chrono::duration<double>(t1-t0).count()/numIters;
+00092         std::cout << \textcolor{stringliteral}{"  >>> RFE gain setting:\(\backslash\)t\(\backslash\)t"} << (secsPerOp/1e-6) << \textcolor{stringliteral}{" us"} << std::endl;
+00093     \}
+00094 
+00095     \textcolor{comment}{//time PAD setting}
+00096     \{
+00097         \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} numIters(1000);
+00098         \textcolor{keyword}{auto} t0 = std::chrono::high\_resolution\_clock::now();
+00099         \textcolor{keywordflow}{for} (\textcolor{keywordtype}{size\_t} i = 0; i < numIters; i++)
+00100         \{
+00101             lms7->SetTRFPAD\_dB(0);
+00102         \}
+00103         \textcolor{keyword}{auto} t1 = std::chrono::high\_resolution\_clock::now();
+00104         \textcolor{keyword}{const} \textcolor{keyword}{auto} secsPerOp = std::chrono::duration<double>(t1-t0).count()/numIters;
+00105         std::cout << \textcolor{stringliteral}{"  >>> TRF gain setting:\(\backslash\)t\(\backslash\)t"} << (secsPerOp/1e-6) << \textcolor{stringliteral}{" us"} << std::endl;
+00106     \}
+00107 
+00108     std::cout << std::endl;
+00109     std::cout << \textcolor{stringliteral}{"Timing tuning operations:"} << std::endl;
+00110 
+00111     \textcolor{comment}{//time CGEN tuning}
+00112     \{
+00113         \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} numIters(100);
+00114         \textcolor{keyword}{auto} t0 = std::chrono::high\_resolution\_clock::now();
+00115         \textcolor{keywordflow}{for} (\textcolor{keywordtype}{size\_t} i = 0; i < numIters; i++)
+00116         \{
+00117             lms7->SetFrequencyCGEN(1e6*(100+i), \textcolor{keyword}{false});
+00118         \}
+00119         \textcolor{keyword}{auto} t1 = std::chrono::high\_resolution\_clock::now();
+00120         \textcolor{keyword}{const} \textcolor{keyword}{auto} secsPerOp = std::chrono::duration<double>(t1-t0).count()/numIters;
+00121         std::cout << \textcolor{stringliteral}{"  >>> CGEN PLL tuning:\(\backslash\)t\(\backslash\)t"} << (secsPerOp/1e-3) << \textcolor{stringliteral}{" ms"} << std::endl;
+00122     \}
+00123 
+00124     \textcolor{comment}{//time LO tuning}
+00125     \{
+00126         \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} numIters(100);
+00127         \textcolor{keyword}{auto} t0 = std::chrono::high\_resolution\_clock::now();
+00128         \textcolor{keywordflow}{for} (\textcolor{keywordtype}{size\_t} i = 0; i < numIters; i++)
+00129         \{
+00130             lms7->SetFrequencySX(LMS7002M::Tx, 1e6*(100+i));
+00131         \}
+00132         \textcolor{keyword}{auto} t1 = std::chrono::high\_resolution\_clock::now();
+00133         \textcolor{keyword}{const} \textcolor{keyword}{auto} secsPerOp = std::chrono::duration<double>(t1-t0).count()/numIters;
+00134         std::cout << \textcolor{stringliteral}{"  >>> RF PLL tuning:\(\backslash\)t\(\backslash\)t"} << (secsPerOp/1e-3) << \textcolor{stringliteral}{" ms"} << std::endl;
+00135     \}
+00136 
+00137     \textcolor{comment}{//time TX filter}
+00138     \{
+00139         \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} numIters(20);
+00140         \textcolor{keyword}{auto} t0 = std::chrono::high\_resolution\_clock::now();
+00141         \textcolor{keywordflow}{for} (\textcolor{keywordtype}{size\_t} i = 0; i < numIters; i++)
+00142         \{
+00143             lms7->TuneTxFilter(10e6 + i*(3e6/numIters));
+00144         \}
+00145         \textcolor{keyword}{auto} t1 = std::chrono::high\_resolution\_clock::now();
+00146         \textcolor{keyword}{const} \textcolor{keyword}{auto} secsPerOp = std::chrono::duration<double>(t1-t0).count()/numIters;
+00147         std::cout << \textcolor{stringliteral}{"  >>> TBB filter tuning:\(\backslash\)t"} << (secsPerOp/1e-3) << \textcolor{stringliteral}{" ms"} << std::endl;
+00148     \}
+00149 
+00150     \textcolor{comment}{//time RX filter}
+00151     \{
+00152         \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} numIters(20);
+00153         \textcolor{keyword}{auto} t0 = std::chrono::high\_resolution\_clock::now();
+00154         \textcolor{keywordflow}{for} (\textcolor{keywordtype}{size\_t} i = 0; i < numIters; i++)
+00155         \{
+00156             lms7->TuneRxFilter(10e6 + i*(3e6/numIters));
+00157         \}
+00158         \textcolor{keyword}{auto} t1 = std::chrono::high\_resolution\_clock::now();
+00159         \textcolor{keyword}{const} \textcolor{keyword}{auto} secsPerOp = std::chrono::duration<double>(t1-t0).count()/numIters;
+00160         std::cout << \textcolor{stringliteral}{"  >>> RBB filter tuning:\(\backslash\)t"} << (secsPerOp/1e-3) << \textcolor{stringliteral}{" ms"} << std::endl;
+00161     \}
+00162 
+00163     \textcolor{comment}{//time TX corrections}
+00164     \{
+00165         \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} numIters(20);
+00166         \textcolor{keyword}{auto} t0 = std::chrono::high\_resolution\_clock::now();
+00167         \textcolor{keywordflow}{for} (\textcolor{keywordtype}{size\_t} i = 0; i < numIters; i++)
+00168         \{
+00169             lms7->CalibrateTx(10e6 + i*(3e6/numIters));
+00170         \}
+00171         \textcolor{keyword}{auto} t1 = std::chrono::high\_resolution\_clock::now();
+00172         \textcolor{keyword}{const} \textcolor{keyword}{auto} secsPerOp = std::chrono::duration<double>(t1-t0).count()/numIters;
+00173         std::cout << \textcolor{stringliteral}{"  >>> TX corrections:\(\backslash\)t\(\backslash\)t"} << (secsPerOp/1e-3) << \textcolor{stringliteral}{" ms"} << std::endl;
+00174     \}
+00175 
+00176     \textcolor{comment}{//time RX corrections}
+00177     \{
+00178         \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} numIters(20);
+00179         \textcolor{keyword}{auto} t0 = std::chrono::high\_resolution\_clock::now();
+00180         \textcolor{keywordflow}{for} (\textcolor{keywordtype}{size\_t} i = 0; i < numIters; i++)
+00181         \{
+00182             lms7->CalibrateRx(10e6 + i*(3e6/numIters));
+00183         \}
+00184         \textcolor{keyword}{auto} t1 = std::chrono::high\_resolution\_clock::now();
+00185         \textcolor{keyword}{const} \textcolor{keyword}{auto} secsPerOp = std::chrono::duration<double>(t1-t0).count()/numIters;
+00186         std::cout << \textcolor{stringliteral}{"  >>> RX corrections:\(\backslash\)t\(\backslash\)t"} << (secsPerOp/1e-3) << \textcolor{stringliteral}{" ms"} << std::endl;
+00187     \}
+00188 
+00189     std::cout << std::endl;
+00190     std::cout << \textcolor{stringliteral}{"Done timing!"} << std::endl;
+00191     \textcolor{keyword}{delete} lms7;
+00192     ConnectionRegistry::freeConnection(conn);
+00193     \textcolor{keywordflow}{return} EXIT\_SUCCESS;
+00194 \}
+\end{DoxyCode}

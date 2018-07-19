@@ -1,0 +1,497 @@
+\subsection{/home/erik/prefix/default/src/limesuite-\/dev/mcu\+\_\+program/host\+\_\+src/spi.cpp File Reference}
+\label{spi_8cpp}\index{/home/erik/prefix/default/src/limesuite-\/dev/mcu\+\_\+program/host\+\_\+src/spi.\+cpp@{/home/erik/prefix/default/src/limesuite-\/dev/mcu\+\_\+program/host\+\_\+src/spi.\+cpp}}
+{\ttfamily \#include \char`\"{}spi.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}I\+Connection.\+h\char`\"{}}\\*
+{\ttfamily \#include $<$ciso646$>$}\\*
+{\ttfamily \#include $<$vector$>$}\\*
+{\ttfamily \#include $<$string$>$}\\*
+{\ttfamily \#include $<$fstream$>$}\\*
+Include dependency graph for spi.\+cpp\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{dd/d59/spi_8cpp__incl}
+\end{center}
+\end{figure}
+\subsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+{\bf void} {\bf S\+P\+I\+\_\+write} (unsigned short spi\+Addr\+Reg, unsigned short spi\+Data\+Reg)
+\item 
+unsigned short {\bf S\+P\+I\+\_\+read} (unsigned short spi\+Addr\+Reg)
+\item 
+{\bf void} {\bf Modify\+\_\+\+S\+P\+I\+\_\+\+Reg\+\_\+bits\+\_\+\+Wr\+Only} (const uint16\+\_\+t S\+P\+I\+\_\+reg\+\_\+addr, const uint8\+\_\+t bits, const uint16\+\_\+t new\+\_\+bits\+\_\+data, const uint16\+\_\+t spi\+Data\+Reg)
+\item 
+{\bf void} {\bf Modify\+\_\+\+S\+P\+I\+\_\+\+Reg\+\_\+bits} (const uint16\+\_\+t S\+P\+I\+\_\+reg\+\_\+addr, const uint8\+\_\+t bits, const uint16\+\_\+t new\+\_\+bits\+\_\+data)
+\item 
+uint16\+\_\+t {\bf Get\+\_\+\+S\+P\+I\+\_\+\+Reg\+\_\+bits} (const uint16\+\_\+t S\+P\+I\+\_\+reg\+\_\+addr, const uint8\+\_\+t bits)
+\item 
+{\bf void} {\bf S\+P\+I\+\_\+read\+\_\+batch} (const uint16\+\_\+t $\ast$addr, uint16\+\_\+t $\ast$values, uint8\+\_\+t cnt)
+\item 
+{\bf void} {\bf S\+P\+I\+\_\+write\+\_\+batch} (const uint16\+\_\+t $\ast$addr, const uint16\+\_\+t $\ast$values, uint8\+\_\+t cnt)
+\item 
+{\bf int} {\bf Begin\+Batch} (const char $\ast${\bf name})
+\item 
+{\bf void} {\bf End\+Batch} ()
+\item 
+{\bf void} {\bf Modify\+\_\+\+S\+P\+I\+\_\+\+Reg\+\_\+mask} (const uint16\+\_\+t $\ast$addr, const uint16\+\_\+t $\ast$values, const uint16\+\_\+t $\ast$masks, uint8\+\_\+t cnt)
+\begin{DoxyCompactList}\small\item\em Modifies given registers with values applied using masks. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsubsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+{\bf lime\+::\+I\+Connection} $\ast$ {\bf ser\+Port}
+\item 
+bool {\bf batch\+Active} = false
+\item 
+std\+::string {\bf b\+Name}
+\item 
+{\bf std\+::vector}$<$ uint16\+\_\+t $>$ {\bf b\+Addr}
+\item 
+{\bf std\+::vector}$<$ uint16\+\_\+t $>$ {\bf b\+Data}
+\item 
+{\bf std\+::vector}$<$ uint16\+\_\+t $>$ {\bf b\+Mask}
+\item 
+uint32\+\_\+t {\bf read\+Cnt} = 0
+\item 
+uint32\+\_\+t {\bf write\+Cnt} = 0
+\end{DoxyCompactItemize}
+
+
+\subsubsection{Function Documentation}
+\index{spi.\+cpp@{spi.\+cpp}!Begin\+Batch@{Begin\+Batch}}
+\index{Begin\+Batch@{Begin\+Batch}!spi.\+cpp@{spi.\+cpp}}
+\paragraph[{Begin\+Batch(const char $\ast$name)}]{\setlength{\rightskip}{0pt plus 5cm}{\bf int} Begin\+Batch (
+\begin{DoxyParamCaption}
+\item[{const char $\ast$}]{name}
+\end{DoxyParamCaption}
+)}\label{spi_8cpp_aa7f896a0a4a4289d3dc05cbb831ef46b}
+
+
+Definition at line {\bf 142} of file {\bf spi.\+cpp}.
+
+
+
+References {\bf batch\+Active}, and {\bf b\+Name}.
+
+
+
+Referenced by {\bf Tune\+Rx\+Filter\+Setup()}, and {\bf Tune\+Tx\+Filter\+Setup()}.
+
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{dd/d7e/spi_8cpp_aa7f896a0a4a4289d3dc05cbb831ef46b_icgraph}
+\end{center}
+\end{figure}
+
+
+\index{spi.\+cpp@{spi.\+cpp}!End\+Batch@{End\+Batch}}
+\index{End\+Batch@{End\+Batch}!spi.\+cpp@{spi.\+cpp}}
+\paragraph[{End\+Batch()}]{\setlength{\rightskip}{0pt plus 5cm}{\bf void} End\+Batch (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}\label{spi_8cpp_aed7f8cb104b205a3386bdddc0b69cf77}
+
+
+Definition at line {\bf 154} of file {\bf spi.\+cpp}.
+
+
+
+References {\bf b\+Name}, {\bf i}, {\bf temp}, and {\bf val}.
+
+
+
+Referenced by {\bf Tune\+Rx\+Filter\+Setup()}, and {\bf Tune\+Tx\+Filter\+Setup()}.
+
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{dd/d7e/spi_8cpp_aed7f8cb104b205a3386bdddc0b69cf77_icgraph}
+\end{center}
+\end{figure}
+
+
+\index{spi.\+cpp@{spi.\+cpp}!Get\+\_\+\+S\+P\+I\+\_\+\+Reg\+\_\+bits@{Get\+\_\+\+S\+P\+I\+\_\+\+Reg\+\_\+bits}}
+\index{Get\+\_\+\+S\+P\+I\+\_\+\+Reg\+\_\+bits@{Get\+\_\+\+S\+P\+I\+\_\+\+Reg\+\_\+bits}!spi.\+cpp@{spi.\+cpp}}
+\paragraph[{Get\+\_\+\+S\+P\+I\+\_\+\+Reg\+\_\+bits(const uint16\+\_\+t S\+P\+I\+\_\+reg\+\_\+addr, const uint8\+\_\+t bits)}]{\setlength{\rightskip}{0pt plus 5cm}uint16\+\_\+t Get\+\_\+\+S\+P\+I\+\_\+\+Reg\+\_\+bits (
+\begin{DoxyParamCaption}
+\item[{const uint16\+\_\+t}]{S\+P\+I\+\_\+reg\+\_\+addr, }
+\item[{const uint8\+\_\+t}]{bits}
+\end{DoxyParamCaption}
+)}\label{spi_8cpp_a6ca6565d9a3c9b39a4ad5239f27665c7}
+
+
+Definition at line {\bf 94} of file {\bf spi.\+cpp}.
+
+
+
+References {\bf S\+P\+I\+\_\+read()}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{dd/d7e/spi_8cpp_a6ca6565d9a3c9b39a4ad5239f27665c7_cgraph}
+\end{center}
+\end{figure}
+
+
+\index{spi.\+cpp@{spi.\+cpp}!Modify\+\_\+\+S\+P\+I\+\_\+\+Reg\+\_\+bits@{Modify\+\_\+\+S\+P\+I\+\_\+\+Reg\+\_\+bits}}
+\index{Modify\+\_\+\+S\+P\+I\+\_\+\+Reg\+\_\+bits@{Modify\+\_\+\+S\+P\+I\+\_\+\+Reg\+\_\+bits}!spi.\+cpp@{spi.\+cpp}}
+\paragraph[{Modify\+\_\+\+S\+P\+I\+\_\+\+Reg\+\_\+bits(const uint16\+\_\+t S\+P\+I\+\_\+reg\+\_\+addr, const uint8\+\_\+t bits, const uint16\+\_\+t new\+\_\+bits\+\_\+data)}]{\setlength{\rightskip}{0pt plus 5cm}{\bf void} Modify\+\_\+\+S\+P\+I\+\_\+\+Reg\+\_\+bits (
+\begin{DoxyParamCaption}
+\item[{const uint16\+\_\+t}]{S\+P\+I\+\_\+reg\+\_\+addr, }
+\item[{const uint8\+\_\+t}]{bits, }
+\item[{const uint16\+\_\+t}]{new\+\_\+bits\+\_\+data}
+\end{DoxyParamCaption}
+)}\label{spi_8cpp_aaf76507507e6a960fa0c8cb26585095d}
+
+
+Definition at line {\bf 65} of file {\bf spi.\+cpp}.
+
+
+
+References {\bf batch\+Active}, {\bf i}, {\bf S\+P\+I\+\_\+read()}, and {\bf S\+P\+I\+\_\+write()}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{dd/d7e/spi_8cpp_aaf76507507e6a960fa0c8cb26585095d_cgraph}
+\end{center}
+\end{figure}
+
+
+\index{spi.\+cpp@{spi.\+cpp}!Modify\+\_\+\+S\+P\+I\+\_\+\+Reg\+\_\+bits\+\_\+\+Wr\+Only@{Modify\+\_\+\+S\+P\+I\+\_\+\+Reg\+\_\+bits\+\_\+\+Wr\+Only}}
+\index{Modify\+\_\+\+S\+P\+I\+\_\+\+Reg\+\_\+bits\+\_\+\+Wr\+Only@{Modify\+\_\+\+S\+P\+I\+\_\+\+Reg\+\_\+bits\+\_\+\+Wr\+Only}!spi.\+cpp@{spi.\+cpp}}
+\paragraph[{Modify\+\_\+\+S\+P\+I\+\_\+\+Reg\+\_\+bits\+\_\+\+Wr\+Only(const uint16\+\_\+t S\+P\+I\+\_\+reg\+\_\+addr, const uint8\+\_\+t bits, const uint16\+\_\+t new\+\_\+bits\+\_\+data, const uint16\+\_\+t spi\+Data\+Reg)}]{\setlength{\rightskip}{0pt plus 5cm}{\bf void} Modify\+\_\+\+S\+P\+I\+\_\+\+Reg\+\_\+bits\+\_\+\+Wr\+Only (
+\begin{DoxyParamCaption}
+\item[{const uint16\+\_\+t}]{S\+P\+I\+\_\+reg\+\_\+addr, }
+\item[{const uint8\+\_\+t}]{bits, }
+\item[{const uint16\+\_\+t}]{new\+\_\+bits\+\_\+data, }
+\item[{const uint16\+\_\+t}]{spi\+Data\+Reg}
+\end{DoxyParamCaption}
+)}\label{spi_8cpp_a1f07f3b59393a3b284a11fda0be6f835}
+
+
+Definition at line {\bf 37} of file {\bf spi.\+cpp}.
+
+
+
+References {\bf batch\+Active}, {\bf i}, and {\bf S\+P\+I\+\_\+write()}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{dd/d7e/spi_8cpp_a1f07f3b59393a3b284a11fda0be6f835_cgraph}
+\end{center}
+\end{figure}
+
+
+\index{spi.\+cpp@{spi.\+cpp}!Modify\+\_\+\+S\+P\+I\+\_\+\+Reg\+\_\+mask@{Modify\+\_\+\+S\+P\+I\+\_\+\+Reg\+\_\+mask}}
+\index{Modify\+\_\+\+S\+P\+I\+\_\+\+Reg\+\_\+mask@{Modify\+\_\+\+S\+P\+I\+\_\+\+Reg\+\_\+mask}!spi.\+cpp@{spi.\+cpp}}
+\paragraph[{Modify\+\_\+\+S\+P\+I\+\_\+\+Reg\+\_\+mask(const uint16\+\_\+t $\ast$addr, const uint16\+\_\+t $\ast$values, const uint16\+\_\+t $\ast$masks, uint8\+\_\+t cnt)}]{\setlength{\rightskip}{0pt plus 5cm}{\bf void} Modify\+\_\+\+S\+P\+I\+\_\+\+Reg\+\_\+mask (
+\begin{DoxyParamCaption}
+\item[{const uint16\+\_\+t $\ast$}]{addr, }
+\item[{const uint16\+\_\+t $\ast$}]{values, }
+\item[{const uint16\+\_\+t $\ast$}]{masks, }
+\item[{uint8\+\_\+t}]{cnt}
+\end{DoxyParamCaption}
+)}\label{spi_8cpp_a78bf31e1a4e17567af1df56c9ecf7966}
+
+
+Modifies given registers with values applied using masks. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em addr} & array of register addresses \\
+\hline
+{\em masks} & array of applied masks \\
+\hline
+{\em values} & array of values to be written \\
+\hline
+{\em start} & starting index of given arrays \\
+\hline
+{\em stop} & end index of given arrays \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line {\bf 244} of file {\bf spi.\+cpp}.
+
+
+
+References {\bf i}, {\bf S\+P\+I\+\_\+read()}, and {\bf S\+P\+I\+\_\+write()}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{dd/d7e/spi_8cpp_a78bf31e1a4e17567af1df56c9ecf7966_cgraph}
+\end{center}
+\end{figure}
+
+
+\index{spi.\+cpp@{spi.\+cpp}!S\+P\+I\+\_\+read@{S\+P\+I\+\_\+read}}
+\index{S\+P\+I\+\_\+read@{S\+P\+I\+\_\+read}!spi.\+cpp@{spi.\+cpp}}
+\paragraph[{S\+P\+I\+\_\+read(unsigned short spi\+Addr\+Reg)}]{\setlength{\rightskip}{0pt plus 5cm}unsigned short S\+P\+I\+\_\+read (
+\begin{DoxyParamCaption}
+\item[{unsigned short}]{spi\+Addr\+Reg}
+\end{DoxyParamCaption}
+)}\label{spi_8cpp_a7dee89a3e8018d75340f8ffd14015284}
+
+
+Definition at line {\bf 28} of file {\bf spi.\+cpp}.
+
+
+
+References {\bf read\+Cnt}, and {\bf lime\+::\+I\+Connection\+::\+Transact\+S\+P\+I()}.
+
+
+
+Referenced by {\bf Get\+\_\+\+S\+P\+I\+\_\+\+Reg\+\_\+bits()}, {\bf Modify\+\_\+\+S\+P\+I\+\_\+\+Reg\+\_\+bits()}, and {\bf Modify\+\_\+\+S\+P\+I\+\_\+\+Reg\+\_\+mask()}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{dd/d7e/spi_8cpp_a7dee89a3e8018d75340f8ffd14015284_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=293pt]{dd/d7e/spi_8cpp_a7dee89a3e8018d75340f8ffd14015284_icgraph}
+\end{center}
+\end{figure}
+
+
+\index{spi.\+cpp@{spi.\+cpp}!S\+P\+I\+\_\+read\+\_\+batch@{S\+P\+I\+\_\+read\+\_\+batch}}
+\index{S\+P\+I\+\_\+read\+\_\+batch@{S\+P\+I\+\_\+read\+\_\+batch}!spi.\+cpp@{spi.\+cpp}}
+\paragraph[{S\+P\+I\+\_\+read\+\_\+batch(const uint16\+\_\+t $\ast$addr, uint16\+\_\+t $\ast$values, uint8\+\_\+t cnt)}]{\setlength{\rightskip}{0pt plus 5cm}{\bf void} S\+P\+I\+\_\+read\+\_\+batch (
+\begin{DoxyParamCaption}
+\item[{const uint16\+\_\+t $\ast$}]{addr, }
+\item[{uint16\+\_\+t $\ast$}]{values, }
+\item[{uint8\+\_\+t}]{cnt}
+\end{DoxyParamCaption}
+)}\label{spi_8cpp_a9c4cc9e15dab47ea2a8cc137d10bc000}
+
+
+Definition at line {\bf 100} of file {\bf spi.\+cpp}.
+
+
+
+References {\bf i}, {\bf read\+Cnt}, and {\bf lime\+::\+I\+Connection\+::\+Transact\+S\+P\+I()}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{dd/d7e/spi_8cpp_a9c4cc9e15dab47ea2a8cc137d10bc000_cgraph}
+\end{center}
+\end{figure}
+
+
+\index{spi.\+cpp@{spi.\+cpp}!S\+P\+I\+\_\+write@{S\+P\+I\+\_\+write}}
+\index{S\+P\+I\+\_\+write@{S\+P\+I\+\_\+write}!spi.\+cpp@{spi.\+cpp}}
+\paragraph[{S\+P\+I\+\_\+write(unsigned short spi\+Addr\+Reg, unsigned short spi\+Data\+Reg)}]{\setlength{\rightskip}{0pt plus 5cm}{\bf void} S\+P\+I\+\_\+write (
+\begin{DoxyParamCaption}
+\item[{unsigned short}]{spi\+Addr\+Reg, }
+\item[{unsigned short}]{spi\+Data\+Reg}
+\end{DoxyParamCaption}
+)}\label{spi_8cpp_abf635d9f0da08fb2a479532b69852e60}
+
+
+Definition at line {\bf 21} of file {\bf spi.\+cpp}.
+
+
+
+References {\bf lime\+::\+I\+Connection\+::\+Transact\+S\+P\+I()}, and {\bf write\+Cnt}.
+
+
+
+Referenced by {\bf Modify\+\_\+\+S\+P\+I\+\_\+\+Reg\+\_\+bits()}, {\bf Modify\+\_\+\+S\+P\+I\+\_\+\+Reg\+\_\+bits\+\_\+\+Wr\+Only()}, and {\bf Modify\+\_\+\+S\+P\+I\+\_\+\+Reg\+\_\+mask()}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{dd/d7e/spi_8cpp_abf635d9f0da08fb2a479532b69852e60_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=295pt]{dd/d7e/spi_8cpp_abf635d9f0da08fb2a479532b69852e60_icgraph}
+\end{center}
+\end{figure}
+
+
+\index{spi.\+cpp@{spi.\+cpp}!S\+P\+I\+\_\+write\+\_\+batch@{S\+P\+I\+\_\+write\+\_\+batch}}
+\index{S\+P\+I\+\_\+write\+\_\+batch@{S\+P\+I\+\_\+write\+\_\+batch}!spi.\+cpp@{spi.\+cpp}}
+\paragraph[{S\+P\+I\+\_\+write\+\_\+batch(const uint16\+\_\+t $\ast$addr, const uint16\+\_\+t $\ast$values, uint8\+\_\+t cnt)}]{\setlength{\rightskip}{0pt plus 5cm}{\bf void} S\+P\+I\+\_\+write\+\_\+batch (
+\begin{DoxyParamCaption}
+\item[{const uint16\+\_\+t $\ast$}]{addr, }
+\item[{const uint16\+\_\+t $\ast$}]{values, }
+\item[{uint8\+\_\+t}]{cnt}
+\end{DoxyParamCaption}
+)}\label{spi_8cpp_a436d1cddc5e8437f75c92f6b65db2798}
+
+
+Definition at line {\bf 111} of file {\bf spi.\+cpp}.
+
+
+
+References {\bf batch\+Active}, {\bf i}, {\bf lime\+::\+I\+Connection\+::\+Transact\+S\+P\+I()}, and {\bf write\+Cnt}.
+
+
+
+Referenced by {\bf M\+C\+U\+\_\+\+Run\+Procedure()}, {\bf M\+C\+U\+\_\+\+Upload\+Program()}, and {\bf Save\+Chip\+State()}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{dd/d7e/spi_8cpp_a436d1cddc5e8437f75c92f6b65db2798_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{dd/d7e/spi_8cpp_a436d1cddc5e8437f75c92f6b65db2798_icgraph}
+\end{center}
+\end{figure}
+
+
+
+
+\subsubsection{Variable Documentation}
+\index{spi.\+cpp@{spi.\+cpp}!b\+Addr@{b\+Addr}}
+\index{b\+Addr@{b\+Addr}!spi.\+cpp@{spi.\+cpp}}
+\paragraph[{b\+Addr}]{\setlength{\rightskip}{0pt plus 5cm}{\bf std\+::vector}$<$uint16\+\_\+t$>$ b\+Addr}\label{spi_8cpp_a9f2ef19d5309f85e8c487704cd310dee}
+
+
+Definition at line {\bf 13} of file {\bf spi.\+cpp}.
+
+\index{spi.\+cpp@{spi.\+cpp}!batch\+Active@{batch\+Active}}
+\index{batch\+Active@{batch\+Active}!spi.\+cpp@{spi.\+cpp}}
+\paragraph[{batch\+Active}]{\setlength{\rightskip}{0pt plus 5cm}bool batch\+Active = false}\label{spi_8cpp_ab37716ab32304630d6174a2666f40fd3}
+
+
+Definition at line {\bf 7} of file {\bf spi.\+cpp}.
+
+
+
+Referenced by {\bf Begin\+Batch()}, {\bf Modify\+\_\+\+S\+P\+I\+\_\+\+Reg\+\_\+bits()}, {\bf Modify\+\_\+\+S\+P\+I\+\_\+\+Reg\+\_\+bits\+\_\+\+Wr\+Only()}, and {\bf S\+P\+I\+\_\+write\+\_\+batch()}.
+
+\index{spi.\+cpp@{spi.\+cpp}!b\+Data@{b\+Data}}
+\index{b\+Data@{b\+Data}!spi.\+cpp@{spi.\+cpp}}
+\paragraph[{b\+Data}]{\setlength{\rightskip}{0pt plus 5cm}{\bf std\+::vector}$<$uint16\+\_\+t$>$ b\+Data}\label{spi_8cpp_a3683dd44d05092af9d46b8e58042498b}
+
+
+Definition at line {\bf 14} of file {\bf spi.\+cpp}.
+
+\index{spi.\+cpp@{spi.\+cpp}!b\+Mask@{b\+Mask}}
+\index{b\+Mask@{b\+Mask}!spi.\+cpp@{spi.\+cpp}}
+\paragraph[{b\+Mask}]{\setlength{\rightskip}{0pt plus 5cm}{\bf std\+::vector}$<$uint16\+\_\+t$>$ b\+Mask}\label{spi_8cpp_a6a066d765bf05ceff2f022984ba19843}
+
+
+Definition at line {\bf 15} of file {\bf spi.\+cpp}.
+
+\index{spi.\+cpp@{spi.\+cpp}!b\+Name@{b\+Name}}
+\index{b\+Name@{b\+Name}!spi.\+cpp@{spi.\+cpp}}
+\paragraph[{b\+Name}]{\setlength{\rightskip}{0pt plus 5cm}std\+::string b\+Name}\label{spi_8cpp_af87b39d2cc0803a9cfa7cee57cf2ba00}
+
+
+Definition at line {\bf 12} of file {\bf spi.\+cpp}.
+
+
+
+Referenced by {\bf Begin\+Batch()}, and {\bf End\+Batch()}.
+
+\index{spi.\+cpp@{spi.\+cpp}!read\+Cnt@{read\+Cnt}}
+\index{read\+Cnt@{read\+Cnt}!spi.\+cpp@{spi.\+cpp}}
+\paragraph[{read\+Cnt}]{\setlength{\rightskip}{0pt plus 5cm}uint32\+\_\+t read\+Cnt = 0}\label{spi_8cpp_a95e234fef53b4cfdb73195aa20ae4109}
+
+
+Definition at line {\bf 17} of file {\bf spi.\+cpp}.
+
+
+
+Referenced by {\bf S\+P\+I\+\_\+read()}, and {\bf S\+P\+I\+\_\+read\+\_\+batch()}.
+
+\index{spi.\+cpp@{spi.\+cpp}!ser\+Port@{ser\+Port}}
+\index{ser\+Port@{ser\+Port}!spi.\+cpp@{spi.\+cpp}}
+\paragraph[{ser\+Port}]{\setlength{\rightskip}{0pt plus 5cm}{\bf lime\+::\+I\+Connection}$\ast$ ser\+Port}\label{spi_8cpp_a0d20ae1076940f5f69e66c3c90cb4f98}
+
+
+Definition at line {\bf 21} of file {\bf main.\+cpp}.
+
+
+
+Referenced by {\bf L\+M\+S7002\+M\+\_\+\+Novena\+\_\+wxgui\+::\+Initialize()}, {\bf main()}, and {\bf T\+E\+S\+T\+\_\+\+F()}.
+
+\index{spi.\+cpp@{spi.\+cpp}!write\+Cnt@{write\+Cnt}}
+\index{write\+Cnt@{write\+Cnt}!spi.\+cpp@{spi.\+cpp}}
+\paragraph[{write\+Cnt}]{\setlength{\rightskip}{0pt plus 5cm}uint32\+\_\+t write\+Cnt = 0}\label{spi_8cpp_a89c5030afcecb6ba0ca486e477bdb595}
+
+
+Definition at line {\bf 18} of file {\bf spi.\+cpp}.
+
+
+
+Referenced by {\bf S\+P\+I\+\_\+write()}, and {\bf S\+P\+I\+\_\+write\+\_\+batch()}.
+

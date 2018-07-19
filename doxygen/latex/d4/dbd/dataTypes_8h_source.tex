@@ -1,0 +1,52 @@
+\subsection{data\+Types.\+h}
+\label{dataTypes_8h_source}\index{/home/erik/prefix/default/src/limesuite-\/dev/src/protocols/data\+Types.\+h@{/home/erik/prefix/default/src/limesuite-\/dev/src/protocols/data\+Types.\+h}}
+
+\begin{DoxyCode}
+00001 \textcolor{preprocessor}{#ifndef LMS\_DATA\_TYPES\_H}
+00002 \textcolor{preprocessor}{#define LMS\_DATA\_TYPES\_H}
+00003 
+00004 \textcolor{preprocessor}{#include <string.h>}
+00005 \textcolor{preprocessor}{#include <stdint.h>}
+00006 
+00007 \textcolor{keyword}{namespace }lime\{
+00008 
+00009 \textcolor{keyword}{struct }FPGA_DataPacket
+00010 \{
+00011     uint8\_t reserved[8];
+00012     uint64\_t counter;
+00013     uint8\_t data[4080];
+00014 \};
+00015 
+00016 \textcolor{keyword}{struct }complex16_t
+00017 \{
+00018     int16\_t i;
+00019     int16\_t q;
+00020 \};
+00021 
+00022 \textcolor{keyword}{const} \textcolor{keywordtype}{int} samples12InPkt = 1360;
+00023 \textcolor{keyword}{const} \textcolor{keywordtype}{int} samples16InPkt = 1020; 
+00024 
+00025 \textcolor{keyword}{class }SamplesPacket
+00026 \{
+00027 \textcolor{keyword}{public}:
+00028     \textcolor{keyword}{static} \textcolor{keyword}{const} int16\_t maxSamplesInPacket = samples12InPkt; \textcolor{comment}{//total number of samples in all channels
+       combined}
+00029     uint64\_t timestamp; \textcolor{comment}{//timestamp of the packet}
+00030     uint16\_t first; \textcolor{comment}{//index of first unused sample in samples}
+00031     uint16\_t last; \textcolor{comment}{//end index of samples}
+00032     complex16_t samples[maxSamplesInPacket];
+00033     uint32\_t flags;
+00034 
+00035     SamplesPacket()
+00036     \{
+00037         timestamp = 0;
+00038         first = 0;
+00039         last = 0;
+00040         flags = 0;
+00041     \}
+00042 \};
+00043 
+00044 \}\textcolor{comment}{// namespace lime}
+00045 
+00046 \textcolor{preprocessor}{#endif}
+\end{DoxyCode}

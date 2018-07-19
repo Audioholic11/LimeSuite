@@ -1,0 +1,174 @@
+\subsection{lms7002\+\_\+pnl\+Gains\+\_\+view.\+cpp}
+\label{lms7002__pnlGains__view_8cpp_source}\index{/home/erik/prefix/default/src/limesuite-\/dev/src/lms7002\+\_\+wxgui/lms7002\+\_\+pnl\+Gains\+\_\+view.\+cpp@{/home/erik/prefix/default/src/limesuite-\/dev/src/lms7002\+\_\+wxgui/lms7002\+\_\+pnl\+Gains\+\_\+view.\+cpp}}
+
+\begin{DoxyCode}
+00001 \textcolor{preprocessor}{#include "lms7002_pnlGains_view.h"}
+00002 \textcolor{preprocessor}{#include "numericSlider.h"}
+00003 \textcolor{preprocessor}{#include <map>}
+00004 \textcolor{preprocessor}{#include "lms7002_gui_utilities.h"}
+00005 \textcolor{preprocessor}{#include "lms7_device.h"}
+00006 \textcolor{keyword}{using namespace }lime;
+00007 \textcolor{keyword}{using namespace }LMS7002_WXGUI;
+00008 
+00009 \textcolor{keyword}{static} indexValueMap g_lna_rfe_IndexValuePairs;
+00010 \textcolor{keyword}{static} indexValueMap g_tia_rfe_IndexValuePairs;
+00011 
+00012 lms7002_pnlGains_view::lms7002_pnlGains_view( wxWindow* parent )
+00013 :
+00014 pnlGains_view( parent )
+00015 \{
+00016 
+00017 \}
+00018 
+00019 lms7002_pnlGains_view::lms7002_pnlGains_view( wxWindow* parent, wxWindowID \textcolor{keywordtype}{id}, \textcolor{keyword}{const} wxPoint& pos, \textcolor{keyword}{const} 
+      wxSize& size, \textcolor{keywordtype}{long} style )
+00020     : pnlGains_view(parent, id, pos, size, style), lmsControl(nullptr)
+00021 \{
+00022     wndId2Enum[chkTRX_GAIN_SRC] = LMS7param(TRX_GAIN_SRC);
+00023     wndId2Enum[cmbG_PGA_RBB] = LMS7param(G_PGA_RBB_R3);
+00024     wndId2Enum[cmbG_LNA_RFE] = LMS7param(G_LNA_RFE_R3);
+00025     wndId2Enum[cmbG_TIA_RFE] = LMS7param(G_TIA_RFE_R3);
+00026     wndId2Enum[cmbCG_IAMP_TBB] = LMS7param(CG_IAMP_TBB_R3);
+00027     wndId2Enum[cmbLOSS_LIN_TXPAD_TRF] = LMS7param(LOSS\_LIN\_TXPAD\_R3);
+00028     wndId2Enum[cmbLOSS_MAIN_TXPAD_TRF] = LMS7param(LOSS\_MAIN\_TXPAD\_R3);
+00029     wndId2Enum[cmbC_CTL_PGA_RBB] = LMS7param(C\_CTL\_PGA\_RBB\_R3);
+00030 
+00031     wxArrayString temp;
+00032 
+00033     temp.clear();
+00034     \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} i=0; i<32; ++i)
+00035         temp.push\_back(wxString::Format(\_(\textcolor{stringliteral}{"%i"}), i));
+00036     cmbLOSS_LIN_TXPAD_TRF->Append(temp);
+00037     cmbLOSS_MAIN_TXPAD_TRF->Append(temp);
+00038 
+00039     temp.clear();
+00040     \textcolor{keywordflow}{for} (\textcolor{keywordtype}{int} i = 0; i<32; ++i)
+00041         temp.push\_back(wxString::Format(\_(\textcolor{stringliteral}{"%i dB"}), -12 + i));
+00042     cmbG_PGA_RBB->Set(temp);
+00043 
+00044     \textcolor{keywordflow}{for} (\textcolor{keywordtype}{int} i = 0; i < 15; ++i)
+00045         g_lna_rfe_IndexValuePairs.push\_back(indexValuePair(i, i + 1));
+00046     temp.clear();
+00047     temp.push\_back(\_(\textcolor{stringliteral}{"Gmax-30"}));
+00048     temp.push\_back(\_(\textcolor{stringliteral}{"Gmax-27"}));
+00049     temp.push\_back(\_(\textcolor{stringliteral}{"Gmax-24"}));
+00050     temp.push\_back(\_(\textcolor{stringliteral}{"Gmax-21"}));
+00051     temp.push\_back(\_(\textcolor{stringliteral}{"Gmax-18"}));
+00052     temp.push\_back(\_(\textcolor{stringliteral}{"Gmax-15"}));
+00053     temp.push\_back(\_(\textcolor{stringliteral}{"Gmax-12"}));
+00054     temp.push\_back(\_(\textcolor{stringliteral}{"Gmax-9"}));
+00055     temp.push\_back(\_(\textcolor{stringliteral}{"Gmax-6"}));
+00056     temp.push\_back(\_(\textcolor{stringliteral}{"Gmax-5"}));
+00057     temp.push\_back(\_(\textcolor{stringliteral}{"Gmax-4"}));
+00058     temp.push\_back(\_(\textcolor{stringliteral}{"Gmax-3"}));
+00059     temp.push\_back(\_(\textcolor{stringliteral}{"Gmax-2"}));
+00060     temp.push\_back(\_(\textcolor{stringliteral}{"Gmax-1"}));
+00061     temp.push\_back(\_(\textcolor{stringliteral}{"Gmax"}));
+00062     cmbG_LNA_RFE->Set(temp);
+00063 
+00064     \textcolor{keywordflow}{for} (\textcolor{keywordtype}{int} i = 0; i < 3; ++i)
+00065         g_tia_rfe_IndexValuePairs.push\_back(indexValuePair(i, i + 1));
+00066     temp.clear();
+00067     temp.push\_back(\_(\textcolor{stringliteral}{"Gmax-12"}));
+00068     temp.push\_back(\_(\textcolor{stringliteral}{"Gmax-3"}));
+00069     temp.push\_back(\_(\textcolor{stringliteral}{"Gmax"}));
+00070     cmbG_TIA_RFE->Set(temp);
+00071 
+00072     LMS7002_WXGUI::UpdateTooltips(wndId2Enum, \textcolor{keyword}{true});
+00073 \}
+00074 
+00075 \textcolor{keywordtype}{void} lms7002_pnlGains_view::Initialize(lms_device_t* pControl)
+00076 \{
+00077     lmsControl = pControl;
+00078     assert(lmsControl != \textcolor{keyword}{nullptr});
+00079     uint16\_t value;
+00080     \textcolor{keywordflow}{if} (LMS_ReadParam(lmsControl,LMS7param(MASK),&value)==0 && value == 0)
+00081     \{
+00082         chkTRX_GAIN_SRC->Enable(\textcolor{keyword}{false});
+00083         chkTRX_GAIN_SRC->SetValue(\textcolor{keyword}{false});
+00084     \}
+00085     \textcolor{keywordflow}{else}
+00086         chkTRX_GAIN_SRC->Enable(\textcolor{keyword}{true});
+00087 \}
+00088 
+00089 \textcolor{keywordtype}{void} lms7002_pnlGains_view::ParameterChangeHandler(wxSpinEvent& event)
+00090 \{
+00091     ParameterChangeHandler(static\_cast<wxCommandEvent&>(event));
+00092 \}
+00093 
+00094 \textcolor{keywordtype}{void} lms7002_pnlGains_view::ParameterChangeHandler(wxCommandEvent& event)
+00095 \{
+00096     assert(lmsControl != \textcolor{keyword}{nullptr});
+00097     LMS7Parameter parameter;
+00098     \textcolor{keywordflow}{try}
+00099     \{
+00100         parameter = wndId2Enum.at(reinterpret\_cast<wxWindow*>(event.GetEventObject()));
+00101     \}
+00102     \textcolor{keywordflow}{catch} (std::exception & e)
+00103     \{
+00104         std::cout << \textcolor{stringliteral}{"Control element(ID = "} << \textcolor{keyword}{event}.GetId() << \textcolor{stringliteral}{") don't have assigned LMS parameter."} << 
+      std::endl;
+00105         \textcolor{keywordflow}{return};
+00106     \}
+00107     \textcolor{keywordtype}{long} value = \textcolor{keyword}{event}.GetInt();
+00108     \textcolor{keywordflow}{if} (event.GetEventObject() == cmbG_LNA_RFE)
+00109     \{
+00110         value = index2value(value, g_lna_rfe_IndexValuePairs);
+00111     \}
+00112     \textcolor{keywordflow}{else} \textcolor{keywordflow}{if} (event.GetEventObject() == cmbG_TIA_RFE)
+00113     \{
+00114         value = index2value(value, g_tia_rfe_IndexValuePairs);
+00115     \}
+00116     \textcolor{keywordflow}{else} \textcolor{keywordflow}{if} (event.GetEventObject() == chkTRX_GAIN_SRC)
+00117     \{
+00118         cmbG_LNA_RFE->Enable(value);
+00119         cmbG_TIA_RFE->Enable(value);
+00120         cmbG_PGA_RBB->Enable(value);
+00121         cmbC_CTL_PGA_RBB->Enable(value);
+00122         cmbLOSS_LIN_TXPAD_TRF->Enable(value);
+00123         cmbLOSS_MAIN_TXPAD_TRF->Enable(value);
+00124         cmbCG_IAMP_TBB->Enable(value);
+00125     \}
+00126     LMS_WriteParam(lmsControl,parameter,value);
+00127 \}
+00128 
+00129 \textcolor{keywordtype}{void} lms7002_pnlGains_view::UpdateGUI()
+00130 \{
+00131     LMS7002_WXGUI::UpdateControlsByMap(\textcolor{keyword}{this}, lmsControl, wndId2Enum);
+00132     uint16\_t value;
+00133     LMS_ReadParam(lmsControl,LMS7param(G_LNA_RFE_R3),&value);
+00134     cmbG_LNA_RFE->SetSelection( value2index(value, g_lna_rfe_IndexValuePairs));
+00135 
+00136     LMS_ReadParam(lmsControl,LMS7param(G_TIA_RFE_R3),&value);
+00137     cmbG_TIA_RFE->SetSelection( value2index(value, g_tia_rfe_IndexValuePairs));
+00138 
+00139     value = chkTRX_GAIN_SRC->GetValue();
+00140     cmbG_LNA_RFE->Enable(value);
+00141     cmbG_TIA_RFE->Enable(value);
+00142     cmbG_PGA_RBB->Enable(value);
+00143     cmbC_CTL_PGA_RBB->Enable(value);
+00144     cmbLOSS_LIN_TXPAD_TRF->Enable(value);
+00145     cmbLOSS_MAIN_TXPAD_TRF->Enable(value);
+00146     cmbCG_IAMP_TBB->Enable(value);
+00147 
+00148 \}
+00149 
+00150 \textcolor{keywordtype}{void} lms7002_pnlGains_view::OnAGCStateChange(wxCommandEvent& event)
+00151 \{
+00152     \textcolor{keywordflow}{if}(chkAGC->GetValue() != 0)
+00153     \{
+00154         LMS7_Device* lms = (LMS7_Device*)lmsControl;
+00155         \textcolor{keywordtype}{double} crestFactor;
+00156         txtCrestFactor->GetValue().ToDouble(&crestFactor);
+00157         uint32\_t wantedRSSI = 87330 / pow(10.0, (3+crestFactor)/20);
+00158         lms->MCU_AGCStart(wantedRSSI);
+00159         txtCrestFactor->Disable();
+00160     \}
+00161     \textcolor{keywordflow}{else}
+00162     \{
+00163         LMS7_Device* lms = (LMS7_Device*)lmsControl;
+00164         lms->MCU_AGCStop();
+00165         txtCrestFactor->Enable();
+00166     \}
+00167 \}
+\end{DoxyCode}

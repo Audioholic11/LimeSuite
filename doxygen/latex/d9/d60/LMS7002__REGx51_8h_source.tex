@@ -1,0 +1,253 @@
+\subsection{L\+M\+S7002\+\_\+\+R\+E\+Gx51.\+h}
+\label{LMS7002__REGx51_8h_source}\index{/home/erik/prefix/default/src/limesuite-\/dev/mcu\+\_\+program/mcu\+\_\+src/\+L\+M\+S7002\+\_\+\+R\+E\+Gx51.\+h@{/home/erik/prefix/default/src/limesuite-\/dev/mcu\+\_\+program/mcu\+\_\+src/\+L\+M\+S7002\+\_\+\+R\+E\+Gx51.\+h}}
+
+\begin{DoxyCode}
+00001 \textcolor{comment}{/*--------------------------------------------------------------------------}
+00002 \textcolor{comment}{LMS7002\_REGx51.h (Ver 1.0)}
+00003 \textcolor{comment}{}
+00004 \textcolor{comment}{Header file for the LIME MCU chip.}
+00005 \textcolor{comment}{Copyright (c) 2013 LIME, Inc.  All rights reserved.}
+00006 \textcolor{comment}{--------------------------------------------------------------------------*/}
+00007 
+00008 \textcolor{comment}{/*------------------------------------------------}
+00009 \textcolor{comment}{Make sure that this file gets included only once.}
+00010 \textcolor{comment}{------------------------------------------------*/}
+00011 \textcolor{preprocessor}{#ifndef \_\_LMS7002\_H\_\_}
+00012 \textcolor{preprocessor}{#define \_\_LMS7002\_H\_\_}
+00013 
+00014 \textcolor{comment}{/*------------------------------------------------}
+00015 \textcolor{comment}{Byte Registers}
+00016 \textcolor{comment}{------------------------------------------------*/}
+00017 sfr P0    = 0x80;
+00018 sfr SP    = 0x81;
+00019 sfr DPL0  = 0x82; 
+00020 sfr DPH0  = 0x83; 
+00021 sfr DPL1  = 0x84; 
+00022 sfr DPH1  = 0x85;
+00023 sfr DPS   = 0x86; 
+00024 sfr PCON  = 0x87; 
+00025 sfr TCON  = 0x88; 
+00026 sfr TMOD  = 0x89;
+00027 sfr TL0   = 0x8A;
+00028 sfr TL1   = 0x8B;
+00029 sfr TH0   = 0x8C;
+00030 sfr TH1   = 0x8D;
+00031 sfr PMSR  = 0x8E; 
+00032 sfr P1    = 0x90; 
+00033 sfr DIR1    = 0x91; 
+00034 sfr SCON  = 0x98;
+00035 sfr SBUF  = 0x99;
+00036 sfr P2    = 0xA0;
+00037 sfr DIR2    = 0xA1; 
+00038 sfr DIR0    = 0xA2; 
+00039 sfr IEN0    = 0xA8; 
+00040 sfr IEN1    = 0xA9; 
+00041 sfr EECTRL  = 0xB0; 
+00042 sfr EEDATA  = 0xB1; 
+00043 sfr IP0     = 0xB8; 
+00044 sfr IP1   = 0xB9; 
+00045 sfr USR2    = 0xBF; 
+00046 sfr IRCON   = 0xC0; 
+00047 sfr T2CON   = 0xC8; 
+00048 sfr RCAP2L  = 0xCA; 
+00049 sfr RCAP2H  = 0xCB; 
+00050 sfr TL2 = 0xCC; 
+00051 sfr TH2 = 0xCD; 
+00052 sfr PSW   = 0xD0;
+00053 sfr ACC   = 0xE0;
+00054 sfr REG0    = 0xEC; 
+00055 sfr REG1    = 0XED; 
+00056 sfr REG2    = 0xEE; 
+00057 sfr REG3    = 0xEF; 
+00058 sfr B     = 0xF0; 
+00059 sfr REG4    = 0xF4; 
+00060 sfr REG5    = 0xF5; 
+00061 sfr REG6    = 0xF6; 
+00062 sfr REG7    = 0xF7; 
+00063 sfr REG8    = 0xFC; 
+00064 sfr REG9    = 0xFD; 
+00065 
+00066 \textcolor{comment}{/*------------------------------------------------}
+00067 \textcolor{comment}{P0 bits }
+00068 \textcolor{comment}{------------------------------------------------*/}
+00069 sbit P0_0 = 0x80;
+00070 sbit P0_1 = 0x81;
+00071 sbit P0_2 = 0x82;
+00072 sbit P0_3 = 0x83;
+00073 sbit P0_4 = 0x84;
+00074 sbit P0_5 = 0x85;
+00075 sbit P0_6 = 0x86;
+00076 sbit P0_7 = 0x87;
+00077 
+00078 \textcolor{comment}{/*------------------------------------------------}
+00079 \textcolor{comment}{TCON bits}
+00080 \textcolor{comment}{------------------------------------------------*/}
+00081 sbit IT0  = 0x88;
+00082 sbit IE0  = 0x89;
+00083 sbit IT1  = 0x8A;
+00084 sbit IE1  = 0x8B;
+00085 sbit TR0  = 0x8C;
+00086 sbit TF0  = 0x8D;
+00087 sbit TR1  = 0x8E;
+00088 sbit TF1  = 0x8F;
+00089 
+00090 \textcolor{comment}{/*------------------------------------------------}
+00091 \textcolor{comment}{P1 bits}
+00092 \textcolor{comment}{------------------------------------------------*/}
+00093 sbit P1_0 = 0x90;
+00094 sbit P1_1 = 0x91;
+00095 sbit P1_2 = 0x92;
+00096 sbit P1_3 = 0x93;
+00097 sbit P1_4 = 0x94;
+00098 sbit P1_5 = 0x95;
+00099 sbit P1_6 = 0x96;
+00100 sbit P1_7 = 0x97;
+00101 
+00102 \textcolor{comment}{/*------------------------------------------------}
+00103 \textcolor{comment}{SCON bits}
+00104 \textcolor{comment}{------------------------------------------------*/}
+00105 sbit RI   = 0x98;
+00106 sbit TI   = 0x99;
+00107 sbit RB8  = 0x9A;
+00108 sbit TB8  = 0x9B;
+00109 sbit REN  = 0x9C;
+00110 sbit SM2  = 0x9D;
+00111 sbit SM1  = 0x9E;
+00112 sbit SM0  = 0x9F;
+00113 
+00114 \textcolor{comment}{/*------------------------------------------------}
+00115 \textcolor{comment}{P2 bits}
+00116 \textcolor{comment}{------------------------------------------------*/}
+00117 sbit P2_0 = 0xA0;
+00118 sbit P2_1 = 0xA1;
+00119 sbit P2_2 = 0xA2;
+00120 sbit P2_3 = 0xA3;
+00122 sbit ucSCLK = 0xA0;
+00123 sbit ucSEN = 0xA1;
+00124 sbit ucSDIN = 0xA2;
+00125 sbit ucSDOUT = 0xA3;
+00126 
+00127 
+00128 \textcolor{comment}{/*------------------------------------------------}
+00129 \textcolor{comment}{IEN0 bits}
+00130 \textcolor{comment}{------------------------------------------------*/}
+00131 sbit EX0  = 0xA8;       \textcolor{comment}{/* 1=Enable External interrupt 0 */}
+00132 sbit ET0  = 0xA9;       \textcolor{comment}{/* 1=Enable Timer 0 interrupt */}
+00133 sbit EX1  = 0xAA;       \textcolor{comment}{/* 1=Enable External interrupt 1 */}
+00134 sbit ET1  = 0xAB;       \textcolor{comment}{/* 1=Enable Timer 1 interrupt */}
+00135 sbit ES0  = 0xAC;       \textcolor{comment}{/* 1=Enable Serial port 0 interrupt */}
+00136 sbit ET2  = 0xAD;       \textcolor{comment}{/* 1=Enable Timer 2 interrupt */}
+00137 \textcolor{comment}{//sbit XX   = 0xAE; /* Don't Care */}
+00138 sbit EA   = 0xAF;       \textcolor{comment}{/* 0=Disable all interrupts */}
+00139 
+00140 \textcolor{comment}{/*------------------------------------------------}
+00141 \textcolor{comment}{EECTRL bits}
+00142 \textcolor{comment}{------------------------------------------------*/}
+00143 sbit CMD0   = 0xB0;       \textcolor{comment}{/* Command 0 bit */}
+00144 sbit CMD1   = 0xB1;       \textcolor{comment}{/* Command 1 bit */}
+00145 sbit CMD2   = 0xB2;       \textcolor{comment}{/* Command 2 bit */}
+00146 sbit CMD3   = 0xB3;       \textcolor{comment}{/* Command 3 bit */}
+00147 sbit TX_ACK = 0xB4;       \textcolor{comment}{/* 1= ACK Transmited to EEPROM */}
+00148 sbit RX_ACK = 0xB5;   \textcolor{comment}{/* 1= ACK Received from EEPROM */}
+00149 sbit BUSY   = 0xB6;   \textcolor{comment}{/* 1= Serial Data BUS is busy */}
+00150 sbit ERROR  = 0xB7;       \textcolor{comment}{/* 1= Illegal Command Received */}
+00151 
+00152 \textcolor{comment}{/*------------------------------------------------}
+00153 \textcolor{comment}{IP0 bits}
+00154 \textcolor{comment}{------------------------------------------------*/}
+00155 sbit PX0  = 0xB8; \textcolor{comment}{/* External iterrupt 0 priority bit */}
+00156 sbit PT0  = 0xB9; \textcolor{comment}{/* Timer 0 iterrupt priority bit */}
+00157 sbit PX1  = 0xBA; \textcolor{comment}{/* External iterrupt 1 priority bit */}
+00158 sbit PT1  = 0xBB; \textcolor{comment}{/* Timer 1 iterrupt priority bit */}
+00159 sbit PS0  = 0xBC; \textcolor{comment}{/* Serial port 0 iterrupt priority bit */}
+00160 sbit PT2  = 0xBD; \textcolor{comment}{/* Timer 2 iterrupt priority bit */}
+00161 \textcolor{comment}{//sbit XX   = 0xBE; /* Don't Care */}
+00162 \textcolor{comment}{//sbit XX   = 0xBF; /* Don't Care */}
+00163 
+00164 \textcolor{comment}{/*------------------------------------------------}
+00165 \textcolor{comment}{IRCON bits}
+00166 \textcolor{comment}{------------------------------------------------*/}
+00167 \textcolor{comment}{//sbit XX   = 0xCO; /* Don't Care */}
+00168 \textcolor{comment}{//sbit XX   = 0xC1; /* Don't Care */}
+00169 sbit IE2  = 0xC2; \textcolor{comment}{/* External iterrupt 2 flag bit */}
+00170 sbit IE3  = 0xC3; \textcolor{comment}{/* External iterrupt 3 flag bit */}
+00171 sbit IE4  = 0xC4; \textcolor{comment}{/* External iterrupt 4 flag bit */}
+00172 sbit IE5  = 0xC5; \textcolor{comment}{/* External iterrupt 5 flag bit */}
+00173 \textcolor{comment}{//sbit XX   = 0xC6; /* Don't Care */}
+00174 \textcolor{comment}{//sbit XX   = 0xC7; /* Don't Care */}
+00175 
+00176 \textcolor{comment}{/*------------------------------------------------}
+00177 \textcolor{comment}{T2CON bits}
+00178 \textcolor{comment}{------------------------------------------------*/}
+00179 sbit CP_RL2 = 0xC8; \textcolor{comment}{/* Capture/Reload Flag */}
+00180 sbit C_T2   = 0xC9; \textcolor{comment}{/* 0/1 - Timer/Counter select */}
+00181 sbit TR2    = 0xCA; \textcolor{comment}{/* 0/1 - Stop/Strat Timer */}
+00182 sbit EXEN2  = 0xCB; \textcolor{comment}{/* Timer 2 enable Flag */}
+00183 sbit TCLK   = 0xCC; \textcolor{comment}{/* Transmit Clock Flag */}
+00184 sbit RCLK   = 0xCD; \textcolor{comment}{/* Receive Clock Flag */}
+00185 sbit EXF2   = 0xCE; \textcolor{comment}{/* Timer 2 External Flag */}
+00186 sbit TF2    = 0xCF; \textcolor{comment}{/* Timer 2 Overflow Flag */} 
+00187 
+00188 \textcolor{comment}{/*------------------------------------------------}
+00189 \textcolor{comment}{PSW bits}
+00190 \textcolor{comment}{------------------------------------------------*/}
+00191 sbit P    = 0xD0; \textcolor{comment}{/* Parity Flag */}
+00192 \textcolor{comment}{//sbit XX     = 0xD1; /* Don't Care */}
+00193 sbit OV   = 0xD2; \textcolor{comment}{/* Overflow Flag */}
+00194 sbit RS0  = 0xD3; \textcolor{comment}{/* Register Bank Select 0 */}
+00195 sbit RS1  = 0xD4; \textcolor{comment}{/* Register Bank Select 0 */}
+00196 \textcolor{comment}{//sbit XX   = 0xD5; /* Don't Care */}
+00197 sbit AC   = 0xD6; \textcolor{comment}{/* Auxiliary Carry Flag */}
+00198 sbit CY   = 0xD7; \textcolor{comment}{/* Carry Flag */}
+00199 
+00200 
+00201 \textcolor{comment}{/*------------------------------------------------}
+00202 \textcolor{comment}{TMOD Bit Values - Defines the bit position in the reg!!!}
+00203 \textcolor{comment}{------------------------------------------------*/}
+00204 \textcolor{preprocessor}{#define T0\_M0\_   0x01 }\textcolor{comment}{/* 0000 0001 = T0\_M0 */}\textcolor{preprocessor}{}
+00205 \textcolor{preprocessor}{#define T0\_M1\_   0x02 }\textcolor{comment}{/* 0000 0010 = T0\_M1 */}\textcolor{preprocessor}{}
+00206 \textcolor{preprocessor}{#define T0\_CT\_   0x04 }\textcolor{comment}{/* 0000 0100 = T0\_CT */}\textcolor{preprocessor}{}
+00207 \textcolor{preprocessor}{#define T0\_GATE\_ 0x08 }\textcolor{comment}{/* 0000 1000 = T0\_GATE */}\textcolor{preprocessor}{}
+00208 \textcolor{preprocessor}{#define T1\_M0\_   0x10 }\textcolor{comment}{/* 0001 0000 = T1\_M0 */}\textcolor{preprocessor}{}
+00209 \textcolor{preprocessor}{#define T1\_M1\_   0x20 }\textcolor{comment}{/* 0010 0000 = T1\_M1 */}\textcolor{preprocessor}{}
+00210 \textcolor{preprocessor}{#define T1\_CT\_   0x40 }\textcolor{comment}{/* 0100 0000 = T1\_CT */}\textcolor{preprocessor}{}
+00211 \textcolor{preprocessor}{#define T1\_GATE\_ 0x80 }\textcolor{comment}{/* 1000 0000 = T1\_GATE */}\textcolor{preprocessor}{}
+00212 
+00213 \textcolor{preprocessor}{#define T1\_MASK\_ 0xF0}
+00214 \textcolor{preprocessor}{#define T0\_MASK\_ 0x0F}
+00215 
+00216 \textcolor{comment}{/*------------------------------------------------}
+00217 \textcolor{comment}{PCON Bit Values - Defines the bit position in the reg!!!}
+00218 \textcolor{comment}{------------------------------------------------*/}
+00219 \textcolor{preprocessor}{#define IDL\_    0x01}
+00220 \textcolor{preprocessor}{#define STOP\_   0x02}
+00221 \textcolor{preprocessor}{#define SMOD\_   0x80}
+00222 
+00223 \textcolor{comment}{/*------------------------------------------------}
+00224 \textcolor{comment}{PMSR Bit Values - Defines the bit position in the reg!!!}
+00225 \textcolor{comment}{------------------------------------------------*/}
+00226 \textcolor{preprocessor}{#define SEL\_DIV\_0\_ 0x01}
+00227 \textcolor{preprocessor}{#define SEL\_DIV\_1\_ 0x02}
+00228 \textcolor{preprocessor}{#define SEL\_DIV\_2\_ 0x04}
+00229 
+00230 \textcolor{comment}{/*------------------------------------------------}
+00231 \textcolor{comment}{Interrupt Vectors:}
+00232 \textcolor{comment}{Interrupt Address = (Number * 8) + 3 }
+00233 \textcolor{comment}{------------------------------------------------*/}
+00234 
+00235 \textcolor{preprocessor}{#define IE0\_VECTOR      0  }\textcolor{comment}{/* 0x03 External Interrupt 0 */}\textcolor{preprocessor}{}
+00236 \textcolor{preprocessor}{#define TF0\_VECTOR      1  }\textcolor{comment}{/* 0x0B Timer 0 */}\textcolor{preprocessor}{}
+00237 \textcolor{preprocessor}{#define IE1\_VECTOR      2  }\textcolor{comment}{/* 0x13 External Interrupt 1 */}\textcolor{preprocessor}{}
+00238 \textcolor{preprocessor}{#define TF1\_VECTOR      3  }\textcolor{comment}{/* 0x1B Timer 1 */}\textcolor{preprocessor}{}
+00239 \textcolor{preprocessor}{#define SIO\_VECTOR  4  }\textcolor{comment}{/* 0x23 Serial channel 0 interrupt! (RI0/TI0) */}\textcolor{preprocessor}{}
+00240 \textcolor{preprocessor}{#define TF2\_VECTOR      5  }\textcolor{comment}{/* 0x2B Timer 2 */}\textcolor{preprocessor}{}
+00241 \textcolor{comment}{//  SKIPPED #define X   6  /* RESERVED*/}
+00242 \textcolor{preprocessor}{#define IEX2\_VECTOR 7    }\textcolor{comment}{/* 0x3B External interrupt 2 */}\textcolor{preprocessor}{}
+00243 \textcolor{preprocessor}{#define IEX3\_VECTOR 8    }\textcolor{comment}{/* 0x43 External interrupt 3 */}\textcolor{preprocessor}{}
+00244 \textcolor{preprocessor}{#define IEX4\_VECTOR 9    }\textcolor{comment}{/* 0x4B External interrupt 4 */}\textcolor{preprocessor}{}
+00245 \textcolor{preprocessor}{#define IEX5\_VECTOR 10   }\textcolor{comment}{/* 0x53 External interrupt 5 */}\textcolor{preprocessor}{}
+00246 
+00247 \textcolor{comment}{/*------------------------------------------------}
+00248 \textcolor{comment}{------------------------------------------------*/}
+00249 \textcolor{preprocessor}{#endif}
+\end{DoxyCode}

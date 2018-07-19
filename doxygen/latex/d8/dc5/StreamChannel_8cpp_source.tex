@@ -1,0 +1,98 @@
+\subsection{Stream\+Channel.\+cpp}
+\label{StreamChannel_8cpp_source}\index{/home/erik/prefix/default/src/limesuite-\/dev/src/\+Connection\+Novena\+R\+F7/\+Stream\+Channel.\+cpp@{/home/erik/prefix/default/src/limesuite-\/dev/src/\+Connection\+Novena\+R\+F7/\+Stream\+Channel.\+cpp}}
+
+\begin{DoxyCode}
+00001 \textcolor{preprocessor}{#include "ConnectionNovenaRF7.h"}
+00002 
+00003 \textcolor{keyword}{using namespace }lime;
+00004 
+00005 ConnectionNovenaRF7::StreamChannel::StreamChannel(lime::IConnection* port) :
+00006     mActive(false)
+00007 \{
+00008     this->port = \textcolor{keyword}{dynamic\_cast<}ConnectionNovenaRF7*\textcolor{keyword}{>}(port);
+00009     fifo = \textcolor{keyword}{new} RingFIFO(1024*8);
+00010 \}
+00011 
+00012 ConnectionNovenaRF7::StreamChannel::~StreamChannel()
+00013 \{
+00014     \textcolor{keyword}{delete} fifo;
+00015 \}
+00016 
+00017 \textcolor{keywordtype}{int} ConnectionNovenaRF7::StreamChannel::Read(\textcolor{keywordtype}{void}* samples, \textcolor{keyword}{const} uint32\_t count, Metadata* 
+      meta, \textcolor{keyword}{const} int32\_t timeout_ms)
+00018 \{
+00019     \textcolor{keywordtype}{int} popped = 0;
+00020     \textcolor{keywordflow}{if}(config.format == StreamConfig::FMT_FLOAT32 && !config.isTx)
+00021     \{
+00022         \textcolor{comment}{//in place conversion}
+00023         complex16_t* ptr = (complex16_t*)samples;
+00024         int16\_t* samplesShort = (int16\_t*)samples;
+00025         \textcolor{keywordtype}{float}* samplesFloat = (\textcolor{keywordtype}{float}*)samples;
+00026         popped = fifo->pop_samples(ptr, count, 1, &meta->timestamp, timeout\_ms, &meta->flags);
+00027         \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} i=2*popped-1; i>=0; --i)
+00028             samplesFloat[i] = (\textcolor{keywordtype}{float})samplesShort[i]/2048.0;
+00029     \}
+00030     \textcolor{comment}{//else if(config.format == StreamConfig::STREAM\_12\_BIT\_IN\_16)}
+00031     \textcolor{keywordflow}{else}
+00032     \{
+00033         complex16_t* ptr = (complex16_t*)samples;
+00034         popped = fifo->pop_samples(ptr, count, 1, &meta->timestamp, timeout\_ms, &meta->flags);
+00035     \}
+00036     \textcolor{keywordflow}{return} popped;
+00037 \}
+00038 
+00039 \textcolor{keywordtype}{int} ConnectionNovenaRF7::StreamChannel::Write(\textcolor{keyword}{const} \textcolor{keywordtype}{void}* samples, \textcolor{keyword}{const} uint32\_t 
+      count, \textcolor{keyword}{const} Metadata *meta, \textcolor{keyword}{const} int32\_t timeout_ms)
+00040 \{
+00041     \textcolor{keywordtype}{int} pushed = 0;
+00042     \textcolor{keywordflow}{if}(config.format == StreamConfig::FMT_FLOAT32 && config.isTx)
+00043     \{
+00044         \textcolor{keyword}{const} \textcolor{keywordtype}{float}* samplesFloat = (\textcolor{keyword}{const} \textcolor{keywordtype}{float}*)samples;
+00045         int16\_t* samplesShort = \textcolor{keyword}{new} int16\_t[2*count];
+00046         \textcolor{keywordflow}{for}(\textcolor{keywordtype}{size\_t} i=0; i<2*count; ++i)
+00047             samplesShort[i] = samplesFloat[i]*2047;
+00048         \textcolor{keyword}{const} complex16_t* ptr = (\textcolor{keyword}{const} complex16_t*)samplesShort ;
+00049         pushed = fifo->push_samples(ptr, count, 1, meta->timestamp, timeout\_ms, meta->flags);
+00050         \textcolor{keyword}{delete}[] samplesShort;
+00051     \}
+00052     \textcolor{comment}{//else if(config.format == StreamConfig::STREAM\_12\_BIT\_IN\_16)}
+00053     \textcolor{keywordflow}{else}
+00054     \{
+00055         \textcolor{keyword}{const} complex16_t* ptr = (\textcolor{keyword}{const} complex16_t*)samples;
+00056         pushed = fifo->push_samples(ptr, count, 1, meta->timestamp, timeout\_ms, meta->flags);
+00057     \}
+00058     \textcolor{keywordflow}{return} pushed;
+00059 \}
+00060 
+00061 IStreamChannel::Info ConnectionNovenaRF7::StreamChannel::GetInfo()
+00062 \{
+00063     Info stats;
+00064     RingFIFO::BufferInfo info = fifo->GetInfo();
+00065     stats.fifoSize = info.size;
+00066     stats.fifoItemsCount = info.itemsFilled;
+00067     stats.active = mActive;
+00068     \textcolor{keywordflow}{if}(config.isTx)
+00069         stats.linkRate = 0;
+00070     \textcolor{keywordflow}{else}
+00071         stats.linkRate = port->rxDataRate_Bps.load();
+00072     \textcolor{keywordflow}{return} stats;
+00073 \}
+00074 
+00075 \textcolor{keywordtype}{bool} ConnectionNovenaRF7::StreamChannel::IsActive()\textcolor{keyword}{ const}
+00076 \textcolor{keyword}{}\{
+00077     \textcolor{keywordflow}{return} mActive;
+00078 \}
+00079 
+00080 \textcolor{keywordtype}{int} ConnectionNovenaRF7::StreamChannel::Start()
+00081 \{
+00082     mActive = \textcolor{keyword}{true};
+00083     fifo->Clear();
+00084     \textcolor{keywordflow}{return} port->UpdateThreads();
+00085 \}
+00086 
+00087 \textcolor{keywordtype}{int} ConnectionNovenaRF7::StreamChannel::Stop()
+00088 \{
+00089     mActive = \textcolor{keyword}{false};
+00090     \textcolor{keywordflow}{return} port->UpdateThreads();
+00091 \}
+\end{DoxyCode}

@@ -1,0 +1,337 @@
+\subsection{/home/erik/prefix/default/src/limesuite-\/dev/src/lms7002m/\+L\+M\+S7002\+M\+\_\+\+Rx\+Tx\+Calibrations.cpp File Reference}
+\label{LMS7002M__RxTxCalibrations_8cpp}\index{/home/erik/prefix/default/src/limesuite-\/dev/src/lms7002m/\+L\+M\+S7002\+M\+\_\+\+Rx\+Tx\+Calibrations.\+cpp@{/home/erik/prefix/default/src/limesuite-\/dev/src/lms7002m/\+L\+M\+S7002\+M\+\_\+\+Rx\+Tx\+Calibrations.\+cpp}}
+{\ttfamily \#include \char`\"{}L\+M\+S7002\+M.\+h\char`\"{}}\\*
+{\ttfamily \#include $<$assert.\+h$>$}\\*
+{\ttfamily \#include \char`\"{}M\+C\+U\+\_\+\+B\+D.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}I\+Connection.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}mcu\+\_\+programs.\+h\char`\"{}}\\*
+{\ttfamily \#include $<$chrono$>$}\\*
+{\ttfamily \#include $<$thread$>$}\\*
+{\ttfamily \#include \char`\"{}Logger.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}L\+M\+S\+Boards.\+h\char`\"{}}\\*
+Include dependency graph for L\+M\+S7002\+M\+\_\+\+Rx\+Tx\+Calibrations.\+cpp\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{dc/dec/LMS7002M__RxTxCalibrations_8cpp__incl}
+\end{center}
+\end{figure}
+\subsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+class {\bf Board\+Loopback\+Store}
+\end{DoxyCompactItemize}
+\subsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define {\bf L\+M\+S\+\_\+\+V\+E\+R\+B\+O\+S\+E\+\_\+\+O\+U\+T\+P\+UT}
+\item 
+\#define {\bf verbose\+\_\+printf}(...)
+\end{DoxyCompactItemize}
+\subsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+static uint8\+\_\+t {\bf Get\+Ext\+Loop\+Pair} ({\bf lime\+::\+L\+M\+S7002M} \&ctr, bool calibrating\+Tx)
+\item 
+static int16\+\_\+t {\bf signext\+Iq\+Corr} (const uint16\+\_\+t reg\+Val)
+\item 
+static {\bf void} {\bf Write\+Analog\+DC} ({\bf lime\+::\+L\+M\+S7002M} $\ast${\bf lms\+Control}, const {\bf L\+M\+S7\+Parameter} \&param, {\bf int} value)
+\item 
+static int16\+\_\+t {\bf Read\+Analog\+DC} ({\bf lime\+::\+L\+M\+S7002M} $\ast${\bf lms\+Control}, const {\bf L\+M\+S7\+Parameter} \&param)
+\item 
+static {\bf int} {\bf Set\+Ext\+Loopback} ({\bf I\+Connection} $\ast${\bf port}, uint8\+\_\+t ch, bool {\bf enable}, bool {\bf tx})
+\end{DoxyCompactItemize}
+\subsubsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+static const bool {\bf verbose\+Enabled} = true
+\item 
+const double {\bf Trx\+Calib\+\_\+\+R\+F\+\_\+\+Limit\+Low} = 2.\+5e6
+\item 
+const double {\bf Trx\+Calib\+\_\+\+R\+F\+\_\+\+Limit\+High} = 120e6
+\item 
+static const char {\bf c\+Squares\+Line} [$\,$]
+\item 
+static const char {\bf c\+Dash\+Line} [$\,$]
+\end{DoxyCompactItemize}
+
+
+\subsubsection{Macro Definition Documentation}
+\index{L\+M\+S7002\+M\+\_\+\+Rx\+Tx\+Calibrations.\+cpp@{L\+M\+S7002\+M\+\_\+\+Rx\+Tx\+Calibrations.\+cpp}!L\+M\+S\+\_\+\+V\+E\+R\+B\+O\+S\+E\+\_\+\+O\+U\+T\+P\+UT@{L\+M\+S\+\_\+\+V\+E\+R\+B\+O\+S\+E\+\_\+\+O\+U\+T\+P\+UT}}
+\index{L\+M\+S\+\_\+\+V\+E\+R\+B\+O\+S\+E\+\_\+\+O\+U\+T\+P\+UT@{L\+M\+S\+\_\+\+V\+E\+R\+B\+O\+S\+E\+\_\+\+O\+U\+T\+P\+UT}!L\+M\+S7002\+M\+\_\+\+Rx\+Tx\+Calibrations.\+cpp@{L\+M\+S7002\+M\+\_\+\+Rx\+Tx\+Calibrations.\+cpp}}
+\paragraph[{L\+M\+S\+\_\+\+V\+E\+R\+B\+O\+S\+E\+\_\+\+O\+U\+T\+P\+UT}]{\setlength{\rightskip}{0pt plus 5cm}\#define L\+M\+S\+\_\+\+V\+E\+R\+B\+O\+S\+E\+\_\+\+O\+U\+T\+P\+UT}\label{LMS7002M__RxTxCalibrations_8cpp_ac970d920ebf39a3824fee739c99bcee1}
+
+
+Definition at line {\bf 12} of file {\bf L\+M\+S7002\+M\+\_\+\+Rx\+Tx\+Calibrations.\+cpp}.
+
+\index{L\+M\+S7002\+M\+\_\+\+Rx\+Tx\+Calibrations.\+cpp@{L\+M\+S7002\+M\+\_\+\+Rx\+Tx\+Calibrations.\+cpp}!verbose\+\_\+printf@{verbose\+\_\+printf}}
+\index{verbose\+\_\+printf@{verbose\+\_\+printf}!L\+M\+S7002\+M\+\_\+\+Rx\+Tx\+Calibrations.\+cpp@{L\+M\+S7002\+M\+\_\+\+Rx\+Tx\+Calibrations.\+cpp}}
+\paragraph[{verbose\+\_\+printf}]{\setlength{\rightskip}{0pt plus 5cm}\#define verbose\+\_\+printf(
+\begin{DoxyParamCaption}
+\item[{}]{...}
+\end{DoxyParamCaption}
+)}\label{LMS7002M__RxTxCalibrations_8cpp_a27a6211171f46e55819adf350b7b8d1c}
+{\bfseries Value\+:}
+\begin{DoxyCode}
+\textcolor{keywordflow}{do} \{ \textcolor{keywordflow}{if} (verboseEnabled) \{\(\backslash\)
+        fprintf(stderr, \_\_VA\_ARGS\_\_);\(\backslash\)
+    \}\} \textcolor{keywordflow}{while} (0)
+\end{DoxyCode}
+
+
+Definition at line {\bf 78} of file {\bf L\+M\+S7002\+M\+\_\+\+Rx\+Tx\+Calibrations.\+cpp}.
+
+
+
+Referenced by {\bf lime\+::\+L\+M\+S7002\+M\+::\+Calibrate\+Rx()}, and {\bf lime\+::\+L\+M\+S7002\+M\+::\+Calibrate\+Tx()}.
+
+
+
+\subsubsection{Function Documentation}
+\index{L\+M\+S7002\+M\+\_\+\+Rx\+Tx\+Calibrations.\+cpp@{L\+M\+S7002\+M\+\_\+\+Rx\+Tx\+Calibrations.\+cpp}!Get\+Ext\+Loop\+Pair@{Get\+Ext\+Loop\+Pair}}
+\index{Get\+Ext\+Loop\+Pair@{Get\+Ext\+Loop\+Pair}!L\+M\+S7002\+M\+\_\+\+Rx\+Tx\+Calibrations.\+cpp@{L\+M\+S7002\+M\+\_\+\+Rx\+Tx\+Calibrations.\+cpp}}
+\paragraph[{Get\+Ext\+Loop\+Pair(lime\+::\+L\+M\+S7002\+M \&ctr, bool calibrating\+Tx)}]{\setlength{\rightskip}{0pt plus 5cm}static uint8\+\_\+t Get\+Ext\+Loop\+Pair (
+\begin{DoxyParamCaption}
+\item[{{\bf lime\+::\+L\+M\+S7002M} \&}]{ctr, }
+\item[{bool}]{calibrating\+Tx}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [static]}}\label{LMS7002M__RxTxCalibrations_8cpp_adcd77ca8ab1c1d39ebc6012d3c6d0f55}
+
+
+Definition at line {\bf 43} of file {\bf L\+M\+S7002\+M\+\_\+\+Rx\+Tx\+Calibrations.\+cpp}.
+
+
+
+References {\bf lime\+::\+Device\+Info\+::device\+Name}, {\bf lime\+::\+L\+M\+S7002\+M\+::\+Get\+\_\+\+S\+P\+I\+\_\+\+Reg\+\_\+bits()}, {\bf lime\+::\+L\+M\+S7002\+M\+::\+Get\+Connection()}, {\bf lime\+::\+I\+Connection\+::\+Get\+Device\+Info()}, {\bf lime\+::\+Get\+Device\+Name()}, {\bf L\+M\+S7\+\_\+\+S\+E\+L\+\_\+\+B\+A\+N\+D1\+\_\+\+T\+RF}, {\bf L\+M\+S7\+\_\+\+S\+E\+L\+\_\+\+B\+A\+N\+D2\+\_\+\+T\+RF}, {\bf L\+M\+S7\+\_\+\+S\+E\+L\+\_\+\+P\+A\+T\+H\+\_\+\+R\+FE}, {\bf lime\+::\+L\+M\+S\+\_\+\+D\+E\+V\+\_\+\+L\+I\+M\+E\+S\+DR}, {\bf lime\+::\+L\+M\+S\+\_\+\+D\+E\+V\+\_\+\+L\+I\+M\+E\+S\+D\+R\+M\+I\+NI}, and {\bf port}.
+
+
+
+Referenced by {\bf lime\+::\+L\+M\+S7002\+M\+::\+Calibrate\+Rx()}, and {\bf lime\+::\+L\+M\+S7002\+M\+::\+Calibrate\+Tx()}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{d6/d0b/LMS7002M__RxTxCalibrations_8cpp_adcd77ca8ab1c1d39ebc6012d3c6d0f55_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{d6/d0b/LMS7002M__RxTxCalibrations_8cpp_adcd77ca8ab1c1d39ebc6012d3c6d0f55_icgraph}
+\end{center}
+\end{figure}
+
+
+\index{L\+M\+S7002\+M\+\_\+\+Rx\+Tx\+Calibrations.\+cpp@{L\+M\+S7002\+M\+\_\+\+Rx\+Tx\+Calibrations.\+cpp}!Read\+Analog\+DC@{Read\+Analog\+DC}}
+\index{Read\+Analog\+DC@{Read\+Analog\+DC}!L\+M\+S7002\+M\+\_\+\+Rx\+Tx\+Calibrations.\+cpp@{L\+M\+S7002\+M\+\_\+\+Rx\+Tx\+Calibrations.\+cpp}}
+\paragraph[{Read\+Analog\+D\+C(lime\+::\+L\+M\+S7002\+M $\ast$lms\+Control, const L\+M\+S7\+Parameter \&param)}]{\setlength{\rightskip}{0pt plus 5cm}static int16\+\_\+t Read\+Analog\+DC (
+\begin{DoxyParamCaption}
+\item[{{\bf lime\+::\+L\+M\+S7002M} $\ast$}]{lms\+Control, }
+\item[{const {\bf L\+M\+S7\+Parameter} \&}]{param}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [static]}}\label{LMS7002M__RxTxCalibrations_8cpp_a2cbca479bdcea72bd84bb9d94db560e5}
+
+
+Definition at line {\bf 98} of file {\bf L\+M\+S7002\+M\+\_\+\+Rx\+Tx\+Calibrations.\+cpp}.
+
+
+
+References {\bf L\+M\+S7\+Parameter\+::address}, {\bf lime\+::\+L\+M\+S7002\+M\+::\+S\+P\+I\+\_\+read()}, and {\bf lime\+::\+L\+M\+S7002\+M\+::\+S\+P\+I\+\_\+write()}.
+
+
+
+Referenced by {\bf lime\+::\+L\+M\+S7002\+M\+::\+Calibrate\+Rx()}, and {\bf lime\+::\+L\+M\+S7002\+M\+::\+Calibrate\+Tx()}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{d6/d0b/LMS7002M__RxTxCalibrations_8cpp_a2cbca479bdcea72bd84bb9d94db560e5_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{d6/d0b/LMS7002M__RxTxCalibrations_8cpp_a2cbca479bdcea72bd84bb9d94db560e5_icgraph}
+\end{center}
+\end{figure}
+
+
+\index{L\+M\+S7002\+M\+\_\+\+Rx\+Tx\+Calibrations.\+cpp@{L\+M\+S7002\+M\+\_\+\+Rx\+Tx\+Calibrations.\+cpp}!Set\+Ext\+Loopback@{Set\+Ext\+Loopback}}
+\index{Set\+Ext\+Loopback@{Set\+Ext\+Loopback}!L\+M\+S7002\+M\+\_\+\+Rx\+Tx\+Calibrations.\+cpp@{L\+M\+S7002\+M\+\_\+\+Rx\+Tx\+Calibrations.\+cpp}}
+\paragraph[{Set\+Ext\+Loopback(\+I\+Connection $\ast$port, uint8\+\_\+t ch, bool enable, bool tx)}]{\setlength{\rightskip}{0pt plus 5cm}static {\bf int} Set\+Ext\+Loopback (
+\begin{DoxyParamCaption}
+\item[{{\bf I\+Connection} $\ast$}]{port, }
+\item[{uint8\+\_\+t}]{ch, }
+\item[{bool}]{enable, }
+\item[{bool}]{tx}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [static]}}\label{LMS7002M__RxTxCalibrations_8cpp_a6b3de4343e7fdcbfb5bc8cf53d5a5ea6}
+
+
+Definition at line {\bf 112} of file {\bf L\+M\+S7002\+M\+\_\+\+Rx\+Tx\+Calibrations.\+cpp}.
+
+
+
+References {\bf lime\+::\+Device\+Info\+::device\+Name}, {\bf lime\+::\+I\+Connection\+::\+Get\+Device\+Info()}, {\bf lime\+::\+Get\+Device\+Name()}, {\bf lime\+::\+L\+M\+S\+\_\+\+D\+E\+V\+\_\+\+L\+I\+M\+E\+S\+DR}, {\bf lime\+::\+L\+M\+S\+\_\+\+D\+E\+V\+\_\+\+L\+I\+M\+E\+S\+D\+R\+M\+I\+NI}, {\bf lime\+::\+I\+Connection\+::\+Read\+L\+M\+S7002\+M\+S\+P\+I()}, {\bf lime\+::\+I\+Connection\+::\+Read\+Register()}, {\bf lime\+::\+Report\+Error()}, {\bf status}, and {\bf lime\+::\+I\+Connection\+::\+Write\+Register()}.
+
+
+
+Referenced by {\bf lime\+::\+L\+M\+S7002\+M\+::\+Calibrate\+Rx()}, and {\bf lime\+::\+L\+M\+S7002\+M\+::\+Calibrate\+Tx()}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{d6/d0b/LMS7002M__RxTxCalibrations_8cpp_a6b3de4343e7fdcbfb5bc8cf53d5a5ea6_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{d6/d0b/LMS7002M__RxTxCalibrations_8cpp_a6b3de4343e7fdcbfb5bc8cf53d5a5ea6_icgraph}
+\end{center}
+\end{figure}
+
+
+\index{L\+M\+S7002\+M\+\_\+\+Rx\+Tx\+Calibrations.\+cpp@{L\+M\+S7002\+M\+\_\+\+Rx\+Tx\+Calibrations.\+cpp}!signext\+Iq\+Corr@{signext\+Iq\+Corr}}
+\index{signext\+Iq\+Corr@{signext\+Iq\+Corr}!L\+M\+S7002\+M\+\_\+\+Rx\+Tx\+Calibrations.\+cpp@{L\+M\+S7002\+M\+\_\+\+Rx\+Tx\+Calibrations.\+cpp}}
+\paragraph[{signext\+Iq\+Corr(const uint16\+\_\+t reg\+Val)}]{\setlength{\rightskip}{0pt plus 5cm}static int16\+\_\+t signext\+Iq\+Corr (
+\begin{DoxyParamCaption}
+\item[{const uint16\+\_\+t}]{reg\+Val}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [static]}}\label{LMS7002M__RxTxCalibrations_8cpp_a19d0a3b737e5664c102f3617a9b4c863}
+Convert the 12-\/bit twos compliment register into a signed integer 
+
+Definition at line {\bf 64} of file {\bf L\+M\+S7002\+M\+\_\+\+Rx\+Tx\+Calibrations.\+cpp}.
+
+
+
+Referenced by {\bf lime\+::\+L\+M\+S7002\+M\+::\+Calibrate\+Rx()}, and {\bf lime\+::\+L\+M\+S7002\+M\+::\+Calibrate\+Tx()}.
+
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{d6/d0b/LMS7002M__RxTxCalibrations_8cpp_a19d0a3b737e5664c102f3617a9b4c863_icgraph}
+\end{center}
+\end{figure}
+
+
+\index{L\+M\+S7002\+M\+\_\+\+Rx\+Tx\+Calibrations.\+cpp@{L\+M\+S7002\+M\+\_\+\+Rx\+Tx\+Calibrations.\+cpp}!Write\+Analog\+DC@{Write\+Analog\+DC}}
+\index{Write\+Analog\+DC@{Write\+Analog\+DC}!L\+M\+S7002\+M\+\_\+\+Rx\+Tx\+Calibrations.\+cpp@{L\+M\+S7002\+M\+\_\+\+Rx\+Tx\+Calibrations.\+cpp}}
+\paragraph[{Write\+Analog\+D\+C(lime\+::\+L\+M\+S7002\+M $\ast$lms\+Control, const L\+M\+S7\+Parameter \&param, int value)}]{\setlength{\rightskip}{0pt plus 5cm}static {\bf void} Write\+Analog\+DC (
+\begin{DoxyParamCaption}
+\item[{{\bf lime\+::\+L\+M\+S7002M} $\ast$}]{lms\+Control, }
+\item[{const {\bf L\+M\+S7\+Parameter} \&}]{param, }
+\item[{{\bf int}}]{value}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [static]}}\label{LMS7002M__RxTxCalibrations_8cpp_a850b1c9647e1b38b39f300b51c65f595}
+
+
+Definition at line {\bf 83} of file {\bf L\+M\+S7002\+M\+\_\+\+Rx\+Tx\+Calibrations.\+cpp}.
+
+
+
+References {\bf L\+M\+S7\+Parameter\+::address}, and {\bf lime\+::\+L\+M\+S7002\+M\+::\+S\+P\+I\+\_\+write()}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{d6/d0b/LMS7002M__RxTxCalibrations_8cpp_a850b1c9647e1b38b39f300b51c65f595_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+\subsubsection{Variable Documentation}
+\index{L\+M\+S7002\+M\+\_\+\+Rx\+Tx\+Calibrations.\+cpp@{L\+M\+S7002\+M\+\_\+\+Rx\+Tx\+Calibrations.\+cpp}!c\+Dash\+Line@{c\+Dash\+Line}}
+\index{c\+Dash\+Line@{c\+Dash\+Line}!L\+M\+S7002\+M\+\_\+\+Rx\+Tx\+Calibrations.\+cpp@{L\+M\+S7002\+M\+\_\+\+Rx\+Tx\+Calibrations.\+cpp}}
+\paragraph[{c\+Dash\+Line}]{\setlength{\rightskip}{0pt plus 5cm}const char c\+Dash\+Line[$\,$]\hspace{0.3cm}{\ttfamily [static]}}\label{LMS7002M__RxTxCalibrations_8cpp_a48155a0581d417c7b91f248271f8d449}
+{\bfseries Initial value\+:}
+\begin{DoxyCode}
+=
+    \textcolor{stringliteral}{"------------------------------------------------------------\(\backslash\)n"}
+\end{DoxyCode}
+
+
+Definition at line {\bf 75} of file {\bf L\+M\+S7002\+M\+\_\+\+Rx\+Tx\+Calibrations.\+cpp}.
+
+\index{L\+M\+S7002\+M\+\_\+\+Rx\+Tx\+Calibrations.\+cpp@{L\+M\+S7002\+M\+\_\+\+Rx\+Tx\+Calibrations.\+cpp}!c\+Squares\+Line@{c\+Squares\+Line}}
+\index{c\+Squares\+Line@{c\+Squares\+Line}!L\+M\+S7002\+M\+\_\+\+Rx\+Tx\+Calibrations.\+cpp@{L\+M\+S7002\+M\+\_\+\+Rx\+Tx\+Calibrations.\+cpp}}
+\paragraph[{c\+Squares\+Line}]{\setlength{\rightskip}{0pt plus 5cm}const char c\+Squares\+Line[$\,$]\hspace{0.3cm}{\ttfamily [static]}}\label{LMS7002M__RxTxCalibrations_8cpp_a33dfc3a397f4e3e95ee4a5ab8236cc2a}
+{\bfseries Initial value\+:}
+\begin{DoxyCode}
+=
+    \textcolor{stringliteral}{"############################################################\(\backslash\)n"}
+\end{DoxyCode}
+
+
+Definition at line {\bf 73} of file {\bf L\+M\+S7002\+M\+\_\+\+Rx\+Tx\+Calibrations.\+cpp}.
+
+\index{L\+M\+S7002\+M\+\_\+\+Rx\+Tx\+Calibrations.\+cpp@{L\+M\+S7002\+M\+\_\+\+Rx\+Tx\+Calibrations.\+cpp}!Trx\+Calib\+\_\+\+R\+F\+\_\+\+Limit\+High@{Trx\+Calib\+\_\+\+R\+F\+\_\+\+Limit\+High}}
+\index{Trx\+Calib\+\_\+\+R\+F\+\_\+\+Limit\+High@{Trx\+Calib\+\_\+\+R\+F\+\_\+\+Limit\+High}!L\+M\+S7002\+M\+\_\+\+Rx\+Tx\+Calibrations.\+cpp@{L\+M\+S7002\+M\+\_\+\+Rx\+Tx\+Calibrations.\+cpp}}
+\paragraph[{Trx\+Calib\+\_\+\+R\+F\+\_\+\+Limit\+High}]{\setlength{\rightskip}{0pt plus 5cm}const double Trx\+Calib\+\_\+\+R\+F\+\_\+\+Limit\+High = 120e6}\label{LMS7002M__RxTxCalibrations_8cpp_acb17486c31c441cace9cfd73cfb0ddb0}
+
+
+Definition at line {\bf 71} of file {\bf L\+M\+S7002\+M\+\_\+\+Rx\+Tx\+Calibrations.\+cpp}.
+
+
+
+Referenced by {\bf lime\+::\+L\+M\+S7002\+M\+::\+Calibrate\+Rx()}, and {\bf lime\+::\+L\+M\+S7002\+M\+::\+Calibrate\+Tx()}.
+
+\index{L\+M\+S7002\+M\+\_\+\+Rx\+Tx\+Calibrations.\+cpp@{L\+M\+S7002\+M\+\_\+\+Rx\+Tx\+Calibrations.\+cpp}!Trx\+Calib\+\_\+\+R\+F\+\_\+\+Limit\+Low@{Trx\+Calib\+\_\+\+R\+F\+\_\+\+Limit\+Low}}
+\index{Trx\+Calib\+\_\+\+R\+F\+\_\+\+Limit\+Low@{Trx\+Calib\+\_\+\+R\+F\+\_\+\+Limit\+Low}!L\+M\+S7002\+M\+\_\+\+Rx\+Tx\+Calibrations.\+cpp@{L\+M\+S7002\+M\+\_\+\+Rx\+Tx\+Calibrations.\+cpp}}
+\paragraph[{Trx\+Calib\+\_\+\+R\+F\+\_\+\+Limit\+Low}]{\setlength{\rightskip}{0pt plus 5cm}const double Trx\+Calib\+\_\+\+R\+F\+\_\+\+Limit\+Low = 2.\+5e6}\label{LMS7002M__RxTxCalibrations_8cpp_a29cfe3bddb660912cc41353036598955}
+
+
+Definition at line {\bf 70} of file {\bf L\+M\+S7002\+M\+\_\+\+Rx\+Tx\+Calibrations.\+cpp}.
+
+
+
+Referenced by {\bf lime\+::\+L\+M\+S7002\+M\+::\+Calibrate\+Rx()}, and {\bf lime\+::\+L\+M\+S7002\+M\+::\+Calibrate\+Tx()}.
+
+\index{L\+M\+S7002\+M\+\_\+\+Rx\+Tx\+Calibrations.\+cpp@{L\+M\+S7002\+M\+\_\+\+Rx\+Tx\+Calibrations.\+cpp}!verbose\+Enabled@{verbose\+Enabled}}
+\index{verbose\+Enabled@{verbose\+Enabled}!L\+M\+S7002\+M\+\_\+\+Rx\+Tx\+Calibrations.\+cpp@{L\+M\+S7002\+M\+\_\+\+Rx\+Tx\+Calibrations.\+cpp}}
+\paragraph[{verbose\+Enabled}]{\setlength{\rightskip}{0pt plus 5cm}const bool verbose\+Enabled = true\hspace{0.3cm}{\ttfamily [static]}}\label{LMS7002M__RxTxCalibrations_8cpp_ad5e1d28ffef8c9967c6eea67ece00a97}
+
+
+Definition at line {\bf 16} of file {\bf L\+M\+S7002\+M\+\_\+\+Rx\+Tx\+Calibrations.\+cpp}.
+

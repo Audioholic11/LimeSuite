@@ -1,0 +1,1472 @@
+\subsection{lms7\+\_\+api.\+cpp}
+\label{lms7__api_8cpp_source}\index{/home/erik/prefix/default/src/limesuite-\/dev/src/\+A\+P\+I/lms7\+\_\+api.\+cpp@{/home/erik/prefix/default/src/limesuite-\/dev/src/\+A\+P\+I/lms7\+\_\+api.\+cpp}}
+
+\begin{DoxyCode}
+00001 \textcolor{preprocessor}{#include "IConnection.h"}
+00002 \textcolor{preprocessor}{#include "ConnectionRegistry.h"}
+00003 \textcolor{preprocessor}{#include "lime/LimeSuite.h"}
+00004 \textcolor{preprocessor}{#include "lms7_device.h"}
+00005 \textcolor{preprocessor}{#include "errno.h"}
+00006 \textcolor{preprocessor}{#include <cmath>}
+00007 \textcolor{preprocessor}{#include "VersionInfo.h"}
+00008 \textcolor{preprocessor}{#include <assert.h>}
+00009 \textcolor{preprocessor}{#include "Logger.h"}
+00010 \textcolor{preprocessor}{#include "LMS64CProtocol.h"}
+00011 \textcolor{preprocessor}{#include "Streamer.h"}
+00012 
+00013 \textcolor{keyword}{using namespace }std;
+00014 
+00015 API_EXPORT \textcolor{keywordtype}{int} CALL_CONV LMS_GetDeviceList(lms_info_str_t * dev\_list)
+00016 \{
+00017     std::vector<lime::ConnectionHandle> handles;
+00018     handles = lime::ConnectionRegistry::findConnections();
+00019 
+00020     \textcolor{keywordflow}{if} (dev\_list != \textcolor{keyword}{nullptr})
+00021     \{
+00022         \textcolor{keywordflow}{for} (\textcolor{keywordtype}{size\_t} i = 0; i < handles.size(); i++)
+00023         \{
+00024             \textcolor{keywordtype}{string} str = handles[i].serialize();
+00025             \textcolor{keywordflow}{if} (dev\_list[i] == \textcolor{keyword}{nullptr})
+00026                 \textcolor{keywordflow}{return} -1;
+00027             strncpy(dev\_list[i],str.c\_str(),\textcolor{keyword}{sizeof}(lms_info_str_t)-1);
+00028             dev\_list[i][\textcolor{keyword}{sizeof}(lms_info_str_t)-1]=0;
+00029         \}
+00030     \}
+00031     \textcolor{keywordflow}{return} handles.size();
+00032 \}
+00033 
+00034 API_EXPORT \textcolor{keywordtype}{int} CALL_CONV LMS_Open(lms_device_t** device, \textcolor{keyword}{const} lms_info_str_t 
+      info, \textcolor{keywordtype}{void}* args)
+00035 \{
+00036     \textcolor{keywordflow}{if} (device == \textcolor{keyword}{nullptr})
+00037     \{
+00038         lime::error(\textcolor{stringliteral}{"Device pointer cannot be NULL"});
+00039         \textcolor{keywordflow}{return} -1;
+00040     \}
+00041 
+00042     std::vector<lime::ConnectionHandle> handles;
+00043     handles = lime::ConnectionRegistry::findConnections();
+00044 
+00045     \textcolor{keywordflow}{for} (\textcolor{keywordtype}{size\_t} i = 0; i < handles.size(); i++)
+00046     \{
+00047         \textcolor{keywordflow}{if} (info == NULL || strcmp(handles[i].serialize().c\_str(),info) == 0)
+00048         \{
+00049             \textcolor{keyword}{auto} dev = lime::LMS7_Device::CreateDevice(handles[i],\textcolor{keyword}{nullptr});
+00050             \textcolor{keywordflow}{if} (dev == \textcolor{keyword}{nullptr})
+00051             \{
+00052                 lime::error(\textcolor{stringliteral}{"Unable to open device"});
+00053                 \textcolor{keywordflow}{return} -1;
+00054             \}
+00055             *device = dev;
+00056             \textcolor{keywordflow}{return} LMS_SUCCESS;
+00057         \}
+00058     \}
+00059 
+00060     lime::error(\textcolor{stringliteral}{"Specified device could not be found"});
+00061     \textcolor{keywordflow}{return} -1;
+00062 \}
+00063 
+00064 API_EXPORT \textcolor{keywordtype}{int} CALL_CONV LMS_Close(lms_device_t * device)
+00065 \{
+00066     \textcolor{keywordflow}{if} (device == \textcolor{keyword}{nullptr})
+00067     \{
+00068         lime::error(\textcolor{stringliteral}{"Device cannot be NULL."});
+00069         \textcolor{keywordflow}{return} -1;
+00070     \}
+00071     lime::LMS7_Device* lms = (lime::LMS7_Device*)device;
+00072     \textcolor{keyword}{delete} lms;
+00073     \textcolor{keywordflow}{return} LMS_SUCCESS;
+00074 \}
+00075 
+00076 API_EXPORT \textcolor{keywordtype}{int} CALL_CONV LMS_Disconnect(lms_device_t *device)
+00077 \{
+00078     lime::warning(\textcolor{stringliteral}{"LMS\_Disconnect() deprecated: closing connection without closing device is no longer
+       supported\(\backslash\)nuse LMS\_Close() to disconnect and close device"});
+00079     \textcolor{keywordflow}{if} (device == \textcolor{keyword}{nullptr})
+00080     \{
+00081         lime::ReportError(EINVAL, \textcolor{stringliteral}{"Device cannot be NULL."});
+00082         \textcolor{keywordflow}{return} -1;
+00083     \}
+00084     \textcolor{keywordflow}{return} 0;
+00085 \}
+00086 
+00087 API_EXPORT \textcolor{keywordtype}{bool} CALL_CONV LMS_IsOpen(lms_device_t *device, \textcolor{keywordtype}{int} port)
+00088 \{
+00089     lime::warning(\textcolor{stringliteral}{"LMS\_IsOpen() deprecated: device is now always open after successful LMS\_Open() call\(\backslash\)n
+      invalid (non-null) device pointer will result in segfault"});
+00090     \textcolor{keywordflow}{if} (device == \textcolor{keyword}{nullptr})
+00091         \textcolor{keywordflow}{return} \textcolor{keyword}{false};
+00092 
+00093     lime::LMS7_Device* lms = (lime::LMS7_Device*)device;
+00094 
+00095     \textcolor{keyword}{auto} conn = lms->GetConnection();
+00096     \textcolor{keywordflow}{if} (conn != \textcolor{keyword}{nullptr})
+00097     \{
+00098         \textcolor{keywordflow}{return} conn->IsOpen();
+00099     \}
+00100     \textcolor{keywordflow}{return} \textcolor{keyword}{false};
+00101 \}
+00102 
+00103 API_EXPORT \textcolor{keywordtype}{int} CALL_CONV LMS_Reset(lms_device_t *device)
+00104 \{
+00105     \textcolor{keywordflow}{if} (device == \textcolor{keyword}{nullptr})
+00106     \{
+00107         lime::ReportError(EINVAL, \textcolor{stringliteral}{"Device cannot be NULL."});
+00108         \textcolor{keywordflow}{return} -1;
+00109     \}
+00110 
+00111     lime::LMS7_Device* lms = (lime::LMS7_Device*)device;
+00112     \textcolor{keywordflow}{return} lms->Reset();
+00113 \}
+00114 
+00115 API_EXPORT \textcolor{keywordtype}{int} CALL_CONV LMS_EnableChannel(lms_device_t * device, \textcolor{keywordtype}{bool} dir_tx, \textcolor{keywordtype}{size\_t} 
+      chan, \textcolor{keywordtype}{bool} enabled)
+00116 \{
+00117     \textcolor{keywordflow}{if} (device == \textcolor{keyword}{nullptr})
+00118     \{
+00119         lime::ReportError(EINVAL, \textcolor{stringliteral}{"Device cannot be NULL."});
+00120         \textcolor{keywordflow}{return} -1;
+00121     \}
+00122 
+00123     lime::LMS7_Device* lms = (lime::LMS7_Device*)device;
+00124 
+00125     \textcolor{keywordflow}{return} lms->EnableChannel(dir\_tx, chan,enabled);
+00126 \}
+00127 
+00128 API_EXPORT \textcolor{keywordtype}{int} CALL_CONV LMS_SetSampleRate(lms_device_t * device, float_type 
+      rate, \textcolor{keywordtype}{size\_t} oversample)
+00129 \{
+00130     \textcolor{keywordflow}{if} (device == \textcolor{keyword}{nullptr})
+00131     \{
+00132         lime::ReportError(EINVAL, \textcolor{stringliteral}{"Device cannot be NULL."});
+00133         \textcolor{keywordflow}{return} -1;
+00134     \}
+00135 
+00136    lime::LMS7_Device* lms = (lime::LMS7_Device*)device;
+00137 
+00138    \textcolor{keywordflow}{return} lms->SetRate(rate, oversample);
+00139 \}
+00140 
+00141 API_EXPORT \textcolor{keywordtype}{int} CALL_CONV LMS_SetSampleRateDir(lms_device_t *device, \textcolor{keywordtype}{bool} dir_tx, 
+      float_type rate, \textcolor{keywordtype}{size\_t} oversample)
+00142 \{
+00143     \textcolor{keywordflow}{if} (device == \textcolor{keyword}{nullptr})
+00144     \{
+00145         lime::ReportError(EINVAL, \textcolor{stringliteral}{"Device cannot be NULL."});
+00146         \textcolor{keywordflow}{return} -1;
+00147     \}
+00148 
+00149     lime::LMS7_Device* lms = (lime::LMS7_Device*)device;
+00150 
+00151     \textcolor{keywordflow}{return} lms->SetRate(dir\_tx,rate,oversample);
+00152 \}
+00153 
+00154 API_EXPORT \textcolor{keywordtype}{int} CALL_CONV LMS_GetSampleRate(lms_device_t *device, \textcolor{keywordtype}{bool} dir_tx, \textcolor{keywordtype}{size\_t} 
+      chan, float_type *host_Hz, float_type *rf_Hz)
+00155 \{
+00156     \textcolor{keywordflow}{if} (device == \textcolor{keyword}{nullptr})
+00157     \{
+00158         lime::ReportError(EINVAL, \textcolor{stringliteral}{"Device cannot be NULL."});
+00159         \textcolor{keywordflow}{return} -1;
+00160     \}
+00161 
+00162     lime::LMS7_Device* lms = (lime::LMS7_Device*)device;
+00163 
+00164     \textcolor{keywordflow}{if} (chan >= lms->GetNumChannels(dir\_tx))
+00165     \{
+00166         lime::ReportError(EINVAL, \textcolor{stringliteral}{"Invalid channel number."});
+00167         \textcolor{keywordflow}{return} -1;
+00168     \}
+00169 
+00170     \textcolor{keywordtype}{double} rate = lms->GetRate(dir\_tx,chan,rf\_Hz);
+00171     \textcolor{keywordflow}{if} (host\_Hz)
+00172         *host\_Hz = rate;
+00173 
+00174     \textcolor{keywordflow}{return} LMS_SUCCESS;
+00175 
+00176 \}
+00177 
+00178 API_EXPORT \textcolor{keywordtype}{int} CALL_CONV LMS_GetSampleRateRange(lms_device_t *device, \textcolor{keywordtype}{bool} 
+      dir_tx, lms_range_t *range)
+00179 \{
+00180     \textcolor{keywordflow}{if} (device == \textcolor{keyword}{nullptr})
+00181     \{
+00182         lime::ReportError(EINVAL, \textcolor{stringliteral}{"Device cannot be NULL."});
+00183         \textcolor{keywordflow}{return} -1;
+00184     \}
+00185 
+00186     lime::LMS7_Device* lms = (lime::LMS7_Device*)device;
+00187     \textcolor{keyword}{auto} retRange = lms->GetRateRange(dir\_tx);
+00188     range->min = retRange.min;
+00189     range->max = retRange.max;
+00190     \textcolor{keywordflow}{return} LMS_SUCCESS;
+00191 \}
+00192 
+00193 API_EXPORT \textcolor{keywordtype}{int} CALL_CONV LMS_Init(lms_device_t * device)
+00194 \{
+00195     \textcolor{keywordflow}{if} (device == \textcolor{keyword}{nullptr})
+00196     \{
+00197         lime::ReportError(EINVAL, \textcolor{stringliteral}{"Device cannot be NULL."});
+00198         \textcolor{keywordflow}{return} -1;
+00199     \}
+00200 
+00201     lime::LMS7_Device* lms = (lime::LMS7_Device*)device;
+00202 
+00203     \textcolor{keywordflow}{return} lms->Init();
+00204 \}
+00205 
+00206 API_EXPORT \textcolor{keywordtype}{int} CALL_CONV LMS_ReadCustomBoardParam(lms_device_t *device,
+00207                            uint8\_t param\_id, float_type *val, lms_name_t units)
+00208 \{
+00209     \textcolor{keywordflow}{if} (device == \textcolor{keyword}{nullptr})
+00210     \{
+00211         lime::ReportError(EINVAL, \textcolor{stringliteral}{"Device cannot be NULL."});
+00212         \textcolor{keywordflow}{return} -1;
+00213     \}
+00214     lime::LMS7_Device* lms = (lime::LMS7_Device*)device;
+00215     std::string str;
+00216     \textcolor{keyword}{auto} conn = lms->GetConnection();
+00217     \textcolor{keywordflow}{if} (conn == \textcolor{keyword}{nullptr})
+00218     \{
+00219         lime::ReportError(EINVAL, \textcolor{stringliteral}{"Device not connected"});
+00220         \textcolor{keywordflow}{return} -1;
+00221     \}
+00222     \textcolor{keywordtype}{int} ret=conn->CustomParameterRead(&param\_id,val,1,&str);
+00223     strncpy(units,str.c\_str(),\textcolor{keyword}{sizeof}(lms_name_t)-1);
+00224     \textcolor{keywordflow}{return} ret;
+00225 \}
+00226 
+00227 API_EXPORT \textcolor{keywordtype}{int} CALL_CONV LMS_WriteCustomBoardParam(lms_device_t *device,
+00228                         uint8\_t param\_id, float_type val, \textcolor{keyword}{const} lms_name_t units)
+00229 \{
+00230     \textcolor{keywordflow}{if} (device == \textcolor{keyword}{nullptr})
+00231     \{
+00232         lime::ReportError(EINVAL, \textcolor{stringliteral}{"Device cannot be NULL."});
+00233         \textcolor{keywordflow}{return} -1;
+00234     \}
+00235     lime::LMS7_Device* lms = (lime::LMS7_Device*)device;
+00236     \textcolor{keyword}{auto} conn = lms->GetConnection();
+00237     \textcolor{keywordflow}{if} (conn == \textcolor{keyword}{nullptr})
+00238     \{
+00239         lime::ReportError(EINVAL, \textcolor{stringliteral}{"Device not connected"});
+00240         \textcolor{keywordflow}{return} -1;
+00241     \}
+00242     std::string str = units == \textcolor{keyword}{nullptr} ? \textcolor{stringliteral}{""} : units;
+00243     \textcolor{keywordflow}{return} conn->CustomParameterWrite(&param\_id,&val,1,str);
+00244 \}
+00245 
+00246 API_EXPORT \textcolor{keywordtype}{int} CALL_CONV LMS_VCTCXOWrite(lms_device_t * device, uint16\_t val)
+00247 \{
+00248     \textcolor{keywordflow}{return} LMS_WriteCustomBoardParam(device, 0, val, \textcolor{stringliteral}{""});
+00249 \}
+00250 
+00251 API_EXPORT \textcolor{keywordtype}{int} CALL_CONV LMS_VCTCXORead(lms_device_t * device, uint16\_t *val)
+00252 \{
+00253     lms_name_t units;
+00254     \textcolor{keywordtype}{double} dval = 0.0;
+00255     \textcolor{keywordtype}{int} ret= LMS_ReadCustomBoardParam(device, 0, &dval, units);
+00256     *val = dval;
+00257     \textcolor{keywordflow}{return} ret;
+00258 \}
+00259 
+00260 API_EXPORT \textcolor{keywordtype}{int} CALL_CONV LMS_GetClockFreq(lms_device_t *device, \textcolor{keywordtype}{size\_t} clk_id, 
+      float_type *freq)
+00261 \{
+00262     \textcolor{keywordflow}{if} (device == \textcolor{keyword}{nullptr})
+00263     \{
+00264         lime::ReportError(EINVAL, \textcolor{stringliteral}{"Device cannot be NULL."});
+00265         \textcolor{keywordflow}{return} -1;
+00266     \}
+00267     lime::LMS7_Device* lms = (lime::LMS7_Device*)device;
+00268     *freq = lms->GetClockFreq(clk\_id);
+00269     \textcolor{keywordflow}{return} *freq > 0 ? 0 : -1;
+00270 \}
+00271 
+00272 API_EXPORT \textcolor{keywordtype}{int} CALL_CONV LMS_SetClockFreq(lms_device_t *device, \textcolor{keywordtype}{size\_t} clk_id, 
+      float_type freq)
+00273 \{
+00274     \textcolor{keywordflow}{if} (device == \textcolor{keyword}{nullptr})
+00275     \{
+00276         lime::ReportError(EINVAL, \textcolor{stringliteral}{"Device cannot be NULL."});
+00277         \textcolor{keywordflow}{return} -1;
+00278     \}
+00279     lime::LMS7_Device* lms = (lime::LMS7_Device*)device;
+00280     \textcolor{keywordflow}{return} lms->SetClockFreq(clk\_id, freq);
+00281 \}
+00282 
+00283 API_EXPORT  \textcolor{keywordtype}{int} CALL_CONV LMS_Synchronize(lms_device_t *dev, \textcolor{keywordtype}{bool} toChip)
+00284 \{
+00285     \textcolor{keywordflow}{if} (dev == \textcolor{keyword}{nullptr})
+00286     \{
+00287         lime::ReportError(EINVAL, \textcolor{stringliteral}{"Device cannot be NULL."});
+00288         \textcolor{keywordflow}{return} -1;
+00289     \}
+00290     lime::LMS7_Device* lms = (lime::LMS7_Device*)dev;
+00291 
+00292     \textcolor{keywordflow}{return} lms->Synchronize(toChip);
+00293 \}
+00294 
+00295 API_EXPORT \textcolor{keywordtype}{int} CALL_CONV LMS_GPIORead(lms_device_t *dev,  uint8\_t* buffer, \textcolor{keywordtype}{size\_t} 
+      len)
+00296 \{
+00297     \textcolor{keywordflow}{if} (dev == \textcolor{keyword}{nullptr})
+00298     \{
+00299         lime::ReportError(EINVAL, \textcolor{stringliteral}{"Device cannot be NULL."});
+00300         \textcolor{keywordflow}{return} -1;
+00301     \}
+00302     lime::LMS7_Device* lms = (lime::LMS7_Device*)dev;
+00303     \textcolor{keyword}{auto} conn = lms->GetConnection();
+00304     \textcolor{keywordflow}{if} (conn == \textcolor{keyword}{nullptr})
+00305     \{
+00306         lime::ReportError(EINVAL, \textcolor{stringliteral}{"Device not connected"});
+00307         \textcolor{keywordflow}{return} -1;
+00308     \}
+00309     \textcolor{keywordflow}{return} conn->GPIORead(buffer,len);
+00310 \}
+00311 
+00312 API_EXPORT \textcolor{keywordtype}{int} CALL_CONV LMS_GPIOWrite(lms_device_t *dev, \textcolor{keyword}{const} uint8\_t* buffer, \textcolor{keywordtype}{size\_t} 
+      len)
+00313 \{
+00314     \textcolor{keywordflow}{if} (dev == \textcolor{keyword}{nullptr})
+00315     \{
+00316         lime::ReportError(EINVAL, \textcolor{stringliteral}{"Device cannot be NULL."});
+00317         \textcolor{keywordflow}{return} -1;
+00318     \}
+00319      lime::LMS7_Device* lms = (lime::LMS7_Device*)dev;
+00320     \textcolor{keyword}{auto} conn = lms->GetConnection();
+00321     \textcolor{keywordflow}{if} (conn == \textcolor{keyword}{nullptr})
+00322     \{
+00323        lime::ReportError(EINVAL, \textcolor{stringliteral}{"Device not connected"});
+00324        \textcolor{keywordflow}{return} -1;
+00325     \}
+00326      \textcolor{keywordflow}{return} conn->GPIOWrite(buffer,len);
+00327 \}
+00328 
+00329 API_EXPORT \textcolor{keywordtype}{int} CALL_CONV LMS_GPIODirRead(lms_device_t *dev,  uint8\_t* buffer, \textcolor{keywordtype}{size\_t} 
+      len)
+00330 \{
+00331     \textcolor{keywordflow}{if} (dev == \textcolor{keyword}{nullptr})
+00332     \{
+00333         lime::ReportError(EINVAL, \textcolor{stringliteral}{"Device cannot be NULL."});
+00334         \textcolor{keywordflow}{return} -1;
+00335     \}
+00336     lime::LMS7_Device* lms = (lime::LMS7_Device*)dev;
+00337     \textcolor{keyword}{auto} conn = lms->GetConnection();
+00338     \textcolor{keywordflow}{if} (conn == \textcolor{keyword}{nullptr})
+00339     \{
+00340         lime::ReportError(EINVAL, \textcolor{stringliteral}{"Device not connected"});
+00341         \textcolor{keywordflow}{return} -1;
+00342     \}
+00343     \textcolor{keywordflow}{return} conn->GPIODirRead(buffer,len);
+00344 \}
+00345 
+00346 API_EXPORT \textcolor{keywordtype}{int} CALL_CONV LMS_GPIODirWrite(lms_device_t *dev, \textcolor{keyword}{const} uint8\_t* 
+      buffer, \textcolor{keywordtype}{size\_t} len)
+00347 \{
+00348     \textcolor{keywordflow}{if} (dev == \textcolor{keyword}{nullptr})
+00349     \{
+00350         lime::ReportError(EINVAL, \textcolor{stringliteral}{"Device cannot be NULL."});
+00351         \textcolor{keywordflow}{return} -1;
+00352     \}
+00353      lime::LMS7_Device* lms = (lime::LMS7_Device*)dev;
+00354     \textcolor{keyword}{auto} conn = lms->GetConnection();
+00355     \textcolor{keywordflow}{if} (conn == \textcolor{keyword}{nullptr})
+00356     \{
+00357        lime::ReportError(EINVAL, \textcolor{stringliteral}{"Device not connected"});
+00358        \textcolor{keywordflow}{return} -1;
+00359     \}
+00360      \textcolor{keywordflow}{return} conn->GPIODirWrite(buffer,len);
+00361 \}
+00362 
+00363 API_EXPORT \textcolor{keywordtype}{int} CALL_CONV LMS_EnableCalibCache(lms_device_t *dev, \textcolor{keywordtype}{bool} enable)
+00364 \{
+00365     \textcolor{keywordflow}{if} (dev == \textcolor{keyword}{nullptr})
+00366     \{
+00367         lime::ReportError(EINVAL, \textcolor{stringliteral}{"Device cannot be NULL."});
+00368         \textcolor{keywordflow}{return} -1;
+00369     \}
+00370 
+00371     lime::LMS7_Device* lms = (lime::LMS7_Device*)dev;
+00372     \textcolor{keywordflow}{return} lms->EnableCalibCache(enable);
+00373 \}
+00374 
+00375 API_EXPORT \textcolor{keywordtype}{int} CALL_CONV LMS_GetChipTemperature(lms_device_t *dev, \textcolor{keywordtype}{size\_t} ind, 
+      float_type *temp)
+00376 \{
+00377     *temp = 0;
+00378     \textcolor{keywordflow}{if} (dev == \textcolor{keyword}{nullptr})
+00379     \{
+00380         lime::ReportError(EINVAL, \textcolor{stringliteral}{"Device cannot be NULL."});
+00381         \textcolor{keywordflow}{return} -1;
+00382     \}
+00383     lime::LMS7_Device* lms = (lime::LMS7_Device*)dev;
+00384     \textcolor{keywordflow}{if} (lms->ReadLMSReg(0x2F) == 0x3840)
+00385     \{
+00386         lime::ReportError(EINVAL, \textcolor{stringliteral}{"Feature is not available on this chip revision"});
+00387         \textcolor{keywordflow}{return} -1;
+00388     \}
+00389     *temp = lms->GetChipTemperature(ind);
+00390     \textcolor{keywordflow}{return} 0;
+00391 \}
+00392 
+00393 API_EXPORT \textcolor{keywordtype}{int} CALL_CONV LMS_GetNumChannels(lms_device_t * device, \textcolor{keywordtype}{bool} dir_tx)
+00394 \{
+00395     \textcolor{keywordflow}{if} (device == \textcolor{keyword}{nullptr})
+00396     \{
+00397         lime::ReportError(EINVAL, \textcolor{stringliteral}{"Device cannot be NULL."});
+00398         \textcolor{keywordflow}{return} -1;
+00399     \}
+00400 
+00401     lime::LMS7_Device* lms = (lime::LMS7_Device*)device;
+00402     \textcolor{keywordflow}{return} lms->GetNumChannels(dir\_tx);
+00403 \}
+00404 
+00405 API_EXPORT \textcolor{keywordtype}{int} CALL_CONV LMS_SetLOFrequency(lms_device_t *device, \textcolor{keywordtype}{bool} dir_tx, \textcolor{keywordtype}{size\_t} 
+      chan, float_type frequency)
+00406 \{
+00407     \textcolor{keywordflow}{if} (device == \textcolor{keyword}{nullptr})
+00408     \{
+00409         lime::ReportError(EINVAL, \textcolor{stringliteral}{"Device cannot be NULL."});
+00410         \textcolor{keywordflow}{return} -1;
+00411     \}
+00412 
+00413     lime::LMS7_Device* lms = (lime::LMS7_Device*)device;
+00414 
+00415     \textcolor{keywordflow}{if} (chan >= lms->GetNumChannels(\textcolor{keyword}{false}))
+00416     \{
+00417         lime::ReportError(EINVAL, \textcolor{stringliteral}{"Invalid channel number."});
+00418         \textcolor{keywordflow}{return} -1;
+00419     \}
+00420 
+00421     \textcolor{keywordflow}{return} lms->SetFrequency(dir\_tx, chan,frequency);
+00422 \}
+00423 
+00424 API_EXPORT \textcolor{keywordtype}{int} CALL_CONV LMS_GetLOFrequency(lms_device_t *device, \textcolor{keywordtype}{bool} dir_tx, \textcolor{keywordtype}{size\_t} 
+      chan, float_type *frequency)
+00425 \{
+00426     \textcolor{keywordflow}{if} (device == \textcolor{keyword}{nullptr})
+00427     \{
+00428         lime::ReportError(EINVAL, \textcolor{stringliteral}{"Device cannot be NULL."});
+00429         \textcolor{keywordflow}{return} -1;
+00430     \}
+00431 
+00432     lime::LMS7_Device* lms = (lime::LMS7_Device*)device;
+00433 
+00434     \textcolor{keywordflow}{if} (chan >= lms->GetNumChannels(dir\_tx))
+00435     \{
+00436         lime::ReportError(EINVAL, \textcolor{stringliteral}{"Invalid channel number."});
+00437         \textcolor{keywordflow}{return} -1;
+00438     \}
+00439 
+00440     *frequency = lms->GetFrequency(dir\_tx, chan);
+00441     \textcolor{keywordflow}{return} LMS_SUCCESS;
+00442 \}
+00443 
+00444 API_EXPORT \textcolor{keywordtype}{int} CALL_CONV LMS_GetLOFrequencyRange(lms_device_t *device, \textcolor{keywordtype}{bool} 
+      dir_tx, lms_range_t *range)
+00445 \{
+00446     \textcolor{keywordflow}{if} (device == \textcolor{keyword}{nullptr})
+00447     \{
+00448         lime::ReportError(EINVAL, \textcolor{stringliteral}{"Device cannot be NULL."});
+00449         \textcolor{keywordflow}{return} -1;
+00450     \}
+00451 
+00452     lime::LMS7_Device* lms = (lime::LMS7_Device*)device;
+00453     \textcolor{keyword}{auto} retRange = lms->GetFrequencyRange(dir\_tx);
+00454     range->min = retRange.min;
+00455     range->max = retRange.max;
+00456     range->step = 0;
+00457     \textcolor{keywordflow}{return} LMS_SUCCESS;
+00458 \}
+00459 
+00460 API_EXPORT \textcolor{keywordtype}{int} CALL_CONV LMS_GetAntennaList(lms_device_t *device, \textcolor{keywordtype}{bool} dir_tx, \textcolor{keywordtype}{size\_t} 
+      chan, lms_name_t *list)
+00461 \{
+00462     \textcolor{keywordflow}{if} (device == \textcolor{keyword}{nullptr})
+00463     \{
+00464         lime::ReportError(EINVAL, \textcolor{stringliteral}{"Device cannot be NULL."});
+00465         \textcolor{keywordflow}{return} -1;
+00466     \}
+00467 
+00468     lime::LMS7_Device* lms = (lime::LMS7_Device*)device;
+00469 
+00470     \textcolor{keywordflow}{if} (chan >= lms->GetNumChannels(\textcolor{keyword}{false}))
+00471     \{
+00472         lime::ReportError(EINVAL, \textcolor{stringliteral}{"Invalid channel number."});
+00473         \textcolor{keywordflow}{return} -1;
+00474     \}
+00475 
+00476     \textcolor{keyword}{auto} names = lms->GetPathNames(dir\_tx, chan);
+00477     \textcolor{keywordflow}{if} (list != \textcolor{keyword}{nullptr})
+00478         \textcolor{keywordflow}{for} (\textcolor{keywordtype}{size\_t} i = 0; i < names.size(); i++)
+00479         \{
+00480             strncpy(list[i], names[i].c\_str(), \textcolor{keyword}{sizeof}(lms_name_t) - 1);
+00481             list[i][\textcolor{keyword}{sizeof}(lms_name_t) - 1] = 0;
+00482         \}
+00483     \textcolor{keywordflow}{return} names.size();
+00484 \}
+00485 
+00486 API_EXPORT \textcolor{keywordtype}{int} CALL_CONV LMS_SetAntenna(lms_device_t *device, \textcolor{keywordtype}{bool} dir_tx, \textcolor{keywordtype}{size\_t} 
+      chan, \textcolor{keywordtype}{size\_t} path)
+00487 \{
+00488     \textcolor{keywordflow}{if} (device == \textcolor{keyword}{nullptr})
+00489     \{
+00490         lime::ReportError(EINVAL, \textcolor{stringliteral}{"Device cannot be NULL."});
+00491         \textcolor{keywordflow}{return} -1;
+00492     \}
+00493 
+00494     lime::LMS7_Device* lms = (lime::LMS7_Device*)device;
+00495 
+00496     \textcolor{keywordflow}{if} (chan >= lms->GetNumChannels(\textcolor{keyword}{false}))
+00497     \{
+00498         lime::ReportError(EINVAL, \textcolor{stringliteral}{"Invalid channel number."});
+00499         \textcolor{keywordflow}{return} -1;
+00500     \}
+00501 
+00502     lms->SetPath(dir\_tx,chan,path);
+00503 
+00504     \textcolor{keywordflow}{return} LMS_SUCCESS;
+00505 \}
+00506 
+00507 
+00508 API_EXPORT \textcolor{keywordtype}{int} CALL_CONV LMS_GetAntenna(lms_device_t *device, \textcolor{keywordtype}{bool} dir_tx, \textcolor{keywordtype}{size\_t} 
+      chan)
+00509 \{
+00510     \textcolor{keywordflow}{if} (device == \textcolor{keyword}{nullptr})
+00511     \{
+00512         lime::ReportError(EINVAL, \textcolor{stringliteral}{"Device cannot be NULL."});
+00513         \textcolor{keywordflow}{return} -1;
+00514     \}
+00515 
+00516     lime::LMS7_Device* lms = (lime::LMS7_Device*)device;
+00517 
+00518     \textcolor{keywordflow}{return} lms->GetPath(dir\_tx, chan);
+00519 \}
+00520 
+00521 API_EXPORT \textcolor{keywordtype}{int} CALL_CONV LMS_GetAntennaBW(lms_device_t *device, \textcolor{keywordtype}{bool} dir_tx, \textcolor{keywordtype}{size\_t} 
+      chan, \textcolor{keywordtype}{size\_t} path, lms_range_t *range)
+00522 \{
+00523     \textcolor{keywordflow}{if} (device == \textcolor{keyword}{nullptr})
+00524     \{
+00525         lime::ReportError(EINVAL, \textcolor{stringliteral}{"Device cannot be NULL."});
+00526         \textcolor{keywordflow}{return} -1;
+00527     \}
+00528 
+00529     lime::LMS7_Device* lms = (lime::LMS7_Device*)device;
+00530     lime::LMS7_Device::Range ret;
+00531     \textcolor{keywordflow}{if} (dir\_tx)
+00532         ret = lms->GetTxPathBand(path,chan);
+00533     \textcolor{keywordflow}{else}
+00534         ret = lms->GetRxPathBand(path,chan);
+00535 
+00536     range->max = ret.max;
+00537     range->min = ret.min;
+00538     range->step = 0;
+00539 
+00540     \textcolor{keywordflow}{return} LMS_SUCCESS;
+00541 \}
+00542 
+00543 API_EXPORT \textcolor{keywordtype}{int} CALL_CONV LMS_SetLPFBW(lms_device_t *device, \textcolor{keywordtype}{bool} dir_tx, \textcolor{keywordtype}{size\_t} 
+      chan, float_type bandwidth)
+00544 \{
+00545     \textcolor{keywordflow}{if} (device == \textcolor{keyword}{nullptr})
+00546     \{
+00547         lime::ReportError(EINVAL, \textcolor{stringliteral}{"Device cannot be NULL."});
+00548         \textcolor{keywordflow}{return} -1;
+00549     \}
+00550 
+00551     lime::LMS7_Device* lms = (lime::LMS7_Device*)device;
+00552 
+00553     \textcolor{keywordflow}{if} (chan >= lms->GetNumChannels(dir\_tx))
+00554     \{
+00555         lime::ReportError(EINVAL, \textcolor{stringliteral}{"Invalid channel number."});
+00556         \textcolor{keywordflow}{return} -1;
+00557     \}
+00558 
+00559     \textcolor{keywordflow}{return} lms->SetLPF(dir\_tx,chan,\textcolor{keyword}{true},bandwidth);
+00560 \}
+00561 
+00562 API_EXPORT \textcolor{keywordtype}{int} CALL_CONV LMS_GetLPFBW(lms_device_t *device, \textcolor{keywordtype}{bool} dir_tx, \textcolor{keywordtype}{size\_t} 
+      chan, float_type *bandwidth)
+00563 \{
+00564     \textcolor{keywordflow}{if} (device == \textcolor{keyword}{nullptr})
+00565     \{
+00566         lime::ReportError(EINVAL, \textcolor{stringliteral}{"Device cannot be NULL."});
+00567         \textcolor{keywordflow}{return} -1;
+00568     \}
+00569 
+00570     lime::LMS7_Device* lms = (lime::LMS7_Device*)device;
+00571 
+00572     \textcolor{keywordflow}{if} (chan >= lms->GetNumChannels(dir\_tx))
+00573     \{
+00574         lime::ReportError(EINVAL, \textcolor{stringliteral}{"Invalid channel number."});
+00575         \textcolor{keywordflow}{return} -1;
+00576     \}
+00577     *bandwidth = lms->GetLPFBW(dir\_tx,chan);
+00578     \textcolor{keywordflow}{return} LMS_SUCCESS;
+00579 \}
+00580 
+00581 API_EXPORT \textcolor{keywordtype}{int} CALL_CONV LMS_SetLPF(lms_device_t *device, \textcolor{keywordtype}{bool} dir_tx, \textcolor{keywordtype}{size\_t} 
+      chan, \textcolor{keywordtype}{bool} enabled)
+00582 \{
+00583     \textcolor{keywordflow}{if} (device == \textcolor{keyword}{nullptr})
+00584     \{
+00585         lime::ReportError(EINVAL, \textcolor{stringliteral}{"Device cannot be NULL."});
+00586         \textcolor{keywordflow}{return} -1;
+00587     \}
+00588 
+00589     lime::LMS7_Device* lms = (lime::LMS7_Device*)device;
+00590 
+00591     \textcolor{keywordflow}{if} (chan >= lms->GetNumChannels(dir\_tx))
+00592     \{
+00593         lime::ReportError(EINVAL, \textcolor{stringliteral}{"Invalid channel number."});
+00594         \textcolor{keywordflow}{return} -1;
+00595     \}
+00596     \textcolor{keywordflow}{return} lms->SetLPF(dir\_tx,chan,enabled,-1);
+00597 \}
+00598 
+00599 API_EXPORT \textcolor{keywordtype}{int} CALL_CONV LMS_SetGFIRLPF(lms_device_t *device, \textcolor{keywordtype}{bool} dir_tx, \textcolor{keywordtype}{size\_t} 
+      chan, \textcolor{keywordtype}{bool} enabled, float_type bandwidth)
+00600 \{
+00601     \textcolor{keywordflow}{if} (device == \textcolor{keyword}{nullptr})
+00602     \{
+00603         lime::ReportError(EINVAL, \textcolor{stringliteral}{"Device cannot be NULL."});
+00604         \textcolor{keywordflow}{return} -1;
+00605     \}
+00606 
+00607     lime::LMS7_Device* lms = (lime::LMS7_Device*)device;
+00608 
+00609     \textcolor{keywordflow}{if} (chan >= lms->GetNumChannels(dir\_tx))
+00610     \{
+00611         lime::ReportError(EINVAL, \textcolor{stringliteral}{"Invalid channel number."});
+00612         \textcolor{keywordflow}{return} -1;
+00613     \}
+00614 
+00615     \textcolor{keywordflow}{if} (chan >= lms->GetNumChannels(dir\_tx))
+00616     \{
+00617         lime::ReportError(EINVAL, \textcolor{stringliteral}{"Invalid channel number."});
+00618         \textcolor{keywordflow}{return} -1;
+00619     \}
+00620     \textcolor{keywordflow}{return} lms->ConfigureGFIR(dir\_tx, chan, enabled, bandwidth);
+00621 \}
+00622 
+00623 API_EXPORT \textcolor{keywordtype}{int} CALL_CONV LMS_GetLPFBWRange(lms_device_t *device, \textcolor{keywordtype}{bool} dir_tx, 
+      lms_range_t *range)
+00624 \{
+00625     \textcolor{keywordflow}{if} (device == \textcolor{keyword}{nullptr})
+00626     \{
+00627         lime::ReportError(EINVAL, \textcolor{stringliteral}{"Device cannot be NULL."});
+00628         \textcolor{keywordflow}{return} -1;
+00629     \}
+00630 
+00631     lime::LMS7_Device* lms = (lime::LMS7_Device*)device;
+00632 
+00633     \textcolor{keyword}{auto} ret = lms->GetLPFRange(dir\_tx,0);
+00634     range->max = ret.max;
+00635     range->min = ret.min;
+00636     range->step = 0;
+00637 
+00638     \textcolor{keywordflow}{return} LMS_SUCCESS;
+00639 \}
+00640 
+00641 API_EXPORT \textcolor{keywordtype}{int} CALL_CONV LMS_SetNormalizedGain(lms_device_t *device, \textcolor{keywordtype}{bool} dir_tx, \textcolor{keywordtype}{size\_t} 
+      chan, float_type gain)
+00642 \{
+00643     \textcolor{keywordflow}{if} (device == \textcolor{keyword}{nullptr})
+00644     \{
+00645         lime::ReportError(EINVAL, \textcolor{stringliteral}{"Device cannot be NULL."});
+00646         \textcolor{keywordflow}{return} -1;
+00647     \}
+00648 
+00649     lime::LMS7_Device* lms = (lime::LMS7_Device*)device;
+00650 
+00651     \textcolor{keywordflow}{if} (chan >= lms->GetNumChannels(dir\_tx))
+00652     \{
+00653         lime::ReportError(EINVAL, \textcolor{stringliteral}{"Invalid channel number."});
+00654         \textcolor{keywordflow}{return} -1;
+00655     \}
+00656 
+00657     \textcolor{keywordflow}{if} (gain > 1.0)
+00658         gain = 1.0;
+00659     \textcolor{keywordflow}{else} \textcolor{keywordflow}{if} (gain < 0)
+00660         gain = 0;
+00661    \textcolor{keyword}{auto} range = lms->GetGainRange(dir\_tx,chan,\textcolor{stringliteral}{""});
+00662    \textcolor{keywordflow}{return} lms->SetGain(dir\_tx,chan,range.min+gain*(range.max-range.min));
+00663 \}
+00664 
+00665 API_EXPORT \textcolor{keywordtype}{int} CALL_CONV LMS_SetGaindB(lms_device_t *device, \textcolor{keywordtype}{bool} dir_tx,
+00666                                                 \textcolor{keywordtype}{size\_t} chan,\textcolor{keywordtype}{unsigned} gain)
+00667 \{
+00668     \textcolor{keywordflow}{if} (device == \textcolor{keyword}{nullptr})
+00669     \{
+00670         lime::ReportError(EINVAL, \textcolor{stringliteral}{"Device cannot be NULL."});
+00671         \textcolor{keywordflow}{return} -1;
+00672     \}
+00673 
+00674     lime::LMS7_Device* lms = (lime::LMS7_Device*)device;
+00675 
+00676     \textcolor{keywordflow}{if} (chan >= lms->GetNumChannels(dir\_tx))
+00677     \{
+00678         lime::ReportError(EINVAL, \textcolor{stringliteral}{"Invalid channel number."});
+00679         \textcolor{keywordflow}{return} -1;
+00680     \}
+00681 
+00682    \textcolor{keywordflow}{return} lms->SetGain(dir\_tx,chan,\textcolor{keywordtype}{int}(gain-12));
+00683 \}
+00684 
+00685 API_EXPORT \textcolor{keywordtype}{int} CALL_CONV LMS_GetNormalizedGain(lms_device_t *device, \textcolor{keywordtype}{bool} dir_tx, \textcolor{keywordtype}{size\_t} 
+      chan,float_type *gain)
+00686 \{
+00687     \textcolor{keywordflow}{if} (device == \textcolor{keyword}{nullptr})
+00688     \{
+00689         lime::ReportError(EINVAL, \textcolor{stringliteral}{"Device cannot be NULL."});
+00690         \textcolor{keywordflow}{return} -1;
+00691     \}
+00692 
+00693     lime::LMS7_Device* lms = (lime::LMS7_Device*)device;
+00694 
+00695     \textcolor{keywordflow}{if} (chan >= lms->GetNumChannels(dir\_tx))
+00696     \{
+00697         lime::ReportError(EINVAL, \textcolor{stringliteral}{"Invalid channel number."});
+00698         \textcolor{keywordflow}{return} -1;
+00699     \}
+00700 
+00701     \textcolor{keyword}{auto} range = lms->GetGainRange(dir\_tx,chan,\textcolor{stringliteral}{""});
+00702     *gain = (lms->GetGain(dir\_tx,chan)-range.min)/(range.max-range.min);
+00703 
+00704     \textcolor{keywordflow}{return} LMS_SUCCESS;
+00705 \}
+00706 
+00707 API_EXPORT \textcolor{keywordtype}{int} CALL_CONV LMS_GetGaindB(lms_device_t *device, \textcolor{keywordtype}{bool} dir_tx, \textcolor{keywordtype}{size\_t} 
+      chan, \textcolor{keywordtype}{unsigned} *gain)
+00708 \{
+00709     \textcolor{keywordflow}{if} (device == \textcolor{keyword}{nullptr})
+00710     \{
+00711         lime::ReportError(EINVAL, \textcolor{stringliteral}{"Device cannot be NULL."});
+00712         \textcolor{keywordflow}{return} -1;
+00713     \}
+00714 
+00715     lime::LMS7_Device* lms = (lime::LMS7_Device*)device;
+00716 
+00717     \textcolor{keywordflow}{if} (chan >= lms->GetNumChannels(dir\_tx))
+00718     \{
+00719         lime::ReportError(EINVAL, \textcolor{stringliteral}{"Invalid channel number."});
+00720         \textcolor{keywordflow}{return} -1;
+00721     \}
+00722 
+00723     *gain = lms->GetGain(dir\_tx,chan)+12+0.5;
+00724     \textcolor{keywordflow}{return} LMS_SUCCESS;
+00725 \}
+00726 
+00727 API_EXPORT \textcolor{keywordtype}{int} CALL_CONV LMS_Calibrate(lms_device_t *device, \textcolor{keywordtype}{bool} dir_tx, \textcolor{keywordtype}{size\_t} 
+      chan, \textcolor{keywordtype}{double} bw, \textcolor{keywordtype}{unsigned} flags)
+00728 \{
+00729     \textcolor{keywordflow}{if} (device == \textcolor{keyword}{nullptr})
+00730     \{
+00731         lime::ReportError(\textcolor{stringliteral}{"Device cannot be NULL."});
+00732         \textcolor{keywordflow}{return} -1;
+00733     \}
+00734 
+00735     lime::LMS7_Device* lms = (lime::LMS7_Device*)device;
+00736 
+00737     \textcolor{keywordflow}{if} (lms->ReadLMSReg(0x2F) == 0x3840)
+00738     \{
+00739         lime::ReportError(\textcolor{stringliteral}{"Calibration not supported"});
+00740         \textcolor{keywordflow}{return} -1;
+00741     \}
+00742 
+00743     \textcolor{keywordflow}{if} (chan >= lms->GetNumChannels(dir\_tx))
+00744     \{
+00745         lime::ReportError(\textcolor{stringliteral}{"Invalid channel number."});
+00746         \textcolor{keywordflow}{return} -1;
+00747     \}
+00748     \textcolor{keywordflow}{return} lms->Calibrate(dir\_tx, chan, bw, flags);
+00749 \}
+00750 
+00751 API_EXPORT \textcolor{keywordtype}{int} CALL_CONV LMS_LoadConfig(lms_device_t *device, \textcolor{keyword}{const} \textcolor{keywordtype}{char} *
+      filename)
+00752 \{
+00753     \textcolor{keywordflow}{if} (device == \textcolor{keyword}{nullptr})
+00754     \{
+00755         lime::ReportError(\textcolor{stringliteral}{"Device cannot be NULL."});
+00756         \textcolor{keywordflow}{return} -1;
+00757     \}
+00758 
+00759     lime::LMS7_Device* lms = (lime::LMS7_Device*)device;
+00760 
+00761     \textcolor{keywordflow}{return} lms->LoadConfig(filename);
+00762 \}
+00763 
+00764 API_EXPORT \textcolor{keywordtype}{int} CALL_CONV LMS_SaveConfig(lms_device_t *device, \textcolor{keyword}{const} \textcolor{keywordtype}{char} *
+      filename)
+00765 \{
+00766     \textcolor{keywordflow}{if} (device == \textcolor{keyword}{nullptr})
+00767     \{
+00768         lime::ReportError(\textcolor{stringliteral}{"Device cannot be NULL."});
+00769         \textcolor{keywordflow}{return} -1;
+00770     \}
+00771 
+00772     lime::LMS7_Device* lms = (lime::LMS7_Device*)device;
+00773 
+00774     \textcolor{keywordflow}{return} lms->SaveConfig(filename);
+00775 \}
+00776 
+00777 API_EXPORT \textcolor{keywordtype}{int} CALL_CONV LMS_SetTestSignal(lms_device_t *device, \textcolor{keywordtype}{bool} dir_tx, \textcolor{keywordtype}{size\_t} 
+      chan, lms_testsig_t sig, int16\_t dc_i, int16\_t dc_q)
+00778 \{
+00779     \textcolor{keywordflow}{if} (device == \textcolor{keyword}{nullptr})
+00780     \{
+00781         lime::ReportError(\textcolor{stringliteral}{"Device cannot be NULL."});
+00782         \textcolor{keywordflow}{return} -1;
+00783     \}
+00784 
+00785     lime::LMS7_Device* lms = (lime::LMS7_Device*)device;
+00786 
+00787     \textcolor{keywordflow}{if} (chan >= lms->GetNumChannels(dir\_tx))
+00788     \{
+00789         lime::ReportError(\textcolor{stringliteral}{"Invalid channel number."});
+00790         \textcolor{keywordflow}{return} -1;
+00791     \}
+00792 
+00793     \textcolor{keywordflow}{if} (sig > LMS_TESTSIG_DC)
+00794     \{
+00795         lime::ReportError(\textcolor{stringliteral}{"Invalid signal."});
+00796         \textcolor{keywordflow}{return} -1;
+00797     \}
+00798 
+00799     lms->SetTestSignal(dir\_tx,chan,sig,dc\_i,dc\_q);
+00800 
+00801     \textcolor{keywordflow}{return} LMS_SUCCESS;
+00802 \}
+00803 
+00804 API_EXPORT \textcolor{keywordtype}{int} CALL_CONV LMS_GetTestSignal(lms_device_t *device, \textcolor{keywordtype}{bool} dir_tx, \textcolor{keywordtype}{size\_t} 
+      chan, lms_testsig_t *sig)
+00805 \{
+00806     \textcolor{keywordflow}{if} (device == \textcolor{keyword}{nullptr})
+00807     \{
+00808         lime::ReportError(\textcolor{stringliteral}{"Device cannot be NULL."});
+00809         \textcolor{keywordflow}{return} -1;
+00810     \}
+00811 
+00812     lime::LMS7_Device* lms = (lime::LMS7_Device*)device;
+00813 
+00814     \textcolor{keywordflow}{if} (chan >= lms->GetNumChannels(dir\_tx))
+00815     \{
+00816         lime::ReportError(\textcolor{stringliteral}{"Invalid channel number."});
+00817         \textcolor{keywordflow}{return} -1;
+00818     \}
+00819 
+00820     \textcolor{keywordtype}{int} tmp = lms->GetTestSignal(dir\_tx,chan);
+00821     \textcolor{keywordflow}{if} (tmp < 0)
+00822         \textcolor{keywordflow}{return} -1;
+00823 
+00824     *sig = (lms_testsig_t)tmp;
+00825     \textcolor{keywordflow}{return} LMS_SUCCESS;
+00826 \}
+00827 
+00828 API_EXPORT \textcolor{keywordtype}{int} CALL_CONV LMS_SetNCOFrequency(lms_device_t *device, \textcolor{keywordtype}{bool} dir_tx, \textcolor{keywordtype}{size\_t} ch, \textcolor{keyword}{const} 
+      float_type *freq, float_type pho)
+00829 \{
+00830     \textcolor{keywordflow}{if} (device == \textcolor{keyword}{nullptr})
+00831     \{
+00832         lime::ReportError(EINVAL, \textcolor{stringliteral}{"Device cannot be NULL."});
+00833         \textcolor{keywordflow}{return} -1;
+00834     \}
+00835 
+00836     lime::LMS7_Device* lms = (lime::LMS7_Device*)device;
+00837 
+00838     \textcolor{keywordflow}{if} (ch >= lms->GetNumChannels(dir\_tx))
+00839     \{
+00840         lime::ReportError(EINVAL, \textcolor{stringliteral}{"Invalid channel number."});
+00841         \textcolor{keywordflow}{return} -1;
+00842     \}
+00843 
+00844     \textcolor{keywordflow}{if} (freq != \textcolor{keyword}{nullptr})
+00845     \{
+00846         \textcolor{keywordflow}{for} (\textcolor{keywordtype}{unsigned} i = 0; i < LMS_NCO_VAL_COUNT; i++)
+00847             \textcolor{keywordflow}{if} (lms->SetNCOFreq(dir\_tx, ch, i, freq[i]) != 0)
+00848                 \textcolor{keywordflow}{return} -1;
+00849         lms->WriteParam(dir\_tx ? LMS7_CMIX_BYP_TXTSP : LMS7_CMIX_BYP_RXTSP, 0);
+00850         lms->WriteParam(dir\_tx ? LMS7_SEL_TX : LMS7_SEL_RX, 0, ch);
+00851     \}
+00852     \textcolor{keywordflow}{return} lms->GetLMS()->SetNCOPhaseOffsetForMode0(dir\_tx, pho);
+00853 \}
+00854 
+00855 
+00856 API_EXPORT \textcolor{keywordtype}{int} CALL_CONV LMS_GetNCOFrequency(lms_device_t *device, \textcolor{keywordtype}{bool} dir_tx, \textcolor{keywordtype}{size\_t} 
+      chan, float_type *freq, float_type *pho)
+00857 \{
+00858     \textcolor{keywordflow}{if} (device == \textcolor{keyword}{nullptr})
+00859     \{
+00860         lime::ReportError(EINVAL, \textcolor{stringliteral}{"Device cannot be NULL."});
+00861         \textcolor{keywordflow}{return} -1;
+00862     \}
+00863 
+00864     lime::LMS7_Device* lms = (lime::LMS7_Device*)device;
+00865 
+00866     \textcolor{keywordflow}{if} (chan >= lms->GetNumChannels(dir\_tx))
+00867     \{
+00868         lime::ReportError(EINVAL, \textcolor{stringliteral}{"Invalid channel number."});
+00869         \textcolor{keywordflow}{return} -1;
+00870     \}
+00871 
+00872     \textcolor{keywordflow}{if} (freq != \textcolor{keyword}{nullptr})
+00873         \textcolor{keywordflow}{for} (\textcolor{keywordtype}{unsigned} i = 0; i < LMS_NCO_VAL_COUNT; i++)
+00874             freq[i] = std::fabs(lms->GetNCOFreq(dir\_tx, chan, i));
+00875 
+00876     \textcolor{keywordflow}{if} (pho != \textcolor{keyword}{nullptr})
+00877     \{
+00878         uint16\_t value = lms->ReadLMSReg(dir\_tx ? 0x0241 : 0x0441, chan/2);
+00879         *pho = 360.0 * value / 65536.0;
+00880     \}
+00881     \textcolor{keywordflow}{return} 0;
+00882 \}
+00883 
+00884 API_EXPORT \textcolor{keywordtype}{int} CALL_CONV LMS_SetNCOPhase(lms_device_t *device, \textcolor{keywordtype}{bool} dir_tx, \textcolor{keywordtype}{size\_t} ch, \textcolor{keyword}{const} 
+      float_type *phase, float_type fcw)
+00885 \{
+00886     \textcolor{keywordflow}{if} (device == \textcolor{keyword}{nullptr})
+00887     \{
+00888         lime::ReportError(\textcolor{stringliteral}{"Device cannot be NULL."});
+00889         \textcolor{keywordflow}{return} -1;
+00890     \}
+00891 
+00892     lime::LMS7_Device* lms = (lime::LMS7_Device*)device;
+00893 
+00894     \textcolor{keywordflow}{if} (ch >= lms->GetNumChannels(dir\_tx))
+00895     \{
+00896         lime::ReportError(\textcolor{stringliteral}{"Invalid channel number."});
+00897         \textcolor{keywordflow}{return} -1;
+00898     \}
+00899 
+00900     \textcolor{keywordflow}{if} (lms->SetNCOFreq(dir\_tx, ch, 0, fcw) != 0)
+00901         \textcolor{keywordflow}{return} -1;
+00902 
+00903     \textcolor{keywordflow}{if} (phase != \textcolor{keyword}{nullptr})
+00904     \{
+00905         \textcolor{keywordflow}{for} (\textcolor{keywordtype}{unsigned} i = 0; i < LMS_NCO_VAL_COUNT; i++)
+00906             \textcolor{keywordflow}{if} (lms->SetNCOPhase(dir\_tx, ch, i, phase[i])!=0)
+00907                 \textcolor{keywordflow}{return} -1;
+00908         \textcolor{keywordflow}{if} ((lms->WriteParam(dir\_tx ? LMS7_SEL_TX : LMS7_SEL_RX, 0, ch) != 0))
+00909             \textcolor{keywordflow}{return} -1;
+00910     \}
+00911     \textcolor{keywordflow}{return} 0;
+00912 \}
+00913 
+00914 API_EXPORT \textcolor{keywordtype}{int} CALL_CONV LMS_GetNCOPhase(lms_device_t *device, \textcolor{keywordtype}{bool} dir_tx, \textcolor{keywordtype}{size\_t} ch, 
+      float_type *phase, float_type *fcw)
+00915 \{
+00916     \textcolor{keywordflow}{if} (device == \textcolor{keyword}{nullptr})
+00917     \{
+00918         lime::ReportError(EINVAL, \textcolor{stringliteral}{"Device cannot be NULL."});
+00919         \textcolor{keywordflow}{return} -1;
+00920     \}
+00921 
+00922     lime::LMS7_Device* lms = (lime::LMS7_Device*)device;
+00923 
+00924     \textcolor{keywordflow}{if} (ch >= lms->GetNumChannels(dir\_tx))
+00925     \{
+00926         lime::ReportError(EINVAL, \textcolor{stringliteral}{"Invalid channel number."});
+00927         \textcolor{keywordflow}{return} -1;
+00928     \}
+00929 
+00930     \textcolor{keywordflow}{if} (phase != \textcolor{keyword}{nullptr})
+00931         \textcolor{keywordflow}{for} (\textcolor{keywordtype}{unsigned} i = 0; i < LMS_NCO_VAL_COUNT; i++)
+00932             phase[i] = lms->GetNCOPhase(dir\_tx, ch, i);
+00933 
+00934     \textcolor{keywordflow}{if} (fcw != \textcolor{keyword}{nullptr})
+00935         *fcw = lms->GetNCOFreq(dir\_tx, ch, 0);
+00936 
+00937     \textcolor{keywordflow}{return} 0;
+00938 \}
+00939 
+00940 API_EXPORT \textcolor{keywordtype}{int} CALL_CONV LMS_SetNCOIndex(lms_device_t *device, \textcolor{keywordtype}{bool} dir_tx, \textcolor{keywordtype}{size\_t} 
+      chan, \textcolor{keywordtype}{int} ind, \textcolor{keywordtype}{bool} down)
+00941 \{
+00942     \textcolor{keywordflow}{if} (device == \textcolor{keyword}{nullptr})
+00943     \{
+00944         lime::ReportError(EINVAL, \textcolor{stringliteral}{"Device cannot be NULL."});
+00945         \textcolor{keywordflow}{return} -1;
+00946     \}
+00947 
+00948     lime::LMS7_Device* lms = (lime::LMS7_Device*)device;
+00949 
+00950     \textcolor{keywordflow}{if} (chan >= lms->GetNumChannels(dir\_tx))
+00951     \{
+00952         lime::ReportError(EINVAL, \textcolor{stringliteral}{"Invalid channel number."});
+00953         \textcolor{keywordflow}{return} -1;
+00954     \}
+00955 
+00956     \textcolor{keywordflow}{if} ((lms->WriteParam(dir\_tx ? LMS7_CMIX_BYP_TXTSP : LMS7_CMIX_BYP_RXTSP, ind < 0 ? 1 : 0, chan)!=0)
+00957     || (lms->WriteParam(dir\_tx ? LMS7_CMIX_GAIN_TXTSP : LMS7_CMIX_GAIN_RXTSP, ind < 0 ? 0 : 1, chan)!=0))
+00958         \textcolor{keywordflow}{return} -1;
+00959 
+00960     \textcolor{keywordflow}{if} (ind < LMS_NCO_VAL_COUNT)
+00961     \{
+00962             \textcolor{keywordflow}{if} ((lms->WriteParam(dir\_tx ? LMS7_SEL_TX : LMS7_SEL_RX,ind)!=0)
+00963             || (lms->WriteParam(dir\_tx ? LMS7_CMIX_SC_TXTSP : LMS7_CMIX_SC_RXTSP, down)!=0))
+00964                 \textcolor{keywordflow}{return} -1;
+00965     \}
+00966     \textcolor{keywordflow}{else}
+00967         \textcolor{keywordflow}{return} lime::ReportError(\textcolor{stringliteral}{"Invalid NCO index value"});
+00968     \textcolor{keywordflow}{return} 0;
+00969 \}
+00970 
+00971 API_EXPORT \textcolor{keywordtype}{int} CALL_CONV LMS_GetNCOIndex(lms_device_t *device, \textcolor{keywordtype}{bool} dir_tx, \textcolor{keywordtype}{size\_t} 
+      chan)
+00972 \{
+00973     \textcolor{keywordflow}{if} (device == \textcolor{keyword}{nullptr})
+00974     \{
+00975         lime::ReportError(\textcolor{stringliteral}{"Device cannot be NULL."});
+00976         \textcolor{keywordflow}{return} -1;
+00977     \}
+00978 
+00979     lime::LMS7_Device* lms = (lime::LMS7_Device*)device;
+00980 
+00981     \textcolor{keywordflow}{if} (chan >= lms->GetNumChannels(dir\_tx))
+00982     \{
+00983         lime::ReportError(\textcolor{stringliteral}{"Invalid channel number."});
+00984         \textcolor{keywordflow}{return} -1;
+00985     \}
+00986 
+00987     \textcolor{keywordflow}{if} (lms->ReadParam(dir\_tx ? LMS7_CMIX_BYP_TXTSP : LMS7_CMIX_BYP_RXTSP, chan) != 0)
+00988     \{
+00989         lime::ReportError(\textcolor{stringliteral}{"NCO is disabled"});
+00990         \textcolor{keywordflow}{return} -1;
+00991     \}
+00992     \textcolor{keywordflow}{return} lms->ReadParam(dir\_tx ? LMS7_SEL_TX : LMS7_SEL_RX, chan);
+00993 \}
+00994 
+00995 API_EXPORT \textcolor{keywordtype}{int} CALL_CONV LMS_ReadLMSReg(lms_device_t *device, uint32\_t address, uint16\_t *
+      val)
+00996 \{
+00997     \textcolor{keywordflow}{if} (device == \textcolor{keyword}{nullptr})
+00998     \{
+00999         lime::ReportError(EINVAL, \textcolor{stringliteral}{"Device cannot be NULL."});
+01000         \textcolor{keywordflow}{return} -1;
+01001     \}
+01002 
+01003     lime::LMS7_Device* lms = (lime::LMS7_Device*)device;
+01004     *val = lms->ReadLMSReg(address);
+01005     \textcolor{keywordflow}{return} 0;
+01006 \}
+01007 
+01008 API_EXPORT \textcolor{keywordtype}{int} CALL_CONV LMS_WriteLMSReg(lms_device_t *device, uint32\_t address, uint16\_t 
+      val)
+01009 \{
+01010     \textcolor{keywordflow}{if} (device == \textcolor{keyword}{nullptr})
+01011     \{
+01012         lime::ReportError(EINVAL, \textcolor{stringliteral}{"Device cannot be NULL."});
+01013         \textcolor{keywordflow}{return} -1;
+01014     \}
+01015 
+01016     lime::LMS7_Device* lms = (lime::LMS7_Device*)device;
+01017     \textcolor{keywordflow}{return} lms->WriteLMSReg(address, val);
+01018 \}
+01019 
+01020 API_EXPORT \textcolor{keywordtype}{int} CALL_CONV LMS_ReadFPGAReg(lms_device_t *device, uint32\_t address, uint16\_t *
+      val)
+01021 \{
+01022     \textcolor{keywordflow}{if} (device == \textcolor{keyword}{nullptr})
+01023     \{
+01024         lime::ReportError(EINVAL, \textcolor{stringliteral}{"Device cannot be NULL."});
+01025         \textcolor{keywordflow}{return} -1;
+01026     \}
+01027 
+01028     lime::LMS7_Device* lms = (lime::LMS7_Device*)device;
+01029     uint32\_t addr = address;
+01030     uint32\_t data;
+01031     \textcolor{keyword}{auto} conn = lms->GetConnection();
+01032     \textcolor{keywordflow}{if} (conn == \textcolor{keyword}{nullptr})
+01033     \{
+01034         lime::ReportError(EINVAL, \textcolor{stringliteral}{"Device not connected"});
+01035         \textcolor{keywordflow}{return} -1;
+01036     \}
+01037     *val = conn->ReadRegisters(&addr,&data,1);
+01038     \textcolor{keywordflow}{if} (*val != LMS_SUCCESS)
+01039         \textcolor{keywordflow}{return} *val;
+01040     *val = data;
+01041     \textcolor{keywordflow}{return} LMS_SUCCESS;
+01042 \}
+01043 
+01044 API_EXPORT \textcolor{keywordtype}{int} CALL_CONV LMS_WriteFPGAReg(lms_device_t *device, uint32\_t address, uint16\_t 
+      val)
+01045 \{
+01046     \textcolor{keywordflow}{if} (device == \textcolor{keyword}{nullptr})
+01047     \{
+01048         lime::ReportError(EINVAL, \textcolor{stringliteral}{"Device cannot be NULL."});
+01049         \textcolor{keywordflow}{return} -1;
+01050     \}
+01051 
+01052     lime::LMS7_Device* lms = (lime::LMS7_Device*)device;
+01053     \textcolor{keyword}{auto} conn = lms->GetConnection();
+01054     \textcolor{keywordflow}{if} (conn == \textcolor{keyword}{nullptr})
+01055     \{
+01056         lime::ReportError(EINVAL, \textcolor{stringliteral}{"Device not connected"});
+01057         \textcolor{keywordflow}{return} -1;
+01058     \}
+01059     \textcolor{keywordflow}{return} conn->WriteRegister(address,val);
+01060 \}
+01061 
+01062 API_EXPORT \textcolor{keywordtype}{int} CALL_CONV LMS_ReadParam(lms_device_t *device, \textcolor{keyword}{struct} 
+      LMS7Parameter param, uint16\_t *val)
+01063 \{
+01064     \textcolor{keywordflow}{if} (device == \textcolor{keyword}{nullptr})
+01065     \{
+01066         lime::ReportError(EINVAL, \textcolor{stringliteral}{"Device cannot be NULL."});
+01067         \textcolor{keywordflow}{return} -1;
+01068     \}
+01069     lime::LMS7_Device* lms = (lime::LMS7_Device*)device;
+01070     *val = lms->ReadParam(param);
+01071     \textcolor{keywordflow}{return} LMS_SUCCESS;;
+01072 \}
+01073 
+01074 API_EXPORT \textcolor{keywordtype}{int} CALL_CONV LMS_WriteParam(lms_device_t *device, \textcolor{keyword}{struct} 
+      LMS7Parameter param, uint16\_t val)
+01075 \{
+01076     \textcolor{keywordflow}{if} (device == \textcolor{keyword}{nullptr})
+01077     \{
+01078         lime::ReportError(EINVAL, \textcolor{stringliteral}{"Device cannot be NULL."});
+01079         \textcolor{keywordflow}{return} -1;
+01080     \}
+01081     lime::LMS7_Device* lms = (lime::LMS7_Device*)device;
+01082 
+01083     \textcolor{keywordflow}{return} lms->WriteParam(param, val);
+01084 \}
+01085 
+01086 API_EXPORT \textcolor{keywordtype}{int} CALL_CONV LMS_SetGFIRCoeff(lms_device_t * device, \textcolor{keywordtype}{bool} dir_tx, \textcolor{keywordtype}{size\_t} 
+      chan, lms_gfir_t filt, \textcolor{keyword}{const} float_type* coef,\textcolor{keywordtype}{size\_t} count)
+01087 \{
+01088     \textcolor{keywordflow}{if} (device == \textcolor{keyword}{nullptr})
+01089     \{
+01090         lime::ReportError(EINVAL, \textcolor{stringliteral}{"Device cannot be NULL."});
+01091         \textcolor{keywordflow}{return} -1;
+01092     \}
+01093     lime::LMS7_Device* lms = (lime::LMS7_Device*)device;
+01094 
+01095     \textcolor{keywordflow}{if} (chan >= lms->GetNumChannels(\textcolor{keyword}{false}))
+01096     \{
+01097         lime::ReportError(EINVAL, \textcolor{stringliteral}{"Invalid channel number."});
+01098         \textcolor{keywordflow}{return} -1;
+01099     \}
+01100     \textcolor{keywordflow}{return} lms->SetGFIRCoef(dir\_tx,chan,filt,coef,count);
+01101 \}
+01102 
+01103 API_EXPORT \textcolor{keywordtype}{int} CALL_CONV LMS_GetGFIRCoeff(lms_device_t * device, \textcolor{keywordtype}{bool} dir_tx, \textcolor{keywordtype}{size\_t} 
+      chan, lms_gfir_t filt, float_type* coef)
+01104 \{
+01105     \textcolor{keywordflow}{if} (device == \textcolor{keyword}{nullptr})
+01106     \{
+01107         lime::ReportError(EINVAL, \textcolor{stringliteral}{"Device cannot be NULL."});
+01108         \textcolor{keywordflow}{return} -1;
+01109     \}
+01110     lime::LMS7_Device* lms = (lime::LMS7_Device*)device;
+01111 
+01112     \textcolor{keywordflow}{if} (chan >= lms->GetNumChannels(\textcolor{keyword}{false}))
+01113     \{
+01114         lime::ReportError(EINVAL, \textcolor{stringliteral}{"Invalid channel number."});
+01115         \textcolor{keywordflow}{return} -1;
+01116     \}
+01117     \textcolor{keywordflow}{return} lms->GetGFIRCoef(dir\_tx,chan,filt,coef);
+01118 \}
+01119 
+01120 API_EXPORT \textcolor{keywordtype}{int} CALL_CONV LMS_SetGFIR(lms_device_t * device, \textcolor{keywordtype}{bool} dir_tx, \textcolor{keywordtype}{size\_t} 
+      chan, lms_gfir_t filt, \textcolor{keywordtype}{bool} enabled)
+01121 \{
+01122     \textcolor{keywordflow}{if} (device == \textcolor{keyword}{nullptr})
+01123     \{
+01124         lime::ReportError(EINVAL, \textcolor{stringliteral}{"Device cannot be NULL."});
+01125         \textcolor{keywordflow}{return} -1;
+01126     \}
+01127     lime::LMS7_Device* lms = (lime::LMS7_Device*)device;
+01128 
+01129     \textcolor{keywordflow}{if} (chan >= lms->GetNumChannels(\textcolor{keyword}{false}))
+01130     \{
+01131         lime::ReportError(EINVAL, \textcolor{stringliteral}{"Invalid channel number."});
+01132         \textcolor{keywordflow}{return} -1;
+01133     \}
+01134 
+01135     \textcolor{keywordflow}{return} lms->SetGFIR(dir\_tx,chan,filt,enabled);
+01136 \}
+01137 
+01138 API_EXPORT \textcolor{keywordtype}{int} CALL_CONV LMS_SetupStream(lms_device_t *device, lms_stream_t *
+      stream)
+01139 \{
+01140     \textcolor{keywordflow}{if}(device == \textcolor{keyword}{nullptr})
+01141         \textcolor{keywordflow}{return} lime::ReportError(EINVAL, \textcolor{stringliteral}{"Device is NULL."});
+01142     \textcolor{keywordflow}{if}(stream == \textcolor{keyword}{nullptr})
+01143         \textcolor{keywordflow}{return} lime::ReportError(EINVAL, \textcolor{stringliteral}{"stream is NULL."});
+01144 
+01145     lime::LMS7_Device* lms = (lime::LMS7_Device*)device;
+01146 
+01147     lime::StreamConfig config;
+01148     config.bufferLength = stream->fifoSize;
+01149     config.channelID = stream->channel;
+01150     config.performanceLatency = stream->throughputVsLatency;
+01151     \textcolor{keywordflow}{switch}(stream->dataFmt)
+01152     \{
+01153         \textcolor{keywordflow}{case} lms_stream_t::LMS_FMT_F32:
+01154             config.format = lime::StreamConfig::FMT_FLOAT32;
+01155             \textcolor{keywordflow}{break};
+01156         \textcolor{keywordflow}{case} lms_stream_t::LMS_FMT_I16:
+01157             config.format = lime::StreamConfig::FMT_INT16;
+01158             \textcolor{keywordflow}{break};
+01159         \textcolor{keywordflow}{case} lms_stream_t::LMS_FMT_I12:
+01160             config.format = lime::StreamConfig::FMT_INT12;
+01161             \textcolor{keywordflow}{break};
+01162         \textcolor{keywordflow}{default}:
+01163             config.format = lime::StreamConfig::FMT_FLOAT32;
+01164     \}
+01165     config.isTx = stream->isTx;
+01166     stream->handle = size\_t(lms->SetupStream(config));
+01167     \textcolor{keywordflow}{return} stream->handle == 0 ? -1 : 0;
+01168 \}
+01169 
+01170 API_EXPORT \textcolor{keywordtype}{int} CALL_CONV LMS_DestroyStream(lms_device_t *device, lms_stream_t *
+      stream)
+01171 \{
+01172     \textcolor{keywordflow}{if}(stream == \textcolor{keyword}{nullptr})
+01173         \textcolor{keywordflow}{return} lime::ReportError(EINVAL, \textcolor{stringliteral}{"stream is NULL."});
+01174 
+01175     lime::LMS7_Device* lms = (lime::LMS7_Device*)device;
+01176     \textcolor{keywordflow}{return} lms->DestroyStream((lime::StreamChannel*)stream->handle);
+01177 \}
+01178 
+01179 API_EXPORT \textcolor{keywordtype}{int} CALL_CONV LMS_StartStream(lms_stream_t *stream)
+01180 \{
+01181     \textcolor{keywordflow}{if} (stream==\textcolor{keyword}{nullptr} || stream->handle==0)
+01182         \textcolor{keywordflow}{return} 0;
+01183     \textcolor{keywordflow}{return} \textcolor{keyword}{reinterpret\_cast<}lime::StreamChannel*\textcolor{keyword}{>}(stream->handle)->Start();
+01184 \}
+01185 
+01186 API_EXPORT \textcolor{keywordtype}{int} CALL_CONV LMS_StopStream(lms_stream_t *stream)
+01187 \{
+01188     \textcolor{keywordflow}{if} (stream==\textcolor{keyword}{nullptr} || stream->handle==0)
+01189         \textcolor{keywordflow}{return} 0;
+01190     \textcolor{keywordflow}{return} \textcolor{keyword}{reinterpret\_cast<}lime::StreamChannel*\textcolor{keyword}{>}(stream->handle)->Stop();
+01191 \}
+01192 
+01193 API_EXPORT \textcolor{keywordtype}{int} CALL_CONV LMS_RecvStream(lms_stream_t *stream, \textcolor{keywordtype}{void} *samples, \textcolor{keywordtype}{size\_t} 
+      sample_count, lms_stream_meta_t *meta, \textcolor{keywordtype}{unsigned} timeout_ms)
+01194 \{
+01195     \textcolor{keywordflow}{if} (stream==\textcolor{keyword}{nullptr} || stream->handle==0)
+01196         \textcolor{keywordflow}{return} -1;
+01197     lime::StreamChannel* channel = (lime::StreamChannel*)stream->handle;
+01198     lime::StreamChannel::Metadata metadata;
+01199     metadata.flags = 0;
+01200     if (meta)
+01201     \{
+01202         metadata.flags |= meta->waitForTimestamp * 
+      lime::RingFIFO::SYNC_TIMESTAMP;
+01203         metadata.timestamp = meta->timestamp;
+01204     \}
+01205     \textcolor{keywordflow}{else} metadata.timestamp = 0;
+01206 
+01207     \textcolor{keywordtype}{int} status = channel->Read(samples, sample\_count, &metadata, timeout\_ms);
+01208     \textcolor{keywordflow}{if} (meta)
+01209         meta->timestamp = metadata.timestamp;
+01210     \textcolor{keywordflow}{return} status;
+01211 \}
+01212 
+01213 API_EXPORT \textcolor{keywordtype}{int} CALL_CONV LMS_SendStream(lms_stream_t *stream, \textcolor{keyword}{const} \textcolor{keywordtype}{void} *
+      samples, \textcolor{keywordtype}{size\_t} sample_count, \textcolor{keyword}{const} lms_stream_meta_t *meta, \textcolor{keywordtype}{unsigned} timeout_ms)
+01214 \{
+01215     \textcolor{keywordflow}{if} (stream==\textcolor{keyword}{nullptr} || stream->handle==0)
+01216         \textcolor{keywordflow}{return} -1;
+01217     lime::StreamChannel* channel = (lime::StreamChannel*)stream->handle;
+01218     lime::StreamChannel::Metadata metadata;
+01219     metadata.flags = 0;
+01220     if (meta)
+01221     \{
+01222         metadata.flags |= meta->waitForTimestamp * 
+      lime::RingFIFO::SYNC_TIMESTAMP;
+01223         metadata.flags |= meta->flushPartialPacket * lime::RingFIFO::END_BURST;
+01224         metadata.timestamp = meta->timestamp;
+01225     \}
+01226     \textcolor{keywordflow}{else} metadata.timestamp = 0;
+01227 
+01228     \textcolor{keywordflow}{return} channel->Write(samples, sample\_count, &metadata, timeout\_ms);
+01229 \}
+01230 
+01231 API_EXPORT \textcolor{keywordtype}{int} CALL_CONV LMS_UploadWFM(lms_device_t *device,
+01232                                          \textcolor{keyword}{const} \textcolor{keywordtype}{void} **samples, uint8\_t chCount,
+01233                                          \textcolor{keywordtype}{size\_t} sample_count, \textcolor{keywordtype}{int} format)
+01234 \{
+01235     lime::LMS7_Device* lms = (lime::LMS7_Device*)device;
+01236     lime::StreamConfig::StreamDataFormat fmt;
+01237     \textcolor{keywordflow}{switch}(format)
+01238     \{
+01239         \textcolor{keywordflow}{case} 0:
+01240             fmt = lime::StreamConfig::StreamDataFormat::FMT\_INT12;
+01241             \textcolor{keywordflow}{break};
+01242         \textcolor{keywordflow}{case} 1:
+01243             fmt = lime::StreamConfig::StreamDataFormat::FMT\_INT16;
+01244             \textcolor{keywordflow}{break};
+01245         \textcolor{keywordflow}{case} 2:
+01246             fmt = lime::StreamConfig::StreamDataFormat::FMT\_FLOAT32;
+01247             \textcolor{keywordflow}{break};
+01248         \textcolor{keywordflow}{default}:
+01249             fmt = lime::StreamConfig::StreamDataFormat::FMT\_INT12;
+01250             \textcolor{keywordflow}{break};
+01251     \}
+01252     \textcolor{keywordflow}{return} lms->UploadWFM(samples, chCount, sample\_count, fmt);
+01253 \}
+01254 
+01255 API_EXPORT \textcolor{keywordtype}{int} CALL_CONV LMS_EnableTxWFM(lms_device_t *device, \textcolor{keywordtype}{unsigned} ch, \textcolor{keywordtype}{bool} 
+      active)
+01256 \{
+01257     uint16\_t regAddr = 0x000D;
+01258     uint16\_t regValue = 0;
+01259     \textcolor{keywordtype}{int} status = 0;
+01260     status = LMS_WriteFPGAReg(device, 0xFFFF, 1<<(ch/2));
+01261     \textcolor{keywordflow}{if} (status != 0)
+01262         \textcolor{keywordflow}{return} status;
+01263     status = LMS_ReadFPGAReg(device, regAddr, &regValue);
+01264     \textcolor{keywordflow}{if}(status != 0)
+01265         \textcolor{keywordflow}{return} status;
+01266     regValue = regValue & ~0x6; \textcolor{comment}{//clear WFM\_LOAD, WFM\_PLAY}
+01267     regValue |= active << 1;
+01268     status = LMS_WriteFPGAReg(device, regAddr, regValue);
+01269     \textcolor{keywordflow}{return} status;
+01270 \}
+01271 
+01272 API_EXPORT \textcolor{keywordtype}{int} CALL_CONV LMS_GetStreamStatus(lms_stream_t *stream, 
+      lms_stream_status_t* status)
+01273 \{
+01274     assert(stream != \textcolor{keyword}{nullptr});
+01275     lime::StreamChannel* channel = (lime::StreamChannel*)stream->handle;
+01276     \textcolor{keywordflow}{if}(channel == \textcolor{keyword}{nullptr})
+01277         \textcolor{keywordflow}{return} -1;
+01278     lime::StreamChannel::Info info = channel->GetInfo();
+01279 
+01280     status->active = info.active;
+01281     status->droppedPackets = info.droppedPackets;
+01282     status->fifoFilledCount = info.fifoItemsCount;
+01283     status->fifoSize = info.fifoSize;
+01284     status->linkRate = info.linkRate;
+01285     status->overrun = info.overrun;
+01286     status->underrun = info.underrun;
+01287     status->timestamp = info.timestamp;
+01288     \textcolor{keywordflow}{return} 0;
+01289 \}
+01290 
+01291 API_EXPORT \textcolor{keyword}{const} lms_dev_info_t* CALL_CONV LMS_GetDeviceInfo(lms_device_t *
+      device)
+01292 \{
+01293     \textcolor{keywordflow}{if} (device == \textcolor{keyword}{nullptr})
+01294     \{
+01295         lime::ReportError(EINVAL, \textcolor{stringliteral}{"Device cannot be NULL."});
+01296         \textcolor{keywordflow}{return} \textcolor{keyword}{nullptr};
+01297     \}
+01298 
+01299     lime::LMS7_Device* lms = (lime::LMS7_Device*)device;
+01300     \textcolor{keyword}{auto} conn = lms->GetConnection();
+01301     \textcolor{keywordflow}{if} (conn == \textcolor{keyword}{nullptr})
+01302     \{
+01303         lime::ReportError(EINVAL, \textcolor{stringliteral}{"Device not connected"});
+01304         \textcolor{keywordflow}{return} \textcolor{keyword}{nullptr};
+01305     \}
+01306     \textcolor{keywordflow}{if} (!conn->IsOpen())
+01307     \{
+01308        lime::ReportError(EINVAL, \textcolor{stringliteral}{"No cennection to board."});
+01309        \textcolor{keywordflow}{return} \textcolor{keyword}{nullptr};
+01310     \}
+01311 
+01312     \textcolor{keywordflow}{return} lms->GetInfo();
+01313 \}
+01314 
+01315 API_EXPORT \textcolor{keywordtype}{int} CALL_CONV LMS_GetProgramModes(lms_device_t *device, lms_name_t *
+      list)
+01316 \{
+01317     \textcolor{keywordflow}{if} (device == \textcolor{keyword}{nullptr})
+01318     \{
+01319         lime::ReportError(EINVAL, \textcolor{stringliteral}{"Device cannot be NULL."});
+01320         \textcolor{keywordflow}{return} -1;
+01321     \}
+01322 
+01323     lime::LMS7_Device* lms = (lime::LMS7_Device*)device;
+01324 
+01325 
+01326     \textcolor{keyword}{auto} names = lms->GetProgramModes();
+01327     \textcolor{keywordflow}{if} (list != \textcolor{keyword}{nullptr})
+01328         \textcolor{keywordflow}{for} (\textcolor{keywordtype}{size\_t} i = 0; i < names.size(); i++)
+01329         \{
+01330             strncpy(list[i], names[i].c\_str(), \textcolor{keyword}{sizeof}(lms_name_t) - 1);
+01331             list[i][\textcolor{keyword}{sizeof}(lms_name_t) - 1] = 0;
+01332         \}
+01333     \textcolor{keywordflow}{return} names.size();
+01334 \}
+01335 
+01336 API_EXPORT \textcolor{keywordtype}{int} CALL_CONV LMS_Program(lms_device_t *device, \textcolor{keyword}{const} \textcolor{keywordtype}{char} *data, \textcolor{keywordtype}{size\_t} 
+      size, \textcolor{keyword}{const} lms_name_t mode, lms_prog_callback_t callback)
+01337 \{
+01338     \textcolor{keywordflow}{if} (device == \textcolor{keyword}{nullptr})
+01339     \{
+01340         lime::ReportError(EINVAL, \textcolor{stringliteral}{"Device cannot be NULL."});
+01341         \textcolor{keywordflow}{return} -1;
+01342     \}
+01343 
+01344     lime::LMS7_Device* lms = (lime::LMS7_Device*)device;
+01345     std::string prog\_mode(mode);
+01346     \textcolor{keywordflow}{return} lms->Program(prog\_mode, data, size, callback);
+01347 \}
+01348 
+01349 API_EXPORT \textcolor{keyword}{const} \textcolor{keywordtype}{char} * CALL_CONV LMS_GetLastErrorMessage(\textcolor{keywordtype}{void})
+01350 \{
+01351     \textcolor{keywordflow}{return} lime::GetLastErrorMessage();
+01352 \}
+01353 
+01354 API_EXPORT \textcolor{keyword}{const} \textcolor{keywordtype}{char}* LMS_GetLibraryVersion()
+01355 \{
+01356     \textcolor{keyword}{static} \textcolor{keywordtype}{char} libraryVersion[32];
+01357     sprintf(libraryVersion, \textcolor{stringliteral}{"%.31s"}, lime::GetLibraryVersion().c\_str());
+01358     \textcolor{keywordflow}{return} libraryVersion;
+01359 \}
+01360 
+01361 \textcolor{keyword}{static} LMS_LogHandler api_msg_handler;
+01362 \textcolor{keyword}{static} \textcolor{keywordtype}{void} APIMsgHandler(\textcolor{keyword}{const} lime::LogLevel level, \textcolor{keyword}{const} \textcolor{keywordtype}{char} *message)
+01363 \{
+01364     api_msg_handler(level,message);
+01365 \}
+01366 
+01367 API_EXPORT \textcolor{keywordtype}{void} LMS_RegisterLogHandler(LMS_LogHandler handler)
+01368 \{
+01369     lime::registerLogHandler(APIMsgHandler);
+01370     api_msg_handler = handler;
+01371 \}
+01372 
+01373 \textcolor{keyword}{extern} \textcolor{stringliteral}{"C"} API_EXPORT \textcolor{keywordtype}{int} CALL_CONV LMS_TransferLMS64C(lms_device_t *dev, \textcolor{keywordtype}{int} cmd, uint8\_t* 
+      data, \textcolor{keywordtype}{size\_t} *len)
+01374 \{
+01375     \textcolor{keywordflow}{if} (dev == \textcolor{keyword}{nullptr})
+01376     \{
+01377         lime::ReportError(EINVAL, \textcolor{stringliteral}{"Device cannot be NULL."});
+01378             \textcolor{keywordflow}{return} -1;
+01379     \}
+01380     lime::LMS7_Device* lms = (lime::LMS7_Device*)dev;
+01381     lime::LMS64CProtocol::GenericPacket pkt;
+01382     \textcolor{keyword}{auto} conn = lms->GetConnection();
+01383     \textcolor{keywordflow}{if} (conn == \textcolor{keyword}{nullptr})
+01384     \{
+01385         lime::ReportError(EINVAL, \textcolor{stringliteral}{"Device not connected"});
+01386         \textcolor{keywordflow}{return} -1;
+01387     \}
+01388 
+01389     pkt.cmd = lime::eCMD_LMS(cmd);
+01390     \textcolor{keywordflow}{for} (\textcolor{keywordtype}{size\_t} i = 0; i < *len; ++i)
+01391         pkt.outBuffer.push\_back(data[i]);
+01392 
+01393     lime::LMS64CProtocol* port = \textcolor{keyword}{dynamic\_cast<}lime::LMS64CProtocol *\textcolor{keyword}{>}(conn);
+01394     \textcolor{keywordflow}{if} (port->TransferPacket(pkt) != 0)
+01395         \textcolor{keywordflow}{return} -1;
+01396 
+01397     \textcolor{keywordflow}{for} (\textcolor{keywordtype}{size\_t} i = 0; i < pkt.inBuffer.size(); ++i)
+01398         data[i] = pkt.inBuffer[i];
+01399     *len = pkt.inBuffer.size();
+01400 
+01401     \textcolor{keywordflow}{if} (pkt.status != lime::STATUS_COMPLETED_CMD)
+01402         \textcolor{keywordflow}{return} lime::ReportError(-1, \textcolor{stringliteral}{"%s"}, lime::status2string(pkt.status));
+01403 
+01404     \textcolor{keywordflow}{return} 0;
+01405 \}
+\end{DoxyCode}

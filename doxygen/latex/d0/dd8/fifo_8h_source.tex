@@ -1,0 +1,243 @@
+\subsection{fifo.\+h}
+\label{fifo_8h_source}\index{/home/erik/prefix/default/src/limesuite-\/dev/src/protocols/fifo.\+h@{/home/erik/prefix/default/src/limesuite-\/dev/src/protocols/fifo.\+h}}
+
+\begin{DoxyCode}
+00001 \textcolor{preprocessor}{#ifndef LMS\_FIFO\_BUFFER\_H}
+00002 \textcolor{preprocessor}{#define LMS\_FIFO\_BUFFER\_H}
+00003 
+00004 \textcolor{preprocessor}{#include <mutex>}
+00005 \textcolor{preprocessor}{#include <condition\_variable>}
+00006 \textcolor{preprocessor}{#include <atomic>}
+00007 \textcolor{preprocessor}{#include <vector>}
+00008 \textcolor{preprocessor}{#include <thread>}
+00009 \textcolor{preprocessor}{#include <queue>}
+00010 \textcolor{preprocessor}{#include <condition\_variable>}
+00011 \textcolor{preprocessor}{#include "dataTypes.h"}
+00012 \textcolor{preprocessor}{#include <cmath>}
+00013 \textcolor{preprocessor}{#include <assert.h>}
+00014 
+00015 \textcolor{keyword}{namespace }lime\{
+00016 
+00017 \textcolor{keyword}{class }RingFIFO
+00018 \{
+00019 \textcolor{keyword}{public}:
+00020 
+00021     \textcolor{keyword}{struct }BufferInfo
+00022     \{
+00023         uint32\_t size;
+00024         uint32\_t itemsFilled;
+00025     \};
+00026     
+00027     \textcolor{keyword}{enum} StreamFlags
+00028     \{
+00029         SYNC_TIMESTAMP = 1,
+00030         END_BURST = 2,
+00031         OVERWRITE_OLD = 4,
+00032     \};
+00033 
+00035     BufferInfo GetInfo()
+00036     \{
+00037         std::unique\_lock<std::mutex> lck(lock);
+00038         BufferInfo stats;
+00039         stats.size = mBufferSize*mBuffer->maxSamplesInPacket;
+00040         stats.itemsFilled = mElementsFilled*mBuffer->maxSamplesInPacket;
+00041         \textcolor{keywordflow}{return} stats;
+00042     \}
+00043 
+00045     RingFIFO(\textcolor{keyword}{const} uint32\_t bufLength) : mBufferSize(1+(bufLength-1)/mBuffer->maxSamplesInPacket)
+00046     \{
+00047         mBuffer = \textcolor{keyword}{new} SamplesPacket[mBufferSize];
+00048         Clear();
+00049     \}
+00050 
+00051     ~RingFIFO()
+00052     \{
+00053         \textcolor{keyword}{delete} []mBuffer;
+00054     \};
+00055 
+00064     uint32\_t push_samples(\textcolor{keyword}{const} complex16_t *buffer, \textcolor{keyword}{const} uint32\_t samplesCount, \textcolor{keyword}{const} uint8\_t 
+      channelsCount, uint64\_t timestamp, \textcolor{keyword}{const} uint32\_t timeout_ms, \textcolor{keyword}{const} uint32\_t flags = 0)
+00065     \{
+00066         assert(buffer != \textcolor{keyword}{nullptr});
+00067         uint32\_t samplesTaken = 0;
+00068         std::unique\_lock<std::mutex> lck(lock);
+00069         \textcolor{keyword}{auto} t1 = std::chrono::high\_resolution\_clock::now();
+00070         \textcolor{keywordflow}{while} (samplesTaken < samplesCount)
+00071         \{
+00072             \textcolor{keywordflow}{if} (mElementsFilled >= mBufferSize) \textcolor{comment}{//buffer might be full, wait for free slots}
+00073             \{
+00074                 \textcolor{keyword}{auto} t2 = std::chrono::high\_resolution\_clock::now();
+00075                 \textcolor{keywordflow}{if}(t2-t1 >= std::chrono::milliseconds(timeout\_ms))
+00076                     \textcolor{keywordflow}{return} samplesTaken;
+00077                 \textcolor{keywordflow}{if}(flags & OVERWRITE_OLD)
+00078                 \{
+00079                     \textcolor{keywordtype}{int} dropElements = 1+(samplesCount-samplesTaken)/
+      SamplesPacket::maxSamplesInPacket;
+00080                     mHead = (mHead + dropElements) & (mBufferSize - 1);\textcolor{comment}{//advance to next one}
+00081                     mElementsFilled -= dropElements;
+00082                 \}
+00083                 \textcolor{keywordflow}{else}  \textcolor{comment}{//there is no space, wait on CV to give pop\_samples the thread context}
+00084                 \{
+00085                     hasItems.wait\_for(lck, std::chrono::milliseconds(timeout\_ms));
+00086                 \}
+00087             \}
+00088             \textcolor{keywordflow}{else}
+00089             \{
+00090                 mBuffer[mTail].timestamp = timestamp + samplesTaken;
+00091                 \textcolor{keywordtype}{int} cnt = samplesCount-samplesTaken;
+00092                 \textcolor{keywordflow}{if} (cnt > SamplesPacket::maxSamplesInPacket)
+00093                 \{
+00094                     cnt = SamplesPacket::maxSamplesInPacket;
+00095                     mBuffer[mTail].flags = flags & SYNC_TIMESTAMP;
+00096                 \}
+00097                 \textcolor{keywordflow}{else}
+00098                     mBuffer[mTail].flags = flags;
+00099                 memcpy(mBuffer[mTail].samples,&buffer[samplesTaken],cnt*\textcolor{keyword}{sizeof}(
+      complex16_t));
+00100                 samplesTaken+=cnt;
+00101                 mBuffer[mTail].last = cnt;
+00102                 mBuffer[mTail++].first = 0;
+00103                 mTail  &= (mBufferSize - 1);\textcolor{comment}{//advance to next one}
+00104                 ++mElementsFilled;
+00105             \}
+00106         \}
+00107         lck.unlock();
+00108         hasItems.notify\_one();
+00109         \textcolor{keywordflow}{return} samplesTaken;
+00110     \}
+00111 
+00121     uint32\_t pop_samples(complex16_t* buffer, \textcolor{keyword}{const} uint32\_t samplesCount, \textcolor{keyword}{const} uint8\_t channelsCount, 
+      uint64\_t *timestamp, \textcolor{keyword}{const} uint32\_t timeout_ms, uint32\_t *flags = \textcolor{keyword}{nullptr})
+00122     \{
+00123         assert(buffer != \textcolor{keyword}{nullptr});
+00124         uint32\_t samplesFilled = 0;
+00125         \textcolor{keywordflow}{if} (flags != \textcolor{keyword}{nullptr}) *flags = 0;
+00126         std::unique\_lock<std::mutex> lck(lock);
+00127         \textcolor{keywordflow}{while} (samplesFilled < samplesCount)
+00128         \{
+00129             \textcolor{keywordflow}{while} (mElementsFilled == 0) \textcolor{comment}{//buffer might be empty, wait for packets}
+00130             \{
+00131                 \textcolor{keywordflow}{if} (timeout\_ms == 0)
+00132                     \textcolor{keywordflow}{return} samplesFilled;
+00133                 \textcolor{keywordflow}{if} (hasItems.wait\_for(lck, std::chrono::milliseconds(timeout\_ms)) == 
+      std::cv\_status::timeout)
+00134                     \textcolor{keywordflow}{return} samplesFilled;
+00135             \}
+00136             \textcolor{keywordflow}{if}(samplesFilled == 0 && timestamp != \textcolor{keyword}{nullptr})
+00137                 *timestamp = mBuffer[mHead].timestamp + mBuffer[mHead].first;
+00138 
+00139             \textcolor{keywordflow}{while}(mElementsFilled > 0 && samplesFilled < samplesCount)
+00140             \{
+00141                 \textcolor{keyword}{const} \textcolor{keywordtype}{bool} hasEOB = mBuffer[mHead].flags & END_BURST;
+00142                 \textcolor{keywordflow}{if} (flags != \textcolor{keyword}{nullptr}) *flags |= mBuffer[mHead].flags;
+00143                 \textcolor{keyword}{const} \textcolor{keywordtype}{int} first = mBuffer[mHead].first;
+00144 
+00145                 \textcolor{keywordtype}{int} cnt = samplesCount - samplesFilled;
+00146                 \textcolor{keyword}{const} \textcolor{keywordtype}{int} cntbuf = mBuffer[mHead].last - first;
+00147                 cnt = cnt > cntbuf ? cntbuf : cnt;
+00148 
+00149                 memcpy(&buffer[samplesFilled],&mBuffer[mHead].samples[first],cnt*\textcolor{keyword}{sizeof}(
+      complex16_t));
+00150                 samplesFilled += cnt;
+00151 
+00152                 \textcolor{keywordflow}{if} (cntbuf == cnt) \textcolor{comment}{//packet depleated}
+00153                 \{
+00154                     mHead = (mHead + 1) & (mBufferSize - 1);\textcolor{comment}{//advance to next one}
+00155                     --mElementsFilled;
+00156                 \}
+00157                 \textcolor{keywordflow}{else}
+00158                     mBuffer[mHead].first += cnt;
+00159 
+00160                 \textcolor{comment}{//leave the loop early when end of burst is encountered}
+00161                 \textcolor{comment}{//so that the calling loop can flush out the buffer}
+00162                 \textcolor{keywordflow}{if} (hasEOB) \textcolor{keywordflow}{goto} done;
+00163             \}
+00164         \}
+00165         done:
+00166         lck.unlock();
+00167         hasItems.notify\_one();
+00168         \textcolor{keywordflow}{return} samplesFilled;
+00169     \}
+00170 
+00171     \textcolor{keywordtype}{void} Clear()
+00172     \{
+00173         std::unique\_lock<std::mutex> lck(lock);
+00174         mHead = 0;
+00175         mTail = 0;
+00176         mElementsFilled = 0;
+00177     \}
+00178 
+00179 \textcolor{keyword}{protected}:
+00180     \textcolor{keyword}{const} uint32\_t mBufferSize;
+00181     SamplesPacket* mBuffer;
+00182     uint32\_t mHead;
+00183     uint32\_t mTail;
+00184     uint32\_t mElementsFilled;
+00185     std::mutex lock;
+00186     std::condition\_variable hasItems;
+00187 \};
+00188 
+00189 \textcolor{comment}{//
+      https://www.justsoftwaresolutions.co.uk/threading/implementing-a-thread-safe-queue-using-condition-variables.html}
+00190 \textcolor{keyword}{template} <\textcolor{keyword}{typename} T>
+00191 \textcolor{keyword}{class }ConcurrentQueue
+00192 \{
+00193 \textcolor{keyword}{private}:
+00194     std::queue<T> mQueue;
+00195     std::mutex mMutex;
+00196     std::condition\_variable mCond;
+00197 \textcolor{keyword}{public}:
+00198     \textcolor{keywordtype}{void} push(T \textcolor{keyword}{const}& data)
+00199     \{
+00200         std::unique\_lock<std::mutex> lock(mMutex);
+00201         mQueue.push(data);
+00202         lock.unlock();
+00203         mCond.notify\_one();
+00204     \}
+00205 
+00206     \textcolor{keywordtype}{bool} empty()\textcolor{keyword}{ const}
+00207 \textcolor{keyword}{    }\{
+00208         std::unique\_lock<std::mutex> lock(mMutex);
+00209         \textcolor{keywordflow}{return} mQueue.empty();
+00210     \}
+00211 
+00212     \textcolor{keywordtype}{bool} try_pop(T& popped\_value)
+00213     \{
+00214         std::unique\_lock<std::mutex> lock(mMutex);
+00215         \textcolor{keywordflow}{if}(mQueue.empty())
+00216         \{
+00217             \textcolor{keywordflow}{return} \textcolor{keyword}{false};
+00218         \}
+00219         popped\_value=mQueue.front();
+00220         mQueue.pop();
+00221         \textcolor{keywordflow}{return} \textcolor{keyword}{true};
+00222     \}
+00223 
+00224     \textcolor{keywordtype}{void} wait_and_pop(T& popped\_value)
+00225     \{
+00226         std::unique\_lock<std::mutex> lock(mMutex);
+00227         \textcolor{keywordflow}{while}(mQueue.empty())
+00228         \{
+00229             mCond.wait(lock);
+00230         \}
+00231         popped\_value=mQueue.front();
+00232         mQueue.pop();
+00233     \}
+00234 
+00235     \textcolor{keywordtype}{bool} wait_and_pop(T& popped\_value, \textcolor{keyword}{const} \textcolor{keywordtype}{int} timeout_ms)
+00236     \{
+00237         std::unique\_lock<std::mutex> lock(mMutex);
+00238         \textcolor{keywordflow}{while}(mQueue.empty())
+00239         \{
+00240             \textcolor{keywordflow}{if} (mCond.wait\_for(lock, std::chrono::milliseconds(timeout\_ms)) == std::cv\_status::timeout)
+00241                 \textcolor{keywordflow}{return} \textcolor{keyword}{false};
+00242         \}
+00243         popped\_value=mQueue.front();
+00244         mQueue.pop();
+00245         \textcolor{keywordflow}{return} \textcolor{keyword}{true};
+00246     \}
+00247 \};
+00248 
+00249 \}
+00250 \textcolor{preprocessor}{#endif}
+\end{DoxyCode}

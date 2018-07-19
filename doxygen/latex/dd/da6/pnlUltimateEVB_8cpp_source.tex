@@ -1,0 +1,163 @@
+\subsection{pnl\+Ultimate\+E\+V\+B.\+cpp}
+\label{pnlUltimateEVB_8cpp_source}\index{/home/erik/prefix/default/src/limesuite-\/dev/src/boards\+\_\+wxgui/pnl\+Ultimate\+E\+V\+B.\+cpp@{/home/erik/prefix/default/src/limesuite-\/dev/src/boards\+\_\+wxgui/pnl\+Ultimate\+E\+V\+B.\+cpp}}
+
+\begin{DoxyCode}
+00001 \textcolor{preprocessor}{#include "pnlUltimateEVB.h"}
+00002 
+00003 \textcolor{preprocessor}{#include <wx/sizer.h>}
+00004 \textcolor{preprocessor}{#include <wx/stattext.h>}
+00005 \textcolor{preprocessor}{#include <wx/button.h>}
+00006 \textcolor{preprocessor}{#include <wx/string.h>}
+00007 \textcolor{preprocessor}{#include <wx/checkbox.h>}
+00008 \textcolor{preprocessor}{#include <wx/msgdlg.h>}
+00009 \textcolor{preprocessor}{#include "lms7suiteEvents.h"}
+00010 
+00011 \textcolor{preprocessor}{#include <ciso646>}
+00012 \textcolor{preprocessor}{#include <vector>}
+00013 
+00014 
+00015 \textcolor{keyword}{using namespace }std;
+00016 
+00017 BEGIN\_EVENT\_TABLE(pnlUltimateEVB, wxPanel)
+00018 END\_EVENT\_TABLE()
+00019 
+00020 pnlUltimateEVB::pnlUltimateEVB(wxWindow* parent,wxWindowID \textcolor{keywordtype}{id}, const wxPoint& pos,const wxSize& 
+      size, \textcolor{keywordtype}{int} style, wxString name)
+00021 \{
+00022     lmsControl = \textcolor{keyword}{nullptr};
+00023 
+00024     Create(parent, \textcolor{keywordtype}{id}, pos, size, style, name);
+00025 \textcolor{preprocessor}{#ifdef WIN32}
+00026     SetBackgroundColour(wxSystemSettings::GetColour(wxSYS\_COLOUR\_BTNFACE));
+00027 \textcolor{preprocessor}{#endif}
+00028     wxFlexGridSizer* mainSizer = \textcolor{keyword}{new} wxFlexGridSizer(0, 2, 5, 5);
+00029 
+00030     SetSizer(mainSizer);
+00031 
+00032     \textcolor{keyword}{auto} powerBox = \textcolor{keyword}{new} wxStaticBoxSizer( \textcolor{keyword}{new} wxStaticBox( \textcolor{keyword}{this}, wxID\_ANY, wxT(\textcolor{stringliteral}{"Voltage/Current/Power"}) ), 
+      wxVERTICAL );
+00033     \textcolor{keyword}{auto} sizerPowerRd = \textcolor{keyword}{new} wxFlexGridSizer( 0, 4, 2, 2 );
+00034     sizerPowerRd->SetFlexibleDirection( wxBOTH );
+00035     sizerPowerRd->SetNonFlexibleGrowMode( wxFLEX\_GROWMODE\_SPECIFIED );
+00036     sizerPowerRd->Add(\textcolor{keyword}{new} wxStaticText(\textcolor{keyword}{this}, wxID\_ANY, \_(\textcolor{stringliteral}{" Name"})), 1, wxALL, 5);
+00037     sizerPowerRd->Add(\textcolor{keyword}{new} wxStaticText(\textcolor{keyword}{this}, wxID\_ANY, \_(\textcolor{stringliteral}{" Voltage"})), 1, wxALL, 5);
+00038     sizerPowerRd->Add(\textcolor{keyword}{new} wxStaticText(\textcolor{keyword}{this}, wxID\_ANY, \_(\textcolor{stringliteral}{" Current"})), 1, wxALL, 5);
+00039     sizerPowerRd->Add(\textcolor{keyword}{new} wxStaticText(\textcolor{keyword}{this}, wxID\_ANY, \_(\textcolor{stringliteral}{" Power"})), 1, wxALL, 5);
+00040 
+00041     \textcolor{keyword}{const} std::vector<std::string> names = \{\textcolor{stringliteral}{"VCC1P25\_LMS\_DIG"}, \textcolor{stringliteral}{"VCC1P25\_LMS"}, \textcolor{stringliteral}{"VCC1P4\_LMS"}, \textcolor{stringliteral}{"VCC1P8\_LMS"}, \textcolor{stringliteral}{"
+      VDIO\_LMS"}, \textcolor{stringliteral}{"USER"}\};
+00042 
+00043     \textcolor{keywordflow}{for} (\textcolor{keywordtype}{unsigned} i = 0; i<names.size(); i++)
+00044     \{
+00045         \textcolor{keyword}{const} \textcolor{keywordtype}{int} offset = 35+i;
+00046         pwrParams.push\_back(ADCparam(offset,names[i]));
+00047         pwrParams.push\_back(ADCparam(offset+names.size(),names[i]));
+00048         pwrParams.push\_back(ADCparam(offset+2*names.size(),names[i]));
+00049     \}
+00050 
+00051     \textcolor{keywordflow}{for} (\textcolor{keywordtype}{unsigned} i = 0; i<pwrParams.size(); i++)
+00052     \{
+00053         \textcolor{keywordflow}{if} (i%3 == 0)
+00054         \{
+00055             pwrParams[i].title = \textcolor{keyword}{new} wxStaticText(\textcolor{keyword}{this}, wxID\_ANY, pwrParams[i].name);
+00056             sizerPowerRd->Add(pwrParams[i].title, 1, wxALL, 5);
+00057         \}
+00058         pwrParams[i].value = \textcolor{keyword}{new} wxStaticText(\textcolor{keyword}{this}, wxID\_ANY, \_(\textcolor{stringliteral}{"- - - - -"}));
+00059         sizerPowerRd->Add(pwrParams[i].value, 1, wxALL, 5);
+00060     \}
+00061     powerBox->Add( sizerPowerRd, 1, wxEXPAND, 5 );
+00062     \textcolor{keyword}{auto} sizertotalPwr = \textcolor{keyword}{new} wxFlexGridSizer( 1, 2, 10, 10 );
+00063     totalPwr = \textcolor{keyword}{new} wxStaticText(\textcolor{keyword}{this}, wxID\_ANY, \_(\textcolor{stringliteral}{"- - - W"}));
+00064     sizertotalPwr->Add(\textcolor{keyword}{new} wxStaticText(\textcolor{keyword}{this}, wxID\_ANY, \_(\textcolor{stringliteral}{"Total LMS power:"})), 1, wxALL, 5);
+00065     sizertotalPwr->Add( totalPwr, 1, wxALL, 5 );
+00066     powerBox->Add( sizertotalPwr, 1, wxEXPAND, 5 );
+00067 
+00068     \textcolor{keyword}{auto} voltageBox = \textcolor{keyword}{new} wxStaticBoxSizer( \textcolor{keyword}{new} wxStaticBox( \textcolor{keyword}{this}, wxID\_ANY, wxT(\textcolor{stringliteral}{"Voltages"}) ), wxVERTICAL 
+      );
+00069     \textcolor{keyword}{auto} sizerVoltageRd = \textcolor{keyword}{new} wxFlexGridSizer( 0, 4, 2, 2 );
+00070     sizerVoltageRd->SetFlexibleDirection( wxBOTH );
+00071     sizerVoltageRd->SetNonFlexibleGrowMode( wxFLEX\_GROWMODE\_SPECIFIED );
+00072     sizerVoltageRd->Add(\textcolor{keyword}{new} wxStaticText(\textcolor{keyword}{this}, wxID\_ANY, \_(\textcolor{stringliteral}{"Name"})), 1, wxALL, 5);
+00073     sizerVoltageRd->Add(\textcolor{keyword}{new} wxStaticText(\textcolor{keyword}{this}, wxID\_ANY, \_(\textcolor{stringliteral}{" Voltage"})), 1, wxALL, 5);
+00074     sizerVoltageRd->Add(\textcolor{keyword}{new} wxStaticText(\textcolor{keyword}{this}, wxID\_ANY, \_(\textcolor{stringliteral}{"Name"})), 1, wxALL, 5);
+00075     sizerVoltageRd->Add(\textcolor{keyword}{new} wxStaticText(\textcolor{keyword}{this}, wxID\_ANY, \_(\textcolor{stringliteral}{"Voltage"})), 1, wxALL, 5);
+00076 
+00077     \textcolor{keyword}{const} std::vector<std::string> voltages = \{
+00078         \textcolor{stringliteral}{"AMUX\_VDD\_AFE"}, \textcolor{stringliteral}{"AMUX\_VDD12\_RXBUF"}, \textcolor{stringliteral}{"AMUX\_VDD12\_VCO\_SXR"}, \textcolor{stringliteral}{"AMUX\_DVDD\_SXR"},
+00079         \textcolor{stringliteral}{"AMUX\_VDD\_DIV\_SXR"}, \textcolor{stringliteral}{"AMUX\_VDD\_CP\_SXR"}, \textcolor{stringliteral}{"AMUX\_VDD18\_SXR"}, \textcolor{stringliteral}{"AMUX\_VDD\_MXLOBUF\_RFE"},
+00080         \textcolor{stringliteral}{"AMUX\_VDD12\_TIA\_RFE"}, \textcolor{stringliteral}{"AMUX\_VDD14\_LNA\_RFE"}, \textcolor{stringliteral}{"AMUX\_VDD14\_TIA\_RFE"}, \textcolor{stringliteral}{"AMUX\_DIGPRVDD1\_1"},
+00081         \textcolor{stringliteral}{"AMUX\_VDD12\_LNA\_RFE"}, \textcolor{stringliteral}{"AMUX\_VDD14\_RBB"}, \textcolor{stringliteral}{"AMUX\_DVDD\_SXT"}, \textcolor{stringliteral}{"AMUX\_VDD\_TBB"},
+00082         \textcolor{stringliteral}{"AMUX\_VDD\_TPAD\_TRF"}, \textcolor{stringliteral}{"AMUX\_VDD12\_DIG"}, \textcolor{stringliteral}{"AMUX\_VDD\_CP\_SXT"}, \textcolor{stringliteral}{"AMUX\_VDD12\_VCO\_SXT"},
+00083         \textcolor{stringliteral}{"AMUX\_DIGPRVDD1\_2"}, \textcolor{stringliteral}{"AMUX\_DVDD\_CGEN"}, \textcolor{stringliteral}{"AMUX\_VDD\_DIV\_CGEN"}, \textcolor{stringliteral}{"AMUX\_VDD\_SPI\_BUF"},
+00084         \textcolor{stringliteral}{"AMUX\_VDD12\_TXBUF"}, \textcolor{stringliteral}{"AMUX\_VDD\_DIV\_SXT"}, \textcolor{stringliteral}{"AMUX\_VDD\_TLOBUF\_TRF"}, \textcolor{stringliteral}{"AMUX\_VDD14\_VCO\_CGEN"},
+00085         \textcolor{stringliteral}{"AMUX\_VDD\_CP\_CGEN"}, \textcolor{stringliteral}{"AMUX\_LMS\_TSTAO"}, \textcolor{stringliteral}{"AMUX\_LMS\_TSTDO1"}, \textcolor{stringliteral}{"AMUX\_LMS\_TSTDO0"}
+00086     \};
+00087 
+00088     \textcolor{keywordflow}{for} (\textcolor{keywordtype}{unsigned} i = 0; i<voltages.size(); i++)
+00089         vltgParams.push\_back(ADCparam(2+i,voltages[i]));
+00090 
+00091 
+00092     \textcolor{keywordflow}{for} (\textcolor{keywordtype}{unsigned} i = 0; i<vltgParams.size(); i++)
+00093     \{
+00094         vltgParams[i].title = \textcolor{keyword}{new} wxStaticText(\textcolor{keyword}{this}, wxID\_ANY, vltgParams[i].name);
+00095         sizerVoltageRd->Add(vltgParams[i].title, 1, wxALL, 5);
+00096         vltgParams[i].value = \textcolor{keyword}{new} wxStaticText(\textcolor{keyword}{this}, wxID\_ANY, \_(\textcolor{stringliteral}{"- - - mV"}));
+00097         sizerVoltageRd->Add(vltgParams[i].value, 1, wxALL, 5);
+00098     \}
+00099     voltageBox->Add( sizerVoltageRd, 1, wxEXPAND, 5 );
+00100 
+00101     mainSizer->Add( voltageBox, 1, wxEXPAND, 5 );
+00102     mainSizer->Add( powerBox, 1, wxEXPAND, 5 );
+00103     mainSizer->Fit(\textcolor{keyword}{this});
+00104     \textcolor{comment}{//mainSizer->SetSizeHints(this);}
+00105     Layout();
+00106     Fit();
+00107     Bind(READ\_ALL\_VALUES, &pnlUltimateEVB::OnReadAll, \textcolor{keyword}{this}, this->GetId());
+00108 \}
+00109 
+00110 \textcolor{keywordtype}{void} pnlUltimateEVB::Initialize(lms_device_t* pControl)
+00111 \{
+00112     lmsControl = pControl;
+00113 \}
+00114 
+00115 pnlUltimateEVB::~pnlUltimateEVB()
+00116 \{
+00117 \}
+00118 
+00119 \textcolor{keywordtype}{void} pnlUltimateEVB::OnReadAll(wxCommandEvent &event)
+00120 \{
+00121     \textcolor{keywordtype}{double} sumPwr = 0;
+00122     float_type value;
+00123     lms_name_t units;
+00124     \textcolor{keywordflow}{for} (\textcolor{keywordtype}{size\_t} i = 0; i < pwrParams.size(); ++i)
+00125     \{
+00126         \textcolor{keywordtype}{int} status = LMS_ReadCustomBoardParam(lmsControl,pwrParams[i].channel,&value,units);
+00127         \textcolor{keywordflow}{if} (status != 0)
+00128         \{
+00129             wxMessageBox(\_(\textcolor{stringliteral}{"Failed to read board parameters"}), \_(\textcolor{stringliteral}{"Warning"}));
+00130             \textcolor{keywordflow}{return};
+00131         \}
+00132         \textcolor{keywordflow}{if} (pwrParams[i].channel >= 47 && pwrParams[i].channel < 52)
+00133             sumPwr += value;
+00134         pwrParams[i].value->SetLabel(wxString::Format(\_(\textcolor{stringliteral}{"%1.0f %s"}), value, units));
+00135     \}
+00136     totalPwr->SetLabel(wxString::Format(\_(\textcolor{stringliteral}{"%1.0f mW"}), sumPwr));
+00137 
+00138     \textcolor{keywordflow}{for} (\textcolor{keywordtype}{size\_t} i = 0; i < vltgParams.size(); ++i)
+00139     \{
+00140         \textcolor{keywordtype}{int} status = LMS_ReadCustomBoardParam(lmsControl,vltgParams[i].channel,&value,units);
+00141         \textcolor{keywordflow}{if} (status != 0)
+00142         \{
+00143             wxMessageBox(\_(\textcolor{stringliteral}{"Failed to read board parameters"}), \_(\textcolor{stringliteral}{"Warning"}));
+00144             \textcolor{keywordflow}{return};
+00145         \}
+00146         vltgParams[i].value->SetLabel(wxString::Format(\_(\textcolor{stringliteral}{"%1.0f %s"}), value, units));
+00147     \}
+00148     this->GetParent()->Layout();
+00149     this->GetParent()->Fit();
+00150 \}
+00151 
+00152 \textcolor{keywordtype}{void} pnlUltimateEVB::OnWriteAll(wxCommandEvent &event)
+00153 \{
+00154 \}
+\end{DoxyCode}

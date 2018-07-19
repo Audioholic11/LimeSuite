@@ -1,0 +1,134 @@
+\subsection{M\+C\+U\+\_\+\+B\+D.\+h}
+\label{MCU__BD_8h_source}\index{/home/erik/prefix/default/src/limesuite-\/dev/src/lms7002m\+\_\+mcu/\+M\+C\+U\+\_\+\+B\+D.\+h@{/home/erik/prefix/default/src/limesuite-\/dev/src/lms7002m\+\_\+mcu/\+M\+C\+U\+\_\+\+B\+D.\+h}}
+
+\begin{DoxyCode}
+00001 
+00007 \textcolor{preprocessor}{#ifndef MCU\_BD\_H}
+00008 \textcolor{preprocessor}{#define MCU\_BD\_H}
+00009 
+00010 \textcolor{preprocessor}{#include <atomic>}
+00011 \textcolor{preprocessor}{#include <string>}
+00012 \textcolor{preprocessor}{#include "IConnection.h"}
+00013 
+00014 \textcolor{keyword}{namespace }lime\{
+00015 
+00016 \textcolor{keyword}{class }LMS64CProtocol;
+00017 \textcolor{keyword}{class }IConnection;
+00018 
+00019 \textcolor{keyword}{class }MCU_BD
+00020 \{
+00021     \textcolor{keyword}{public}:
+00022         \textcolor{keyword}{enum} MCU_ERROR_CODES
+00023         \{
+00024             MCU_NO_ERROR = 0,
+00025             MCU_ERROR,
+00026             MCU_CGEN_TUNE_FAILED,
+00027             MCU_SXR_TUNE_FAILED,
+00028             MCU_SXT_TUNE_FAILED,
+00029             MCU_LOOPBACK_SIGNAL_WEAK,
+00030             MCU_INVALID_RX_PATH,
+00031             MCU_INVALID_TX_BAND,
+00032             MCU_RX_LPF_OUT_OF_RANGE,
+00033             MCU_RX_INVALID_TIA,
+00034             MCU_TX_LPF_OUT_OF_RANGE,
+00035             MCU_PROCEDURE_DISABLED,
+00036             MCU_R_CTL_LPF_LIMIT_REACHED,
+00037             MCU_CFB_TIA_RFE_LIMIT_REACHED,
+00038             MCU_RCAL_LPF_LIMIT_REACHED,
+00039 
+00040             MCU_ERROR_CODES_COUNT
+00041         \};
+00042 
+00043         \textcolor{keyword}{enum} OperationStatus
+00044         \{
+00045             SUCCESS = 0,
+00046             FAILURE,
+00047             TIMEOUT,
+00048         \};
+00049 
+00050         \textcolor{keyword}{struct }ProgressInfo
+00051         \{
+00052             \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{short} stepsDone;
+00053             \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{short} stepsTotal;
+00054             \textcolor{keywordtype}{bool} aborted;
+00055         \};
+00056         ProgressInfo GetProgressInfo() \textcolor{keyword}{const};
+00057 
+00058         MCU_BD();
+00059         \textcolor{keyword}{virtual} ~MCU_BD();
+00060         \textcolor{keywordtype}{int} m_iLoopTries;
+00061         std::string GetProgramFilename() \textcolor{keyword}{const};
+00062 
+00063         \textcolor{keywordtype}{void} RunProcedure(uint8\_t \textcolor{keywordtype}{id});
+00064         \textcolor{keyword}{enum} MCU_Parameter
+00065         \{
+00066             MCU_REF_CLK,
+00067             MCU_BW,
+00068             MCU_EXT_LOOPBACK_PAIR,
+00069         \};
+00070         \textcolor{keywordtype}{void} SetParameter(MCU_Parameter param, \textcolor{keywordtype}{float} value);
+00071         \textcolor{keywordtype}{int} WaitForMCU(uint32\_t timeout_ms);
+00072         \textcolor{keyword}{static} \textcolor{keyword}{const} \textcolor{keywordtype}{char}* MCUStatusMessage(\textcolor{keyword}{const} uint8\_t code);
+00073 
+00074         \textcolor{keyword}{static} \textcolor{keyword}{const} \textcolor{keywordtype}{int} cMaxFWSize = 1024 * 16;
+00075 
+00076     \textcolor{keyword}{protected}:
+00077         std::string mLoadedProgramFilename;
+00078         std::atomic\_ushort stepsDone;
+00079         std::atomic\_ushort stepsTotal;
+00080         std::atomic\_bool aborted;
+00081         \textcolor{keywordtype}{int} WaitUntilWritten();
+00082         \textcolor{keywordtype}{int} ReadOneByte(\textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{char} * data);
+00083         \textcolor{keywordtype}{int} One_byte_command(\textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{short} data1, \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{char} * rdata1);
+00084         \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{int} formREG2command(\textcolor{keywordtype}{int} m\_iExt5, \textcolor{keywordtype}{int} m\_iExt4, \textcolor{keywordtype}{int} m\_iExt3, \textcolor{keywordtype}{int} m\_iExt2, \textcolor{keywordtype}{int} m\_iMode1, \textcolor{keywordtype}{int} 
+      m\_iMode0);
+00085         IConnection* m_serPort;
+00086         \textcolor{keywordtype}{int} m_bLoadedDebug;
+00087         \textcolor{keywordtype}{int} m_bLoadedProd;
+00088         \textcolor{keywordtype}{int} byte_array_size;
+00089         \textcolor{keywordtype}{unsigned} mChipID;
+00090 
+00091     \textcolor{keyword}{public}:
+00092         uint8\_t ReadMCUProgramID();
+00093         OperationStatus SetDebugMode(\textcolor{keywordtype}{bool} enabled, IConnection::MCU_PROG_MODE 
+      mode);
+00094         OperationStatus readIRAM(\textcolor{keyword}{const} uint8\_t *addr, uint8\_t* values, \textcolor{keyword}{const} uint8\_t 
+      count);
+00095         OperationStatus writeIRAM(\textcolor{keyword}{const} uint8\_t *addr, \textcolor{keyword}{const} uint8\_t* values, \textcolor{keyword}{const} uint8\_t 
+      count);
+00096 
+00097         \textcolor{keywordtype}{void} Wait_CLK_Cycles(\textcolor{keywordtype}{int} data);
+00098         \textcolor{comment}{// The IRAM content}
+00099         \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{char} m_IRAM[256];
+00100         \textcolor{comment}{// The SFR content}
+00101         \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{char} m_SFR[256];
+00102         \textcolor{comment}{// The program memory code}
+00103         \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{char} byte_array[cMaxFWSize];
+00104 
+00105         \textcolor{keywordtype}{void} mSPI_write(\textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{short} addr\_reg,\textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{short} data\_reg);
+00106         \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{short} mSPI_read(\textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{short} addr\_reg);
+00107         \textcolor{keywordtype}{int} Three_byte_command(\textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{char} data1,\textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{char} data2,\textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{char} data3,
+00108         \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{char} * rdata1,\textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{char} * rdata2,\textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{char} * rdata3);
+00109         \textcolor{keywordtype}{int} GetProgramCode(\textcolor{keyword}{const} \textcolor{keywordtype}{char} *inFileName, \textcolor{keywordtype}{bool} bin = \textcolor{keyword}{false});
+00110         \textcolor{keywordtype}{int} Change_MCUFrequency(\textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{char} data);
+00111         \textcolor{keywordtype}{int} Read_IRAM();
+00112         \textcolor{keywordtype}{int} Erase_IRAM();
+00113         \textcolor{keywordtype}{int} Read_SFR();
+00114         \textcolor{keywordtype}{int} Program_MCU(\textcolor{keywordtype}{int} m\_iMode1, \textcolor{keywordtype}{int} m\_iMode0);
+00115         \textcolor{keywordtype}{int} Program_MCU(\textcolor{keyword}{const} uint8\_t* binArray, \textcolor{keyword}{const} 
+      IConnection::MCU_PROG_MODE mode);
+00116         \textcolor{keywordtype}{void} Reset_MCU();
+00117         \textcolor{keywordtype}{void} RunTest_MCU(\textcolor{keywordtype}{int} m\_iMode1, \textcolor{keywordtype}{int} m\_iMode0, \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{short} test\_code, \textcolor{keywordtype}{int} m\_iDebug);
+00118         \textcolor{keywordtype}{int} RunProductionTest_MCU();
+00119         \textcolor{keywordtype}{void} RunFabTest_MCU(\textcolor{keywordtype}{int} m\_iMode1, \textcolor{keywordtype}{int} m\_iMode0, \textcolor{keywordtype}{int} m\_iDebug);
+00120         \textcolor{comment}{// debug mode functions}
+00121         \textcolor{keywordtype}{void} DebugModeSet_MCU(\textcolor{keywordtype}{int} m\_iMode1, \textcolor{keywordtype}{int} m\_iMode0);
+00122         \textcolor{keywordtype}{void} DebugModeExit_MCU(\textcolor{keywordtype}{int} m\_iMode1, \textcolor{keywordtype}{int} m\_iMode0);
+00123         \textcolor{keywordtype}{int} ResetPC_MCU();
+00124         \textcolor{keywordtype}{int} RunInstr_MCU(\textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{short} * pPCVAL);
+00125         \textcolor{keywordtype}{void} Initialize(IConnection* pSerPort, \textcolor{keywordtype}{unsigned} chipID = 0, \textcolor{keywordtype}{unsigned} rom\_size = 0);
+00126         lime::IConnection::ProgrammingCallback callback;
+00127 \};
+00128 \}
+00129 \textcolor{preprocessor}{#endif // MCU\_BD\_H}
+\end{DoxyCode}

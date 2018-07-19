@@ -1,0 +1,406 @@
+\subsection{F\+P\+G\+Acontrols\+\_\+wxgui.\+cpp}
+\label{FPGAcontrols__wxgui_8cpp_source}\index{/home/erik/prefix/default/src/limesuite-\/dev/src/\+F\+P\+G\+Acontrols\+\_\+wxgui/\+F\+P\+G\+Acontrols\+\_\+wxgui.\+cpp@{/home/erik/prefix/default/src/limesuite-\/dev/src/\+F\+P\+G\+Acontrols\+\_\+wxgui/\+F\+P\+G\+Acontrols\+\_\+wxgui.\+cpp}}
+
+\begin{DoxyCode}
+00001 
+00007 \textcolor{preprocessor}{#include <wx/artprov.h>}
+00008 \textcolor{preprocessor}{#include <wx/sizer.h>}
+00009 \textcolor{preprocessor}{#include <wx/stattext.h>}
+00010 \textcolor{preprocessor}{#include <wx/bitmap.h>}
+00011 \textcolor{preprocessor}{#include <wx/bmpbuttn.h>}
+00012 \textcolor{preprocessor}{#include <wx/button.h>}
+00013 \textcolor{preprocessor}{#include <wx/image.h>}
+00014 \textcolor{preprocessor}{#include <wx/string.h>}
+00015 \textcolor{preprocessor}{#include <wx/gauge.h>}
+00016 \textcolor{preprocessor}{#include <wx/tglbtn.h>}
+00017 \textcolor{preprocessor}{#include <wx/timer.h>}
+00018 \textcolor{preprocessor}{#include <wx/filedlg.h>}
+00019 \textcolor{preprocessor}{#include <wx/msgdlg.h>}
+00020 \textcolor{preprocessor}{#include "wx/checkbox.h"}
+00021 
+00022 \textcolor{preprocessor}{#include "dataTypes.h"}
+00023 \textcolor{preprocessor}{#include "FPGAcontrols_wxgui.h"}
+00024 \textcolor{preprocessor}{#include <vector>}
+00025 \textcolor{preprocessor}{#include <fstream>}
+00026 \textcolor{preprocessor}{#include <wx/ffile.h>}
+00027 \textcolor{preprocessor}{#include <wx/dir.h>}
+00028 \textcolor{preprocessor}{#include <wx/filename.h>}
+00029 \textcolor{preprocessor}{#include <iostream>}
+00030 \textcolor{preprocessor}{#include "WFM_wcdma.h"}
+00031 
+00032 \textcolor{keyword}{using namespace }std;
+00033 
+00034 \textcolor{keyword}{const} \textcolor{keywordtype}{long} FPGAcontrols_wxgui::ID_BUTTON6 = wxNewId();
+00035 \textcolor{keyword}{const} \textcolor{keywordtype}{long} FPGAcontrols_wxgui::ID_BUTTON7 = wxNewId();
+00036 \textcolor{keyword}{const} \textcolor{keywordtype}{long} FPGAcontrols_wxgui::ID_BUTTON8 = wxNewId();
+00037 \textcolor{keyword}{const} \textcolor{keywordtype}{long} FPGAcontrols_wxgui::ID_BITMAPBUTTON1 = wxNewId();
+00038 \textcolor{keyword}{const} \textcolor{keywordtype}{long} FPGAcontrols_wxgui::ID_STATICTEXT2 = wxNewId();
+00039 \textcolor{keyword}{const} \textcolor{keywordtype}{long} FPGAcontrols_wxgui::ID_STATICTEXT5 = wxNewId();
+00040 \textcolor{keyword}{const} \textcolor{keywordtype}{long} FPGAcontrols_wxgui::ID_GAUGE1 = wxNewId();
+00041 \textcolor{keyword}{const} \textcolor{keywordtype}{long} FPGAcontrols_wxgui::ID_BUTTON3 = wxNewId();
+00042 \textcolor{keyword}{const} \textcolor{keywordtype}{long} FPGAcontrols_wxgui::ID_BUTTON4 = wxNewId();
+00043 \textcolor{comment}{//*)}
+00044 \textcolor{keyword}{const} \textcolor{keywordtype}{long} FPGAcontrols_wxgui::ID_STREAMING_TIMER = wxNewId();
+00045 
+00046 BEGIN\_EVENT\_TABLE(FPGAcontrols_wxgui, wxFrame)
+00047 END\_EVENT\_TABLE()
+00048 
+00049 FPGAcontrols_wxgui::FPGAcontrols_wxgui(wxWindow* parent,wxWindowID \textcolor{keywordtype}{id},const wxString &title, const wxPoint&
+       pos,const wxSize& size, \textcolor{keywordtype}{long} styles)
+00050 \{
+00051     lmsControl = \textcolor{keyword}{nullptr};
+00052     mStreamingTimer = \textcolor{keyword}{new} wxTimer(\textcolor{keyword}{this}, ID\_STREAMING\_TIMER);
+00053 
+00054     wxFlexGridSizer* FlexGridSizer10;
+00055     wxFlexGridSizer* FlexGridSizer3;
+00056     wxFlexGridSizer* FlexGridSizer2;
+00057     wxStaticBoxSizer* StaticBoxSizer3;
+00058     wxFlexGridSizer* FlexGridSizer8;
+00059     wxFlexGridSizer* FlexGridSizer6;
+00060     wxFlexGridSizer* FlexGridSizer1;
+00061 
+00062     Create(parent, \textcolor{keywordtype}{id}, title, wxDefaultPosition, wxDefaultSize, styles, title);
+00063 \textcolor{preprocessor}{#ifdef WIN32}
+00064     SetBackgroundColour(wxSystemSettings::GetColour(wxSYS\_COLOUR\_BTNFACE));
+00065 \textcolor{preprocessor}{#endif}
+00066     FlexGridSizer1 = \textcolor{keyword}{new} wxFlexGridSizer(0, 1, 5, 5);
+00067     FlexGridSizer1->AddGrowableCol(0);
+00068     cmbDevice = \textcolor{keyword}{new} wxChoice(\textcolor{keyword}{this}, wxNewId(), wxDefaultPosition, wxDefaultSize, 0, 0, 0, wxDefaultValidator
+      , \_T(\textcolor{stringliteral}{"ID\_CHOICE"}));
+00069     cmbDevice->Append(\_T(\textcolor{stringliteral}{"LMS1"}));
+00070     cmbDevice->Append(\_T(\textcolor{stringliteral}{"LMS2"}));
+00071     cmbDevice->Append(\_T(\textcolor{stringliteral}{"ADC/DAC"}));
+00072     cmbDevice->SetSelection(0);
+00073     FlexGridSizer1->Add(cmbDevice, 1, wxEXPAND | wxALIGN\_LEFT | wxALIGN\_TOP, 5);
+00074     wxStaticBoxSizer* digitalInterfaceGroup = \textcolor{keyword}{new} wxStaticBoxSizer(wxHORIZONTAL, \textcolor{keyword}{this}, \_(\textcolor{stringliteral}{"Digital Interface
+      "}));
+00075     chkDigitalLoopbackEnable = \textcolor{keyword}{new} wxCheckBox(\textcolor{keyword}{this}, wxNewId(), \_(\textcolor{stringliteral}{"Digital Loopback enable"}));
+00076     digitalInterfaceGroup->Add(chkDigitalLoopbackEnable, 1, wxALIGN\_LEFT | wxALIGN\_TOP, 5);
+00077     Connect(chkDigitalLoopbackEnable->GetId(), wxEVT\_COMMAND\_CHECKBOX\_CLICKED, (wxObjectEventFunction)&
+      FPGAcontrols_wxgui::OnChkDigitalLoopbackEnableClick);
+00078     FlexGridSizer1->Add(digitalInterfaceGroup, 1, wxALIGN\_LEFT | wxALIGN\_TOP | wxLEFT, 5);
+00079 
+00080     StaticBoxSizer3 = \textcolor{keyword}{new} wxStaticBoxSizer(wxHORIZONTAL, \textcolor{keyword}{this}, \_T(\textcolor{stringliteral}{"WFM loader"}));
+00081     FlexGridSizer6 = \textcolor{keyword}{new} wxFlexGridSizer(0, 1, 5, 0);
+00082     FlexGridSizer6->AddGrowableCol(0);
+00083     FlexGridSizer8 = \textcolor{keyword}{new} wxFlexGridSizer(0, 3, 0, 5);
+00084     btnLoadOnetone = \textcolor{keyword}{new} wxToggleButton(\textcolor{keyword}{this}, ID\_BUTTON6, \_T(\textcolor{stringliteral}{"Onetone"}), wxDefaultPosition, wxDefaultSize, 
+      0, wxDefaultValidator, \_T(\textcolor{stringliteral}{"ID\_BUTTON6"}));
+00085     btnLoadOnetone->SetToolTip(\_T(\textcolor{stringliteral}{"Loads single tone waveform"}));
+00086     FlexGridSizer8->Add(btnLoadOnetone, 1, wxALIGN\_LEFT|wxALIGN\_TOP, 5);
+00087     btnLoadWCDMA = \textcolor{keyword}{new} wxToggleButton(\textcolor{keyword}{this}, ID\_BUTTON7, \_T(\textcolor{stringliteral}{"W-CDMA"}), wxDefaultPosition, wxDefaultSize, 0, 
+      wxDefaultValidator, \_T(\textcolor{stringliteral}{"ID\_BUTTON7"}));
+00088     btnLoadWCDMA->SetToolTip(\_T(\textcolor{stringliteral}{"Loads WCDMA waveform"}));
+00089     FlexGridSizer8->Add(btnLoadWCDMA, 1, wxALIGN\_LEFT|wxALIGN\_TOP, 5);
+00090     chkMIMO = \textcolor{keyword}{new} wxCheckBox(\textcolor{keyword}{this}, wxNewId(), \_(\textcolor{stringliteral}{"MIMO"}));
+00091     FlexGridSizer8->Add(chkMIMO, 1, wxALIGN\_CENTER\_VERTICAL | wxALIGN\_TOP, 5);
+00092     FlexGridSizer6->Add(FlexGridSizer8, 1, wxALIGN\_LEFT|wxALIGN\_TOP, 5);
+00093     FlexGridSizer10 = \textcolor{keyword}{new} wxFlexGridSizer(0, 3, 0, 5);
+00094     FlexGridSizer10->AddGrowableCol(2);
+00095     btnLoadCustom = \textcolor{keyword}{new} wxToggleButton(\textcolor{keyword}{this}, ID\_BUTTON8, \_T(\textcolor{stringliteral}{"Custom"}), wxDefaultPosition, wxDefaultSize, 0,
+       wxDefaultValidator, \_T(\textcolor{stringliteral}{"ID\_BUTTON8"}));
+00096     btnLoadCustom->SetToolTip(\_T(\textcolor{stringliteral}{"Loads user selected custom file"}));
+00097     FlexGridSizer10->Add(btnLoadCustom, 1, wxALIGN\_LEFT|wxALIGN\_TOP, 5);
+00098     btnOpenWFM = \textcolor{keyword}{new} wxBitmapButton(\textcolor{keyword}{this}, ID\_BITMAPBUTTON1, wxArtProvider::GetBitmap(
+      wxART\_MAKE\_ART\_ID\_FROM\_STR(\_T(\textcolor{stringliteral}{"wxART\_FILE\_OPEN"})),wxART\_BUTTON), wxDefaultPosition, wxDefaultSize, wxBU\_AUTODRAW, 
+      wxDefaultValidator, \_T(\textcolor{stringliteral}{"ID\_BITMAPBUTTON1"}));
+00099     FlexGridSizer10->Add(btnOpenWFM, 1, wxALIGN\_LEFT|wxALIGN\_TOP, 5);
+00100     txtFilename = \textcolor{keyword}{new} wxStaticText(\textcolor{keyword}{this}, ID\_STATICTEXT2, wxEmptyString, wxDefaultPosition, wxDefaultSize, 
+      wxST\_ELLIPSIZE\_START, \_T(\textcolor{stringliteral}{"ID\_STATICTEXT2"}));
+00101     FlexGridSizer10->Add(txtFilename, 1, wxALL|wxEXPAND|wxALIGN\_LEFT|wxALIGN\_CENTER\_VERTICAL, 5);
+00102     FlexGridSizer6->Add(FlexGridSizer10, 1, wxEXPAND|wxALIGN\_LEFT|wxALIGN\_TOP, 5);
+00103     FlexGridSizer3 = \textcolor{keyword}{new} wxFlexGridSizer(0, 3, 0, 0);
+00104     FlexGridSizer3->AddGrowableCol(1);
+00105     lblProgressPercent = \textcolor{keyword}{new} wxStaticText(\textcolor{keyword}{this}, ID\_STATICTEXT5, \_T(\textcolor{stringliteral}{"0 %"}), wxDefaultPosition, wxSize(32,-1)
+      , 0, \_T(\textcolor{stringliteral}{"ID\_STATICTEXT5"}));
+00106     FlexGridSizer3->Add(lblProgressPercent, 1, wxLEFT|wxALIGN\_CENTER\_HORIZONTAL|wxALIGN\_CENTER\_VERTICAL, 5)
+      ;
+00107     progressBar = \textcolor{keyword}{new} wxGauge(\textcolor{keyword}{this}, ID\_GAUGE1, 100, wxDefaultPosition, wxSize(-1,10), 0, wxDefaultValidator
+      , \_T(\textcolor{stringliteral}{"ID\_GAUGE1"}));
+00108     FlexGridSizer3->Add(progressBar, 1, wxEXPAND|wxALIGN\_LEFT|wxALIGN\_CENTER\_VERTICAL, 5);
+00109     FlexGridSizer6->Add(FlexGridSizer3, 1, wxEXPAND|wxALIGN\_LEFT|wxALIGN\_TOP, 5);
+00110     FlexGridSizer2 = \textcolor{keyword}{new} wxFlexGridSizer(0, 3, 0, 5);
+00111     btnPlayWFM = \textcolor{keyword}{new} wxButton(\textcolor{keyword}{this}, ID\_BUTTON3, \_T(\textcolor{stringliteral}{"Play >"}), wxDefaultPosition, wxDefaultSize, 0, 
+      wxDefaultValidator, \_T(\textcolor{stringliteral}{"ID\_BUTTON3"}));
+00112     FlexGridSizer2->Add(btnPlayWFM, 1, wxALIGN\_LEFT|wxALIGN\_TOP, 5);
+00113     btnStopWFM = \textcolor{keyword}{new} wxButton(\textcolor{keyword}{this}, ID\_BUTTON4, \_T(\textcolor{stringliteral}{"Stop ||"}), wxDefaultPosition, wxDefaultSize, 0, 
+      wxDefaultValidator, \_T(\textcolor{stringliteral}{"ID\_BUTTON4"}));
+00114     FlexGridSizer2->Add(btnStopWFM, 1, wxALIGN\_LEFT|wxALIGN\_TOP, 5);
+00115     FlexGridSizer6->Add(FlexGridSizer2, 1, wxALIGN\_LEFT|wxALIGN\_TOP, 5);
+00116     StaticBoxSizer3->Add(FlexGridSizer6, 1, wxALIGN\_LEFT|wxALIGN\_TOP, 5);
+00117     FlexGridSizer1->Add(StaticBoxSizer3, 1, wxEXPAND|wxALIGN\_CENTER\_HORIZONTAL|wxALIGN\_CENTER\_VERTICAL | 
+      wxLEFT, 5);
+00118 
+00119     SetSizer(FlexGridSizer1);
+00120     FlexGridSizer1->Fit(\textcolor{keyword}{this});
+00121     FlexGridSizer1->SetSizeHints(\textcolor{keyword}{this});
+00122 
+00123     Connect(ID\_BUTTON6, wxEVT\_TOGGLEBUTTON, (wxObjectEventFunction)&
+      FPGAcontrols_wxgui::OnbtnLoadOnetoneClick);
+00124     Connect(ID\_BUTTON7, wxEVT\_TOGGLEBUTTON, (wxObjectEventFunction)&
+      FPGAcontrols_wxgui::OnbtnLoadWCDMAClick);
+00125     Connect(ID\_BUTTON8, wxEVT\_TOGGLEBUTTON, (wxObjectEventFunction)&
+      FPGAcontrols_wxgui::OnbtnLoadCustomClick);
+00126     Connect(ID\_BITMAPBUTTON1,wxEVT\_COMMAND\_BUTTON\_CLICKED,(wxObjectEventFunction)&
+      FPGAcontrols_wxgui::OnbtnOpenFileClick);
+00127     Connect(ID\_BUTTON3,wxEVT\_COMMAND\_BUTTON\_CLICKED,(wxObjectEventFunction)&
+      FPGAcontrols_wxgui::OnbtnPlayWFMClick);
+00128     Connect(ID\_BUTTON4,wxEVT\_COMMAND\_BUTTON\_CLICKED,(wxObjectEventFunction)&
+      FPGAcontrols_wxgui::OnbtnStopWFMClick);
+00129 \}
+00130 
+00131 \textcolor{keywordtype}{void} FPGAcontrols_wxgui::Initialize(lms_device_t* dataPort)
+00132 \{
+00133     lmsControl = dataPort;
+00134     
+00135     \textcolor{keywordflow}{if} (LMS_GetNumChannels(lmsControl,LMS_CH_TX) > 2)
+00136         cmbDevice->Show();
+00137     \textcolor{keywordflow}{else}
+00138         cmbDevice->Hide();
+00139     Layout();
+00140 \}
+00141 
+00142 FPGAcontrols_wxgui::~FPGAcontrols_wxgui()
+00143 \{
+00144     wxCommandEvent evt;
+00145 \}
+00146 
+00153 \textcolor{keywordtype}{int} ReadWFM(\textcolor{keyword}{const} wxString filename, std::vector<int16\_t> &iSamples, std::vector<int16\_t> &qSamples)
+00154 \{
+00155     \textcolor{keywordflow}{if} (filename.length() <= 1)
+00156         \textcolor{keywordflow}{return} 0;
+00157     wxFFile fpin(filename, \textcolor{stringliteral}{"rb"});
+00158     \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{char} inputBuffer[4];
+00159     \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{char} c1, c2, c3, c4; \textcolor{comment}{// To read Agilent Signal Studio file}
+00160     \textcolor{keywordtype}{double} iin, qin; \textcolor{comment}{// IQ inputs}
+00161     \textcolor{keywordtype}{int} iint, qint; \textcolor{comment}{// IQ integer versions}
+00162     \textcolor{keywordtype}{int} cnt = 0;
+00163 
+00164     \textcolor{keywordflow}{if}( fpin.IsOpened() == \textcolor{keyword}{false})
+00165     \{
+00166 \textcolor{preprocessor}{#ifndef NDEBUG}
+00167         cout << \_(\textcolor{stringliteral}{"WFM reading: Input file can not be opened ("}) << filename << \_(\textcolor{stringliteral}{")\(\backslash\)n"});
+00168 \textcolor{preprocessor}{#endif}
+00169         \textcolor{keywordflow}{return} -1;
+00170     \}
+00171 
+00172     \textcolor{keywordflow}{while}( fpin.Read(inputBuffer, 4) == 4 )
+00173     \{
+00174         c1 = inputBuffer[0];
+00175         c2 = inputBuffer[1];
+00176         c3 = inputBuffer[2];
+00177         c4 = inputBuffer[3];
+00178 
+00179         cnt++;
+00180 
+00181         c1 &= 0xFF;
+00182         c2 &= 0xFF;
+00183         c3 &= 0xFF;
+00184         c4 &= 0xFF;
+00185 
+00186         \textcolor{keywordflow}{if}( c1&0x80 ) iin = (double)(-1*(1<<15) + ((c1&0x7F)<<8) + c2);
+00187         \textcolor{keywordflow}{else} iin = (double)(((c1&0x7F)<<8) + c2);
+00188 
+00189         \textcolor{keywordflow}{if}( c3&0x80 ) qin = (double)(-1*(1<<15) + ((c3&0x7F)<<8) + c4);
+00190         \textcolor{keywordflow}{else} qin = (double)(((c3&0x7F)<<8) + c4);
+00191 
+00192         iint = (int)(iin);
+00193         qint = (int)(qin);
+00194 
+00195         \textcolor{comment}{//convert from 16 bit to 12 bit values}
+00196         \textcolor{comment}{//iint = iint >> 4;}
+00197         \textcolor{comment}{//qint = qint >> 4;}
+00198 
+00199         iSamples.push\_back(iint);
+00200         qSamples.push\_back(qint);
+00201     \};
+00202     \textcolor{keywordflow}{return} iSamples.size();
+00203 \}
+00204 
+00205 \textcolor{keywordtype}{void} FPGAcontrols_wxgui::OnbtnOpenFileClick(wxCommandEvent& event)
+00206 \{
+00207     wxFileDialog dlg(\textcolor{keyword}{this}, \_(\textcolor{stringliteral}{"Open file"}), \_(\textcolor{stringliteral}{""}), \_(\textcolor{stringliteral}{""}), \_(\textcolor{stringliteral}{"wfm (*.wfm)|*.wfm"}), wxFD\_OPEN | 
+      wxFD\_FILE\_MUST\_EXIST);
+00208     \textcolor{keywordflow}{if} (dlg.ShowModal() == wxID\_CANCEL)
+00209         \textcolor{keywordflow}{return};
+00210     txtFilename->SetLabelText( dlg.GetPath());
+00211     Layout();
+00212 \}
+00213 
+00214 \textcolor{keywordtype}{void} FPGAcontrols_wxgui::OnbtnPlayWFMClick(wxCommandEvent& event)
+00215 \{ 
+00216     LMS_EnableTxWFM(lmsControl, cmbDevice->GetSelection()*2, \textcolor{keyword}{true});
+00217 \}
+00218 
+00219 \textcolor{keywordtype}{void} FPGAcontrols_wxgui::OnbtnStopWFMClick(wxCommandEvent& event)
+00220 \{
+00221     LMS_EnableTxWFM(lmsControl, cmbDevice->GetSelection()*2, \textcolor{keyword}{false});
+00222 \};
+00223 
+00224 \textcolor{keywordtype}{int} FPGAcontrols_wxgui::UploadFile(\textcolor{keyword}{const} wxString &filename)
+00225 \{
+00226     \textcolor{keywordflow}{if} (!lmsControl)
+00227     \{
+00228         wxMessageBox(\_(\textcolor{stringliteral}{"Device not connected"}), \_(\textcolor{stringliteral}{"Error"}));
+00229         \textcolor{keywordflow}{return} -2;
+00230     \}
+00231 
+00232     \textcolor{keywordflow}{if} (filename.length() == 0)
+00233     \{
+00234         wxMessageBox(\_(\textcolor{stringliteral}{"File not selected"}), \_(\textcolor{stringliteral}{"Error"}));
+00235         \textcolor{keywordflow}{return} -1;
+00236     \}
+00237     vector<int16\_t> isamples;
+00238     vector<int16\_t> qsamples;
+00239     isamples.clear();
+00240     qsamples.clear();
+00241     \textcolor{keywordflow}{if}( ReadWFM(filename, isamples, qsamples) < 0)
+00242     \{
+00243         wxMessageBox(\_(\textcolor{stringliteral}{"File not found "}) + filename, \_(\textcolor{stringliteral}{"Error"}));
+00244         \textcolor{keywordflow}{return} -1;
+00245     \}
+00246     \textcolor{keywordflow}{return} UploadFile(isamples, qsamples);
+00247 \}
+00248 
+00249 \textcolor{keywordtype}{int} FPGAcontrols_wxgui::UploadFile(std::vector<int16\_t> isamples, std::vector<int16\_t> qsamples)
+00250 \{
+00251     \textcolor{keywordflow}{if} (!lmsControl)
+00252     \{
+00253         wxMessageBox(\_(\textcolor{stringliteral}{"Device not connected"}), \_(\textcolor{stringliteral}{"Error"}));
+00254         \textcolor{keywordflow}{return} -2;
+00255     \}
+00256 
+00257     progressBar->SetRange(isamples.size());
+00258     progressBar->SetValue(0);
+00259 
+00260     btnPlayWFM->Enable(\textcolor{keyword}{false});
+00261     btnStopWFM->Enable(\textcolor{keyword}{false});
+00262 
+00263     \textcolor{keyword}{const} uint8\_t chCount = 2;
+00264     \textcolor{keywordtype}{bool} MIMO = chkMIMO->IsChecked();
+00265 
+00266     lime::complex16_t* src[chCount];
+00267     \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} i=0; i<chCount; ++i)
+00268         src[i] = \textcolor{keyword}{new} lime::complex16_t[isamples.size()];
+00269 
+00270     \textcolor{keywordflow}{for}(\textcolor{keywordtype}{size\_t} i=0; i<isamples.size(); ++i)
+00271     \{
+00272         \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} c=0; c<chCount; ++c)
+00273         \{
+00274             \textcolor{keywordflow}{if}(c == 1 && !MIMO)
+00275             \{
+00276                 src[c][i].i = 0;
+00277                 src[c][i].q = 0;
+00278             \}
+00279             \textcolor{keywordflow}{else}
+00280             \{
+00281                 src[c][i].i = isamples[i];
+00282                 src[c][i].q = qsamples[i];
+00283             \}
+00284         \}
+00285     \}
+00286 
+00287     \textcolor{keywordtype}{int} status = LMS_UploadWFM(lmsControl, (\textcolor{keyword}{const} \textcolor{keywordtype}{void}**)src, 2+cmbDevice->GetSelection()*2, isamples.size(
+      ), 1);
+00288 
+00289     progressBar->SetValue(progressBar->GetRange());
+00290     lblProgressPercent->SetLabelText(\_(\textcolor{stringliteral}{"100%"}));
+00291 
+00292     LMS_EnableTxWFM(lmsControl, cmbDevice->GetSelection()*2, \textcolor{keyword}{true});
+00293 
+00294     btnPlayWFM->Enable(\textcolor{keyword}{true});
+00295     btnStopWFM->Enable(\textcolor{keyword}{true});
+00296 
+00297     \textcolor{keywordflow}{if} (status != 0)
+00298     \{
+00299         wxMessageBox(\_(\textcolor{stringliteral}{"Failed to upload WFM file"}), \_(\textcolor{stringliteral}{"Error"}));
+00300         \textcolor{keywordflow}{return} -3;
+00301     \}
+00302     \textcolor{keywordflow}{else}
+00303         \textcolor{keywordflow}{return} 0;
+00304 \}
+00305 
+00306 \textcolor{keywordtype}{void} FPGAcontrols_wxgui::OnbtnLoadOnetoneClick(wxCommandEvent& event)
+00307 \{
+00308     \textcolor{keyword}{const} \textcolor{keywordtype}{int} samplesPerPeriod = 64;
+00309     vector<int16\_t> isamples;
+00310     vector<int16\_t> qsamples;
+00311     isamples.resize(samplesPerPeriod);
+00312     qsamples.resize(samplesPerPeriod);
+00313     \textcolor{keywordflow}{for} (\textcolor{keywordtype}{int} i = 0; i < samplesPerPeriod; i++)
+00314     \{
+00315         \textcolor{keyword}{const} \textcolor{keywordtype}{double} PI  = 3.141592653589793238463;
+00316         isamples[i] = 32767.0*cos(2.0*PI*i/samplesPerPeriod)+0.5;
+00317         qsamples[i] = 32767.0*sin(2.0*PI*i/samplesPerPeriod)+0.5;;
+00318     \}
+00319 
+00320     \textcolor{keywordflow}{if} (UploadFile(isamples, qsamples) < 0)
+00321         btnLoadOnetone->SetValue(0);
+00322     \textcolor{keywordflow}{else}
+00323     \{
+00324         btnLoadOnetone->SetValue(1);
+00325         btnLoadWCDMA->SetValue(0);
+00326         btnLoadCustom->SetValue(0);
+00327     \}
+00328 \}
+00329 
+00330 \textcolor{keywordtype}{void} FPGAcontrols_wxgui::OnbtnLoadWCDMAClick(wxCommandEvent& event)
+00331 \{
+00332     \textcolor{keyword}{const} \textcolor{keywordtype}{int} samplesCnt = wcdma_wfm_len/4;
+00333     vector<int16\_t> isamples;
+00334     vector<int16\_t> qsamples;
+00335     isamples.resize(samplesCnt);
+00336     qsamples.resize(samplesCnt);
+00337     \textcolor{keywordflow}{for} (\textcolor{keywordtype}{int} i = 0; i < samplesCnt; i++)
+00338     \{
+00339         \textcolor{comment}{//TODO: generate WCDMA waveform instead of storing wfm data in header}
+00340         isamples[i] = ((int16\_t)wcdma_wfm[4*i]<<8)| (wcdma_wfm[4*i+1]);
+00341         qsamples[i] = ((int16\_t)wcdma_wfm[4*i+2]<<8)|(wcdma_wfm[4*i+3]);
+00342     \}
+00343 
+00344     \textcolor{keywordflow}{if} (UploadFile(isamples, qsamples) < 0)
+00345         btnLoadWCDMA->SetValue(0);
+00346     \textcolor{keywordflow}{else}
+00347     \{
+00348         btnLoadOnetone->SetValue(0);
+00349         btnLoadWCDMA->SetValue(1);
+00350         btnLoadCustom->SetValue(0);
+00351     \}
+00352 \}
+00353 
+00354 \textcolor{keywordtype}{void} FPGAcontrols_wxgui::OnbtnLoadCustomClick(wxCommandEvent& event)
+00355 \{
+00356     \textcolor{keywordflow}{if}( UploadFile(txtFilename->GetLabel()) < 0)
+00357     \{
+00358         btnLoadCustom->SetValue(0);
+00359     \}
+00360     \textcolor{keywordflow}{else}
+00361     \{
+00362         btnLoadOnetone->SetValue(0);
+00363         btnLoadWCDMA->SetValue(0);
+00364         btnLoadCustom->SetValue(1);
+00365     \}
+00366 \}
+00367 
+00368 \textcolor{keywordtype}{void} FPGAcontrols_wxgui::OnChkDigitalLoopbackEnableClick(wxCommandEvent& event)
+00369 \{
+00370     \textcolor{keywordflow}{if}(!lmsControl)
+00371     \{
+00372         wxMessageBox(\_(\textcolor{stringliteral}{"FPGA controls: Connection not initialized"}), \_(\textcolor{stringliteral}{"ERROR"}));
+00373         \textcolor{keywordflow}{return};
+00374     \}
+00375 
+00376     \textcolor{keyword}{const} uint16\_t address = 0x0008;
+00377     \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{short} regValue = 0;
+00378     \textcolor{keywordflow}{if} (LMS_WriteFPGAReg(lmsControl, 0xFFFF, 1<< cmbDevice->GetSelection())!=0   
+00379     ||  LMS_ReadFPGAReg(lmsControl, address, &regValue)!=0)
+00380     \{
+00381         wxMessageBox(\_(\textcolor{stringliteral}{"Failed to write SPI"}), \_(\textcolor{stringliteral}{"Error"}), wxICON\_ERROR);
+00382         \textcolor{keywordflow}{return};
+00383     \}
+00384     
+00385     regValue = (regValue & ~(1<<10)) | chkDigitalLoopbackEnable->IsChecked() << 10;
+00386     \textcolor{keywordflow}{if} (LMS_WriteFPGAReg(lmsControl, address, regValue)!=0)
+00387         wxMessageBox(\_(\textcolor{stringliteral}{"Failed to write SPI"}), \_(\textcolor{stringliteral}{"Error"}), wxICON\_ERROR);
+00388 \}
+\end{DoxyCode}

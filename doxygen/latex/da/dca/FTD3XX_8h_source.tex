@@ -1,0 +1,814 @@
+\subsection{F\+T\+D3\+X\+X.\+h}
+\label{FTD3XX_8h_source}\index{/home/erik/prefix/default/src/limesuite-\/dev/src/\+Connection\+F\+T\+D\+I/\+F\+T\+D3\+X\+X\+Library/\+F\+T\+D3\+X\+X.\+h@{/home/erik/prefix/default/src/limesuite-\/dev/src/\+Connection\+F\+T\+D\+I/\+F\+T\+D3\+X\+X\+Library/\+F\+T\+D3\+X\+X.\+h}}
+
+\begin{DoxyCode}
+00001 \textcolor{comment}{/*++}
+00002 \textcolor{comment}{}
+00003 \textcolor{comment}{Copyright © 2016 Future Technology Devices International Limited}
+00004 \textcolor{comment}{}
+00005 \textcolor{comment}{THIS SOFTWARE IS PROVIDED BY FUTURE TECHNOLOGY DEVICES INTERNATIONAL LIMITED "AS IS"}
+00006 \textcolor{comment}{AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES}
+00007 \textcolor{comment}{OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL}
+00008 \textcolor{comment}{FUTURE TECHNOLOGY DEVICES INTERNATIONAL LIMITED BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,}
+00009 \textcolor{comment}{SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT}
+00010 \textcolor{comment}{OF SUBSTITUTE GOODS OR SERVICES LOSS OF USE, DATA, OR PROFITS OR BUSINESS INTERRUPTION)}
+00011 \textcolor{comment}{HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR}
+00012 \textcolor{comment}{TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,}
+00013 \textcolor{comment}{EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.}
+00014 \textcolor{comment}{}
+00015 \textcolor{comment}{FTDI DRIVERS MAY BE USED ONLY IN CONJUNCTION WITH PRODUCTS BASED ON FTDI PARTS.}
+00016 \textcolor{comment}{}
+00017 \textcolor{comment}{FTDI DRIVERS MAY BE DISTRIBUTED IN ANY FORM AS LONG AS LICENSE INFORMATION IS NOT MODIFIED.}
+00018 \textcolor{comment}{}
+00019 \textcolor{comment}{IF A CUSTOM VENDOR ID AND/OR PRODUCT ID OR DESCRIPTION STRING ARE USED, IT IS THE}
+00020 \textcolor{comment}{RESPONSIBILITY OF THE PRODUCT MANUFACTURER TO MAINTAIN ANY CHANGES AND SUBSEQUENT WHQL}
+00021 \textcolor{comment}{RE-CERTIFICATION AS A RESULT OF MAKING THESE CHANGES.}
+00022 \textcolor{comment}{}
+00023 \textcolor{comment}{}
+00024 \textcolor{comment}{Module Name:}
+00025 \textcolor{comment}{}
+00026 \textcolor{comment}{ftd3xx.h}
+00027 \textcolor{comment}{}
+00028 \textcolor{comment}{Abstract:}
+00029 \textcolor{comment}{}
+00030 \textcolor{comment}{Superspeed USB device driver for FTDI FT60X devices}
+00031 \textcolor{comment}{FTD3XX library definitions}
+00032 \textcolor{comment}{}
+00033 \textcolor{comment}{Environment:}
+00034 \textcolor{comment}{}
+00035 \textcolor{comment}{kernel & user mode}
+00036 \textcolor{comment}{}
+00037 \textcolor{comment}{}
+00038 \textcolor{comment}{--*/}
+00039 
+00040 
+00041 \textcolor{preprocessor}{#ifndef \_\_FTD3XX\_H\_\_}
+00042 \textcolor{preprocessor}{#define \_\_FTD3XX\_H\_\_}
+00043 
+00044 \textcolor{preprocessor}{#include <windows.h>}
+00045 
+00046 
+00047 
+00048 \textcolor{comment}{//}
+00049 \textcolor{comment}{// Standard Descriptor Types}
+00050 \textcolor{comment}{//}
+00051 \textcolor{preprocessor}{#define FT\_DEVICE\_DESCRIPTOR\_TYPE                          0x01}
+00052 \textcolor{preprocessor}{#define FT\_CONFIGURATION\_DESCRIPTOR\_TYPE                   0x02}
+00053 \textcolor{preprocessor}{#define FT\_STRING\_DESCRIPTOR\_TYPE                          0x03}
+00054 \textcolor{preprocessor}{#define FT\_INTERFACE\_DESCRIPTOR\_TYPE                       0x04}
+00055 
+00056 \textcolor{comment}{//}
+00057 \textcolor{comment}{// Power Configuration}
+00058 \textcolor{comment}{//}
+00059 \textcolor{preprocessor}{#define FT\_IS\_SELF\_POWERED(bmAttributes)                    ((bmAttributes) == 0x40)}
+00060 \textcolor{preprocessor}{#define FT\_IS\_BUS\_POWERED(bmAttributes)                     (!((bmAttributes) == 0x40))}
+00061 \textcolor{preprocessor}{#define FT\_IS\_REMOTE\_WAKEUP\_ENABLED(bmAttributes)           ((bmAttributes) == 0x20)}
+00062 
+00063 \textcolor{comment}{//}
+00064 \textcolor{comment}{// Pipe Direction}
+00065 \textcolor{comment}{//}
+00066 \textcolor{preprocessor}{#define FT\_IS\_READ\_PIPE(ucPipeID)                           ((ucPipeID) & 0x80)}
+00067 \textcolor{preprocessor}{#define FT\_IS\_WRITE\_PIPE(ucPipeID)                          (!((ucPipeID) & 0x80))}
+00068 
+00069 \textcolor{comment}{//}
+00070 \textcolor{comment}{// Pipe type}
+00071 \textcolor{comment}{//}
+00072 \textcolor{preprocessor}{#define FT\_IS\_BULK\_PIPE(ucPipeType)                         ((ucPipeType) == 2)}
+00073 \textcolor{preprocessor}{#define FT\_IS\_INTERRUPT\_PIPE(ucPipeType)                    ((ucPipeType) == 3)}
+00074 \textcolor{preprocessor}{#define FT\_IS\_ISOCHRONOUS\_PIPE(ucPipeType)                  (0)}
+00075 
+00076 \textcolor{comment}{//}
+00077 \textcolor{comment}{// Reserved pipes}
+00078 \textcolor{comment}{//}
+00079 \textcolor{preprocessor}{#define FT\_RESERVED\_INTERFACE\_INDEX                         0x0}
+00080 \textcolor{preprocessor}{#define FT\_RESERVED\_PIPE\_INDEX\_SESSION                      0x0}
+00081 \textcolor{preprocessor}{#define FT\_RESERVED\_PIPE\_INDEX\_NOTIFICATION                 0x1}
+00082 \textcolor{preprocessor}{#define FT\_RESERVED\_PIPE\_SESSION                            0x1}
+00083 \textcolor{preprocessor}{#define FT\_RESERVED\_PIPE\_NOTIFICATION                       0x81}
+00084 
+00085 \textcolor{comment}{//}
+00086 \textcolor{comment}{// Create flags}
+00087 \textcolor{comment}{//}
+00088 \textcolor{preprocessor}{#define FT\_OPEN\_BY\_SERIAL\_NUMBER                            0x00000001}
+00089 \textcolor{preprocessor}{#define FT\_OPEN\_BY\_DESCRIPTION                              0x00000002}
+00090 \textcolor{preprocessor}{#define FT\_OPEN\_BY\_LOCATION                                 0x00000004}
+00091 \textcolor{preprocessor}{#define FT\_OPEN\_BY\_GUID                                     0x00000008}
+00092 \textcolor{preprocessor}{#define FT\_OPEN\_BY\_INDEX                                    0x00000010}
+00093 
+00094 \textcolor{comment}{//}
+00095 \textcolor{comment}{// ListDevices flags}
+00096 \textcolor{comment}{//}
+00097 \textcolor{preprocessor}{#define FT\_LIST\_ALL                                         0x20000000}
+00098 \textcolor{preprocessor}{#define FT\_LIST\_BY\_INDEX                                    0x40000000}
+00099 \textcolor{preprocessor}{#define FT\_LIST\_NUMBER\_ONLY                                 0x80000000}
+00100 
+00101 \textcolor{comment}{//}
+00102 \textcolor{comment}{// GPIO direction, value}
+00103 \textcolor{comment}{//}
+00104 \textcolor{preprocessor}{#define FT\_GPIO\_DIRECTION\_IN                                0}
+00105 \textcolor{preprocessor}{#define FT\_GPIO\_DIRECTION\_OUT                               1}
+00106 \textcolor{preprocessor}{#define FT\_GPIO\_VALUE\_LOW                                   0}
+00107 \textcolor{preprocessor}{#define FT\_GPIO\_VALUE\_HIGH                                  1}
+00108 \textcolor{preprocessor}{#define FT\_GPIO\_0                                           0}
+00109 \textcolor{preprocessor}{#define FT\_GPIO\_1                                           1}
+00110 
+00111 \textcolor{comment}{//}
+00112 \textcolor{comment}{// Open/Create handle}
+00113 \textcolor{comment}{//}
+00114 \textcolor{keyword}{typedef} PVOID FT_HANDLE, *PFT_HANDLE;
+00115 
+00116 \textcolor{comment}{//}
+00117 \textcolor{comment}{// FT Status Codes}
+00118 \textcolor{comment}{//}
+00119 \textcolor{keyword}{typedef} \textcolor{keyword}{enum} _FT_STATUS
+00120 \{
+00121     FT_OK,
+00122     FT_INVALID_HANDLE,
+00123     FT_DEVICE_NOT_FOUND,
+00124     FT_DEVICE_NOT_OPENED,
+00125     FT_IO_ERROR,
+00126     FT_INSUFFICIENT_RESOURCES,
+00127     FT_INVALID_PARAMETER,
+00128     FT_INVALID_BAUD_RATE,
+00129     FT_DEVICE_NOT_OPENED_FOR_ERASE,
+00130     FT_DEVICE_NOT_OPENED_FOR_WRITE,
+00131     FT_FAILED_TO_WRITE_DEVICE,
+00132     FT_EEPROM_READ_FAILED,
+00133     FT_EEPROM_WRITE_FAILED,
+00134     FT_EEPROM_ERASE_FAILED,
+00135     FT_EEPROM_NOT_PRESENT,
+00136     FT_EEPROM_NOT_PROGRAMMED,
+00137     FT_INVALID_ARGS,
+00138     FT_NOT_SUPPORTED,
+00139 
+00140     FT_NO_MORE_ITEMS,
+00141     FT_TIMEOUT,
+00142     FT_OPERATION_ABORTED,
+00143     FT_RESERVED_PIPE,
+00144     FT_INVALID_CONTROL_REQUEST_DIRECTION,
+00145     FT_INVALID_CONTROL_REQUEST_TYPE,
+00146     FT_IO_PENDING,
+00147     FT_IO_INCOMPLETE,
+00148     FT_HANDLE_EOF,
+00149     FT_BUSY,
+00150     FT_NO_SYSTEM_RESOURCES,
+00151     FT_DEVICE_LIST_NOT_READY,
+00152     FT_DEVICE_NOT_CONNECTED,
+00153     FT_INCORRECT_DEVICE_PATH,
+00154 
+00155     FT_OTHER_ERROR,
+00156 
+00157 \};
+00158 
+00159 \textcolor{comment}{//}
+00160 \textcolor{comment}{// FT Status macros}
+00161 \textcolor{comment}{//}
+00162 \textcolor{keyword}{typedef} ULONG FT_STATUS;
+00163 \textcolor{preprocessor}{#define FT\_SUCCESS(status) ((status) == FT\_OK)}
+00164 \textcolor{preprocessor}{#define FT\_FAILED(status)  ((status) != FT\_OK)}
+00165 
+00166 \textcolor{comment}{//}
+00167 \textcolor{comment}{// Pipe types}
+00168 \textcolor{comment}{//}
+00169 \textcolor{keyword}{typedef} \textcolor{keyword}{enum} _FT_PIPE_TYPE
+00170 \{
+00171     FTPipeTypeControl,
+00172     FTPipeTypeIsochronous,
+00173     FTPipeTypeBulk,
+00174     FTPipeTypeInterrupt
+00175 
+00176 \} FT_PIPE_TYPE;
+00177 
+00178 \textcolor{comment}{//}
+00179 \textcolor{comment}{// Common descriptor header}
+00180 \textcolor{comment}{//}
+00181 \textcolor{keyword}{typedef} \textcolor{keyword}{struct }_FT_COMMON_DESCRIPTOR
+00182 \{
+00183     UCHAR   bLength;
+00184     UCHAR   bDescriptorType;
+00185 
+00186 \} FT_COMMON_DESCRIPTOR, *PFT_COMMON_DESCRIPTOR;
+00187 
+00188 \textcolor{comment}{//}
+00189 \textcolor{comment}{// Device descriptor}
+00190 \textcolor{comment}{//}
+00191 \textcolor{keyword}{typedef} \textcolor{keyword}{struct }_FT_DEVICE_DESCRIPTOR
+00192 \{
+00193     UCHAR   bLength;
+00194     UCHAR   bDescriptorType;
+00195     USHORT  bcdUSB;
+00196     UCHAR   bDeviceClass;
+00197     UCHAR   bDeviceSubClass;
+00198     UCHAR   bDeviceProtocol;
+00199     UCHAR   bMaxPacketSize0;
+00200     USHORT  idVendor;
+00201     USHORT  idProduct;
+00202     USHORT  bcdDevice;
+00203     UCHAR   iManufacturer;
+00204     UCHAR   iProduct;
+00205     UCHAR   iSerialNumber;
+00206     UCHAR   bNumConfigurations;
+00207 
+00208 \} FT_DEVICE_DESCRIPTOR, *PFT_DEVICE_DESCRIPTOR;
+00209 
+00210 \textcolor{comment}{//}
+00211 \textcolor{comment}{// Configuration descriptor}
+00212 \textcolor{comment}{//}
+00213 \textcolor{keyword}{typedef} \textcolor{keyword}{struct }_FT_CONFIGURATION_DESCRIPTOR
+00214 \{
+00215     UCHAR   bLength;
+00216     UCHAR   bDescriptorType;
+00217     USHORT  wTotalLength;
+00218     UCHAR   bNumInterfaces;
+00219     UCHAR   bConfigurationValue;
+00220     UCHAR   iConfiguration;
+00221     UCHAR   bmAttributes;
+00222     UCHAR   MaxPower;
+00223 
+00224 \} FT_CONFIGURATION_DESCRIPTOR, *PFT_CONFIGURATION_DESCRIPTOR;
+00225 
+00226 \textcolor{comment}{//}
+00227 \textcolor{comment}{// Interface descriptor}
+00228 \textcolor{comment}{//}
+00229 \textcolor{keyword}{typedef} \textcolor{keyword}{struct }_FT_INTERFACE_DESCRIPTOR
+00230 \{
+00231     UCHAR   bLength;
+00232     UCHAR   bDescriptorType;
+00233     UCHAR   bInterfaceNumber;
+00234     UCHAR   bAlternateSetting;
+00235     UCHAR   bNumEndpoints;
+00236     UCHAR   bInterfaceClass;
+00237     UCHAR   bInterfaceSubClass;
+00238     UCHAR   bInterfaceProtocol;
+00239     UCHAR   iInterface;
+00240 
+00241 \} FT_INTERFACE_DESCRIPTOR, *PFT_INTERFACE_DESCRIPTOR;
+00242 
+00243 \textcolor{comment}{//}
+00244 \textcolor{comment}{// String descriptor}
+00245 \textcolor{comment}{//}
+00246 \textcolor{keyword}{typedef} \textcolor{keyword}{struct }_FT_STRING_DESCRIPTOR
+00247 \{
+00248     UCHAR   bLength;
+00249     UCHAR   bDescriptorType;
+00250     WCHAR   szString[256];
+00251 
+00252 \} FT_STRING_DESCRIPTOR, *PFT_STRING_DESCRIPTOR;
+00253 
+00254 \textcolor{comment}{//}
+00255 \textcolor{comment}{// Pipe information}
+00256 \textcolor{comment}{//}
+00257 \textcolor{keyword}{typedef} \textcolor{keyword}{struct }_FT_PIPE_INFORMATION
+00258 \{
+00259     FT_PIPE_TYPE    PipeType;
+00260     UCHAR           PipeId;
+00261     USHORT          MaximumPacketSize;
+00262     UCHAR           Interval;
+00263 
+00264 \} FT_PIPE_INFORMATION, *PFT_PIPE_INFORMATION;
+00265 
+00266 \textcolor{comment}{//}
+00267 \textcolor{comment}{// Control setup packet}
+00268 \textcolor{comment}{//}
+00269 \textcolor{keyword}{typedef} \textcolor{keyword}{struct }_FT_SETUP_PACKET
+00270 \{
+00271     UCHAR   RequestType;
+00272     UCHAR   Request;
+00273     USHORT  Value;
+00274     USHORT  Index;
+00275     USHORT  Length;
+00276 
+00277 \} FT_SETUP_PACKET, *PFT_SETUP_PACKET;
+00278 
+00279 \textcolor{comment}{//}
+00280 \textcolor{comment}{// Notification callback type}
+00281 \textcolor{comment}{//}
+00282 \textcolor{keyword}{typedef} \textcolor{keyword}{enum} _E_FT_NOTIFICATION_CALLBACK_TYPE
+00283 \{
+00284     E_FT_NOTIFICATION_CALLBACK_TYPE_DATA,
+00285     E_FT_NOTIFICATION_CALLBACK_TYPE_GPIO,
+00286 
+00287 \} E_FT_NOTIFICATION_CALLBACK_TYPE;
+00288 
+00289 \textcolor{comment}{//}
+00290 \textcolor{comment}{// Notification callback information data}
+00291 \textcolor{comment}{//}
+00292 \textcolor{keyword}{typedef} \textcolor{keyword}{struct }_FT_NOTIFICATION_CALLBACK_INFO_DATA
+00293 \{
+00294     ULONG ulRecvNotificationLength;
+00295     UCHAR ucEndpointNo;
+00296 
+00297 \} FT_NOTIFICATION_CALLBACK_INFO_DATA;
+00298 
+00299 \textcolor{comment}{//}
+00300 \textcolor{comment}{// Notification callback information gpio}
+00301 \textcolor{comment}{//}
+00302 \textcolor{keyword}{typedef} \textcolor{keyword}{struct }_FT_NOTIFICATION_CALLBACK_INFO_GPIO
+00303 \{
+00304     BOOL bGPIO0;
+00305     BOOL bGPIO1;
+00306 
+00307 \} FT_NOTIFICATION_CALLBACK_INFO_GPIO;
+00308 
+00309 \textcolor{comment}{//}
+00310 \textcolor{comment}{// Notification callback function}
+00311 \textcolor{comment}{//}
+00312 \textcolor{keyword}{typedef} VOID(*FT_NOTIFICATION_CALLBACK)(PVOID pvCallbackContext, 
+      E_FT_NOTIFICATION_CALLBACK_TYPE eCallbackType, PVOID pvCallbackInfo);
+00313 
+00314 \textcolor{comment}{//}
+00315 \textcolor{comment}{// Chip configuration - FlashEEPROMDetection}
+00316 \textcolor{comment}{//}
+00317 \textcolor{preprocessor}{#define CONFIGURATION\_FLASH\_ROM\_BIT\_ROM                         0}
+00318 \textcolor{preprocessor}{#define CONFIGURATION\_FLASH\_ROM\_BIT\_MEMORY\_NOTEXIST             1}
+00319 \textcolor{preprocessor}{#define CONFIGURATION\_FLASH\_ROM\_BIT\_CUSTOMDATA\_INVALID          2}
+00320 \textcolor{preprocessor}{#define CONFIGURATION\_FLASH\_ROM\_BIT\_CUSTOMDATACHKSUM\_INVALID    3}
+00321 \textcolor{preprocessor}{#define CONFIGURATION\_FLASH\_ROM\_BIT\_CUSTOM                      4}
+00322 \textcolor{preprocessor}{#define CONFIGURATION\_FLASH\_ROM\_BIT\_GPIO\_INPUT                  5}
+00323 \textcolor{preprocessor}{#define CONFIGURATION\_FLASH\_ROM\_BIT\_GPIO\_0                      6}
+00324 \textcolor{preprocessor}{#define CONFIGURATION\_FLASH\_ROM\_BIT\_GPIO\_1                      7}
+00325 
+00326 \textcolor{comment}{//}
+00327 \textcolor{comment}{// Chip configuration - Battery charging}
+00328 \textcolor{comment}{//}
+00329 \textcolor{preprocessor}{#define CONFIGURATION\_BATCHG\_BIT\_OFFSET\_DCP                     6 // Bit 6 and Bit 7}
+00330 \textcolor{preprocessor}{#define CONFIGURATION\_BATCHG\_BIT\_OFFSET\_CDP                     4 // Bit 4 and Bit 5}
+00331 \textcolor{preprocessor}{#define CONFIGURATION\_BATCHG\_BIT\_OFFSET\_SDP                     2 // Bit 2 and Bit 3}
+00332 \textcolor{preprocessor}{#define CONFIGURATION\_BATCHG\_BIT\_OFFSET\_DEF                     0 // Bit 0 and Bit 1}
+00333 \textcolor{preprocessor}{#define CONFIGURATION\_BATCHG\_BIT\_MASK                           3 // 2 bits}
+00334 
+00335 \textcolor{comment}{//}
+00336 \textcolor{comment}{// Chip configuration - FIFO Clock Speed}
+00337 \textcolor{comment}{//}
+00338 \textcolor{keyword}{typedef} \textcolor{keyword}{enum}
+00339 \{
+00340     CONFIGURATION_FIFO_CLK_100,
+00341     CONFIGURATION_FIFO_CLK_66,
+00342     CONFIGURATION_FIFO_CLK_COUNT,
+00343 
+00344 \} CONFIGURATION_FIFO_CLK;
+00345 
+00346 \textcolor{comment}{//}
+00347 \textcolor{comment}{// Chip configuration - FIFO Mode}
+00348 \textcolor{comment}{//}
+00349 \textcolor{keyword}{typedef} \textcolor{keyword}{enum}
+00350 \{
+00351     CONFIGURATION_FIFO_MODE_245,
+00352     CONFIGURATION_FIFO_MODE_600,
+00353     CONFIGURATION_FIFO_MODE_COUNT,
+00354 
+00355 \} CONFIGURATION_FIFO_MODE;
+00356 
+00357 \textcolor{comment}{//}
+00358 \textcolor{comment}{// Chip configuration - Channel Configuration}
+00359 \textcolor{comment}{//}
+00360 \textcolor{keyword}{typedef} \textcolor{keyword}{enum}
+00361 \{
+00362     CONFIGURATION_CHANNEL_CONFIG_4,
+00363     CONFIGURATION_CHANNEL_CONFIG_2,
+00364     CONFIGURATION_CHANNEL_CONFIG_1,
+00365     CONFIGURATION_CHANNEL_CONFIG_1_OUTPIPE,
+00366     CONFIGURATION_CHANNEL_CONFIG_1_INPIPE,
+00367     CONFIGURATION_CHANNEL_CONFIG_COUNT,
+00368 
+00369 \} CONFIGURATION_CHANNEL_CONFIG;
+00370 
+00371 \textcolor{comment}{//}
+00372 \textcolor{comment}{// Chip configuration - Optional Feature Support}
+00373 \textcolor{comment}{//}
+00374 \textcolor{keyword}{typedef} \textcolor{keyword}{enum}
+00375 \{
+00376     CONFIGURATION_OPTIONAL_FEATURE_DISABLEALL                           = 0,
+00377     CONFIGURATION_OPTIONAL_FEATURE_ENABLEBATTERYCHARGING                = (0x1 << 0),
+00378     CONFIGURATION_OPTIONAL_FEATURE_DISABLECANCELSESSIONUNDERRUN         = (0x1 << 1),
+00379     CONFIGURATION_OPTIONAL_FEATURE_ENABLENOTIFICATIONMESSAGE_INCH1      = (0x1 << 2),
+00380     CONFIGURATION_OPTIONAL_FEATURE_ENABLENOTIFICATIONMESSAGE_INCH2      = (0x1 << 3),
+00381     CONFIGURATION_OPTIONAL_FEATURE_ENABLENOTIFICATIONMESSAGE_INCH3      = (0x1 << 4),
+00382     CONFIGURATION_OPTIONAL_FEATURE_ENABLENOTIFICATIONMESSAGE_INCH4      = (0x1 << 5),
+00383     CONFIGURATION_OPTIONAL_FEATURE_ENABLENOTIFICATIONMESSAGE_INCHALL    = (0xF << 2),
+00384     CONFIGURATION_OPTIONAL_FEATURE_DISABLEUNDERRUN_INCH1                = (0x1 << 6),
+00385     CONFIGURATION_OPTIONAL_FEATURE_DISABLEUNDERRUN_INCH2                = (0x1 << 7),
+00386     CONFIGURATION_OPTIONAL_FEATURE_DISABLEUNDERRUN_INCH3                = (0x1 << 8),
+00387     CONFIGURATION_OPTIONAL_FEATURE_DISABLEUNDERRUN_INCH4                = (0x1 << 9),
+00388     CONFIGURATION_OPTIONAL_FEATURE_DISABLEUNDERRUN_INCHALL              = (0xF << 6),
+00389     CONFIGURATION_OPTIONAL_FEATURE_SUPPORT_ENABLE_FIFO_IN_SUSPEND       = (1 << 10),
+00390     CONFIGURATION_OPTIONAL_FEATURE_SUPPORT_DISABLE_CHIP_POWERDOWN       = (1 << 11),
+00391     CONFIGURATION_OPTIONAL_FEATURE_ENABLEALL                            = 0xFFFF,
+00392 
+00393 \} CONFIGURATION_OPTIONAL_FEATURE_SUPPORT;
+00394 
+00395 \textcolor{comment}{//}
+00396 \textcolor{comment}{// Chip configuration - Default values}
+00397 \textcolor{comment}{//}
+00398 \textcolor{preprocessor}{#define CONFIGURATION\_DEFAULT\_VENDORID                          0x0403}
+00399 \textcolor{preprocessor}{#define CONFIGURATION\_DEFAULT\_PRODUCTID\_600                     0x601E}
+00400 \textcolor{preprocessor}{#define CONFIGURATION\_DEFAULT\_PRODUCTID\_601                     0x601F}
+00401 \textcolor{preprocessor}{#define CONFIGURATION\_DEFAULT\_POWERATTRIBUTES                   0xE0}
+00402 \textcolor{preprocessor}{#define CONFIGURATION\_DEFAULT\_POWERCONSUMPTION                  0x60}
+00403 \textcolor{preprocessor}{#define CONFIGURATION\_DEFAULT\_FIFOCLOCK                         CONFIGURATION\_FIFO\_CLK\_100}
+00404 \textcolor{preprocessor}{#define CONFIGURATION\_DEFAULT\_FIFOMODE                          CONFIGURATION\_FIFO\_MODE\_600}
+00405 \textcolor{preprocessor}{#define CONFIGURATION\_DEFAULT\_CHANNELCONFIG                     CONFIGURATION\_CHANNEL\_CONFIG\_4}
+00406 \textcolor{preprocessor}{#define CONFIGURATION\_DEFAULT\_OPTIONALFEATURE                   CONFIGURATION\_OPTIONAL\_FEATURE\_DISABLEALL}
+00407 \textcolor{preprocessor}{#define CONFIGURATION\_DEFAULT\_BATTERYCHARGING                   0xE4}
+00408 \textcolor{preprocessor}{#define CONFIGURATION\_DEFAULT\_BATTERYCHARGING\_TYPE\_DCP          0x3}
+00409 \textcolor{preprocessor}{#define CONFIGURATION\_DEFAULT\_BATTERYCHARGING\_TYPE\_CDP          0x2}
+00410 \textcolor{preprocessor}{#define CONFIGURATION\_DEFAULT\_BATTERYCHARGING\_TYPE\_SDP          0x1}
+00411 \textcolor{preprocessor}{#define CONFIGURATION\_DEFAULT\_BATTERYCHARGING\_TYPE\_OFF          0x0}
+00412 \textcolor{preprocessor}{#define CONFIGURATION\_DEFAULT\_FLASHDETECTION                    0x0}
+00413 \textcolor{preprocessor}{#define CONFIGURATION\_DEFAULT\_MSIOCONTROL                       0x10800}
+00414 \textcolor{preprocessor}{#define CONFIGURATION\_DEFAULT\_GPIOCONTROL                       0x0}
+00415 
+00416 \textcolor{comment}{//}
+00417 \textcolor{comment}{//}
+00418 \textcolor{comment}{// Chip configuration structure}
+00419 \textcolor{comment}{//}
+00420 \textcolor{keyword}{typedef} \textcolor{keyword}{struct}
+00421 \{
+00422     \textcolor{comment}{// Device Descriptor}
+00423     USHORT       VendorID;
+00424     USHORT       ProductID;
+00425 
+00426     \textcolor{comment}{// String Descriptors}
+00427     UCHAR        StringDescriptors[128];
+00428 
+00429     \textcolor{comment}{// Configuration Descriptor}
+00430     UCHAR        bInterval; \textcolor{comment}{//   Interrupt interval (Valid range: 1-16)}
+00431     UCHAR        PowerAttributes;
+00432     USHORT       PowerConsumption;
+00433 
+00434     \textcolor{comment}{// Data Transfer Configuration}
+00435     UCHAR        Reserved2;
+00436     UCHAR        FIFOClock;
+00437     UCHAR        FIFOMode;
+00438     UCHAR        ChannelConfig;
+00439 
+00440     \textcolor{comment}{// Optional Feature Support}
+00441     USHORT       OptionalFeatureSupport;
+00442     UCHAR        BatteryChargingGPIOConfig;
+00443     UCHAR        FlashEEPROMDetection;      \textcolor{comment}{// Read-only}
+00444 
+00445     \textcolor{comment}{// MSIO and GPIO Configuration}
+00446     ULONG        MSIO_Control;
+00447     ULONG        GPIO_Control;
+00448 
+00449 \} FT_60XCONFIGURATION, *PFT_60XCONFIGURATION;
+00450 
+00451 
+00452 \textcolor{comment}{//}
+00453 \textcolor{comment}{// Device types}
+00454 \textcolor{comment}{//}
+00455 
+00456 \textcolor{keyword}{typedef} \textcolor{keyword}{enum} _FT_DEVICE
+00457 \{
+00458     FT_DEVICE_UNKNOWN = 3,
+00459     FT_DEVICE_600 = 600,
+00460     FT_DEVICE_601 = 601,
+00461 
+00462 \} FT_DEVICE;
+00463 
+00464 
+00465 \textcolor{comment}{//}
+00466 \textcolor{comment}{// Device information}
+00467 \textcolor{comment}{//}
+00468 
+00469 \textcolor{keyword}{typedef} \textcolor{keyword}{enum} _FT_FLAGS
+00470 \{
+00471     FT_FLAGS_OPENED = 1,
+00472     FT_FLAGS_HISPEED = 2,
+00473     FT_FLAGS_SUPERSPEED = 4
+00474 
+00475 \} FT_FLAGS;
+00476 
+00477 \textcolor{keyword}{typedef} \textcolor{keyword}{struct }_FT_DEVICE_LIST_INFO_NODE
+00478 \{
+00479     ULONG Flags; \textcolor{comment}{// FT\_FLAGS}
+00480     ULONG Type;
+00481     ULONG ID;
+00482     DWORD LocId;
+00483     \textcolor{keywordtype}{char} SerialNumber[16];
+00484     \textcolor{keywordtype}{char} Description[32];
+00485     FT_HANDLE ftHandle;
+00486 
+00487 \} FT_DEVICE_LIST_INFO_NODE;
+00488 
+00489 
+00490 
+00491 \textcolor{comment}{//}
+00492 \textcolor{comment}{// API Functions}
+00493 \textcolor{comment}{//}
+00494 \textcolor{comment}{// Declare FTD3XX\_STATIC if using the static library}
+00495 \textcolor{comment}{// Else if using dynamic link library}
+00496 \textcolor{comment}{// Don't enable FTD3XX\_EXPORTS}
+00497 \textcolor{comment}{//}
+00498 
+00499 \textcolor{preprocessor}{#ifdef FTD3XX\_EXPORTS}
+00500 \textcolor{preprocessor}{#define FTD3XX\_API \_\_declspec(dllexport)}
+00501 \textcolor{preprocessor}{#elif defined(FTD3XX\_STATIC)}
+00502 \textcolor{preprocessor}{#define FTD3XX\_API}
+00503 \textcolor{preprocessor}{#else}
+00504 \textcolor{preprocessor}{#define FTD3XX\_API \_\_declspec(dllimport)}
+00505 \textcolor{preprocessor}{#endif}
+00506 
+00507 
+00508 \textcolor{preprocessor}{#ifdef \_\_cplusplus}
+00509 \textcolor{keyword}{extern} \textcolor{stringliteral}{"C"} \{
+00510 \textcolor{preprocessor}{#endif}
+00511 
+00512     FTD3XX_API
+00513         FT_STATUS WINAPI FT\_Create(
+00514         PVOID pvArg,
+00515         DWORD dwFlags,
+00516         FT_HANDLE *pftHandle
+00517         );
+00518 
+00519     FTD3XX_API
+00520         FT_STATUS WINAPI FT\_Close(
+00521         FT_HANDLE ftHandle
+00522         );
+00523 
+00524     FTD3XX_API
+00525         FT_STATUS WINAPI FT\_GetVIDPID(
+00526         FT_HANDLE ftHandle,
+00527         PUSHORT puwVID,
+00528         PUSHORT puwPID
+00529         );
+00530 
+00531     FTD3XX_API
+00532         FT_STATUS WINAPI FT\_WritePipe(
+00533         FT_HANDLE ftHandle,
+00534         UCHAR ucPipeID,
+00535         PUCHAR pucBuffer,
+00536         ULONG ulBufferLength,
+00537         PULONG pulBytesTransferred,
+00538         LPOVERLAPPED pOverlapped
+00539         );
+00540 
+00541     FTD3XX_API
+00542         FT_STATUS WINAPI FT\_ReadPipe(
+00543         FT_HANDLE ftHandle,
+00544         UCHAR ucPipeID,
+00545         PUCHAR pucBuffer,
+00546         ULONG ulBufferLength,
+00547         PULONG pulBytesTransferred,
+00548         LPOVERLAPPED pOverlapped
+00549         );
+00550 
+00551     FTD3XX_API
+00552         FT_STATUS WINAPI FT\_GetOverlappedResult(
+00553         FT_HANDLE ftHandle,
+00554         LPOVERLAPPED pOverlapped,
+00555         PULONG pulBytesTransferred,
+00556         BOOL bWait
+00557         );
+00558 
+00559     FTD3XX_API
+00560         FT_STATUS  WINAPI FT\_InitializeOverlapped(
+00561         FT_HANDLE ftHandle,
+00562         LPOVERLAPPED pOverlapped
+00563         );
+00564 
+00565     FTD3XX_API
+00566         FT_STATUS  WINAPI FT\_ReleaseOverlapped(
+00567         FT_HANDLE ftHandle,
+00568         LPOVERLAPPED pOverlapped
+00569         );
+00570 
+00571     FTD3XX_API
+00572         FT_STATUS WINAPI FT\_SetStreamPipe(
+00573         FT_HANDLE ftHandle,
+00574         BOOLEAN bAllWritePipes,
+00575         BOOLEAN bAllReadPipes,
+00576         UCHAR ucPipeID,
+00577         ULONG ulStreamSize
+00578         );
+00579 
+00580     FTD3XX_API
+00581         FT_STATUS WINAPI FT\_ClearStreamPipe(
+00582         FT_HANDLE ftHandle,
+00583         BOOLEAN bAllWritePipes,
+00584         BOOLEAN bAllReadPipes,
+00585         UCHAR ucPipeID
+00586         );
+00587 
+00588     FTD3XX_API
+00589         FT_STATUS WINAPI FT\_FlushPipe(
+00590         FT_HANDLE ftHandle,
+00591         UCHAR ucPipeID
+00592         );
+00593 
+00594     FTD3XX_API
+00595         FT_STATUS WINAPI FT\_AbortPipe(
+00596         FT_HANDLE ftHandle,
+00597         UCHAR ucPipeID
+00598         );
+00599 
+00600     FTD3XX_API
+00601         FT_STATUS WINAPI FT\_GetDeviceDescriptor(
+00602         FT_HANDLE ftHandle,
+00603         PFT\_DEVICE\_DESCRIPTOR ptDescriptor
+00604         );
+00605 
+00606     FTD3XX_API
+00607         FT_STATUS WINAPI FT\_GetConfigurationDescriptor(
+00608         FT_HANDLE ftHandle,
+00609         PFT\_CONFIGURATION\_DESCRIPTOR ptDescriptor
+00610         );
+00611 
+00612     FTD3XX_API
+00613         FT_STATUS WINAPI FT\_GetInterfaceDescriptor(
+00614         FT_HANDLE ftHandle,
+00615         UCHAR ucInterfaceIndex,
+00616         PFT\_INTERFACE\_DESCRIPTOR ptDescriptor
+00617         );
+00618 
+00619     FTD3XX_API
+00620         FT_STATUS WINAPI FT\_GetPipeInformation(
+00621         FT_HANDLE ftHandle,
+00622         UCHAR ucInterfaceIndex,
+00623         UCHAR ucPipeIndex,
+00624         PFT\_PIPE\_INFORMATION ptPipeInformation
+00625         );
+00626 
+00627     FTD3XX_API
+00628         FT_STATUS WINAPI FT\_GetStringDescriptor(
+00629         FT_HANDLE ftHandle,
+00630         UCHAR ucStringIndex,
+00631         PFT\_STRING\_DESCRIPTOR ptDescriptor
+00632         );
+00633 
+00634     FTD3XX_API
+00635         FT_STATUS WINAPI FT\_GetDescriptor(
+00636         FT_HANDLE ftHandle,
+00637         UCHAR ucDescriptorType,
+00638         UCHAR ucIndex,
+00639         PUCHAR pucBuffer,
+00640         ULONG ulBufferLength,
+00641         PULONG pulLengthTransferred
+00642         );
+00643 
+00644     FTD3XX_API
+00645         FT_STATUS WINAPI FT\_ControlTransfer(
+00646         FT_HANDLE ftHandle,
+00647         FT_SETUP_PACKET tSetupPacket,
+00648         PUCHAR pucBuffer,
+00649         ULONG ulBufferLength,
+00650         PULONG pulLengthTransferred
+00651         );
+00652 
+00653     FTD3XX_API
+00654         FT_STATUS WINAPI FT\_SetNotificationCallback(
+00655         FT_HANDLE ftHandle,
+00656         FT_NOTIFICATION_CALLBACK pCallback,
+00657         PVOID pvCallbackContext
+00658         );
+00659 
+00660     FTD3XX_API
+00661         VOID WINAPI FT\_ClearNotificationCallback(
+00662         FT_HANDLE ftHandle
+00663         );
+00664 
+00665     FTD3XX_API
+00666         FT_STATUS WINAPI FT\_GetChipConfiguration(
+00667         FT_HANDLE ftHandle,
+00668         PVOID pvConfiguration
+00669         );
+00670 
+00671     FTD3XX_API
+00672         FT_STATUS WINAPI FT\_SetChipConfiguration(
+00673         FT_HANDLE ftHandle,
+00674         PVOID pvConfiguration
+00675         );
+00676 
+00677     FTD3XX_API
+00678         FT_STATUS WINAPI FT\_GetFirmwareVersion(
+00679         FT_HANDLE ftHandle,
+00680         PULONG pulFirmwareVersion
+00681         );
+00682 
+00683     FTD3XX_API
+00684         FT_STATUS WINAPI FT\_ResetDevicePort(
+00685         FT_HANDLE ftHandle
+00686         );
+00687 
+00688     FTD3XX_API
+00689         FT_STATUS WINAPI FT\_CycleDevicePort(
+00690         FT_HANDLE ftHandle
+00691         );
+00692 
+00693     FTD3XX_API
+00694         FT_STATUS WINAPI FT\_CreateDeviceInfoList(
+00695         LPDWORD lpdwNumDevs
+00696         );
+00697 
+00698     FTD3XX_API
+00699         FT_STATUS WINAPI FT\_GetDeviceInfoList(
+00700         FT_DEVICE_LIST_INFO_NODE *ptDest,
+00701         LPDWORD lpdwNumDevs
+00702         );
+00703 
+00704     FTD3XX_API
+00705         FT_STATUS WINAPI FT\_GetDeviceInfoDetail(
+00706         DWORD dwIndex,
+00707         LPDWORD lpdwFlags,
+00708         LPDWORD lpdwType,
+00709         LPDWORD lpdwID,
+00710         LPDWORD lpdwLocId,
+00711         LPVOID lpSerialNumber,
+00712         LPVOID lpDescription,
+00713         FT_HANDLE *pftHandle
+00714         );
+00715 
+00716     FTD3XX_API
+00717         FT_STATUS WINAPI FT\_ListDevices(
+00718         PVOID pArg1,
+00719         PVOID pArg2,
+00720         DWORD Flags
+00721         );
+00722 
+00723     FTD3XX_API
+00724         FT_STATUS WINAPI FT\_IsDevicePath(
+00725         FT_HANDLE ftHandle,
+00726         CONST CHAR* pucDevicePath 
+00727         );
+00728 
+00729 
+00730     \textcolor{comment}{//}
+00731     \textcolor{comment}{// Version information}
+00732     \textcolor{comment}{//}
+00733 
+00734     FTD3XX_API
+00735         FT_STATUS WINAPI FT\_GetDriverVersion(
+00736         FT_HANDLE ftHandle,
+00737         LPDWORD lpdwVersion
+00738         );
+00739 
+00740     FTD3XX_API
+00741         FT_STATUS WINAPI FT\_GetLibraryVersion(
+00742         LPDWORD lpdwVersion
+00743         );
+00744 
+00745     FTD3XX_API
+00746     FT_STATUS WINAPI FT\_SetPipeTimeout(
+00747     FT_HANDLE ftHandle,
+00748     UCHAR ucPipeID,
+00749     ULONG TimeoutInMs
+00750     );
+00751 
+00752     FTD3XX_API
+00753     FT_STATUS WINAPI FT\_GetPipeTimeout(
+00754     FT_HANDLE ftHandle,
+00755     UCHAR ucPipeID,
+00756     PULONG pTimeoutInMs
+00757     );
+00758 
+00759     FTD3XX_API
+00760     FT_STATUS WINAPI FT\_SetSuspendTimeout(
+00761     FT_HANDLE ftHandle,
+00762     ULONG Timeout
+00763     );
+00764 
+00765     FTD3XX_API
+00766     FT_STATUS WINAPI FT\_GetSuspendTimeout(
+00767     FT_HANDLE ftHandle,
+00768     PULONG pTimeout
+00769     );
+00770 
+00771     FTD3XX_API
+00772     FT_STATUS WINAPI FT\_EnableGPIO(
+00773     FT_HANDLE ftHandle,
+00774     UINT32 u32Mask,
+00775     UINT32 u32Dir
+00776     );
+00777 
+00778 
+00779     FTD3XX_API
+00780     FT_STATUS WINAPI FT\_WriteGPIO(
+00781     FT_HANDLE ftHandle,
+00782     UINT32 u32Mask,
+00783     UINT32 u32Data
+00784     );
+00785 
+00786     FTD3XX_API
+00787     FT_STATUS WINAPI FT\_ReadGPIO(
+00788     FT_HANDLE ftHandle,
+00789     UINT32 *pu32Data
+00790     );
+00791 
+00792     FTD3XX_API
+00793     FT_STATUS WINAPI FT\_SetGPIOPull(
+00794     FT_HANDLE ftHandle,
+00795     UINT32 u32Mask,
+00796     UINT32 u32Pull
+00797     );
+00798 
+00799 \textcolor{preprocessor}{#ifdef \_\_cplusplus}
+00800 \}
+00801 \textcolor{preprocessor}{#endif}
+00802 
+00803 
+00804 \textcolor{comment}{// ---------------------------------------------------//}
+00805 
+00806 
+00807 \textcolor{preprocessor}{#endif // \_\_FTD3XX\_H\_\_}
+00808 
+\end{DoxyCode}

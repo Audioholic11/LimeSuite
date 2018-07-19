@@ -1,0 +1,161 @@
+\subsection{mcu.\+c}
+\label{mcu_8c_source}\index{/home/erik/prefix/default/src/limesuite-\/dev/mcu\+\_\+program/host\+\_\+src/mcu.\+c@{/home/erik/prefix/default/src/limesuite-\/dev/mcu\+\_\+program/host\+\_\+src/mcu.\+c}}
+
+\begin{DoxyCode}
+00001 \textcolor{preprocessor}{#include "mcu.h"}
+00002 \textcolor{preprocessor}{#include "spi.h"}
+00003 
+00004 \textcolor{preprocessor}{#ifdef \_\_cplusplus}
+00005 \textcolor{preprocessor}{    #include <chrono>}
+00006 \textcolor{preprocessor}{    #include <stdio.h>}
+00007 \textcolor{preprocessor}{    #include <thread>}
+00008 \textcolor{preprocessor}{    #include <chrono>}
+00009 \textcolor{keyword}{using namespace }std;
+00010 \textcolor{preprocessor}{#endif}
+00011 
+00012 \textcolor{keywordtype}{void} MCU_RunProcedure(uint8\_t \textcolor{keywordtype}{id})
+00013 \{
+00014     \textcolor{keyword}{const} uint16\_t x0002reg = SPI_read(0x0002) & 0xFF;
+00015     \textcolor{keyword}{const} uint16\_t interupt6 = 0x0008;
+00016     \textcolor{keyword}{const} uint16\_t addrs[5] = \{0x0006, 0x0, 0x0002, 0x0002, 0x0002\};
+00017     \textcolor{keyword}{const} uint16\_t values[5] = \{
+00018         (uint16\_t)(1),
+00019         (uint16\_t)(\textcolor{keywordtype}{id}),
+00020         (uint16\_t)(x0002reg & ~interupt6),
+00021         (uint16\_t)(x0002reg | interupt6),
+00022         (uint16\_t)(x0002reg & ~interupt6)\};
+00023     SPI_write_batch(addrs, values, 5);
+00024     SPI_read(0x0002);
+00025 \}
+00026 
+00027 uint8\_t MCU_WaitForStatus(uint16\_t timeout_ms)
+00028 \{
+00029     \textcolor{keyword}{auto} t1 = std::chrono::high\_resolution\_clock::now();
+00030     \textcolor{keyword}{auto} t2 = t1;
+00031     \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{short} value = 0;
+00032     std::this\_thread::sleep\_for(std::chrono::milliseconds(1));
+00033     \textcolor{keywordflow}{do} \{
+00034         value = SPI_read(0x0001) & 0xFF;
+00035         \textcolor{keywordflow}{if} (value != 0xFF) \textcolor{comment}{//working}
+00036             \textcolor{keywordflow}{break};
+00037         std::this\_thread::sleep\_for(std::chrono::milliseconds(1));
+00038         t2 = std::chrono::high\_resolution\_clock::now();
+00039     \}\textcolor{keywordflow}{while} (std::chrono::duration\_cast<std::chrono::milliseconds>(t2 - t1).count() < timeout\_ms);
+00040     SPI_write(0x0006, 0); \textcolor{comment}{//return SPI control to PC}
+00041     \textcolor{keywordflow}{return} value & 0x7F;
+00042 \}
+00043 
+00044 uint8\_t MCU_SetParameter(MCU_Parameter param, \textcolor{keywordtype}{float} value)
+00045 \{
+00046     uint8\_t x0002reg = SPI_read(0x0002);
+00047     \textcolor{keyword}{const} uint8\_t interupt7 = 0x04;
+00048     \textcolor{keywordflow}{if}(param==MCU_REF_CLK || param == MCU_BW)
+00049     \{
+00050         uint8\_t inputRegs[3];
+00051         value /= 1e6;
+00052         inputRegs[0] = (uint8\_t)value; \textcolor{comment}{//frequency integer part}
+00053         uint16\_t fracPart = value * 1000.0 - inputRegs[0]*1000.0;
+00054         inputRegs[1] = (fracPart >> 8) & 0xFF;
+00055         inputRegs[2] = fracPart & 0xFF;
+00056         \textcolor{keywordflow}{for}(uint8\_t i = 0; i < 3; ++i)
+00057         \{
+00058             SPI_write(0, inputRegs[2-i]);
+00059             SPI_write(0x0002, x0002reg | interupt7);
+00060             SPI_write(0x0002, x0002reg & ~interupt7);
+00061             \textcolor{keywordtype}{int} status = MCU_WaitForStatus(10);
+00062             \textcolor{keywordflow}{if}(status != 0)
+00063                 printf(\textcolor{stringliteral}{"MCU error status 0x%02X\(\backslash\)n"}, status);
+00064         \}
+00065     \}
+00066     \textcolor{keywordflow}{if}(param==MCU_REF_CLK)
+00067         MCU_RunProcedure(4);
+00068     \textcolor{keywordflow}{if}(param == MCU_BW)
+00069         MCU_RunProcedure(3);
+00070     \textcolor{keywordflow}{if}(param == MCU_EXT_LOOPBACK_PAIR)
+00071     \{
+00072         uint8\_t intVal = (int)value;
+00073         SPI_write(0, intVal);
+00074         SPI_write(0x0002, x0002reg | interupt7);
+00075         SPI_write(0x0002, x0002reg & ~interupt7);
+00076         \textcolor{keywordtype}{int} status = MCU_WaitForStatus(10);
+00077         \textcolor{keywordflow}{if}(status != 0)
+00078             printf(\textcolor{stringliteral}{"MCU error status 0x%02X\(\backslash\)n"}, status);
+00079         MCU_RunProcedure(9);
+00080     \}
+00081     \textcolor{keywordtype}{int} status = MCU_WaitForStatus(100);
+00082     \textcolor{keywordflow}{if}(status != 0)
+00083             printf(\textcolor{stringliteral}{"MCU error status 0x%02X\(\backslash\)n"}, status);
+00084     \textcolor{keywordflow}{return} status;
+00085 \}
+00086 
+00087 uint8\_t MCU_UploadProgram(\textcolor{keyword}{const} uint8\_t* binImage, \textcolor{keyword}{const} uint16\_t len)
+00088 \{
+00089 \textcolor{preprocessor}{#ifndef NDEBUG}
+00090     \textcolor{keyword}{auto} timeStart = std::chrono::high\_resolution\_clock::now();
+00091 \textcolor{preprocessor}{#endif // NDEBUG}
+00092     \textcolor{keyword}{const} \textcolor{keyword}{auto} timeout = std::chrono::milliseconds(100);
+00093     uint16\_t i;
+00094     \textcolor{keyword}{const} uint32\_t controlAddr = 0x0002;
+00095     \textcolor{keyword}{const} uint32\_t statusReg = 0x0003;
+00096     \textcolor{keyword}{const} uint32\_t addrDTM = 0x0004; \textcolor{comment}{//data to MCU}
+00097     \textcolor{keyword}{const} uint16\_t EMTPY\_WRITE\_BUFF = 1 << 0;
+00098     \textcolor{keyword}{const} uint16\_t PROGRAMMED = 1 << 6;
+00099     \textcolor{keyword}{const} uint8\_t fifoLen = 32;
+00100 
+00101     \textcolor{comment}{//reset MCU, set mode}
+00102     SPI_write(controlAddr, 0);
+00103     SPI_write(controlAddr, 2 & 0x3); \textcolor{comment}{//SRAM}
+00104 
+00105     \textcolor{keywordflow}{for}(i=0; i<len; i+=fifoLen)
+00106     \{
+00107         \textcolor{comment}{//wait till EMPTY\_WRITE\_BUFF = 1}
+00108         \textcolor{keywordtype}{bool} fifoEmpty = \textcolor{keyword}{false};
+00109         \textcolor{keyword}{auto} t1 = std::chrono::high\_resolution\_clock::now();
+00110         \textcolor{keyword}{auto} t2 = t1;
+00111         \textcolor{keywordflow}{do}\{
+00112             fifoEmpty = SPI_read(statusReg) & EMTPY\_WRITE\_BUFF;
+00113             t2 = std::chrono::high\_resolution\_clock::now();
+00114         \}\textcolor{keywordflow}{while}( !fifoEmpty && (t2-t1)<timeout);
+00115 
+00116         \textcolor{keywordflow}{if}(!fifoEmpty)
+00117             \textcolor{keywordflow}{return} -1;\textcolor{comment}{//ReportError(ETIMEDOUT, "MCU FIFO full");}
+00118 
+00119         \textcolor{comment}{//write 32 bytes into FIFO}
+00120         \{
+00121             uint8\_t j;
+00122             uint16\_t addr[fifoLen];
+00123             uint16\_t data[fifoLen];
+00124             \textcolor{keywordflow}{for}(j=0; j<fifoLen; ++j)
+00125             \{
+00126                 addr[j] = addrDTM;
+00127                 data[j] = binImage[i+j];
+00128             \}
+00129             SPI_write_batch(addr, data, fifoLen);
+00130         \}
+00131 \textcolor{preprocessor}{#ifndef NDEBUG}
+00132         printf(\textcolor{stringliteral}{"MCU programming : %4i/%4i\(\backslash\)r"}, i+fifoLen, len);
+00133 \textcolor{preprocessor}{#endif}
+00134     \}
+00135 
+00136     \textcolor{comment}{//wait until programmed flag}
+00137     \{
+00138         \textcolor{keywordtype}{bool} programmed = \textcolor{keyword}{false};
+00139         \textcolor{keyword}{auto} t1 = std::chrono::high\_resolution\_clock::now();
+00140         \textcolor{keyword}{auto} t2 = t1;
+00141         \textcolor{keywordflow}{do}\{
+00142             programmed = SPI_read(statusReg) & PROGRAMMED;
+00143             t2 = std::chrono::high\_resolution\_clock::now();
+00144         \}\textcolor{keywordflow}{while}( !programmed && (t2-t1)<timeout);
+00145 
+00146         \textcolor{keywordflow}{if}(!programmed)
+00147             \textcolor{keywordflow}{return} -1;\textcolor{comment}{//ReportError(ETIMEDOUT, "MCU not programmed");}
+00148     \}
+00149 \textcolor{preprocessor}{#ifndef NDEBUG}
+00150     \textcolor{keyword}{auto} timeEnd = std::chrono::high\_resolution\_clock::now();
+00151     printf(\textcolor{stringliteral}{"\(\backslash\)nMCU Programming finished, %li ms\(\backslash\)n"},
+00152             std::chrono::duration\_cast<std::chrono::milliseconds>
+00153             (timeEnd-timeStart).count());
+00154 \textcolor{preprocessor}{#endif //NDEBUG}
+00155     \textcolor{keywordflow}{return} 0;
+00156 \}
+\end{DoxyCode}

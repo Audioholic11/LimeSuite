@@ -1,0 +1,1160 @@
+\subsection{M\+C\+U\+\_\+\+B\+D.\+cpp}
+\label{MCU__BD_8cpp_source}\index{/home/erik/prefix/default/src/limesuite-\/dev/src/lms7002m\+\_\+mcu/\+M\+C\+U\+\_\+\+B\+D.\+cpp@{/home/erik/prefix/default/src/limesuite-\/dev/src/lms7002m\+\_\+mcu/\+M\+C\+U\+\_\+\+B\+D.\+cpp}}
+
+\begin{DoxyCode}
+00001 
+00007 \textcolor{preprocessor}{#include "MCU_BD.h"}
+00008 \textcolor{keyword}{using namespace }std;
+00009 \textcolor{preprocessor}{#include <string>}
+00010 \textcolor{preprocessor}{#include "MCU_File.h"}
+00011 \textcolor{preprocessor}{#include <sstream>}
+00012 \textcolor{preprocessor}{#include <fstream>}
+00013 \textcolor{preprocessor}{#include "LMS64CProtocol.h"}
+00014 \textcolor{preprocessor}{#include <assert.h>}
+00015 \textcolor{preprocessor}{#include <thread>}
+00016 \textcolor{preprocessor}{#include <list>}
+00017 \textcolor{preprocessor}{#include "LMS7002M.h"}
+00018 \textcolor{preprocessor}{#include "Logger.h"}
+00019 
+00020 \textcolor{keyword}{using namespace }lime;
+00021 
+00022 MCU\_BD::MCU\_BD()
+00023 \{
+00024     mLoadedProgramFilename = \textcolor{stringliteral}{""};
+00025     m\_bLoadedDebug = 0;
+00026     m\_bLoadedProd = 0;
+00027     stepsTotal = 0;
+00028     stepsDone = 0;
+00029     aborted = \textcolor{keyword}{false};
+00030     callback = \textcolor{keyword}{nullptr};
+00031     mChipID =0;
+00032     \textcolor{comment}{//ctor}
+00033     \textcolor{keywordtype}{int} i=0;
+00034     m\_serPort=NULL;
+00035     \textcolor{comment}{//default value,}
+00036     \textcolor{comment}{//must be verified during program exploatation}
+00037     m\_iLoopTries=20;
+00038     byte\_array\_size = cMaxFWSize;
+00039     \textcolor{comment}{// array initiallization}
+00040     \textcolor{keywordflow}{for} (i=0; i<=255; i++)\{
+00041             m\_SFR[i]=0x00;
+00042             m\_IRAM[i]=0x00;
+00043     \}
+00044     \textcolor{keywordflow}{for} (i=0; i<byte\_array\_size; i++)\{
+00045         byte\_array[i]=0x00;
+00046     \};
+00047 \}
+00048 
+00049 MCU\_BD::~MCU\_BD()
+00050 \{
+00051     \textcolor{comment}{//dtor}
+00052 \}
+00053 
+00054 \textcolor{keywordtype}{void} MCU\_BD::Initialize(IConnection* pSerPort, \textcolor{keywordtype}{unsigned} chipID, \textcolor{keywordtype}{unsigned} size)
+00055 \{
+00056     m\_serPort = pSerPort;
+00057     mChipID = chipID;
+00058     \textcolor{keywordflow}{if} (size > 0)
+00059         byte\_array\_size = size;
+00060 \}
+00061 
+00067 \textcolor{keywordtype}{int} MCU\_BD:: GetProgramCode(\textcolor{keyword}{const} \textcolor{keywordtype}{char}* inFileName, \textcolor{keywordtype}{bool} bin)
+00068 \{
+00069     \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{char} ch=0x00;
+00070     \textcolor{keywordtype}{bool} find\_byte=\textcolor{keyword}{false};
+00071     \textcolor{keywordtype}{int} i=0;
+00072 
+00073     \textcolor{keywordflow}{if}(!bin)
+00074     \{
+00075         MCU_File    inFile(inFileName, \textcolor{stringliteral}{"rb"});
+00076         \textcolor{keywordflow}{if} (inFile.FileOpened() == \textcolor{keyword}{false})
+00077             \textcolor{keywordflow}{return} -1;
+00078 
+00079         mLoadedProgramFilename = inFileName;
+00080         \textcolor{keywordflow}{try}
+00081         \{
+00082             inFile.ReadHex(byte\_array\_size-1);
+00083         \}
+00084         \textcolor{keywordflow}{catch} (...)
+00085         \{
+00086             \textcolor{keywordflow}{return} -1;
+00087         \}
+00088 
+00089         \textcolor{keywordflow}{for} (i=0; i<byte\_array\_size; i++)
+00090         \{
+00091             find\_byte=inFile.GetByte(i, ch);
+00092             \textcolor{keywordflow}{if} (find\_byte==\textcolor{keyword}{true})
+00093                 byte\_array[i]=ch;
+00094             \textcolor{keywordflow}{else}
+00095                 byte\_array[i]=0x00;
+00096         \};
+00097     \}
+00098     \textcolor{keywordflow}{else}
+00099     \{
+00100         \textcolor{keywordtype}{char} inByte = 0;
+00101         fstream fin;
+00102         fin.open(inFileName, ios::in | ios::binary);
+00103         \textcolor{keywordflow}{if} (fin.good() == \textcolor{keyword}{false})
+00104             \textcolor{keywordflow}{return} -1;
+00105         mLoadedProgramFilename = inFileName;
+00106         memset(byte\_array, 0, byte\_array\_size);
+00107         \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} i=0; i<byte\_array\_size && !fin.eof(); ++i)
+00108         \{
+00109             inByte = 0;
+00110             fin.read(&inByte, 1);
+00111             byte\_array[i]=inByte;
+00112         \}
+00113     \}
+00114     \textcolor{keywordflow}{return} 0;
+00115 \}
+00116 
+00117 \textcolor{keywordtype}{void} MCU\_BD:: mSPI\_write(
+00118             \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{short} addr\_reg,  \textcolor{comment}{// takes 16 bit address}
+00119             \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{short} data\_reg)  \textcolor{comment}{// takes 16 bit value}
+00120 \{
+00121     \textcolor{keywordflow}{if}(m\_serPort == \textcolor{keyword}{nullptr})
+00122         \textcolor{keywordflow}{return};
+00123     uint32\_t wrdata = addr\_reg << 16 | data\_reg;
+00124     m\_serPort->WriteLMS7002MSPI(&wrdata, 1, mChipID);
+00125 \}
+00126 
+00127 
+00128 \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{short} MCU\_BD:: mSPI\_read(
+00129             \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{short} addr\_reg)  \textcolor{comment}{// takes 16 bit address}
+00130 \{\textcolor{comment}{// returns 16 bit value}
+00131     \textcolor{keywordflow}{if}(m\_serPort == \textcolor{keyword}{nullptr})
+00132         \textcolor{keywordflow}{return} 0;
+00133     uint32\_t wrdata = addr\_reg << 16;
+00134     uint32\_t rddata = 0;
+00135     \textcolor{keywordflow}{if}(m\_serPort->ReadLMS7002MSPI(&wrdata, &rddata, 1, mChipID)!=0)
+00136         \textcolor{keywordflow}{return} 0;
+00137 
+00138     \textcolor{keywordflow}{return} rddata & 0xFFFF;
+00139 \}
+00140 
+00141 \textcolor{keywordtype}{int} MCU\_BD::WaitUntilWritten()\{
+00142 
+00143      \textcolor{comment}{// waits if WRITE\_REQ (REG3[2]) flag is equal to '1'}
+00144      \textcolor{comment}{// this means that  write operation is in progress}
+00145     \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{short} tempi=0x0000;
+00146     \textcolor{keywordtype}{int} countDown=m\_iLoopTries;  \textcolor{comment}{// Time out value}
+00147     tempi=mSPI\_read(0x0003); \textcolor{comment}{// REG3 read}
+00148 
+00149     \textcolor{keywordflow}{while} (( (tempi&0x0004) == 0x0004) && (countDown>0))
+00150     \{
+00151         tempi=mSPI\_read(0x0003); \textcolor{comment}{// REG3 read}
+00152         countDown--;
+00153     \}
+00154     \textcolor{keywordflow}{if} (countDown==0)
+00155         \textcolor{keywordflow}{return} -1; \textcolor{comment}{// an error occured, timer elapsed}
+00156     \textcolor{keywordflow}{else}
+00157         \textcolor{keywordflow}{return} 0; \textcolor{comment}{// Finished regularly}
+00158     \textcolor{comment}{// pass if WRITE\_REQ is '0'}
+00159 \}
+00160 
+00161 \textcolor{keywordtype}{int} MCU\_BD::ReadOneByte(\textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{char} * data)
+00162 \{
+00163     \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{short} tempi=0x0000;
+00164     \textcolor{keywordtype}{int} countDown=m\_iLoopTries;
+00165 
+00166      \textcolor{comment}{// waits when READ\_REQ (REG3[3]) flag is equal to '0'}
+00167      \textcolor{comment}{// this means that there is nothing to read}
+00168     tempi=mSPI\_read(0x0003); \textcolor{comment}{// REG3 read}
+00169 
+00170     \textcolor{keywordflow}{while} (((tempi&0x0008)==0x0000) && (countDown>0))
+00171     \{
+00172         \textcolor{comment}{// wait if READ\_REQ is '0'}
+00173         tempi=mSPI\_read(0x0003); \textcolor{comment}{// REG3 read}
+00174         countDown--;
+00175     \}
+00176 
+00177     \textcolor{keywordflow}{if} (countDown>0)
+00178     \{ \textcolor{comment}{// Time out has not occured}
+00179          tempi=mSPI\_read(0x0005); \textcolor{comment}{// REG5 read}
+00180           \textcolor{comment}{// return the read byte}
+00181          (* data) = (\textcolor{keywordtype}{unsigned} char) (tempi);
+00182     \}
+00183     \textcolor{keywordflow}{else}
+00184         (* data) =0;
+00185      \textcolor{comment}{// return the zero, default value}
+00186 
+00187     \textcolor{keywordflow}{if} (countDown==0)
+00188         \textcolor{keywordflow}{return} -1; \textcolor{comment}{// an error occured}
+00189     \textcolor{keywordflow}{else}
+00190         \textcolor{keywordflow}{return} 0; \textcolor{comment}{// finished regularly}
+00191 \}
+00192 
+00193 \textcolor{keywordtype}{int} MCU\_BD::One\_byte\_command(\textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{short} data1, \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{char} * rdata1)
+00194 \{
+00195     \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{char} tempc=0x00;
+00196     \textcolor{keywordtype}{int} retval=0;
+00197     *rdata1=0x00; \textcolor{comment}{//default return value}
+00198 
+00199     \textcolor{comment}{// sends the one byte command}
+00200     mSPI\_write(0x8004, data1); \textcolor{comment}{//REG4 write}
+00201     retval=WaitUntilWritten();
+00202     \textcolor{keywordflow}{if} (retval==-1) \textcolor{keywordflow}{return} -1;
+00203     \textcolor{comment}{// error if operation executes too long}
+00204 
+00205     \textcolor{comment}{// gets the one byte answer}
+00206     retval=ReadOneByte(&tempc);
+00207     \textcolor{keywordflow}{if} (retval==-1) \textcolor{keywordflow}{return} -1;
+00208     \textcolor{comment}{// error if operation takes too long}
+00209 
+00210     *rdata1=tempc;
+00211     \textcolor{keywordflow}{return} 0;
+00212 \}
+00213 
+00214 
+00215 \textcolor{keywordtype}{int} MCU\_BD::Three\_byte\_command(
+00216         \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{char} data1,\textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{char} data2,\textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{char} data3,
+00217         \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{char} * rdata1,\textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{char} * rdata2,\textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{char} * rdata3)\{
+00218 
+00219 
+00220         \textcolor{keywordtype}{int} retval=0;
+00221         *rdata1=0x00;
+00222         *rdata2=0x00;
+00223         *rdata3=0x00;
+00224 
+00225         mSPI\_write(0x8004, (\textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{short})(data1)); \textcolor{comment}{//REG4 write}
+00226         retval=WaitUntilWritten();
+00227         \textcolor{keywordflow}{if} (retval==-1) \textcolor{keywordflow}{return} -1;
+00228 
+00229         mSPI\_write(0x8004, (\textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{short})(data2)); \textcolor{comment}{//REG4 write}
+00230         retval=WaitUntilWritten();
+00231         \textcolor{keywordflow}{if} (retval==-1) \textcolor{keywordflow}{return} -1;
+00232 
+00233         mSPI\_write(0x8004, (\textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{short})(data3)); \textcolor{comment}{//REG4 write}
+00234         retval=WaitUntilWritten();
+00235         \textcolor{keywordflow}{if} (retval==-1) \textcolor{keywordflow}{return} -1;
+00236 
+00237         retval= ReadOneByte(rdata1);
+00238         \textcolor{keywordflow}{if} (retval==-1) \textcolor{keywordflow}{return} -1;
+00239 
+00240         retval= ReadOneByte(rdata2);
+00241         \textcolor{keywordflow}{if} (retval==-1) \textcolor{keywordflow}{return} -1;
+00242 
+00243         retval= ReadOneByte(rdata3);
+00244         \textcolor{keywordflow}{if} (retval==-1) \textcolor{keywordflow}{return} -1;
+00245 
+00246         \textcolor{keywordflow}{return} 0;
+00247 \}
+00248 
+00249 \textcolor{keywordtype}{int} MCU\_BD::Change\_MCUFrequency(\textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{char} data) \{
+00250 
+00251     \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{char} tempc1, tempc2, tempc3=0x00;
+00252     \textcolor{keywordtype}{int} retval=0;
+00253     \textcolor{comment}{// code 0x7E is for writing the SFR registers}
+00254     retval=Three\_byte\_command(0x7E, 0x8E, data, &tempc1, &tempc2, &tempc3);
+00255     \textcolor{comment}{// PMSR register, address 0x8E}
+00256     \textcolor{keywordflow}{return} retval;
+00257 \}
+00258 
+00259 \textcolor{keywordtype}{int} MCU\_BD::Read\_IRAM()
+00260 \{
+00261     \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{char} tempc1, tempc2, tempc3=0x00;
+00262     \textcolor{keywordtype}{int} i=0;
+00263     \textcolor{keywordtype}{int} retval=0;
+00264 
+00265     \textcolor{comment}{//default}
+00266     \textcolor{comment}{//IRAM array initialization}
+00267     \textcolor{keywordflow}{for} (i=0; i<=255; i++)
+00268         m\_IRAM[i]=0x00;
+00269 
+00270     stepsTotal.store(256);
+00271     stepsDone.store(0);
+00272     aborted.store(\textcolor{keyword}{false});
+00273     \textcolor{keywordflow}{for} (i=0; i<=255; i++)
+00274     \{
+00275         \textcolor{comment}{// code 0x78 is for reading the IRAM locations}
+00276         retval=Three\_byte\_command(0x78, ((\textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{char})(i)), 0x00,&tempc1, &tempc2, &tempc3);
+00277         \textcolor{keywordflow}{if} (retval==0)
+00278             m\_IRAM[i]=tempc3;
+00279         \textcolor{keywordflow}{else}
+00280         \{
+00281             i=256; \textcolor{comment}{// error, stop}
+00282             aborted.store(\textcolor{keyword}{true});
+00283         \}
+00284         ++stepsDone;
+00285 \textcolor{preprocessor}{#ifndef NDEBUG}
+00286         printf(\textcolor{stringliteral}{"MCU reading IRAM: %2i/256\(\backslash\)r"}, stepsDone.load());
+00287 \textcolor{preprocessor}{#endif}
+00288         Wait\_CLK\_Cycles(64);
+00289     \}
+00290 \textcolor{preprocessor}{#ifndef NDEBUG}
+00291     printf(\textcolor{stringliteral}{"\(\backslash\)nMCU reading IRAM finished\(\backslash\)n"});
+00292 \textcolor{preprocessor}{#endif}
+00293     \textcolor{keywordflow}{return} retval;
+00294 \}
+00295 
+00296 \textcolor{keywordtype}{int} MCU\_BD::Erase\_IRAM()
+00297 \{
+00298     \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{char} tempc1, tempc2, tempc3=0x00;
+00299     \textcolor{keywordtype}{int} retval=0;
+00300     \textcolor{keywordtype}{int} i=0;
+00301 
+00302     \textcolor{comment}{//default ini.}
+00303     \textcolor{keywordflow}{for} (i=0; i<=255; i++)
+00304             m\_IRAM[i]=0x00;
+00305 
+00306     stepsTotal.store(256);
+00307     stepsDone.store(0);
+00308     aborted.store(\textcolor{keyword}{false});
+00309     \textcolor{keywordflow}{for} (i=0; i<=255; i++)
+00310     \{
+00311             m\_IRAM[i]=0x00;
+00312             \textcolor{comment}{// code 0x7C is for writing the IRAM locations}
+00313             retval=Three\_byte\_command(0x7C, ((\textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{char})(i)), 0x00,&tempc1, &tempc2, &tempc3);
+00314             \textcolor{keywordflow}{if} (retval == -1)
+00315             \{
+00316                 i = 256;
+00317                 aborted.store(\textcolor{keyword}{true});
+00318             \}
+00319             ++stepsDone;
+00320 \textcolor{preprocessor}{#ifndef NDEBUG}
+00321             printf(\textcolor{stringliteral}{"MCU erasing IRAM: %2i/256\(\backslash\)r"}, stepsDone.load());
+00322 \textcolor{preprocessor}{#endif}
+00323     \}
+00324 \textcolor{preprocessor}{#ifndef NDEBUG}
+00325     printf(\textcolor{stringliteral}{"\(\backslash\)nMCU erasing IRAM finished\(\backslash\)n"});
+00326 \textcolor{preprocessor}{#endif}
+00327     \textcolor{keywordflow}{return} retval;
+00328 \}
+00329 
+00330 \textcolor{keywordtype}{int} MCU\_BD::Read\_SFR()
+00331 \{
+00332     \textcolor{keywordtype}{int} i=0;
+00333     \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{char} tempc1, tempc2, tempc3=0x00;
+00334     \textcolor{keywordtype}{int} retval=0;
+00335 
+00336     stepsTotal.store(48);
+00337     stepsDone.store(0);
+00338     aborted.store(\textcolor{keyword}{false});
+00339 
+00340     \textcolor{comment}{//default m\_SFR array initialization}
+00341     \textcolor{keywordflow}{for} (i=0; i<=255; i++)
+00342             m\_SFR[i]=0x00;
+00343 
+00344     \textcolor{comment}{// code 0x7A is for reading the SFR registers}
+00345     retval=Three\_byte\_command(0x7A, 0x80, 0x00, &tempc1, &tempc2, &tempc3); \textcolor{comment}{// P0}
+00346     \textcolor{keywordflow}{if} (retval==-1) \textcolor{keywordflow}{return} -1;
+00347     m\_SFR[0x80]=tempc3;
+00348 
+00349     retval=Three\_byte\_command(0x7A, 0x81, 0x00, &tempc1, &tempc2, &tempc3); \textcolor{comment}{// SP}
+00350     \textcolor{keywordflow}{if} (retval==-1) \textcolor{keywordflow}{return} -1;
+00351     m\_SFR[0x81]=tempc3;
+00352 
+00353     retval=Three\_byte\_command(0x7A, 0x82, 0x00, &tempc1, &tempc2, &tempc3); \textcolor{comment}{// DPL0}
+00354     \textcolor{keywordflow}{if} (retval==-1) \textcolor{keywordflow}{return} -1;
+00355     m\_SFR[0x82]=tempc3;
+00356 
+00357     retval=Three\_byte\_command(0x7A, 0x83, 0x00, &tempc1, &tempc2, &tempc3); \textcolor{comment}{// DPH0}
+00358     \textcolor{keywordflow}{if} (retval==-1) \textcolor{keywordflow}{return} -1;
+00359     m\_SFR[0x83]=tempc3;
+00360 
+00361     retval=Three\_byte\_command(0x7A, 0x84, 0x00, &tempc1, &tempc2, &tempc3); \textcolor{comment}{// DPL1}
+00362     \textcolor{keywordflow}{if} (retval==-1) \textcolor{keywordflow}{return} -1;
+00363     m\_SFR[0x84]=tempc3;
+00364 
+00365     retval=Three\_byte\_command(0x7A, 0x85, 0x00, &tempc1, &tempc2, &tempc3); \textcolor{comment}{// DPH1}
+00366     \textcolor{keywordflow}{if} (retval==-1) \textcolor{keywordflow}{return} -1;
+00367     m\_SFR[0x85]=tempc3;
+00368 
+00369     stepsDone.store(6);
+00370 
+00371     retval=Three\_byte\_command(0x7A, 0x86, 0x00, &tempc1, &tempc2, &tempc3); \textcolor{comment}{// DPS}
+00372     \textcolor{keywordflow}{if} (retval==-1) \textcolor{keywordflow}{return} -1;
+00373     m\_SFR[0x86]=tempc3;
+00374 
+00375     retval=Three\_byte\_command(0x7A, 0x87, 0x00, &tempc1, &tempc2, &tempc3); \textcolor{comment}{// PCON}
+00376     \textcolor{keywordflow}{if} (retval==-1) \textcolor{keywordflow}{return} -1;
+00377     m\_SFR[0x87]=tempc3;
+00378 
+00379     retval=Three\_byte\_command(0x7A, 0x88, 0x00, &tempc1, &tempc2, &tempc3); \textcolor{comment}{// TCON}
+00380     \textcolor{keywordflow}{if} (retval==-1) \textcolor{keywordflow}{return} -1;
+00381     m\_SFR[0x88]=tempc3;
+00382 
+00383     retval=Three\_byte\_command(0x7A, 0x89, 0x00, &tempc1, &tempc2, &tempc3); \textcolor{comment}{// TMOD}
+00384     \textcolor{keywordflow}{if} (retval==-1) \textcolor{keywordflow}{return} -1;
+00385     m\_SFR[0x89]=tempc3;
+00386 
+00387     retval=Three\_byte\_command(0x7A, 0x8A, 0x00, &tempc1, &tempc2, &tempc3); \textcolor{comment}{// TL0}
+00388     \textcolor{keywordflow}{if} (retval==-1) \textcolor{keywordflow}{return} -1;
+00389     m\_SFR[0x8A]=tempc3;
+00390 
+00391     retval=Three\_byte\_command(0x7A, 0x8B, 0x00, &tempc1, &tempc2, &tempc3); \textcolor{comment}{// TL1}
+00392     \textcolor{keywordflow}{if} (retval==-1) \textcolor{keywordflow}{return} -1;
+00393     m\_SFR[0x8B]=tempc3;
+00394 
+00395     stepsDone.store(12);
+00396 
+00397     retval=Three\_byte\_command(0x7A, 0x8C, 0x00, &tempc1, &tempc2, &tempc3); \textcolor{comment}{// TH0}
+00398     \textcolor{keywordflow}{if} (retval==-1) \textcolor{keywordflow}{return} -1;
+00399     m\_SFR[0x8C]=tempc3;
+00400 
+00401     retval=Three\_byte\_command(0x7A, 0x8D, 0x00, &tempc1, &tempc2, &tempc3); \textcolor{comment}{// TH1}
+00402     \textcolor{keywordflow}{if} (retval==-1) \textcolor{keywordflow}{return} -1;
+00403     m\_SFR[0x8D]=tempc3;
+00404 
+00405     retval=Three\_byte\_command(0x7A, 0x8E, 0x00, &tempc1, &tempc2, &tempc3); \textcolor{comment}{// PMSR}
+00406     \textcolor{keywordflow}{if} (retval==-1) \textcolor{keywordflow}{return} -1;
+00407     m\_SFR[0x8E]=tempc3;
+00408 
+00409     retval=Three\_byte\_command(0x7A, 0x90, 0x00, &tempc1, &tempc2, &tempc3); \textcolor{comment}{// P1}
+00410     \textcolor{keywordflow}{if} (retval==-1) \textcolor{keywordflow}{return} -1;
+00411     m\_SFR[0x90]=tempc3;
+00412 
+00413     retval=Three\_byte\_command(0x7A, 0x91, 0x00, &tempc1, &tempc2, &tempc3); \textcolor{comment}{// DIR1}
+00414     \textcolor{keywordflow}{if} (retval==-1) \textcolor{keywordflow}{return} -1;
+00415     m\_SFR[0x91]=tempc3;
+00416 
+00417     retval=Three\_byte\_command(0x7A, 0x98, 0x00, &tempc1, &tempc2, &tempc3); \textcolor{comment}{// SCON}
+00418     \textcolor{keywordflow}{if} (retval==-1) \textcolor{keywordflow}{return} -1;
+00419     m\_SFR[0x98]=tempc3;
+00420 
+00421     stepsDone.store(18);
+00422 
+00423     retval=Three\_byte\_command(0x7A, 0x99, 0x00, &tempc1, &tempc2, &tempc3); \textcolor{comment}{// SBUF}
+00424     \textcolor{keywordflow}{if} (retval==-1) \textcolor{keywordflow}{return} -1;
+00425     m\_SFR[0x99]=tempc3;
+00426 
+00427     retval=Three\_byte\_command(0x7A, 0xA0, 0x00, &tempc1, &tempc2, &tempc3); \textcolor{comment}{// P2}
+00428     \textcolor{keywordflow}{if} (retval==-1) \textcolor{keywordflow}{return} -1;
+00429     m\_SFR[0xA0]=tempc3;
+00430 
+00431     retval=Three\_byte\_command(0x7A, 0xA1, 0x00, &tempc1, &tempc2, &tempc3); \textcolor{comment}{// DIR2}
+00432     \textcolor{keywordflow}{if} (retval==-1) \textcolor{keywordflow}{return} -1;
+00433     m\_SFR[0xA1]=tempc3;
+00434 
+00435     retval=Three\_byte\_command(0x7A, 0xA2, 0x00, &tempc1, &tempc2, &tempc3); \textcolor{comment}{// DIR0}
+00436     \textcolor{keywordflow}{if} (retval==-1) \textcolor{keywordflow}{return} -1;
+00437     m\_SFR[0xA2]=tempc3;
+00438 
+00439     retval=Three\_byte\_command(0x7A, 0xA8, 0x00, &tempc1, &tempc2, &tempc3); \textcolor{comment}{// IEN0}
+00440     \textcolor{keywordflow}{if} (retval==-1) \textcolor{keywordflow}{return} -1;
+00441     m\_SFR[0xA8]=tempc3;
+00442 
+00443     stepsDone.store(24);
+00444 
+00445     retval=Three\_byte\_command(0x7A, 0xA9, 0x00, &tempc1, &tempc2, &tempc3); \textcolor{comment}{// IEN1}
+00446     \textcolor{keywordflow}{if} (retval==-1) \textcolor{keywordflow}{return} -1;
+00447     m\_SFR[0xA9]=tempc3;
+00448 
+00449     retval=Three\_byte\_command(0x7A, 0xB0, 0x00, &tempc1, &tempc2, &tempc3); \textcolor{comment}{// EECTRL}
+00450     \textcolor{keywordflow}{if} (retval==-1) \textcolor{keywordflow}{return} -1;
+00451     m\_SFR[0xB0]=tempc3;
+00452 
+00453     retval=Three\_byte\_command(0x7A, 0xB1, 0x00, &tempc1, &tempc2, &tempc3); \textcolor{comment}{// EEDATA}
+00454     \textcolor{keywordflow}{if} (retval==-1) \textcolor{keywordflow}{return} -1;
+00455     m\_SFR[0xB1]=tempc3;
+00456 
+00457     retval=Three\_byte\_command(0x7A, 0xB8, 0x00, &tempc1, &tempc2, &tempc3); \textcolor{comment}{// IP0}
+00458     \textcolor{keywordflow}{if} (retval==-1) \textcolor{keywordflow}{return} -1;
+00459     m\_SFR[0xB8]=tempc3;
+00460 
+00461     retval=Three\_byte\_command(0x7A, 0xB9, 0x00, &tempc1, &tempc2, &tempc3); \textcolor{comment}{// IP1}
+00462     \textcolor{keywordflow}{if} (retval==-1) \textcolor{keywordflow}{return} -1;
+00463     m\_SFR[0xB9]=tempc3;
+00464 
+00465     retval=Three\_byte\_command(0x7A, 0xBF, 0x00, &tempc1, &tempc2, &tempc3); \textcolor{comment}{// USR2}
+00466     \textcolor{keywordflow}{if} (retval==-1) \textcolor{keywordflow}{return} -1;
+00467     m\_SFR[0xBF]=tempc3;
+00468 
+00469     stepsDone.store(30);
+00470 
+00471     retval=Three\_byte\_command(0x7A, 0xC0, 0x00, &tempc1, &tempc2, &tempc3); \textcolor{comment}{// IRCON}
+00472     \textcolor{keywordflow}{if} (retval==-1) \textcolor{keywordflow}{return} -1;
+00473     m\_SFR[0xC0]=tempc3;
+00474 
+00475     retval=Three\_byte\_command(0x7A, 0xC8, 0x00, &tempc1, &tempc2, &tempc3); \textcolor{comment}{// T2CON}
+00476     \textcolor{keywordflow}{if} (retval==-1) \textcolor{keywordflow}{return} -1;
+00477     m\_SFR[0xC8]=tempc3;
+00478 
+00479     retval=Three\_byte\_command(0x7A, 0xCA, 0x00, &tempc1, &tempc2, &tempc3); \textcolor{comment}{// RCAP2L}
+00480     \textcolor{keywordflow}{if} (retval==-1) \textcolor{keywordflow}{return} -1;
+00481     m\_SFR[0xCA]=tempc3;
+00482 
+00483     retval=Three\_byte\_command(0x7A, 0xCB, 0x00, &tempc1, &tempc2, &tempc3); \textcolor{comment}{// RCAP2H}
+00484     \textcolor{keywordflow}{if} (retval==-1) \textcolor{keywordflow}{return} -1;
+00485     m\_SFR[0xCB]=tempc3;
+00486 
+00487     retval=Three\_byte\_command(0x7A, 0xCC, 0x00, &tempc1, &tempc2, &tempc3); \textcolor{comment}{// TL2}
+00488     \textcolor{keywordflow}{if} (retval==-1) \textcolor{keywordflow}{return} -1;
+00489     m\_SFR[0xCC]=tempc3;
+00490 
+00491     retval=Three\_byte\_command(0x7A, 0xCD, 0x00, &tempc1, &tempc2, &tempc3); \textcolor{comment}{// TH2}
+00492     \textcolor{keywordflow}{if} (retval==-1) \textcolor{keywordflow}{return} -1;
+00493     m\_SFR[0xCD]=tempc3;
+00494 
+00495     stepsDone.store(36);
+00496 
+00497     retval=Three\_byte\_command(0x7A, 0xD0, 0x00, &tempc1, &tempc2, &tempc3); \textcolor{comment}{// PSW}
+00498     \textcolor{keywordflow}{if} (retval==-1) \textcolor{keywordflow}{return} -1;
+00499     m\_SFR[0xD0]=tempc3;
+00500 
+00501     retval=Three\_byte\_command(0x7A, 0xE0, 0x00, &tempc1, &tempc2, &tempc3); \textcolor{comment}{// ACC}
+00502     \textcolor{keywordflow}{if} (retval==-1) \textcolor{keywordflow}{return} -1;
+00503     m\_SFR[0xE0]=tempc3;
+00504 
+00505     retval=Three\_byte\_command(0x7A, 0xF0, 0x00, &tempc1, &tempc2, &tempc3); \textcolor{comment}{// B}
+00506     \textcolor{keywordflow}{if} (retval==-1) \textcolor{keywordflow}{return} -1;
+00507     m\_SFR[0xF0]=tempc3;
+00508 
+00509     retval=Three\_byte\_command(0x7A, 0xEC, 0x00, &tempc1, &tempc2, &tempc3); \textcolor{comment}{// REG0}
+00510     \textcolor{keywordflow}{if} (retval==-1) \textcolor{keywordflow}{return} -1;
+00511     m\_SFR[0xEC]=tempc3;
+00512 
+00513     retval=Three\_byte\_command(0x7A, 0xED, 0x00, &tempc1, &tempc2, &tempc3); \textcolor{comment}{// REG1}
+00514     \textcolor{keywordflow}{if} (retval==-1) \textcolor{keywordflow}{return} -1;
+00515     m\_SFR[0xED]=tempc3;
+00516 
+00517     retval=Three\_byte\_command(0x7A, 0xEE, 0x00, &tempc1, &tempc2, &tempc3); \textcolor{comment}{// REG2}
+00518     \textcolor{keywordflow}{if} (retval==-1) \textcolor{keywordflow}{return} -1;
+00519     m\_SFR[0xEE]=tempc3;
+00520 
+00521     stepsDone.store(42);
+00522 
+00523     retval=Three\_byte\_command(0x7A, 0xEF, 0x00, &tempc1, &tempc2, &tempc3); \textcolor{comment}{// REG3}
+00524     \textcolor{keywordflow}{if} (retval==-1) \textcolor{keywordflow}{return} -1;
+00525     m\_SFR[0xEF]=tempc3;
+00526 
+00527     retval=Three\_byte\_command(0x7A, 0xF4, 0x00, &tempc1, &tempc2, &tempc3); \textcolor{comment}{// REG4}
+00528     \textcolor{keywordflow}{if} (retval==-1) \textcolor{keywordflow}{return} -1;
+00529     m\_SFR[0xF4]=tempc3;
+00530 
+00531     retval=Three\_byte\_command(0x7A, 0xF5, 0x00, &tempc1, &tempc2, &tempc3); \textcolor{comment}{// REG5}
+00532     \textcolor{keywordflow}{if} (retval==-1) \textcolor{keywordflow}{return} -1;
+00533     m\_SFR[0xF5]=tempc3;
+00534 
+00535     retval=Three\_byte\_command(0x7A, 0xF6, 0x00, &tempc1, &tempc2, &tempc3); \textcolor{comment}{// REG6}
+00536     \textcolor{keywordflow}{if} (retval==-1) \textcolor{keywordflow}{return} -1;
+00537     m\_SFR[0xF6]=tempc3;
+00538 
+00539     retval=Three\_byte\_command(0x7A, 0xF7, 0x00, &tempc1, &tempc2, &tempc3); \textcolor{comment}{// REG7}
+00540     \textcolor{keywordflow}{if} (retval==-1) \textcolor{keywordflow}{return} -1;
+00541     m\_SFR[0xF7]=tempc3;
+00542 
+00543     retval=Three\_byte\_command(0x7A, 0xFC, 0x00, &tempc1, &tempc2, &tempc3); \textcolor{comment}{// REG8}
+00544     \textcolor{keywordflow}{if} (retval==-1) \textcolor{keywordflow}{return} -1;
+00545     m\_SFR[0xFC]=tempc3;
+00546 
+00547     retval=Three\_byte\_command(0x7A, 0xFD, 0x00, &tempc1, &tempc2, &tempc3); \textcolor{comment}{// REG9}
+00548     \textcolor{keywordflow}{if} (retval==-1) \textcolor{keywordflow}{return} -1;
+00549     m\_SFR[0xFD]=tempc3;
+00550 
+00551     stepsDone.store(48);
+00552 
+00553     \textcolor{keywordflow}{return} 0;
+00554 \}
+00555 
+00556 \textcolor{keywordtype}{void} MCU\_BD::Wait\_CLK\_Cycles(\textcolor{keywordtype}{int} delay)
+00557 \{
+00559     \textcolor{keywordtype}{int} i=0;
+00560     \textcolor{keywordflow}{for} (i=0;i<(delay/64);i++)
+00561            mSPI\_read(0x0003);
+00562 \}
+00563 
+00567 \textcolor{keywordtype}{int} MCU\_BD::Program\_MCU(\textcolor{keywordtype}{int} m\_iMode1, \textcolor{keywordtype}{int} m\_iMode0)
+00568 \{
+00569     IConnection::MCU_PROG_MODE mode;
+00570     \textcolor{keywordflow}{switch}(m\_iMode1 << 1 | m\_iMode0)
+00571     \{
+00572     \textcolor{keywordflow}{case} 0: mode = IConnection::MCU\_PROG\_MODE::RESET; \textcolor{keywordflow}{break};
+00573     \textcolor{keywordflow}{case} 1: mode = IConnection::MCU\_PROG\_MODE::EEPROM\_AND\_SRAM; \textcolor{keywordflow}{break};
+00574     \textcolor{keywordflow}{case} 2: mode = IConnection::MCU\_PROG\_MODE::SRAM; \textcolor{keywordflow}{break};
+00575     \textcolor{keywordflow}{case} 3: mode = IConnection::MCU\_PROG\_MODE::BOOT\_SRAM\_FROM\_EEPROM; \textcolor{keywordflow}{break};
+00576     \textcolor{keywordflow}{default}: mode = IConnection::MCU\_PROG\_MODE::RESET; \textcolor{keywordflow}{break};
+00577     \}
+00578     \textcolor{keywordflow}{return} Program\_MCU(byte\_array,mode);
+00579 \}
+00580 
+00581 \textcolor{keywordtype}{int} MCU\_BD::Program\_MCU(\textcolor{keyword}{const} uint8\_t* buffer, \textcolor{keyword}{const} IConnection::MCU_PROG_MODE 
+      mode)
+00582 \{
+00583     \textcolor{keywordflow}{if}(!m\_serPort)
+00584         \textcolor{keywordflow}{return} ReportError(ENOLINK, \textcolor{stringliteral}{"Device not connected"});
+00585 
+00586     \textcolor{keywordflow}{if} (byte\_array\_size <= 8192)
+00587         \textcolor{keywordflow}{return} m\_serPort->ProgramMCU(buffer, byte\_array\_size, mode, callback);
+00588 \textcolor{preprocessor}{#ifndef NDEBUG}
+00589     \textcolor{keyword}{auto} timeStart = std::chrono::high\_resolution\_clock::now();
+00590 \textcolor{preprocessor}{#endif}
+00591     \textcolor{keyword}{const} \textcolor{keyword}{auto} timeout = std::chrono::milliseconds(100);
+00592     \textcolor{keyword}{const} uint32\_t controlAddr = 0x0002 << 16;
+00593     \textcolor{keyword}{const} uint32\_t statusReg = 0x0003 << 16;
+00594     \textcolor{keyword}{const} uint32\_t addrDTM = 0x0004 << 16; \textcolor{comment}{//data to MCU}
+00595     \textcolor{keyword}{const} uint16\_t EMTPY\_WRITE\_BUFF = 1 << 0;
+00596     \textcolor{keyword}{const} uint16\_t PROGRAMMED = 1 << 6;
+00597     \textcolor{keyword}{const} uint8\_t fifoLen = 64;
+00598     uint32\_t wrdata[fifoLen];
+00599     uint32\_t rddata = 0;
+00600     \textcolor{keywordtype}{int} status;
+00601     \textcolor{keywordtype}{bool} abort = \textcolor{keyword}{false};
+00602         \textcolor{comment}{//reset MCU, set mode}
+00603     wrdata[0] = controlAddr | 0;
+00604     wrdata[1] = controlAddr | (mode & 0x3);
+00605     \textcolor{keywordflow}{if}((status = m\_serPort->WriteLMS7002MSPI(wrdata, 2, mChipID))!=0)
+00606         \textcolor{keywordflow}{return} status;
+00607 
+00608     \textcolor{keywordflow}{if}(callback)
+00609         abort = callback(0, byte\_array\_size, \textcolor{stringliteral}{""});
+00610 
+00611     \textcolor{keywordflow}{for}(uint16\_t i=0; i<byte\_array\_size && !abort; i+=fifoLen)
+00612     \{
+00613         \textcolor{comment}{//wait till EMPTY\_WRITE\_BUFF = 1}
+00614         \textcolor{keywordtype}{bool} fifoEmpty = \textcolor{keyword}{false};
+00615         wrdata[0] = statusReg;
+00616         \textcolor{keyword}{auto} t1 = std::chrono::high\_resolution\_clock::now();
+00617         \textcolor{keyword}{auto} t2 = t1;
+00618         \textcolor{keywordflow}{do}\{
+00619             \textcolor{keywordflow}{if}((status = m\_serPort->ReadLMS7002MSPI(wrdata, &rddata, 1, mChipID))!=0)
+00620                 \textcolor{keywordflow}{return} status;
+00621             fifoEmpty = rddata & EMTPY\_WRITE\_BUFF;
+00622             t2 = std::chrono::high\_resolution\_clock::now();
+00623         \}\textcolor{keywordflow}{while}( (!fifoEmpty) && (t2-t1)<timeout);
+00624 
+00625         \textcolor{keywordflow}{if}(!fifoEmpty)
+00626             \textcolor{keywordflow}{return} ReportError(ETIMEDOUT, \textcolor{stringliteral}{"MCU FIFO full"});
+00627 
+00628         \textcolor{comment}{//write 32 bytes into FIFO}
+00629         \textcolor{keywordflow}{for}(uint8\_t j=0; j<fifoLen; ++j)
+00630             wrdata[j] = addrDTM | buffer[i+j];
+00631         \textcolor{keywordflow}{if}((status = m\_serPort->WriteLMS7002MSPI(wrdata,fifoLen, mChipID))!=0)
+00632             \textcolor{keywordflow}{return} status;
+00633         \textcolor{keywordflow}{if}(callback)
+00634             abort = callback(i+fifoLen, byte\_array\_size, \textcolor{stringliteral}{""});
+00635 \textcolor{preprocessor}{#ifndef NDEBUG}
+00636         printf(\textcolor{stringliteral}{"MCU programming : %4i/%4li\(\backslash\)r"}, i+fifoLen, \textcolor{keywordtype}{long}(byte\_array\_size));
+00637 \textcolor{preprocessor}{#endif}
+00638     \};
+00639     \textcolor{keywordflow}{if}(abort)
+00640         \textcolor{keywordflow}{return} ReportError(-1, \textcolor{stringliteral}{"operation aborted by user"});
+00641 
+00642     \textcolor{comment}{//wait until programmed flag}
+00643     wrdata[0] = statusReg;
+00644     \textcolor{keywordtype}{bool} programmed = \textcolor{keyword}{false};
+00645     \textcolor{keyword}{auto} t1 = std::chrono::high\_resolution\_clock::now();
+00646     \textcolor{keyword}{auto} t2 = t1;
+00647     \textcolor{keywordflow}{do}\{
+00648         \textcolor{keywordflow}{if}((status = m\_serPort->ReadLMS7002MSPI(wrdata, &rddata, 1, mChipID))!=0)
+00649             \textcolor{keywordflow}{return} status;
+00650         programmed = rddata & PROGRAMMED;
+00651         t2 = std::chrono::high\_resolution\_clock::now();
+00652     \}\textcolor{keywordflow}{while}( (!programmed) && (t2-t1)<timeout);
+00653 \textcolor{preprocessor}{#ifndef NDEBUG}
+00654     \textcolor{keyword}{auto} timeEnd = std::chrono::high\_resolution\_clock::now();
+00655     printf(\textcolor{stringliteral}{"\(\backslash\)nMCU Programming finished, %li ms\(\backslash\)n"},
+00656             std::chrono::duration\_cast<std::chrono::milliseconds>
+00657             (timeEnd-timeStart).count());
+00658 \textcolor{preprocessor}{#endif}
+00659     \textcolor{keywordflow}{if}(!programmed)
+00660         \textcolor{keywordflow}{return} ReportError(ETIMEDOUT, \textcolor{stringliteral}{"MCU not programmed"});
+00661     \textcolor{keywordflow}{return} 0;
+00662 \}
+00663 
+00664 \textcolor{keywordtype}{void} MCU\_BD::Reset\_MCU()
+00665 \{
+00666     \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{short} tempi=0x0000;  \textcolor{comment}{// was 0x0000}
+00667     mSPI\_write(0x8002, tempi);
+00668     tempi=0x0000;
+00669     mSPI\_write(0x8000, tempi);
+00670 \}
+00671 
+00672 \textcolor{keywordtype}{int} MCU\_BD::RunProductionTest\_MCU()
+00673 \{
+00674     \textcolor{keywordtype}{string} temps;
+00675     \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{short} tempi = 0x0080;  \textcolor{comment}{// was 0x0000}
+00676     \textcolor{keywordtype}{int} m\_iMode1\_ = 0;
+00677     \textcolor{keywordtype}{int} m\_iMode0\_ = 0;
+00678 
+00679     \textcolor{keywordflow}{if} (m\_bLoadedProd == 0)
+00680     \{
+00681         \textcolor{keywordflow}{if} (GetProgramCode(\textcolor{stringliteral}{"lms7suite\_mcu/ptest.hex"}, \textcolor{keyword}{false}) != 0)
+00682             \textcolor{keywordflow}{return} -1;
+00683     \}
+00684     \textcolor{comment}{//MCU gets control over SPI switch}
+00685     mSPI\_write(0x0006, 0x0001); \textcolor{comment}{//REG6 write}
+00686 
+00687     \textcolor{comment}{// reset MCU}
+00688     tempi = 0x0080;
+00689     mSPI\_write(0x8002, tempi); \textcolor{comment}{// REG2}
+00690     tempi = 0x0000;
+00691     mSPI\_write(0x8000, tempi); \textcolor{comment}{// REG0}
+00692 
+00693     \textcolor{keywordflow}{if} (m\_bLoadedProd == 0)
+00694     \{
+00695         \textcolor{comment}{//select programming mode "01" for SRAM and EEPROM}
+00696         m\_iMode1\_ = 0; m\_iMode0\_ = 1;
+00697     \}
+00698     \textcolor{keywordflow}{else}
+00699     \{
+00700         \textcolor{comment}{//boot from EEPROM}
+00701         m\_iMode1\_ = 1; m\_iMode0\_ = 1;
+00702     \}
+00703 
+00704     \textcolor{comment}{//upload hex file}
+00705     \textcolor{keywordflow}{if} (Program\_MCU(m\_iMode1\_, m\_iMode0\_) != 0)
+00706         \textcolor{keywordflow}{return} -1; \textcolor{comment}{//failed to program}
+00707 
+00708     \textcolor{keywordflow}{if} (m\_bLoadedProd == 0)
+00709     \{
+00710         Wait\_CLK\_Cycles(256 * 100);  \textcolor{comment}{// for programming mode, prog.code has been already loaded into MCU}
+00711         m\_iMode1\_ = 0; m\_iMode0\_ = 1;
+00712     \}
+00713     \textcolor{keywordflow}{else}
+00714     \{
+00715         Wait\_CLK\_Cycles(256 * 400);
+00716         \textcolor{comment}{// for booting from EEPROM mode, must wait for some longer delay, at least 8kB/(80kb/s)=0.1s}
+00717         m\_iMode1\_ = 1; m\_iMode0\_ = 1;
+00718     \}
+00719 
+00720     \textcolor{comment}{// global variable}
+00721     m\_bLoadedProd = 1;  \textcolor{comment}{// the ptest.hex has been loaded}
+00722     m\_bLoadedDebug = 0;
+00723 
+00724     \textcolor{comment}{//tempi = 0x0000;}
+00725     \textcolor{comment}{// EXT\_INT2=1, external interrupt 2 is raised}
+00726     mSPI\_write(0x8002, formREG2command(0, 0, 0, 1, m\_iMode1\_, m\_iMode0\_)); \textcolor{comment}{// EXT\_INT2=1}
+00727     \textcolor{comment}{// here you can put any Delay function}
+00728     Wait\_CLK\_Cycles(256);
+00729     \textcolor{comment}{// EXT\_INT2=0, external interrupt 2 is pulled down}
+00730     mSPI\_write(0x8002, formREG2command(0, 0, 0, 0, m\_iMode1\_, m\_iMode0\_)); \textcolor{comment}{// EXT\_INT2=0}
+00731 
+00732     \textcolor{comment}{// wait for some time MCU to execute the tests}
+00733     \textcolor{comment}{// the time is approximately 20ms}
+00734     \textcolor{comment}{// here you can put any Delay function}
+00735     Wait\_CLK\_Cycles(256 * 100);
+00736 
+00737     \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{short} retval = 0;
+00738     retval = mSPI\_read(1); \textcolor{comment}{//REG1 read}
+00739 
+00740     \textcolor{comment}{// show the return value at the MCU Control Panel}
+00741     \textcolor{comment}{//int temps = wxString::Format("Result is: 0x%02X", retval);}
+00742     \textcolor{comment}{//ReadResult->SetLabel(temps);}
+00743 
+00744     \textcolor{keywordflow}{if} (retval == 0x10)
+00745     \{
+00746         tempi = 0x0055;
+00747         mSPI\_write(0x8000, tempi); \textcolor{comment}{// P0=0x55;}
+00748         \textcolor{comment}{// EXT\_INT3=1, external interrupt 3 is raised}
+00749         mSPI\_write(0x8002, formREG2command(0, 0, 1, 0, m\_iMode1\_, m\_iMode0\_)); \textcolor{comment}{// EXT\_INT3=1}
+00750         \textcolor{comment}{// here you can put any Delay function}
+00751         Wait\_CLK\_Cycles(256);
+00752         \textcolor{comment}{// EXT\_INT3=0, external interrupt 3 is pulled down}
+00753         mSPI\_write(0x8002, formREG2command(0, 0, 0, 0, m\_iMode1\_, m\_iMode0\_)); \textcolor{comment}{// EXT\_INT3=0}
+00754         Wait\_CLK\_Cycles(256 * 5);
+00755         retval = mSPI\_read(1);  \textcolor{comment}{//REG1 read}
+00756         \textcolor{keywordflow}{if} (retval != 0x55)
+00757             temps = \textcolor{stringliteral}{"Ext. interrupt 3 test failed."};
+00758         \textcolor{keywordflow}{else}
+00759         \{
+00760             tempi = 0x00AA;
+00761             mSPI\_write(0x8000, tempi); \textcolor{comment}{// P0=0xAA;}
+00762             \textcolor{comment}{// EXT\_INT4=1, external interrupt 4 is raised}
+00763             mSPI\_write(0x8002, formREG2command(0, 1, 0, 0, m\_iMode1\_, m\_iMode0\_)); \textcolor{comment}{// EXT\_INT4=1}
+00764             \textcolor{comment}{// here you can put any Delay function}
+00765             Wait\_CLK\_Cycles(256);
+00766             \textcolor{comment}{// EXT\_INT4=0, external interrupt 4 is pulled down}
+00767             mSPI\_write(0x8002, formREG2command(0, 0, 0, 0, m\_iMode1\_, m\_iMode0\_)); \textcolor{comment}{// EXT\_INT4=0}
+00768             Wait\_CLK\_Cycles(256 * 5);
+00769             retval = mSPI\_read(1);  \textcolor{comment}{//REG1 read}
+00770             \textcolor{keywordflow}{if} (retval != 0xAA)  temps = \textcolor{stringliteral}{"Ext. interrupt 4 test failed."};
+00771             \textcolor{keywordflow}{else} \{
+00772                 tempi = 0x0055;
+00773                 mSPI\_write(0x8000, tempi); \textcolor{comment}{// P0=0x55;}
+00774                 \textcolor{comment}{// EXT\_INT5=1, external interrupt 5 is raised}
+00775                 mSPI\_write(0x8002, formREG2command(1, 0, 0, 0, m\_iMode1\_, m\_iMode0\_)); \textcolor{comment}{// EXT\_INT5=1}
+00776                 \textcolor{comment}{// here you can put any Delay function}
+00777                 Wait\_CLK\_Cycles(256);
+00778                 \textcolor{comment}{// EXT\_INT5=0, external interrupt 5 is pulled down}
+00779                 mSPI\_write(0x8002, formREG2command(0, 0, 0, 0, m\_iMode1\_, m\_iMode0\_)); \textcolor{comment}{// EXT\_INT5=0}
+00780                 Wait\_CLK\_Cycles(256 * 5);
+00781                 retval = mSPI\_read(1);  \textcolor{comment}{//REG1 read}
+00782                 \textcolor{keywordflow}{if} (retval != 0x55)
+00783                 \{
+00784                     temps = \textcolor{stringliteral}{"Ext. interrupt 5 test failed."};
+00785                     \textcolor{keywordflow}{return} -1;
+00786                 \}
+00787                 \textcolor{keywordflow}{else}
+00788                 \{
+00789                     temps = \textcolor{stringliteral}{"Production test finished. MCU is OK."};
+00790                     \textcolor{keywordflow}{return} 0;
+00791                 \}
+00792             \}
+00793         \}
+00794     \}
+00795     \textcolor{keywordflow}{else}
+00796     \{
+00797         \textcolor{keywordflow}{if} ((retval & 0xF0) == 0x30)
+00798         \{ \textcolor{comment}{// detected error code}
+00799             \textcolor{keywordflow}{if} ((retval & 0x0F) > 0)
+00800             \{
+00801                 \textcolor{keywordtype}{char} ctemp[64];
+00802                 sprintf(ctemp, \textcolor{stringliteral}{"Test %i failed"}, (retval & 0x0F));
+00803                 temps = ctemp;
+00804                 \textcolor{keywordflow}{return} -1;
+00805             \}
+00806             \textcolor{keywordflow}{else}
+00807             \{
+00808                 temps = \textcolor{stringliteral}{"Test failed"};
+00809                 \textcolor{keywordflow}{return} -1;
+00810             \}
+00811         \}
+00812         \textcolor{keywordflow}{else}
+00813         \{
+00814             \textcolor{comment}{// test too long. Failure.}
+00815             temps = \textcolor{stringliteral}{"Test failed."};
+00816             \textcolor{keywordflow}{return} -1;
+00817         \}
+00818     \}
+00819 
+00820     \textcolor{comment}{//Baseband gets back the control over SPI switch}
+00821     mSPI\_write(0x0006, 0x0000); \textcolor{comment}{//REG6 write}
+00822 
+00823     \textcolor{keywordflow}{return} 0;
+00824 \}
+00825 
+00826 \textcolor{keywordtype}{void} MCU\_BD::RunTest\_MCU(\textcolor{keywordtype}{int} m\_iMode1, \textcolor{keywordtype}{int} m\_iMode0, \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{short} test\_code, \textcolor{keywordtype}{int} m\_iDebug) \{
+00827 
+00828     \textcolor{keywordtype}{int} i=0;
+00829     \textcolor{keywordtype}{int} limit=0;
+00830     \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{short} tempi=0x0000;
+00831     \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{short} basei=0x0000;
+00832 
+00833     \textcolor{keywordflow}{if}  (test\_code<=15) basei=(test\_code<<4);
+00834     \textcolor{keywordflow}{else} basei=0x0000;
+00835 
+00836     basei=basei&0xFFF0; \textcolor{comment}{// not necessery}
+00837     \textcolor{comment}{// 4 LSBs are zeros}
+00838 
+00839     \textcolor{comment}{// variable basei contains test no. value at bit positions 7-4}
+00840     \textcolor{comment}{// used for driving the P0 input}
+00841     \textcolor{comment}{// P0 defines the test no.}
+00842 
+00843     \textcolor{keywordflow}{if} ((test\_code>7)||(test\_code==0))
+00844         limit=1;
+00845     \textcolor{keywordflow}{else}
+00846         limit=50;
+00847 
+00848     \textcolor{comment}{// tests 8 to 14 have short duration}
+00849 
+00850     \textcolor{keywordflow}{if} (m\_iDebug==1) \textcolor{keywordflow}{return}; \textcolor{comment}{// normal MCU operating mode required}
+00851 
+00852     \textcolor{comment}{// EXT\_INT2=1, external interrupt 2 is raised}
+00853     tempi=0x0000;  \textcolor{comment}{// changed}
+00854     \textcolor{keywordtype}{int} m\_iExt2=1;
+00855 
+00856     \textcolor{keywordflow}{if} (m\_iExt2==1)  tempi=tempi|0x0004;
+00857     \textcolor{keywordflow}{if} (m\_iMode1==1) tempi=tempi|0x0002;
+00858     \textcolor{keywordflow}{if} (m\_iMode0==1) tempi=tempi|0x0001;
+00859 
+00860     \textcolor{comment}{// tempi variable is driving the mspi\_REG2}
+00861 
+00862     mSPI\_write(0x8002, tempi); \textcolor{comment}{// REG2 write}
+00863 
+00864     \textcolor{comment}{// generating waveform}
+00865     \textcolor{keywordflow}{for} (i=0; i<=limit; i++)
+00866     \{
+00867         tempi=basei|0x000C;
+00868         mSPI\_write(0x8000, tempi);
+00869         \textcolor{comment}{// REG0 write}
+00870         Wait\_CLK\_Cycles(256);
+00871         tempi=basei|0x000D;
+00872         mSPI\_write(0x8000, tempi);
+00873         \textcolor{comment}{// REG0 write  - P0(0) set}
+00874         Wait\_CLK\_Cycles(256);
+00875         tempi=basei|0x000C;
+00876         mSPI\_write(0x8000, tempi);
+00877         \textcolor{comment}{// REG0 write}
+00878         Wait\_CLK\_Cycles(256);
+00879         tempi=basei|0x000E;
+00880         mSPI\_write(0x8000, tempi);
+00881         \textcolor{comment}{// REG0 write - PO(1) set}
+00882         Wait\_CLK\_Cycles(256);
+00883 
+00884         \textcolor{keywordflow}{if} (i==0) \{
+00885             \textcolor{comment}{// EXT\_INT2=0}
+00886             \textcolor{comment}{// external interrupt 2 is pulled down}
+00887             tempi=0x0000; \textcolor{comment}{// changed}
+00888             m\_iExt2=0;
+00889             \textcolor{keywordflow}{if} (m\_iExt2==1)  tempi=tempi|0x0004;
+00890             \textcolor{keywordflow}{if} (m\_iMode1==1) tempi=tempi|0x0002;
+00891             \textcolor{keywordflow}{if} (m\_iMode0==1) tempi=tempi|0x0001;
+00892             mSPI\_write(0x8002, tempi);
+00893             \textcolor{comment}{// REG2 write}
+00894         \}
+00895     \}
+00896 \}
+00897 
+00898 
+00899 \textcolor{keywordtype}{void} MCU\_BD::RunFabTest\_MCU(\textcolor{keywordtype}{int} m\_iMode1, \textcolor{keywordtype}{int} m\_iMode0, \textcolor{keywordtype}{int} m\_iDebug) \{
+00900 
+00901     \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{short} tempi=0x0000;
+00902 
+00903     \textcolor{keywordflow}{if} (m\_iDebug==1) \textcolor{keywordflow}{return}; \textcolor{comment}{// normal MCU operating mode required}
+00904 
+00905     \textcolor{comment}{// EXT\_INT2=1, external interrupt 2 is raised}
+00906     tempi=0x0000;  \textcolor{comment}{// changed}
+00907     \textcolor{keywordtype}{int} m\_iExt2=1;
+00908     \textcolor{keywordflow}{if} (m\_iExt2==1)  tempi=tempi|0x0004;
+00909     \textcolor{keywordflow}{if} (m\_iMode1==1) tempi=tempi|0x0002;
+00910     \textcolor{keywordflow}{if} (m\_iMode0==1) tempi=tempi|0x0001;
+00911     mSPI\_write(0x8002, tempi); \textcolor{comment}{// REG2 write}
+00912 
+00913     Wait\_CLK\_Cycles(256);
+00914 
+00915     \textcolor{comment}{// EXT\_INT2=0, external interrupt 2 is pulled down}
+00916     tempi=0x0000; \textcolor{comment}{// changed}
+00917     m\_iExt2=0;
+00918     \textcolor{keywordflow}{if} (m\_iExt2==1)  tempi=tempi|0x0004;
+00919     \textcolor{keywordflow}{if} (m\_iMode1==1) tempi=tempi|0x0002;
+00920     \textcolor{keywordflow}{if} (m\_iMode0==1) tempi=tempi|0x0001;
+00921     mSPI\_write(0x8002, tempi);
+00922 
+00923     Wait\_CLK\_Cycles(256);
+00924 
+00925 \}
+00926 
+00927 \textcolor{keywordtype}{void} MCU\_BD::DebugModeSet\_MCU(\textcolor{keywordtype}{int} m\_iMode1, \textcolor{keywordtype}{int} m\_iMode0)
+00928 \{
+00929         \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{short} tempi=0x00C0;
+00930         \textcolor{comment}{// bit DEBUG is set}
+00931         \textcolor{keywordtype}{int} m\_iExt2=0;
+00932         \textcolor{keywordflow}{if} (m\_iExt2==1)  tempi=tempi|0x0004;
+00933         \textcolor{keywordflow}{if} (m\_iMode1==1) tempi=tempi|0x0002;
+00934         \textcolor{keywordflow}{if} (m\_iMode0==1) tempi=tempi|0x0001;
+00935 
+00936         \textcolor{comment}{// Select debug mode}
+00937         mSPI\_write(0x8002, tempi);
+00938         \textcolor{comment}{// REG2 write}
+00939 \}
+00940 
+00941  \textcolor{keywordtype}{void} MCU\_BD::DebugModeExit\_MCU(\textcolor{keywordtype}{int} m\_iMode1, \textcolor{keywordtype}{int} m\_iMode0)
+00942 \{
+00943 
+00944         \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{short} tempi=0x0000; \textcolor{comment}{// bit DEBUG is zero}
+00945         \textcolor{keywordtype}{int} m\_iExt2=0;
+00946 
+00947         \textcolor{keywordflow}{if} (m\_iExt2==1)  tempi=tempi|0x0004;
+00948         \textcolor{keywordflow}{if} (m\_iMode1==1) tempi=tempi|0x0002;
+00949         \textcolor{keywordflow}{if} (m\_iMode0==1) tempi=tempi|0x0001;
+00950         \textcolor{comment}{// To run mode}
+00951         mSPI\_write(0x8002, tempi);  \textcolor{comment}{// REG2 write}
+00952 \}
+00953 
+00954 \textcolor{keywordtype}{int} MCU\_BD::ResetPC\_MCU()
+00955 \{
+00956      \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{char} tempc1=0x00;
+00957      \textcolor{keywordtype}{int} retval=0;
+00958      retval=One\_byte\_command(0x70, &tempc1);
+00959      \textcolor{keywordflow}{return} retval;
+00960 \}
+00961 
+00962 \textcolor{keywordtype}{int} MCU\_BD::RunInstr\_MCU(\textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{short} * pPCVAL)
+00963 \{
+00964     \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{char} tempc1, tempc2, tempc3=0x00;
+00965     \textcolor{keywordtype}{int} retval=0;
+00966     retval=Three\_byte\_command(0x74, 0x00, 0x00, &tempc1, &tempc2, &tempc3);
+00967     \textcolor{keywordflow}{if} (retval==-1) (*pPCVAL)=0;
+00968     \textcolor{keywordflow}{else} (*pPCVAL)=tempc2*256+tempc3;
+00969     \textcolor{keywordflow}{return} retval;
+00970 \}
+00971 
+00974 MCU_BD::ProgressInfo MCU\_BD::GetProgressInfo()\textcolor{keyword}{ const}
+00975 \textcolor{keyword}{}\{
+00976     ProgressInfo info;
+00977     info.stepsDone = stepsDone.load();
+00978     info.stepsTotal = stepsTotal.load();
+00979     info.aborted = aborted.load();
+00980     \textcolor{keywordflow}{return} info;
+00981 \}
+00982 
+00983 \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{int} MCU\_BD::formREG2command(\textcolor{keywordtype}{int} m\_iExt5, \textcolor{keywordtype}{int} m\_iExt4, \textcolor{keywordtype}{int} m\_iExt3, \textcolor{keywordtype}{int} m\_iExt2, \textcolor{keywordtype}{int} m\_iMode1, \textcolor{keywordtype}{int} 
+      m\_iMode0) \{
+00984     \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{int} tempi = 0x0000;
+00985     \textcolor{keywordflow}{if} (m\_iExt5 == 1)  tempi = tempi | 0x0020;
+00986     \textcolor{keywordflow}{if} (m\_iExt4 == 1)  tempi = tempi | 0x0010;
+00987     \textcolor{keywordflow}{if} (m\_iExt3 == 1)  tempi = tempi | 0x0008;
+00988     \textcolor{keywordflow}{if} (m\_iExt2 == 1)  tempi = tempi | 0x0004;
+00989     \textcolor{keywordflow}{if} (m\_iMode1 == 1) tempi = tempi | 0x0002;
+00990     \textcolor{keywordflow}{if} (m\_iMode0 == 1) tempi = tempi | 0x0001;
+00991     \textcolor{keywordflow}{return}(tempi);
+00992 \}
+00993 
+00994 std::string MCU\_BD::GetProgramFilename()\textcolor{keyword}{ const}
+00995 \textcolor{keyword}{}\{
+00996     \textcolor{keywordflow}{return} mLoadedProgramFilename;
+00997 \}
+00998 
+01001 \textcolor{keywordtype}{void} MCU\_BD::RunProcedure(uint8\_t \textcolor{keywordtype}{id})
+01002 \{
+01003     mSPI\_write(0x0006, 1);
+01004     mSPI\_write(0x0000, \textcolor{keywordtype}{id});
+01005     uint8\_t x0002reg = mSPI\_read(0x0002);
+01006     \textcolor{keyword}{const} uint8\_t interupt6 = 0x08;
+01007     mSPI\_write(0x0002, x0002reg & ~interupt6);
+01008     mSPI\_write(0x0002, x0002reg | interupt6);
+01009     mSPI\_write(0x0002, x0002reg & ~interupt6);
+01010     \textcolor{comment}{//MCU seems to be stuck at this point until any SPI operation is performed}
+01011     mSPI\_read(0x0002); \textcolor{comment}{//random spi action}
+01012     std::this\_thread::sleep\_for(std::chrono::microseconds(10));
+01013 \}
+01014 
+01015 
+01019 \textcolor{keywordtype}{int} MCU\_BD::WaitForMCU(uint32\_t timeout_ms)
+01020 \{
+01021     \textcolor{keyword}{auto} t1 = std::chrono::high\_resolution\_clock::now();
+01022     \textcolor{keyword}{auto} t2 = t1;
+01023     \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{short} value = 0;
+01024     std::this\_thread::sleep\_for(std::chrono::microseconds(50));
+01025     \textcolor{keywordflow}{do} \{
+01026         value = mSPI\_read(0x0001) & 0xFF;
+01027         \textcolor{keywordflow}{if} (value != 0xFF) \textcolor{comment}{//working}
+01028             \textcolor{keywordflow}{break};
+01029         std::this\_thread::sleep\_for(std::chrono::milliseconds(1));
+01030         t2 = std::chrono::high\_resolution\_clock::now();
+01031     \}\textcolor{keywordflow}{while} (std::chrono::duration\_cast<std::chrono::milliseconds>(t2 - t1).count() < timeout\_ms);
+01032     mSPI\_write(0x0006, 0); \textcolor{comment}{//return SPI control to PC}
+01033     \textcolor{comment}{//if((value & 0x7f) != 0)}
+01034     lime::debug(\textcolor{stringliteral}{"MCU algorithm time: %li ms"}, std::chrono::duration\_cast<std::chrono::milliseconds>(
+      t2 - t1).count());
+01035     \textcolor{keywordflow}{return} value & 0x7F;
+01036 \}
+01037 
+01038 \textcolor{keywordtype}{void} MCU\_BD::SetParameter(MCU_Parameter param, \textcolor{keywordtype}{float} value)
+01039 \{
+01040     \textcolor{keyword}{const} uint8\_t x0002reg = mSPI\_read(0x0002);
+01041     \textcolor{keyword}{const} uint8\_t interupt7 = 0x04;
+01042     \textcolor{keywordflow}{if}(param==MCU_REF_CLK || param == MCU_BW)
+01043     \{
+01044         uint8\_t inputRegs[3];
+01045         value /= 1e6;
+01046         inputRegs[0] = (uint8\_t)value; \textcolor{comment}{//frequency integer part}
+01047 
+01048         uint16\_t fracPart = value * 1000.0 - inputRegs[0]*1000.0;
+01049         inputRegs[1] = (fracPart >> 8) & 0xFF;
+01050         inputRegs[2] = fracPart & 0xFF;
+01051         \textcolor{keywordflow}{for}(uint8\_t i = 0; i < 3; ++i)
+01052         \{
+01053             mSPI\_write(0, inputRegs[2-i]);
+01054             mSPI\_write(0x0002, x0002reg | interupt7);
+01055             mSPI\_write(0x0002, x0002reg & ~interupt7);
+01056             this\_thread::sleep\_for(chrono::microseconds(5));
+01057         \}
+01058     \}
+01059     \textcolor{keywordflow}{if}(param==MCU_REF_CLK)
+01060         RunProcedure(4);
+01061     \textcolor{keywordflow}{if}(param == MCU_BW)
+01062         RunProcedure(3);
+01063     \textcolor{keywordflow}{if}(param == MCU_EXT_LOOPBACK_PAIR)
+01064     \{
+01065         uint8\_t intVal = (int)value;
+01066         mSPI\_write(0, intVal);
+01067         mSPI\_write(0x0002, x0002reg | interupt7);
+01068         mSPI\_write(0x0002, x0002reg & ~interupt7);
+01069         \textcolor{keywordtype}{int} status = WaitForMCU(10);
+01070         \textcolor{keywordflow}{if}(status != 0)
+01071             printf(\textcolor{stringliteral}{"MCU error status 0x%02X\(\backslash\)n"}, status);
+01072         RunProcedure(9);
+01073     \}
+01074     \textcolor{keywordflow}{if}(WaitForMCU(100) != 0)
+01075         lime::debug(\textcolor{stringliteral}{"Failed to set MCU parameter"});
+01076 \}
+01077 
+01082 MCU_BD::OperationStatus MCU\_BD::SetDebugMode(\textcolor{keywordtype}{bool} enabled, 
+      IConnection::MCU_PROG_MODE mode)
+01083 \{
+01084     uint8\_t regValue = 0;
+01085     \textcolor{keywordflow}{switch} (mode)
+01086     \{
+01087     \textcolor{keywordflow}{case} IConnection::MCU\_PROG\_MODE::RESET:
+01088         \textcolor{keywordflow}{break};
+01089     \textcolor{keywordflow}{case} IConnection::MCU\_PROG\_MODE::EEPROM\_AND\_SRAM:
+01090         regValue |= 0x01; \textcolor{keywordflow}{break};
+01091     \textcolor{keywordflow}{case} IConnection::MCU\_PROG\_MODE::SRAM:
+01092         regValue |= 0x02; \textcolor{keywordflow}{break};
+01093     \textcolor{keywordflow}{case} IConnection::MCU\_PROG\_MODE::BOOT\_SRAM\_FROM\_EEPROM:
+01094         regValue |= 0x03; \textcolor{keywordflow}{break};
+01095     \}
+01096     \textcolor{keywordflow}{if} (enabled)
+01097         regValue |= 0xC0;
+01098     mSPI\_write(0x8002, regValue);
+01099     \textcolor{keywordflow}{return} SUCCESS;
+01100 \}
+01101 
+01102 MCU_BD::OperationStatus MCU\_BD::readIRAM(\textcolor{keyword}{const} uint8\_t *addr, uint8\_t* values, \textcolor{keyword}{const} uint8\_t 
+      count)
+01103 \{
+01104     uint8\_t cmd = 0x78; \textcolor{comment}{//}
+01105     \textcolor{keywordtype}{int} retval;
+01106     \textcolor{keywordflow}{for} (\textcolor{keywordtype}{int} i = 0; i < count; ++i)
+01107     \{
+01108         mSPI\_write(0x8004, cmd); \textcolor{comment}{//REG4 write cmd}
+01109         retval = WaitUntilWritten();
+01110         \textcolor{keywordflow}{if} (retval == -1) \textcolor{keywordflow}{return} FAILURE;
+01111 
+01112         mSPI\_write(0x8004, addr[i]); \textcolor{comment}{//REG4 write IRAM address}
+01113         retval = WaitUntilWritten();
+01114         \textcolor{keywordflow}{if} (retval == -1) \textcolor{keywordflow}{return} FAILURE;
+01115 
+01116         mSPI\_write(0x8004, 0); \textcolor{comment}{//REG4 nop}
+01117         retval = WaitUntilWritten();
+01118         \textcolor{keywordflow}{if} (retval == -1) \textcolor{keywordflow}{return} FAILURE;
+01119 
+01120         uint8\_t result = 0;
+01121         retval = ReadOneByte(&result);
+01122         \textcolor{keywordflow}{if} (retval == -1) \textcolor{keywordflow}{return} FAILURE;
+01123 
+01124         retval = ReadOneByte(&result);
+01125         \textcolor{keywordflow}{if} (retval == -1) \textcolor{keywordflow}{return} FAILURE;
+01126 
+01127         retval = ReadOneByte(&result);
+01128         \textcolor{keywordflow}{if} (retval == -1) \textcolor{keywordflow}{return} FAILURE;
+01129         values[i] = result;
+01130     \}
+01131     \textcolor{keywordflow}{return} SUCCESS;
+01132 \}
+01133 
+01134 MCU_BD::OperationStatus MCU\_BD::writeIRAM(\textcolor{keyword}{const} uint8\_t *addr, \textcolor{keyword}{const} uint8\_t* values, \textcolor{keyword}{const} uint8\_t 
+      count)
+01135 \{
+01136     \textcolor{keywordflow}{return} FAILURE;
+01137 \}
+01138 
+01139 uint8\_t MCU\_BD::ReadMCUProgramID()
+01140 \{
+01141     RunProcedure(255);
+01142     \textcolor{keyword}{auto} statusMcu = WaitForMCU(10);
+01143     \textcolor{keywordflow}{return} statusMcu & 0x7F;
+01144 \}
+01145 
+01146 \textcolor{keyword}{static} \textcolor{keyword}{const} \textcolor{keywordtype}{char}* MCU_ErrorMessages[] =
+01147 \{
+01148 \textcolor{stringliteral}{"No error"},
+01149 \textcolor{stringliteral}{"Generic error"},
+01150 \textcolor{stringliteral}{"CGEN tune failed"},
+01151 \textcolor{stringliteral}{"SXR tune failed"},
+01152 \textcolor{stringliteral}{"SXT tune failed"},
+01153 \textcolor{stringliteral}{"Loopback signal weak: not connected/insufficient gain?"},
+01154 \textcolor{stringliteral}{"Invalid Rx path"},
+01155 \textcolor{stringliteral}{"Invalid Tx band"},
+01156 \textcolor{stringliteral}{"Rx LPF bandwidth out of range"},
+01157 \textcolor{stringliteral}{"Rx invalid TIA gain"},
+01158 \textcolor{stringliteral}{"Tx LPF bandwidth out of range"},
+01159 \textcolor{stringliteral}{"Procedure is disabled"},
+01160 \textcolor{stringliteral}{"Rx R\_CTL\_LPF range limit reached"},
+01161 \textcolor{stringliteral}{"Rx CFB\_TIA\_RFE range limit reached"},
+01162 \textcolor{stringliteral}{"Tx RCAL\_LPF range limit reached,"}
+01163 \};
+01164 
+01165 \textcolor{keyword}{const} \textcolor{keywordtype}{char}* MCU\_BD::MCUStatusMessage(\textcolor{keyword}{const} uint8\_t code)
+01166 \{
+01167     static\_assert(MCU_ERROR_CODES_COUNT == \textcolor{keyword}{sizeof}(MCU_ErrorMessages)/\textcolor{keyword}{sizeof}(\textcolor{keywordtype}{char}*), \textcolor{stringliteral}{"MCU errors enum/string
+       count mismatch"});
+01168     \textcolor{keywordflow}{if}(code == 255)
+01169         \textcolor{keywordflow}{return} \textcolor{stringliteral}{"MCU not programmed/procedure still in progress"};
+01170     \textcolor{keywordflow}{if}(code >= MCU_ERROR_CODES_COUNT)
+01171         \textcolor{keywordflow}{return} \textcolor{stringliteral}{"Error code undefined"};
+01172     \textcolor{keywordflow}{return} MCU_ErrorMessages[code];
+01173 \}
+\end{DoxyCode}

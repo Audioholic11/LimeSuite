@@ -1,0 +1,712 @@
+\subsection{lms7002\+\_\+pnl\+R3.\+cpp}
+\label{lms7002__pnlR3_8cpp_source}\index{/home/erik/prefix/default/src/limesuite-\/dev/src/lms7002\+\_\+wxgui/lms7002\+\_\+pnl\+R3.\+cpp@{/home/erik/prefix/default/src/limesuite-\/dev/src/lms7002\+\_\+wxgui/lms7002\+\_\+pnl\+R3.\+cpp}}
+
+\begin{DoxyCode}
+00001 \textcolor{preprocessor}{#include "lms7002_pnlR3.h"}
+00002 
+00003 \textcolor{preprocessor}{#include <wx/wx.h>}
+00004 \textcolor{preprocessor}{#include <wx/stattext.h>}
+00005 \textcolor{preprocessor}{#include "LMS7002M_parameters.h"}
+00006 \textcolor{preprocessor}{#include "lms7002_gui_utilities.h"}
+00007 \textcolor{preprocessor}{#include <chrono>}
+00008 \textcolor{preprocessor}{#include <thread>}
+00009 \textcolor{preprocessor}{#include "mcu_programs.h"}
+00010 \textcolor{preprocessor}{#include "lms7_device.h"}
+00011 \textcolor{preprocessor}{#include "device_constants.h"}
+00012 
+00013 \textcolor{preprocessor}{#include <vector>}
+00014 
+00015 \textcolor{keyword}{using namespace }std;
+00016 
+00017 lms7002_pnlR3_view::lms7002_pnlR3_view( wxWindow* parent ) :
+00018     wxPanel( parent)
+00019 \{
+00020 
+00021 \}
+00022 
+00023 lms7002_pnlR3_view::lms7002_pnlR3_view(wxWindow* parent, wxWindowID \textcolor{keywordtype}{id}, \textcolor{keyword}{const} wxPoint& pos, \textcolor{keyword}{const} wxSize& 
+      size, \textcolor{keywordtype}{long} style) :
+00024     wxPanel( parent, id, pos, size, style )
+00025 \{
+00026     lmsControl = \textcolor{keyword}{nullptr};
+00027     wxFlexGridSizer* mainSizer;
+00028     mainSizer = \textcolor{keyword}{new} wxFlexGridSizer( 0, 1, 5, 5 );
+00029     \{
+00030         wxStaticBoxSizer* dcCalibGroup = \textcolor{keyword}{new} wxStaticBoxSizer(wxHORIZONTAL, \textcolor{keyword}{this}, wxT(\textcolor{stringliteral}{"DC calibration"}));
+00031         wxWindow* panel = dcCalibGroup->GetStaticBox();
+00032         \{
+00033             wxFlexGridSizer* sizer = \textcolor{keyword}{new} wxFlexGridSizer(0, 1, 0, 5);
+00034             std::vector<const LMS7Parameter*> params = \{
+00035                 &LMS7_PD_DCDAC_RXB,
+00036                 &LMS7_PD_DCDAC_RXA,
+00037                 &LMS7_PD_DCDAC_TXB,
+00038                 &LMS7_PD_DCDAC_TXA,
+00039                 &LMS7_PD_DCCMP_RXB,
+00040                 &LMS7_PD_DCCMP_RXA,
+00041                 &LMS7_PD_DCCMP_TXB,
+00042                 &LMS7_PD_DCCMP_TXA
+00043             \};
+00044             \textcolor{keywordtype}{int} row = 0;
+00045             \textcolor{keywordflow}{for}(\textcolor{keyword}{auto} i : params)
+00046             \{
+00047                 sizer->AddGrowableRow(row++);
+00048                 wxCheckBox* chkbox = \textcolor{keyword}{new} wxCheckBox(dcCalibGroup->GetStaticBox(), wxNewId(), 
+      i->name);
+00049                 chkbox->Connect(wxEVT\_COMMAND\_CHECKBOX\_CLICKED, wxCommandEventHandler(
+      lms7002_pnlR3_view::ParameterChangeHandler), NULL, \textcolor{keyword}{this});
+00050                 sizer->Add(chkbox, 1, wxEXPAND, 5);
+00051                 wndId2Enum[chkbox] = *i;
+00052             \}
+00053             dcCalibGroup->Add(sizer, 0, wxEXPAND, 5);
+00054         \}
+00055         \{
+00056             wxFlexGridSizer* sizer = \textcolor{keyword}{new} wxFlexGridSizer(0, 2, 0, 0);
+00057             std::vector<const LMS7Parameter*> paramsRx = \{
+00058                 &LMS7_DCWR_RXBQ, &LMS7_DCRD_RXBQ, &LMS7_DC_RXBQ,
+00059                 &LMS7_DCWR_RXBI, &LMS7_DCRD_RXBI, &LMS7_DC_RXBI,
+00060                 &LMS7_DCWR_RXAQ, &LMS7_DCRD_RXAQ, &LMS7_DC_RXAQ,
+00061                 &LMS7_DCWR_RXAI, &LMS7_DCRD_RXAI, &LMS7_DC_RXAI
+00062             \};
+00063             \textcolor{keywordflow}{for}(\textcolor{keywordtype}{size\_t} i = 0; i<paramsRx.size(); i += 3)
+00064             \{
+00065                 wxButton* btnReadDC = \textcolor{keyword}{new} wxButton(dcCalibGroup->GetStaticBox(), wxNewId(), \_(\textcolor{stringliteral}{"Read"}));
+00066                 btnReadDC ->Connect(wxEVT\_COMMAND\_BUTTON\_CLICKED, wxCommandEventHandler(
+      lms7002_pnlR3_view::OnReadDC), NULL, \textcolor{keyword}{this});
+00067                 sizer->Add(btnReadDC , 1, wxEXPAND, 5);
+00068                 NumericSlider* slider = \textcolor{keyword}{new} NumericSlider(dcCalibGroup->GetStaticBox(), wxNewId(), 
+      wxEmptyString, wxDefaultPosition, wxDefaultSize, wxSP\_ARROW\_KEYS, -63, 63, 0);
+00069                 cmbDCControlsRx.push\_back(slider);
+00070                 slider->Connect(wxEVT\_COMMAND\_SPINCTRL\_UPDATED, wxCommandEventHandler(
+      lms7002_pnlR3_view::OnWriteRxDC), NULL, \textcolor{keyword}{this});
+00071                 sizer->Add(slider, 1, wxEXPAND, 5);
+00072                 wndId2Enum[slider] = *paramsRx[i + 2];
+00073             \}
+00074             std::vector<const LMS7Parameter*> paramsTx = \{
+00075                 &LMS7_DCWR_TXBQ, &LMS7_DCRD_TXBQ, &LMS7_DC_TXBQ,
+00076                 &LMS7_DCWR_TXBI, &LMS7_DCRD_TXBI, &LMS7_DC_TXBI,
+00077                 &LMS7_DCWR_TXAQ, &LMS7_DCRD_TXAQ, &LMS7_DC_TXAQ,
+00078                 &LMS7_DCWR_TXAI, &LMS7_DCRD_TXAI, &LMS7_DC_TXAI
+00079             \};
+00080             \textcolor{keywordflow}{for}(\textcolor{keywordtype}{size\_t} i = 0; i<paramsTx.size(); i += 3)
+00081             \{
+00082                 wxButton* btnReadDC = \textcolor{keyword}{new} wxButton(dcCalibGroup->GetStaticBox(), wxNewId(), \_(\textcolor{stringliteral}{"Read"}));
+00083                 btnReadDC ->Connect(wxEVT\_COMMAND\_BUTTON\_CLICKED, wxCommandEventHandler(
+      lms7002_pnlR3_view::OnReadDC), NULL, \textcolor{keyword}{this});
+00084                 sizer->Add(btnReadDC , 1, wxEXPAND, 5);
+00085                 NumericSlider* slider = \textcolor{keyword}{new} NumericSlider(dcCalibGroup->GetStaticBox(), wxNewId(), 
+      wxEmptyString, wxDefaultPosition, wxDefaultSize, wxSP\_ARROW\_KEYS, -1023, 1023, 0);
+00086                 cmbDCControlsTx.push\_back(slider);
+00087                 slider->Connect(wxEVT\_COMMAND\_SPINCTRL\_UPDATED, wxCommandEventHandler(
+      lms7002_pnlR3_view::OnWriteTxDC), NULL, \textcolor{keyword}{this});
+00088                 sizer->Add(slider, 1, wxEXPAND, 5);
+00089                 wndId2Enum[slider] = *paramsTx[i + 2];
+00090             \}
+00091             dcCalibGroup->Add(sizer, 0, 0, 5);
+00092         \}
+00093         \{
+00094             \textcolor{keyword}{const} std::vector<wxString> names = \{\_(\textcolor{stringliteral}{"RXBQ"}), \_(\textcolor{stringliteral}{"RXBI"}), \_(\textcolor{stringliteral}{"RXAQ"}), \_(\textcolor{stringliteral}{"RXAI"}), \_(\textcolor{stringliteral}{"TXBQ"}), \_(\textcolor{stringliteral}{"
+      TXBI"}), \_(\textcolor{stringliteral}{"TXAQ"}), \_(\textcolor{stringliteral}{"TXAI"})\};
+00095             \textcolor{keyword}{const} std::vector<LMS7Parameter> cmpcfg = \{(LMS7_DCCAL_CMPCFG_RXBQ), (
+      LMS7_DCCAL_CMPCFG_RXBI), (LMS7_DCCAL_CMPCFG_RXAQ), (LMS7_DCCAL_CMPCFG_RXAI), (
+      LMS7_DCCAL_CMPCFG_TXBQ), (LMS7_DCCAL_CMPCFG_TXBI), (LMS7_DCCAL_CMPCFG_TXAQ), (
+      LMS7_DCCAL_CMPCFG_TXAI)\};
+00096             \textcolor{keyword}{const} std::vector<LMS7Parameter> cmpstatus =\{(
+      LMS7_DCCAL_CMPSTATUS_RXBQ), (LMS7_DCCAL_CMPSTATUS_RXBI), (
+      LMS7_DCCAL_CMPSTATUS_RXAQ), (LMS7_DCCAL_CMPSTATUS_RXAI), (
+      LMS7_DCCAL_CMPSTATUS_TXBQ), (LMS7_DCCAL_CMPSTATUS_TXBI), (
+      LMS7_DCCAL_CMPSTATUS_TXAQ), (LMS7_DCCAL_CMPSTATUS_TXAI)\};
+00097             \textcolor{keyword}{const} std::vector<LMS7Parameter> calstatus = \{(
+      LMS7_DCCAL_CALSTATUS_RXBQ), (LMS7_DCCAL_CALSTATUS_RXBI), (
+      LMS7_DCCAL_CALSTATUS_RXAQ), (LMS7_DCCAL_CALSTATUS_RXAI), (
+      LMS7_DCCAL_CALSTATUS_TXBQ), (LMS7_DCCAL_CALSTATUS_TXBI), (
+      LMS7_DCCAL_CALSTATUS_TXAQ), (LMS7_DCCAL_CMPSTATUS_TXAI)\};
+00098             \textcolor{keyword}{const} std::vector<LMS7Parameter> start = \{(LMS7_DCCAL_START_RXBQ), (
+      LMS7_DCCAL_START_RXBI), (LMS7_DCCAL_START_RXAQ), (LMS7_DCCAL_START_RXAI), (
+      LMS7_DCCAL_START_TXBQ), (LMS7_DCCAL_START_TXBI), (LMS7_DCCAL_START_TXAQ), (
+      LMS7_DCCAL_START_TXAI)\};
+00099 
+00100             wxFlexGridSizer* sizer = \textcolor{keyword}{new} wxFlexGridSizer(0, 5, 0, 5);
+00101             sizer->Add(\textcolor{keyword}{new} wxStaticText(dcCalibGroup->GetStaticBox(), wxID\_ANY, \_(\textcolor{stringliteral}{"Name:"})), 1, wxEXPAND, 0
+      );
+00102             sizer->Add(\textcolor{keyword}{new} wxStaticText(dcCalibGroup->GetStaticBox(), wxID\_ANY, \_(\textcolor{stringliteral}{"START:"})), 1, wxEXPAND, 
+      0);
+00103             sizer->Add(\textcolor{keyword}{new} wxStaticText(dcCalibGroup->GetStaticBox(), wxID\_ANY, \_(\textcolor{stringliteral}{"CMP invert:"})), 1, 
+      wxEXPAND, 0);
+00104             sizer->Add(\textcolor{keyword}{new} wxStaticText(dcCalibGroup->GetStaticBox(), wxID\_ANY, \_(\textcolor{stringliteral}{"CMP:"})), 1, wxEXPAND, 0)
+      ;
+00105             sizer->Add(\textcolor{keyword}{new} wxStaticText(dcCalibGroup->GetStaticBox(), wxID\_ANY, \_(\textcolor{stringliteral}{"Status:"})), 1, wxEXPAND,
+       0);
+00106             \textcolor{keywordflow}{for}(\textcolor{keywordtype}{size\_t} i = 0; i<names.size(); ++i)
+00107             \{
+00108                 sizer->AddGrowableRow(i);
+00109                 wxCheckBox* chkbox;
+00110                 sizer->Add(\textcolor{keyword}{new} wxStaticText(dcCalibGroup->GetStaticBox(), wxID\_ANY, names[
+      i]), 1, wxEXPAND, 0);
+00111 
+00112                 chkbox = \textcolor{keyword}{new} wxCheckBox(dcCalibGroup->GetStaticBox(), wxNewId(), wxEmptyString);
+00113                 chkbox->Connect(wxEVT\_COMMAND\_CHECKBOX\_CLICKED, wxCommandEventHandler(
+      lms7002_pnlR3_view::ParameterChangeHandler), NULL, \textcolor{keyword}{this});
+00114                 wndId2Enum[chkbox] = start[i];
+00115                 sizer->Add(chkbox, 0, wxALIGN\_CENTER\_HORIZONTAL, 0);
+00116 
+00117                 chkbox = \textcolor{keyword}{new} wxCheckBox(dcCalibGroup->GetStaticBox(), wxNewId(), wxEmptyString);
+00118                 chkbox->Connect(wxEVT\_COMMAND\_CHECKBOX\_CLICKED, wxCommandEventHandler(
+      lms7002_pnlR3_view::ParameterChangeHandler), NULL, \textcolor{keyword}{this});
+00119                 wndId2Enum[chkbox] = cmpcfg[i];
+00120                 sizer->Add(chkbox, 0, wxALIGN\_CENTER\_HORIZONTAL, 0);
+00121 
+00122                 dccal_cmpstatuses[i] = \textcolor{keyword}{new} wxStaticText(dcCalibGroup->GetStaticBox(), wxID\_ANY, \_(\textcolor{stringliteral}{"0"}));
+00123                 wndId2Enum[dccal_cmpstatuses[i]] = cmpstatus[i];
+00124                 sizer->Add(dccal\_cmpstatuses[i], 1, wxEXPAND, 0);
+00125                 dccal_statuses[i] = \textcolor{keyword}{new} wxStaticText(dcCalibGroup->GetStaticBox(), wxID\_ANY, \_(\textcolor{stringliteral}{"Not running
+      "}));
+00126                 sizer->Add(dccal_statuses[i], 1, wxEXPAND, 0);
+00127                 wndId2Enum[dccal_statuses[i]] = calstatus[i];
+00128             \}
+00129             \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} i = 0; i < 4; ++i)
+00130                 sizer->Add(\textcolor{keyword}{new} wxFlexGridSizer(0, 0, 0, 0));
+00131             wxButton* btnUpdateCMP = \textcolor{keyword}{new} wxButton(panel, wxNewId(), \_(\textcolor{stringliteral}{"Read"}));
+00132             btnUpdateCMP->Connect(wxEVT\_COMMAND\_BUTTON\_CLICKED, wxCommandEventHandler(
+      lms7002_pnlR3_view::OnReadDCCMP), NULL, \textcolor{keyword}{this});
+00133             sizer->Add(btnUpdateCMP);
+00134             dcCalibGroup->Add(sizer, 0, 0, 5);
+00135         \}
+00136         \{
+00137             wxFlexGridSizer* sizer = \textcolor{keyword}{new} wxFlexGridSizer(0, 2, 0, 5);
+00138             sizer->Add(\textcolor{keyword}{new} wxStaticText(dcCalibGroup->GetStaticBox(), wxID\_ANY, \_(\textcolor{stringliteral}{"DC\_RXCDIV"})), 1, 
+      wxEXPAND, 0);
+00139             NumericSlider* ctrl = \textcolor{keyword}{new} NumericSlider(dcCalibGroup->GetStaticBox(), wxNewId(), wxEmptyString,
+       wxDefaultPosition, wxDefaultSize, wxSP\_ARROW\_KEYS, 0, 255, 0);
+00140             ctrl->Connect(wxEVT\_COMMAND\_SPINCTRL\_UPDATED, wxCommandEventHandler(
+      lms7002_pnlR3_view::ParameterChangeHandler), NULL, \textcolor{keyword}{this});
+00141             sizer->Add(ctrl, 1, wxEXPAND, 5);
+00142             wndId2Enum[ctrl] = LMS7_DC_RXCDIV;
+00143             sizer->Add(\textcolor{keyword}{new} wxStaticText(dcCalibGroup->GetStaticBox(), wxID\_ANY, \_(\textcolor{stringliteral}{"DC\_TXCDIV"})), 1, 
+      wxEXPAND, 0);
+00144             ctrl = \textcolor{keyword}{new} NumericSlider(dcCalibGroup->GetStaticBox(), wxNewId(), wxEmptyString, 
+      wxDefaultPosition, wxDefaultSize, wxSP\_ARROW\_KEYS, 0, 255, 0);
+00145             ctrl->Connect(wxEVT\_COMMAND\_SPINCTRL\_UPDATED, wxCommandEventHandler(
+      lms7002_pnlR3_view::ParameterChangeHandler), NULL, \textcolor{keyword}{this});
+00146             sizer->Add(ctrl, 1, wxEXPAND, 5);
+00147             wndId2Enum[ctrl] = LMS7_DC_TXCDIV;
+00148 
+00149             sizer->Add(\textcolor{keyword}{new} wxStaticText(dcCalibGroup->GetStaticBox(), wxID\_ANY, \_(\textcolor{stringliteral}{"HYSCMP\_RXB"})), 1, 
+      wxEXPAND, 0);
+00150             ctrl = \textcolor{keyword}{new} NumericSlider(dcCalibGroup->GetStaticBox(), wxNewId(), wxEmptyString, 
+      wxDefaultPosition, wxDefaultSize, wxSP\_ARROW\_KEYS, 0, 7, 0);
+00151             ctrl->Connect(wxEVT\_COMMAND\_SPINCTRL\_UPDATED, wxCommandEventHandler(
+      lms7002_pnlR3_view::ParameterChangeHandler), NULL, \textcolor{keyword}{this});
+00152             sizer->Add(ctrl, 1, wxEXPAND, 5);
+00153             wndId2Enum[ctrl] = LMS7_HYSCMP_RXB;
+00154 
+00155             sizer->Add(\textcolor{keyword}{new} wxStaticText(dcCalibGroup->GetStaticBox(), wxID\_ANY, \_(\textcolor{stringliteral}{"HYSCMP\_RXA"})), 1, 
+      wxEXPAND, 0);
+00156             ctrl = \textcolor{keyword}{new} NumericSlider(dcCalibGroup->GetStaticBox(), wxNewId(), wxEmptyString, 
+      wxDefaultPosition, wxDefaultSize, wxSP\_ARROW\_KEYS, 0, 7, 0);
+00157             ctrl->Connect(wxEVT\_COMMAND\_SPINCTRL\_UPDATED, wxCommandEventHandler(
+      lms7002_pnlR3_view::ParameterChangeHandler), NULL, \textcolor{keyword}{this});
+00158             sizer->Add(ctrl, 1, wxEXPAND, 5);
+00159             wndId2Enum[ctrl] = LMS7_HYSCMP_RXA;
+00160 
+00161             sizer->Add(\textcolor{keyword}{new} wxStaticText(dcCalibGroup->GetStaticBox(), wxID\_ANY, \_(\textcolor{stringliteral}{"HYSCMP\_TXB"})), 1, 
+      wxEXPAND, 0);
+00162             ctrl = \textcolor{keyword}{new} NumericSlider(dcCalibGroup->GetStaticBox(), wxNewId(), wxEmptyString, 
+      wxDefaultPosition, wxDefaultSize, wxSP\_ARROW\_KEYS, 0, 7, 0);
+00163             ctrl->Connect(wxEVT\_COMMAND\_SPINCTRL\_UPDATED, wxCommandEventHandler(
+      lms7002_pnlR3_view::ParameterChangeHandler), NULL, \textcolor{keyword}{this});
+00164             sizer->Add(ctrl, 1, wxEXPAND, 5);
+00165             wndId2Enum[ctrl] = LMS7_HYSCMP_TXB;
+00166 
+00167             sizer->Add(\textcolor{keyword}{new} wxStaticText(dcCalibGroup->GetStaticBox(), wxID\_ANY, \_(\textcolor{stringliteral}{"HYSCMP\_TXA"})), 1, 
+      wxEXPAND, 0);
+00168             ctrl = \textcolor{keyword}{new} NumericSlider(dcCalibGroup->GetStaticBox(), wxNewId(), wxEmptyString, 
+      wxDefaultPosition, wxDefaultSize, wxSP\_ARROW\_KEYS, 0, 7, 0);
+00169             ctrl->Connect(wxEVT\_COMMAND\_SPINCTRL\_UPDATED, wxCommandEventHandler(
+      lms7002_pnlR3_view::ParameterChangeHandler), NULL, \textcolor{keyword}{this});
+00170             sizer->Add(ctrl, 1, wxEXPAND, 5);
+00171             wndId2Enum[ctrl] = LMS7_HYSCMP_TXA;
+00172             dcCalibGroup->Add(sizer, 0, wxLEFT, 5);
+00173         \}
+00174         mainSizer->Add(dcCalibGroup, 1, wxEXPAND, 5);
+00175     \}
+00176     \{
+00177         wxFlexGridSizer* rowGroup = \textcolor{keyword}{new} wxFlexGridSizer(0, 4, 0, 5);
+00178         \{
+00179             wxStaticBoxSizer* RSSIPDETGroup = \textcolor{keyword}{new} wxStaticBoxSizer(wxHORIZONTAL, \textcolor{keyword}{this}, wxT(\textcolor{stringliteral}{"RSSI, PDET,
+       TEMP"}));
+00180             wxWindow* panel = RSSIPDETGroup->GetStaticBox();
+00181 
+00182             wxFlexGridSizer* sizer = \textcolor{keyword}{new} wxFlexGridSizer(0, 2, 0, 5);
+00183 
+00184             wxCheckBox* chkbox = \textcolor{keyword}{new} wxCheckBox(panel, wxNewId(), \_(\textcolor{stringliteral}{"Power down modules"}));
+00185             chkbox->Connect(wxEVT\_COMMAND\_CHECKBOX\_CLICKED, wxCommandEventHandler(
+      lms7002_pnlR3_view::ParameterChangeHandler), NULL, \textcolor{keyword}{this});
+00186             sizer->Add(chkbox);
+00187             wndId2Enum[chkbox] = LMS7_RSSI_PD;
+00188 
+00189             chkbox = \textcolor{keyword}{new} wxCheckBox(panel, wxNewId(), \_(\textcolor{stringliteral}{"Manual operation mode"}));
+00190             chkbox->Connect(wxEVT\_COMMAND\_CHECKBOX\_CLICKED, wxCommandEventHandler(
+      lms7002_pnlR3_view::ParameterChangeHandler), NULL, \textcolor{keyword}{this});
+00191             sizer->Add(chkbox);
+00192             wndId2Enum[chkbox] = LMS7_RSSI_RSSIMODE;
+00193 
+00194             sizer->Add(\textcolor{keyword}{new} wxStaticText(panel, wxID\_ANY, \_(\textcolor{stringliteral}{"DAC\_CLKDIV"})), 1, wxEXPAND, 0);
+00195             NumericSlider* spnCtrl = \textcolor{keyword}{new} NumericSlider(panel, wxNewId(), wxEmptyString, wxDefaultPosition, 
+      wxDefaultSize, wxSP\_ARROW\_KEYS, 0, 255, 0);
+00196             spnCtrl->Connect(wxEVT\_COMMAND\_SPINCTRL\_UPDATED, wxCommandEventHandler(
+      lms7002_pnlR3_view::ParameterChangeHandler), NULL, \textcolor{keyword}{this});
+00197             sizer->Add(spnCtrl);
+00198             wndId2Enum[spnCtrl] = LMS7_DAC_CLKDIV;
+00199 
+00200             sizer->Add(\textcolor{keyword}{new} wxStaticText(panel, wxID\_ANY, \_(\textcolor{stringliteral}{"Reference bias current to test ADC"})), 1, 
+      wxEXPAND, 0);
+00201             spnCtrl = \textcolor{keyword}{new} NumericSlider(panel, wxNewId(), wxEmptyString, wxDefaultPosition, wxDefaultSize, 
+      wxSP\_ARROW\_KEYS, 0, 31, 0);
+00202             spnCtrl->Connect(wxEVT\_COMMAND\_SPINCTRL\_UPDATED, wxCommandEventHandler(
+      lms7002_pnlR3_view::ParameterChangeHandler), NULL, \textcolor{keyword}{this});
+00203             sizer->Add(spnCtrl);
+00204             wndId2Enum[spnCtrl] = LMS7_RSSI_BIAS;
+00205 
+00206             sizer->Add(\textcolor{keyword}{new} wxStaticText(panel, wxID\_ANY, \_(\textcolor{stringliteral}{"HYSCMP"})), 1, wxEXPAND, 0);
+00207             spnCtrl = \textcolor{keyword}{new} NumericSlider(panel, wxNewId(), wxEmptyString, wxDefaultPosition, wxDefaultSize, 
+      wxSP\_ARROW\_KEYS, 0, 7, 0);
+00208             spnCtrl->Connect(wxEVT\_COMMAND\_SPINCTRL\_UPDATED, wxCommandEventHandler(
+      lms7002_pnlR3_view::ParameterChangeHandler), NULL, \textcolor{keyword}{this});
+00209             sizer->Add(spnCtrl);
+00210             wndId2Enum[spnCtrl] = LMS7_RSSI_HYSCMP;
+00211 
+00212             sizer->Add(\textcolor{keyword}{new} wxStaticText(panel, wxID\_ANY, \_(\textcolor{stringliteral}{"DAC\_VAL"})), 1, wxEXPAND, 0);
+00213             spnCtrl = \textcolor{keyword}{new} NumericSlider(panel, wxNewId(), wxEmptyString, wxDefaultPosition, wxDefaultSize, 
+      wxSP\_ARROW\_KEYS, 0, 255, 0);
+00214             spnCtrl->Connect(wxEVT\_COMMAND\_SPINCTRL\_UPDATED, wxCommandEventHandler(
+      lms7002_pnlR3_view::ParameterChangeHandler), NULL, \textcolor{keyword}{this});
+00215             sizer->Add(spnCtrl);
+00216             wndId2Enum[spnCtrl] = LMS7_RSSI_DAC_VAL;
+00217 
+00218             sizer->Add(\textcolor{keyword}{new} wxStaticText(panel, wxID\_ANY, \_(\textcolor{stringliteral}{"PDET2\_VAL"})), 1, wxEXPAND, 0);
+00219             pdet_vals[1] = \textcolor{keyword}{new} wxStaticText(panel, wxID\_ANY, \_(\textcolor{stringliteral}{"????"}));
+00220             sizer->Add(pdet_vals[1]);
+00221             wndId2Enum[pdet_vals[1]] = LMS7_RSSI_PDET2_VAL;
+00222 
+00223             sizer->Add(\textcolor{keyword}{new} wxStaticText(panel, wxID\_ANY, \_(\textcolor{stringliteral}{"PDET1\_VAL"})), 1, wxEXPAND, 0);
+00224             pdet\_vals[0] = \textcolor{keyword}{new} wxStaticText(panel, wxID\_ANY, \_(\textcolor{stringliteral}{"????"}));
+00225             sizer->Add(pdet\_vals[0]);
+00226             wndId2Enum[pdet\_vals[0]] = LMS7_RSSI_PDET1_VAL;
+00227 
+00228             sizer->Add(\textcolor{keyword}{new} wxStaticText(panel, wxID\_ANY, \_(\textcolor{stringliteral}{"RSSI2\_VAL"})), 1, wxEXPAND, 0);
+00229             rssi_vals[1] = \textcolor{keyword}{new} wxStaticText(panel, wxID\_ANY, \_(\textcolor{stringliteral}{"????"}));
+00230             sizer->Add(rssi_vals[1]);
+00231             wndId2Enum[rssi_vals[1]] = LMS7_RSSI_RSSI2_VAL;
+00232 
+00233             sizer->Add(\textcolor{keyword}{new} wxStaticText(panel, wxID\_ANY, \_(\textcolor{stringliteral}{"RSSI1\_VAL"})), 1, wxEXPAND, 0);
+00234             rssi\_vals[0] = \textcolor{keyword}{new} wxStaticText(panel, wxID\_ANY, \_(\textcolor{stringliteral}{"????"}));
+00235             sizer->Add(rssi\_vals[0]);
+00236             wndId2Enum[rssi\_vals[0]] = LMS7_RSSI_RSSI1_VAL;
+00237 
+00238             sizer->Add(\textcolor{keyword}{new} wxStaticText(panel, wxID\_ANY, \_(\textcolor{stringliteral}{"TREF\_VAL"})), 1, wxEXPAND, 0);
+00239             tref_val = \textcolor{keyword}{new} wxStaticText(panel, wxID\_ANY, \_(\textcolor{stringliteral}{"????"}));
+00240             sizer->Add(tref_val);
+00241             wndId2Enum[tref_val] = LMS7_RSSI_TREF_VAL;
+00242 
+00243             sizer->Add(\textcolor{keyword}{new} wxStaticText(panel, wxID\_ANY, \_(\textcolor{stringliteral}{"TVPTAT\_VAL"})), 1, wxEXPAND, 0);
+00244             tvptat_val = \textcolor{keyword}{new} wxStaticText(panel, wxID\_ANY, \_(\textcolor{stringliteral}{"????"}));
+00245             wndId2Enum[tvptat_val] = LMS7_RSSI_TVPTAT_VAL;
+00246             sizer->Add(tvptat_val);
+00247 
+00248             RSSIPDETGroup->Add(sizer);
+00249 
+00250             wxFlexGridSizer* sizerCMP = \textcolor{keyword}{new} wxFlexGridSizer(0, 2, 0, 5);
+00251             std::vector<LMS7Parameter> paramStatus= \{
+      LMS7_INTADC_CMPSTATUS_TEMPREF,
+00252 LMS7_INTADC_CMPSTATUS_TEMPVPTAT,
+00253 LMS7_INTADC_CMPSTATUS_RSSI2,
+00254 LMS7_INTADC_CMPSTATUS_RSSI1,
+00255 LMS7_INTADC_CMPSTATUS_PDET2,
+00256 LMS7_INTADC_CMPSTATUS_PDET1\};
+00257 std::vector<LMS7Parameter> params= \{LMS7_INTADC_CMPCFG_TEMPREF,
+00258 LMS7_INTADC_CMPCFG_TEMPVPTAT,
+00259 LMS7_INTADC_CMPCFG_RSSI2,
+00260 LMS7_INTADC_CMPCFG_RSSI1,
+00261 LMS7_INTADC_CMPCFG_PDET2,
+00262 LMS7_INTADC_CMPCFG_PDET1\};
+00263             sizerCMP->Add( \textcolor{keyword}{new} wxStaticText(panel, wxID\_ANY, \_(\textcolor{stringliteral}{"Invert:"})));
+00264             sizerCMP->Add(\textcolor{keyword}{new} wxStaticText(panel, wxID\_ANY, \_(\textcolor{stringliteral}{"CMP:"})));
+00265 
+00266             \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} i = 0; i < 6; ++i)
+00267             \{
+00268                 rssiCMPCFG[i] = \textcolor{keyword}{new} wxCheckBox(panel, wxNewId(), wxString::Format(\textcolor{stringliteral}{"%s"}, params[
+      i].name));
+00269                 sizerCMP->Add(rssiCMPCFG[i]);
+00270                 wndId2Enum[rssiCMPCFG[i]] = params[i];
+00271                 rssiCMPCFG[i]->Connect(wxEVT\_COMMAND\_CHECKBOX\_CLICKED, wxCommandEventHandler(
+      lms7002_pnlR3_view::ParameterChangeHandler), NULL, \textcolor{keyword}{this});
+00272                 rssiCMPSTATUS[i] = \textcolor{keyword}{new} wxStaticText(panel, wxNewId(), \_(\textcolor{stringliteral}{"?"}));
+00273                 sizerCMP->Add(rssiCMPSTATUS[i]);
+00274                 wndId2Enum[rssiCMPSTATUS[i]] = paramStatus[i];
+00275             \}
+00276             sizerCMP->Add(\textcolor{keyword}{new} wxFlexGridSizer(0, 0, 0, 0));
+00277             wxButton* btnUpdateRSSICMP = \textcolor{keyword}{new} wxButton(panel, wxNewId(), \_(\textcolor{stringliteral}{"Read"}));
+00278             btnUpdateRSSICMP->Connect(wxEVT\_COMMAND\_BUTTON\_CLICKED, wxCommandEventHandler(
+      lms7002_pnlR3_view::OnReadRSSICMP), NULL, \textcolor{keyword}{this});
+00279             sizerCMP->Add(btnUpdateRSSICMP);
+00280             RSSIPDETGroup->Add(sizerCMP);
+00281 
+00282             rowGroup->Add(RSSIPDETGroup);
+00283         \}
+00284     \{
+00285         wxStaticBoxSizer* RSSIGroup = \textcolor{keyword}{new} wxStaticBoxSizer(wxHORIZONTAL, \textcolor{keyword}{this}, wxT(\textcolor{stringliteral}{"RSSI DC Calibration"}));
+00286         wxWindow* panel = RSSIGroup->GetStaticBox();
+00287 
+00288         wxFlexGridSizer* sizer = \textcolor{keyword}{new} wxFlexGridSizer(0, 2, 0, 5);
+00289 
+00290         sizer->Add(\textcolor{keyword}{new} wxFlexGridSizer(0, 1, 0, 0), 0, 0, 0);
+00291 
+00292         wxCheckBox* chkbox = \textcolor{keyword}{new} wxCheckBox(panel, wxNewId(), \_(\textcolor{stringliteral}{"Power down modules"}));
+00293         chkbox->Connect(wxEVT\_COMMAND\_CHECKBOX\_CLICKED, wxCommandEventHandler(
+      lms7002_pnlR3_view::ParameterChangeHandler), NULL, \textcolor{keyword}{this});
+00294         sizer->Add(chkbox);
+00295         wndId2Enum[chkbox] = LMS7_RSSIDC_PD;
+00296         chkRSSI_PD = chkbox;
+00297 
+00298         sizer->Add(\textcolor{keyword}{new} wxStaticText(panel, wxID\_ANY, \_(\textcolor{stringliteral}{"HYSCMP"})), 1, wxEXPAND, 0);
+00299         NumericSlider* spnCtrl = \textcolor{keyword}{new} NumericSlider(panel, wxNewId(), wxEmptyString, wxDefaultPosition, 
+      wxDefaultSize, wxSP\_ARROW\_KEYS, 0, 7, 0);
+00300         cmbRSSIDC_HYSCMP = spnCtrl;
+00301         spnCtrl->Connect(wxEVT\_COMMAND\_SPINCTRL\_UPDATED, wxCommandEventHandler(
+      lms7002_pnlR3_view::ParameterChangeHandler), NULL, \textcolor{keyword}{this});
+00302         sizer->Add(spnCtrl);
+00303         wndId2Enum[spnCtrl] = LMS7_RSSIDC_HYSCMP;
+00304 
+00305         sizer->Add(\textcolor{keyword}{new} wxStaticText(panel, wxID\_ANY, \_(\textcolor{stringliteral}{"DCO2"})), 1, wxEXPAND, 0);
+00306         spnCtrl = \textcolor{keyword}{new} NumericSlider(panel, wxNewId(), wxEmptyString, wxDefaultPosition, wxDefaultSize, 
+      wxSP\_ARROW\_KEYS, 0, 127, 0);
+00307         spinDCO2 = spnCtrl;
+00308         spnCtrl->Connect(wxEVT\_COMMAND\_SPINCTRL\_UPDATED, wxCommandEventHandler(
+      lms7002_pnlR3_view::ParameterChangeHandlerCMPRead), NULL, \textcolor{keyword}{this});
+00309         sizer->Add(spnCtrl);
+00310         wndId2Enum[spnCtrl] = LMS7_RSSIDC_DCO2;
+00311 
+00312         sizer->Add(\textcolor{keyword}{new} wxStaticText(panel, wxID\_ANY, \_(\textcolor{stringliteral}{"DCO1"})), 1, wxEXPAND, 0);
+00313         spnCtrl = \textcolor{keyword}{new} NumericSlider(panel, wxNewId(), wxEmptyString, wxDefaultPosition, wxDefaultSize, 
+      wxSP\_ARROW\_KEYS, 0, 127, 0);
+00314         spinDCO1 = spnCtrl;
+00315         spnCtrl->Connect(wxEVT\_COMMAND\_SPINCTRL\_UPDATED, wxCommandEventHandler(
+      lms7002_pnlR3_view::ParameterChangeHandlerCMPRead), NULL, \textcolor{keyword}{this});
+00316         sizer->Add(spnCtrl);
+00317         wndId2Enum[spnCtrl] = LMS7_RSSIDC_DCO1;
+00318 
+00319         wxArrayString rselArray;
+00320         \textcolor{keywordtype}{float} value\_mV = 800;
+00321         \textcolor{keywordtype}{int} i = 0;
+00322         \textcolor{keywordflow}{for}(; i < 4; ++i)
+00323         \{
+00324             rselArray.push\_back(wxString::Format(\textcolor{stringliteral}{"%.1f mV"}, value\_mV));
+00325             value\_mV -= 50;
+00326         \}
+00327         \textcolor{keywordflow}{for}(; i < 12; ++i)
+00328         \{
+00329             rselArray.push\_back(wxString::Format(\textcolor{stringliteral}{"%.1f mV"}, value\_mV));
+00330             value\_mV -= 21.5;
+00331         \}
+00332         \textcolor{keywordflow}{for}(; i <= 31; ++i)
+00333         \{
+00334             rselArray.push\_back(wxString::Format(\textcolor{stringliteral}{"%.1f mV"}, value\_mV));
+00335             value\_mV -= 10;
+00336         \}
+00337         sizer->Add(\textcolor{keyword}{new} wxStaticText(panel, wxID\_ANY, \_(\textcolor{stringliteral}{"RSEL:"})), 1, wxEXPAND, 0);
+00338         cmbRSEL = \textcolor{keyword}{new} wxComboBox(panel, wxID\_ANY);
+00339         cmbRSEL->Append(rselArray);
+00340         cmbRSEL->Connect(wxEVT\_COMMAND\_COMBOBOX\_SELECTED, wxCommandEventHandler(
+      lms7002_pnlR3_view::ParameterChangeHandlerCMPRead), NULL, \textcolor{keyword}{this});
+00341         sizer->Add(cmbRSEL);
+00342         wndId2Enum[cmbRSEL] = LMS7_RSSIDC_RSEL;
+00343 
+00344         sizer->Add(\textcolor{keyword}{new} wxStaticText(panel, wxID\_ANY, \_(\textcolor{stringliteral}{"CMPSTATUS"})), 1, wxEXPAND, 0);
+00345         rssidc_cmpstatus = \textcolor{keyword}{new} wxStaticText(panel, wxID\_ANY, \_(\textcolor{stringliteral}{"?"}));
+00346         sizer->Add(rssidc_cmpstatus);
+00347 
+00348         wxButton* calibrateAnalogRSSIDC = \textcolor{keyword}{new} wxButton(panel, wxNewId(), \_(\textcolor{stringliteral}{"Calibrate Analog RSSI"}));
+00349         calibrateAnalogRSSIDC->Connect(wxEVT\_COMMAND\_BUTTON\_CLICKED, wxCommandEventHandler(
+      lms7002_pnlR3_view::OnCalibrateAnalogRSSI), NULL, \textcolor{keyword}{this});
+00350         sizer->Add(calibrateAnalogRSSIDC);
+00351 
+00352         RSSIGroup->Add(sizer);
+00353         rowGroup->Add(RSSIGroup);
+00354     \}
+00355     mainSizer->Add(rowGroup);
+00356     \}
+00357     this->SetSizer( mainSizer );
+00358     this->Layout();
+00359     mainSizer->Fit( \textcolor{keyword}{this} );
+00360 
+00361     LMS7002_WXGUI::UpdateTooltips(wndId2Enum, \textcolor{keyword}{true});
+00362 \}
+00363 
+00364 lms7002_pnlR3_view::~lms7002_pnlR3_view()
+00365 \{
+00366 \}
+00367 
+00368 \textcolor{keywordtype}{void} lms7002_pnlR3_view::Initialize(lms_device_t* pControl)
+00369 \{
+00370     lmsControl = pControl;
+00371     uint16\_t value;
+00372     \textcolor{keywordflow}{if} (LMS_ReadParam(lmsControl,LMS7param(MASK),&value)!=0  || value != 0)
+00373         value = 1;
+00374     this->Enable(value);
+00375 \}
+00376 
+00377 \textcolor{keywordtype}{void} lms7002_pnlR3_view::UpdateGUI()
+00378 \{
+00379     LMS_Synchronize(lmsControl, \textcolor{keyword}{false});
+00380     LMS7002_WXGUI::UpdateControlsByMap(\textcolor{keyword}{this}, lmsControl, wndId2Enum);
+00381 
+00382     wxCommandEvent evt;
+00383 
+00384     \textcolor{keywordflow}{for}(\textcolor{keywordtype}{size\_t} i = 0; i<cmbDCControlsRx.size(); ++i)
+00385     \{
+00386         uint16\_t value = 0;
+00387         \textcolor{keyword}{auto} parameter = wndId2Enum[cmbDCControlsRx[i]];
+00388         LMS_WriteLMSReg(lmsControl, parameter.address, 0);
+00389         LMS_WriteLMSReg(lmsControl, parameter.address, 0x4000);
+00390         LMS_ReadParam(lmsControl, wndId2Enum[cmbDCControlsRx[i]], &value);
+00391         LMS_WriteLMSReg(lmsControl, parameter.address, value & ~0xC000);
+00392         \textcolor{keywordtype}{int} absval = (value & 0x3F);
+00393         \textcolor{keywordflow}{if}(value&0x40)
+00394             absval *= -1;
+00395         cmbDCControlsRx[i]->SetValue(absval);
+00396     \}
+00397     \textcolor{keywordflow}{for}(\textcolor{keywordtype}{size\_t} i = 0; i<cmbDCControlsTx.size(); ++i)
+00398     \{
+00399         uint16\_t value = 0;
+00400         \textcolor{keyword}{auto} parameter = wndId2Enum[cmbDCControlsTx[i]];
+00401         LMS_WriteLMSReg(lmsControl, parameter.address, 0);
+00402         LMS_WriteLMSReg(lmsControl, parameter.address, 0x4000);
+00403         LMS_ReadParam(lmsControl, wndId2Enum[cmbDCControlsTx[i]], &value);
+00404         LMS_WriteLMSReg(lmsControl, parameter.address, value & ~0xC000);
+00405         \textcolor{keywordtype}{int} absval = (value & 0x3FF);
+00406         \textcolor{keywordflow}{if}(value&0x400)
+00407             absval *= -1;
+00408         cmbDCControlsTx[i]->SetValue(absval);
+00409     \}
+00410 
+00411     UpdateGUISlow();
+00412 \}
+00413 
+00414 \textcolor{keywordtype}{void} lms7002_pnlR3_view::MCU_RunProcedure(uint8\_t \textcolor{keywordtype}{id})
+00415 \{
+00416     uint16\_t temp;
+00417     LMS_ReadLMSReg(lmsControl, 0x0002, &temp);
+00418 
+00419     \textcolor{keyword}{const} uint16\_t x0002reg = temp & 0xFF;
+00420     \textcolor{keyword}{const} uint16\_t interupt6 = 0x0008;
+00421     \textcolor{keyword}{const} uint16\_t addrs[5] = \{0x0006, 0x0, 0x0002, 0x0002, 0x0002\};
+00422     \textcolor{keyword}{const} uint16\_t values[5] = \{
+00423         (uint16\_t)(\textcolor{keywordtype}{id} != 0),
+00424         (uint16\_t)(\textcolor{keywordtype}{id}),
+00425         (uint16\_t)(x0002reg & ~interupt6),
+00426         (uint16\_t)(x0002reg | interupt6),
+00427         (uint16\_t)(x0002reg & ~interupt6)\};
+00428     \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} i=0; i<5; ++i)
+00429         LMS_WriteLMSReg(lmsControl, addrs[i], values[i]);
+00430 \}
+00431 
+00432 uint8\_t lms7002_pnlR3_view::MCU_WaitForStatus(uint16\_t timeout_ms)
+00433 \{
+00434     \textcolor{keyword}{auto} t1 = std::chrono::high\_resolution\_clock::now();
+00435     \textcolor{keyword}{auto} t2 = t1;
+00436     uint16\_t value = 0;
+00437     std::this\_thread::sleep\_for(std::chrono::milliseconds(1));
+00438     \textcolor{keywordflow}{do} \{
+00439         \textcolor{comment}{//value = SPI\_read(0x0001) & 0xFF;}
+00440         LMS_ReadLMSReg(lmsControl, 0x0001, &value);
+00441         value &= 0xFF;
+00442         \textcolor{keywordflow}{if} (value != 0xFF) \textcolor{comment}{//working}
+00443             \textcolor{keywordflow}{break};
+00444         std::this\_thread::sleep\_for(std::chrono::milliseconds(1));
+00445         t2 = std::chrono::high\_resolution\_clock::now();
+00446     \}\textcolor{keywordflow}{while} (std::chrono::duration\_cast<std::chrono::milliseconds>(t2 - t1).count() < timeout\_ms);
+00447     LMS_WriteLMSReg(lmsControl, 0x0006, 0);
+00448     \textcolor{comment}{//SPI\_write(0x0006, 0); //return SPI control to PC}
+00449     \textcolor{keywordflow}{return} value & 0x7F;
+00450 \}
+00451 
+00452 \textcolor{keywordtype}{void} lms7002_pnlR3_view::ParameterChangeHandler(wxCommandEvent& event)
+00453 \{
+00454     assert(lmsControl != \textcolor{keyword}{nullptr});
+00455     LMS7Parameter parameter;
+00456     \textcolor{keywordflow}{try}
+00457     \{
+00458         parameter = wndId2Enum.at(reinterpret\_cast<wxWindow*>(event.GetEventObject()));
+00459     \}
+00460     \textcolor{keywordflow}{catch} (std::exception & e)
+00461     \{
+00462         std::cout << \textcolor{stringliteral}{"Control element(ID = "} << \textcolor{keyword}{event}.GetId() << \textcolor{stringliteral}{") don't have assigned LMS parameter."} << 
+      std::endl;
+00463         \textcolor{keywordflow}{return};
+00464     \}
+00465 
+00466     \textcolor{keywordflow}{if}(parameter.address == 0x0640 || parameter.address == 0x0641)
+00467     \{
+00468         MCU_RunProcedure(MCU_FUNCTION_GET_PROGRAM_ID);
+00469         \textcolor{keywordflow}{if}(MCU_WaitForStatus(100) != MCU_ID_CALIBRATIONS_SINGLE_IMAGE)
+00470             LMS_Program(lmsControl, (\textcolor{keyword}{const} \textcolor{keywordtype}{char}*)
+      mcu_program_lms7_dc_iq_calibration_bin, \textcolor{keyword}{sizeof}(
+      mcu_program_lms7_dc_iq_calibration_bin), lime::program_mode::mcuRAM, \textcolor{keyword}{nullptr});
+00471 
+00472         \textcolor{comment}{//run mcu write}
+00473         LMS_WriteLMSReg(lmsControl, 0x002D, parameter.address);
+00474         uint16\_t wrVal = 0;
+00475 
+00476         \textcolor{comment}{//read reg}
+00477         MCU_RunProcedure(8);
+00478         uint16\_t rdVal = 0;
+00479         MCU_WaitForStatus(100);
+00480         LMS_ReadLMSReg(lmsControl, 0x040B, &rdVal);
+00481 
+00482         uint16\_t mask = (~0) << (parameter.msb-parameter.lsb+1);
+00483         mask = ~mask;
+00484         mask <<= parameter.lsb;
+00485         rdVal &= ~mask;
+00486         wrVal = rdVal | (\textcolor{keyword}{event}.GetInt() << parameter.lsb);
+00487 
+00488         LMS_WriteLMSReg(lmsControl, 0x020C, wrVal);
+00489         MCU_RunProcedure(7);
+00490         MCU_WaitForStatus(100);
+00491 
+00492         \textcolor{comment}{//check if correct}
+00493         MCU_RunProcedure(8);
+00494 
+00495         MCU_WaitForStatus(100);
+00496         LMS_ReadLMSReg(lmsControl, 0x040B, &rdVal);
+00497         \textcolor{keywordflow}{if}(rdVal != wrVal)
+00498         \{
+00499             printf(\textcolor{stringliteral}{"Reg 0x%04X value mismatch, written 0x%04X, got 0x%04X\(\backslash\)n"},
+00500                    parameter.address, wrVal, rdVal);
+00501         \}
+00502     \}
+00503     \textcolor{keywordflow}{else}
+00504         LMS_WriteParam(lmsControl,parameter,event.GetInt());
+00505 \}
+00506 
+00507 \textcolor{keywordtype}{void} lms7002_pnlR3_view::ParameterChangeHandler(wxSpinEvent& event)
+00508 \{
+00509     wxCommandEvent evt;
+00510     evt.SetInt(event.GetInt());
+00511     evt.SetId(event.GetId());
+00512     evt.SetEventObject(event.GetEventObject());
+00513     ParameterChangeHandler(evt);
+00514 \}
+00515 
+00516 \textcolor{keywordtype}{void} lms7002_pnlR3_view::OnDCCMPCFGRead()
+00517 \{
+00518     UpdateGUI();
+00519 \}
+00520 
+00521 \textcolor{keywordtype}{void} lms7002_pnlR3_view::OnReadRSSICMP(wxCommandEvent& event)
+00522 \{
+00523     UpdateGUI();
+00524 \}
+00525 
+00526 \textcolor{keywordtype}{void} lms7002_pnlR3_view::OnReadDCCMP(wxCommandEvent& event)
+00527 \{
+00528     UpdateGUI();
+00529 \}
+00530 
+00531 \textcolor{keywordtype}{void} lms7002_pnlR3_view::OnWriteTxDC(wxCommandEvent& event)
+00532 \{
+00533     LMS7Parameter parameter;
+00534     \textcolor{keywordflow}{try}
+00535     \{
+00536         parameter = wndId2Enum.at(reinterpret\_cast<wxWindow*>(event.GetEventObject()));
+00537         uint16\_t regVal = 0;
+00538         LMS_ReadLMSReg(lmsControl, parameter.address, &regVal);
+00539         regVal &= 0xF800;
+00540         \textcolor{keywordtype}{int} dcVal = \textcolor{keyword}{event}.GetInt();
+00541         \textcolor{keywordflow}{if}(dcVal < 0)
+00542         \{
+00543             --dcVal;
+00544             regVal |= 0x0400;
+00545         \}
+00546         regVal |= (abs(dcVal+0x400) & 0x3FF);
+00547         LMS_WriteLMSReg(lmsControl, parameter.address, regVal);
+00548         LMS_WriteLMSReg(lmsControl, parameter.address, regVal | 0x8000);
+00549         LMS_WriteLMSReg(lmsControl, parameter.address, regVal);
+00550         \textcolor{keywordflow}{return};
+00551     \}
+00552     \textcolor{keywordflow}{catch} (std::exception & e)
+00553     \{
+00554         std::cout << \textcolor{stringliteral}{"Control element(ID = "} << \textcolor{keyword}{event}.GetId() << \textcolor{stringliteral}{") don't have assigned LMS parameter."} << 
+      std::endl;
+00555         \textcolor{keywordflow}{return};
+00556     \}
+00557 \}
+00558 
+00559 \textcolor{keywordtype}{void} lms7002_pnlR3_view::OnWriteRxDC(wxCommandEvent& event)
+00560 \{
+00561     LMS7Parameter parameter;
+00562     \textcolor{keywordflow}{try}
+00563     \{
+00564         parameter = wndId2Enum.at(reinterpret\_cast<wxWindow*>(event.GetEventObject()));
+00565         uint16\_t regVal = 0;
+00566         LMS_ReadLMSReg(lmsControl, parameter.address, &regVal);
+00567         regVal &= 0xFF80;
+00568         \textcolor{keywordtype}{int} dcVal = \textcolor{keyword}{event}.GetInt();
+00569         \textcolor{keywordflow}{if}(dcVal < 0)
+00570         \{
+00571             --dcVal;
+00572             regVal |= 0x0040;
+00573         \}
+00574         regVal |= (abs(dcVal+0x40) & 0x3F);
+00575         LMS_WriteLMSReg(lmsControl, parameter.address, regVal & ~0x8000);
+00576         LMS_WriteLMSReg(lmsControl, parameter.address, regVal | 0x8000);
+00577         LMS_WriteLMSReg(lmsControl, parameter.address, regVal);
+00578         \textcolor{keywordflow}{return};
+00579     \}
+00580     \textcolor{keywordflow}{catch} (std::exception & e)
+00581     \{
+00582         std::cout << \textcolor{stringliteral}{"Control element(ID = "} << \textcolor{keyword}{event}.GetId() << \textcolor{stringliteral}{") don't have assigned LMS parameter."} << 
+      std::endl;
+00583         \textcolor{keywordflow}{return};
+00584     \}
+00585 \}
+00586 
+00587 \textcolor{keywordtype}{void} lms7002_pnlR3_view::OnReadDC( wxCommandEvent& event )
+00588 \{
+00589     UpdateGUI();
+00590 \}
+00591 
+00592 \textcolor{keywordtype}{void} lms7002_pnlR3_view::ParameterChangeHandlerCMPRead( wxCommandEvent& event )
+00593 \{
+00594     ParameterChangeHandler(event);
+00595     UpdateGUISlow();
+00596 \}
+00597 
+00598 \textcolor{keywordtype}{void} lms7002_pnlR3_view::UpdateGUISlow()
+00599 \{
+00600     vector<uint16\_t> addrs = \{0x0640, 0x0641\};
+00601     vector<uint16\_t> rez;
+00602     \textcolor{keywordflow}{for}(\textcolor{keyword}{auto} i : addrs)
+00603     \{
+00604         LMS_WriteLMSReg(lmsControl, 0x002D, i);
+00605         uint16\_t value = 0;
+00606         MCU_RunProcedure(8);
+00607         MCU_WaitForStatus(100);
+00608         LMS_ReadLMSReg(lmsControl, 0x040B, &value);
+00609         rez.push\_back(value);
+00610     \}
+00611     rssidc_cmpstatus->SetLabel(wxString::Format(\textcolor{stringliteral}{"%i"}, (rez[0]>>15) ));
+00612     cmbRSEL->SetSelection((rez[0] >> 4) & 0x1F);
+00613     cmbRSSIDC_HYSCMP->SetValue((rez[0] >> 1) & 0x7);
+00614     chkRSSI_PD->SetValue(rez[0] & 0x1);
+00615     spinDCO2->SetValue((rez[1] >> 7) & 0x7F);
+00616     spinDCO1->SetValue((rez[1] >> 0) & 0x7F);
+00617 
+00618 \}
+00619 
+00620 \textcolor{keywordtype}{void} lms7002_pnlR3_view::OnCalibrateAnalogRSSI( wxCommandEvent& event )
+00621 \{
+00622     lime::LMS7002M* lms = ((lime::LMS7_Device*)lmsControl)->GetLMS();
+00623     lms->CalibrateAnalogRSSI_DC_Offset();
+00624     UpdateGUI();
+00625 \}
+\end{DoxyCode}

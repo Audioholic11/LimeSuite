@@ -1,0 +1,561 @@
+\subsection{/home/erik/prefix/default/src/limesuite-\/dev/mcu\+\_\+program/common\+\_\+src/lms7002m\+\_\+filters.c File Reference}
+\label{lms7002m__filters_8c}\index{/home/erik/prefix/default/src/limesuite-\/dev/mcu\+\_\+program/common\+\_\+src/lms7002m\+\_\+filters.\+c@{/home/erik/prefix/default/src/limesuite-\/dev/mcu\+\_\+program/common\+\_\+src/lms7002m\+\_\+filters.\+c}}
+{\ttfamily \#include \char`\"{}lms7002m\+\_\+controls.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}lms7002m\+\_\+calibrations.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}lms7002m\+\_\+filters.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}L\+M\+S7002\+M\+\_\+parameters\+\_\+compact.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}spi.\+h\char`\"{}}\\*
+{\ttfamily \#include $<$math.\+h$>$}\\*
+{\ttfamily \#include \char`\"{}mcu\+\_\+defines.\+h\char`\"{}}\\*
+Include dependency graph for lms7002m\+\_\+filters.\+c\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{dd/d85/lms7002m__filters_8c__incl}
+\end{center}
+\end{figure}
+\subsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct {\bf Reach\+R\+S\+S\+Iparams}
+\end{DoxyCompactItemize}
+\subsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define {\bf B\+A\+T\+C\+H\+\_\+\+R\+X\+\_\+\+S\+E\+T\+UP}~1
+\item 
+\#define {\bf B\+A\+T\+C\+H\+\_\+\+T\+X\+\_\+\+S\+E\+T\+UP}~1
+\end{DoxyCompactItemize}
+\subsubsection*{Enumerations}
+\begin{DoxyCompactItemize}
+\item 
+enum \{ {\bf S\+E\+A\+R\+C\+H\+\_\+\+S\+U\+C\+C\+E\+SS} = 0, 
+{\bf S\+E\+A\+R\+C\+H\+\_\+\+N\+E\+E\+D\+\_\+\+T\+O\+\_\+\+D\+E\+C\+R\+E\+A\+SE}, 
+{\bf S\+E\+A\+R\+C\+H\+\_\+\+N\+E\+E\+D\+\_\+\+T\+O\+\_\+\+I\+N\+C\+R\+E\+A\+SE}
+ \}
+\end{DoxyCompactItemize}
+\subsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+static uint8\+\_\+t {\bf Config\+C\+G\+E\+N\+\_\+\+For\+L\+P\+F\+\_\+\+IF} (float I\+F\+\_\+\+Hz)
+\item 
+static uint8\+\_\+t {\bf Rx\+Filter\+Search} (const uint16\+\_\+t addr, const uint8\+\_\+t msblsb, const uint16\+\_\+t rssi\+\_\+3dB, const uint16\+\_\+t step\+Limit)
+\item 
+uint8\+\_\+t {\bf Tune\+Rx\+Filter\+Setup} (const {\bf float\+\_\+type} rx\+\_\+lpf\+\_\+\+IF)
+\item 
+static bool {\bf Change\+Until\+Reach\+R\+S\+SI} (const {\bf Reach\+R\+S\+S\+Iparams} $\ast$param, uint16\+\_\+t rssi\+Target)
+\item 
+uint8\+\_\+t {\bf Tune\+Rx\+Filter} (const {\bf float\+\_\+type} rx\+\_\+lpf\+\_\+freq\+\_\+\+RF)
+\item 
+static {\bf void} {\bf Set\+Tx\+L\+P\+F\+\_\+\+P\+Ds} (float lpf\+\_\+\+IF)
+\item 
+uint8\+\_\+t {\bf Tune\+Tx\+Filter\+Setup} (const {\bf float\+\_\+type} tx\+\_\+lpf\+\_\+\+IF)
+\item 
+static uint8\+\_\+t {\bf Search\+Tx\+Filter\+C\+C\+A\+L\+\_\+\+R\+C\+AL} (uint16\+\_\+t addr, uint8\+\_\+t msblsb)
+\item 
+uint8\+\_\+t {\bf Tune\+Tx\+Filter} (const {\bf float\+\_\+type} tx\+\_\+lpf\+\_\+freq\+\_\+\+RF)
+\end{DoxyCompactItemize}
+\subsubsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+static const {\bf float\+\_\+type} {\bf Rx\+L\+P\+F\+\_\+\+R\+F\+\_\+\+Limit\+Low} = 1.\+4e6
+\item 
+static const {\bf float\+\_\+type} {\bf Rx\+L\+P\+F\+\_\+\+R\+F\+\_\+\+Limit\+High} = 130e6
+\item 
+static const {\bf float\+\_\+type} {\bf Tx\+L\+P\+F\+\_\+\+R\+F\+\_\+\+Limit\+Low} = 5e6
+\item 
+static const {\bf float\+\_\+type} {\bf Tx\+L\+P\+F\+\_\+\+R\+F\+\_\+\+Limit\+Low\+Mid} = 40e6
+\item 
+static const {\bf float\+\_\+type} {\bf Tx\+L\+P\+F\+\_\+\+R\+F\+\_\+\+Limit\+Mid\+High} = 50e6
+\item 
+static const {\bf float\+\_\+type} {\bf Tx\+L\+P\+F\+\_\+\+R\+F\+\_\+\+Limit\+High} = 130e6
+\end{DoxyCompactItemize}
+
+
+\subsubsection{Macro Definition Documentation}
+\index{lms7002m\+\_\+filters.\+c@{lms7002m\+\_\+filters.\+c}!B\+A\+T\+C\+H\+\_\+\+R\+X\+\_\+\+S\+E\+T\+UP@{B\+A\+T\+C\+H\+\_\+\+R\+X\+\_\+\+S\+E\+T\+UP}}
+\index{B\+A\+T\+C\+H\+\_\+\+R\+X\+\_\+\+S\+E\+T\+UP@{B\+A\+T\+C\+H\+\_\+\+R\+X\+\_\+\+S\+E\+T\+UP}!lms7002m\+\_\+filters.\+c@{lms7002m\+\_\+filters.\+c}}
+\paragraph[{B\+A\+T\+C\+H\+\_\+\+R\+X\+\_\+\+S\+E\+T\+UP}]{\setlength{\rightskip}{0pt plus 5cm}\#define B\+A\+T\+C\+H\+\_\+\+R\+X\+\_\+\+S\+E\+T\+UP~1}\label{lms7002m__filters_8c_a3effd48ce344144155ae040e316ee0cf}
+\index{lms7002m\+\_\+filters.\+c@{lms7002m\+\_\+filters.\+c}!B\+A\+T\+C\+H\+\_\+\+T\+X\+\_\+\+S\+E\+T\+UP@{B\+A\+T\+C\+H\+\_\+\+T\+X\+\_\+\+S\+E\+T\+UP}}
+\index{B\+A\+T\+C\+H\+\_\+\+T\+X\+\_\+\+S\+E\+T\+UP@{B\+A\+T\+C\+H\+\_\+\+T\+X\+\_\+\+S\+E\+T\+UP}!lms7002m\+\_\+filters.\+c@{lms7002m\+\_\+filters.\+c}}
+\paragraph[{B\+A\+T\+C\+H\+\_\+\+T\+X\+\_\+\+S\+E\+T\+UP}]{\setlength{\rightskip}{0pt plus 5cm}\#define B\+A\+T\+C\+H\+\_\+\+T\+X\+\_\+\+S\+E\+T\+UP~1}\label{lms7002m__filters_8c_a9d0cfc738b7b42e6b902cbf22037b102}
+
+
+\subsubsection{Enumeration Type Documentation}
+\paragraph[{anonymous enum}]{\setlength{\rightskip}{0pt plus 5cm}anonymous enum}\label{lms7002m__filters_8c_a94798fdadfbf49a7c658ace669a1d310}
+\begin{Desc}
+\item[Enumerator]\par
+\begin{description}
+\index{S\+E\+A\+R\+C\+H\+\_\+\+S\+U\+C\+C\+E\+SS@{S\+E\+A\+R\+C\+H\+\_\+\+S\+U\+C\+C\+E\+SS}!lms7002m\+\_\+filters.\+c@{lms7002m\+\_\+filters.\+c}}\index{lms7002m\+\_\+filters.\+c@{lms7002m\+\_\+filters.\+c}!S\+E\+A\+R\+C\+H\+\_\+\+S\+U\+C\+C\+E\+SS@{S\+E\+A\+R\+C\+H\+\_\+\+S\+U\+C\+C\+E\+SS}}\item[{\em 
+S\+E\+A\+R\+C\+H\+\_\+\+S\+U\+C\+C\+E\+SS\label{lms7002m__filters_8c_a94798fdadfbf49a7c658ace669a1d310a5529b9579968478726fe45399b7987ba}
+}]\index{S\+E\+A\+R\+C\+H\+\_\+\+N\+E\+E\+D\+\_\+\+T\+O\+\_\+\+D\+E\+C\+R\+E\+A\+SE@{S\+E\+A\+R\+C\+H\+\_\+\+N\+E\+E\+D\+\_\+\+T\+O\+\_\+\+D\+E\+C\+R\+E\+A\+SE}!lms7002m\+\_\+filters.\+c@{lms7002m\+\_\+filters.\+c}}\index{lms7002m\+\_\+filters.\+c@{lms7002m\+\_\+filters.\+c}!S\+E\+A\+R\+C\+H\+\_\+\+N\+E\+E\+D\+\_\+\+T\+O\+\_\+\+D\+E\+C\+R\+E\+A\+SE@{S\+E\+A\+R\+C\+H\+\_\+\+N\+E\+E\+D\+\_\+\+T\+O\+\_\+\+D\+E\+C\+R\+E\+A\+SE}}\item[{\em 
+S\+E\+A\+R\+C\+H\+\_\+\+N\+E\+E\+D\+\_\+\+T\+O\+\_\+\+D\+E\+C\+R\+E\+A\+SE\label{lms7002m__filters_8c_a94798fdadfbf49a7c658ace669a1d310a18eea22757848f655049b9992316fa38}
+}]\index{S\+E\+A\+R\+C\+H\+\_\+\+N\+E\+E\+D\+\_\+\+T\+O\+\_\+\+I\+N\+C\+R\+E\+A\+SE@{S\+E\+A\+R\+C\+H\+\_\+\+N\+E\+E\+D\+\_\+\+T\+O\+\_\+\+I\+N\+C\+R\+E\+A\+SE}!lms7002m\+\_\+filters.\+c@{lms7002m\+\_\+filters.\+c}}\index{lms7002m\+\_\+filters.\+c@{lms7002m\+\_\+filters.\+c}!S\+E\+A\+R\+C\+H\+\_\+\+N\+E\+E\+D\+\_\+\+T\+O\+\_\+\+I\+N\+C\+R\+E\+A\+SE@{S\+E\+A\+R\+C\+H\+\_\+\+N\+E\+E\+D\+\_\+\+T\+O\+\_\+\+I\+N\+C\+R\+E\+A\+SE}}\item[{\em 
+S\+E\+A\+R\+C\+H\+\_\+\+N\+E\+E\+D\+\_\+\+T\+O\+\_\+\+I\+N\+C\+R\+E\+A\+SE\label{lms7002m__filters_8c_a94798fdadfbf49a7c658ace669a1d310a1f1e3ac20b0ba1cd7e4b144e9e604553}
+}]\end{description}
+\end{Desc}
+
+
+Definition at line {\bf 9} of file {\bf lms7002m\+\_\+filters.\+c}.
+
+
+
+\subsubsection{Function Documentation}
+\index{lms7002m\+\_\+filters.\+c@{lms7002m\+\_\+filters.\+c}!Change\+Until\+Reach\+R\+S\+SI@{Change\+Until\+Reach\+R\+S\+SI}}
+\index{Change\+Until\+Reach\+R\+S\+SI@{Change\+Until\+Reach\+R\+S\+SI}!lms7002m\+\_\+filters.\+c@{lms7002m\+\_\+filters.\+c}}
+\paragraph[{Change\+Until\+Reach\+R\+S\+S\+I(const Reach\+R\+S\+S\+Iparams $\ast$param, uint16\+\_\+t rssi\+Target)}]{\setlength{\rightskip}{0pt plus 5cm}static bool Change\+Until\+Reach\+R\+S\+SI (
+\begin{DoxyParamCaption}
+\item[{const {\bf Reach\+R\+S\+S\+Iparams} $\ast$}]{param, }
+\item[{uint16\+\_\+t}]{rssi\+Target}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [static]}}\label{lms7002m__filters_8c_a4e71f9b215d593ff792a55f14efa8427}
+
+
+Definition at line {\bf 280} of file {\bf lms7002m\+\_\+filters.\+c}.
+
+
+
+References {\bf gain}, {\bf Get\+\_\+\+S\+P\+I\+\_\+\+Reg\+\_\+bits()}, {\bf Get\+R\+S\+S\+I()}, and {\bf Modify\+\_\+\+S\+P\+I\+\_\+\+Reg\+\_\+bits()}.
+
+
+
+Referenced by {\bf Search\+Tx\+Filter\+C\+C\+A\+L\+\_\+\+R\+C\+A\+L()}, {\bf Tune\+Rx\+Filter()}, and {\bf Tune\+Tx\+Filter()}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{d2/da6/lms7002m__filters_8c_a4e71f9b215d593ff792a55f14efa8427_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{d2/da6/lms7002m__filters_8c_a4e71f9b215d593ff792a55f14efa8427_icgraph}
+\end{center}
+\end{figure}
+
+
+\index{lms7002m\+\_\+filters.\+c@{lms7002m\+\_\+filters.\+c}!Config\+C\+G\+E\+N\+\_\+\+For\+L\+P\+F\+\_\+\+IF@{Config\+C\+G\+E\+N\+\_\+\+For\+L\+P\+F\+\_\+\+IF}}
+\index{Config\+C\+G\+E\+N\+\_\+\+For\+L\+P\+F\+\_\+\+IF@{Config\+C\+G\+E\+N\+\_\+\+For\+L\+P\+F\+\_\+\+IF}!lms7002m\+\_\+filters.\+c@{lms7002m\+\_\+filters.\+c}}
+\paragraph[{Config\+C\+G\+E\+N\+\_\+\+For\+L\+P\+F\+\_\+\+I\+F(float I\+F\+\_\+\+Hz)}]{\setlength{\rightskip}{0pt plus 5cm}static uint8\+\_\+t Config\+C\+G\+E\+N\+\_\+\+For\+L\+P\+F\+\_\+\+IF (
+\begin{DoxyParamCaption}
+\item[{float}]{I\+F\+\_\+\+Hz}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [static]}}\label{lms7002m__filters_8c_a2932fa7b7abd57355fb40dcf30270187}
+
+
+Definition at line {\bf 26} of file {\bf lms7002m\+\_\+filters.\+c}.
+
+
+
+References {\bf clamp()}, and {\bf Set\+Frequency\+C\+G\+E\+N()}.
+
+
+
+Referenced by {\bf Tune\+Rx\+Filter\+Setup()}, and {\bf Tune\+Tx\+Filter\+Setup()}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{d2/da6/lms7002m__filters_8c_a2932fa7b7abd57355fb40dcf30270187_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{d2/da6/lms7002m__filters_8c_a2932fa7b7abd57355fb40dcf30270187_icgraph}
+\end{center}
+\end{figure}
+
+
+\index{lms7002m\+\_\+filters.\+c@{lms7002m\+\_\+filters.\+c}!Rx\+Filter\+Search@{Rx\+Filter\+Search}}
+\index{Rx\+Filter\+Search@{Rx\+Filter\+Search}!lms7002m\+\_\+filters.\+c@{lms7002m\+\_\+filters.\+c}}
+\paragraph[{Rx\+Filter\+Search(const uint16\+\_\+t addr, const uint8\+\_\+t msblsb, const uint16\+\_\+t rssi\+\_\+3d\+B, const uint16\+\_\+t step\+Limit)}]{\setlength{\rightskip}{0pt plus 5cm}static uint8\+\_\+t Rx\+Filter\+Search (
+\begin{DoxyParamCaption}
+\item[{const uint16\+\_\+t}]{addr, }
+\item[{const uint8\+\_\+t}]{msblsb, }
+\item[{const uint16\+\_\+t}]{rssi\+\_\+3dB, }
+\item[{const uint16\+\_\+t}]{step\+Limit}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [static]}}\label{lms7002m__filters_8c_a36ea3a13b9b1aeff9323d1e2a73dbd2e}
+
+
+Definition at line {\bf 32} of file {\bf lms7002m\+\_\+filters.\+c}.
+
+
+
+References {\bf clamp()}, {\bf Get\+\_\+\+S\+P\+I\+\_\+\+Reg\+\_\+bits()}, {\bf Get\+R\+S\+S\+I()}, {\bf Modify\+\_\+\+S\+P\+I\+\_\+\+Reg\+\_\+bits()}, {\bf pow2()}, {\bf S\+E\+A\+R\+C\+H\+\_\+\+N\+E\+E\+D\+\_\+\+T\+O\+\_\+\+D\+E\+C\+R\+E\+A\+SE}, and {\bf S\+E\+A\+R\+C\+H\+\_\+\+N\+E\+E\+D\+\_\+\+T\+O\+\_\+\+I\+N\+C\+R\+E\+A\+SE}.
+
+
+
+Referenced by {\bf Tune\+Rx\+Filter()}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{d2/da6/lms7002m__filters_8c_a36ea3a13b9b1aeff9323d1e2a73dbd2e_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{d2/da6/lms7002m__filters_8c_a36ea3a13b9b1aeff9323d1e2a73dbd2e_icgraph}
+\end{center}
+\end{figure}
+
+
+\index{lms7002m\+\_\+filters.\+c@{lms7002m\+\_\+filters.\+c}!Search\+Tx\+Filter\+C\+C\+A\+L\+\_\+\+R\+C\+AL@{Search\+Tx\+Filter\+C\+C\+A\+L\+\_\+\+R\+C\+AL}}
+\index{Search\+Tx\+Filter\+C\+C\+A\+L\+\_\+\+R\+C\+AL@{Search\+Tx\+Filter\+C\+C\+A\+L\+\_\+\+R\+C\+AL}!lms7002m\+\_\+filters.\+c@{lms7002m\+\_\+filters.\+c}}
+\paragraph[{Search\+Tx\+Filter\+C\+C\+A\+L\+\_\+\+R\+C\+A\+L(uint16\+\_\+t addr, uint8\+\_\+t msblsb)}]{\setlength{\rightskip}{0pt plus 5cm}static uint8\+\_\+t Search\+Tx\+Filter\+C\+C\+A\+L\+\_\+\+R\+C\+AL (
+\begin{DoxyParamCaption}
+\item[{uint16\+\_\+t}]{addr, }
+\item[{uint8\+\_\+t}]{msblsb}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [static]}}\label{lms7002m__filters_8c_aa9caab5ff4ebdb1cec1517f380af23d6}
+
+
+Definition at line {\bf 579} of file {\bf lms7002m\+\_\+filters.\+c}.
+
+
+
+References {\bf C\+C\+A\+L\+\_\+\+L\+P\+F\+L\+A\+D\+\_\+\+T\+BB}, {\bf Change\+Until\+Reach\+R\+S\+S\+I()}, {\bf clamp()}, {\bf Get\+\_\+\+S\+P\+I\+\_\+\+Reg\+\_\+bits()}, {\bf Get\+R\+S\+S\+I()}, {\bf M\+C\+U\+\_\+\+N\+O\+\_\+\+E\+R\+R\+OR}, {\bf M\+C\+U\+\_\+\+R\+C\+A\+L\+\_\+\+L\+P\+F\+\_\+\+L\+I\+M\+I\+T\+\_\+\+R\+E\+A\+C\+H\+ED}, {\bf Modify\+\_\+\+S\+P\+I\+\_\+\+Reg\+\_\+bits()}, {\bf R\+OM}, {\bf S\+E\+L\+\_\+\+RX}, and {\bf S\+E\+L\+\_\+\+TX}.
+
+
+
+Referenced by {\bf Tune\+Tx\+Filter()}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{d2/da6/lms7002m__filters_8c_aa9caab5ff4ebdb1cec1517f380af23d6_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{d2/da6/lms7002m__filters_8c_aa9caab5ff4ebdb1cec1517f380af23d6_icgraph}
+\end{center}
+\end{figure}
+
+
+\index{lms7002m\+\_\+filters.\+c@{lms7002m\+\_\+filters.\+c}!Set\+Tx\+L\+P\+F\+\_\+\+P\+Ds@{Set\+Tx\+L\+P\+F\+\_\+\+P\+Ds}}
+\index{Set\+Tx\+L\+P\+F\+\_\+\+P\+Ds@{Set\+Tx\+L\+P\+F\+\_\+\+P\+Ds}!lms7002m\+\_\+filters.\+c@{lms7002m\+\_\+filters.\+c}}
+\paragraph[{Set\+Tx\+L\+P\+F\+\_\+\+P\+Ds(float lpf\+\_\+\+I\+F)}]{\setlength{\rightskip}{0pt plus 5cm}static {\bf void} Set\+Tx\+L\+P\+F\+\_\+\+P\+Ds (
+\begin{DoxyParamCaption}
+\item[{float}]{lpf\+\_\+\+IF}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [static]}}\label{lms7002m__filters_8c_af423268c146b49eb60271a133bfc562d}
+
+
+Definition at line {\bf 432} of file {\bf lms7002m\+\_\+filters.\+c}.
+
+
+
+References {\bf Modify\+\_\+\+S\+P\+I\+\_\+\+Reg\+\_\+bits()}, {\bf R5\+\_\+\+L\+P\+F\+\_\+\+B\+Y\+P\+\_\+\+T\+BB}, {\bf S\+P\+I\+\_\+read()}, {\bf S\+P\+I\+\_\+write()}, and {\bf Tx\+L\+P\+F\+\_\+\+R\+F\+\_\+\+Limit\+Low\+Mid}.
+
+
+
+Referenced by {\bf Tune\+Tx\+Filter()}, and {\bf Tune\+Tx\+Filter\+Setup()}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{d2/da6/lms7002m__filters_8c_af423268c146b49eb60271a133bfc562d_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{d2/da6/lms7002m__filters_8c_af423268c146b49eb60271a133bfc562d_icgraph}
+\end{center}
+\end{figure}
+
+
+\index{lms7002m\+\_\+filters.\+c@{lms7002m\+\_\+filters.\+c}!Tune\+Rx\+Filter@{Tune\+Rx\+Filter}}
+\index{Tune\+Rx\+Filter@{Tune\+Rx\+Filter}!lms7002m\+\_\+filters.\+c@{lms7002m\+\_\+filters.\+c}}
+\paragraph[{Tune\+Rx\+Filter(const float\+\_\+type rx\+\_\+lpf\+\_\+freq\+\_\+\+R\+F)}]{\setlength{\rightskip}{0pt plus 5cm}uint8\+\_\+t Tune\+Rx\+Filter (
+\begin{DoxyParamCaption}
+\item[{const {\bf float\+\_\+type}}]{rx\+\_\+lpf\+\_\+freq\+\_\+\+RF}
+\end{DoxyParamCaption}
+)}\label{lms7002m__filters_8c_a9424d257383be4943c2846bb47253bf3}
+
+
+Definition at line {\bf 296} of file {\bf lms7002m\+\_\+filters.\+c}.
+
+
+
+References {\bf C\+C\+O\+M\+P\+\_\+\+T\+I\+A\+\_\+\+R\+FE}, {\bf C\+F\+B\+\_\+\+T\+I\+A\+\_\+\+R\+FE}, {\bf C\+G\+\_\+\+I\+A\+M\+P\+\_\+\+T\+BB}, {\bf Change\+Until\+Reach\+R\+S\+S\+I()}, {\bf clamp()}, {\bf G\+\_\+\+R\+X\+L\+O\+O\+P\+B\+\_\+\+R\+FE}, {\bf G\+\_\+\+T\+I\+A\+\_\+\+R\+FE}, {\bf Get\+\_\+\+S\+P\+I\+\_\+\+Reg\+\_\+bits()}, {\bf Get\+R\+S\+S\+I()}, {\bf I\+N\+P\+U\+T\+\_\+\+C\+T\+L\+\_\+\+P\+G\+A\+\_\+\+R\+BB}, {\bf int()}, {\bf L\+M\+S7002\+M\+\_\+\+Rx}, {\bf M\+C\+U\+\_\+\+C\+F\+B\+\_\+\+T\+I\+A\+\_\+\+R\+F\+E\+\_\+\+L\+I\+M\+I\+T\+\_\+\+R\+E\+A\+C\+H\+ED}, {\bf M\+C\+U\+\_\+\+N\+O\+\_\+\+E\+R\+R\+OR}, {\bf M\+C\+U\+\_\+\+R\+\_\+\+C\+T\+L\+\_\+\+L\+P\+F\+\_\+\+L\+I\+M\+I\+T\+\_\+\+R\+E\+A\+C\+H\+ED}, {\bf M\+C\+U\+\_\+\+R\+X\+\_\+\+I\+N\+V\+A\+L\+I\+D\+\_\+\+T\+IA}, {\bf Modify\+\_\+\+S\+P\+I\+\_\+\+Reg\+\_\+bits()}, {\bf M\+S\+B\+\_\+\+L\+SB}, {\bf R\+\_\+\+C\+T\+L\+\_\+\+L\+P\+F\+\_\+\+R\+BB}, {\bf R\+C\+O\+M\+P\+\_\+\+T\+I\+A\+\_\+\+R\+FE}, {\bf R\+OM}, {\bf Rx\+Filter\+Search()}, {\bf Save\+Chip\+State()}, {\bf S\+E\+A\+R\+C\+H\+\_\+\+N\+E\+E\+D\+\_\+\+T\+O\+\_\+\+I\+N\+C\+R\+E\+A\+SE}, {\bf S\+E\+A\+R\+C\+H\+\_\+\+S\+U\+C\+C\+E\+SS}, {\bf Set\+Frequency\+S\+X()}, {\bf Set\+N\+C\+O\+Frequency()}, {\bf S\+P\+I\+\_\+read()}, {\bf S\+P\+I\+\_\+write()}, {\bf status}, {\bf Tune\+Rx\+Filter\+Setup()}, and {\bf Update\+R\+S\+S\+I\+Delay()}.
+
+
+
+Referenced by {\bf Filters()}, and {\bf main()}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{d2/da6/lms7002m__filters_8c_a9424d257383be4943c2846bb47253bf3_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=307pt]{d2/da6/lms7002m__filters_8c_a9424d257383be4943c2846bb47253bf3_icgraph}
+\end{center}
+\end{figure}
+
+
+\index{lms7002m\+\_\+filters.\+c@{lms7002m\+\_\+filters.\+c}!Tune\+Rx\+Filter\+Setup@{Tune\+Rx\+Filter\+Setup}}
+\index{Tune\+Rx\+Filter\+Setup@{Tune\+Rx\+Filter\+Setup}!lms7002m\+\_\+filters.\+c@{lms7002m\+\_\+filters.\+c}}
+\paragraph[{Tune\+Rx\+Filter\+Setup(const float\+\_\+type rx\+\_\+lpf\+\_\+\+I\+F)}]{\setlength{\rightskip}{0pt plus 5cm}uint8\+\_\+t Tune\+Rx\+Filter\+Setup (
+\begin{DoxyParamCaption}
+\item[{const {\bf float\+\_\+type}}]{rx\+\_\+lpf\+\_\+\+IF}
+\end{DoxyParamCaption}
+)}\label{lms7002m__filters_8c_a0b0fba102366e901abb3ea5a08d8d373}
+
+
+Definition at line {\bf 65} of file {\bf lms7002m\+\_\+filters.\+c}.
+
+
+
+References {\bf A\+G\+C\+\_\+\+A\+V\+G\+\_\+\+R\+X\+T\+SP}, {\bf A\+G\+C\+\_\+\+M\+O\+D\+E\+\_\+\+R\+X\+T\+SP}, {\bf Begin\+Batch()}, {\bf C\+G\+\_\+\+I\+A\+M\+P\+\_\+\+T\+BB}, {\bf clamp()}, {\bf C\+M\+I\+X\+\_\+\+B\+Y\+P\+\_\+\+R\+X\+T\+SP}, {\bf C\+M\+I\+X\+\_\+\+G\+A\+I\+N\+\_\+\+R\+X\+T\+SP}, {\bf C\+M\+I\+X\+\_\+\+S\+C\+\_\+\+R\+X\+T\+SP}, {\bf C\+M\+I\+X\+\_\+\+S\+C\+\_\+\+T\+X\+T\+SP}, {\bf Config\+C\+G\+E\+N\+\_\+\+For\+L\+P\+F\+\_\+\+I\+F()}, {\bf E\+N\+\_\+\+G\+\_\+\+X\+B\+UF}, {\bf E\+N\+\_\+\+I\+N\+S\+H\+S\+W\+\_\+\+L\+B2\+\_\+\+R\+FE}, {\bf E\+N\+\_\+\+L\+O\+O\+P\+B\+\_\+\+T\+X\+P\+A\+D\+\_\+\+T\+RF}, {\bf Enable\+Channel\+Power\+Controls()}, {\bf Enable\+M\+I\+M\+O\+Buffers\+If\+Necessary()}, {\bf End\+Batch()}, {\bf G\+\_\+\+P\+G\+A\+\_\+\+R\+BB}, {\bf G\+\_\+\+R\+X\+L\+O\+O\+P\+B\+\_\+\+R\+FE}, {\bf G\+\_\+\+T\+I\+A\+\_\+\+R\+FE}, {\bf Get\+\_\+\+S\+P\+I\+\_\+\+Reg\+\_\+bits()}, {\bf Get\+Value\+Of\+\_\+c\+\_\+ctl\+\_\+pga\+\_\+rbb()}, {\bf G\+F\+I\+R1\+\_\+\+B\+Y\+P\+\_\+\+R\+X\+T\+SP}, {\bf G\+F\+I\+R1\+\_\+\+B\+Y\+P\+\_\+\+T\+X\+T\+SP}, {\bf G\+F\+I\+R2\+\_\+\+B\+Y\+P\+\_\+\+R\+X\+T\+SP}, {\bf G\+F\+I\+R2\+\_\+\+B\+Y\+P\+\_\+\+T\+X\+T\+SP}, {\bf G\+F\+I\+R3\+\_\+\+B\+Y\+P\+\_\+\+R\+X\+T\+SP}, {\bf G\+F\+I\+R3\+\_\+\+B\+Y\+P\+\_\+\+T\+X\+T\+SP}, {\bf H\+B\+D\+\_\+\+O\+V\+R\+\_\+\+R\+X\+T\+SP}, {\bf I\+C\+T\+\_\+\+I\+A\+M\+P\+\_\+\+F\+R\+P\+\_\+\+T\+BB}, {\bf I\+C\+T\+\_\+\+I\+A\+M\+P\+\_\+\+G\+G\+\_\+\+F\+R\+P\+\_\+\+T\+BB}, {\bf I\+C\+T\+\_\+\+P\+G\+A\+\_\+\+I\+N\+\_\+\+R\+BB}, {\bf I\+C\+T\+\_\+\+P\+G\+A\+\_\+\+O\+U\+T\+\_\+\+R\+BB}, {\bf I\+C\+T\+\_\+\+V\+C\+O\+\_\+\+C\+G\+EN}, {\bf I\+N\+P\+U\+T\+\_\+\+C\+T\+L\+\_\+\+P\+G\+A\+\_\+\+R\+BB}, {\bf I\+N\+S\+E\+L\+\_\+\+T\+X\+T\+SP}, {\bf L\+\_\+\+L\+O\+O\+P\+B\+\_\+\+T\+X\+P\+A\+D\+\_\+\+T\+RF}, {\bf L\+M\+S7002\+M\+\_\+\+Rx}, {\bf L\+M\+S7002\+M\+\_\+\+Tx}, {\bf Load\+D\+C\+\_\+\+R\+E\+G\+\_\+\+T\+X\+\_\+\+I\+Q()}, {\bf M\+AC}, {\bf M\+C\+U\+\_\+\+N\+O\+\_\+\+E\+R\+R\+OR}, {\bf M\+C\+U\+\_\+\+R\+X\+\_\+\+I\+N\+V\+A\+L\+I\+D\+\_\+\+T\+IA}, {\bf M\+C\+U\+\_\+\+R\+X\+\_\+\+L\+P\+F\+\_\+\+O\+U\+T\+\_\+\+O\+F\+\_\+\+R\+A\+N\+GE}, {\bf Modify\+\_\+\+S\+P\+I\+\_\+\+Reg\+\_\+bits()}, {\bf M\+S\+B\+\_\+\+L\+SB}, {\bf P\+D\+\_\+\+M\+X\+L\+O\+B\+U\+F\+\_\+\+R\+FE}, {\bf P\+D\+\_\+\+Q\+G\+E\+N\+\_\+\+R\+FE}, {\bf P\+D\+\_\+\+R\+L\+O\+O\+P\+B\+\_\+2\+\_\+\+R\+FE}, {\bf P\+D\+\_\+\+R\+X\+\_\+\+A\+F\+E2}, {\bf P\+D\+\_\+\+X\+B\+U\+F\+\_\+\+RX}, {\bf P\+D\+\_\+\+X\+B\+U\+F\+\_\+\+TX}, {\bf R\+C\+O\+M\+P\+\_\+\+T\+I\+A\+\_\+\+R\+FE}, {\bf R\+F\+B\+\_\+\+T\+I\+A\+\_\+\+R\+FE}, {\bf R\+OM}, {\bf Rx\+L\+P\+F\+\_\+\+R\+F\+\_\+\+Limit\+High}, {\bf Rx\+L\+P\+F\+\_\+\+R\+F\+\_\+\+Limit\+Low}, {\bf S\+E\+C\+T\+I\+O\+N\+\_\+\+A\+FE}, {\bf S\+E\+C\+T\+I\+O\+N\+\_\+\+C\+G\+EN}, {\bf S\+E\+C\+T\+I\+O\+N\+\_\+\+R\+BB}, {\bf S\+E\+C\+T\+I\+O\+N\+\_\+\+R\+FE}, {\bf S\+E\+C\+T\+I\+O\+N\+\_\+\+Rx\+N\+CO}, {\bf S\+E\+C\+T\+I\+O\+N\+\_\+\+Rx\+T\+SP}, {\bf S\+E\+C\+T\+I\+O\+N\+\_\+\+T\+BB}, {\bf S\+E\+C\+T\+I\+O\+N\+\_\+\+T\+RF}, {\bf S\+E\+C\+T\+I\+O\+N\+\_\+\+Tx\+N\+CO}, {\bf S\+E\+C\+T\+I\+O\+N\+\_\+\+Tx\+T\+SP}, {\bf S\+E\+L\+\_\+\+B\+A\+N\+D1\+\_\+\+T\+RF}, {\bf S\+E\+L\+\_\+\+B\+A\+N\+D2\+\_\+\+T\+RF}, {\bf S\+E\+L\+\_\+\+P\+A\+T\+H\+\_\+\+R\+FE}, {\bf Set\+Defaults()}, {\bf Set\+Defaults\+S\+X()}, {\bf Set\+Frequency\+S\+X()}, {\bf Set\+N\+C\+O\+Frequency()}, {\bf S\+P\+I\+\_\+read()}, {\bf S\+P\+I\+\_\+write()}, {\bf status}, {\bf T\+S\+G\+M\+O\+D\+E\+\_\+\+T\+X\+T\+SP}, and {\bf Write\+Masked\+Regs()}.
+
+
+
+Referenced by {\bf Tune\+Rx\+Filter()}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{d2/da6/lms7002m__filters_8c_a0b0fba102366e901abb3ea5a08d8d373_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{d2/da6/lms7002m__filters_8c_a0b0fba102366e901abb3ea5a08d8d373_icgraph}
+\end{center}
+\end{figure}
+
+
+\index{lms7002m\+\_\+filters.\+c@{lms7002m\+\_\+filters.\+c}!Tune\+Tx\+Filter@{Tune\+Tx\+Filter}}
+\index{Tune\+Tx\+Filter@{Tune\+Tx\+Filter}!lms7002m\+\_\+filters.\+c@{lms7002m\+\_\+filters.\+c}}
+\paragraph[{Tune\+Tx\+Filter(const float\+\_\+type tx\+\_\+lpf\+\_\+freq\+\_\+\+R\+F)}]{\setlength{\rightskip}{0pt plus 5cm}uint8\+\_\+t Tune\+Tx\+Filter (
+\begin{DoxyParamCaption}
+\item[{const {\bf float\+\_\+type}}]{tx\+\_\+lpf\+\_\+freq\+\_\+\+RF}
+\end{DoxyParamCaption}
+)}\label{lms7002m__filters_8c_a801d017b2c167a8ccd481e5a8aa884f6}
+
+
+Definition at line {\bf 636} of file {\bf lms7002m\+\_\+filters.\+c}.
+
+
+
+References {\bf C\+\_\+\+C\+T\+L\+\_\+\+P\+G\+A\+\_\+\+R\+BB}, {\bf C\+C\+A\+L\+\_\+\+L\+P\+F\+L\+A\+D\+\_\+\+T\+BB}, {\bf C\+G\+\_\+\+I\+A\+M\+P\+\_\+\+T\+BB}, {\bf Change\+Until\+Reach\+R\+S\+S\+I()}, {\bf Get\+\_\+\+S\+P\+I\+\_\+\+Reg\+\_\+bits()}, {\bf M\+C\+U\+\_\+\+N\+O\+\_\+\+E\+R\+R\+OR}, {\bf M\+C\+U\+\_\+\+T\+X\+\_\+\+L\+P\+F\+\_\+\+O\+U\+T\+\_\+\+O\+F\+\_\+\+R\+A\+N\+GE}, {\bf Modify\+\_\+\+S\+P\+I\+\_\+\+Reg\+\_\+bits()}, {\bf R\+C\+A\+L\+\_\+\+L\+P\+F\+H\+\_\+\+T\+BB}, {\bf R\+C\+A\+L\+\_\+\+L\+P\+F\+L\+A\+D\+\_\+\+T\+BB}, {\bf R\+OM}, {\bf Save\+Chip\+State()}, {\bf Search\+Tx\+Filter\+C\+C\+A\+L\+\_\+\+R\+C\+A\+L()}, {\bf S\+E\+L\+\_\+\+RX}, {\bf S\+E\+L\+\_\+\+TX}, {\bf Set\+Tx\+L\+P\+F\+\_\+\+P\+Ds()}, {\bf S\+P\+I\+\_\+read()}, {\bf S\+P\+I\+\_\+write()}, {\bf status}, {\bf Tune\+Tx\+Filter\+Setup()}, {\bf Tx\+L\+P\+F\+\_\+\+R\+F\+\_\+\+Limit\+High}, {\bf Tx\+L\+P\+F\+\_\+\+R\+F\+\_\+\+Limit\+Low\+Mid}, {\bf Tx\+L\+P\+F\+\_\+\+R\+F\+\_\+\+Limit\+Mid\+High}, and {\bf Update\+R\+S\+S\+I\+Delay()}.
+
+
+
+Referenced by {\bf Filters()}, and {\bf main()}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{d2/da6/lms7002m__filters_8c_a801d017b2c167a8ccd481e5a8aa884f6_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=305pt]{d2/da6/lms7002m__filters_8c_a801d017b2c167a8ccd481e5a8aa884f6_icgraph}
+\end{center}
+\end{figure}
+
+
+\index{lms7002m\+\_\+filters.\+c@{lms7002m\+\_\+filters.\+c}!Tune\+Tx\+Filter\+Setup@{Tune\+Tx\+Filter\+Setup}}
+\index{Tune\+Tx\+Filter\+Setup@{Tune\+Tx\+Filter\+Setup}!lms7002m\+\_\+filters.\+c@{lms7002m\+\_\+filters.\+c}}
+\paragraph[{Tune\+Tx\+Filter\+Setup(const float\+\_\+type tx\+\_\+lpf\+\_\+\+I\+F)}]{\setlength{\rightskip}{0pt plus 5cm}uint8\+\_\+t Tune\+Tx\+Filter\+Setup (
+\begin{DoxyParamCaption}
+\item[{const {\bf float\+\_\+type}}]{tx\+\_\+lpf\+\_\+\+IF}
+\end{DoxyParamCaption}
+)}\label{lms7002m__filters_8c_af1361ae85c78643bf99447e7251304fb}
+
+
+Definition at line {\bf 445} of file {\bf lms7002m\+\_\+filters.\+c}.
+
+
+
+References {\bf A\+G\+C\+\_\+\+A\+V\+G\+\_\+\+R\+X\+T\+SP}, {\bf A\+G\+C\+\_\+\+M\+O\+D\+E\+\_\+\+R\+X\+T\+SP}, {\bf Begin\+Batch()}, {\bf C\+G\+\_\+\+I\+A\+M\+P\+\_\+\+T\+BB}, {\bf clamp()}, {\bf C\+M\+I\+X\+\_\+\+S\+C\+\_\+\+R\+X\+T\+SP}, {\bf Config\+C\+G\+E\+N\+\_\+\+For\+L\+P\+F\+\_\+\+I\+F()}, {\bf E\+N\+\_\+\+G\+\_\+\+R\+FE}, {\bf E\+N\+\_\+\+G\+\_\+\+T\+RF}, {\bf E\+N\+\_\+\+G\+\_\+\+X\+B\+UF}, {\bf Enable\+Channel\+Power\+Controls()}, {\bf Enable\+M\+I\+M\+O\+Buffers\+If\+Necessary()}, {\bf End\+Batch()}, {\bf freq}, {\bf G\+\_\+\+P\+G\+A\+\_\+\+R\+BB}, {\bf Get\+\_\+\+S\+P\+I\+\_\+\+Reg\+\_\+bits()}, {\bf H\+B\+D\+\_\+\+O\+V\+R\+\_\+\+R\+X\+T\+SP}, {\bf I\+C\+T\+\_\+\+V\+C\+O\+\_\+\+C\+G\+EN}, {\bf I\+N\+P\+U\+T\+\_\+\+C\+T\+L\+\_\+\+P\+G\+A\+\_\+\+R\+BB}, {\bf I\+N\+S\+E\+L\+\_\+\+T\+X\+T\+SP}, {\bf I\+S\+E\+L\+\_\+\+D\+A\+C\+\_\+\+A\+FE}, {\bf L\+M\+S7002\+M\+\_\+\+Rx}, {\bf L\+M\+S7002\+M\+\_\+\+Tx}, {\bf Load\+D\+C\+\_\+\+R\+E\+G\+\_\+\+T\+X\+\_\+\+I\+Q()}, {\bf L\+O\+O\+P\+B\+\_\+\+T\+BB}, {\bf M\+AC}, {\bf M\+C\+U\+\_\+\+N\+O\+\_\+\+E\+R\+R\+OR}, {\bf Modify\+\_\+\+S\+P\+I\+\_\+\+Reg\+\_\+bits()}, {\bf P\+D\+\_\+\+L\+P\+F\+L\+\_\+\+R\+BB}, {\bf P\+D\+\_\+\+R\+X\+\_\+\+A\+F\+E2}, {\bf P\+D\+\_\+\+T\+X\+\_\+\+A\+F\+E2}, {\bf P\+D\+\_\+\+V\+CO}, {\bf P\+D\+\_\+\+X\+B\+U\+F\+\_\+\+RX}, {\bf P\+D\+\_\+\+X\+B\+U\+F\+\_\+\+TX}, {\bf R\+C\+A\+L\+\_\+\+L\+P\+F\+H\+\_\+\+T\+BB}, {\bf R\+C\+A\+L\+\_\+\+L\+P\+F\+L\+A\+D\+\_\+\+T\+BB}, {\bf R\+C\+C\+\_\+\+C\+T\+L\+\_\+\+P\+G\+A\+\_\+\+R\+BB}, {\bf R\+OM}, {\bf S\+E\+C\+T\+I\+O\+N\+\_\+\+A\+FE}, {\bf S\+E\+C\+T\+I\+O\+N\+\_\+\+C\+G\+EN}, {\bf S\+E\+C\+T\+I\+O\+N\+\_\+\+R\+BB}, {\bf S\+E\+C\+T\+I\+O\+N\+\_\+\+Rx\+N\+CO}, {\bf S\+E\+C\+T\+I\+O\+N\+\_\+\+Rx\+T\+SP}, {\bf S\+E\+C\+T\+I\+O\+N\+\_\+\+T\+BB}, {\bf S\+E\+C\+T\+I\+O\+N\+\_\+\+Tx\+N\+CO}, {\bf S\+E\+C\+T\+I\+O\+N\+\_\+\+Tx\+T\+SP}, {\bf Set\+Defaults()}, {\bf Set\+N\+C\+O\+Frequency()}, {\bf Set\+Tx\+L\+P\+F\+\_\+\+P\+Ds()}, {\bf S\+P\+I\+\_\+read()}, {\bf S\+P\+I\+\_\+write()}, {\bf status}, {\bf T\+S\+G\+M\+O\+D\+E\+\_\+\+T\+X\+T\+SP}, {\bf Tx\+L\+P\+F\+\_\+\+R\+F\+\_\+\+Limit\+Low\+Mid}, and {\bf Write\+Masked\+Regs()}.
+
+
+
+Referenced by {\bf Tune\+Tx\+Filter()}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{d2/da6/lms7002m__filters_8c_af1361ae85c78643bf99447e7251304fb_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{d2/da6/lms7002m__filters_8c_af1361ae85c78643bf99447e7251304fb_icgraph}
+\end{center}
+\end{figure}
+
+
+
+
+\subsubsection{Variable Documentation}
+\index{lms7002m\+\_\+filters.\+c@{lms7002m\+\_\+filters.\+c}!Rx\+L\+P\+F\+\_\+\+R\+F\+\_\+\+Limit\+High@{Rx\+L\+P\+F\+\_\+\+R\+F\+\_\+\+Limit\+High}}
+\index{Rx\+L\+P\+F\+\_\+\+R\+F\+\_\+\+Limit\+High@{Rx\+L\+P\+F\+\_\+\+R\+F\+\_\+\+Limit\+High}!lms7002m\+\_\+filters.\+c@{lms7002m\+\_\+filters.\+c}}
+\paragraph[{Rx\+L\+P\+F\+\_\+\+R\+F\+\_\+\+Limit\+High}]{\setlength{\rightskip}{0pt plus 5cm}const {\bf float\+\_\+type} Rx\+L\+P\+F\+\_\+\+R\+F\+\_\+\+Limit\+High = 130e6\hspace{0.3cm}{\ttfamily [static]}}\label{lms7002m__filters_8c_a05c91ce39e2a5164631243875e3dd63c}
+
+
+Definition at line {\bf 18} of file {\bf lms7002m\+\_\+filters.\+c}.
+
+
+
+Referenced by {\bf Tune\+Rx\+Filter\+Setup()}.
+
+\index{lms7002m\+\_\+filters.\+c@{lms7002m\+\_\+filters.\+c}!Rx\+L\+P\+F\+\_\+\+R\+F\+\_\+\+Limit\+Low@{Rx\+L\+P\+F\+\_\+\+R\+F\+\_\+\+Limit\+Low}}
+\index{Rx\+L\+P\+F\+\_\+\+R\+F\+\_\+\+Limit\+Low@{Rx\+L\+P\+F\+\_\+\+R\+F\+\_\+\+Limit\+Low}!lms7002m\+\_\+filters.\+c@{lms7002m\+\_\+filters.\+c}}
+\paragraph[{Rx\+L\+P\+F\+\_\+\+R\+F\+\_\+\+Limit\+Low}]{\setlength{\rightskip}{0pt plus 5cm}const {\bf float\+\_\+type} Rx\+L\+P\+F\+\_\+\+R\+F\+\_\+\+Limit\+Low = 1.\+4e6\hspace{0.3cm}{\ttfamily [static]}}\label{lms7002m__filters_8c_a42d996f914d0818182ff2b90d24c7ca5}
+
+
+Definition at line {\bf 17} of file {\bf lms7002m\+\_\+filters.\+c}.
+
+
+
+Referenced by {\bf Tune\+Rx\+Filter\+Setup()}.
+
+\index{lms7002m\+\_\+filters.\+c@{lms7002m\+\_\+filters.\+c}!Tx\+L\+P\+F\+\_\+\+R\+F\+\_\+\+Limit\+High@{Tx\+L\+P\+F\+\_\+\+R\+F\+\_\+\+Limit\+High}}
+\index{Tx\+L\+P\+F\+\_\+\+R\+F\+\_\+\+Limit\+High@{Tx\+L\+P\+F\+\_\+\+R\+F\+\_\+\+Limit\+High}!lms7002m\+\_\+filters.\+c@{lms7002m\+\_\+filters.\+c}}
+\paragraph[{Tx\+L\+P\+F\+\_\+\+R\+F\+\_\+\+Limit\+High}]{\setlength{\rightskip}{0pt plus 5cm}const {\bf float\+\_\+type} Tx\+L\+P\+F\+\_\+\+R\+F\+\_\+\+Limit\+High = 130e6\hspace{0.3cm}{\ttfamily [static]}}\label{lms7002m__filters_8c_ad4eecea5513ad251abd368c1f07d121f}
+
+
+Definition at line {\bf 24} of file {\bf lms7002m\+\_\+filters.\+c}.
+
+
+
+Referenced by {\bf Tune\+Tx\+Filter()}.
+
+\index{lms7002m\+\_\+filters.\+c@{lms7002m\+\_\+filters.\+c}!Tx\+L\+P\+F\+\_\+\+R\+F\+\_\+\+Limit\+Low@{Tx\+L\+P\+F\+\_\+\+R\+F\+\_\+\+Limit\+Low}}
+\index{Tx\+L\+P\+F\+\_\+\+R\+F\+\_\+\+Limit\+Low@{Tx\+L\+P\+F\+\_\+\+R\+F\+\_\+\+Limit\+Low}!lms7002m\+\_\+filters.\+c@{lms7002m\+\_\+filters.\+c}}
+\paragraph[{Tx\+L\+P\+F\+\_\+\+R\+F\+\_\+\+Limit\+Low}]{\setlength{\rightskip}{0pt plus 5cm}const {\bf float\+\_\+type} Tx\+L\+P\+F\+\_\+\+R\+F\+\_\+\+Limit\+Low = 5e6\hspace{0.3cm}{\ttfamily [static]}}\label{lms7002m__filters_8c_a41b5f1e72a489822ffaf4e499c7b9154}
+
+
+Definition at line {\bf 21} of file {\bf lms7002m\+\_\+filters.\+c}.
+
+\index{lms7002m\+\_\+filters.\+c@{lms7002m\+\_\+filters.\+c}!Tx\+L\+P\+F\+\_\+\+R\+F\+\_\+\+Limit\+Low\+Mid@{Tx\+L\+P\+F\+\_\+\+R\+F\+\_\+\+Limit\+Low\+Mid}}
+\index{Tx\+L\+P\+F\+\_\+\+R\+F\+\_\+\+Limit\+Low\+Mid@{Tx\+L\+P\+F\+\_\+\+R\+F\+\_\+\+Limit\+Low\+Mid}!lms7002m\+\_\+filters.\+c@{lms7002m\+\_\+filters.\+c}}
+\paragraph[{Tx\+L\+P\+F\+\_\+\+R\+F\+\_\+\+Limit\+Low\+Mid}]{\setlength{\rightskip}{0pt plus 5cm}const {\bf float\+\_\+type} Tx\+L\+P\+F\+\_\+\+R\+F\+\_\+\+Limit\+Low\+Mid = 40e6\hspace{0.3cm}{\ttfamily [static]}}\label{lms7002m__filters_8c_ad60dd3989e72e40be2270ae4be4f277d}
+
+
+Definition at line {\bf 22} of file {\bf lms7002m\+\_\+filters.\+c}.
+
+
+
+Referenced by {\bf Set\+Tx\+L\+P\+F\+\_\+\+P\+Ds()}, {\bf Tune\+Tx\+Filter()}, and {\bf Tune\+Tx\+Filter\+Setup()}.
+
+\index{lms7002m\+\_\+filters.\+c@{lms7002m\+\_\+filters.\+c}!Tx\+L\+P\+F\+\_\+\+R\+F\+\_\+\+Limit\+Mid\+High@{Tx\+L\+P\+F\+\_\+\+R\+F\+\_\+\+Limit\+Mid\+High}}
+\index{Tx\+L\+P\+F\+\_\+\+R\+F\+\_\+\+Limit\+Mid\+High@{Tx\+L\+P\+F\+\_\+\+R\+F\+\_\+\+Limit\+Mid\+High}!lms7002m\+\_\+filters.\+c@{lms7002m\+\_\+filters.\+c}}
+\paragraph[{Tx\+L\+P\+F\+\_\+\+R\+F\+\_\+\+Limit\+Mid\+High}]{\setlength{\rightskip}{0pt plus 5cm}const {\bf float\+\_\+type} Tx\+L\+P\+F\+\_\+\+R\+F\+\_\+\+Limit\+Mid\+High = 50e6\hspace{0.3cm}{\ttfamily [static]}}\label{lms7002m__filters_8c_a8b82d455baafae9bb1da212cae9cff71}
+
+
+Definition at line {\bf 23} of file {\bf lms7002m\+\_\+filters.\+c}.
+
+
+
+Referenced by {\bf Tune\+Tx\+Filter()}.
+

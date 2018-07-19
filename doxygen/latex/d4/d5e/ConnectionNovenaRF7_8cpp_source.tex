@@ -1,0 +1,271 @@
+\subsection{Connection\+Novena\+R\+F7.\+cpp}
+\label{ConnectionNovenaRF7_8cpp_source}\index{/home/erik/prefix/default/src/limesuite-\/dev/src/\+Connection\+Novena\+R\+F7/\+Connection\+Novena\+R\+F7.\+cpp@{/home/erik/prefix/default/src/limesuite-\/dev/src/\+Connection\+Novena\+R\+F7/\+Connection\+Novena\+R\+F7.\+cpp}}
+
+\begin{DoxyCode}
+00001 
+00007 \textcolor{preprocessor}{#include "ConnectionNovenaRF7.h"}
+00008 \textcolor{preprocessor}{#include "ErrorReporting.h"}
+00009 \textcolor{preprocessor}{#include <errno.h>}
+00010 \textcolor{preprocessor}{#include <unistd.h>}
+00011 \textcolor{preprocessor}{#include <termios.h>}
+00012 \textcolor{preprocessor}{#include <sys/types.h>}
+00013 \textcolor{preprocessor}{#include <sys/stat.h>}
+00014 \textcolor{preprocessor}{#include <fcntl.h>}
+00015 \textcolor{preprocessor}{#include <stdlib.h>}
+00016 \textcolor{preprocessor}{#include <stdio.h>}
+00017 \textcolor{preprocessor}{#include <sys/ioctl.h>}
+00018 \textcolor{preprocessor}{#include <linux/types.h>}
+00019 \textcolor{preprocessor}{#include <linux/spi/spidev.h>}
+00020 \textcolor{preprocessor}{#include <linux/i2c-dev.h>}
+00021 \textcolor{preprocessor}{#include <iostream>}
+00022 
+00023 \textcolor{keyword}{using namespace }std;
+00024 \textcolor{keyword}{using namespace }lime;
+00025 
+00026 \textcolor{keyword}{const} \textcolor{keywordtype}{int} ConnectionNovenaRF7::cSPI\_BUF\_SIZE = 128;
+00027 \textcolor{keyword}{const} \textcolor{keywordtype}{int} ConnectionNovenaRF7::cSPI\_SPEED\_HZ = 2000000;
+00028 
+00029 ConnectionNovenaRF7::ConnectionNovenaRF7(\textcolor{keywordtype}{void})
+00030 \{
+00031     fd = -1;
+00032     std::fstream gpio;
+00033     \textcolor{comment}{//export SEN pin}
+00034     gpio.open(\textcolor{stringliteral}{"/sys/class/gpio/export"}, ios::out);
+00035     \textcolor{keywordflow}{if}(gpio.good())
+00036     \{
+00037         gpio << 122;
+00038         gpio.flush();
+00039         gpio.close();
+00040         gpio.open(\textcolor{stringliteral}{"/sys/class/gpio/gpio122/direction"}, ios::out);
+00041         gpio << \textcolor{stringliteral}{"out"};
+00042         gpio.flush();
+00043         gpio.close();
+00044         m\_SEN.open(\textcolor{stringliteral}{"/sys/class/gpio/gpio122/value"}, ios::out);
+00045         m\_SEN<< 1;
+00046         m\_SEN.flush();
+00047         cout << \textcolor{stringliteral}{"GPIO122: set to 1"} << endl;
+00048     \}
+00049 
+00050 \}
+00051 
+00052 ConnectionNovenaRF7::~ConnectionNovenaRF7(\textcolor{keywordtype}{void})
+00053 \{
+00054     this->Close();
+00055 \}
+00056 
+00060 \textcolor{keywordtype}{int} ConnectionNovenaRF7::Open(\textcolor{keyword}{const} \textcolor{keywordtype}{char} *spiDevPath)
+00061 \{
+00062 \textcolor{preprocessor}{#ifdef \_\_unix\_\_}
+00063     fd = open(spiDevPath, O\_RDWR | O\_SYNC);
+00064     \textcolor{keywordflow}{if} (fd < 0)
+00065     \{
+00066         \textcolor{comment}{//MessageLog::getInstance()->write("SPI PORT: device not found\(\backslash\)n", LOG\_ERROR);}
+00067         \textcolor{keywordflow}{return} ReportError(errno, \textcolor{stringliteral}{"SPI PORT %s: device not found"}, spiDevPath);
+00068     \}
+00069     \textcolor{keywordtype}{int} mode = SPI\_MODE\_0;
+00070     \textcolor{keywordtype}{int} ret = ioctl(fd, SPI\_IOC\_WR\_MODE, &mode);
+00071     \textcolor{keywordflow}{if} (ret == -1)
+00072         printf(\textcolor{stringliteral}{"can't set spi mode"});
+00073 
+00074     ret = ioctl(fd, SPI\_IOC\_RD\_MODE, &mode);
+00075     \textcolor{keywordflow}{if} (ret == -1)
+00076         printf(\textcolor{stringliteral}{"can't get spi mode"});
+00077 
+00078     \textcolor{comment}{/*}
+00079 \textcolor{comment}{     * bits per word}
+00080 \textcolor{comment}{     */}
+00081     \textcolor{keywordtype}{int} bits = 8;
+00082     ret = ioctl(fd, SPI\_IOC\_WR\_BITS\_PER\_WORD, &bits);
+00083     \textcolor{keywordflow}{if} (ret == -1)
+00084         printf(\textcolor{stringliteral}{"can't set bits per word"});
+00085 
+00086     ret = ioctl(fd, SPI\_IOC\_RD\_BITS\_PER\_WORD, &bits);
+00087     \textcolor{keywordflow}{if} (ret == -1)
+00088         printf(\textcolor{stringliteral}{"can't get bits per word"});
+00089 
+00090     \textcolor{comment}{/*}
+00091 \textcolor{comment}{     * max speed hz}
+00092 \textcolor{comment}{     */}
+00093     \textcolor{keywordtype}{int} speed = cSPI\_SPEED\_HZ;
+00094     ret = ioctl(fd, SPI\_IOC\_WR\_MAX\_SPEED\_HZ, &speed);
+00095     \textcolor{keywordflow}{if} (ret == -1)
+00096         printf(\textcolor{stringliteral}{"can't set max speed hz"});
+00097 
+00098     ret = ioctl(fd, SPI\_IOC\_RD\_MAX\_SPEED\_HZ, &speed);
+00099     \textcolor{keywordflow}{if} (ret == -1)
+00100         printf(\textcolor{stringliteral}{"can't get max speed hz"});
+00101 
+00102     printf(\textcolor{stringliteral}{"spi mode: 0x%x\(\backslash\)n"}, mode);
+00103     printf(\textcolor{stringliteral}{"bits per word: %d\(\backslash\)n"}, bits);
+00104     printf(\textcolor{stringliteral}{"max speed: %d Hz (%d KHz)\(\backslash\)n"}, speed, speed/1000);
+00105     \textcolor{keywordflow}{return} 0;
+00106 \textcolor{preprocessor}{#else}
+00107     \textcolor{keywordflow}{return} ReportError(\textcolor{stringliteral}{"spidev not supported on this OS"});
+00108 \textcolor{preprocessor}{#endif}
+00109 \}
+00110 
+00113 \textcolor{keywordtype}{void} ConnectionNovenaRF7::Close()
+00114 \{
+00115 \textcolor{preprocessor}{#ifdef \_\_unix\_\_}
+00116     close(fd);
+00117     fd = -1;
+00118 \textcolor{preprocessor}{#endif}
+00119 \}
+00120 
+00124 \textcolor{keywordtype}{bool} ConnectionNovenaRF7::IsOpen()
+00125 \{
+00126     \textcolor{keywordflow}{return} (fd >= 0);
+00127 \}
+00128 
+00135 \textcolor{keywordtype}{int} ConnectionNovenaRF7::Write(\textcolor{keyword}{const} \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{char} *buffer, \textcolor{keywordtype}{int} length, \textcolor{keywordtype}{int} 
+      timeout_ms)
+00136 \{
+00137 \textcolor{preprocessor}{    #ifdef \_\_unix\_\_}
+00138     \textcolor{keywordflow}{if}(fd < 0)
+00139         \textcolor{keywordflow}{return} 0;
+00140     m\_SEN << 0;
+00141     m\_SEN.flush();
+00142     \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{long} bytesWritten = 0;
+00143     rxbuf.clear();
+00144     \textcolor{keywordtype}{int} bytesReceived = 0;
+00145     \textcolor{keywordtype}{char} rxbytes[2];
+00146     \textcolor{keywordflow}{while}(\textcolor{keywordtype}{int}(bytesWritten) < length)
+00147     \{
+00148         \textcolor{keywordtype}{int} toWrite = length-bytesWritten > cSPI\_BUF\_SIZE ? cSPI\_BUF\_SIZE : length-bytesWritten;
+00149         \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} i=0; i<toWrite; i+=2)
+00150         \{
+00151             \textcolor{keywordflow}{if}(buffer[i] < 0x80) \textcolor{comment}{//reading}
+00152             \{
+00153                 \textcolor{keywordflow}{if} (write(fd, &buffer[i+bytesWritten], 2) != 2) \textcolor{keywordflow}{return} 0;
+00154                 bytesReceived += read(fd, rxbytes, 2);
+00155                 rxbuf.push\_back(rxbytes[0]);
+00156                 rxbuf.push\_back(rxbytes[1]);
+00157             \}
+00158             \textcolor{keywordflow}{else} \textcolor{comment}{//writing}
+00159             \{
+00160                 \textcolor{keywordflow}{if} (write(fd, &buffer[i+bytesWritten], 4) != 4) \textcolor{keywordflow}{return} 0;
+00161                 i+=2; \textcolor{comment}{//data bytes have been written}
+00162             \}
+00163         \}
+00164         bytesWritten += toWrite;
+00165     \}
+00166     m\_SEN << 1;
+00167     m\_SEN.flush();
+00168     \textcolor{keywordflow}{return} bytesWritten;
+00169 \textcolor{preprocessor}{#else}
+00170     \textcolor{keywordflow}{return} 0;
+00171 \textcolor{preprocessor}{#endif}
+00172 \}
+00173 
+00180 \textcolor{keywordtype}{int} ConnectionNovenaRF7::Read(\textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{char} *buffer, \textcolor{keywordtype}{int} length, \textcolor{keywordtype}{int} timeout_ms)
+00181 \{
+00182 \textcolor{preprocessor}{#ifdef \_\_unix\_\_}
+00183     \textcolor{keywordflow}{if}(fd < 0)
+00184         \textcolor{keywordflow}{return} 0;
+00185     \textcolor{comment}{//because transfer is done in full duplex, function returns data from last transfer}
+00186     \textcolor{keywordtype}{int} tocpy = length > int(rxbuf.size()) ? rxbuf.size() : length;
+00187     memcpy(buffer, &rxbuf[0], tocpy);
+00188     rxbuf.clear();
+00189     \textcolor{keywordflow}{return} tocpy;
+00190 \textcolor{preprocessor}{#else}
+00191     \textcolor{keywordflow}{return} 0;
+00192 \textcolor{preprocessor}{#endif}
+00193 \}
+00194 
+00195 \textcolor{keywordtype}{void} ConnectionNovenaRF7::UpdateExternalBandSelect(\textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} channel, \textcolor{keyword}{const} \textcolor{keywordtype}{int} trfBand, \textcolor{keyword}{const} \textcolor{keywordtype}{int} 
+      rfePath)
+00196 \{
+00197     \textcolor{comment}{//TODO...}
+00198     printf(\textcolor{stringliteral}{"Fill in the UpdateExternalBandSelect() function for NovenaRF7!\(\backslash\)n"});
+00199     \textcolor{comment}{/*}
+00200 \textcolor{comment}{    //in case of Novena board, need to update GPIO}
+00201 \textcolor{comment}{    if(controlPort->GetInfo().device == LMS\_DEV\_NOVENA)}
+00202 \textcolor{comment}{    \{}
+00203 \textcolor{comment}{        uint16\_t regValue = SPI\_read(0x0706) & 0xFFF8;}
+00204 \textcolor{comment}{        //lms\_gpio2 - tx output selection:}
+00205 \textcolor{comment}{        //      0 - TX1\_A and TX1\_B (Band 1),}
+00206 \textcolor{comment}{        //      1 - TX2\_A and TX2\_B (Band 2)}
+00207 \textcolor{comment}{        regValue |= Get\_SPI\_Reg\_bits(LMS7param(SEL\_BAND2\_TRF)) << 2; //gpio2}
+00208 \textcolor{comment}{        //RX active paths}
+00209 \textcolor{comment}{        //lms\_gpio0 | lms\_gpio1         RX\_A        RX\_B}
+00210 \textcolor{comment}{        //  0           0       =>      no active path}
+00211 \textcolor{comment}{        //  1           0       =>  LNAW\_A      LNAW\_B}
+00212 \textcolor{comment}{        //  0           1       =>  LNAH\_A      LNAH\_B}
+00213 \textcolor{comment}{        //  1           1       =>  LNAL\_A      LNAL\_B}
+00214 \textcolor{comment}{        switch(Get\_SPI\_Reg\_bits(LMS7param(SEL\_PATH\_RFE)))}
+00215 \textcolor{comment}{        \{}
+00216 \textcolor{comment}{            //set gpio1:gpio0}
+00217 \textcolor{comment}{            case 0: regValue |= 0x0; break;}
+00218 \textcolor{comment}{            case 1: regValue |= 0x2; break;}
+00219 \textcolor{comment}{            case 2: regValue |= 0x3; break;}
+00220 \textcolor{comment}{            case 3: regValue |= 0x1; break;}
+00221 \textcolor{comment}{        \}}
+00222 \textcolor{comment}{        SPI\_write(0x0706, regValue);}
+00223 \textcolor{comment}{    \}}
+00224 \textcolor{comment}{    */}
+00225 \}
+00226 
+00227 \textcolor{keywordtype}{int} ConnectionNovenaRF7::UpdateThreads()
+00228 \{
+00229     \textcolor{keywordtype}{bool} needRx = \textcolor{keyword}{false};
+00230 
+00231     \textcolor{comment}{//check which threads are needed}
+00232     \textcolor{keywordflow}{for}(\textcolor{keyword}{auto} i : mRxStreams)
+00233         \textcolor{keywordflow}{if}(i->IsActive())
+00234         \{
+00235             needRx = \textcolor{keyword}{true};
+00236             \textcolor{keywordflow}{break};
+00237         \}
+00238 
+00239     \textcolor{comment}{//stop threads if not needed}
+00240     \textcolor{keywordflow}{if}(not needRx and rxRunning.load())
+00241     \{
+00242         terminateRx.store(\textcolor{keyword}{true});
+00243         rxThread.join();
+00244         rxRunning.store(\textcolor{keyword}{false});
+00245     \}
+00246 
+00247     \textcolor{comment}{//configure FPGA on first start, or disable FPGA when not streaming}
+00248     \textcolor{keywordflow}{if}(needRx && not rxRunning.load())
+00249     \{
+00250         \textcolor{comment}{//Stop streaming in case it was running}
+00251         uint16\_t regVal = 0;
+00252         ReadRegister(0x000A, regVal);
+00253         WriteRegister(0x000A, regVal & ~0x1);
+00254 
+00255         \textcolor{comment}{//USB FIFO reset}
+00256         LMS64CProtocol::GenericPacket ctrPkt;
+00257         ctrPkt.cmd = CMD_USB_FIFO_RST;
+00258         ctrPkt.outBuffer.push\_back(0x01);
+00259         TransferPacket(ctrPkt);
+00260         ctrPkt.outBuffer[0] = 0x00;
+00261         TransferPacket(ctrPkt);
+00262 
+00263         \textcolor{comment}{//StartStreaming}
+00264         ReadRegister(0x000A, regVal);
+00265         WriteRegister(0x000A, regVal | 0x1);
+00266     \}
+00267     \textcolor{keywordflow}{else} \textcolor{keywordflow}{if}(not needRx)
+00268     \{
+00269         \textcolor{comment}{//Stop streaming}
+00270         uint16\_t regVal = 0;
+00271         ReadRegister(0x000A, regVal);
+00272         WriteRegister(0x000A, regVal & ~0x1);
+00273     \}
+00274 
+00275     \textcolor{comment}{//FPGA should be configured and activated, start needed threads}
+00276     \textcolor{keywordflow}{if}(needRx and not rxRunning.load())
+00277     \{
+00278         ThreadData args;
+00279         args.terminate = &terminateRx;
+00280         args.dataPort = \textcolor{keyword}{this};
+00281         args.dataRate_Bps = &rxDataRate\_Bps;
+00282         args.channels = mRxStreams;
+00283 
+00284         rxRunning.store(\textcolor{keyword}{true});
+00285         terminateRx.store(\textcolor{keyword}{false});
+00286         rxThread = std::thread(ReceivePacketsLoop, args);
+00287     \}
+00288     \textcolor{keywordflow}{return} 0;
+00289 \}
+\end{DoxyCode}

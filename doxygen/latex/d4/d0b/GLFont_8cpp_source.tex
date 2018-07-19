@@ -1,0 +1,414 @@
+\subsection{G\+L\+Font.\+cpp}
+\label{GLFont_8cpp_source}\index{/home/erik/prefix/default/src/limesuite-\/dev/src/ogl\+Graph/\+G\+L\+Font.\+cpp@{/home/erik/prefix/default/src/limesuite-\/dev/src/ogl\+Graph/\+G\+L\+Font.\+cpp}}
+
+\begin{DoxyCode}
+00001 \textcolor{preprocessor}{#include "GLFont.h"}
+00002 \textcolor{preprocessor}{#include <fstream>}
+00003 \textcolor{preprocessor}{#include <string>}
+00004 \textcolor{preprocessor}{#include <sstream>}
+00005 \textcolor{preprocessor}{#include <string.h>}
+00006 \textcolor{preprocessor}{#include <vector>}
+00007 \textcolor{keyword}{using namespace }std;
+00008 
+00009 GLFont::GLFont() : m\_texID(0), m\_vboID(0), m\_glyphCount(256)
+00010 \{
+00011     m_fontSize = 10;
+00012     m_glyphs = \textcolor{keyword}{new} GLGlyph[m_glyphCount];
+00013 \}
+00014 
+00015 GLFont::~GLFont()
+00016 \{
+00017     \textcolor{keyword}{delete} []m_glyphs;
+00018 \}
+00019 
+00044 \textcolor{keywordtype}{bool} GLFont::load(\textcolor{keyword}{const} \textcolor{keywordtype}{char}* file)
+00045 \{
+00046     glewInit();
+00047     fstream in;
+00048     in.open(file, ios::in | ios::binary);
+00049     \textcolor{keywordtype}{char} header[13];
+00050     header[12] = 0;
+00051     in.read(header, 12);
+00052     \textcolor{keywordflow}{if}( strcmp(\textcolor{stringliteral}{"OpenGL Font"}, header) != 0)
+00053     \{
+00054         \textcolor{keywordflow}{return} \textcolor{keyword}{false};
+00055     \}
+00056 
+00057     \textcolor{keywordtype}{char} fileVersion = 0;
+00058     in.read(&fileVersion, 1);
+00059 
+00060     \textcolor{keywordtype}{char} reserved[16];
+00061     in.read(reserved, 16);
+00062 
+00063     \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{char} fontSize = 0;
+00064     in.read((\textcolor{keywordtype}{char}*)&fontSize, 1);
+00065     m_fontSize = fontSize;
+00066 
+00067     \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{short} glyphCount = 0;
+00068     in.read((\textcolor{keywordtype}{char}*)&glyphCount, 2);
+00069 
+00070     \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} i=0; i<m_glyphCount; ++i)
+00071         m_glyphs[i].reset();
+00072     GLGlyph tempGlyph;
+00073     \textcolor{keywordflow}{for}(\textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{int} i=0; i<glyphCount; ++i)
+00074     \{
+00075         in.read((\textcolor{keywordtype}{char}*)&tempGlyph.id, \textcolor{keyword}{sizeof}(\textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{short}));
+00076         in.read((\textcolor{keywordtype}{char}*)&tempGlyph.width, \textcolor{keyword}{sizeof}(\textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{short}));
+00077         in.read((\textcolor{keywordtype}{char}*)&tempGlyph.height, \textcolor{keyword}{sizeof}(\textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{short}));
+00078         in.read((\textcolor{keywordtype}{char}*)&tempGlyph.u, \textcolor{keyword}{sizeof}(\textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{short}));
+00079         in.read((\textcolor{keywordtype}{char}*)&tempGlyph.v, \textcolor{keyword}{sizeof}(\textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{short}));
+00080         in.read((\textcolor{keywordtype}{char}*)&tempGlyph.offset_x, \textcolor{keyword}{sizeof}(\textcolor{keywordtype}{short}));
+00081         in.read((\textcolor{keywordtype}{char}*)&tempGlyph.offset_y, \textcolor{keyword}{sizeof}(\textcolor{keywordtype}{short}));
+00082         in.read((\textcolor{keywordtype}{char}*)&tempGlyph.advance_x, \textcolor{keyword}{sizeof}(\textcolor{keywordtype}{short}));
+00083         tempGlyph.advance_x = tempGlyph.advance_x >> 6;
+00084         m_glyphs[tempGlyph.id] = tempGlyph;
+00085     \}
+00086 
+00087     \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{short} texWidth = 0;
+00088     \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{short} texHeight = 0;
+00089     \textcolor{keywordtype}{char} bpp = 0;
+00090 
+00091     in.read((\textcolor{keywordtype}{char}*)&texWidth, \textcolor{keyword}{sizeof}(\textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{short}));
+00092     m_texwidth = texWidth;
+00093     in.read((\textcolor{keywordtype}{char}*)&texHeight, \textcolor{keyword}{sizeof}(\textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{short}));
+00094     m_texheight = texHeight;
+00095     in.read(&bpp, \textcolor{keyword}{sizeof}(\textcolor{keywordtype}{char}));
+00096 
+00097     \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{char} *bitmap = \textcolor{keyword}{new} \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{char}[texWidth*texHeight];
+00098     in.read((\textcolor{keywordtype}{char}*)bitmap, texWidth*texHeight);
+00099     in.close();
+00100 
+00101     glEnable( GL_TEXTURE_2D );
+00102     glActiveTexture(GL_TEXTURE0);
+00103     \textcolor{keywordflow}{if}( m_texID > 0)
+00104         glDeleteTextures(1, &m_texID);
+00105     glGenTextures(1, &m_texID);
+00106     glBindTexture(GL_TEXTURE_2D, m_texID);
+00107     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+00108     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+00109     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+00110     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+00111 
+00112     glTexImage2D(
+00113         GL_TEXTURE_2D,
+00114         0,
+00115         GL_ALPHA8,
+00116         texWidth,
+00117         texHeight,
+00118         0,
+00119         GL_ALPHA,
+00120         GL_UNSIGNED_BYTE,
+00121         bitmap
+00122     );
+00123     glBindTexture(GL_TEXTURE_2D, 0);
+00124 
+00125     \textcolor{keywordflow}{if}(!m_vboID && GLEW_VERSION_1_5)
+00126     \{
+00127         glGenBuffers(1, &m_vboID);
+00128         glBindBuffer( GL_ARRAY_BUFFER, m_vboID);
+00129         glBufferData( GL_ARRAY_BUFFER, 16*\textcolor{keyword}{sizeof}(\textcolor{keywordtype}{float}), NULL, GL_DYNAMIC_DRAW );
+00130         glBindBuffer( GL_ARRAY_BUFFER, 0);
+00131     \}
+00132 
+00133     \textcolor{keywordflow}{return} \textcolor{keyword}{true};
+00134 \}
+00135 
+00136 \textcolor{keywordtype}{bool} GLFont::loadFromArray(\textcolor{keyword}{const} \textcolor{keywordtype}{char}* array, \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{int} size)
+00137 \{
+00138     glewInit();
+00139     stringstream in;
+00140     in.str( \textcolor{keywordtype}{string}(array, size));
+00141     \textcolor{keywordtype}{char} header[13];
+00142     header[12] = 0;
+00143     in.read(header, 12);
+00144     \textcolor{keywordflow}{if}( strcmp(\textcolor{stringliteral}{"OpenGL Font"}, header) != 0)
+00145     \{
+00146         \textcolor{keywordflow}{return} \textcolor{keyword}{false};
+00147     \}
+00148 
+00149     \textcolor{keywordtype}{char} fileVersion = 0;
+00150     in.read(&fileVersion, 1);
+00151 
+00152     \textcolor{keywordtype}{char} reserved[16];
+00153     in.read(reserved, 16);
+00154 
+00155     \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{char} fontSize = 0;
+00156     in.read((\textcolor{keywordtype}{char}*)&fontSize, 1);
+00157     m_fontSize = fontSize;
+00158 
+00159     \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{short} glyphCount = 0;
+00160     in.read((\textcolor{keywordtype}{char}*)&glyphCount, 2);
+00161 
+00162     \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} i=0; i<m_glyphCount; ++i)
+00163         m_glyphs[i].reset();
+00164     GLGlyph tempGlyph;
+00165     \textcolor{keywordflow}{for}(\textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{int} i=0; i<glyphCount; ++i)
+00166     \{
+00167         in.read((\textcolor{keywordtype}{char}*)&tempGlyph.id, \textcolor{keyword}{sizeof}(\textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{short}));
+00168         in.read((\textcolor{keywordtype}{char}*)&tempGlyph.width, \textcolor{keyword}{sizeof}(\textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{short}));
+00169         in.read((\textcolor{keywordtype}{char}*)&tempGlyph.height, \textcolor{keyword}{sizeof}(\textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{short}));
+00170         in.read((\textcolor{keywordtype}{char}*)&tempGlyph.u, \textcolor{keyword}{sizeof}(\textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{short}));
+00171         in.read((\textcolor{keywordtype}{char}*)&tempGlyph.v, \textcolor{keyword}{sizeof}(\textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{short}));
+00172         in.read((\textcolor{keywordtype}{char}*)&tempGlyph.offset_x, \textcolor{keyword}{sizeof}(\textcolor{keywordtype}{short}));
+00173         in.read((\textcolor{keywordtype}{char}*)&tempGlyph.offset_y, \textcolor{keyword}{sizeof}(\textcolor{keywordtype}{short}));
+00174         in.read((\textcolor{keywordtype}{char}*)&tempGlyph.advance_x, \textcolor{keyword}{sizeof}(\textcolor{keywordtype}{short}));
+00175         tempGlyph.advance_x = tempGlyph.advance_x >> 6;
+00176         m_glyphs[tempGlyph.id] = tempGlyph;
+00177     \}
+00178 
+00179     \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{short} texWidth = 0;
+00180     \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{short} texHeight = 0;
+00181     \textcolor{keywordtype}{char} bpp = 0;
+00182 
+00183     in.read((\textcolor{keywordtype}{char}*)&texWidth, \textcolor{keyword}{sizeof}(\textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{short}));
+00184     m_texwidth = texWidth;
+00185     in.read((\textcolor{keywordtype}{char}*)&texHeight, \textcolor{keyword}{sizeof}(\textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{short}));
+00186     m_texheight = texHeight;
+00187     in.read(&bpp, \textcolor{keyword}{sizeof}(\textcolor{keywordtype}{char}));
+00188 
+00189     \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{char} *bitmap = \textcolor{keyword}{new} \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{char}[texWidth*texHeight];
+00190     in.read((\textcolor{keywordtype}{char}*)bitmap, texWidth*texHeight);
+00191 
+00192     glEnable( GL_TEXTURE_2D );
+00193     glActiveTexture(GL_TEXTURE0);
+00194     \textcolor{keywordflow}{if}( m_texID > 0)
+00195         glDeleteTextures(1, &m_texID);
+00196     glGenTextures(1, &m_texID);
+00197     glBindTexture(GL_TEXTURE_2D, m_texID);
+00198     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+00199     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+00200     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+00201     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+00202 
+00203     glTexImage2D(
+00204         GL_TEXTURE_2D,
+00205         0,
+00206         GL_ALPHA8,
+00207         texWidth,
+00208         texHeight,
+00209         0,
+00210         GL_ALPHA,
+00211         GL_UNSIGNED_BYTE,
+00212         bitmap
+00213     );
+00214     glBindTexture(GL_TEXTURE_2D, 0);
+00215 
+00216     \textcolor{keywordflow}{if}(!m_vboID && GLEW_VERSION_1_5)
+00217     \{
+00218         glGenBuffers(1, &m_vboID);
+00219         glBindBuffer( GL_ARRAY_BUFFER, m_vboID);
+00220         glBufferData( GL_ARRAY_BUFFER, 16*\textcolor{keyword}{sizeof}(\textcolor{keywordtype}{float}), NULL, GL_DYNAMIC_DRAW );
+00221         glBindBuffer( GL_ARRAY_BUFFER, 0);
+00222     \}
+00223 
+00224     \textcolor{keywordflow}{return} \textcolor{keyword}{true};
+00225 \}
+00226 
+00227 \textcolor{keywordtype}{void} GLFont::render_textWorldSpace(\textcolor{keyword}{const} \textcolor{keywordtype}{char} *text, \textcolor{keywordtype}{float} x, \textcolor{keywordtype}{float} y, \textcolor{keywordtype}{float} fontSize, \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{int} rgba)
+00228 \{
+00229     glEnable( GL_TEXTURE_2D );
+00230     glAlphaFunc(GL_GEQUAL, 0.05);
+00231     glEnable( GL_ALPHA_TEST);
+00232     glEnable( GL_BLEND);
+00233     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+00234 
+00235     glColor3ub( (rgba >> 24)&0xff , (rgba >> 16)&0xFF, (rgba >> 8)&0xFF);
+00236 
+00237     \textcolor{keywordtype}{float} vbodata[16]; \textcolor{comment}{//interleaved x,y,u,v}
+00238 
+00239     \textcolor{keywordtype}{float} scale = fontSize/m_fontSize;
+00240     \textcolor{keywordtype}{float} startx = x;
+00241     GLGlyph *g = NULL;
+00242     glBindTexture( GL_TEXTURE_2D, m_texID );
+00243 
+00244     \textcolor{keywordflow}{if}(GLEW_VERSION_1_5)
+00245         glBindBuffer(GL_ARRAY_BUFFER, m_vboID);
+00246     glEnableClientState( GL_VERTEX_ARRAY );
+00247     glEnableClientState( GL_TEXTURE_COORD_ARRAY );
+00248     glVertexPointer( 2, GL_FLOAT, 4*\textcolor{keyword}{sizeof}(\textcolor{keywordtype}{float}), (\textcolor{keywordtype}{char}*)0 );
+00249     glTexCoordPointer( 2, GL_FLOAT, 4*\textcolor{keyword}{sizeof}(\textcolor{keywordtype}{float}), (\textcolor{keywordtype}{char}*)0+2*\textcolor{keyword}{sizeof}(\textcolor{keywordtype}{float}) );
+00250     \textcolor{keyword}{const} \textcolor{keywordtype}{char} *p;
+00251     \textcolor{keywordflow}{for}(p = text; *p; ++p)
+00252     \{
+00253         g = &m_glyphs[(\textcolor{keywordtype}{unsigned} char)*p];
+00254         \textcolor{keywordflow}{if}((\textcolor{keywordtype}{char})*p == \textcolor{charliteral}{'\(\backslash\)n'})
+00255         \{
+00256             x = startx;
+00257             y = y - lineHeight()*scale;
+00258             \textcolor{keywordflow}{continue};
+00259         \}
+00260         \textcolor{keywordtype}{float} w = g->width * scale;
+00261         \textcolor{keywordtype}{float} h = g->height * scale;
+00262         vbodata[0] = x + g->offset_x * scale;
+00263         vbodata[1] = y - (g->height-g->offset_y) * scale;
+00264         vbodata[2] = g->u*1.0/m_texwidth;
+00265         vbodata[3] = g->v*1.0/m_texheight;
+00266 
+00267         vbodata[4] = vbodata[0] + w;
+00268         vbodata[5] = vbodata[1];
+00269         vbodata[6] = g->u*1.0/m_texwidth + g->width*1.0/m_texwidth;
+00270         vbodata[7] = vbodata[3];
+00271 
+00272         vbodata[8] = vbodata[0];
+00273         vbodata[9] = vbodata[1] + h;
+00274         vbodata[10] = vbodata[2];
+00275         vbodata[11] = g->v*1.0/m_texheight + (g->height)*1.0/m_texheight;
+00276 
+00277         vbodata[12] = vbodata[4];
+00278         vbodata[13] = vbodata[9];
+00279         vbodata[14] = vbodata[6];
+00280         vbodata[15] = vbodata[11];
+00281 
+00282 \textcolor{comment}{//        if(GLEW\_VERSION\_1\_5)}
+00283 \textcolor{comment}{//        \{}
+00284 \textcolor{comment}{//            glBufferData( GL\_ARRAY\_BUFFER, 16*sizeof(float), NULL, GL\_DYNAMIC\_DRAW );}
+00285 \textcolor{comment}{//            glBufferData( GL\_ARRAY\_BUFFER, 16*sizeof(float), vbodata, GL\_DYNAMIC\_DRAW );}
+00286 \textcolor{comment}{//            glDrawArrays( GL\_TRIANGLE\_STRIP, 0, 4 );}
+00287 \textcolor{comment}{//            glFlush();}
+00288 \textcolor{comment}{//        \}}
+00289 \textcolor{comment}{//        else}
+00290         \{
+00291             glBegin( GL_TRIANGLE_STRIP );
+00292             glTexCoord2f( vbodata[2], vbodata[3]);
+00293             glVertex3d(vbodata[0], vbodata[1], 10);
+00294             glTexCoord2f( vbodata[6], vbodata[7]);
+00295             glVertex3d(vbodata[4], vbodata[5], 10);
+00296             glTexCoord2f( vbodata[10], vbodata[11]);
+00297             glVertex3d(vbodata[8], vbodata[9], 10);
+00298             glTexCoord2f( vbodata[14], vbodata[15]);
+00299             glVertex3d(vbodata[12], vbodata[13], 10);
+00300             glEnd();
+00301             glFlush();
+00302         \}
+00303 
+00304         x += (g->advance_x ) * scale;
+00305     \}
+00306     glDisableClientState( GL_VERTEX_ARRAY );
+00307     glDisableClientState( GL_TEXTURE_COORD_ARRAY );
+00308 \}
+00309 
+00310 \textcolor{keywordtype}{void} GLFont::render_textScreenSpace(\textcolor{keyword}{const} \textcolor{keywordtype}{char} *text, \textcolor{keywordtype}{float} x, \textcolor{keywordtype}{float} y, \textcolor{keywordtype}{float} fontSize, \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{int} rgba)
+00311 \{
+00312     glEnable( GL_TEXTURE_2D );
+00313     glAlphaFunc(GL_GEQUAL, 0.05);
+00314     glEnable( GL_ALPHA_TEST);
+00315     glEnable( GL_BLEND);
+00316     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+00317 
+00318     glColor3ub( (rgba >> 24)&0xff , (rgba >> 16)&0xFF, (rgba >> 8)&0xFF);
+00319 
+00320     \textcolor{keywordtype}{float} vbodata[16]; \textcolor{comment}{//interleaved x,y,u,v}
+00321 
+00322     \textcolor{keywordtype}{float} scale = fontSize/m_fontSize;
+00323     \textcolor{keywordtype}{float} startx = x;
+00324     GLGlyph *g = NULL;
+00325     glBindTexture( GL_TEXTURE_2D, m_texID );
+00326 
+00327     \textcolor{keywordflow}{if}(GLEW_VERSION_1_5)
+00328         glBindBuffer(GL_ARRAY_BUFFER, m_vboID);
+00329     glEnableClientState( GL_VERTEX_ARRAY );
+00330     glEnableClientState( GL_TEXTURE_COORD_ARRAY );
+00331     glVertexPointer( 2, GL_FLOAT, 4*\textcolor{keyword}{sizeof}(\textcolor{keywordtype}{float}), (\textcolor{keywordtype}{char}*)0 );
+00332     glTexCoordPointer( 2, GL_FLOAT, 4*\textcolor{keyword}{sizeof}(\textcolor{keywordtype}{float}), (\textcolor{keywordtype}{char}*)0+2*\textcolor{keyword}{sizeof}(\textcolor{keywordtype}{float}) );
+00333     \textcolor{keyword}{const} \textcolor{keywordtype}{char} *p;
+00334     \textcolor{keywordflow}{for}(p = text; *p; ++p)
+00335     \{
+00336         g = &m_glyphs[(\textcolor{keywordtype}{unsigned} char)*p];
+00337         \textcolor{keywordflow}{if}((\textcolor{keywordtype}{char})*p == \textcolor{charliteral}{'\(\backslash\)n'})
+00338         \{
+00339             x = startx;
+00340             y = y + lineHeight()*scale;
+00341             \textcolor{keywordflow}{continue};
+00342         \}
+00343         \textcolor{keywordtype}{float} w = g->width * scale;
+00344         \textcolor{comment}{//float h = g->height * scale;}
+00345         vbodata[0] = x + g->offset_x * scale;
+00346         vbodata[1] = y + (lineHeight()+(g->height-g->offset_y)) * scale;
+00347         vbodata[2] = g->u*1.0/m_texwidth;
+00348         vbodata[3] = g->v*1.0/m_texheight;
+00349 
+00350         vbodata[4] = vbodata[0] + w;
+00351         vbodata[5] = vbodata[1];
+00352         vbodata[6] = g->u*1.0/m_texwidth + g->width*1.0/m_texwidth;
+00353         vbodata[7] = vbodata[3];
+00354 
+00355         vbodata[8] = vbodata[0];
+00356         vbodata[9] = y + (lineHeight()-g->offset_y) * scale;;
+00357         vbodata[10] = vbodata[2];
+00358         vbodata[11] = g->v*1.0/m_texheight + (g->height)*1.0/m_texheight;
+00359 
+00360         vbodata[12] = vbodata[4];
+00361         vbodata[13] = vbodata[9];
+00362         vbodata[14] = vbodata[6];
+00363         vbodata[15] = vbodata[11];
+00364 
+00365 \textcolor{comment}{//        if(GLEW\_VERSION\_1\_5)}
+00366 \textcolor{comment}{//        \{}
+00367 \textcolor{comment}{//            glBufferData( GL\_ARRAY\_BUFFER, 16*sizeof(float), (char*)0, GL\_DYNAMIC\_DRAW );}
+00368 \textcolor{comment}{//            glBufferData( GL\_ARRAY\_BUFFER, 16*sizeof(float), vbodata, GL\_DYNAMIC\_DRAW );}
+00369 \textcolor{comment}{//            glDrawArrays( GL\_TRIANGLE\_STRIP, 0, 4 );}
+00370 \textcolor{comment}{//            glFlush();}
+00371 \textcolor{comment}{//        \}}
+00372 \textcolor{comment}{//        else}
+00373         \{
+00374             glBegin( GL_TRIANGLE_STRIP );
+00375             glTexCoord2f( vbodata[2], vbodata[3]);
+00376             glVertex3d(vbodata[0], vbodata[1], 1);
+00377             glTexCoord2f( vbodata[6], vbodata[7]);
+00378             glVertex3d(vbodata[4], vbodata[5], 1);
+00379             glTexCoord2f( vbodata[10], vbodata[11]);
+00380             glVertex3d(vbodata[8], vbodata[9], 1);
+00381             glTexCoord2f( vbodata[14], vbodata[15]);
+00382             glVertex3d(vbodata[12], vbodata[13], 1);
+00383             glEnd();
+00384             \textcolor{comment}{//glFlush();}
+00385         \}
+00386 
+00387         x += (g->advance_x ) * scale;
+00388     \}
+00389 
+00390     glFlush();
+00391     glDisableClientState( GL_VERTEX_ARRAY );
+00392     glDisableClientState( GL_TEXTURE_COORD_ARRAY );
+00393 \}
+00394 
+00395 \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{int} GLFont::lineHeight()\textcolor{keyword}{ const}
+00396 \textcolor{keyword}{}\{
+00397     \textcolor{keywordflow}{return} m_fontSize;
+00398 \}
+00399 
+00400 \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{int} GLFont::char_width(\textcolor{keyword}{const} \textcolor{keywordtype}{char} c)\textcolor{keyword}{ const}
+00401 \textcolor{keyword}{}\{
+00402     \textcolor{keywordflow}{return} m_glyphs[(\textcolor{keywordtype}{unsigned} char)c].advance\_x;
+00403 \}
+00404 
+00405 \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{int} GLFont::string_width(\textcolor{keyword}{const} \textcolor{keywordtype}{char} *str)\textcolor{keyword}{ const}
+00406 \textcolor{keyword}{}\{
+00407     \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{int} width = 0;
+00408     \textcolor{keywordflow}{for}(\textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{int} i=0; i<strlen(str); ++i)
+00409         width += m_glyphs[(\textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{char})str[i]].advance_x;
+00410     \textcolor{keywordflow}{return} width;
+00411 \}
+00412 
+00413 \textcolor{keywordtype}{void} GLFont::getTextSize(\textcolor{keyword}{const} \textcolor{keywordtype}{char}* str, \textcolor{keywordtype}{int}& width, \textcolor{keywordtype}{int} &height, \textcolor{keywordtype}{float} fontSize)
+00414 \{
+00415     \textcolor{keywordtype}{float} scale = fontSize/m_fontSize;
+00416     width = 0;
+00417 
+00418     \textcolor{keywordtype}{int} glyphH = 0;
+00419     height =0;
+00420     \textcolor{keywordtype}{int} len = strlen(str);
+00421     \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} i=0; i<len; ++i)
+00422     \{
+00423         \textcolor{keywordflow}{if}(i>len-1)
+00424             width += m_glyphs[(\textcolor{keywordtype}{unsigned} char)str[i]].width;
+00425         \textcolor{keywordflow}{else}
+00426             width += m_glyphs[(\textcolor{keywordtype}{unsigned} char)str[i]].advance\_x;
+00427         glyphH = m_glyphs[(\textcolor{keywordtype}{unsigned} char)str[i]].height;
+00428         \textcolor{keywordflow}{if} (glyphH> height)
+00429             height = glyphH;
+00430     \}
+00431     width = width*scale;
+00432     height = height*scale;
+00433 \}
+\end{DoxyCode}

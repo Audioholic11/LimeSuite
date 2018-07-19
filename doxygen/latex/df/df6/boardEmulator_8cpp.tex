@@ -1,0 +1,245 @@
+\subsection{/home/erik/prefix/default/src/limesuite-\/dev/src/board\+Emulator.cpp File Reference}
+\label{boardEmulator_8cpp}\index{/home/erik/prefix/default/src/limesuite-\/dev/src/board\+Emulator.\+cpp@{/home/erik/prefix/default/src/limesuite-\/dev/src/board\+Emulator.\+cpp}}
+{\ttfamily \#include $<$signal.\+h$>$}\\*
+{\ttfamily \#include $<$stdlib.\+h$>$}\\*
+{\ttfamily \#include $<$stdio.\+h$>$}\\*
+{\ttfamily \#include $<$iostream$>$}\\*
+{\ttfamily \#include $<$thread$>$}\\*
+{\ttfamily \#include $<$unistd.\+h$>$}\\*
+{\ttfamily \#include $<$fcntl.\+h$>$}\\*
+{\ttfamily \#include $<$errno.\+h$>$}\\*
+{\ttfamily \#include $<$string.\+h$>$}\\*
+{\ttfamily \#include $<$vector$>$}\\*
+{\ttfamily \#include $<$termios.\+h$>$}\\*
+{\ttfamily \#include $<$map$>$}\\*
+{\ttfamily \#include $<$ctime$>$}\\*
+{\ttfamily \#include $<$L\+M\+S64\+C\+Protocol.\+h$>$}\\*
+{\ttfamily \#include $<$L\+M\+S\+Boards.\+h$>$}\\*
+Include dependency graph for board\+Emulator.\+cpp\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{db/de1/boardEmulator_8cpp__incl}
+\end{center}
+\end{figure}
+\subsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+{\bf int} {\bf Process\+L\+M\+S64C} (const uint8\+\_\+t $\ast$input, uint8\+\_\+t $\ast$output)
+\item 
+{\bf void} {\bf Application\+Stop\+Handler} ({\bf int} s)
+\item 
+{\bf int} {\bf main} ({\bf int} argc, char $\ast$$\ast$argv)
+\item 
+{\bf void} {\bf Write\+Register} (const uint16\+\_\+t addr, const uint16\+\_\+t {\bf data})
+\item 
+uint16\+\_\+t {\bf Read\+Register} (const uint16\+\_\+t addr)
+\end{DoxyCompactItemize}
+\subsubsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+bool {\bf stop\+Application} = false
+\item 
+map$<$ uint16\+\_\+t, uint16\+\_\+t $>$ {\bf channelA}
+\item 
+map$<$ uint16\+\_\+t, uint16\+\_\+t $>$ {\bf channelB}
+\item 
+map$<$ uint16\+\_\+t, uint16\+\_\+t $>$ {\bf fpga\+Registers}
+\end{DoxyCompactItemize}
+
+
+\subsubsection{Function Documentation}
+\index{board\+Emulator.\+cpp@{board\+Emulator.\+cpp}!Application\+Stop\+Handler@{Application\+Stop\+Handler}}
+\index{Application\+Stop\+Handler@{Application\+Stop\+Handler}!board\+Emulator.\+cpp@{board\+Emulator.\+cpp}}
+\paragraph[{Application\+Stop\+Handler(int s)}]{\setlength{\rightskip}{0pt plus 5cm}{\bf void} Application\+Stop\+Handler (
+\begin{DoxyParamCaption}
+\item[{{\bf int}}]{s}
+\end{DoxyParamCaption}
+)}\label{boardEmulator_8cpp_a8025b7c1fc417b152585913d46893f54}
+
+
+Definition at line {\bf 24} of file {\bf board\+Emulator.\+cpp}.
+
+
+
+References {\bf stop\+Application}.
+
+
+
+Referenced by {\bf main()}.
+
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=273pt]{df/df6/boardEmulator_8cpp_a8025b7c1fc417b152585913d46893f54_icgraph}
+\end{center}
+\end{figure}
+
+
+\index{board\+Emulator.\+cpp@{board\+Emulator.\+cpp}!main@{main}}
+\index{main@{main}!board\+Emulator.\+cpp@{board\+Emulator.\+cpp}}
+\paragraph[{main(int argc, char $\ast$$\ast$argv)}]{\setlength{\rightskip}{0pt plus 5cm}{\bf int} main (
+\begin{DoxyParamCaption}
+\item[{{\bf int}}]{argc, }
+\item[{char $\ast$$\ast$}]{argv}
+\end{DoxyParamCaption}
+)}\label{boardEmulator_8cpp_a3c04138a5bfe5d72780bb7e82a18e627}
+
+
+Definition at line {\bf 30} of file {\bf board\+Emulator.\+cpp}.
+
+
+
+References {\bf Application\+Stop\+Handler()}, {\bf i}, {\bf Process\+L\+M\+S64\+C()}, {\bf read()}, and {\bf stop\+Application}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{df/df6/boardEmulator_8cpp_a3c04138a5bfe5d72780bb7e82a18e627_cgraph}
+\end{center}
+\end{figure}
+
+
+\index{board\+Emulator.\+cpp@{board\+Emulator.\+cpp}!Process\+L\+M\+S64C@{Process\+L\+M\+S64C}}
+\index{Process\+L\+M\+S64C@{Process\+L\+M\+S64C}!board\+Emulator.\+cpp@{board\+Emulator.\+cpp}}
+\paragraph[{Process\+L\+M\+S64\+C(const uint8\+\_\+t $\ast$input, uint8\+\_\+t $\ast$output)}]{\setlength{\rightskip}{0pt plus 5cm}{\bf int} Process\+L\+M\+S64C (
+\begin{DoxyParamCaption}
+\item[{const uint8\+\_\+t $\ast$}]{input, }
+\item[{uint8\+\_\+t $\ast$}]{output}
+\end{DoxyParamCaption}
+)}\label{boardEmulator_8cpp_a83e9fda9cb90993c61661958dd030d40}
+
+
+Definition at line {\bf 140} of file {\bf board\+Emulator.\+cpp}.
+
+
+
+References {\bf lime\+::\+C\+M\+D\+\_\+\+A\+L\+T\+E\+R\+A\+\_\+\+F\+P\+G\+A\+\_\+\+G\+W\+\_\+\+RD}, {\bf lime\+::\+C\+M\+D\+\_\+\+A\+L\+T\+E\+R\+A\+\_\+\+F\+P\+G\+A\+\_\+\+G\+W\+\_\+\+WR}, {\bf lime\+::\+C\+M\+D\+\_\+\+B\+R\+D\+S\+P\+I\+\_\+\+RD}, {\bf lime\+::\+C\+M\+D\+\_\+\+B\+R\+D\+S\+P\+I\+\_\+\+WR}, {\bf lime\+::\+C\+M\+D\+\_\+\+G\+E\+T\+\_\+\+I\+N\+FO}, {\bf lime\+::\+C\+M\+D\+\_\+\+L\+M\+S7002\+\_\+\+RD}, {\bf lime\+::\+C\+M\+D\+\_\+\+L\+M\+S7002\+\_\+\+WR}, {\bf lime\+::\+C\+M\+D\+\_\+\+M\+E\+M\+O\+R\+Y\+\_\+\+WR}, {\bf lime\+::\+E\+X\+P\+\_\+\+B\+O\+A\+R\+D\+\_\+\+U\+N\+S\+U\+P\+P\+O\+R\+T\+ED}, {\bf i}, {\bf lime\+::\+L\+M\+S\+\_\+\+D\+E\+V\+\_\+\+E\+V\+B7\+V2}, {\bf Read\+Register()}, {\bf lime\+::\+S\+T\+A\+T\+U\+S\+\_\+\+C\+O\+M\+P\+L\+E\+T\+E\+D\+\_\+\+C\+MD}, {\bf lime\+::\+S\+T\+A\+T\+U\+S\+\_\+\+U\+N\+K\+N\+O\+W\+N\+\_\+\+C\+MD}, and {\bf Write\+Register()}.
+
+
+
+Referenced by {\bf main()}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=284pt]{df/df6/boardEmulator_8cpp_a83e9fda9cb90993c61661958dd030d40_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=245pt]{df/df6/boardEmulator_8cpp_a83e9fda9cb90993c61661958dd030d40_icgraph}
+\end{center}
+\end{figure}
+
+
+\index{board\+Emulator.\+cpp@{board\+Emulator.\+cpp}!Read\+Register@{Read\+Register}}
+\index{Read\+Register@{Read\+Register}!board\+Emulator.\+cpp@{board\+Emulator.\+cpp}}
+\paragraph[{Read\+Register(const uint16\+\_\+t addr)}]{\setlength{\rightskip}{0pt plus 5cm}uint16\+\_\+t Read\+Register (
+\begin{DoxyParamCaption}
+\item[{const uint16\+\_\+t}]{addr}
+\end{DoxyParamCaption}
+)}\label{boardEmulator_8cpp_af4be06bf61181ea8b4fd3a3bad02c37b}
+
+
+Definition at line {\bf 130} of file {\bf board\+Emulator.\+cpp}.
+
+
+
+Referenced by {\bf Process\+L\+M\+S64\+C()}, and {\bf lime\+::\+Connection\+Novena\+R\+F7\+::\+Update\+Threads()}.
+
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{df/df6/boardEmulator_8cpp_af4be06bf61181ea8b4fd3a3bad02c37b_icgraph}
+\end{center}
+\end{figure}
+
+
+\index{board\+Emulator.\+cpp@{board\+Emulator.\+cpp}!Write\+Register@{Write\+Register}}
+\index{Write\+Register@{Write\+Register}!board\+Emulator.\+cpp@{board\+Emulator.\+cpp}}
+\paragraph[{Write\+Register(const uint16\+\_\+t addr, const uint16\+\_\+t data)}]{\setlength{\rightskip}{0pt plus 5cm}{\bf void} Write\+Register (
+\begin{DoxyParamCaption}
+\item[{const uint16\+\_\+t}]{addr, }
+\item[{const uint16\+\_\+t}]{data}
+\end{DoxyParamCaption}
+)}\label{boardEmulator_8cpp_a5686580120a233bde133fc914a90c5fa}
+
+
+Definition at line {\bf 123} of file {\bf board\+Emulator.\+cpp}.
+
+
+
+Referenced by {\bf Process\+L\+M\+S64\+C()}, and {\bf lime\+::\+Connection\+Novena\+R\+F7\+::\+Update\+Threads()}.
+
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{df/df6/boardEmulator_8cpp_a5686580120a233bde133fc914a90c5fa_icgraph}
+\end{center}
+\end{figure}
+
+
+
+
+\subsubsection{Variable Documentation}
+\index{board\+Emulator.\+cpp@{board\+Emulator.\+cpp}!channelA@{channelA}}
+\index{channelA@{channelA}!board\+Emulator.\+cpp@{board\+Emulator.\+cpp}}
+\paragraph[{channelA}]{\setlength{\rightskip}{0pt plus 5cm}map$<$uint16\+\_\+t, uint16\+\_\+t$>$ channelA}\label{boardEmulator_8cpp_affcb26249fd3177bbd304bbe3a3880ec}
+
+
+Definition at line {\bf 117} of file {\bf board\+Emulator.\+cpp}.
+
+\index{board\+Emulator.\+cpp@{board\+Emulator.\+cpp}!channelB@{channelB}}
+\index{channelB@{channelB}!board\+Emulator.\+cpp@{board\+Emulator.\+cpp}}
+\paragraph[{channelB}]{\setlength{\rightskip}{0pt plus 5cm}map$<$uint16\+\_\+t, uint16\+\_\+t$>$ channelB}\label{boardEmulator_8cpp_af1bc8aac577c6c8f05c8d484e7c27fc8}
+
+
+Definition at line {\bf 118} of file {\bf board\+Emulator.\+cpp}.
+
+\index{board\+Emulator.\+cpp@{board\+Emulator.\+cpp}!fpga\+Registers@{fpga\+Registers}}
+\index{fpga\+Registers@{fpga\+Registers}!board\+Emulator.\+cpp@{board\+Emulator.\+cpp}}
+\paragraph[{fpga\+Registers}]{\setlength{\rightskip}{0pt plus 5cm}map$<$uint16\+\_\+t, uint16\+\_\+t$>$ fpga\+Registers}\label{boardEmulator_8cpp_a92e9e07e444a95ef5d49ffc694a02969}
+
+
+Definition at line {\bf 121} of file {\bf board\+Emulator.\+cpp}.
+
+\index{board\+Emulator.\+cpp@{board\+Emulator.\+cpp}!stop\+Application@{stop\+Application}}
+\index{stop\+Application@{stop\+Application}!board\+Emulator.\+cpp@{board\+Emulator.\+cpp}}
+\paragraph[{stop\+Application}]{\setlength{\rightskip}{0pt plus 5cm}bool stop\+Application = false}\label{boardEmulator_8cpp_a2edad80191396287a766547eae09e8aa}
+
+
+Definition at line {\bf 20} of file {\bf board\+Emulator.\+cpp}.
+
+
+
+Referenced by {\bf Application\+Stop\+Handler()}, and {\bf main()}.
+

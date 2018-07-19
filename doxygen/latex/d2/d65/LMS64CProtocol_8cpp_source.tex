@@ -1,0 +1,900 @@
+\subsection{L\+M\+S64\+C\+Protocol.\+cpp}
+\label{LMS64CProtocol_8cpp_source}\index{/home/erik/prefix/default/src/limesuite-\/dev/src/protocols/\+L\+M\+S64\+C\+Protocol.\+cpp@{/home/erik/prefix/default/src/limesuite-\/dev/src/protocols/\+L\+M\+S64\+C\+Protocol.\+cpp}}
+
+\begin{DoxyCode}
+00001 
+00007 \textcolor{preprocessor}{#include "Logger.h"}
+00008 \textcolor{preprocessor}{#include "LMS64CProtocol.h"}
+00009 \textcolor{preprocessor}{#include "Si5351C.h"}
+00010 \textcolor{preprocessor}{#include <chrono>}
+00011 \textcolor{preprocessor}{#include <iostream>}
+00012 \textcolor{preprocessor}{#include <assert.h>}
+00013 \textcolor{preprocessor}{#include <math.h>}
+00014 \textcolor{preprocessor}{#include <algorithm>}
+00015 \textcolor{preprocessor}{#include <iso646.h>} \textcolor{comment}{// alternative operators for visual c++: not, and, or...}
+00016 \textcolor{preprocessor}{#include <ADCUnits.h>}
+00017 \textcolor{preprocessor}{#include <sstream>}
+00018 \textcolor{keyword}{using namespace }lime;
+00019 
+00021 \textcolor{keyword}{const} \textcolor{keywordtype}{int} LMS_RST_DEACTIVATE = 0;
+00022 \textcolor{keyword}{const} \textcolor{keywordtype}{int} LMS_RST_ACTIVATE = 1;
+00023 \textcolor{keyword}{const} \textcolor{keywordtype}{int} LMS_RST_PULSE = 2;
+00024 
+00026 \textcolor{preprocessor}{#define LMS7002M\_SPI\_INDEX 0x10}
+00027 \textcolor{preprocessor}{#define ADF4002\_SPI\_INDEX 0x30}
+00028 
+00029 \textcolor{keyword}{static} \textcolor{keywordtype}{int} convertStatus(\textcolor{keyword}{const} \textcolor{keywordtype}{int} &status, \textcolor{keyword}{const} LMS64CProtocol::GenericPacket &pkt)
+00030 \{
+00031     \textcolor{keywordflow}{if} (status != 0) \textcolor{keywordflow}{return} -1;
+00032     \textcolor{keywordflow}{switch} (pkt.status)
+00033     \{
+00034     \textcolor{keywordflow}{case} STATUS_COMPLETED_CMD: \textcolor{keywordflow}{return} 0;
+00035     \textcolor{keywordflow}{case} STATUS_UNKNOWN_CMD:
+00036         \textcolor{keywordflow}{return} ReportError(EPROTONOSUPPORT, \textcolor{stringliteral}{"Command not supported"});
+00037     \textcolor{keywordflow}{default}: \textcolor{keywordflow}{break};
+00038     \}
+00039     \textcolor{keywordflow}{return} ReportError(EPROTO, status2string(pkt.status));
+00040 \}
+00041 
+00042 LMS64CProtocol::LMS64CProtocol(\textcolor{keywordtype}{void})
+00043 \{
+00044     \textcolor{comment}{//set a sane-default for the rate}
+00045     _cachedRefClockRate = 61.44e6/2;
+00046 \}
+00047 
+00048 LMS64CProtocol::~LMS64CProtocol(\textcolor{keywordtype}{void})
+00049 \{
+00050     \textcolor{keywordflow}{return};
+00051 \}
+00052 
+00053 \textcolor{keywordtype}{int} LMS64CProtocol::DeviceReset(\textcolor{keywordtype}{int} ind)
+00054 \{
+00055     \textcolor{keywordflow}{if} (not this->IsOpen())
+00056     \{
+00057         \textcolor{keywordflow}{return} ReportError(ENOTCONN, \textcolor{stringliteral}{"connection is not open"});
+00058     \}
+00059 
+00060     GenericPacket pkt;
+00061     pkt.cmd = CMD_LMS7002_RST;
+00062     pkt.periphID = ind;
+00063     pkt.outBuffer.push\_back (LMS_RST_PULSE);
+00064     \textcolor{keywordtype}{int} status = this->TransferPacket(pkt);
+00065 
+00066     \textcolor{keywordflow}{return} convertStatus(status, pkt);
+00067 \}
+00068 
+00069 \textcolor{keywordtype}{int} LMS64CProtocol::TransactSPI(\textcolor{keyword}{const} \textcolor{keywordtype}{int} addr, \textcolor{keyword}{const} uint32\_t *writeData, uint32\_t *readData, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t}
+       size)
+00070 \{
+00074 
+00075     \textcolor{keywordflow}{if} (not this->IsOpen())
+00076     \{
+00077         ReportError(ENOTCONN, \textcolor{stringliteral}{"connection is not open"});
+00078         \textcolor{keywordflow}{return} -1;
+00079     \}
+00080 
+00081     \textcolor{comment}{//perform spi writes when there is no read data}
+00082     \textcolor{keywordflow}{if} (readData == \textcolor{keyword}{nullptr}) \textcolor{keywordflow}{switch}(addr)
+00083     \{
+00084     \textcolor{keywordflow}{case} LMS7002M_SPI_INDEX: \textcolor{keywordflow}{return} this->WriteLMS7002MSPI(writeData, size);
+00085     \textcolor{keywordflow}{case} ADF4002_SPI_INDEX: \textcolor{keywordflow}{return} this->WriteADF4002SPI(writeData, size);
+00086     \}
+00087 
+00088     \textcolor{comment}{//otherwise perform reads into the provided buffer}
+00089     \textcolor{keywordflow}{if} (readData != \textcolor{keyword}{nullptr}) \textcolor{keywordflow}{switch}(addr)
+00090     \{
+00091     \textcolor{keywordflow}{case} LMS7002M_SPI_INDEX: \textcolor{keywordflow}{return} this->ReadLMS7002MSPI(writeData, readData, size);
+00092     \textcolor{keywordflow}{case} ADF4002_SPI_INDEX: \textcolor{keywordflow}{return} this->ReadADF4002SPI(writeData, readData, size);
+00093     \}
+00094 
+00095     \textcolor{keywordflow}{return} ReportError(ENOTSUP, \textcolor{stringliteral}{"unknown spi address"});
+00096 \}
+00097 
+00098 \textcolor{keywordtype}{int} LMS64CProtocol::WriteI2C(\textcolor{keyword}{const} \textcolor{keywordtype}{int} addr, \textcolor{keyword}{const} std::string &data)
+00099 \{
+00100     \textcolor{keywordflow}{if} (not this->IsOpen())
+00101     \{
+00102         \textcolor{keywordflow}{return} ReportError(ENOTCONN, \textcolor{stringliteral}{"connection is not open"});
+00103     \}
+00104     \textcolor{keywordflow}{return} this->WriteSi5351I2C(data);
+00105 \}
+00106 
+00107 \textcolor{keywordtype}{int} LMS64CProtocol::ReadI2C(\textcolor{keyword}{const} \textcolor{keywordtype}{int} addr, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} numBytes, std::string &
+      data)
+00108 \{
+00109     \textcolor{keywordflow}{if} (not this->IsOpen())
+00110     \{
+00111         \textcolor{keywordflow}{return} ReportError(ENOTCONN, \textcolor{stringliteral}{"connection is not open"});
+00112     \}
+00113     \textcolor{keywordflow}{return} this->ReadSi5351I2C(numBytes, data);
+00114 \}
+00115 
+00116 \textcolor{comment}{/***********************************************************************}
+00117 \textcolor{comment}{ * LMS7002M SPI access}
+00118 \textcolor{comment}{ **********************************************************************/}
+00119 \textcolor{keywordtype}{int} LMS64CProtocol::WriteLMS7002MSPI(\textcolor{keyword}{const} uint32\_t *writeData, \textcolor{keywordtype}{size\_t} size, \textcolor{keywordtype}{unsigned} periphID)
+00120 \{
+00121     GenericPacket pkt;
+00122     pkt.cmd = CMD_LMS7002_WR;
+00123     pkt.periphID = periphID;
+00124     \textcolor{keywordflow}{for} (\textcolor{keywordtype}{size\_t} i = 0; i < size; ++i)
+00125     \{
+00126         uint16\_t addr = (writeData[i] >> 16) & 0x7fff;
+00127         uint16\_t data = writeData[i] & 0xffff;
+00128         pkt.outBuffer.push\_back(addr >> 8);
+00129         pkt.outBuffer.push\_back(addr & 0xFF);
+00130         pkt.outBuffer.push\_back(data >> 8);
+00131         pkt.outBuffer.push\_back(data & 0xFF);
+00132     \}
+00133 
+00134     \textcolor{keywordtype}{int} status = this->TransferPacket(pkt);
+00135 
+00136     \textcolor{keywordflow}{return} convertStatus(status, pkt);
+00137 \}
+00138 
+00139 \textcolor{keywordtype}{int} LMS64CProtocol::ReadLMS7002MSPI(\textcolor{keyword}{const} uint32\_t *writeData, uint32\_t *readData, \textcolor{keywordtype}{size\_t} 
+      size, \textcolor{keywordtype}{unsigned} periphID)
+00140 \{
+00141     GenericPacket pkt;
+00142     pkt.cmd = CMD_LMS7002_RD;
+00143     pkt.periphID = periphID;
+00144     \textcolor{keywordflow}{for} (\textcolor{keywordtype}{size\_t} i = 0; i < size; ++i)
+00145     \{
+00146         uint16\_t addr = (writeData[i] >> 16) & 0x7fff;
+00147         pkt.outBuffer.push\_back(addr >> 8);
+00148         pkt.outBuffer.push\_back(addr & 0xFF);
+00149     \}
+00150 
+00151     \textcolor{keywordtype}{int} status = this->TransferPacket(pkt);
+00152 
+00153     \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} numRead = std::min<size\_t>(pkt.inBuffer.size()/4, size);
+00154     \textcolor{keywordflow}{for} (\textcolor{keywordtype}{size\_t} i = 0; i < numRead; ++i)
+00155     \{
+00156         \textcolor{keywordtype}{int} hi = pkt.inBuffer[4*i + 2];
+00157         \textcolor{keywordtype}{int} lo = pkt.inBuffer[4*i + 3];
+00158         readData[i] = (hi << 8) | lo;
+00159     \}
+00160 
+00161     \textcolor{keywordflow}{return} convertStatus(status, pkt);
+00162 \}
+00163 
+00164 \textcolor{comment}{/***********************************************************************}
+00165 \textcolor{comment}{ * Si5351 SPI access}
+00166 \textcolor{comment}{ **********************************************************************/}
+00167 \textcolor{keywordtype}{int} LMS64CProtocol::WriteSi5351I2C(\textcolor{keyword}{const} std::string &data)
+00168 \{
+00169     GenericPacket pkt;
+00170     pkt.cmd = CMD_SI5351_WR;
+00171 
+00172     \textcolor{keywordflow}{for} (\textcolor{keywordtype}{size\_t} i = 0; i < data.size(); i++)
+00173     \{
+00174         pkt.outBuffer.push\_back(data.at(i));
+00175     \}
+00176 
+00177     \textcolor{keywordtype}{int} status = this->TransferPacket(pkt);
+00178     \textcolor{keywordflow}{return} convertStatus(status, pkt);
+00179 \}
+00180 
+00181 \textcolor{keywordtype}{int} LMS64CProtocol::ReadSi5351I2C(\textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} numBytes, std::string &data)
+00182 \{
+00183     GenericPacket pkt;
+00184     pkt.cmd = CMD_SI5351_RD;
+00185 
+00186     \textcolor{keywordtype}{int} status = this->TransferPacket(pkt);
+00187 
+00188     \textcolor{keywordflow}{for} (\textcolor{keywordtype}{size\_t} i = 0; i < data.size(); i++)
+00189     \{
+00190         pkt.outBuffer.push\_back(data.at(i));
+00191     \}
+00192 
+00193     data.clear();
+00194     \textcolor{keywordflow}{for} (\textcolor{keywordtype}{size\_t} i = 0; i < pkt.inBuffer.size(); ++i)
+00195     \{
+00196         data += pkt.inBuffer[i];
+00197     \}
+00198 
+00199     \textcolor{keywordflow}{return} convertStatus(status, pkt);
+00200 \}
+00201 
+00202 \textcolor{comment}{/***********************************************************************}
+00203 \textcolor{comment}{ * ADF4002 SPI access}
+00204 \textcolor{comment}{ **********************************************************************/}
+00205 \textcolor{keywordtype}{int} LMS64CProtocol::WriteADF4002SPI(\textcolor{keyword}{const} uint32\_t *writeData, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} size)
+00206 \{
+00207     GenericPacket pkt;
+00208     pkt.cmd = CMD_ADF4002_WR;
+00209 
+00210     \textcolor{keywordflow}{for} (\textcolor{keywordtype}{size\_t} i = 0; i < size; i++)
+00211     \{
+00212         pkt.outBuffer.push\_back((writeData[i] >> 16) & 0xff);
+00213         pkt.outBuffer.push\_back((writeData[i] >> 8) & 0xff);
+00214         pkt.outBuffer.push\_back((writeData[i] >> 0) & 0xff);
+00215     \}
+00216 
+00217     \textcolor{keywordtype}{int} status = this->TransferPacket(pkt);
+00218     \textcolor{keywordflow}{return} convertStatus(status, pkt);
+00219 \}
+00220 
+00221 \textcolor{keywordtype}{int} LMS64CProtocol::ReadADF4002SPI(\textcolor{keyword}{const} uint32\_t *writeData, uint32\_t *readData, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} 
+      size)
+00222 \{
+00223     ReportError(ENOTSUP, \textcolor{stringliteral}{"ReadADF4002SPI not supported"});
+00224     \textcolor{keywordflow}{return} -1;
+00225 \}
+00226 
+00227 \textcolor{comment}{/***********************************************************************}
+00228 \textcolor{comment}{ * Board SPI access}
+00229 \textcolor{comment}{ **********************************************************************/}
+00230 \textcolor{keywordtype}{int} LMS64CProtocol::WriteRegisters(\textcolor{keyword}{const} uint32\_t *addrs, \textcolor{keyword}{const} uint32\_t *data, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} 
+      size)
+00231 \{
+00232     GenericPacket pkt;
+00233     pkt.cmd = CMD_BRDSPI_WR;
+00234     \textcolor{keywordflow}{for} (\textcolor{keywordtype}{size\_t} i = 0; i < size; ++i)
+00235     \{
+00236         pkt.outBuffer.push\_back(addrs[i] >> 8);
+00237         pkt.outBuffer.push\_back(addrs[i] & 0xFF);
+00238         pkt.outBuffer.push\_back(data[i] >> 8);
+00239         pkt.outBuffer.push\_back(data[i] & 0xFF);
+00240     \}
+00241 
+00242     \textcolor{keywordtype}{int} status = this->TransferPacket(pkt);
+00243 
+00244     \textcolor{keywordflow}{return} convertStatus(status, pkt);
+00245 \}
+00246 
+00247 \textcolor{keywordtype}{int} LMS64CProtocol::ReadRegisters(\textcolor{keyword}{const} uint32\_t *addrs, uint32\_t *data, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} 
+      size)
+00248 \{
+00249     GenericPacket pkt;
+00250     pkt.cmd = CMD_BRDSPI_RD;
+00251     \textcolor{keywordflow}{for} (\textcolor{keywordtype}{size\_t} i = 0; i < size; ++i)
+00252     \{
+00253         pkt.outBuffer.push\_back(addrs[i] >> 8);
+00254         pkt.outBuffer.push\_back(addrs[i] & 0xFF);
+00255     \}
+00256 
+00257     \textcolor{keywordtype}{int} status = this->TransferPacket(pkt);
+00258 
+00259     \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} numRead = std::min<size\_t>(pkt.inBuffer.size()/4, size);
+00260     \textcolor{keywordflow}{for} (\textcolor{keywordtype}{size\_t} i = 0; i < numRead; ++i)
+00261     \{
+00262         \textcolor{keywordtype}{int} hi = pkt.inBuffer[4*i + 2];
+00263         \textcolor{keywordtype}{int} lo = pkt.inBuffer[4*i + 3];
+00264         data[i] = (hi << 8) | lo;
+00265     \}
+00266 
+00267     \textcolor{keywordflow}{return} convertStatus(status, pkt);
+00268 \}
+00269 
+00270 \textcolor{comment}{/***********************************************************************}
+00271 \textcolor{comment}{ * Device Information}
+00272 \textcolor{comment}{ **********************************************************************/}
+00273 DeviceInfo LMS64CProtocol::GetDeviceInfo(\textcolor{keywordtype}{void})
+00274 \{
+00275     LMSinfo lmsInfo = this->GetInfo();
+00276     DeviceInfo devInfo;
+00277     devInfo.deviceName = GetDeviceName(lmsInfo.device);
+00278     devInfo.expansionName = GetExpansionBoardName(lmsInfo.expansion);
+00279     devInfo.firmwareVersion = std::to\_string(\textcolor{keywordtype}{int}(lmsInfo.firmware));
+00280     devInfo.hardwareVersion = std::to\_string(\textcolor{keywordtype}{int}(lmsInfo.hardware));
+00281     devInfo.protocolVersion = std::to\_string(\textcolor{keywordtype}{int}(lmsInfo.protocol));
+00282     devInfo.boardSerialNumber = lmsInfo.boardSerialNumber;
+00283 
+00284     FPGAinfo gatewareInfo = this->GetFPGAInfo();
+00285     devInfo.gatewareTargetBoard = GetDeviceName(eLMS_DEV(gatewareInfo.boardID));
+00286     devInfo.gatewareVersion = std::to\_string(\textcolor{keywordtype}{int}(gatewareInfo.gatewareVersion));
+00287     devInfo.gatewareRevision = std::to\_string(\textcolor{keywordtype}{int}(gatewareInfo.gatewareRevision));
+00288     devInfo.hardwareVersion = std::to\_string(\textcolor{keywordtype}{int}(gatewareInfo.hwVersion));
+00289 
+00290     \textcolor{keywordflow}{return} devInfo;
+00291 \}
+00292 
+00295 LMS64CProtocol::LMSinfo LMS64CProtocol::GetInfo()
+00296 \{
+00297     LMSinfo info;
+00298     info.device = LMS_DEV_UNKNOWN;
+00299     info.expansion = EXP_BOARD_UNKNOWN;
+00300     info.firmware = 0;
+00301     info.hardware = 0;
+00302     info.protocol = 0;
+00303     info.boardSerialNumber = 0;
+00304     GenericPacket pkt;
+00305     pkt.cmd = CMD_GET_INFO;
+00306     \textcolor{keywordtype}{int} status = TransferPacket(pkt);
+00307     \textcolor{keywordflow}{if} (status == 0 && pkt.inBuffer.size() >= 5)
+00308     \{
+00309         info.firmware = pkt.inBuffer[0];
+00310         info.device = pkt.inBuffer[1] < LMS_DEV_COUNT ? (eLMS_DEV)pkt.inBuffer[1] : 
+      LMS_DEV_UNKNOWN;
+00311         info.protocol = pkt.inBuffer[2];
+00312         info.hardware = pkt.inBuffer[3];
+00313         info.expansion = pkt.inBuffer[4] < EXP_BOARD_COUNT ? (eEXP_BOARD)pkt.
+      inBuffer[4] : EXP_BOARD_UNKNOWN;
+00314         info.boardSerialNumber = 0;
+00315         \textcolor{keywordflow}{for} (\textcolor{keywordtype}{int} i = 10; i < 18; i++)
+00316         \{
+00317             info.boardSerialNumber <<= 8;
+00318             info.boardSerialNumber |= pkt.inBuffer[i];
+00319         \}
+00320     \}
+00321     \textcolor{keywordflow}{return} info;
+00322 \}
+00323 
+00326 LMS64CProtocol::FPGAinfo LMS64CProtocol::GetFPGAInfo()
+00327 \{
+00328     FPGAinfo info;
+00329     info.boardID = 0;
+00330     info.gatewareVersion = 0;
+00331     info.gatewareRevision = 0;
+00332     GenericPacket pkt;
+00333     pkt.cmd = CMD_BRDSPI_RD;
+00334     \textcolor{keyword}{const} uint16\_t addrs[] = \{0x0000, 0x0001, 0x0002, 0x0003\};
+00335     \textcolor{keywordflow}{for} (\textcolor{keywordtype}{size\_t} i = 0; i < 4; ++i)
+00336     \{
+00337         pkt.outBuffer.push\_back(addrs[i] >> 8);
+00338         pkt.outBuffer.push\_back(addrs[i] & 0xFF);
+00339     \}
+00340     \textcolor{keywordtype}{int} status = this->TransferPacket(pkt);
+00341     \textcolor{keywordflow}{if} (status == 0 && pkt.inBuffer.size() >= \textcolor{keyword}{sizeof}(addrs)*2)
+00342     \{
+00343         info.boardID = (pkt.inBuffer[2] << 8) | pkt.inBuffer[3];
+00344         info.gatewareVersion = (pkt.inBuffer[6] << 8) | pkt.inBuffer[7];
+00345         info.gatewareRevision = (pkt.inBuffer[10] << 8) | pkt.inBuffer[11];
+00346         info.hwVersion = (pkt.inBuffer[14] << 8) | pkt.inBuffer[15];
+00347     \}
+00348     \textcolor{keywordflow}{return} info;
+00349 \}
+00350 
+00351 
+00356 \textcolor{keywordtype}{int} LMS64CProtocol::TransferPacket(GenericPacket& pkt)
+00357 \{
+00358     std::lock\_guard<std::mutex> lock(mControlPortLock);
+00359     \textcolor{keywordtype}{int} status = 0;
+00360     \textcolor{keywordflow}{if}(IsOpen() == \textcolor{keyword}{false}) ReportError(ENOTCONN, \textcolor{stringliteral}{"connection is not open"});
+00361 
+00362     \textcolor{keywordtype}{int} packetLen;
+00363     eLMS_PROTOCOL protocol = LMS_PROTOCOL_UNDEFINED;
+00364     \textcolor{keywordflow}{if}(this->GetType() == SPI_PORT)
+00365         protocol = LMS_PROTOCOL_NOVENA;
+00366     \textcolor{keywordflow}{else}
+00367         protocol = LMS_PROTOCOL_LMS64C;
+00368     \textcolor{keywordflow}{switch}(protocol)
+00369     \{
+00370     \textcolor{keywordflow}{case} LMS_PROTOCOL_UNDEFINED:
+00371         \textcolor{keywordflow}{return} ReportError(\textcolor{stringliteral}{"protocol type undefined"});
+00372     \textcolor{keywordflow}{case} LMS_PROTOCOL_LMS64C:
+00373         packetLen = ProtocolLMS64C::pktLength;
+00374         \textcolor{keywordflow}{break};
+00375     \textcolor{keywordflow}{case} LMS_PROTOCOL_NOVENA:
+00376         packetLen = pkt.outBuffer.size() > ProtocolNovena::pktLength ? 
+      ProtocolNovena::pktLength : pkt.outBuffer.size();
+00377         \textcolor{keywordflow}{break};
+00378     \textcolor{keywordflow}{default}:
+00379         packetLen = 0;
+00380         \textcolor{keywordflow}{return} ReportError(\textcolor{stringliteral}{"Unknown protocol type %d"}, \textcolor{keywordtype}{int}(protocol));
+00381     \}
+00382     \textcolor{keywordtype}{int} outLen = 0;
+00383     \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{char}* outBuffer = NULL;
+00384     outBuffer = PreparePacket(pkt, outLen, protocol);
+00385     \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{char}* inBuffer = \textcolor{keyword}{new} \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{char}[outLen];
+00386     memset(inBuffer, 0, outLen);
+00387 
+00388     \textcolor{keywordtype}{int} outBufPos = 0;
+00389     \textcolor{keywordtype}{int} inDataPos = 0;
+00390     \textcolor{keywordflow}{if}(outLen == 0)
+00391         outLen = 1;
+00392 
+00393     \textcolor{keywordflow}{if}(protocol == LMS_PROTOCOL_NOVENA)
+00394     \{
+00395         \textcolor{keywordtype}{bool} transferData = \textcolor{keyword}{true}; \textcolor{comment}{//some commands are fake, so don't need transferring}
+00396         \textcolor{keywordflow}{if}(pkt.cmd == CMD_GET_INFO)
+00397         \{
+00398             \textcolor{comment}{//spi does not have GET INFO, fake it to inform what device it is}
+00399             pkt.status = STATUS_COMPLETED_CMD;
+00400             pkt.inBuffer.clear();
+00401             pkt.inBuffer.resize(64, 0);
+00402             pkt.inBuffer[0] = 0; \textcolor{comment}{//firmware}
+00403             pkt.inBuffer[1] = LMS_DEV_NOVENA; \textcolor{comment}{//device}
+00404             pkt.inBuffer[2] = 0; \textcolor{comment}{//protocol}
+00405             pkt.inBuffer[3] = 0; \textcolor{comment}{//hardware}
+00406             pkt.inBuffer[4] = EXP_BOARD_UNSUPPORTED; \textcolor{comment}{//expansion}
+00407             transferData = \textcolor{keyword}{false};
+00408         \}
+00409 
+00410         \textcolor{keywordflow}{if}(transferData)
+00411         \{
+00412             \textcolor{keywordflow}{if} (callback_logData)
+00413                 callback_logData(\textcolor{keyword}{true}, outBuffer, outLen);
+00414             \textcolor{keywordtype}{int} bytesWritten = Write(outBuffer, outLen);
+00415             \textcolor{keywordflow}{if}( bytesWritten == outLen)
+00416             \{
+00417                 \textcolor{keywordflow}{if}(pkt.cmd == CMD_LMS7002_RD)
+00418                 \{
+00419                     inDataPos = Read(&inBuffer[inDataPos], outLen);
+00420                     \textcolor{keywordflow}{if}(inDataPos != outLen)
+00421                         status = ReportError(\textcolor{stringliteral}{"Read(%d bytes) got %d"}, (\textcolor{keywordtype}{int})outLen, (\textcolor{keywordtype}{int})inDataPos);
+00422                     \textcolor{keywordflow}{else}
+00423                     \{
+00424                         \textcolor{keywordflow}{if} (callback_logData)
+00425                             callback_logData(\textcolor{keyword}{false}, inBuffer, inDataPos);
+00426                     \}
+00427                 \}
+00428                 ParsePacket(pkt, inBuffer, inDataPos, protocol);
+00429             \}
+00430             \textcolor{keywordflow}{else}
+00431                 status = ReportError(\textcolor{stringliteral}{"Write(%d bytes) got %d"}, (\textcolor{keywordtype}{int})outLen, (\textcolor{keywordtype}{int})bytesWritten);
+00432         \}
+00433     \}
+00434     \textcolor{keywordflow}{else}
+00435     \{
+00436         \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} i=0; i<outLen; i+=packetLen)
+00437         \{
+00438             \textcolor{keywordtype}{int} bytesToSend = packetLen;
+00439             \textcolor{keywordflow}{if} (callback_logData)
+00440                 callback_logData(\textcolor{keyword}{true}, &outBuffer[outBufPos], bytesToSend);
+00441             \textcolor{keywordflow}{if}( Write(&outBuffer[outBufPos], bytesToSend) )
+00442             \{
+00443                 outBufPos += packetLen;
+00444                 \textcolor{keywordtype}{long} readLen = packetLen;
+00445                 \textcolor{keywordtype}{int} bread = Read(&inBuffer[inDataPos], readLen);
+00446                 \textcolor{keywordflow}{if}(bread != readLen && protocol != LMS_PROTOCOL_NOVENA)
+00447                 \{
+00448                     status = ReportError(EIO, \textcolor{stringliteral}{"Read(%d bytes) failed"}, (\textcolor{keywordtype}{int})readLen);
+00449                     \textcolor{keywordflow}{break};
+00450                 \}
+00451                 \textcolor{keywordflow}{if} (callback_logData)
+00452                     callback_logData(\textcolor{keyword}{false}, &inBuffer[inDataPos], bread);
+00453                 inDataPos += bread;
+00454             \}
+00455             \textcolor{keywordflow}{else}
+00456             \{
+00457                 status = ReportError(EIO, \textcolor{stringliteral}{"Write(%d bytes) failed"}, (\textcolor{keywordtype}{int})bytesToSend);
+00458                 \textcolor{keywordflow}{break};
+00459             \}
+00460         \}
+00461         ParsePacket(pkt, inBuffer, inDataPos, protocol);
+00462     \}
+00463     \textcolor{keyword}{delete}[] outBuffer;
+00464     \textcolor{keyword}{delete}[] inBuffer;
+00465     \textcolor{keywordflow}{return} convertStatus(status, pkt);
+00466 \}
+00467 
+00474 \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{char}* LMS64CProtocol::PreparePacket(\textcolor{keyword}{const} GenericPacket& pkt, \textcolor{keywordtype}{int}& 
+      length, \textcolor{keyword}{const} eLMS_PROTOCOL protocol)
+00475 \{
+00476     \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{char}* buffer = NULL;
+00477     \textcolor{keywordflow}{if}(protocol == LMS_PROTOCOL_UNDEFINED)
+00478         \textcolor{keywordflow}{return} NULL;
+00479 
+00480     \textcolor{keywordflow}{if}(protocol == LMS_PROTOCOL_LMS64C)
+00481     \{
+00482         ProtocolLMS64C packet;
+00483         \textcolor{keywordtype}{int} maxDataLength = packet.maxDataLength;
+00484         packet.cmd = pkt.cmd;
+00485         packet.status = pkt.status;
+00486         packet.periphID = pkt.periphID;
+00487         \textcolor{keywordtype}{int} byteBlockRatio = 1; \textcolor{comment}{//block ratio - how many bytes in one block}
+00488         \textcolor{keywordflow}{switch}( packet.cmd )
+00489         \{
+00490         \textcolor{keywordflow}{case} CMD_PROG_MCU:
+00491         \textcolor{keywordflow}{case} CMD_GET_INFO:
+00492         \textcolor{keywordflow}{case} CMD_SI5351_RD:
+00493         \textcolor{keywordflow}{case} CMD_SI5356_RD:
+00494             byteBlockRatio = 1;
+00495             \textcolor{keywordflow}{break};
+00496         \textcolor{keywordflow}{case} CMD_SI5351_WR:
+00497         \textcolor{keywordflow}{case} CMD_SI5356_WR:
+00498             byteBlockRatio = 2;
+00499             \textcolor{keywordflow}{break};
+00500         \textcolor{keywordflow}{case} CMD_LMS7002_RD:
+00501         \textcolor{keywordflow}{case} CMD_BRDSPI_RD:
+00502         \textcolor{keywordflow}{case} CMD_BRDSPI8_RD:
+00503             byteBlockRatio = 2;
+00504             \textcolor{keywordflow}{break};
+00505         \textcolor{keywordflow}{case} CMD_ADF4002_WR:
+00506             byteBlockRatio = 3;
+00507             \textcolor{keywordflow}{break};
+00508         \textcolor{keywordflow}{case} CMD_LMS7002_WR:
+00509         \textcolor{keywordflow}{case} CMD_BRDSPI_WR:
+00510         \textcolor{keywordflow}{case} CMD_ANALOG_VAL_WR:
+00511             byteBlockRatio = 4;
+00512             \textcolor{keywordflow}{break};
+00513         \textcolor{keywordflow}{default}:
+00514             byteBlockRatio = 1;
+00515         \}
+00516         \textcolor{keywordflow}{if} (packet.cmd == CMD_LMS7002_RD || packet.cmd == CMD_BRDSPI_RD)
+00517             maxDataLength = maxDataLength/2;
+00518         \textcolor{keywordflow}{if} (packet.cmd == CMD_ANALOG_VAL_RD)
+00519             maxDataLength = maxDataLength / 4;
+00520         \textcolor{keywordtype}{int} blockCount = pkt.outBuffer.size()/byteBlockRatio;
+00521         \textcolor{keywordtype}{int} bufLen = blockCount/(maxDataLength/byteBlockRatio)
+00522                     +(blockCount%(maxDataLength/byteBlockRatio)!=0);
+00523         bufLen *= packet.pktLength;
+00524         \textcolor{keywordflow}{if}(bufLen == 0)
+00525             bufLen = packet.pktLength;
+00526         buffer = \textcolor{keyword}{new} \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{char}[bufLen];
+00527         memset(buffer, 0, bufLen);
+00528         \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{int} srcPos = 0;
+00529         \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} j=0; j*packet.pktLength<bufLen; ++j)
+00530         \{
+00531             \textcolor{keywordtype}{int} pktPos = j*packet.pktLength;
+00532             buffer[pktPos] = packet.cmd;
+00533             buffer[pktPos+1] = packet.status;
+00534             buffer[pktPos + 3] = packet.periphID;
+00535             \textcolor{keywordflow}{if}(blockCount > (maxDataLength/byteBlockRatio))
+00536             \{
+00537                 buffer[pktPos+2] = maxDataLength/byteBlockRatio;
+00538                 blockCount -= buffer[pktPos+2];
+00539             \}
+00540             \textcolor{keywordflow}{else}
+00541                 buffer[pktPos+2] = blockCount;
+00542             memcpy(&buffer[pktPos+4], packet.reserved, \textcolor{keyword}{sizeof}(packet.reserved));
+00543             \textcolor{keywordtype}{int} bytesToPack = (maxDataLength/byteBlockRatio)*byteBlockRatio;
+00544             \textcolor{keywordflow}{for} (\textcolor{keywordtype}{int} k = 0; k<bytesToPack && srcPos < pkt.outBuffer.size(); ++srcPos, ++k)
+00545                 buffer[pktPos + 8 + k] = pkt.outBuffer[srcPos];
+00546         \}
+00547         length = bufLen;
+00548     \}
+00549     \textcolor{keywordflow}{else} \textcolor{keywordflow}{if}(protocol == LMS_PROTOCOL_NOVENA)
+00550     \{
+00551         \textcolor{keywordflow}{if}(pkt.cmd == CMD_LMS7002_RST)
+00552         \{
+00553             buffer = \textcolor{keyword}{new} \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{char}[8];
+00554             buffer[0] = 0x88;
+00555             buffer[1] = 0x06;
+00556             buffer[2] = 0x00;
+00557             buffer[3] = 0x18;
+00558             buffer[4] = 0x88;
+00559             buffer[5] = 0x06;
+00560             buffer[6] = 0x00;
+00561             buffer[7] = 0x38;
+00562             length = 8;
+00563         \}
+00564         \textcolor{keywordflow}{else}
+00565         \{
+00566             buffer = \textcolor{keyword}{new} \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{char}[pkt.outBuffer.size()];
+00567             memcpy(buffer, &pkt.outBuffer[0], pkt.outBuffer.size());
+00568             \textcolor{keywordflow}{if} (pkt.cmd == CMD_LMS7002_WR)
+00569             \{
+00570                 \textcolor{keywordflow}{for}(\textcolor{keywordtype}{size\_t} i=0; i<pkt.outBuffer.size(); i+=4)
+00571                     buffer[i] |= 0x80;
+00572             \}
+00573             length = pkt.outBuffer.size();
+00574         \}
+00575     \}
+00576     \textcolor{keywordflow}{return} buffer;
+00577 \}
+00578 
+00586 \textcolor{keywordtype}{int} LMS64CProtocol::ParsePacket(GenericPacket& pkt, \textcolor{keyword}{const} \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{char}* buffer, \textcolor{keyword}{const} \textcolor{keywordtype}{int} 
+      length, \textcolor{keyword}{const} eLMS_PROTOCOL protocol)
+00587 \{
+00588     \textcolor{keywordflow}{if}(protocol == LMS_PROTOCOL_UNDEFINED)
+00589         \textcolor{keywordflow}{return} -1;
+00590 
+00591     \textcolor{keywordflow}{if}(protocol == LMS_PROTOCOL_LMS64C)
+00592     \{
+00593         ProtocolLMS64C packet;
+00594         \textcolor{keywordtype}{int} inBufPos = 0;
+00595         pkt.inBuffer.resize(packet.maxDataLength*(length / packet.pktLength + (length % packet.
+      pktLength)), 0);
+00596         \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} i=0; i<length; i+=packet.pktLength)
+00597         \{
+00598             pkt.cmd = (eCMD_LMS)buffer[i];
+00599             pkt.status = (eCMD_STATUS)buffer[i+1];
+00600             memcpy(&pkt.inBuffer[inBufPos], &buffer[i+8], packet.maxDataLength);
+00601             inBufPos += packet.maxDataLength;
+00602         \}
+00603     \}
+00604     \textcolor{keywordflow}{else} \textcolor{keywordflow}{if}(protocol == LMS_PROTOCOL_NOVENA)
+00605     \{
+00606         pkt.cmd = CMD_LMS7002_RD;
+00607         pkt.status = STATUS_COMPLETED_CMD;
+00608         pkt.inBuffer.clear();
+00609         \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} i=0; i<length; i+=2)
+00610         \{
+00611             \textcolor{comment}{//reading from spi returns only registers values}
+00612             \textcolor{comment}{//fill addresses as zeros to match generic format of address, value pairs}
+00613             pkt.inBuffer.push\_back(0); \textcolor{comment}{//should be address msb}
+00614             pkt.inBuffer.push\_back(0); \textcolor{comment}{//should be address lsb}
+00615             pkt.inBuffer.push\_back(buffer[i]);
+00616             pkt.inBuffer.push\_back(buffer[i+1]);
+00617         \}
+00618     \}
+00619     \textcolor{keywordflow}{return} 1;
+00620 \}
+00621 
+00622 \textcolor{keywordtype}{int} LMS64CProtocol::ProgramWrite(\textcolor{keyword}{const} \textcolor{keywordtype}{char} *data\_src, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} length, \textcolor{keyword}{const} \textcolor{keywordtype}{int} prog\_mode, \textcolor{keyword}{const} \textcolor{keywordtype}{int} 
+      device, ProgrammingCallback callback)
+00623 \{
+00624 \textcolor{preprocessor}{#ifndef NDEBUG}
+00625     \textcolor{keyword}{auto} t1 = std::chrono::high\_resolution\_clock::now();
+00626 \textcolor{preprocessor}{#endif}
+00627     \textcolor{comment}{//erasing FLASH can take up to 3 seconds before reply is received}
+00628     \textcolor{keyword}{const} \textcolor{keywordtype}{int} progTimeout\_ms = 5000;
+00629     \textcolor{keywordtype}{char} progressMsg[128];
+00630     sprintf(progressMsg, \textcolor{stringliteral}{"in progress..."});
+00631     \textcolor{keywordtype}{bool} abortProgramming = \textcolor{keyword}{false};
+00632     \textcolor{keywordtype}{int} bytesSent = 0;
+00633 
+00634     \textcolor{keywordtype}{bool} needsData = \textcolor{keyword}{true};
+00635     \textcolor{keywordflow}{if}(device == FPGA && prog\_mode == 2)
+00636         needsData = \textcolor{keyword}{false};
+00637     \textcolor{keywordflow}{if}(device == FX3 && (prog\_mode == 0 || prog\_mode == 1))
+00638         needsData = \textcolor{keyword}{false};
+00639 
+00640     \textcolor{keywordflow}{if}(length == 0 && needsData)
+00641     \{
+00642         \textcolor{keywordflow}{return} ReportError(EIO, \textcolor{stringliteral}{"ProgramWrite length should be > 0"});
+00643     \}
+00644 
+00645     \textcolor{keywordflow}{if} (not this->IsOpen())
+00646     \{
+00647         \textcolor{keywordflow}{return} ReportError(ENOTCONN, \textcolor{stringliteral}{"connection is not open"});
+00648     \}
+00649 
+00650     \textcolor{keyword}{const} \textcolor{keywordtype}{int} pktSize = 32;
+00651     \textcolor{keywordtype}{int} data\_left = length;
+00652     \textcolor{keyword}{const} \textcolor{keywordtype}{int} portionsCount = length/pktSize + (length%pktSize > 0) + 1; \textcolor{comment}{// +1 programming end packet}
+00653     \textcolor{keywordtype}{int} portionNumber;
+00654     \textcolor{keywordtype}{int} status = 0;
+00655     eCMD_LMS cmd;
+00656     \textcolor{keywordflow}{if}(device != FPGA)
+00657         cmd = CMD_MEMORY_WR;
+00658     \textcolor{keywordflow}{else} \textcolor{keywordflow}{if}(device == FPGA)
+00659         cmd = CMD_ALTERA_FPGA_GW_WR;
+00660     \textcolor{keywordflow}{else}
+00661     \{
+00662         sprintf(progressMsg, \textcolor{stringliteral}{"Programming failed! Target device not supported"});
+00663         \textcolor{keywordflow}{if}(callback)
+00664             abortProgramming = callback(bytesSent, length, progressMsg);
+00665         \textcolor{keywordflow}{return} ReportError(ENOTSUP, progressMsg);
+00666     \}
+00667 
+00668     \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{char} ctrbuf[64];
+00669     \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{char} inbuf[64];
+00670     memset(ctrbuf, 0, 64);
+00671     ctrbuf[0] = cmd;
+00672     ctrbuf[1] = 0;
+00673     ctrbuf[2] = 56;
+00674 
+00675     \textcolor{keywordflow}{for} (portionNumber = 0; portionNumber<portionsCount && !abortProgramming; ++portionNumber)
+00676     \{
+00677         \textcolor{keywordtype}{int} offset = 8;
+00678         memset(&ctrbuf[offset], 0, 56);
+00679         ctrbuf[offset+0] = prog\_mode;
+00680         ctrbuf[offset+1] = (portionNumber >> 24) & 0xFF;
+00681         ctrbuf[offset+2] = (portionNumber >> 16) & 0xFF;
+00682         ctrbuf[offset+3] = (portionNumber >> 8) & 0xFF;
+00683         ctrbuf[offset+4] = portionNumber & 0xFF;
+00684         \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{char} data\_cnt = data\_left > pktSize ? pktSize : data\_left;
+00685         ctrbuf[offset+5] = data\_cnt;
+00686         \textcolor{keywordflow}{if}(cmd == CMD_MEMORY_WR)
+00687         \{
+00688             ctrbuf[offset+6] = 0;
+00689             ctrbuf[offset+7] = 0;
+00690             ctrbuf[offset+8] = 0;
+00691             ctrbuf[offset+9] = 0;
+00692 
+00693             ctrbuf[offset+10] = (device >> 8) & 0xFF;
+00694             ctrbuf[offset+11] = device & 0xFF;
+00695         \}
+00696         \textcolor{keywordflow}{if}(data\_src != NULL)
+00697         \{
+00698             memcpy(&ctrbuf[offset + 24], data\_src, data\_cnt);
+00699             data\_src += data\_cnt;
+00700         \}
+00701 
+00702         \textcolor{keywordflow}{if}(Write(ctrbuf, \textcolor{keyword}{sizeof}(ctrbuf)) != \textcolor{keyword}{sizeof}(ctrbuf))
+00703         \{
+00704             \textcolor{keywordflow}{if}(callback)
+00705                 callback(bytesSent, length, \textcolor{stringliteral}{"Programming failed! Write operation failed"});
+00706             \textcolor{keywordflow}{return} ReportError(EIO, \textcolor{stringliteral}{"Programming failed! Write operation failed"});
+00707         \}
+00708         \textcolor{keywordflow}{if}(Read(inbuf, \textcolor{keyword}{sizeof}(inbuf), progTimeout\_ms) != \textcolor{keyword}{sizeof}(ctrbuf))
+00709         \{
+00710             \textcolor{keywordflow}{if}(callback)
+00711                 callback(bytesSent, length, \textcolor{stringliteral}{"Programming failed! Read operation failed"});
+00712             \textcolor{keywordflow}{return} ReportError(EIO, \textcolor{stringliteral}{"Programming failed! Read operation failed"});
+00713         \}
+00714         data\_left -= data\_cnt;
+00715         status = inbuf[1];
+00716         bytesSent += data\_cnt;
+00717 
+00718         \textcolor{keywordflow}{if}(status != STATUS_COMPLETED_CMD)
+00719         \{
+00720             sprintf(progressMsg, \textcolor{stringliteral}{"Programming failed! %s"}, status2string(status));
+00721             \textcolor{keywordflow}{if}(callback)
+00722                 abortProgramming = callback(bytesSent, length, progressMsg);
+00723             \textcolor{keywordflow}{return} ReportError(EPROTO, progressMsg);
+00724         \}
+00725         \textcolor{keywordflow}{if}(needsData == \textcolor{keyword}{false}) \textcolor{comment}{//only one packet is needed to initiate bitstream from flash}
+00726         \{
+00727             bytesSent = length;
+00728             \textcolor{keywordflow}{break};
+00729         \}
+00730         \textcolor{keywordflow}{if}(callback)
+00731             abortProgramming = callback(bytesSent, length, progressMsg);
+00732     \}
+00733     \textcolor{keywordflow}{if} (abortProgramming == \textcolor{keyword}{true})
+00734     \{
+00735         sprintf(progressMsg, \textcolor{stringliteral}{"programming: aborted by user"});
+00736         \textcolor{keywordflow}{if}(callback)
+00737             callback(bytesSent, length, progressMsg);
+00738         \textcolor{keywordflow}{return} ReportError(ECONNABORTED, \textcolor{stringliteral}{"user aborted programming"});
+00739     \}
+00740     sprintf(progressMsg, \textcolor{stringliteral}{"programming: completed"});
+00741     \textcolor{keywordflow}{if}(callback)
+00742         callback(bytesSent, length, progressMsg);
+00743 \textcolor{preprocessor}{#ifndef NDEBUG}
+00744     \textcolor{keyword}{auto} t2 = std::chrono::high\_resolution\_clock::now();
+00745     \textcolor{keywordflow}{if} ((device == 2 && prog\_mode == 2) == \textcolor{keyword}{false})
+00746         printf(\textcolor{stringliteral}{"Programming finished, %li bytes sent! %li ms\(\backslash\)n"}, length, 
+      std::chrono::duration\_cast<std::chrono::milliseconds>(t2 - t1).count());
+00747     \textcolor{keywordflow}{else}
+00748         printf(\textcolor{stringliteral}{"FPGA configuring initiated\(\backslash\)n"});
+00749 \textcolor{preprocessor}{#endif}
+00750     \textcolor{keywordflow}{return} 0;
+00751 \}
+00752 
+00753 \textcolor{keywordtype}{int} LMS64CProtocol::CustomParameterRead(\textcolor{keyword}{const} uint8\_t *ids, \textcolor{keywordtype}{double} *values, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} 
+      count, std::string* units)
+00754 \{
+00755     LMS64CProtocol::GenericPacket pkt;
+00756     pkt.cmd = CMD_ANALOG_VAL_RD;
+00757 
+00758     \textcolor{keywordflow}{for} (\textcolor{keywordtype}{size\_t} i=0; i<count; ++i)
+00759         pkt.outBuffer.push\_back(ids[i]);
+00760 
+00761     \textcolor{keywordtype}{int} status = this->TransferPacket(pkt);
+00762     \textcolor{keywordflow}{if} (status != 0) \textcolor{keywordflow}{return} status;
+00763 
+00764     assert(pkt.inBuffer.size() >= 4 * count);
+00765 
+00766     \textcolor{keywordflow}{for} (\textcolor{keywordtype}{size\_t} i = 0; i < count; ++i)
+00767     \{
+00768         \textcolor{keywordtype}{int} unitsIndex = pkt.inBuffer[i * 4 + 1];
+00769         \textcolor{keywordflow}{if}(units)
+00770         \{
+00771 
+00772             \textcolor{keyword}{const} \textcolor{keywordtype}{char} adc\_units\_prefix[] = \{
+00773                 \textcolor{charliteral}{' '}, \textcolor{charliteral}{'k'}, \textcolor{charliteral}{'M'}, \textcolor{charliteral}{'G'}, \textcolor{charliteral}{'T'}, \textcolor{charliteral}{'P'}, \textcolor{charliteral}{'E'}, \textcolor{charliteral}{'Z'},
+00774                 \textcolor{charliteral}{'y'}, \textcolor{charliteral}{'z'}, \textcolor{charliteral}{'a'}, \textcolor{charliteral}{'f'}, \textcolor{charliteral}{'p'}, \textcolor{charliteral}{'n'}, \textcolor{charliteral}{'u'}, \textcolor{charliteral}{'m'}\};
+00775             units[i] = adc\_units\_prefix[unitsIndex&0x0F];
+00776             units[i] += adcUnits2string((unitsIndex & 0xF0)>>4);
+00777         \}
+00778         values[i] = (int16\_t)(pkt.inBuffer[i * 4 + 2] << 8 | pkt.inBuffer[i * 4 + 3]);
+00779 
+00780         \textcolor{keywordflow}{if}((unitsIndex & 0xF0)>>4 == TEMPERATURE)
+00781             values[i] /= 10;
+00782     \}
+00783     \textcolor{keywordflow}{return} 0;
+00784 \}
+00785 
+00786 \textcolor{keywordtype}{int} LMS64CProtocol::CustomParameterWrite(\textcolor{keyword}{const} uint8\_t *ids, \textcolor{keyword}{const} \textcolor{keywordtype}{double} *values, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} 
+      count, \textcolor{keyword}{const} std::string& units)
+00787 \{
+00788     LMS64CProtocol::GenericPacket pkt;
+00789     pkt.cmd = CMD_ANALOG_VAL_WR;
+00790 
+00791     \textcolor{keywordflow}{for} (\textcolor{keywordtype}{size\_t} i = 0; i < count; ++i)
+00792     \{
+00793         pkt.outBuffer.push\_back(ids[i]);
+00794         \textcolor{keywordtype}{int} powerOf10 = 0;
+00795         \textcolor{keywordflow}{if}(values[i] > 65535.0 && (units != \textcolor{stringliteral}{""}))
+00796             powerOf10 = log10(values[i]/65.536)/3;
+00797         \textcolor{keywordflow}{if} (values[i] < 65.536 && (units != \textcolor{stringliteral}{""}))
+00798             powerOf10 = log10(values[i]/65535.0) / 3;
+00799         \textcolor{keywordtype}{int} unitsId = 0; \textcolor{comment}{// need to convert given units to their enum}
+00800         pkt.outBuffer.push\_back(unitsId << 4 | powerOf10);
+00801         \textcolor{keywordtype}{int} value = values[i] / pow(10, 3*powerOf10);
+00802         pkt.outBuffer.push\_back(value >> 8);
+00803         pkt.outBuffer.push\_back(value & 0xFF);
+00804     \}
+00805     \textcolor{keywordflow}{return} TransferPacket(pkt);
+00806 \}
+00807 
+00808 \textcolor{keywordtype}{int} LMS64CProtocol::GPIOWrite(\textcolor{keyword}{const} uint8\_t *buffer, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} bufLength)
+00809 \{
+00810     LMS64CProtocol::GenericPacket pkt;
+00811     pkt.cmd = CMD_GPIO_WR;
+00812     \textcolor{keywordflow}{for} (\textcolor{keywordtype}{size\_t} i=0; i<bufLength; ++i)
+00813         pkt.outBuffer.push\_back(buffer[i]);
+00814     \textcolor{keywordflow}{return} TransferPacket(pkt);
+00815 \}
+00816 
+00817 \textcolor{keywordtype}{int} LMS64CProtocol::GPIORead(uint8\_t *buffer, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} bufLength)
+00818 \{
+00819     LMS64CProtocol::GenericPacket pkt;
+00820     pkt.cmd = CMD_GPIO_RD;
+00821     \textcolor{keywordtype}{int} status = TransferPacket(pkt);
+00822     \textcolor{keywordflow}{if}(status != 0)
+00823         \textcolor{keywordflow}{return} status;
+00824 
+00825     \textcolor{keywordflow}{for} (\textcolor{keywordtype}{size\_t} i=0; i<bufLength; ++i)
+00826         buffer[i] = pkt.inBuffer[i];
+00827     \textcolor{keywordflow}{return} status;
+00828 \}
+00829 
+00830 \textcolor{keywordtype}{int} LMS64CProtocol::GPIODirWrite(\textcolor{keyword}{const} uint8\_t *buffer, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} bufLength)
+00831 \{
+00832     LMS64CProtocol::GenericPacket pkt;
+00833     pkt.cmd = CMD_GPIO_DIR_WR;
+00834     \textcolor{keywordflow}{for} (\textcolor{keywordtype}{size\_t} i=0; i<bufLength; ++i)
+00835         pkt.outBuffer.push\_back(buffer[i]);
+00836     \textcolor{keywordflow}{return} TransferPacket(pkt);
+00837 \}
+00838 
+00839 \textcolor{keywordtype}{int} LMS64CProtocol::GPIODirRead(uint8\_t *buffer, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} bufLength)
+00840 \{
+00841     LMS64CProtocol::GenericPacket pkt;
+00842     pkt.cmd = CMD_GPIO_DIR_RD;
+00843     \textcolor{keywordtype}{int} status = TransferPacket(pkt);
+00844     \textcolor{keywordflow}{if}(status != 0)
+00845         \textcolor{keywordflow}{return} convertStatus(status, pkt);
+00846 
+00847     \textcolor{keywordflow}{for} (\textcolor{keywordtype}{size\_t} i=0; i<bufLength; ++i)
+00848         buffer[i] = pkt.inBuffer[i];
+00849     \textcolor{keywordflow}{return} status;
+00850 \}
+00851 
+00852 \textcolor{keywordtype}{int} LMS64CProtocol::ProgramMCU(\textcolor{keyword}{const} uint8\_t *buffer, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} length, \textcolor{keyword}{const} 
+      MCU_PROG_MODE mode, ProgrammingCallback callback)
+00853 \{
+00854 \textcolor{preprocessor}{#ifndef NDEBUG}
+00855     \textcolor{keyword}{auto} timeStart = std::chrono::high\_resolution\_clock::now();
+00856 \textcolor{preprocessor}{#endif}
+00857     \textcolor{keyword}{const} uint8\_t fifoLen = 32;
+00858     \textcolor{keywordtype}{bool} success = \textcolor{keyword}{true};
+00859     \textcolor{keywordtype}{bool} terminate = \textcolor{keyword}{false};
+00860 
+00861     \textcolor{keywordtype}{int} packetNumber = 0;
+00862     \textcolor{keywordtype}{int} status = STATUS_UNDEFINED;
+00863 
+00864     LMS64CProtocol::GenericPacket pkt;
+00865     pkt.cmd = CMD_PROG_MCU;
+00866 
+00867     \textcolor{keywordflow}{if} (callback)
+00868         terminate = callback(0, length,\textcolor{stringliteral}{""});
+00869 
+00870     \textcolor{keywordflow}{for}(uint16\_t CntEnd=0; CntEnd<length && !terminate; CntEnd+=32)
+00871     \{
+00872         pkt.outBuffer.clear();
+00873         pkt.outBuffer.reserve(fifoLen+2);
+00874         pkt.outBuffer.push\_back(mode);
+00875         pkt.outBuffer.push\_back(packetNumber++);
+00876         \textcolor{keywordflow}{for} (uint8\_t i=0; i<fifoLen; i++)
+00877             pkt.outBuffer.push\_back(buffer[CntEnd + i]);
+00878 
+00879         TransferPacket(pkt);
+00880         status = pkt.status;
+00881         \textcolor{keywordflow}{if} (callback)
+00882             terminate = callback(CntEnd+fifoLen,length,\textcolor{stringliteral}{""});
+00883 \textcolor{preprocessor}{#ifndef NDEBUG}
+00884         printf(\textcolor{stringliteral}{"MCU programming : %4i/%4li\(\backslash\)r"}, CntEnd+fifoLen, \textcolor{keywordtype}{long}(length));
+00885 \textcolor{preprocessor}{#endif}
+00886         \textcolor{keywordflow}{if}(status != STATUS_COMPLETED_CMD)
+00887         \{
+00888             std::stringstream ss;
+00889             ss << \textcolor{stringliteral}{"Programming MCU: status : not completed, block "} << packetNumber << std::endl;
+00890             success = \textcolor{keyword}{false};
+00891             \textcolor{keywordflow}{break};
+00892         \}
+00893 
+00894         \textcolor{keywordflow}{if}(mode == 3) \textcolor{comment}{// if boot mode , send only first packet}
+00895         \{
+00896             \textcolor{keywordflow}{if} (callback)
+00897                 callback(1, 1, \textcolor{stringliteral}{""});
+00898             \textcolor{keywordflow}{break};
+00899         \}
+00900     \};
+00901 \textcolor{preprocessor}{#ifndef NDEBUG}
+00902     \textcolor{keyword}{auto} timeEnd = std::chrono::high\_resolution\_clock::now();
+00903     printf(\textcolor{stringliteral}{"\(\backslash\)nMCU Programming finished, %li ms\(\backslash\)n"},
+00904             std::chrono::duration\_cast<std::chrono::milliseconds>
+00905             (timeEnd-timeStart).count());
+00906 \textcolor{preprocessor}{#endif}
+00907     \textcolor{keywordflow}{return} success ? 0 : -1;
+00908 \}
+00909 
+\end{DoxyCode}

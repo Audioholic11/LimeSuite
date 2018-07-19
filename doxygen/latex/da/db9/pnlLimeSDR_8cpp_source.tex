@@ -1,0 +1,273 @@
+\subsection{pnl\+Lime\+S\+D\+R.\+cpp}
+\label{pnlLimeSDR_8cpp_source}\index{/home/erik/prefix/default/src/limesuite-\/dev/src/boards\+\_\+wxgui/pnl\+Lime\+S\+D\+R.\+cpp@{/home/erik/prefix/default/src/limesuite-\/dev/src/boards\+\_\+wxgui/pnl\+Lime\+S\+D\+R.\+cpp}}
+
+\begin{DoxyCode}
+00001 \textcolor{preprocessor}{#include "pnlLimeSDR.h"}
+00002 
+00003 \textcolor{preprocessor}{#include <wx/sizer.h>}
+00004 \textcolor{preprocessor}{#include <wx/stattext.h>}
+00005 \textcolor{preprocessor}{#include <wx/button.h>}
+00006 \textcolor{preprocessor}{#include <wx/string.h>}
+00007 \textcolor{preprocessor}{#include <wx/checkbox.h>}
+00008 \textcolor{preprocessor}{#include <wx/msgdlg.h>}
+00009 \textcolor{preprocessor}{#include <wx/statbox.h>}
+00010 \textcolor{preprocessor}{#include "lms7suiteEvents.h"}
+00011 \textcolor{preprocessor}{#include "Logger.h"}
+00012 \textcolor{preprocessor}{#include "LMSBoards.h"}
+00013 
+00014 \textcolor{preprocessor}{#include <ciso646>}
+00015 
+00016 \textcolor{keyword}{using namespace }lime;
+00017 \textcolor{keyword}{using namespace }std;
+00018 
+00019 BEGIN\_EVENT\_TABLE(pnlLimeSDR, wxPanel)
+00020 END\_EVENT\_TABLE()
+00021 
+00022 pnlLimeSDR::pnlLimeSDR(wxWindow* parent,wxWindowID \textcolor{keywordtype}{id}, const wxPoint& pos,const wxSize& 
+      size, \textcolor{keywordtype}{int} style, wxString name)
+00023 \{
+00024     lmsControl = \textcolor{keyword}{nullptr};
+00025     gpioCnt = 8;
+00026     Create(parent, \textcolor{keywordtype}{id}, pos, size, style, name);
+00027 \textcolor{preprocessor}{#ifdef WIN32}
+00028     SetBackgroundColour(wxSystemSettings::GetColour(wxSYS\_COLOUR\_BTNFACE));
+00029 \textcolor{preprocessor}{#endif}
+00030     mainSizer = \textcolor{keyword}{new} wxFlexGridSizer(0, 2, 5, 5);
+00031     controlsSizer = \textcolor{keyword}{new} wxFlexGridSizer(0, 2, 5, 5);
+00032 
+00033     SetSizer(mainSizer);
+00034     chkRFLB\_A\_EN = \textcolor{keyword}{new} wxCheckBox(\textcolor{keyword}{this}, wxNewId(), \_(\textcolor{stringliteral}{"RF loopback ch.A"}));
+00035     chkRFLB\_A\_EN->SetToolTip(\_(\textcolor{stringliteral}{"[RFLB\_A\_EN] External RF loopback TxBAND2->RxLNAH channel A"}));
+00036     Connect(chkRFLB\_A\_EN->GetId(), wxEVT\_CHECKBOX, wxCommandEventHandler(
+      pnlLimeSDR::OnGPIOChange), NULL, \textcolor{keyword}{this});
+00037     controlsSizer->Add(chkRFLB\_A\_EN, 1, wxEXPAND | wxALIGN\_LEFT | wxALIGN\_TOP, 5);
+00038     chkRFLB\_B\_EN = \textcolor{keyword}{new} wxCheckBox(\textcolor{keyword}{this}, wxNewId(), \_(\textcolor{stringliteral}{"RF loopback ch.B"}));
+00039     chkRFLB\_B\_EN->SetToolTip(\_(\textcolor{stringliteral}{"[RFLB\_B\_EN] External RF loopback TxBAND2->RxLNAH channel B"}));
+00040     Connect(chkRFLB\_B\_EN->GetId(), wxEVT\_CHECKBOX, wxCommandEventHandler(
+      pnlLimeSDR::OnGPIOChange), NULL, \textcolor{keyword}{this});
+00041     controlsSizer->Add(chkRFLB\_B\_EN, 1, wxEXPAND | wxALIGN\_LEFT | wxALIGN\_TOP, 5);
+00042 
+00043     chkTX1\_2\_LB\_SH = \textcolor{keyword}{new} wxCheckBox(\textcolor{keyword}{this}, wxNewId(), \_(\textcolor{stringliteral}{"Ch.A shunt"}));
+00044     chkTX1\_2\_LB\_SH->SetToolTip(\_(\textcolor{stringliteral}{"[TX1\_2\_LB\_SH]"}));
+00045     Connect(chkTX1\_2\_LB\_SH->GetId(), wxEVT\_CHECKBOX, wxCommandEventHandler(
+      pnlLimeSDR::OnGPIOChange), NULL, \textcolor{keyword}{this});
+00046     controlsSizer->Add(chkTX1\_2\_LB\_SH, 1, wxEXPAND | wxALIGN\_LEFT | wxALIGN\_TOP, 5);
+00047     chkTX2\_2\_LB\_SH = \textcolor{keyword}{new} wxCheckBox(\textcolor{keyword}{this}, wxNewId(), \_(\textcolor{stringliteral}{"Ch.B shunt"}));
+00048     chkTX2\_2\_LB\_SH->SetToolTip(\_(\textcolor{stringliteral}{"[TX2\_2\_LB\_SH]"}));
+00049     Connect(chkTX2\_2\_LB\_SH->GetId(), wxEVT\_CHECKBOX, wxCommandEventHandler(
+      pnlLimeSDR::OnGPIOChange), NULL, \textcolor{keyword}{this});
+00050     controlsSizer->Add(chkTX2\_2\_LB\_SH, 1, wxEXPAND | wxALIGN\_LEFT | wxALIGN\_TOP, 5);
+00051     chkTX1\_2\_LB\_AT = \textcolor{keyword}{new} wxCheckBox(\textcolor{keyword}{this}, wxNewId(), \_(\textcolor{stringliteral}{"Ch.A attenuator"}));
+00052     chkTX1\_2\_LB\_AT->SetToolTip(\_(\textcolor{stringliteral}{"[TX1\_2\_LB\_AT]"}));
+00053     Connect(chkTX1\_2\_LB\_AT->GetId(), wxEVT\_CHECKBOX, wxCommandEventHandler(
+      pnlLimeSDR::OnGPIOChange), NULL, \textcolor{keyword}{this});
+00054     controlsSizer->Add(chkTX1\_2\_LB\_AT, 1, wxEXPAND | wxALIGN\_LEFT | wxALIGN\_TOP, 5);
+00055     chkTX2\_2\_LB\_AT = \textcolor{keyword}{new} wxCheckBox(\textcolor{keyword}{this}, wxNewId(), \_(\textcolor{stringliteral}{"Ch.B attenuator"}));
+00056     chkTX2\_2\_LB\_AT->SetToolTip(\_(\textcolor{stringliteral}{"[TX2\_2\_LB\_AT]"}));
+00057     Connect(chkTX2\_2\_LB\_AT->GetId(), wxEVT\_CHECKBOX, wxCommandEventHandler(
+      pnlLimeSDR::OnGPIOChange), NULL, \textcolor{keyword}{this});
+00058     controlsSizer->Add(chkTX2\_2\_LB\_AT, 1, wxEXPAND | wxALIGN\_LEFT | wxALIGN\_TOP, 5);
+00059 
+00060     \textcolor{keyword}{auto} groupSizer = \textcolor{keyword}{new} wxStaticBoxSizer( \textcolor{keyword}{new} wxStaticBox( \textcolor{keyword}{this}, wxID\_ANY, wxT(\textcolor{stringliteral}{"External loopback
+       controls"}) ), wxVERTICAL );
+00061     groupSizer->Add(controlsSizer, 1, wxEXPAND | wxALIGN\_LEFT | wxALIGN\_TOP, 5);
+00062     mainSizer->Add(groupSizer, 1, wxEXPAND | wxALIGN\_LEFT | wxALIGN\_TOP, 5);
+00063 
+00064     Bind(READ\_ALL\_VALUES, &pnlLimeSDR::OnReadAll, \textcolor{keyword}{this}, this->GetId());
+00065     Bind(WRITE\_ALL\_VALUES, &pnlLimeSDR::OnWriteAll, \textcolor{keyword}{this}, this->GetId());
+00066 \}
+00067 
+00068 \textcolor{keywordtype}{void} pnlLimeSDR::Initialize(lms_device_t* pControl)
+00069 \{
+00070     lmsControl = pControl;
+00071     \textcolor{keywordflow}{if}(lmsControl)
+00072     \{
+00073         \textcolor{keyword}{auto} info = LMS_GetDeviceInfo(lmsControl);
+00074         \textcolor{keywordflow}{if}(info != \textcolor{keyword}{nullptr})
+00075         \{
+00076             \textcolor{keywordflow}{if} (\textcolor{keywordtype}{string}(info->deviceName) == \textcolor{keywordtype}{string}(GetDeviceName(
+      LMS_DEV_LIMESDR_PCIE)))
+00077                 gpioCnt = 16;
+00078             \textcolor{keyword}{auto} controls = controlsSizer->GetChildren();
+00079             \textcolor{keywordflow}{for}(\textcolor{keyword}{auto} i : controls)
+00080                 i->GetWindow()->Enable();
+00081         \}
+00082     \}
+00083 
+00084     \textcolor{keyword}{auto} gpioSizer = \textcolor{keyword}{new} wxFlexGridSizer(0, gpioCnt+1, 0, 0);
+00085     gpioSizer->Add(\textcolor{keyword}{new} wxStaticText(\textcolor{keyword}{this}, wxID\_ANY, \_(\textcolor{stringliteral}{"GPIO"})), 1, wxALL, 5);
+00086 
+00087     \textcolor{keywordflow}{for} (\textcolor{keywordtype}{int} i = gpioCnt; i--;)
+00088         gpioSizer->Add(\textcolor{keyword}{new} wxStaticText(\textcolor{keyword}{this}, wxID\_ANY, wxString::Format(\textcolor{stringliteral}{"%d"}, i)), 1, wxALL, 5);
+00089 
+00090     wxStaticText* text = \textcolor{keyword}{new} wxStaticText(\textcolor{keyword}{this}, wxID\_ANY, \_(\textcolor{stringliteral}{"DIR"}));
+00091     text->SetToolTip(\_(\textcolor{stringliteral}{"Check to set GPIO to output"}));
+00092     gpioSizer->Add(text, 1, wxALL, 5);
+00093 
+00094     \textcolor{keywordflow}{for} (\textcolor{keywordtype}{int} i = gpioCnt; i--;)
+00095     \{
+00096         gpioDir[i] = \textcolor{keyword}{new} wxCheckBox(\textcolor{keyword}{this}, wxNewId(), \_(\textcolor{stringliteral}{""}));
+00097         gpioDir[i]->SetToolTip(\_(\textcolor{stringliteral}{"Check to set GPIO to output"}));
+00098         Connect(gpioDir[i]->GetId(), wxEVT\_CHECKBOX, wxCommandEventHandler(
+      pnlLimeSDR::OnUsrGPIODirChange), NULL, \textcolor{keyword}{this});
+00099         gpioSizer->Add(gpioDir[i]);
+00100     \}
+00101     text = \textcolor{keyword}{new} wxStaticText(\textcolor{keyword}{this}, wxID\_ANY, \_(\textcolor{stringliteral}{"OUT"}));
+00102     text->SetToolTip(\_(\textcolor{stringliteral}{"GPIO output value (checked - High)"}));
+00103     gpioSizer->Add(text, 1, wxALL, 5);
+00104     \textcolor{keywordflow}{for} (\textcolor{keywordtype}{int} i = gpioCnt; i--;)
+00105     \{
+00106         gpioOut[i] = \textcolor{keyword}{new} wxCheckBox(\textcolor{keyword}{this}, wxNewId(), \_(\textcolor{stringliteral}{""}));
+00107         gpioOut[i]->SetToolTip(\_(\textcolor{stringliteral}{"GPIO output value (checked - High)"}));
+00108         gpioOut[i]->Disable();
+00109         Connect(gpioOut[i]->GetId(), wxEVT\_CHECKBOX, wxCommandEventHandler(
+      pnlLimeSDR::OnUsrGPIOChange), NULL, \textcolor{keyword}{this});
+00110         gpioSizer->Add(gpioOut[i]);
+00111     \}
+00112     text = \textcolor{keyword}{new} wxStaticText(\textcolor{keyword}{this}, wxID\_ANY, \_(\textcolor{stringliteral}{"IN"}));
+00113     text->SetToolTip(\_(\textcolor{stringliteral}{"GPIO input value"}));
+00114     gpioSizer->Add(text, 1, wxALL, 5);
+00115     \textcolor{keywordflow}{for} (\textcolor{keywordtype}{int} i = gpioCnt; i--;)
+00116     \{
+00117         gpioIn[i] = \textcolor{keyword}{new} wxStaticText(\textcolor{keyword}{this}, wxNewId(), \_(\textcolor{stringliteral}{"0"}));
+00118         gpioIn[i]->SetToolTip(\_(\textcolor{stringliteral}{"GPIO input value"}));
+00119         gpioSizer->Add(gpioIn[i],1, wxALL, 5);
+00120     \}
+00121 
+00122     \textcolor{keyword}{auto} groupSizer = \textcolor{keyword}{new} wxStaticBoxSizer( \textcolor{keyword}{new} wxStaticBox( \textcolor{keyword}{this}, wxID\_ANY, wxT(\textcolor{stringliteral}{"GPIO Control"}) ), 
+      wxVERTICAL );
+00123     groupSizer->Add(gpioSizer, 1, wxEXPAND | wxALIGN\_LEFT | wxALIGN\_TOP, 5);
+00124     mainSizer->Add(groupSizer, 1, wxEXPAND | wxALIGN\_LEFT | wxALIGN\_TOP, 5);
+00125 
+00126     mainSizer->Fit(\textcolor{keyword}{this});
+00127     mainSizer->SetSizeHints(\textcolor{keyword}{this});
+00128     Layout();
+00129 \}
+00130 
+00131 pnlLimeSDR::~pnlLimeSDR()
+00132 \{
+00133     chkRFLB\_A\_EN->Disconnect(wxEVT\_CHECKBOX, chkRFLB\_A\_EN->GetId(), wxCommandEventHandler(
+      pnlLimeSDR::OnGPIOChange), 0, \textcolor{keyword}{this});
+00134     chkRFLB\_B\_EN->Disconnect(wxEVT\_CHECKBOX, chkRFLB\_B\_EN->GetId(), wxCommandEventHandler(
+      pnlLimeSDR::OnGPIOChange), 0, \textcolor{keyword}{this});
+00135     chkTX1\_2\_LB\_SH->Disconnect(wxEVT\_CHECKBOX, chkTX1\_2\_LB\_SH->GetId(), wxCommandEventHandler(
+      pnlLimeSDR::OnGPIOChange), 0, \textcolor{keyword}{this});;
+00136     chkTX1\_2\_LB\_AT->Disconnect(wxEVT\_CHECKBOX, chkTX1\_2\_LB\_AT->GetId(), wxCommandEventHandler(
+      pnlLimeSDR::OnGPIOChange), 0, \textcolor{keyword}{this});;
+00137     chkTX2\_2\_LB\_SH->Disconnect(wxEVT\_CHECKBOX, chkTX2\_2\_LB\_SH->GetId(), wxCommandEventHandler(
+      pnlLimeSDR::OnGPIOChange), 0, \textcolor{keyword}{this});;
+00138     chkTX2\_2\_LB\_AT->Disconnect(wxEVT\_CHECKBOX, chkTX2\_2\_LB\_AT->GetId(), wxCommandEventHandler(
+      pnlLimeSDR::OnGPIOChange), 0, \textcolor{keyword}{this});;
+00139     \textcolor{keywordflow}{for} (\textcolor{keywordtype}{int} i = 0; i < 8; i++)
+00140     \{
+00141         gpioOut[i]->Disconnect(wxEVT\_CHECKBOX, gpioOut[i]->GetId(), wxCommandEventHandler(
+      pnlLimeSDR::OnUsrGPIOChange), 0, \textcolor{keyword}{this});
+00142         gpioDir[i]->Disconnect(wxEVT\_CHECKBOX, gpioDir[i]->GetId(), wxCommandEventHandler(
+      pnlLimeSDR::OnUsrGPIODirChange), 0, \textcolor{keyword}{this});
+00143     \}
+00144 \}
+00145 
+00146 \textcolor{keywordtype}{void} pnlLimeSDR::OnGPIOChange(wxCommandEvent& event)
+00147 \{
+00148     uint16\_t addr = 0x0017;
+00149     uint16\_t value = 0;
+00150     value |= chkRFLB\_A\_EN->GetValue() << 0;
+00151     value |= chkTX1\_2\_LB\_AT->GetValue() << 1;
+00152     value |= chkTX1\_2\_LB\_SH->GetValue() << 2;
+00153 
+00154     value |= chkRFLB\_B\_EN->GetValue() << 4;
+00155     value |= chkTX2\_2\_LB\_AT->GetValue() << 5;
+00156     value |= chkTX2\_2\_LB\_SH->GetValue() << 6;
+00157 
+00158     \textcolor{keywordflow}{if}(lmsControl && LMS_WriteFPGAReg(lmsControl, addr, value))
+00159     lime::error(\textcolor{stringliteral}{"Board loopback cahnge failed"});
+00160 \}
+00161 
+00162 \textcolor{keywordtype}{void} pnlLimeSDR::OnUsrGPIODirChange(wxCommandEvent& event)
+00163 \{
+00164     uint8\_t value[2] = \{0\};
+00165 
+00166     \textcolor{keywordflow}{for} (\textcolor{keywordtype}{int} i = 0; i < gpioCnt; i++)
+00167     \{
+00168         value[i/8] >>=1;
+00169         \textcolor{keywordtype}{bool} check = gpioDir[i]->GetValue();
+00170         \textcolor{keywordflow}{if} (check)
+00171             value[i/8] |= 0x80;
+00172         gpioOut[i]->Enable(check);
+00173     \}
+00174     \textcolor{keywordflow}{if}(lmsControl && LMS_GPIODirWrite(lmsControl, value, gpioCnt/8))
+00175         lime::error(\textcolor{stringliteral}{"GPIO direction change failed"});
+00176 \}
+00177 
+00178 \textcolor{keywordtype}{void} pnlLimeSDR::OnUsrGPIOChange(wxCommandEvent& event)
+00179 \{
+00180     uint8\_t value[2] = \{0\};
+00181     \textcolor{keywordflow}{for} (\textcolor{keywordtype}{int} i = 0; i < gpioCnt; i++)
+00182     \{
+00183         value[i/8] >>=1;
+00184         \textcolor{keywordflow}{if} (gpioOut[i]->GetValue())
+00185             value[i/8] |= 0x80;
+00186     \}
+00187 
+00188     \textcolor{keywordflow}{if}(lmsControl && LMS_GPIOWrite(lmsControl, value, gpioCnt/8))
+00189         lime::error(\textcolor{stringliteral}{"GPIO write failed"});
+00190 \}
+00191 
+00192 \textcolor{keywordtype}{void} pnlLimeSDR::UpdatePanel()
+00193 \{
+00194     uint16\_t addr = 0x0017;
+00195     uint16\_t value = 0;
+00196     uint8\_t gpio[2] = \{0\};
+00197     uint8\_t dir[2] = \{0\};
+00198     \textcolor{keywordflow}{if}(lmsControl && LMS_ReadFPGAReg(lmsControl, addr, &value)==0)
+00199     \{
+00200         chkRFLB\_A\_EN->SetValue((value >> 0) & 0x1);
+00201         chkTX1\_2\_LB\_AT->SetValue((value >> 1) & 0x1);
+00202         chkTX1\_2\_LB\_SH->SetValue((value >> 2) & 0x1);
+00203 
+00204         chkRFLB\_B\_EN->SetValue((value >> 4) & 0x1);
+00205         chkTX2\_2\_LB\_AT->SetValue((value >> 5) & 0x1);
+00206         chkTX2\_2\_LB\_SH->SetValue((value >> 6) & 0x1);
+00207     \}
+00208     \textcolor{keywordflow}{else}
+00209         lime::error(\textcolor{stringliteral}{"Board loopback read failed"});
+00210 
+00211     \textcolor{keywordflow}{if}(lmsControl && LMS_GPIODirRead(lmsControl, dir, gpioCnt/8)==0)
+00212     \{
+00213         \textcolor{keywordflow}{for} (\textcolor{keywordtype}{int} i = 0; i < gpioCnt; i++)
+00214         \{
+00215             gpioDir[i]->SetValue(dir[i/8] & 1);
+00216             gpioOut[i]->Enable(dir[i/8] & 1);
+00217             dir[i/8] >>= 1;
+00218         \}
+00219     \}
+00220     \textcolor{keywordflow}{else}
+00221     \{
+00222         lime::error(\textcolor{stringliteral}{"GPIO direction read failed"});
+00223         \textcolor{keywordflow}{return};
+00224     \}
+00225 
+00226     \textcolor{keywordflow}{if}(lmsControl && LMS_GPIORead(lmsControl, gpio, gpioCnt/8) == 0)
+00227     \{
+00228         \textcolor{keywordflow}{for} (\textcolor{keywordtype}{int} i = 0; i < gpioCnt; i++)
+00229         \{
+00230             gpioIn[i]->SetLabel(gpio[i/8] & 1 ? \_(\textcolor{stringliteral}{"1"}) : \_(\textcolor{stringliteral}{"0"}));
+00231             gpio[i/8] >>= 1;
+00232         \}
+00233     \}
+00234     \textcolor{keywordflow}{else}
+00235         lime::error(\textcolor{stringliteral}{"GPIO read failed"});
+00236 \}
+00237 
+00238 \textcolor{keywordtype}{void} pnlLimeSDR::OnReadAll(wxCommandEvent &event)
+00239 \{
+00240     UpdatePanel();
+00241 \}
+00242 
+00243 \textcolor{keywordtype}{void} pnlLimeSDR::OnWriteAll(wxCommandEvent &event)
+00244 \{
+00245     OnGPIOChange(event);
+00246     OnUsrGPIODirChange(event);
+00247     OnUsrGPIOChange(event);
+00248 \}
+\end{DoxyCode}

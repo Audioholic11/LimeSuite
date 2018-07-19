@@ -1,0 +1,852 @@
+\subsection{Connection\+F\+X3.\+cpp}
+\label{ConnectionFX3_8cpp_source}\index{/home/erik/prefix/default/src/limesuite-\/dev/src/\+Connection\+F\+X3/\+Connection\+F\+X3.\+cpp@{/home/erik/prefix/default/src/limesuite-\/dev/src/\+Connection\+F\+X3/\+Connection\+F\+X3.\+cpp}}
+
+\begin{DoxyCode}
+00001 
+00007 \textcolor{preprocessor}{#include "ConnectionFX3.h"}
+00008 \textcolor{preprocessor}{#include <cstring>}
+00009 \textcolor{preprocessor}{#include "Si5351C.h"}
+00010 \textcolor{preprocessor}{#include "FPGA_common.h"}
+00011 \textcolor{preprocessor}{#include "LMS7002M.h"}
+00012 \textcolor{preprocessor}{#include "Logger.h"}
+00013 \textcolor{preprocessor}{#include <ciso646>}
+00014 \textcolor{preprocessor}{#include <fstream>}
+00015 \textcolor{preprocessor}{#include <thread>}
+00016 \textcolor{preprocessor}{#include <chrono>}
+00017 
+00018 \textcolor{keyword}{using namespace }std;
+00019 
+00020 \textcolor{preprocessor}{#define CTR\_W\_REQCODE 0xC1}
+00021 \textcolor{preprocessor}{#define CTR\_W\_VALUE 0x0000}
+00022 \textcolor{preprocessor}{#define CTR\_W\_INDEX 0x0000}
+00023 
+00024 \textcolor{preprocessor}{#define CTR\_R\_REQCODE 0xC0}
+00025 \textcolor{preprocessor}{#define CTR\_R\_VALUE 0x0000}
+00026 \textcolor{preprocessor}{#define CTR\_R\_INDEX 0x0000}
+00027 
+00028 \textcolor{keyword}{using namespace }lime;
+00029 
+00030 \textcolor{keyword}{const} uint8\_t ConnectionFX3::ctrlBulkOutAddr = 0x0F;
+00031 \textcolor{keyword}{const} uint8\_t ConnectionFX3::ctrlBulkInAddr = 0x8F;
+00032 
+00033 \textcolor{comment}{//control commands to be send via bulk port for boards v1.1 and earlier}
+00034 \textcolor{keyword}{const} std::set<uint8\_t> ConnectionFX3::commandsToBulkCtrlHw1 =
+00035 \{
+00036     CMD_BRDSPI_WR, CMD_BRDSPI_RD,
+00037     CMD_LMS7002_WR, CMD_LMS7002_RD,
+00038     CMD_LMS7002_RST,
+00039 \};
+00040 \textcolor{comment}{//control commands to be send via bulk port for boards v1.2 and later}
+00041 \textcolor{keyword}{const} std::set<uint8\_t> ConnectionFX3::commandsToBulkCtrlHw2 =
+00042 \{
+00043     CMD_BRDSPI_WR, CMD_BRDSPI_RD,
+00044     CMD_LMS7002_WR, CMD_LMS7002_RD,
+00045     CMD_ANALOG_VAL_WR, CMD_ANALOG_VAL_RD,
+00046     CMD_ADF4002_WR,
+00047     CMD_LMS7002_RST,
+00048     CMD_GPIO_DIR_WR, CMD_GPIO_DIR_RD,
+00049     CMD_GPIO_WR, CMD_GPIO_RD,
+00050 \};
+00051 
+00054 ConnectionFX3::ConnectionFX3(\textcolor{keywordtype}{void} *arg, \textcolor{keyword}{const} std::string &vidpid, \textcolor{keyword}{const} std::string &serial, \textcolor{keyword}{const} \textcolor{keywordtype}{
+      unsigned} index)
+00055 \{
+00056     bulkCtrlAvailable = \textcolor{keyword}{false};
+00057     bulkCtrlInProgress = \textcolor{keyword}{false};
+00058     isConnected = \textcolor{keyword}{false};
+00059 \textcolor{preprocessor}{#ifndef \_\_unix\_\_}
+00060     \textcolor{keywordflow}{if}(arg == \textcolor{keyword}{nullptr})
+00061         USBDevicePrimary = \textcolor{keyword}{new} CCyFX3Device();
+00062     \textcolor{keywordflow}{else}
+00063         USBDevicePrimary = \textcolor{keyword}{new} CCyFX3Device(*(CCyFX3Device*)arg);
+00064     InCtrlEndPt3 = \textcolor{keyword}{nullptr};
+00065     OutCtrlEndPt3 = \textcolor{keyword}{nullptr};
+00066     InCtrlBulkEndPt = \textcolor{keyword}{nullptr};
+00067     OutCtrlBulkEndPt = \textcolor{keyword}{nullptr};
+00068     \textcolor{keywordflow}{for} (\textcolor{keywordtype}{int} i = 0; i < MAX\_EP\_CNT; i++)
+00069         InEndPt[i] = OutEndPt[i] = \textcolor{keyword}{nullptr};
+00070 
+00071 \textcolor{preprocessor}{#else}
+00072     dev\_handle = \textcolor{keyword}{nullptr};
+00073     ctx = (libusb\_context *)arg;
+00074 \textcolor{preprocessor}{#endif}
+00075     \textcolor{keywordflow}{if} (this->Open(vidpid, serial, index) != 0)
+00076         lime::error(\textcolor{stringliteral}{"Failed to open device"});
+00077 
+00078     commandsToBulkCtrl = commandsToBulkCtrlHw2;
+00079 
+00080     LMSinfo info = this->GetInfo();
+00081 
+00082     \textcolor{keywordflow}{if} (info.hardware <= 1)
+00083     \{
+00084         commandsToBulkCtrl = commandsToBulkCtrlHw1;
+00085     \}
+00086 
+00087     this->VersionCheck();
+00088 
+00089     \textcolor{comment}{//must configure synthesizer before using LimeSDR}
+00090     \textcolor{keywordflow}{if} (info.device == LMS_DEV_LIMESDR && info.hardware < 4)
+00091     \{
+00092         std::shared\_ptr<Si5351C> si5351module(\textcolor{keyword}{new} Si5351C());
+00093         si5351module->Initialize(\textcolor{keyword}{this});
+00094         si5351module->SetPLL(0, 25000000, 0);
+00095         si5351module->SetPLL(1, 25000000, 0);
+00096         si5351module->SetClock(0, 27000000, \textcolor{keyword}{true}, \textcolor{keyword}{false});
+00097         si5351module->SetClock(1, 27000000, \textcolor{keyword}{true}, \textcolor{keyword}{false});
+00098         \textcolor{keywordflow}{for} (\textcolor{keywordtype}{int} i = 2; i < 8; ++i)
+00099             si5351module->SetClock(i, 27000000, \textcolor{keyword}{false}, \textcolor{keyword}{false});
+00100         Si5351C::Status status = si5351module->ConfigureClocks();
+00101         \textcolor{keywordflow}{if} (status != Si5351C::SUCCESS)
+00102         \{
+00103             lime::warning(\textcolor{stringliteral}{"Failed to configure Si5351C"});
+00104             \textcolor{keywordflow}{return};
+00105         \}
+00106         status = si5351module->UploadConfiguration();
+00107         \textcolor{keywordflow}{if} (status != Si5351C::SUCCESS)
+00108             lime::warning(\textcolor{stringliteral}{"Failed to upload Si5351C configuration"});
+00109         std::this\_thread::sleep\_for(std::chrono::milliseconds(10)); \textcolor{comment}{//some settle time}
+00110     \}
+00111 \}
+00112 
+00115 ConnectionFX3::~ConnectionFX3()
+00116 \{
+00117     Close();
+00118 \textcolor{preprocessor}{#ifndef \_\_unix\_\_}
+00119     \textcolor{keyword}{delete} USBDevicePrimary;
+00120 \textcolor{preprocessor}{#endif}
+00121 \}
+00122 
+00126 \textcolor{keywordtype}{int} ConnectionFX3::Open(\textcolor{keyword}{const} std::string &vidpid, \textcolor{keyword}{const} std::string &serial, \textcolor{keyword}{const} \textcolor{keywordtype}{unsigned} 
+      index)
+00127 \{
+00128     bulkCtrlAvailable = \textcolor{keyword}{false};
+00129 \textcolor{preprocessor}{#ifndef \_\_unix\_\_}
+00130     \textcolor{keywordflow}{if}(index > USBDevicePrimary->DeviceCount())
+00131         \textcolor{keywordflow}{return} ReportError(ERANGE, \textcolor{stringliteral}{"ConnectionSTREAM: Device index out of range"});
+00132 
+00133     \textcolor{keywordflow}{if}(USBDevicePrimary->Open(index) == \textcolor{keyword}{false})
+00134         \textcolor{keywordflow}{return} ReportError(-1, \textcolor{stringliteral}{"ConnectionSTREAM: Failed to open device"});
+00135 
+00136     \textcolor{keywordflow}{if} (InCtrlEndPt3)
+00137     \{
+00138         \textcolor{keyword}{delete} InCtrlEndPt3;
+00139         InCtrlEndPt3 = \textcolor{keyword}{nullptr};
+00140     \}
+00141     InCtrlEndPt3 = \textcolor{keyword}{new} CCyControlEndPoint(*USBDevicePrimary->ControlEndPt);
+00142 
+00143     \textcolor{keywordflow}{if} (OutCtrlEndPt3)
+00144     \{
+00145         \textcolor{keyword}{delete} OutCtrlEndPt3;
+00146         OutCtrlEndPt3 = \textcolor{keyword}{nullptr};
+00147     \}
+00148     OutCtrlEndPt3 = \textcolor{keyword}{new} CCyControlEndPoint(*USBDevicePrimary->ControlEndPt);
+00149 
+00150     InCtrlEndPt3->ReqCode = CTR_R_REQCODE;
+00151     InCtrlEndPt3->Value = CTR_R_VALUE;
+00152     InCtrlEndPt3->Index = CTR_R_INDEX;
+00153     InCtrlEndPt3->TimeOut = 3000;
+00154 
+00155     OutCtrlEndPt3->ReqCode = CTR_W_REQCODE;
+00156     OutCtrlEndPt3->Value = CTR_W_VALUE;
+00157     OutCtrlEndPt3->Index = CTR_W_INDEX;
+00158     OutCtrlEndPt3->TimeOut = 3000;
+00159 
+00160     \textcolor{keywordflow}{for} (\textcolor{keywordtype}{int} i = 0; i < USBDevicePrimary->EndPointCount(); i++)
+00161     \{
+00162         \textcolor{keyword}{auto} adr = USBDevicePrimary->EndPoints[i]->Address;
+00163         \textcolor{keywordflow}{if} (adr < ctrlBulkOutAddr)
+00164         \{
+00165             OutEndPt[adr] = USBDevicePrimary->EndPoints[i];
+00166             \textcolor{keywordtype}{long} len = OutEndPt[adr]->MaxPktSize * 64;
+00167             OutEndPt[adr]->SetXferSize(len);
+00168         \}
+00169         \textcolor{keywordflow}{else} \textcolor{keywordflow}{if} (adr < ctrlBulkInAddr)
+00170         \{
+00171             adr &= 0xF;
+00172             InEndPt[adr] = USBDevicePrimary->EndPoints[i];
+00173             \textcolor{keywordtype}{long} len = InEndPt[adr]->MaxPktSize * 64;
+00174             InEndPt[adr]->SetXferSize(len);
+00175         \}
+00176     \}
+00177 
+00178     InCtrlBulkEndPt = \textcolor{keyword}{nullptr};
+00179     \textcolor{keywordflow}{for} (\textcolor{keywordtype}{int} i=0; i<USBDevicePrimary->EndPointCount(); i++)
+00180         \textcolor{keywordflow}{if}(USBDevicePrimary->EndPoints[i]->Address == ctrlBulkInAddr)
+00181         \{
+00182             InCtrlBulkEndPt = USBDevicePrimary->EndPoints[i];
+00183             InCtrlBulkEndPt->TimeOut = 1000;
+00184             bulkCtrlAvailable = \textcolor{keyword}{true};
+00185             \textcolor{keywordflow}{break};
+00186         \}
+00187     OutCtrlBulkEndPt = \textcolor{keyword}{nullptr};
+00188     \textcolor{keywordflow}{for} (\textcolor{keywordtype}{int} i=0; i<USBDevicePrimary->EndPointCount(); i++)
+00189         \textcolor{keywordflow}{if}(USBDevicePrimary->EndPoints[i]->Address == ctrlBulkOutAddr)
+00190         \{
+00191             OutCtrlBulkEndPt = USBDevicePrimary->EndPoints[i];
+00192             OutCtrlBulkEndPt->TimeOut = 1000;
+00193             bulkCtrlAvailable = \textcolor{keyword}{true};
+00194             \textcolor{keywordflow}{break};
+00195         \}
+00196     isConnected = \textcolor{keyword}{true};
+00197     \textcolor{keywordflow}{return} 0;
+00198 \textcolor{preprocessor}{#else}
+00199     \textcolor{keyword}{const} \textcolor{keyword}{auto} splitPos = vidpid.find(\textcolor{stringliteral}{":"});
+00200     \textcolor{keyword}{const} \textcolor{keyword}{auto} vid = std::stoi(vidpid.substr(0, splitPos), \textcolor{keyword}{nullptr}, 16);
+00201     \textcolor{keyword}{const} \textcolor{keyword}{auto} pid = std::stoi(vidpid.substr(splitPos+1), \textcolor{keyword}{nullptr}, 16);
+00202 
+00203     libusb\_device **devs; \textcolor{comment}{//pointer to pointer of device, used to retrieve a list of devices}
+00204     \textcolor{keywordtype}{int} usbDeviceCount = libusb\_get\_device\_list(ctx, &devs);
+00205 
+00206     \textcolor{keywordflow}{if} (usbDeviceCount < 0) \{
+00207         \textcolor{keywordflow}{return} ReportError(-1, \textcolor{stringliteral}{"libusb\_get\_device\_list failed: %s"}, libusb\_strerror(libusb\_error(
+      usbDeviceCount)));
+00208     \}
+00209 
+00210     \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} i=0; i<usbDeviceCount; ++i)
+00211     \{
+00212         libusb\_device\_descriptor desc;
+00213         \textcolor{keywordtype}{int} r = libusb\_get\_device\_descriptor(devs[i], &desc);
+00214         \textcolor{keywordflow}{if}(r<0) \{
+00215             lime::error(\textcolor{stringliteral}{"failed to get device description"});
+00216             \textcolor{keywordflow}{continue};
+00217         \}
+00218         \textcolor{keywordflow}{if} (desc.idProduct != pid) \textcolor{keywordflow}{continue};
+00219         \textcolor{keywordflow}{if} (desc.idVendor != vid) \textcolor{keywordflow}{continue};
+00220         \textcolor{keywordflow}{if}(libusb\_open(devs[i], &dev\_handle) != 0) \textcolor{keywordflow}{continue};
+00221 
+00222         std::string foundSerial;
+00223         \textcolor{keywordflow}{if} (desc.iSerialNumber > 0)
+00224         \{
+00225             \textcolor{keywordtype}{char} data[255];
+00226             r = libusb\_get\_string\_descriptor\_ascii(dev\_handle,desc.iSerialNumber,(\textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{char}*)data, \textcolor{keyword}{
+      sizeof}(data));
+00227             \textcolor{keywordflow}{if}(r<0)
+00228                 lime::error(\textcolor{stringliteral}{"failed to get serial number"});
+00229             \textcolor{keywordflow}{else}
+00230                 foundSerial = std::string(data, \textcolor{keywordtype}{size\_t}(r));
+00231         \}
+00232 
+00233         \textcolor{keywordflow}{if} (serial == foundSerial) \textcolor{keywordflow}{break}; \textcolor{comment}{//found it}
+00234         libusb\_close(dev\_handle);
+00235         dev\_handle = \textcolor{keyword}{nullptr};
+00236     \}
+00237     libusb\_free\_device\_list(devs, 1);
+00238 
+00239     \textcolor{keywordflow}{if}(dev\_handle == \textcolor{keyword}{nullptr})
+00240         \textcolor{keywordflow}{return} ReportError(-1, \textcolor{stringliteral}{"libusb\_open failed"});
+00241     \textcolor{keywordflow}{if}(libusb\_kernel\_driver\_active(dev\_handle, 0) == 1)   \textcolor{comment}{//find out if kernel driver is attached}
+00242     \{
+00243         lime::info(\textcolor{stringliteral}{"Kernel Driver Active"});
+00244         \textcolor{keywordflow}{if}(libusb\_detach\_kernel\_driver(dev\_handle, 0) == 0) \textcolor{comment}{//detach it}
+00245             lime::info(\textcolor{stringliteral}{"Kernel Driver Detached!"});
+00246     \}
+00247     \textcolor{keywordtype}{int} r = libusb\_claim\_interface(dev\_handle, 0); \textcolor{comment}{//claim interface 0 (the first) of device}
+00248     \textcolor{keywordflow}{if}(r < 0)
+00249         \textcolor{keywordflow}{return} ReportError(-1, \textcolor{stringliteral}{"Cannot claim interface - %s"}, libusb\_strerror(libusb\_error(r)));
+00250 
+00251     libusb\_device* device = libusb\_get\_device(dev\_handle);
+00252     libusb\_config\_descriptor* descriptor = \textcolor{keyword}{nullptr};
+00253     \textcolor{keywordflow}{if}(libusb\_get\_active\_config\_descriptor(device, &descriptor) < 0)
+00254     \{
+00255         lime::error(\textcolor{stringliteral}{"failed to get config descriptor"});
+00256     \}
+00257     \textcolor{comment}{//check for 0x0F and 0x8F endpoints}
+00258     \textcolor{keywordflow}{if}(descriptor->bNumInterfaces > 0)
+00259     \{
+00260         libusb\_interface\_descriptor iface = descriptor->interface[0].altsetting[0];
+00261         \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} i=0; i<iface.bNumEndpoints; ++i)
+00262             \textcolor{keywordflow}{if}(iface.endpoint[i].bEndpointAddress == ctrlBulkOutAddr ||
+00263                iface.endpoint[i].bEndpointAddress == ctrlBulkInAddr)
+00264             \{
+00265                 bulkCtrlAvailable = \textcolor{keyword}{true};
+00266                 \textcolor{keywordflow}{break};
+00267             \}
+00268     \}
+00269     libusb\_free\_config\_descriptor(descriptor);
+00270     isConnected = \textcolor{keyword}{true};
+00271     \textcolor{keywordflow}{if}(bulkCtrlAvailable)
+00272     \{
+00273         LMS64CProtocol::GenericPacket ctrPkt;
+00274         ctrPkt.cmd = CMD_USB_FIFO_RST;
+00275         ctrPkt.outBuffer.push\_back(0x01); \textcolor{comment}{//reset bulk endpoints}
+00276         \textcolor{keywordflow}{if}(TransferPacket(ctrPkt) != 0)
+00277             lime::error(\textcolor{stringliteral}{"Failed to reset USB bulk endpoints"});
+00278     \}
+00279     \textcolor{keywordflow}{return} 0;
+00280 \textcolor{preprocessor}{#endif}
+00281 \}
+00284 \textcolor{keywordtype}{void} ConnectionFX3::Close()
+00285 \{
+00286 \textcolor{preprocessor}{    #ifndef \_\_unix\_\_}
+00287     USBDevicePrimary->Close();
+00288     \textcolor{keywordflow}{for} (\textcolor{keywordtype}{int} i = 0; i < MAX\_EP\_CNT; i++)
+00289         InEndPt[i] = OutEndPt[i] = \textcolor{keyword}{nullptr};
+00290     InCtrlBulkEndPt = \textcolor{keyword}{nullptr};
+00291     OutCtrlBulkEndPt = \textcolor{keyword}{nullptr};
+00292     \textcolor{keywordflow}{if} (InCtrlEndPt3)
+00293     \{
+00294         \textcolor{keyword}{delete} InCtrlEndPt3;
+00295         InCtrlEndPt3 = \textcolor{keyword}{nullptr};
+00296     \}
+00297     \textcolor{keywordflow}{if} (OutCtrlEndPt3)
+00298     \{
+00299         \textcolor{keyword}{delete} OutCtrlEndPt3;
+00300         OutCtrlEndPt3 = \textcolor{keyword}{nullptr};
+00301     \}
+00302 \textcolor{preprocessor}{    #else}
+00303     \textcolor{keywordflow}{if}(dev\_handle != 0)
+00304     \{
+00305         libusb\_release\_interface(dev\_handle, 0);
+00306         libusb\_close(dev\_handle);
+00307         dev\_handle = 0;
+00308     \}
+00309 \textcolor{preprocessor}{    #endif}
+00310     isConnected = \textcolor{keyword}{false};
+00311 \}
+00312 
+00316 \textcolor{keywordtype}{bool} ConnectionFX3::IsOpen()
+00317 \{
+00318 \textcolor{preprocessor}{    #ifndef \_\_unix\_\_}
+00319     \textcolor{keywordflow}{return} USBDevicePrimary->IsOpen() && isConnected;
+00320 \textcolor{preprocessor}{    #else}
+00321     \textcolor{keywordflow}{return} isConnected;
+00322 \textcolor{preprocessor}{    #endif}
+00323 \}
+00324 
+00331 \textcolor{keywordtype}{int} ConnectionFX3::Write(\textcolor{keyword}{const} \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{char} *buffer, \textcolor{keyword}{const} \textcolor{keywordtype}{int} length, \textcolor{keywordtype}{int} 
+      timeout_ms)
+00332 \{
+00333     std::lock\_guard<std::mutex> lock(mExtraUsbMutex);
+00334     \textcolor{keywordtype}{long} len = length;
+00335     \textcolor{keywordflow}{if}(IsOpen() == \textcolor{keyword}{false})
+00336         \textcolor{keywordflow}{return} 0;
+00337 
+00338     \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{char}* wbuffer = \textcolor{keyword}{new} \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{char}[length];
+00339     memcpy(wbuffer, buffer, length);
+00340     bulkCtrlInProgress = \textcolor{keyword}{false};
+00341 \textcolor{preprocessor}{    #ifndef \_\_unix\_\_}
+00342     \textcolor{keywordflow}{if}(bulkCtrlAvailable
+00343         && commandsToBulkCtrl.find(buffer[0]) != commandsToBulkCtrl.end())
+00344     \{
+00345         bulkCtrlInProgress = \textcolor{keyword}{true};
+00346         OutCtrlBulkEndPt->XferData(wbuffer, len);
+00347     \}
+00348     \textcolor{keywordflow}{else} \textcolor{keywordflow}{if}(OutCtrlEndPt3)
+00349         OutCtrlEndPt3->Write(wbuffer, len);
+00350     \textcolor{keywordflow}{else}
+00351         len = 0;
+00352 \textcolor{preprocessor}{    #else}
+00353     \textcolor{keywordflow}{if}(bulkCtrlAvailable
+00354         && commandsToBulkCtrl.find(buffer[0]) != commandsToBulkCtrl.end())
+00355     \{
+00356         bulkCtrlInProgress = \textcolor{keyword}{true};
+00357         \textcolor{keywordtype}{int} actual = 0;
+00358         libusb\_bulk\_transfer(dev\_handle, ctrlBulkOutAddr, wbuffer, length, &actual, timeout\_ms);
+00359         len = actual;
+00360     \}
+00361     \textcolor{keywordflow}{else}
+00362         len = libusb\_control\_transfer(dev\_handle, LIBUSB\_REQUEST\_TYPE\_VENDOR,
+      CTR_W_REQCODE ,CTR_W_VALUE, CTR_W_INDEX, wbuffer, length, timeout\_ms);
+00363 \textcolor{preprocessor}{    #endif}
+00364     \textcolor{keyword}{delete}[] wbuffer;
+00365     \textcolor{keywordflow}{return} len;
+00366 \}
+00367 
+00375 \textcolor{keywordtype}{int} ConnectionFX3::Read(\textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{char} *buffer, \textcolor{keyword}{const} \textcolor{keywordtype}{int} length, \textcolor{keywordtype}{int} timeout_ms)
+00376 \{
+00377     std::lock\_guard<std::mutex> lock(mExtraUsbMutex);
+00378     \textcolor{keywordtype}{long} len = length;
+00379     \textcolor{keywordflow}{if}(IsOpen() == \textcolor{keyword}{false})
+00380         \textcolor{keywordflow}{return} 0;
+00381 
+00382 \textcolor{preprocessor}{#ifndef \_\_unix\_\_}
+00383     \textcolor{keywordflow}{if}(bulkCtrlAvailable && bulkCtrlInProgress)
+00384     \{
+00385         InCtrlBulkEndPt->XferData(buffer, len);
+00386         bulkCtrlInProgress = \textcolor{keyword}{false};
+00387     \}
+00388     \textcolor{keywordflow}{else} \textcolor{keywordflow}{if}(InCtrlEndPt3)
+00389         InCtrlEndPt3->Read(buffer, len);
+00390     \textcolor{keywordflow}{else}
+00391         len = 0;
+00392 \textcolor{preprocessor}{#else}
+00393     \textcolor{keywordflow}{if}(bulkCtrlAvailable && bulkCtrlInProgress)
+00394     \{
+00395         \textcolor{keywordtype}{int} actual = 0;
+00396         libusb\_bulk\_transfer(dev\_handle, ctrlBulkInAddr, buffer, len, &actual, timeout\_ms);
+00397         len = actual;
+00398         bulkCtrlInProgress = \textcolor{keyword}{false};
+00399     \}
+00400     \textcolor{keywordflow}{else}
+00401         len = libusb\_control\_transfer(dev\_handle, LIBUSB\_REQUEST\_TYPE\_VENDOR | LIBUSB\_ENDPOINT\_IN ,
+      CTR_R_REQCODE ,CTR_R_VALUE, CTR_R_INDEX, buffer, len, timeout\_ms);
+00402 \textcolor{preprocessor}{#endif}
+00403     \textcolor{keywordflow}{return} len;
+00404 \}
+00405 
+00406 \textcolor{preprocessor}{#ifdef \_\_unix\_\_}
+00407 
+00409 \textcolor{keywordtype}{void} callback\_libusbtransfer(libusb\_transfer *trans)
+00410 \{
+00411     USBTransferContext *context = \textcolor{keyword}{reinterpret\_cast<}USBTransferContext*\textcolor{keyword}{>}(trans->user\_data);
+00412     std::unique\_lock<std::mutex> lck(context->transferLock);
+00413     \textcolor{keywordflow}{switch}(trans->status)
+00414     \{
+00415     \textcolor{keywordflow}{case} LIBUSB\_TRANSFER\_CANCELLED:
+00416         context->bytesXfered = trans->actual\_length;
+00417         context->done.store(\textcolor{keyword}{true});
+00418         \textcolor{keywordflow}{break};
+00419     \textcolor{keywordflow}{case} LIBUSB\_TRANSFER\_COMPLETED:
+00420         context->bytesXfered = trans->actual\_length;
+00421         context->done.store(\textcolor{keyword}{true});
+00422         \textcolor{keywordflow}{break};
+00423     \textcolor{keywordflow}{case} LIBUSB\_TRANSFER\_ERROR:
+00424         lime::error(\textcolor{stringliteral}{"USB TRANSFER ERROR"});
+00425         context->bytesXfered = trans->actual\_length;
+00426         context->done.store(\textcolor{keyword}{true});
+00427         \textcolor{keywordflow}{break};
+00428     \textcolor{keywordflow}{case} LIBUSB\_TRANSFER\_TIMED\_OUT:
+00429         context->bytesXfered = trans->actual\_length;
+00430         context->done.store(\textcolor{keyword}{true});
+00431         \textcolor{keywordflow}{break};
+00432     \textcolor{keywordflow}{case} LIBUSB\_TRANSFER\_OVERFLOW:
+00433         lime::error(\textcolor{stringliteral}{"USB transfer overflow"});
+00434         \textcolor{keywordflow}{break};
+00435     \textcolor{keywordflow}{case} LIBUSB\_TRANSFER\_STALL:
+00436         lime::error(\textcolor{stringliteral}{"USB transfer stalled"});
+00437         \textcolor{keywordflow}{break};
+00438     \textcolor{keywordflow}{case} LIBUSB\_TRANSFER\_NO\_DEVICE:
+00439         lime::error(\textcolor{stringliteral}{"USB transfer no device"});
+00440         \textcolor{keywordflow}{break};
+00441     \}
+00442     lck.unlock();
+00443     context->cv.notify\_one();
+00444 \}
+00445 \textcolor{preprocessor}{#endif}
+00446 
+00454 \textcolor{keywordtype}{int} ConnectionFX3::BeginDataReading(\textcolor{keywordtype}{char} *buffer, uint32\_t length, \textcolor{keywordtype}{int} ep)
+00455 \{
+00456     \textcolor{keyword}{const} \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{char} streamBulkInAddr = 0x81;
+00457     \textcolor{keywordtype}{int} i = 0;
+00458     \textcolor{keywordtype}{bool} contextFound = \textcolor{keyword}{false};
+00459     \textcolor{comment}{//find not used context}
+00460     \textcolor{keywordflow}{for}(i = 0; i<USB\_MAX\_CONTEXTS; i++)
+00461     \{
+00462         \textcolor{keywordflow}{if}(!contexts[i].used)
+00463         \{
+00464             contextFound = \textcolor{keyword}{true};
+00465             \textcolor{keywordflow}{break};
+00466         \}
+00467     \}
+00468     \textcolor{keywordflow}{if}(!contextFound)
+00469     \{
+00470         lime::error(\textcolor{stringliteral}{"No contexts left for reading data"});
+00471         \textcolor{keywordflow}{return} -1;
+00472     \}
+00473     contexts[i].used = \textcolor{keyword}{true};
+00474 \textcolor{preprocessor}{    #ifndef \_\_unix\_\_}
+00475     \textcolor{keywordflow}{if} (InEndPt[streamBulkInAddr & 0xF])
+00476     \{
+00477         contexts[i].EndPt = InEndPt[streamBulkInAddr & 0xF];
+00478         contexts[i].context = contexts[i].EndPt->BeginDataXfer((\textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{char}*)buffer, length, contexts[i].
+      inOvLap);
+00479     \}
+00480     \textcolor{keywordflow}{return} i;
+00481 \textcolor{preprocessor}{    #else}
+00482     libusb\_transfer *tr = contexts[i].transfer;
+00483     libusb\_fill\_bulk\_transfer(tr, dev\_handle, streamBulkInAddr, (\textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{char}*)buffer, length, 
+      callback\_libusbtransfer, &contexts[i], 0);
+00484     contexts[i].done = \textcolor{keyword}{false};
+00485     contexts[i].bytesXfered = 0;
+00486     \textcolor{keywordtype}{int} status = libusb\_submit\_transfer(tr);
+00487     \textcolor{keywordflow}{if}(status != 0)
+00488     \{
+00489         lime::error(\textcolor{stringliteral}{"BEGIN DATA READING %s"}, libusb\_error\_name(status));
+00490         contexts[i].used = \textcolor{keyword}{false};
+00491         \textcolor{keywordflow}{return} -1;
+00492     \}
+00493 \textcolor{preprocessor}{    #endif}
+00494     \textcolor{keywordflow}{return} i;
+00495 \}
+00496 
+00503 \textcolor{keywordtype}{bool} ConnectionFX3::WaitForReading(\textcolor{keywordtype}{int} contextHandle, \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{int} timeout_ms)
+00504 \{
+00505     \textcolor{keywordflow}{if}(contextHandle >= 0 && contexts[contextHandle].used == \textcolor{keyword}{true})
+00506     \{
+00507 \textcolor{preprocessor}{    #ifndef \_\_unix\_\_}
+00508     \textcolor{keywordtype}{int} status = 0;
+00509     status = contexts[contextHandle].EndPt->WaitForXfer(contexts[contextHandle].inOvLap, timeout\_ms);
+00510     \textcolor{keywordflow}{return} status;
+00511 \textcolor{preprocessor}{    #else}
+00512     \textcolor{keyword}{auto} t1 = chrono::high\_resolution\_clock::now();
+00513     \textcolor{keyword}{auto} t2 = t1;
+00514 
+00515     std::unique\_lock<std::mutex> lck(contexts[contextHandle].transferLock);
+00516     \textcolor{keywordflow}{while}(contexts[contextHandle].done.load() == \textcolor{keyword}{false} && std::chrono::duration\_cast<
+      std::chrono::milliseconds>(t2 - t1).count() < timeout_ms)
+00517     \{
+00518         \textcolor{comment}{//blocking not to waste CPU}
+00519         contexts[contextHandle].cv.wait\_for(lck, chrono::milliseconds(timeout\_ms));
+00520         t2 = chrono::high\_resolution\_clock::now();
+00521     \}
+00522     \textcolor{keywordflow}{return} contexts[contextHandle].done.load() == \textcolor{keyword}{true};
+00523 \textcolor{preprocessor}{    #endif}
+00524     \}
+00525     \textcolor{keywordflow}{else}
+00526         \textcolor{keywordflow}{return} 0;
+00527 \}
+00528 
+00536 \textcolor{keywordtype}{int} ConnectionFX3::FinishDataReading(\textcolor{keywordtype}{char} *buffer, uint32\_t length, \textcolor{keywordtype}{int} contextHandle)
+00537 \{
+00538     \textcolor{keywordflow}{if}(contextHandle >= 0 && contexts[contextHandle].used == \textcolor{keyword}{true})
+00539     \{
+00540 \textcolor{preprocessor}{    #ifndef \_\_unix\_\_}
+00541     \textcolor{keywordtype}{int} status = 0;
+00542     \textcolor{keywordtype}{long} len = length;
+00543     status = contexts[contextHandle].EndPt->FinishDataXfer((\textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{char}*)buffer, len, contexts[
+      contextHandle].inOvLap, contexts[contextHandle].context);
+00544     contexts[contextHandle].used = \textcolor{keyword}{false};
+00545     contexts[contextHandle].reset();
+00546     \textcolor{keywordflow}{return} len;
+00547 \textcolor{preprocessor}{    #else}
+00548     length = contexts[contextHandle].bytesXfered;
+00549     contexts[contextHandle].used = \textcolor{keyword}{false};
+00550     contexts[contextHandle].reset();
+00551     \textcolor{keywordflow}{return} length;
+00552 \textcolor{preprocessor}{    #endif}
+00553     \}
+00554     \textcolor{keywordflow}{else}
+00555         \textcolor{keywordflow}{return} 0;
+00556 \}
+00557 
+00561 \textcolor{keywordtype}{void} ConnectionFX3::AbortReading(\textcolor{keywordtype}{int} ep)
+00562 \{
+00563     ep = 0x81;
+00564 \textcolor{preprocessor}{#ifndef \_\_unix\_\_}
+00565     \textcolor{keywordflow}{for} (\textcolor{keywordtype}{int} i = 0; i < MAX\_EP\_CNT; i++)
+00566         \textcolor{keywordflow}{if} (InEndPt[i] && InEndPt[i]->Address == ep)
+00567             InEndPt[i]->Abort();
+00568 \textcolor{preprocessor}{#else}
+00569     \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} i=0; i<USB\_MAX\_CONTEXTS; ++i)
+00570     \{
+00571         \textcolor{keywordflow}{if}(contexts[i].used && contexts[i].transfer->endpoint == 0x81)
+00572             libusb\_cancel\_transfer( contexts[i].transfer );
+00573     \}
+00574 \textcolor{preprocessor}{#endif}
+00575     \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} i=0; i<USB\_MAX\_CONTEXTS; ++i)
+00576     \{
+00577         \textcolor{keywordflow}{if}(contexts[i].used)
+00578         \{
+00579             WaitForReading(i, 250);
+00580             FinishDataReading(\textcolor{keyword}{nullptr}, 0, i);
+00581         \}
+00582     \}
+00583 \}
+00584 
+00592 \textcolor{keywordtype}{int} ConnectionFX3::BeginDataSending(\textcolor{keyword}{const} \textcolor{keywordtype}{char} *buffer, uint32\_t length, \textcolor{keywordtype}{int} ep)
+00593 \{
+00594     \textcolor{keyword}{const} \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{char} streamBulkOutAddr = 0x01;
+00595     \textcolor{keywordtype}{int} i = 0;
+00596     \textcolor{comment}{//find not used context}
+00597     \textcolor{keywordtype}{bool} contextFound = \textcolor{keyword}{false};
+00598     \textcolor{keywordflow}{for}(i = 0; i<USB\_MAX\_CONTEXTS; i++)
+00599     \{
+00600         \textcolor{keywordflow}{if}(!contextsToSend[i].used)
+00601         \{
+00602             contextFound = \textcolor{keyword}{true};
+00603             \textcolor{keywordflow}{break};
+00604         \}
+00605     \}
+00606     \textcolor{keywordflow}{if}(!contextFound)
+00607         \textcolor{keywordflow}{return} -1;
+00608     contextsToSend[i].used = \textcolor{keyword}{true};
+00609 \textcolor{preprocessor}{    #ifndef \_\_unix\_\_}
+00610     \textcolor{keywordflow}{if} (OutEndPt[streamBulkOutAddr])
+00611     \{
+00612         contextsToSend[i].EndPt = OutEndPt[streamBulkOutAddr];
+00613         contextsToSend[i].context = contextsToSend[i].EndPt->BeginDataXfer((\textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{char}*)buffer, length, 
+      contextsToSend[i].inOvLap);
+00614     \}
+00615     \textcolor{keywordflow}{return} i;
+00616 \textcolor{preprocessor}{    #else}
+00617     libusb\_transfer *tr = contextsToSend[i].transfer;
+00618     contextsToSend[i].done = \textcolor{keyword}{false};
+00619     contextsToSend[i].bytesXfered = 0;
+00620     libusb\_fill\_bulk\_transfer(tr, dev\_handle, streamBulkOutAddr, (\textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{char}*)buffer, length, 
+      callback\_libusbtransfer, &contextsToSend[i], 0);
+00621     \textcolor{keywordtype}{int} status = libusb\_submit\_transfer(tr);
+00622     \textcolor{keywordflow}{if}(status != 0)
+00623     \{
+00624         lime::error(\textcolor{stringliteral}{"BEGIN DATA SENDING %s"}, libusb\_error\_name(status));
+00625         contextsToSend[i].used = \textcolor{keyword}{false};
+00626         \textcolor{keywordflow}{return} -1;
+00627     \}
+00628 \textcolor{preprocessor}{    #endif}
+00629     \textcolor{keywordflow}{return} i;
+00630 \}
+00631 
+00638 \textcolor{keywordtype}{bool} ConnectionFX3::WaitForSending(\textcolor{keywordtype}{int} contextHandle, \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{int} timeout_ms)
+00639 \{
+00640     \textcolor{keywordflow}{if}( contextsToSend[contextHandle].used == \textcolor{keyword}{true} )
+00641     \{
+00642 \textcolor{preprocessor}{#   ifndef \_\_unix\_\_}
+00643     \textcolor{keywordtype}{int} status = 0;
+00644     status = contextsToSend[contextHandle].EndPt->WaitForXfer(contextsToSend[contextHandle].inOvLap, 
+      timeout\_ms);
+00645     \textcolor{keywordflow}{return} status;
+00646 \textcolor{preprocessor}{#   else}
+00647     \textcolor{keyword}{auto} t1 = chrono::high\_resolution\_clock::now();
+00648     \textcolor{keyword}{auto} t2 = t1;
+00649 
+00650     std::unique\_lock<std::mutex> lck(contextsToSend[contextHandle].transferLock);
+00651     \textcolor{keywordflow}{while}(contextsToSend[contextHandle].done.load() == \textcolor{keyword}{false} && std::chrono::duration\_cast<
+      std::chrono::milliseconds>(t2 - t1).count() < timeout_ms)
+00652     \{
+00653         \textcolor{comment}{//blocking not to waste CPU}
+00654         contextsToSend[contextHandle].cv.wait\_for(lck, chrono::milliseconds(timeout\_ms));
+00655         t2 = chrono::high\_resolution\_clock::now();
+00656     \}
+00657     \textcolor{keywordflow}{return} contextsToSend[contextHandle].done == \textcolor{keyword}{true};
+00658 \textcolor{preprocessor}{#   endif}
+00659     \}
+00660     \textcolor{keywordflow}{return} 0;
+00661 \}
+00662 
+00670 \textcolor{keywordtype}{int} ConnectionFX3::FinishDataSending(\textcolor{keyword}{const} \textcolor{keywordtype}{char} *buffer, uint32\_t length, \textcolor{keywordtype}{int} contextHandle)
+00671 \{
+00672     \textcolor{keywordflow}{if}( contextsToSend[contextHandle].used == \textcolor{keyword}{true})
+00673     \{
+00674 \textcolor{preprocessor}{#ifndef \_\_unix\_\_}
+00675         \textcolor{keywordtype}{long} len = length;
+00676         contextsToSend[contextHandle].EndPt->FinishDataXfer((\textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{char}*)buffer, len, contextsToSend[
+      contextHandle].inOvLap, contextsToSend[contextHandle].context);
+00677         contextsToSend[contextHandle].used = \textcolor{keyword}{false};
+00678         contextsToSend[contextHandle].reset();
+00679         \textcolor{keywordflow}{return} len;
+00680 \textcolor{preprocessor}{#else}
+00681     length = contextsToSend[contextHandle].bytesXfered;
+00682     contextsToSend[contextHandle].used = \textcolor{keyword}{false};
+00683         contextsToSend[contextHandle].reset();
+00684     \textcolor{keywordflow}{return} length;
+00685 \textcolor{preprocessor}{#endif}
+00686     \}
+00687     \textcolor{keywordflow}{else}
+00688         \textcolor{keywordflow}{return} 0;
+00689 \}
+00690 
+00694 \textcolor{keywordtype}{void} ConnectionFX3::AbortSending(\textcolor{keywordtype}{int} ep)
+00695 \{
+00696     ep = 0x01;
+00697 \textcolor{preprocessor}{#ifndef \_\_unix\_\_}
+00698     \textcolor{keywordflow}{for} (\textcolor{keywordtype}{int} i = 0; i < MAX\_EP\_CNT; i++)
+00699         \textcolor{keywordflow}{if} (OutEndPt[i] && OutEndPt[i]->Address == ep)
+00700             OutEndPt[i]->Abort();
+00701 \textcolor{preprocessor}{#else}
+00702     \textcolor{keywordflow}{for} (\textcolor{keywordtype}{int} i = 0; i<USB\_MAX\_CONTEXTS; ++i)
+00703     \{
+00704         \textcolor{keywordflow}{if}(contextsToSend[i].used && contextsToSend[i].transfer->endpoint == 0x01)
+00705             libusb\_cancel\_transfer(contextsToSend[i].transfer);
+00706     \}
+00707 \textcolor{preprocessor}{#endif}
+00708     \textcolor{keywordflow}{for} (\textcolor{keywordtype}{int} i = 0; i<USB\_MAX\_CONTEXTS; ++i)
+00709     \{
+00710         \textcolor{keywordflow}{if}(contextsToSend[i].used)
+00711         \{
+00712             WaitForSending(i, 250);
+00713             FinishDataSending(\textcolor{keyword}{nullptr}, 0, i);
+00714         \}
+00715     \}
+00716 \}
+00717 
+00718 \textcolor{keywordtype}{int} ConnectionFX3::GetBuffersCount()\textcolor{keyword}{ const}
+00719 \textcolor{keyword}{}\{
+00720     \textcolor{keywordflow}{return} USB\_MAX\_CONTEXTS;
+00721 \};
+00722 
+00723 \textcolor{keywordtype}{int} ConnectionFX3::CheckStreamSize(\textcolor{keywordtype}{int} size)\textcolor{keyword}{const}
+00724 \textcolor{keyword}{}\{
+00725     \textcolor{keywordflow}{return} size;
+00726 \};
+00727 
+00728 \textcolor{keywordtype}{int} ConnectionFX3::SendData(\textcolor{keyword}{const} \textcolor{keywordtype}{char}* buffer, \textcolor{keywordtype}{int} length, \textcolor{keywordtype}{int} epIndex, \textcolor{keywordtype}{int} timeout)
+00729 \{
+00730     \textcolor{keyword}{const} \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{char} ep = 0x01;
+00731     \textcolor{keywordtype}{int} context = BeginDataSending((\textcolor{keywordtype}{char}*)buffer, length, ep);
+00732     \textcolor{keywordflow}{if} (WaitForSending(context, timeout)==\textcolor{keyword}{false})
+00733         AbortSending(ep);
+00734     \textcolor{keywordflow}{return} FinishDataSending((\textcolor{keywordtype}{char}*)buffer, length , context);
+00735 \}
+00736 
+00737 \textcolor{keywordtype}{int} ConnectionFX3::ReceiveData(\textcolor{keywordtype}{char}* buffer, \textcolor{keywordtype}{int} length, \textcolor{keywordtype}{int} epIndex, \textcolor{keywordtype}{int} timeout)
+00738 \{
+00739     \textcolor{keyword}{const} \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{char} ep = 0x81;
+00740     \textcolor{keywordtype}{int} context = BeginDataReading(buffer, length, ep);
+00741     \textcolor{keywordflow}{if} (WaitForReading(context, timeout) == \textcolor{keyword}{false})
+00742         AbortReading(ep);
+00743     \textcolor{keywordflow}{return} FinishDataReading(buffer, length, context);
+00744 \}
+00745 
+00746 \textcolor{keywordtype}{int} ConnectionFX3::ProgramWrite(\textcolor{keyword}{const} \textcolor{keywordtype}{char} *buffer, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} length, \textcolor{keyword}{const} \textcolor{keywordtype}{int} programmingMode, \textcolor{keyword}{const} \textcolor{keywordtype}{
+      int} device, ProgrammingCallback callback)
+00747 \{
+00748     \textcolor{keywordflow}{if} (device == LMS64CProtocol::FX3 && programmingMode == 1)
+00749     \{
+00750 \textcolor{preprocessor}{#ifdef \_\_unix\_\_}
+00751         libusb\_device\_descriptor desc;
+00752         \textcolor{keywordtype}{int} ret = libusb\_get\_device\_descriptor(libusb\_get\_device(dev\_handle), &desc);
+00753         \textcolor{keywordflow}{if}(ret<0)
+00754             lime::error(\textcolor{stringliteral}{"failed to get device description"});
+00755         \textcolor{keywordflow}{else} \textcolor{keywordflow}{if} (desc.idProduct == 243)
+00756 \textcolor{preprocessor}{#else}
+00757         \textcolor{keywordflow}{if} (USBDevicePrimary->ProductID == 243)
+00758 \textcolor{preprocessor}{#endif}
+00759         \{
+00760 \textcolor{preprocessor}{#ifdef \_\_unix\_\_}
+00761             \textcolor{keywordflow}{return} fx3\_usbboot\_download((\textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{char}*)buffer,length);
+00762 \textcolor{preprocessor}{#else}
+00763             \textcolor{keywordtype}{char}* filename = \textcolor{stringliteral}{"fx3fw\_image\_tmp.img"};
+00764             \textcolor{keywordtype}{int} ret = 0;
+00765             std::ofstream myfile(filename, ios::out | ios::binary | ios::trunc);
+00766             \textcolor{keywordflow}{if} (!myfile.is\_open())
+00767             \{
+00768                 ReportError(\textcolor{stringliteral}{"FX3 FW:Unable to create temporary file"});
+00769                 \textcolor{keywordflow}{return} -1;
+00770             \}
+00771             myfile.write(buffer,length);
+00772             \textcolor{keywordflow}{if} (myfile.fail())
+00773             \{
+00774                 ReportError(\textcolor{stringliteral}{"FX3 FW:Unable to write to temporary file"});
+00775                 ret = -1;
+00776             \}
+00777             myfile.close();
+00778 
+00779             \textcolor{keywordflow}{if} (ret != -1)
+00780             \{
+00781                 \textcolor{keywordflow}{if} ((ret=USBDevicePrimary->DownloadFw(filename, 
+      FX3_FWDWNLOAD_MEDIA_TYPE::RAM))!=0)
+00782                     ReportError(\textcolor{stringliteral}{"FX3: Failed to upload FW to RAM"});
+00783             \}
+00784 
+00785             std::remove(filename);
+00786             \textcolor{keywordflow}{return} ret;
+00787 \textcolor{preprocessor}{#endif}
+00788         \}
+00789             \textcolor{keywordflow}{else}
+00790             \{
+00791                 ReportError(\textcolor{stringliteral}{"FX3 bootloader NOT detected"});
+00792                 \textcolor{keywordflow}{return} -1;
+00793             \}
+00794     \}
+00795     \textcolor{keywordflow}{return} LMS64CProtocol::ProgramWrite(buffer,length,programmingMode,device,callback);
+00796 \}
+00797 
+00798 \textcolor{keywordtype}{int} ConnectionFX3::ResetStreamBuffers()
+00799 \{
+00800     \textcolor{comment}{//USB FIFO reset}
+00801     LMS64CProtocol::GenericPacket ctrPkt;
+00802     ctrPkt.cmd = CMD_USB_FIFO_RST;
+00803     ctrPkt.outBuffer.push\_back(0x00);
+00804     \textcolor{keywordflow}{return} TransferPacket(ctrPkt);
+00805 \}
+00806 
+00807 \textcolor{preprocessor}{#ifdef \_\_unix\_\_}
+00808 
+00809 \textcolor{preprocessor}{#define MAX\_FWIMG\_SIZE  (512 * 1024)        // Maximum size of the firmware binary.}
+00810 \textcolor{preprocessor}{#define GET\_LSW(v)  ((unsigned short)((v) & 0xFFFF))}
+00811 \textcolor{preprocessor}{#define GET\_MSW(v)  ((unsigned short)((v) >> 16))}
+00812 
+00813 \textcolor{preprocessor}{#define VENDORCMD\_TIMEOUT   (5000)      // Timeout for each vendor command is set to 5 seconds.}
+00814 
+00815 
+00816 \textcolor{keywordtype}{int} ConnectionFX3::ram\_write(\textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{char} *buf, \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{int} ramAddress, \textcolor{keywordtype}{int} 
+      len)
+00817 \{
+00818     \textcolor{keyword}{const} \textcolor{keywordtype}{int} MAX\_WRITE\_SIZE = (2 * 1024);      \textcolor{comment}{// Max. size of data that can be written through one vendor
+       command.}
+00819     \textcolor{keywordtype}{int} r;
+00820     \textcolor{keywordtype}{int} index = 0;
+00821     \textcolor{keywordtype}{int} size;
+00822 
+00823     \textcolor{keywordflow}{while} ( len > 0 )
+00824     \{
+00825         size = (len > MAX\_WRITE\_SIZE) ? MAX\_WRITE\_SIZE : len;
+00826         r = libusb\_control\_transfer(dev\_handle, 0x40, 0xA0, GET\_LSW(ramAddress), GET\_MSW(ramAddress),&buf[
+      index], size, VENDORCMD\_TIMEOUT);
+00827         \textcolor{keywordflow}{if} ( r != size )
+00828         \{
+00829             lime::error(\textcolor{stringliteral}{"Vendor write to FX3 RAM failed"});
+00830             \textcolor{keywordflow}{return} -1;
+00831         \}
+00832         ramAddress += size;
+00833         index      += size;
+00834         len        -= size;
+00835     \}
+00836     \textcolor{keywordflow}{return} 0;
+00837 \}
+00838 
+00839 \textcolor{keywordtype}{int} ConnectionFX3::fx3\_usbboot\_download(\textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{char} *fwBuf, \textcolor{keywordtype}{int} filesize)
+00840 \{
+00841     \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{int}  *data\_p;
+00842     \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{int} i, checksum;
+00843     \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{int} address, length;
+00844     \textcolor{keywordtype}{int} r, index;
+00845 
+00846     \textcolor{keywordflow}{if} ( filesize > MAX\_FWIMG\_SIZE ) \{
+00847         ReportError(\textcolor{stringliteral}{"File size exceeds maximum firmware image size\(\backslash\)n"});
+00848         \textcolor{keywordflow}{return} -2;
+00849     \}
+00850 
+00851     \textcolor{keywordflow}{if} ( strncmp((\textcolor{keywordtype}{char} *)fwBuf,\textcolor{stringliteral}{"CY"},2) ) \{
+00852         ReportError(\textcolor{stringliteral}{"Image does not have 'CY' at start. aborting\(\backslash\)n"});
+00853         \textcolor{keywordflow}{return} -4;
+00854     \}
+00855 
+00856     \textcolor{keywordflow}{if} ( fwBuf[2] & 0x01 ) \{
+00857         ReportError(\textcolor{stringliteral}{"Image does not contain executable code\(\backslash\)n"});
+00858         \textcolor{keywordflow}{return} -5;
+00859     \}
+00860 
+00861     \textcolor{keywordflow}{if} ( !(fwBuf[3] == 0xB0) ) \{
+00862         ReportError(\textcolor{stringliteral}{"Not a normal FW binary with checksum\(\backslash\)n"});
+00863         \textcolor{keywordflow}{return} -6;
+00864     \}
+00865 
+00866     \textcolor{comment}{// Run through each section of code, and use vendor commands to download them to RAM.}
+00867     index    = 4;
+00868     checksum = 0;
+00869     \textcolor{keywordflow}{while} ( index < filesize )
+00870     \{
+00871         data\_p  = (\textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{int} *)(fwBuf + index);
+00872         length  = data\_p[0];
+00873         address = data\_p[1];
+00874         \textcolor{keywordflow}{if} (length != 0)
+00875         \{
+00876             \textcolor{keywordflow}{for} (i = 0; i < length; i++)
+00877                 checksum += data\_p[2 + i];
+00878             r = ram\_write(fwBuf + index + 8, address, length * 4);
+00879             \textcolor{keywordflow}{if} (r != 0)
+00880             \{
+00881                 ReportError(\textcolor{stringliteral}{"Failed to download data to FX3 RAM\(\backslash\)n"});
+00882                 \textcolor{keywordflow}{return} -3;
+00883             \}
+00884         \}
+00885         \textcolor{keywordflow}{else}
+00886         \{
+00887             \textcolor{keywordflow}{if} (checksum != data\_p[2]) \{
+00888                 ReportError (\textcolor{stringliteral}{"Checksum error in firmware binary\(\backslash\)n"});
+00889                 \textcolor{keywordflow}{return} -4;
+00890             \}
+00891 
+00892             r = libusb\_control\_transfer(dev\_handle, 0x40, 0xA0, GET\_LSW(address), GET\_MSW(address), NULL,0,
+       VENDORCMD\_TIMEOUT);
+00893             \textcolor{keywordflow}{if} ( r != 0 )
+00894                 lime::error(\textcolor{stringliteral}{"Ignored error in control transfer: %d"}, r);
+00895             \textcolor{keywordflow}{break};
+00896         \}
+00897         index += (8 + length * 4);
+00898     \}
+00899 
+00900     \textcolor{keywordflow}{return} 0;
+00901 \}
+00902 \textcolor{preprocessor}{#endif}
+\end{DoxyCode}

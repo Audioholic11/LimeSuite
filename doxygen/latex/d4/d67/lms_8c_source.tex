@@ -1,0 +1,197 @@
+\subsection{lms.\+c}
+\label{lms_8c_source}\index{/home/erik/prefix/default/src/limesuite-\/dev/src/\+G\+F\+I\+R/lms.\+c@{/home/erik/prefix/default/src/limesuite-\/dev/src/\+G\+F\+I\+R/lms.\+c}}
+
+\begin{DoxyCode}
+00001 \textcolor{comment}{/* ************************************************************************ }
+00002 \textcolor{comment}{   FILE:    lms.c}
+00003 \textcolor{comment}{   COMMENT: Optimal FIR filter design by LMS algorithm.}
+00004 \textcolor{comment}{   CONTENT:}
+00005 \textcolor{comment}{        double Case1F(double w, int i)}
+00006 \textcolor{comment}{        double Case2F(double w, int i)}
+00007 \textcolor{comment}{        double Case3F(double w, int i)}
+00008 \textcolor{comment}{        double Case4F(double w, int i)}
+00009 \textcolor{comment}{}
+00010 \textcolor{comment}{   AUTHOR:  Lime Microsystems}
+00011 \textcolor{comment}{   DATE:    Feb 24, 2000}
+00012 \textcolor{comment}{   REVISION:}
+00013 \textcolor{comment}{   ************************************************************************ */}
+00014 \textcolor{preprocessor}{#ifdef \_MSC\_VER}
+00015 \textcolor{preprocessor}{#define \_USE\_MATH\_DEFINES}
+00016 \textcolor{preprocessor}{#endif }
+00017 
+00018 \textcolor{preprocessor}{#include "lms.h"}
+00019 \textcolor{preprocessor}{#include "recipes.h"}
+00020 \textcolor{preprocessor}{#include "rounding.h"}
+00021 
+00022 \textcolor{comment}{/* Filter parity constants */}
+00023 \textcolor{preprocessor}{#define EVEN    0}
+00024 \textcolor{preprocessor}{#define ODD     1}
+00025 
+00026 \textcolor{comment}{/* Declare functions from Numerical Recipes that are used here */}
+00027 \textcolor{keywordtype}{double}  *vector();
+00028 \textcolor{keywordtype}{int}  *ivector();
+00029 \textcolor{keywordtype}{double}  **matrix();
+00030     
+00031 \textcolor{comment}{/* ************************************************************************ }
+00032 \textcolor{comment}{ *  Trigonometric functions for CASE1, CASE2, CASE3 and CASE4 filters}
+00033 \textcolor{comment}{ *}
+00034 \textcolor{comment}{ *  INPUTS:}
+00035 \textcolor{comment}{ *  double  w   - Normalised frequency [0, 0.5]}
+00036 \textcolor{comment}{ *  int     i}
+00037 \textcolor{comment}{ *}
+00038 \textcolor{comment}{ *  RETURN VALUE:}
+00039 \textcolor{comment}{ *  Value of trigonometric function}
+00040 \textcolor{comment}{ * ************************************************************************ */}
+00041 \textcolor{keywordtype}{double} Case1F(\textcolor{keywordtype}{double} w, \textcolor{keywordtype}{int} i)
+00042 \{
+00043     \textcolor{keywordflow}{return}( cos( 2.0*M\_PI*w*((\textcolor{keywordtype}{double})(i)-1.0)) );
+00044 \}
+00045 
+00046 \textcolor{keywordtype}{double} Case2F(\textcolor{keywordtype}{double} w, \textcolor{keywordtype}{int} i)
+00047 \{
+00048     \textcolor{keywordflow}{return}( cos( 2.0*M\_PI*w*((\textcolor{keywordtype}{double})(i)-0.5)) );
+00049 \}
+00050 
+00051 \textcolor{keywordtype}{double} Case3F(\textcolor{keywordtype}{double} w, \textcolor{keywordtype}{int} i)
+00052 \{
+00053     \textcolor{keywordflow}{return}( sin( 2.0*M\_PI*w*(\textcolor{keywordtype}{double})(i)) );
+00054 \}
+00055 
+00056 \textcolor{keywordtype}{double} Case4F(\textcolor{keywordtype}{double} w, \textcolor{keywordtype}{int} i)
+00057 \{
+00058     \textcolor{keywordflow}{return}( sin( 2.0*M\_PI*w*((\textcolor{keywordtype}{double})(i)-0.5)) );
+00059 \}
+00060 
+00061 \textcolor{comment}{/* ************************************************************************ }
+00062 \textcolor{comment}{ *  OUTPUT:}
+00063 \textcolor{comment}{ *  double  hr[n]       - Filter impulse response}
+00064 \textcolor{comment}{ *  double  hi[n]       - Filter impulse response rounded to integer}
+00065 \textcolor{comment}{ *  double  hcsd[n]     - Filter impulse response rounded to CSD}
+00066 \textcolor{comment}{ *}
+00067 \textcolor{comment}{ *  INPUTS:}
+00068 \textcolor{comment}{ *  int     n       - Number of taps}
+00069 \textcolor{comment}{ *  double  w[p]        - Frequency points}
+00070 \textcolor{comment}{ *  double  des[p]      - Filter desired response}
+00071 \textcolor{comment}{ *  double  weight[p]   - Wighting function}
+00072 \textcolor{comment}{ *  int p       - Number of points on a frequency scale,}
+00073 \textcolor{comment}{ *  int cprec       - Desired coefficients precision,}
+00074 \textcolor{comment}{ *  int csdprec     - CSD coefficients precision,}
+00075 \textcolor{comment}{ *  int symmetry    - Filter response symmetry}
+00076 \textcolor{comment}{ *}
+00077 \textcolor{comment}{ *  RETURN VALUE:}
+00078 \textcolor{comment}{ *  0           - if everything is OK}
+00079 \textcolor{comment}{ *  -1          - otherwise}
+00080 \textcolor{comment}{ * ************************************************************************ */}
+00081 \textcolor{keywordtype}{int} lms(hr, hi, hcsd, n, w, des, weight, p, cprec, csdprec, symmetry,
+00082     bincode, csdcode, csdcoder)
+00083 double *hr, *hi, *hcsd;
+00084 \textcolor{keywordtype}{int} n;
+00085 \textcolor{keywordtype}{double} *w;
+00086 \textcolor{keywordtype}{double} *des;
+00087 \textcolor{keywordtype}{double} *weight;
+00088 \textcolor{keywordtype}{int} p;
+00089 \textcolor{keywordtype}{int} cprec;
+00090 \textcolor{keywordtype}{int} csdprec;
+00091 \textcolor{keywordtype}{int} symmetry;
+00092 \textcolor{keywordtype}{int} **bincode, **csdcode, **csdcoder;
+00093 \{
+00094 
+00095     \textcolor{comment}{/* All this is for  solving a linear system */}
+00096     \textcolor{comment}{/* of equations by LU decomposition */}
+00097     \textcolor{keywordtype}{double} **A, d;
+00098     \textcolor{keywordtype}{int} *index;
+00099 
+00100     \textcolor{comment}{/* Parameters of real function Hr(w) */}
+00101     \textcolor{keywordtype}{double} *a;      \textcolor{comment}{/* Coefficients */}
+00102     \textcolor{keywordtype}{int} L;          \textcolor{comment}{/* Number of terms in Hr(w) sum */}
+00103     double (*f)();      \textcolor{comment}{/* Trigonometric function in Hr(w) */}
+00104     
+00105     \textcolor{keywordtype}{int} parity;     \textcolor{comment}{/* Parity of the filter (ODD or EVEN) */}
+00106     \textcolor{keywordtype}{int} i, j, k;        \textcolor{comment}{/* Loop counters */}
+00107     \textcolor{keywordtype}{double} fwki, fwkj;  \textcolor{comment}{/* Used for equation formulation */}
+00108 
+00109     \textcolor{comment}{/* Check the correctness of inputs */}
+00110     \textcolor{keywordflow}{if}( (hr == NULL) || (w == NULL) || 
+00111         (des == NULL) || (weight == NULL)) \textcolor{keywordflow}{return}(-1);
+00112     \textcolor{keywordflow}{if}( n == 0) \textcolor{keywordflow}{return}(-1);
+00113     \textcolor{keywordflow}{if}( (symmetry != POSITIVE) && (symmetry != NEGATIVE) ) \textcolor{keywordflow}{return}(-1);
+00114 
+00115     \textcolor{comment}{/* Determine parity */}
+00116     parity = EVEN;
+00117     \textcolor{keywordflow}{if}( n % 2 ) parity = ODD;
+00118 
+00119     \textcolor{comment}{/* Calculate L. If we use integer arithmetic, L is n/2 */}
+00120     \textcolor{comment}{/* for all cases except for CASE1 filters */}
+00121     L = n/2;
+00122     \textcolor{keywordflow}{if}( (symmetry == POSITIVE) && (parity == ODD) ) L++;
+00123 
+00124     \textcolor{comment}{/* Find which trigonometric function to use depending on filter type */}
+00125     \textcolor{keywordflow}{if}( (symmetry == POSITIVE) && (parity == ODD) ) \{       \textcolor{comment}{/* Case 1 */}
+00126         f = Case1F; 
+00127     \} \textcolor{keywordflow}{else} \textcolor{keywordflow}{if}( (symmetry == POSITIVE) && (parity == EVEN) ) \{   \textcolor{comment}{/* Case 2 */}
+00128         f = Case2F;
+00129     \} \textcolor{keywordflow}{else} \textcolor{keywordflow}{if}( (symmetry == NEGATIVE) && (parity == ODD) ) \{    \textcolor{comment}{/* Case 2 */}
+00130         f = Case3F;
+00131     \} \textcolor{keywordflow}{else} \textcolor{keywordflow}{if}( (symmetry == NEGATIVE) && (parity == EVEN) ) \{   \textcolor{comment}{/* Case 2 */}
+00132         f = Case4F;
+00133     \} \textcolor{keywordflow}{else} \{    \textcolor{comment}{/* This should never happen but ... */}
+00134         \textcolor{keywordflow}{return}(-1);
+00135     \}
+00136 
+00137     \textcolor{comment}{/* Allocate memory for a[1:L], A[1:L][1:L] and index[1:L]. */}
+00138     \textcolor{comment}{/* Functions from Numerical Recipes are used because I hate  */}
+00139     \textcolor{comment}{/* FORTRAN like indexing (starting from 1, not 0). */}
+00140     a = vector(1, L);
+00141     A = matrix(1, L, 1, L);
+00142     index = ivector(1, L);
+00143 
+00144     \textcolor{comment}{/* Set A, a and index all to zeroes */}
+00145     \textcolor{keywordflow}{for}(j=1; j <= L; j++) \{
+00146         a[j] = 0.0;
+00147         index[j] = 0;
+00148         \textcolor{keywordflow}{for}(i=1; i <= L; i++) A[i][j] = 0.0;
+00149     \}
+00150 
+00151     \textcolor{comment}{/* OK, ready to fill up the equations */}
+00152     \textcolor{keywordflow}{for}(k=0; k<p; k++) \{
+00153         \textcolor{keywordflow}{for}(j=1; j <= L; j++) \{
+00154             fwkj = (f)(w[k], j);
+00155             A[j][j] += weight[k]*fwkj*fwkj;
+00156             a[j] += weight[k]*des[k]*fwkj;
+00157             \textcolor{keywordflow}{for}(i=j+1; i <= L; i++) \{
+00158                 fwki = (f)(w[k], i);
+00159                 A[i][j] += weight[k]*fwki*fwkj;
+00160                 A[j][i] += weight[k]*fwkj*fwki;
+00161             \}
+00162         \}
+00163     \}
+00164 
+00165     \textcolor{comment}{/* Solve the equations */}
+00166     ludcmp(A, L, index, &d); 
+00167     lubksb(A, L, index, a);
+00168 
+00169     \textcolor{comment}{/* Calculate impulse response h[] from a[] */}
+00170     \textcolor{keywordflow}{for}(i=0; i<n; i++) hr[i] = 0.0;
+00171     \textcolor{keywordflow}{for}(i=0; i<L; i++) hr[i] = 0.5*a[L-i];
+00172 
+00173     \textcolor{comment}{/* Resolve CASE1 for i=L-1 */}
+00174     \textcolor{keywordflow}{if}((symmetry == POSITIVE) && (parity == ODD)) hr[L-1] = a[1];
+00175 
+00176     \textcolor{comment}{/* Construct other half of hr[] using symmetry */}
+00177     \textcolor{keywordflow}{for}(i=0; i<n/2; i++) hr[n-i-1] = symmetry * hr[i];
+00178 
+00179     \textcolor{comment}{/* Round the filter coefficients to the nearest integer value */}
+00180     round2int(hr, hi, n, cprec);
+00181 
+00182     \textcolor{comment}{/* Round the filter coefficients to the nearest CSD code */}
+00183     round2csd(hr, hcsd, n, cprec, csdprec, bincode, csdcode, csdcoder);
+00184 
+00185     \textcolor{comment}{/* Free allocated memory */}
+00186     free_vector(a, 1, L);
+00187     free_matrix(A, 1, L, 1, L);
+00188     free_ivector(index, 1, L);
+00189 
+00190     \textcolor{comment}{/* That's all, let's go home */}
+00191     \textcolor{keywordflow}{return}(0);
+00192 \}
+\end{DoxyCode}

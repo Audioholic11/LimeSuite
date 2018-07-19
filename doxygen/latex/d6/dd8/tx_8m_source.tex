@@ -1,0 +1,36 @@
+\subsection{tx.\+m}
+\label{tx_8m_source}\index{/home/erik/prefix/default/src/limesuite-\/dev/octave/tx.\+m@{/home/erik/prefix/default/src/limesuite-\/dev/octave/tx.\+m}}
+
+\begin{DoxyCode}
+00001 clear all;
+00002 
+00003 LoadLimeSuite
+00004 
+00005 %generate test signal
+00006 phase = pi/6;           %phase step
+00007 periods = 3000;         %periods to generate
+00008 src = 0.7*complex(sin(phase:phase:periods*2*pi), cos(phase:phase:periods*2*pi));
+00009 
+00010 LimeInitialize();               % open device
+00011 LimeLoadConfig(\textcolor{stringliteral}{'trxTest.ini'});  % load configuration from file
+00012                                 % use LimeSuiteGUI to create configuration file
+00013                                 
+00014 %Real-time sample streaming                                
+00015 fifoSize = 1024*1024        %set library FIFO size to 1 MSample
+00016 LimeStartStreaming(fifoSize,"tx0"); % start TX to channel 0
+00017 \textcolor{keywordflow}{for} i=1:100
+00018     LimeTransmitSamples(src,0); % send samples to TX channel 0
+00019 end
+00020 sleep(1);
+00021 LimeStopStreaming();    % stop streaming
+00022 
+00023 %Waveform playback from device RAM
+00024 LimeLoopWFMStart(src);  % Load samples to device RAM, \textcolor{keywordflow}{for} looping to TX
+00025 sleep(10);
+00026 LimeLoopWFMStop();      % stop looping TX samples from device RAM
+00027 
+00028 LimeDestroy();          % close device
+00029 
+00030 
+00031 
+\end{DoxyCode}

@@ -1,0 +1,169 @@
+\subsection{main.\+c}
+\label{main_8c_source}\index{/home/erik/prefix/default/src/limesuite-\/dev/mcu\+\_\+program/mcu\+\_\+src/main.\+c@{/home/erik/prefix/default/src/limesuite-\/dev/mcu\+\_\+program/mcu\+\_\+src/main.\+c}}
+
+\begin{DoxyCode}
+00001 \textcolor{preprocessor}{#include "LMS7002_REGx51.h"}
+00002 \textcolor{preprocessor}{#include "spi.h"}
+00003 \textcolor{preprocessor}{#include "lms7002m_calibrations.h"}
+00004 \textcolor{preprocessor}{#include "lms7002m_filters.h"}
+00005 \textcolor{preprocessor}{#include "LMS7002M_parameters_compact.h"}
+00006 \textcolor{preprocessor}{#include "lms7002m_controls.h"}
+00007 
+00008 \textcolor{preprocessor}{#include "typedefs.h"}
+00009 
+00010 \textcolor{keywordtype}{bool} stopProcedure = \textcolor{keyword}{false};
+00011 \textcolor{keywordtype}{bool} hasStopped = \textcolor{keyword}{true};
+00012 \textcolor{keywordtype}{bool} runProcedure = \textcolor{keyword}{false};
+00013 uint8\_t currentInstruction;
+00014 \textcolor{keyword}{extern} float_type RefClk;
+00015 \textcolor{keyword}{extern} float_type bandwidthRF;
+00016 \textcolor{keyword}{extern} uint8\_t extLoopbackPair;
+00017 \textcolor{preprocessor}{#define MCU\_PARAMETER\_ADDRESS 0x002D //register used to pass parameter values to MCU}
+00018 
+00019 \textcolor{preprocessor}{#define INPUT\_COUNT 3}
+00020 uint8\_t inputRegs[INPUT_COUNT];
+00021 
+00022 \textcolor{keyword}{enum}
+00023 \{
+00024     MCU_WORKING = 0xFF,
+00025     MCU_IDLE = 0x00,
+00026 \};
+00027 
+00030 \textcolor{keywordtype}{void} UpdateFreq(\textcolor{keywordtype}{bool} refClk)
+00031 \{
+00032     \textcolor{keyword}{const} \textcolor{keywordtype}{float} freq = 1e6*(inputRegs[0] + ((((uint16\_t)inputRegs[1] << 8) | 
+      inputRegs[2]) / 1000.0)); \textcolor{comment}{//integer part MHz}
+00033     \textcolor{keywordflow}{if}(refClk)
+00034         RefClk = freq;
+00035     \textcolor{keywordflow}{else}
+00036         bandwidthRF = freq;
+00037     P1 = MCU_IDLE;
+00038 \}
+00039 
+00040 \textcolor{keywordtype}{void} ext2_int() interrupt 7
+00041 \{
+00042     uint8\_t i;
+00043     P1 = MCU_WORKING;
+00044     \textcolor{keywordflow}{for}(i=INPUT_COUNT-1; i>0; --i)
+00045         inputRegs[i] = inputRegs[i-1];
+00046     inputRegs[0] = P0;
+00047     P1 = MCU_IDLE;
+00048 \}
+00049 
+00050 \textcolor{keywordtype}{void} ext3_int() interrupt 8
+00051 \{
+00052     P1 = MCU_WORKING;
+00053     currentInstruction = P0;
+00054     stopProcedure = \textcolor{keyword}{true};
+00055     runProcedure = \textcolor{keyword}{true};
+00056 \}
+00057 
+00058 \textcolor{keyword}{const} uint16\_t proxyRegAddr = 0x002D;
+00059 \textcolor{keyword}{const} uint16\_t proxyWrValue = 0x020C;
+00060 \textcolor{keyword}{const} uint16\_t proxyRdValue = 0x040B;
+00061 
+00062 uint8\_t ProxyWrite()
+00063 \{
+00064     uint16\_t addr;
+00065     uint16\_t wrValue;
+00066     P1 = MCU_WORKING;
+00067     addr = SPI_read(proxyRegAddr);
+00068     wrValue = SPI_read(proxyWrValue);
+00069     SPI_write_slow(addr, wrValue);
+00070     \textcolor{keywordflow}{return} MCU_IDLE;
+00071 \}
+00072 
+00073 uint8\_t ProxyRead()
+00074 \{
+00075     uint16\_t addr;
+00076     uint16\_t rdValue;
+00077     P1 = MCU_WORKING;
+00078     addr = SPI_read(proxyRegAddr);
+00079     rdValue = SPI_read_slow(addr);
+00080     SPI_write(proxyRdValue, rdValue);
+00081     \textcolor{keywordflow}{return} MCU_IDLE;
+00082 \}
+00083 
+00084 \textcolor{comment}{/*}
+00085 \textcolor{comment}{    P1[7] : 0-MCU idle, 1-MCU\_working}
+00086 \textcolor{comment}{    P1[6:0] : return status (while working = 0x3F)}
+00087 \textcolor{comment}{*/}
+00088 \textcolor{keywordtype}{void} main()  \textcolor{comment}{//main routine}
+00089 \{
+00090     SP=0xD0; \textcolor{comment}{// Set stack pointer}
+00091     DIR0=0x00; \textcolor{comment}{// ;DIR0 - Configure P0 as all inputs}
+00092     DIR1=0xFF;  \textcolor{comment}{// ;DIR1 - Configure P1 as all outputs}
+00093     P1 = MCU_IDLE;
+00094     DIR2=0x07;  \textcolor{comment}{// ;DIR2 -  Configure P2\_3 is input}
+00095     IEN1=0xFF;\textcolor{comment}{//0x04;  //EX2=1 enable external interrupt 2}
+00096     IEN0=0x80;
+00097     TMOD = 0x01; \textcolor{comment}{// timer0 16-bit}
+00098 
+00099     ucSCLK=0; \textcolor{comment}{//repairs external SPI}
+00100     ucSEN=1;\textcolor{comment}{//}
+00101 
+00102     \textcolor{comment}{//P1 returns MCU status}
+00103     \textcolor{keywordflow}{while}(1)
+00104     \{
+00105         \textcolor{keywordflow}{if}(runProcedure)
+00106         \{
+00107             \textcolor{keywordflow}{switch}(currentInstruction)
+00108             \{
+00109             \textcolor{keywordflow}{case} 0:
+00110                 runProcedure = \textcolor{keyword}{false};
+00111                 \textcolor{keywordflow}{while}(!hasStopped);
+00112 
+00113                 P1 = MCU_IDLE;
+00114                 \textcolor{keywordflow}{break};
+00115             \textcolor{keywordflow}{case} 1: \textcolor{comment}{//CalibrateTx}
+00116                 P1 = MCU_IDLE | CalibrateTx(\textcolor{keyword}{false});
+00117                 \textcolor{keywordflow}{break};
+00118             \textcolor{keywordflow}{case} 2: \textcolor{comment}{//CalibrateRx}
+00119                 P1 = MCU_IDLE | CalibrateRx(\textcolor{keyword}{false}, \textcolor{keyword}{false});
+00120                 \textcolor{keywordflow}{break};
+00121             \textcolor{keywordflow}{case} 3:
+00122                 UpdateFreq(0);
+00123                 \textcolor{comment}{//UpdateBW();}
+00124                 \textcolor{keywordflow}{break};
+00125             \textcolor{keywordflow}{case} 4: \textcolor{comment}{//update ref clk}
+00126                 \textcolor{comment}{//UpdateReferenceClock();}
+00127                 UpdateFreq(1);
+00128                 \textcolor{keywordflow}{break};
+00129             \textcolor{keywordflow}{case} 5:
+00130                 P1 = TuneRxFilter(bandwidthRF);
+00131                 \textcolor{keywordflow}{break};
+00132             \textcolor{keywordflow}{case} 6:
+00133                 P1 = TuneTxFilter(bandwidthRF);
+00134                 \textcolor{keywordflow}{break};
+00135             \textcolor{keywordflow}{case} 7:
+00136                 P1 = ProxyWrite();
+00137                 \textcolor{keywordflow}{break};
+00138             \textcolor{keywordflow}{case} 8:
+00139                 P1 = ProxyRead();
+00140                 \textcolor{keywordflow}{break};
+00141             \textcolor{keywordflow}{case} 9:
+00142                 extLoopbackPair = inputRegs[0];
+00143                 P1 = MCU_IDLE;
+00144                 \textcolor{keywordflow}{break};
+00145             \textcolor{keywordflow}{case} 10:
+00146                 P1 = MCU_IDLE;
+00147                 stopProcedure = \textcolor{keyword}{false};
+00148                 P1 = RunAGC(((uint32\_t)SPI_read(MCU_PARAMETER_ADDRESS))<<2);
+00149                 \textcolor{keywordflow}{break};
+00150             \textcolor{keywordflow}{case} 17: \textcolor{comment}{//CalibrateTx}
+00151                 P1 = MCU_IDLE | CalibrateTx(\textcolor{keyword}{true});
+00152                 \textcolor{keywordflow}{break};
+00153             \textcolor{keywordflow}{case} 18: \textcolor{comment}{//CalibrateRx}
+00154                 P1 = MCU_IDLE | CalibrateRx(\textcolor{keyword}{true}, \textcolor{keyword}{false});
+00155                 \textcolor{keywordflow}{break};
+00156             \textcolor{keywordflow}{case} 255: \textcolor{comment}{//return program ID}
+00157                 P1 = 0x05;
+00158                 \textcolor{keywordflow}{break};
+00159 
+00160             \}
+00161             runProcedure = \textcolor{keyword}{false};
+00162         \}
+00163     \}
+00164 \}
+00165 
+\end{DoxyCode}

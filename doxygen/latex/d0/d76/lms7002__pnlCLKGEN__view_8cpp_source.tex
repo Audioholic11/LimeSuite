@@ -1,0 +1,349 @@
+\subsection{lms7002\+\_\+pnl\+C\+L\+K\+G\+E\+N\+\_\+view.\+cpp}
+\label{lms7002__pnlCLKGEN__view_8cpp_source}\index{/home/erik/prefix/default/src/limesuite-\/dev/src/lms7002\+\_\+wxgui/lms7002\+\_\+pnl\+C\+L\+K\+G\+E\+N\+\_\+view.\+cpp@{/home/erik/prefix/default/src/limesuite-\/dev/src/lms7002\+\_\+wxgui/lms7002\+\_\+pnl\+C\+L\+K\+G\+E\+N\+\_\+view.\+cpp}}
+
+\begin{DoxyCode}
+00001 \textcolor{preprocessor}{#include "lms7002_pnlCLKGEN_view.h"}
+00002 \textcolor{preprocessor}{#include <map>}
+00003 \textcolor{preprocessor}{#include <wx/msgdlg.h>}
+00004 \textcolor{preprocessor}{#include "lms7002_gui_utilities.h"}
+00005 \textcolor{preprocessor}{#include "numericSlider.h"}
+00006 \textcolor{preprocessor}{#include "lms7suiteEvents.h"}
+00007 \textcolor{preprocessor}{#include "lms7002_dlgVCOfrequencies.h"}
+00008 \textcolor{preprocessor}{#include "lms7_device.h"}
+00009 \textcolor{preprocessor}{#include "FPGA_common.h"}
+00010 \textcolor{preprocessor}{#include "Logger.h"}
+00011 \textcolor{keyword}{using namespace }lime;
+00012 
+00013 lms7002_pnlCLKGEN_view::lms7002_pnlCLKGEN_view( wxWindow* parent )
+00014 :
+00015 pnlCLKGEN_view( parent )
+00016 \{
+00017 
+00018 \}
+00019 
+00020 lms7002_pnlCLKGEN_view::lms7002_pnlCLKGEN_view( wxWindow* parent, wxWindowID \textcolor{keywordtype}{id}, \textcolor{keyword}{const} wxPoint& pos, \textcolor{keyword}{const} 
+      wxSize& size, \textcolor{keywordtype}{long} style )
+00021     : pnlCLKGEN_view(parent, id, pos, size, style), lmsControl(nullptr)
+00022 \{
+00023     sizerR3->Add(\textcolor{keyword}{new} wxStaticText(\textcolor{keyword}{this}, wxID\_ANY, \_(\textcolor{stringliteral}{"CMPLO\_CTRL:"})), 1, wxEXPAND, 0);
+00024     cmbCMPLO_CTRL = \textcolor{keyword}{new} wxComboBox(\textcolor{keyword}{this}, wxID\_ANY);
+00025     cmbCMPLO_CTRL->Append(\_(\textcolor{stringliteral}{"Low threshold is set to 0.18V"}));
+00026     cmbCMPLO_CTRL->Append(\_(\textcolor{stringliteral}{"Low threshold is set to 0.1V"}));
+00027     cmbCMPLO_CTRL->Connect(wxEVT\_COMMAND\_COMBOBOX\_SELECTED, wxCommandEventHandler(
+      lms7002_pnlCLKGEN_view::ParameterChangeHandler), NULL, \textcolor{keyword}{this});
+00028     sizerR3->Add(cmbCMPLO_CTRL, 0, 0, 5);
+00029     wndId2Enum[cmbCMPLO_CTRL] = LMS7_CMPLO_CTRL_CGEN;
+00030 
+00031     wndId2Enum[cmbCLKH_OV_CLKL_CGEN] = LMS7param(CLKH_OV_CLKL_CGEN);
+00032     wndId2Enum[chkCOARSE_START_CGEN] = LMS7param(COARSE_START_CGEN);
+00033     wndId2Enum[cmbCP2_CGEN] = LMS7param(CP2_CGEN);
+00034     wndId2Enum[cmbCP3_CGEN] = LMS7param(CP3_CGEN);
+00035     wndId2Enum[cmbCSW_VCO_CGEN] = LMS7param(CSW_VCO_CGEN);
+00036     wndId2Enum[cmbCZ_CGEN] = LMS7param(CZ_CGEN);
+00037     wndId2Enum[chkEN_COARSE_CKLGEN] = LMS7param(EN_COARSE_CKLGEN);
+00038     wndId2Enum[cmbEN_ADCCLKH_CLKGN] = LMS7param(EN_ADCCLKH_CLKGN);
+00039     wndId2Enum[chkEN_G_CGEN] = LMS7param(EN_G_CGEN);
+00040     wndId2Enum[chkEN_INTONLY_SDM_CGEN] = LMS7param(EN_INTONLY_SDM_CGEN);
+00041     wndId2Enum[chkEN_SDM_CLK_CGEN] = LMS7param(EN_SDM_CLK_CGEN);
+00042     wndId2Enum[cmbICT_VCO_CGEN] = LMS7param(ICT_VCO_CGEN);
+00043     wndId2Enum[lblINT_SDM_CGEN] = LMS7param(INT_SDM_CGEN);
+00044     wndId2Enum[cmbIOFFSET_CP_CGEN] = LMS7param(IOFFSET_CP_CGEN);
+00045     wndId2Enum[cmbIPULSE_CP_CGEN] = LMS7param(IPULSE_CP_CGEN);
+00046     wndId2Enum[chkPD_CP_CGEN] = LMS7param(PD_CP_CGEN);
+00047     wndId2Enum[chkPD_FDIV_FB_CGEN] = LMS7param(PD_FDIV_FB_CGEN);
+00048     wndId2Enum[chkPD_FDIV_O_CGEN] = LMS7param(PD_FDIV_O_CGEN);
+00049     wndId2Enum[chkPD_SDM_CGEN] = LMS7param(PD_SDM_CGEN);
+00050     wndId2Enum[chkPD_VCO_CGEN] = LMS7param(PD_VCO_CGEN);
+00051     wndId2Enum[chkPD_VCO_COMP_CGEN] = LMS7param(PD_VCO_COMP_CGEN);
+00052     wndId2Enum[chkRESET_N_CGEN] = LMS7param(RESET_N_CGEN);
+00053     wndId2Enum[chkREVPH_PFD_CGEN] = LMS7param(REVPH_PFD_CGEN);
+00054     wndId2Enum[chkREV_CLKADC_CGEN] = LMS7param(REV_CLKADC_CGEN);
+00055     wndId2Enum[chkREV_CLKDAC_CGEN] = LMS7param(REV_CLKDAC_CGEN);
+00056     wndId2Enum[chkREV_SDMCLK_CGEN] = LMS7param(REV_SDMCLK_CGEN);
+00057     wndId2Enum[rgrSEL_SDMCLK_CGEN] = LMS7param(SEL_SDMCLK_CGEN);
+00058     wndId2Enum[chkSPDUP_VCO_CGEN] = LMS7param(SPDUP_VCO_CGEN);
+00059     wndId2Enum[chkSX_DITHER_EN_CGEN] = LMS7param(SX_DITHER_EN_CGEN);
+00060     wndId2Enum[cmbTST_CGEN] = LMS7param(TST_CGEN);
+00061 
+00062     wxArrayString temp;
+00063     temp.clear();
+00064     temp.push\_back(\_(\textcolor{stringliteral}{"1"}));
+00065     temp.push\_back(\_(\textcolor{stringliteral}{"2"}));
+00066     temp.push\_back(\_(\textcolor{stringliteral}{"4"}));
+00067     temp.push\_back(\_(\textcolor{stringliteral}{"8"}));
+00068     cmbCLKH_OV_CLKL_CGEN->Set(temp);
+00069 
+00070     temp.clear();
+00071     \textcolor{keywordflow}{for} (\textcolor{keywordtype}{int} i = 0; i<16; ++i)
+00072     \{
+00073         temp.push\_back(wxString::Format(\_(\textcolor{stringliteral}{"%.3f pF"}), (i * 6 * 63.2) / 1000.0));
+00074     \}
+00075     cmbCP2_CGEN->Set(temp);
+00076 
+00077     temp.clear();
+00078     \textcolor{keywordflow}{for} (\textcolor{keywordtype}{int} i = 0; i<16; ++i)
+00079     \{
+00080         temp.push\_back(wxString::Format(\_(\textcolor{stringliteral}{"%.3f pF"}), (i*248.0) / 1000.0));
+00081     \}
+00082     cmbCP3_CGEN->Set(temp);
+00083 
+00084     temp.clear();
+00085     \textcolor{keywordflow}{for} (\textcolor{keywordtype}{int} i = 0; i<16; ++i)
+00086     \{
+00087         temp.push\_back(wxString::Format(\_(\textcolor{stringliteral}{"%.0f pF"}), (i * 8 * 365.0) / 1000.0));
+00088     \}
+00089     cmbCZ_CGEN->Set(temp);
+00090 
+00091     temp.clear();
+00092     temp.push\_back(\_(\textcolor{stringliteral}{"TST disabled"}));
+00093     temp.push\_back(\_(\textcolor{stringliteral}{"TST[0]=ADC clk; TST[1]=DAC clk; TSTA=Hi Z"}));
+00094     temp.push\_back(\_(\textcolor{stringliteral}{"TST[0]=SDM clk; TST[1]=FBD output; TSTA=Vtune@60kOhm"}));
+00095     temp.push\_back(\_(\textcolor{stringliteral}{"TST[0]=Ref clk; TST[1]=FBD output; TSTA=Vtune@10kOhm"}));
+00096     temp.push\_back(\_(\textcolor{stringliteral}{"TST[0]=Hi Z; TST[1]=Hi Z; TSTA=Hi Z"}));
+00097     temp.push\_back(\_(\textcolor{stringliteral}{"TST[0]=CP Down offset; TST[1]=CP Up offset; TSTA=Hi Z"}));
+00098     temp.push\_back(\_(\textcolor{stringliteral}{"TST[0]=Hi Z; TST[1]=Hi Z; TSTA=Vtune@60kOhm"}));
+00099     temp.push\_back(\_(\textcolor{stringliteral}{"TST[0]=Hi Z; TST[1]=Hi Z; TSTA=Vtune@10kOhm"}));
+00100     cmbTST_CGEN->Set(temp);
+00101 
+00102     LMS7002_WXGUI::UpdateTooltips(wndId2Enum, \textcolor{keyword}{true});
+00103 \}
+00104 
+00105 \textcolor{keywordtype}{void} lms7002_pnlCLKGEN_view::Initialize(lms_device_t* pControl)
+00106 \{
+00107     lmsControl = pControl;
+00108     assert(lmsControl != \textcolor{keyword}{nullptr});
+00109     \textcolor{keywordtype}{double} freq;
+00110     LMS_GetClockFreq(lmsControl,LMS_CLOCK_CGEN,&freq);
+00111     txtFrequency->SetValue(wxString::Format(\_(\textcolor{stringliteral}{"%.3f"}), freq));
+00112     LMS_GetClockFreq(lmsControl,LMS_CLOCK_REF,&freq);
+00113     lblRefClk_MHz->SetLabel(wxString::Format(\_(\textcolor{stringliteral}{"%.3f"}), freq));
+00114 \}
+00115 
+00116 \textcolor{keywordtype}{void} lms7002_pnlCLKGEN_view::ParameterChangeHandler(wxSpinEvent& event)
+00117 \{
+00118     wxCommandEvent evt;
+00119     evt.SetInt(event.GetInt());
+00120     evt.SetId(event.GetId());
+00121     evt.SetEventObject(event.GetEventObject());
+00122     ParameterChangeHandler(evt);
+00123 \}
+00124 
+00125 \textcolor{keywordtype}{void} lms7002_pnlCLKGEN_view::ParameterChangeHandler(wxCommandEvent& event)
+00126 \{
+00127     assert(lmsControl != \textcolor{keyword}{nullptr});
+00128     LMS7Parameter parameter;
+00129     \textcolor{keywordflow}{try}
+00130     \{
+00131         parameter = wndId2Enum.at(reinterpret\_cast<wxWindow*>(event.GetEventObject()));
+00132     \}
+00133     \textcolor{keywordflow}{catch} (std::exception & e)
+00134     \{
+00135         std::cout << \textcolor{stringliteral}{"Control element(ID = "} << \textcolor{keyword}{event}.GetId() << \textcolor{stringliteral}{") don't have assigned LMS parameter."} << 
+      std::endl;
+00136         \textcolor{keywordflow}{return};
+00137     \}
+00138 
+00139     LMS_WriteParam(lmsControl,parameter,event.GetInt());
+00140 
+00141     \textcolor{keywordflow}{if}(event.GetEventObject() == cmbEN_ADCCLKH_CLKGN)
+00142         UpdateInterfaceFrequencies();
+00143     \textcolor{keywordflow}{else} \textcolor{keywordflow}{if}(event.GetEventObject() == cmbCSW_VCO_CGEN)
+00144     \{
+00145         OnbtnReadComparators(event);
+00146     \}
+00147     \textcolor{keywordflow}{else} \textcolor{keywordflow}{if}(event.GetEventObject() == cmbCLKH_OV_CLKL_CGEN)
+00148     \{
+00149         \textcolor{keywordtype}{double} cgenFreq;
+00150         txtFrequency->GetValue().ToDouble(&cgenFreq);
+00151         txtFrequencyCLKL->SetValue(wxString::Format(\_(\textcolor{stringliteral}{"%.3f"}), cgenFreq / pow(2.0, 
+      cmbCLKH_OV_CLKL_CGEN->GetSelection())));
+00152         UpdateInterfaceFrequencies();
+00153         UpdateCLKL();
+00154     \}
+00155 \}
+00156 
+00157  \textcolor{keywordtype}{void} lms7002_pnlCLKGEN_view::OnAutoPhase(wxCommandEvent& event)
+00158  \{
+00159      \textcolor{keywordtype}{bool} disabled = this->chkAutoPhase->GetValue();
+00160      this->txPhase->Enable(!disabled);
+00161      this->rxPhase->Enable(!disabled);
+00162  \}
+00163 
+00164 \textcolor{keywordtype}{void} lms7002_pnlCLKGEN_view::onbtnCalculateClick(wxSpinEvent& event)
+00165 \{
+00166     \textcolor{keywordtype}{double} freqMHz;
+00167     \textcolor{keyword}{auto} device = ((LMS7_Device*)lmsControl);
+00168     txtFrequency->GetValue().ToDouble(&freqMHz);
+00169     LMS7002M* lms = device->GetLMS();
+00170     lms->Modify_SPI_Reg_bits(LMS7param(MAC),1,\textcolor{keyword}{true});
+00171     \textcolor{keywordtype}{int} interp = lms->Get_SPI_Reg_bits(LMS7param(HBI_OVR_TXTSP));
+00172     \textcolor{keywordtype}{int} decim = lms->Get_SPI_Reg_bits(LMS7param(HBD_OVR_RXTSP));
+00173     \textcolor{keywordflow}{if} (lms->SetInterfaceFrequency(freqMHz*1e6, interp, decim))
+00174     \{
+00175         wxMessageBox(\_(\textcolor{stringliteral}{"CLKGEN: failed to set interface frequency"}));
+00176         \textcolor{keywordflow}{return};
+00177     \}
+00178     device->SetFPGAInterfaceFreq(interp, decim, txPhase->GetValue(), rxPhase->GetValue());
+00179 
+00180     \textcolor{keyword}{auto} freq = lms->GetFrequencyCGEN();
+00181     lblRealOutFrequency->SetLabel(wxString::Format(\_(\textcolor{stringliteral}{"%f"}), freq / 1e6));
+00182     UpdateGUI();
+00183     wxCommandEvent evt;
+00184     evt.SetEventType(CGEN\_FREQUENCY\_CHANGED);
+00185     wxPostEvent(\textcolor{keyword}{this}, evt);
+00186     wxCommandEvent cmd;
+00187     cmd.SetString(\_(\textcolor{stringliteral}{"CGEN frequency set to "}) + lblRealOutFrequency->GetLabel() + \_(\textcolor{stringliteral}{" MHz"}));
+00188     cmd.SetEventType(LOG\_MESSAGE);
+00189     cmd.SetInt(lime::LOG_LEVEL_INFO);
+00190     wxPostEvent(\textcolor{keyword}{this}, cmd);
+00191 \}
+00192 
+00193 \textcolor{keywordtype}{void} lms7002_pnlCLKGEN_view::onbtnCalculateClick( wxCommandEvent& event )
+00194 \{
+00195     \textcolor{keywordtype}{double} freqMHz;
+00196     \textcolor{keyword}{auto} device = ((LMS7_Device*)lmsControl);
+00197     txtFrequency->GetValue().ToDouble(&freqMHz);
+00198     LMS7002M* lms = ((LMS7_Device*)lmsControl)->GetLMS();
+00199     lms->Modify_SPI_Reg_bits(LMS7param(MAC),1,\textcolor{keyword}{true});
+00200     \textcolor{keywordtype}{int} interp = lms->Get_SPI_Reg_bits(LMS7param(HBI_OVR_TXTSP));
+00201     \textcolor{keywordtype}{int} decim = lms->Get_SPI_Reg_bits(LMS7param(HBD_OVR_RXTSP));
+00202     \textcolor{keywordflow}{if} (lms->SetInterfaceFrequency(freqMHz*1e6, interp, decim))
+00203     \{
+00204         wxMessageBox(\_(\textcolor{stringliteral}{"CLKGEN: failed to set interface frequency"}));
+00205         \textcolor{keyword}{auto} freq = lms->GetFrequencyCGEN();
+00206         lblRealOutFrequency->SetLabel(wxString::Format(\_(\textcolor{stringliteral}{"%f"}), freq / 1e6));
+00207         UpdateGUI();
+00208         return ;
+00209     \}
+00210 
+00211     \textcolor{keywordtype}{int} status;
+00212     \textcolor{keywordflow}{if} (this->chkAutoPhase->GetValue())
+00213         status = device->SetFPGAInterfaceFreq(interp, decim);
+00214     \textcolor{keywordflow}{else}
+00215         status = device->SetFPGAInterfaceFreq(interp, decim, txPhase->GetValue(), 
+      rxPhase->GetValue());
+00216     \textcolor{keywordflow}{if} (status != 0)
+00217         wxMessageBox(\_(\textcolor{stringliteral}{"CLKGEN: failed to set interface frequency"}));
+00218 
+00219     \textcolor{keyword}{auto} freq = lms->GetFrequencyCGEN();
+00220     lblRealOutFrequency->SetLabel(wxString::Format(\_(\textcolor{stringliteral}{"%f"}), freq / 1e6));
+00221     UpdateGUI();
+00222     wxCommandEvent evt;
+00223     evt.SetEventType(CGEN\_FREQUENCY\_CHANGED);
+00224     wxPostEvent(\textcolor{keyword}{this}, evt);
+00225     wxCommandEvent cmd;
+00226     cmd.SetString(\_(\textcolor{stringliteral}{"CGEN frequency set to "}) + lblRealOutFrequency->GetLabel() + \_(\textcolor{stringliteral}{" MHz"}));
+00227     cmd.SetEventType(LOG\_MESSAGE);
+00228     cmd.SetInt(lime::LOG_LEVEL_INFO);
+00229     wxPostEvent(\textcolor{keyword}{this}, cmd);
+00230 \}
+00231 
+00232 \textcolor{keywordtype}{void} lms7002_pnlCLKGEN_view::onbtnTuneClick( wxCommandEvent& event )
+00233 \{
+00234     \textcolor{keyword}{auto} device = ((LMS7_Device*)lmsControl);
+00235     LMS7002M* lms = device->GetLMS();
+00236     lms->Modify_SPI_Reg_bits(LMS7param(MAC),1,\textcolor{keyword}{true});
+00237     \textcolor{keywordflow}{if} (lms->TuneVCO(lime::LMS7002M::VCO_CGEN)!=0)
+00238     \{
+00239         wxMessageBox(wxString(\_(\textcolor{stringliteral}{"CLKGEN VCO Tune failed"})));
+00240         return ;
+00241     \}
+00242 
+00243     \textcolor{keywordtype}{int} interp = lms->Get_SPI_Reg_bits(LMS7param(HBI_OVR_TXTSP));
+00244     \textcolor{keywordtype}{int} decim = lms->Get_SPI_Reg_bits(LMS7param(HBD_OVR_RXTSP));
+00245 
+00246     \textcolor{keywordtype}{int} status;
+00247     \textcolor{keywordflow}{if} (this->chkAutoPhase->GetValue())
+00248         status = device->SetFPGAInterfaceFreq(interp, decim);
+00249     \textcolor{keywordflow}{else}
+00250         status = device->SetFPGAInterfaceFreq(interp, decim, txPhase->GetValue(), 
+      rxPhase->GetValue());
+00251     \textcolor{keywordflow}{if} (status != 0)
+00252         wxMessageBox(\_(\textcolor{stringliteral}{"CLKGEN VCO Tune: failed to set interface frequency"}));
+00253 
+00254     uint16\_t value;
+00255     LMS_ReadParam(lmsControl,LMS7param(CSW_VCO_CGEN),&value);
+00256     cmbCSW_VCO_CGEN->SetValue(value);
+00257     OnbtnReadComparators(event);
+00258 \}
+00259 
+00260 \textcolor{keywordtype}{void} lms7002_pnlCLKGEN_view::UpdateGUI()
+00261 \{
+00262     LMS7002_WXGUI::UpdateControlsByMap(\textcolor{keyword}{this}, lmsControl, wndId2Enum);
+00263     wxCommandEvent evt;
+00264     OnbtnReadComparators(evt);
+00265     UpdateInterfaceFrequencies();
+00266     UpdateCLKL();
+00267     \textcolor{keywordtype}{double} freq;
+00268     LMS_GetClockFreq(lmsControl,LMS_CLOCK_CGEN,&freq);
+00269     lblRealOutFrequency->SetLabel(wxString::Format(\_(\textcolor{stringliteral}{"%f"}), freq / 1e6));
+00270     txtFrequency->SetValue(wxString::Format(\_(\textcolor{stringliteral}{"%.3f"}), freq / 1e6));
+00271     LMS_GetClockFreq(lmsControl,LMS_CLOCK_REF,&freq);
+00272     lblRefClk_MHz->SetLabel(wxString::Format(\_(\textcolor{stringliteral}{"%.3f"}),freq / 1e6 ));
+00273     uint16\_t value;
+00274     LMS_ReadParam(lmsControl,LMS7param(FRAC\_SDM\_CGEN\_MSB),&value);
+00275     \textcolor{keywordtype}{int} fracValue = value << 16;
+00276     LMS_ReadParam(lmsControl,LMS7param(FRAC\_SDM\_CGEN\_LSB),&value);
+00277     fracValue |= 0;
+00278     lblFRAC_SDM_CGEN->SetLabel(wxString::Format(\textcolor{stringliteral}{"%i"}, fracValue));
+00279     LMS_ReadParam(lmsControl,LMS7param(DIV_OUTCH_CGEN),&value);
+00280     lblDivider->SetLabel(wxString::Format(\textcolor{stringliteral}{"2^%i"}, value+1));
+00281 \}
+00282 
+00283 \textcolor{keywordtype}{void} lms7002_pnlCLKGEN_view::UpdateInterfaceFrequencies()
+00284 \{
+00285     \textcolor{keywordtype}{double} freq;
+00286     LMS_GetClockFreq(lmsControl,LMS_CLOCK_RXTSP,&freq);
+00287     lblRxTSPfreq->SetLabel(wxString::Format(\_(\textcolor{stringliteral}{"%.3f"}), freq / 1e6));
+00288     LMS_GetClockFreq(lmsControl,LMS_CLOCK_TXTSP,&freq);
+00289     lblTxTSPfreq->SetLabel(wxString::Format(\_(\textcolor{stringliteral}{"%.3f"}), freq / 1e6));
+00290 \}
+00291 
+00292 \textcolor{keywordtype}{void} lms7002_pnlCLKGEN_view::OnbtnReadComparators(wxCommandEvent& event)
+00293 \{
+00294 
+00295     uint16\_t param;
+00296     LMS_ReadParam(lmsControl,LMS7param(VCO_CMPHO_CGEN),&param);
+00297 
+00298     lblVCO_CMPHO_CGEN->SetLabel(wxString::Format(\_(\textcolor{stringliteral}{"%i"}), param));
+00299     \textcolor{keywordflow}{if} (param == 1)
+00300         lblVCO_CMPHO_CGEN->SetBackgroundColour(*wxGREEN);
+00301     \textcolor{keywordflow}{else}
+00302         lblVCO_CMPHO_CGEN->SetBackgroundColour(*wxRED);
+00303 
+00304     LMS_ReadParam(lmsControl,LMS7param(VCO_CMPLO_CGEN),&param);
+00305 
+00306     lblVCO_CMPLO_CGEN->SetLabel(wxString::Format(\_(\textcolor{stringliteral}{"%i"}), param));
+00307     \textcolor{keywordflow}{if} (param == 0)
+00308         lblVCO_CMPLO_CGEN->SetBackgroundColour(*wxGREEN);
+00309     \textcolor{keywordflow}{else}
+00310         lblVCO_CMPLO_CGEN->SetBackgroundColour(*wxRED);
+00311 \}
+00312 
+00313 \textcolor{keywordtype}{void} lms7002_pnlCLKGEN_view::OnbtnUpdateCoarse(wxCommandEvent& event)
+00314 \{
+00315     uint16\_t param;
+00316     LMS_ReadParam(lmsControl,LMS7param(COARSE_STEPDONE),&param);
+00317     lblCOARSE_STEPDONE_CGEN->SetLabel(wxString::Format(\_(\textcolor{stringliteral}{"%i"}), param));
+00318     LMS_ReadParam(lmsControl,LMS7param(COARSEPLL_COMPO_CGEN),&param);
+00319     lblCOARSEPLL_COMPO_CGEN->SetLabel(wxString::Format(\_(\textcolor{stringliteral}{"%i"}), param));
+00320 \}
+00321 
+00322 \textcolor{keywordtype}{void} lms7002_pnlCLKGEN_view::UpdateCLKL()
+00323 \{
+00324     \textcolor{keywordtype}{int} dMul;
+00325     dMul = cmbCLKH_OV_CLKL_CGEN->GetSelection();
+00326     \textcolor{keywordtype}{double} cgenFreq;
+00327     txtFrequency->GetValue().ToDouble(&cgenFreq);
+00328     \textcolor{keywordtype}{double} clklfreq = cgenFreq / pow(2.0, dMul);
+00329     txtFrequencyCLKL->SetLabel(wxString::Format(\textcolor{stringliteral}{"%.3f"}, clklfreq));
+00330 \}
+00331 
+00332 \textcolor{keywordtype}{void} lms7002_pnlCLKGEN_view::OnShowVCOclicked(wxCommandEvent& event)
+00333 \{
+00334     lms7002_dlgVCOfrequencies* dlg = \textcolor{keyword}{new} lms7002_dlgVCOfrequencies(\textcolor{keyword}{this}, 
+      lmsControl);
+00335     dlg->ShowModal();
+00336     dlg->Destroy();
+00337 \}
+\end{DoxyCode}

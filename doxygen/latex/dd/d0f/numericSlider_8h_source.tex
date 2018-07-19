@@ -1,0 +1,48 @@
+\subsection{numeric\+Slider.\+h}
+\label{numericSlider_8h_source}\index{/home/erik/prefix/default/src/limesuite-\/dev/src/numeric\+Slider/numeric\+Slider.\+h@{/home/erik/prefix/default/src/limesuite-\/dev/src/numeric\+Slider/numeric\+Slider.\+h}}
+
+\begin{DoxyCode}
+00001 
+00007 \textcolor{preprocessor}{#ifndef NUMERIC\_SLIDER\_H}
+00008 \textcolor{preprocessor}{#define NUMERIC\_SLIDER\_H}
+00009 
+00010 \textcolor{preprocessor}{#include <wx/wx.h>}
+00011 \textcolor{preprocessor}{#include <wx/panel.h>}
+00012 
+00013 \textcolor{keyword}{class }wxSpinCtrl;
+00014 \textcolor{keyword}{class }wxScrollBar;
+00015 
+00016 \textcolor{keyword}{class }NumericSlider : \textcolor{keyword}{public} wxPanel
+00017 \{
+00018 \textcolor{keyword}{public}:
+00019     NumericSlider();
+00020     NumericSlider(wxWindow* parent,
+00021         wxWindowID \textcolor{keywordtype}{id} = wxID\_ANY,
+00022         \textcolor{keyword}{const} wxString &value = wxEmptyString,
+00023         \textcolor{keyword}{const} wxPoint &pos = wxDefaultPosition,
+00024         \textcolor{keyword}{const} wxSize &size = wxDefaultSize,
+00025         \textcolor{keywordtype}{long} style = wxSP\_ARROW\_KEYS,
+00026         \textcolor{keywordtype}{int} min = 0,
+00027         \textcolor{keywordtype}{int} max = 100,
+00028         \textcolor{keywordtype}{int} initial = 0,
+00029         \textcolor{keyword}{const} wxString &name = \textcolor{stringliteral}{"numericSlider"}
+00030         );
+00031    ~NumericSlider();
+00032 
+00033    \textcolor{keywordtype}{void} SetValue(\textcolor{keywordtype}{int} integer);
+00034    \textcolor{keywordtype}{int} GetValue();
+00035 
+00036    \textcolor{keyword}{virtual} \textcolor{keywordtype}{void} SetToolTip(\textcolor{keyword}{const} wxString &tipString);
+00037 \textcolor{keyword}{protected}:
+00038     \textcolor{keywordtype}{void} OnSpinnerChangeEnter(wxSpinEvent &event);
+00039     \textcolor{keywordtype}{void} OnSpinnerChange(wxSpinEvent &event);
+00040     \textcolor{keywordtype}{void} OnScrollChange(wxScrollEvent &event);
+00041     wxSpinCtrl* mSpinner;
+00042     wxScrollBar* mScroll;
+00043 \textcolor{keyword}{private}:
+00044     DECLARE\_DYNAMIC\_CLASS(NumericSlider)
+00045     DECLARE\_EVENT\_TABLE()
+00046 \};
+00047 
+00048 \textcolor{preprocessor}{#endif}
+\end{DoxyCode}

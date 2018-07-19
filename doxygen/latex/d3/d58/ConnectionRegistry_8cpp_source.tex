@@ -1,0 +1,116 @@
+\subsection{Connection\+Registry.\+cpp}
+\label{ConnectionRegistry_8cpp_source}\index{/home/erik/prefix/default/src/limesuite-\/dev/src/\+Connection\+Registry/\+Connection\+Registry.\+cpp@{/home/erik/prefix/default/src/limesuite-\/dev/src/\+Connection\+Registry/\+Connection\+Registry.\+cpp}}
+
+\begin{DoxyCode}
+00001 
+00007 \textcolor{preprocessor}{#include "ConnectionRegistry.h"}
+00008 \textcolor{preprocessor}{#include "IConnection.h"}
+00009 \textcolor{preprocessor}{#include <mutex>}
+00010 \textcolor{preprocessor}{#include <map>}
+00011 \textcolor{preprocessor}{#include <memory>}
+00012 \textcolor{preprocessor}{#include <iostream>}
+00013 \textcolor{preprocessor}{#include <iso646.h>} \textcolor{comment}{// alternative operators for visual c++: not, and, or...}
+00014 \textcolor{keyword}{using namespace }lime;
+00015 
+00016 \textcolor{keywordtype}{void} __loadAllConnections(\textcolor{keywordtype}{void});
+00017 
+00018 \textcolor{comment}{/*******************************************************************}
+00019 \textcolor{comment}{ * Registry data structures}
+00020 \textcolor{comment}{ ******************************************************************/}
+00021 \textcolor{keyword}{static} std::mutex &registryMutex(\textcolor{keywordtype}{void})
+00022 \{
+00023     \textcolor{keyword}{static} std::mutex mutex;
+00024     \textcolor{keywordflow}{return} mutex;
+00025 \}
+00026 
+00027 \textcolor{keyword}{static} std::map<std::string, ConnectionRegistryEntry *> registryEntries;
+00028 
+00029 
+00030 \textcolor{comment}{/*******************************************************************}
+00031 \textcolor{comment}{ * Registry implementation}
+00032 \textcolor{comment}{ ******************************************************************/}
+00033 std::vector<ConnectionHandle> ConnectionRegistry::findConnections(\textcolor{keyword}{const} 
+      ConnectionHandle &hint)
+00034 \{
+00035     __loadAllConnections();
+00036     std::lock\_guard<std::mutex> lock(registryMutex());
+00037 
+00038     std::vector<ConnectionHandle> results;
+00039     \textcolor{keywordflow}{for} (\textcolor{keyword}{const} \textcolor{keyword}{auto} &entry : registryEntries)
+00040     \{
+00041         \textcolor{comment}{//filter by module name when specified}
+00042         \textcolor{keywordflow}{if} (not hint.module.empty() and hint.module != entry.first) \textcolor{keywordflow}{continue};
+00043 
+00044         \textcolor{keywordflow}{for} (\textcolor{keyword}{auto} handle : entry.second->enumerate(hint))
+00045         \{
+00046             \textcolor{comment}{//insert the module name, which can be filtered on in makeConnection()}
+00047             handle.module = entry.first;
+00048             results.push\_back(handle);
+00049         \}
+00050     \}
+00051     \textcolor{keywordflow}{return} results;
+00052 \}
+00053 
+00054 IConnection *ConnectionRegistry::makeConnection(\textcolor{keyword}{const} ConnectionHandle &handle)
+00055 \{
+00056     __loadAllConnections();
+00057     std::lock\_guard<std::mutex> lock(registryMutex());
+00058 
+00059     \textcolor{comment}{//use the identifier as a hint to perform a discovery}
+00060     \textcolor{comment}{//only identifiers from the discovery function itself is used in the factory}
+00061     \textcolor{keywordflow}{for} (\textcolor{keyword}{const} \textcolor{keyword}{auto} &entry : registryEntries)
+00062     \{
+00063         \textcolor{comment}{//filter by module name when specified}
+00064         \textcolor{keywordflow}{if} (not handle.module.empty() and handle.module != entry.first) \textcolor{keywordflow}{continue};
+00065 
+00066         \textcolor{keyword}{const} \textcolor{keyword}{auto} r = entry.second->enumerate(handle);
+00067         \textcolor{keywordflow}{if} (r.empty()) \textcolor{keywordflow}{continue};
+00068 
+00069         \textcolor{keyword}{auto} realHandle = r.front(); \textcolor{comment}{//just pick the first}
+00070         realHandle.module = entry.first;
+00071 
+00072         \textcolor{keywordflow}{return} entry.second->make(realHandle);
+00073 
+00074     \}
+00075 
+00076     \textcolor{keywordflow}{return} \textcolor{keyword}{nullptr};
+00077 \}
+00078 
+00079 \textcolor{keywordtype}{void} ConnectionRegistry::freeConnection(IConnection *conn)
+00080 \{
+00081     \textcolor{comment}{//some client code may end up freeing a null connection}
+00082     \textcolor{keywordflow}{if} (conn == \textcolor{keyword}{nullptr}) \textcolor{keywordflow}{return};
+00083 
+00084     std::lock\_guard<std::mutex> lock(registryMutex());
+00085 
+00086     \textcolor{keyword}{delete} conn;
+00087 \}
+00088 
+00089 std::vector<std::string> ConnectionRegistry::moduleNames(\textcolor{keywordtype}{void})
+00090 \{
+00091     __loadAllConnections();
+00092     std::vector<std::string> names;
+00093     std::lock\_guard<std::mutex> lock(registryMutex());
+00094     \textcolor{keywordflow}{for} (\textcolor{keyword}{const} \textcolor{keyword}{auto} &entry : registryEntries)
+00095     \{
+00096         names.push\_back(entry.first);
+00097     \}
+00098     \textcolor{keywordflow}{return} names;
+00099 \}
+00100 
+00101 \textcolor{comment}{/*******************************************************************}
+00102 \textcolor{comment}{ * Entry implementation}
+00103 \textcolor{comment}{ ******************************************************************/}
+00104 ConnectionRegistryEntry::ConnectionRegistryEntry(\textcolor{keyword}{const} std::string &name):
+00105     \_name(name)
+00106 \{
+00107     std::lock\_guard<std::mutex> lock(registryMutex());
+00108     registryEntries[_name] = \textcolor{keyword}{this};
+00109 \}
+00110 
+00111 ConnectionRegistryEntry::~ConnectionRegistryEntry(\textcolor{keywordtype}{void})
+00112 \{
+00113     std::lock\_guard<std::mutex> lock(registryMutex());
+00114     registryEntries.erase(_name);
+00115 \}
+\end{DoxyCode}

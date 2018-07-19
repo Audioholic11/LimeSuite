@@ -1,0 +1,326 @@
+\subsection{/home/erik/prefix/default/src/limesuite-\/dev/src/\+Connection\+Novena\+R\+F7/\+Connection\+Novena\+R\+F7\+\_\+streaming.cpp File Reference}
+\label{ConnectionNovenaRF7__streaming_8cpp}\index{/home/erik/prefix/default/src/limesuite-\/dev/src/\+Connection\+Novena\+R\+F7/\+Connection\+Novena\+R\+F7\+\_\+streaming.\+cpp@{/home/erik/prefix/default/src/limesuite-\/dev/src/\+Connection\+Novena\+R\+F7/\+Connection\+Novena\+R\+F7\+\_\+streaming.\+cpp}}
+{\ttfamily \#include \char`\"{}Connection\+Novena\+R\+F7.\+h\char`\"{}}\\*
+{\ttfamily \#include $<$stdio.\+h$>$}\\*
+{\ttfamily \#include $<$stdlib.\+h$>$}\\*
+{\ttfamily \#include $<$fcntl.\+h$>$}\\*
+{\ttfamily \#include $<$errno.\+h$>$}\\*
+{\ttfamily \#include $<$string.\+h$>$}\\*
+{\ttfamily \#include $<$sys/stat.\+h$>$}\\*
+{\ttfamily \#include $<$fstream$>$}\\*
+{\ttfamily \#include $<$chrono$>$}\\*
+{\ttfamily \#include $<$thread$>$}\\*
+{\ttfamily \#include \char`\"{}I\+Connection.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}Error\+Reporting.\+h\char`\"{}}\\*
+Include dependency graph for Connection\+Novena\+R\+F7\+\_\+streaming.\+cpp\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{df/d26/ConnectionNovenaRF7__streaming_8cpp__incl}
+\end{center}
+\end{figure}
+\subsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define {\bf I\+M\+X6\+\_\+\+E\+I\+M\+\_\+\+B\+A\+S\+E\+\_\+\+A\+D\+DR}~0x021b8000
+\item 
+\#define {\bf I\+M\+X6\+\_\+\+E\+I\+M\+\_\+\+C\+S0\+\_\+\+B\+A\+SE}~(0x00)
+\item 
+\#define {\bf I\+M\+X6\+\_\+\+E\+I\+M\+\_\+\+C\+S1\+\_\+\+B\+A\+SE}~(0x18)
+\item 
+\#define {\bf I\+M\+X6\+\_\+\+E\+I\+M\+\_\+\+C\+S2\+\_\+\+B\+A\+SE}~(0x30)
+\item 
+\#define {\bf I\+M\+X6\+\_\+\+E\+I\+M\+\_\+\+C\+S3\+\_\+\+B\+A\+SE}~(0x48)
+\item 
+\#define {\bf I\+M\+X6\+\_\+\+E\+I\+M\+\_\+\+W\+CR}~(0x90)
+\item 
+\#define {\bf I\+M\+X6\+\_\+\+E\+I\+M\+\_\+\+W\+I\+AR}~(0x94)
+\item 
+\#define {\bf I\+M\+X6\+\_\+\+E\+I\+M\+\_\+\+C\+S0\+\_\+\+B\+A\+S\+E\+\_\+\+A\+D\+DR}~0x08040000
+\item 
+\#define {\bf I\+M\+X6\+\_\+\+E\+I\+M\+\_\+\+C\+S1\+\_\+\+B\+A\+S\+E\+\_\+\+A\+D\+DR}~0x0c040000
+\item 
+\#define {\bf D\+A\+T\+A\+\_\+\+F\+I\+F\+O\+\_\+\+A\+D\+DR}~({\bf I\+M\+X6\+\_\+\+E\+I\+M\+\_\+\+C\+S1\+\_\+\+B\+A\+S\+E\+\_\+\+A\+D\+DR} + 0xf000)
+\end{DoxyCompactItemize}
+\subsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+{\bf int} {\bf fpga\+\_\+send} (unsigned const {\bf int} addr, const char $\ast$buf, const {\bf int} {\bf len})
+\item 
+{\bf int} {\bf fpga\+\_\+read} (unsigned const {\bf int} addr, unsigned short $\ast$buf, const {\bf int} {\bf len})
+\item 
+{\bf int} {\bf read\+Kernel\+Memory} (long offset, {\bf int} virtualized, {\bf int} {\bf size})
+\item 
+{\bf int} {\bf write\+Kernel\+Memory} (long offset, long value, {\bf int} virtualized, {\bf int} {\bf size})
+\item 
+{\bf int} {\bf prep\+\_\+eim\+\_\+burst} ()
+\end{DoxyCompactItemize}
+\subsubsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+static const {\bf int} {\bf c\+S\+P\+I\+\_\+\+S\+P\+E\+ED} = 5000000
+\item 
+bool {\bf eim\+\_\+configured} = false
+\end{DoxyCompactItemize}
+
+
+\subsubsection{Macro Definition Documentation}
+\index{Connection\+Novena\+R\+F7\+\_\+streaming.\+cpp@{Connection\+Novena\+R\+F7\+\_\+streaming.\+cpp}!D\+A\+T\+A\+\_\+\+F\+I\+F\+O\+\_\+\+A\+D\+DR@{D\+A\+T\+A\+\_\+\+F\+I\+F\+O\+\_\+\+A\+D\+DR}}
+\index{D\+A\+T\+A\+\_\+\+F\+I\+F\+O\+\_\+\+A\+D\+DR@{D\+A\+T\+A\+\_\+\+F\+I\+F\+O\+\_\+\+A\+D\+DR}!Connection\+Novena\+R\+F7\+\_\+streaming.\+cpp@{Connection\+Novena\+R\+F7\+\_\+streaming.\+cpp}}
+\paragraph[{D\+A\+T\+A\+\_\+\+F\+I\+F\+O\+\_\+\+A\+D\+DR}]{\setlength{\rightskip}{0pt plus 5cm}\#define D\+A\+T\+A\+\_\+\+F\+I\+F\+O\+\_\+\+A\+D\+DR~({\bf I\+M\+X6\+\_\+\+E\+I\+M\+\_\+\+C\+S1\+\_\+\+B\+A\+S\+E\+\_\+\+A\+D\+DR} + 0xf000)}\label{ConnectionNovenaRF7__streaming_8cpp_ab4884d4bf0d9759a2710eda815cd4cf5}
+
+
+Definition at line {\bf 45} of file {\bf Connection\+Novena\+R\+F7\+\_\+streaming.\+cpp}.
+
+\index{Connection\+Novena\+R\+F7\+\_\+streaming.\+cpp@{Connection\+Novena\+R\+F7\+\_\+streaming.\+cpp}!I\+M\+X6\+\_\+\+E\+I\+M\+\_\+\+B\+A\+S\+E\+\_\+\+A\+D\+DR@{I\+M\+X6\+\_\+\+E\+I\+M\+\_\+\+B\+A\+S\+E\+\_\+\+A\+D\+DR}}
+\index{I\+M\+X6\+\_\+\+E\+I\+M\+\_\+\+B\+A\+S\+E\+\_\+\+A\+D\+DR@{I\+M\+X6\+\_\+\+E\+I\+M\+\_\+\+B\+A\+S\+E\+\_\+\+A\+D\+DR}!Connection\+Novena\+R\+F7\+\_\+streaming.\+cpp@{Connection\+Novena\+R\+F7\+\_\+streaming.\+cpp}}
+\paragraph[{I\+M\+X6\+\_\+\+E\+I\+M\+\_\+\+B\+A\+S\+E\+\_\+\+A\+D\+DR}]{\setlength{\rightskip}{0pt plus 5cm}\#define I\+M\+X6\+\_\+\+E\+I\+M\+\_\+\+B\+A\+S\+E\+\_\+\+A\+D\+DR~0x021b8000}\label{ConnectionNovenaRF7__streaming_8cpp_a2bc9d9aed62c3d4d40fbd61158133124}
+
+
+Definition at line {\bf 34} of file {\bf Connection\+Novena\+R\+F7\+\_\+streaming.\+cpp}.
+
+\index{Connection\+Novena\+R\+F7\+\_\+streaming.\+cpp@{Connection\+Novena\+R\+F7\+\_\+streaming.\+cpp}!I\+M\+X6\+\_\+\+E\+I\+M\+\_\+\+C\+S0\+\_\+\+B\+A\+SE@{I\+M\+X6\+\_\+\+E\+I\+M\+\_\+\+C\+S0\+\_\+\+B\+A\+SE}}
+\index{I\+M\+X6\+\_\+\+E\+I\+M\+\_\+\+C\+S0\+\_\+\+B\+A\+SE@{I\+M\+X6\+\_\+\+E\+I\+M\+\_\+\+C\+S0\+\_\+\+B\+A\+SE}!Connection\+Novena\+R\+F7\+\_\+streaming.\+cpp@{Connection\+Novena\+R\+F7\+\_\+streaming.\+cpp}}
+\paragraph[{I\+M\+X6\+\_\+\+E\+I\+M\+\_\+\+C\+S0\+\_\+\+B\+A\+SE}]{\setlength{\rightskip}{0pt plus 5cm}\#define I\+M\+X6\+\_\+\+E\+I\+M\+\_\+\+C\+S0\+\_\+\+B\+A\+SE~(0x00)}\label{ConnectionNovenaRF7__streaming_8cpp_a69d2bc6528123a2c1812fae9a61a7039}
+
+
+Definition at line {\bf 35} of file {\bf Connection\+Novena\+R\+F7\+\_\+streaming.\+cpp}.
+
+\index{Connection\+Novena\+R\+F7\+\_\+streaming.\+cpp@{Connection\+Novena\+R\+F7\+\_\+streaming.\+cpp}!I\+M\+X6\+\_\+\+E\+I\+M\+\_\+\+C\+S0\+\_\+\+B\+A\+S\+E\+\_\+\+A\+D\+DR@{I\+M\+X6\+\_\+\+E\+I\+M\+\_\+\+C\+S0\+\_\+\+B\+A\+S\+E\+\_\+\+A\+D\+DR}}
+\index{I\+M\+X6\+\_\+\+E\+I\+M\+\_\+\+C\+S0\+\_\+\+B\+A\+S\+E\+\_\+\+A\+D\+DR@{I\+M\+X6\+\_\+\+E\+I\+M\+\_\+\+C\+S0\+\_\+\+B\+A\+S\+E\+\_\+\+A\+D\+DR}!Connection\+Novena\+R\+F7\+\_\+streaming.\+cpp@{Connection\+Novena\+R\+F7\+\_\+streaming.\+cpp}}
+\paragraph[{I\+M\+X6\+\_\+\+E\+I\+M\+\_\+\+C\+S0\+\_\+\+B\+A\+S\+E\+\_\+\+A\+D\+DR}]{\setlength{\rightskip}{0pt plus 5cm}\#define I\+M\+X6\+\_\+\+E\+I\+M\+\_\+\+C\+S0\+\_\+\+B\+A\+S\+E\+\_\+\+A\+D\+DR~0x08040000}\label{ConnectionNovenaRF7__streaming_8cpp_a60ab59fb7cf4ebca3ec404002d102695}
+
+
+Definition at line {\bf 42} of file {\bf Connection\+Novena\+R\+F7\+\_\+streaming.\+cpp}.
+
+\index{Connection\+Novena\+R\+F7\+\_\+streaming.\+cpp@{Connection\+Novena\+R\+F7\+\_\+streaming.\+cpp}!I\+M\+X6\+\_\+\+E\+I\+M\+\_\+\+C\+S1\+\_\+\+B\+A\+SE@{I\+M\+X6\+\_\+\+E\+I\+M\+\_\+\+C\+S1\+\_\+\+B\+A\+SE}}
+\index{I\+M\+X6\+\_\+\+E\+I\+M\+\_\+\+C\+S1\+\_\+\+B\+A\+SE@{I\+M\+X6\+\_\+\+E\+I\+M\+\_\+\+C\+S1\+\_\+\+B\+A\+SE}!Connection\+Novena\+R\+F7\+\_\+streaming.\+cpp@{Connection\+Novena\+R\+F7\+\_\+streaming.\+cpp}}
+\paragraph[{I\+M\+X6\+\_\+\+E\+I\+M\+\_\+\+C\+S1\+\_\+\+B\+A\+SE}]{\setlength{\rightskip}{0pt plus 5cm}\#define I\+M\+X6\+\_\+\+E\+I\+M\+\_\+\+C\+S1\+\_\+\+B\+A\+SE~(0x18)}\label{ConnectionNovenaRF7__streaming_8cpp_a5992fa1d901462150a983d478b0a9c12}
+
+
+Definition at line {\bf 36} of file {\bf Connection\+Novena\+R\+F7\+\_\+streaming.\+cpp}.
+
+\index{Connection\+Novena\+R\+F7\+\_\+streaming.\+cpp@{Connection\+Novena\+R\+F7\+\_\+streaming.\+cpp}!I\+M\+X6\+\_\+\+E\+I\+M\+\_\+\+C\+S1\+\_\+\+B\+A\+S\+E\+\_\+\+A\+D\+DR@{I\+M\+X6\+\_\+\+E\+I\+M\+\_\+\+C\+S1\+\_\+\+B\+A\+S\+E\+\_\+\+A\+D\+DR}}
+\index{I\+M\+X6\+\_\+\+E\+I\+M\+\_\+\+C\+S1\+\_\+\+B\+A\+S\+E\+\_\+\+A\+D\+DR@{I\+M\+X6\+\_\+\+E\+I\+M\+\_\+\+C\+S1\+\_\+\+B\+A\+S\+E\+\_\+\+A\+D\+DR}!Connection\+Novena\+R\+F7\+\_\+streaming.\+cpp@{Connection\+Novena\+R\+F7\+\_\+streaming.\+cpp}}
+\paragraph[{I\+M\+X6\+\_\+\+E\+I\+M\+\_\+\+C\+S1\+\_\+\+B\+A\+S\+E\+\_\+\+A\+D\+DR}]{\setlength{\rightskip}{0pt plus 5cm}\#define I\+M\+X6\+\_\+\+E\+I\+M\+\_\+\+C\+S1\+\_\+\+B\+A\+S\+E\+\_\+\+A\+D\+DR~0x0c040000}\label{ConnectionNovenaRF7__streaming_8cpp_a185a4cb13e6fbfb43b29d5f7d965ad23}
+
+
+Definition at line {\bf 43} of file {\bf Connection\+Novena\+R\+F7\+\_\+streaming.\+cpp}.
+
+\index{Connection\+Novena\+R\+F7\+\_\+streaming.\+cpp@{Connection\+Novena\+R\+F7\+\_\+streaming.\+cpp}!I\+M\+X6\+\_\+\+E\+I\+M\+\_\+\+C\+S2\+\_\+\+B\+A\+SE@{I\+M\+X6\+\_\+\+E\+I\+M\+\_\+\+C\+S2\+\_\+\+B\+A\+SE}}
+\index{I\+M\+X6\+\_\+\+E\+I\+M\+\_\+\+C\+S2\+\_\+\+B\+A\+SE@{I\+M\+X6\+\_\+\+E\+I\+M\+\_\+\+C\+S2\+\_\+\+B\+A\+SE}!Connection\+Novena\+R\+F7\+\_\+streaming.\+cpp@{Connection\+Novena\+R\+F7\+\_\+streaming.\+cpp}}
+\paragraph[{I\+M\+X6\+\_\+\+E\+I\+M\+\_\+\+C\+S2\+\_\+\+B\+A\+SE}]{\setlength{\rightskip}{0pt plus 5cm}\#define I\+M\+X6\+\_\+\+E\+I\+M\+\_\+\+C\+S2\+\_\+\+B\+A\+SE~(0x30)}\label{ConnectionNovenaRF7__streaming_8cpp_a263711532551a0e3a482fb27eaee1579}
+
+
+Definition at line {\bf 37} of file {\bf Connection\+Novena\+R\+F7\+\_\+streaming.\+cpp}.
+
+\index{Connection\+Novena\+R\+F7\+\_\+streaming.\+cpp@{Connection\+Novena\+R\+F7\+\_\+streaming.\+cpp}!I\+M\+X6\+\_\+\+E\+I\+M\+\_\+\+C\+S3\+\_\+\+B\+A\+SE@{I\+M\+X6\+\_\+\+E\+I\+M\+\_\+\+C\+S3\+\_\+\+B\+A\+SE}}
+\index{I\+M\+X6\+\_\+\+E\+I\+M\+\_\+\+C\+S3\+\_\+\+B\+A\+SE@{I\+M\+X6\+\_\+\+E\+I\+M\+\_\+\+C\+S3\+\_\+\+B\+A\+SE}!Connection\+Novena\+R\+F7\+\_\+streaming.\+cpp@{Connection\+Novena\+R\+F7\+\_\+streaming.\+cpp}}
+\paragraph[{I\+M\+X6\+\_\+\+E\+I\+M\+\_\+\+C\+S3\+\_\+\+B\+A\+SE}]{\setlength{\rightskip}{0pt plus 5cm}\#define I\+M\+X6\+\_\+\+E\+I\+M\+\_\+\+C\+S3\+\_\+\+B\+A\+SE~(0x48)}\label{ConnectionNovenaRF7__streaming_8cpp_a49b4551e6bffd9ce3e6a527f0ecd32bf}
+
+
+Definition at line {\bf 38} of file {\bf Connection\+Novena\+R\+F7\+\_\+streaming.\+cpp}.
+
+\index{Connection\+Novena\+R\+F7\+\_\+streaming.\+cpp@{Connection\+Novena\+R\+F7\+\_\+streaming.\+cpp}!I\+M\+X6\+\_\+\+E\+I\+M\+\_\+\+W\+CR@{I\+M\+X6\+\_\+\+E\+I\+M\+\_\+\+W\+CR}}
+\index{I\+M\+X6\+\_\+\+E\+I\+M\+\_\+\+W\+CR@{I\+M\+X6\+\_\+\+E\+I\+M\+\_\+\+W\+CR}!Connection\+Novena\+R\+F7\+\_\+streaming.\+cpp@{Connection\+Novena\+R\+F7\+\_\+streaming.\+cpp}}
+\paragraph[{I\+M\+X6\+\_\+\+E\+I\+M\+\_\+\+W\+CR}]{\setlength{\rightskip}{0pt plus 5cm}\#define I\+M\+X6\+\_\+\+E\+I\+M\+\_\+\+W\+CR~(0x90)}\label{ConnectionNovenaRF7__streaming_8cpp_ae164add8c851ca2aa93713f85dea7452}
+
+
+Definition at line {\bf 39} of file {\bf Connection\+Novena\+R\+F7\+\_\+streaming.\+cpp}.
+
+\index{Connection\+Novena\+R\+F7\+\_\+streaming.\+cpp@{Connection\+Novena\+R\+F7\+\_\+streaming.\+cpp}!I\+M\+X6\+\_\+\+E\+I\+M\+\_\+\+W\+I\+AR@{I\+M\+X6\+\_\+\+E\+I\+M\+\_\+\+W\+I\+AR}}
+\index{I\+M\+X6\+\_\+\+E\+I\+M\+\_\+\+W\+I\+AR@{I\+M\+X6\+\_\+\+E\+I\+M\+\_\+\+W\+I\+AR}!Connection\+Novena\+R\+F7\+\_\+streaming.\+cpp@{Connection\+Novena\+R\+F7\+\_\+streaming.\+cpp}}
+\paragraph[{I\+M\+X6\+\_\+\+E\+I\+M\+\_\+\+W\+I\+AR}]{\setlength{\rightskip}{0pt plus 5cm}\#define I\+M\+X6\+\_\+\+E\+I\+M\+\_\+\+W\+I\+AR~(0x94)}\label{ConnectionNovenaRF7__streaming_8cpp_a3574d34feb7b17a5014d3513cc7aa4cf}
+
+
+Definition at line {\bf 40} of file {\bf Connection\+Novena\+R\+F7\+\_\+streaming.\+cpp}.
+
+
+
+\subsubsection{Function Documentation}
+\index{Connection\+Novena\+R\+F7\+\_\+streaming.\+cpp@{Connection\+Novena\+R\+F7\+\_\+streaming.\+cpp}!fpga\+\_\+read@{fpga\+\_\+read}}
+\index{fpga\+\_\+read@{fpga\+\_\+read}!Connection\+Novena\+R\+F7\+\_\+streaming.\+cpp@{Connection\+Novena\+R\+F7\+\_\+streaming.\+cpp}}
+\paragraph[{fpga\+\_\+read(unsigned const int addr, unsigned short $\ast$buf, const int len)}]{\setlength{\rightskip}{0pt plus 5cm}{\bf int} fpga\+\_\+read (
+\begin{DoxyParamCaption}
+\item[{unsigned const {\bf int}}]{addr, }
+\item[{unsigned short $\ast$}]{buf, }
+\item[{const {\bf int}}]{len}
+\end{DoxyParamCaption}
+)}\label{ConnectionNovenaRF7__streaming_8cpp_abd515944f06d68714b15fd61048e01cf}
+
+
+Definition at line {\bf 102} of file {\bf Connection\+Novena\+R\+F7\+\_\+streaming.\+cpp}.
+
+
+
+Referenced by {\bf lime\+::\+Connection\+Novena\+R\+F7\+::\+Receive\+Packets\+Loop()}.
+
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=318pt]{dd/df4/ConnectionNovenaRF7__streaming_8cpp_abd515944f06d68714b15fd61048e01cf_icgraph}
+\end{center}
+\end{figure}
+
+
+\index{Connection\+Novena\+R\+F7\+\_\+streaming.\+cpp@{Connection\+Novena\+R\+F7\+\_\+streaming.\+cpp}!fpga\+\_\+send@{fpga\+\_\+send}}
+\index{fpga\+\_\+send@{fpga\+\_\+send}!Connection\+Novena\+R\+F7\+\_\+streaming.\+cpp@{Connection\+Novena\+R\+F7\+\_\+streaming.\+cpp}}
+\paragraph[{fpga\+\_\+send(unsigned const int addr, const char $\ast$buf, const int len)}]{\setlength{\rightskip}{0pt plus 5cm}{\bf int} fpga\+\_\+send (
+\begin{DoxyParamCaption}
+\item[{unsigned const {\bf int}}]{addr, }
+\item[{const char $\ast$}]{buf, }
+\item[{const {\bf int}}]{len}
+\end{DoxyParamCaption}
+)}\label{ConnectionNovenaRF7__streaming_8cpp_ae4b5ac960e28b89424a27cd74377dfe4}
+
+
+Definition at line {\bf 63} of file {\bf Connection\+Novena\+R\+F7\+\_\+streaming.\+cpp}.
+
+
+
+References {\bf i}.
+
+\index{Connection\+Novena\+R\+F7\+\_\+streaming.\+cpp@{Connection\+Novena\+R\+F7\+\_\+streaming.\+cpp}!prep\+\_\+eim\+\_\+burst@{prep\+\_\+eim\+\_\+burst}}
+\index{prep\+\_\+eim\+\_\+burst@{prep\+\_\+eim\+\_\+burst}!Connection\+Novena\+R\+F7\+\_\+streaming.\+cpp@{Connection\+Novena\+R\+F7\+\_\+streaming.\+cpp}}
+\paragraph[{prep\+\_\+eim\+\_\+burst()}]{\setlength{\rightskip}{0pt plus 5cm}{\bf int} prep\+\_\+eim\+\_\+burst (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}\label{ConnectionNovenaRF7__streaming_8cpp_ad0f92d939b154521f01fb2dbbe35bc75}
+
+
+Definition at line {\bf 241} of file {\bf Connection\+Novena\+R\+F7\+\_\+streaming.\+cpp}.
+
+
+
+References {\bf eim\+\_\+configured}, {\bf i}, {\bf I\+N\+T()}, {\bf read\+Kernel\+Memory()}, {\bf SP}, and {\bf write\+Kernel\+Memory()}.
+
+
+
+Referenced by {\bf lime\+::\+Connection\+Novena\+R\+F7\+::\+Receive\+Packets\+Loop()}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{dd/df4/ConnectionNovenaRF7__streaming_8cpp_ad0f92d939b154521f01fb2dbbe35bc75_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=342pt]{dd/df4/ConnectionNovenaRF7__streaming_8cpp_ad0f92d939b154521f01fb2dbbe35bc75_icgraph}
+\end{center}
+\end{figure}
+
+
+\index{Connection\+Novena\+R\+F7\+\_\+streaming.\+cpp@{Connection\+Novena\+R\+F7\+\_\+streaming.\+cpp}!read\+Kernel\+Memory@{read\+Kernel\+Memory}}
+\index{read\+Kernel\+Memory@{read\+Kernel\+Memory}!Connection\+Novena\+R\+F7\+\_\+streaming.\+cpp@{Connection\+Novena\+R\+F7\+\_\+streaming.\+cpp}}
+\paragraph[{read\+Kernel\+Memory(long offset, int virtualized, int size)}]{\setlength{\rightskip}{0pt plus 5cm}{\bf int} read\+Kernel\+Memory (
+\begin{DoxyParamCaption}
+\item[{long}]{offset, }
+\item[{{\bf int}}]{virtualized, }
+\item[{{\bf int}}]{size}
+\end{DoxyParamCaption}
+)}\label{ConnectionNovenaRF7__streaming_8cpp_aaa2ddf589562f60d0b979b9824c0d675}
+
+
+Definition at line {\bf 142} of file {\bf Connection\+Novena\+R\+F7\+\_\+streaming.\+cpp}.
+
+
+
+Referenced by {\bf prep\+\_\+eim\+\_\+burst()}, and {\bf write\+Kernel\+Memory()}.
+
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{dd/df4/ConnectionNovenaRF7__streaming_8cpp_aaa2ddf589562f60d0b979b9824c0d675_icgraph}
+\end{center}
+\end{figure}
+
+
+\index{Connection\+Novena\+R\+F7\+\_\+streaming.\+cpp@{Connection\+Novena\+R\+F7\+\_\+streaming.\+cpp}!write\+Kernel\+Memory@{write\+Kernel\+Memory}}
+\index{write\+Kernel\+Memory@{write\+Kernel\+Memory}!Connection\+Novena\+R\+F7\+\_\+streaming.\+cpp@{Connection\+Novena\+R\+F7\+\_\+streaming.\+cpp}}
+\paragraph[{write\+Kernel\+Memory(long offset, long value, int virtualized, int size)}]{\setlength{\rightskip}{0pt plus 5cm}{\bf int} write\+Kernel\+Memory (
+\begin{DoxyParamCaption}
+\item[{long}]{offset, }
+\item[{long}]{value, }
+\item[{{\bf int}}]{virtualized, }
+\item[{{\bf int}}]{size}
+\end{DoxyParamCaption}
+)}\label{ConnectionNovenaRF7__streaming_8cpp_ab4e68de971a960f7dad07ce349480ecf}
+
+
+Definition at line {\bf 216} of file {\bf Connection\+Novena\+R\+F7\+\_\+streaming.\+cpp}.
+
+
+
+References {\bf read\+Kernel\+Memory()}.
+
+
+
+Referenced by {\bf prep\+\_\+eim\+\_\+burst()}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=315pt]{dd/df4/ConnectionNovenaRF7__streaming_8cpp_ab4e68de971a960f7dad07ce349480ecf_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{dd/df4/ConnectionNovenaRF7__streaming_8cpp_ab4e68de971a960f7dad07ce349480ecf_icgraph}
+\end{center}
+\end{figure}
+
+
+
+
+\subsubsection{Variable Documentation}
+\index{Connection\+Novena\+R\+F7\+\_\+streaming.\+cpp@{Connection\+Novena\+R\+F7\+\_\+streaming.\+cpp}!c\+S\+P\+I\+\_\+\+S\+P\+E\+ED@{c\+S\+P\+I\+\_\+\+S\+P\+E\+ED}}
+\index{c\+S\+P\+I\+\_\+\+S\+P\+E\+ED@{c\+S\+P\+I\+\_\+\+S\+P\+E\+ED}!Connection\+Novena\+R\+F7\+\_\+streaming.\+cpp@{Connection\+Novena\+R\+F7\+\_\+streaming.\+cpp}}
+\paragraph[{c\+S\+P\+I\+\_\+\+S\+P\+E\+ED}]{\setlength{\rightskip}{0pt plus 5cm}const {\bf int} c\+S\+P\+I\+\_\+\+S\+P\+E\+ED = 5000000\hspace{0.3cm}{\ttfamily [static]}}\label{ConnectionNovenaRF7__streaming_8cpp_affb644df422da85c3552247e450faa6b}
+
+
+Definition at line {\bf 50} of file {\bf Connection\+Novena\+R\+F7\+\_\+streaming.\+cpp}.
+
+\index{Connection\+Novena\+R\+F7\+\_\+streaming.\+cpp@{Connection\+Novena\+R\+F7\+\_\+streaming.\+cpp}!eim\+\_\+configured@{eim\+\_\+configured}}
+\index{eim\+\_\+configured@{eim\+\_\+configured}!Connection\+Novena\+R\+F7\+\_\+streaming.\+cpp@{Connection\+Novena\+R\+F7\+\_\+streaming.\+cpp}}
+\paragraph[{eim\+\_\+configured}]{\setlength{\rightskip}{0pt plus 5cm}bool eim\+\_\+configured = false}\label{ConnectionNovenaRF7__streaming_8cpp_a1c181b5f0c4a7bc638cba14f498f457f}
+
+
+Definition at line {\bf 61} of file {\bf Connection\+Novena\+R\+F7\+\_\+streaming.\+cpp}.
+
+
+
+Referenced by {\bf prep\+\_\+eim\+\_\+burst()}.
+

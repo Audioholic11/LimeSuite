@@ -1,0 +1,3437 @@
+\subsection{/home/erik/prefix/default/src/limesuite-\/dev/src/\+A\+P\+I/lms7\+\_\+api.cpp File Reference}
+\label{lms7__api_8cpp}\index{/home/erik/prefix/default/src/limesuite-\/dev/src/\+A\+P\+I/lms7\+\_\+api.\+cpp@{/home/erik/prefix/default/src/limesuite-\/dev/src/\+A\+P\+I/lms7\+\_\+api.\+cpp}}
+{\ttfamily \#include \char`\"{}I\+Connection.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}Connection\+Registry.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}lime/\+Lime\+Suite.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}lms7\+\_\+device.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}errno.\+h\char`\"{}}\\*
+{\ttfamily \#include $<$cmath$>$}\\*
+{\ttfamily \#include \char`\"{}Version\+Info.\+h\char`\"{}}\\*
+{\ttfamily \#include $<$assert.\+h$>$}\\*
+{\ttfamily \#include \char`\"{}Logger.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}L\+M\+S64\+C\+Protocol.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}Streamer.\+h\char`\"{}}\\*
+Include dependency graph for lms7\+\_\+api.\+cpp\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{de/d2b/lms7__api_8cpp__incl}
+\end{center}
+\end{figure}
+\subsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+{\bf A\+P\+I\+\_\+\+E\+X\+P\+O\+RT} {\bf int} {\bf C\+A\+L\+L\+\_\+\+C\+O\+NV} {\bf L\+M\+S\+\_\+\+Get\+Device\+List} ({\bf lms\+\_\+info\+\_\+str\+\_\+t} $\ast$dev\+\_\+list)
+\item 
+{\bf A\+P\+I\+\_\+\+E\+X\+P\+O\+RT} {\bf int} {\bf C\+A\+L\+L\+\_\+\+C\+O\+NV} {\bf L\+M\+S\+\_\+\+Open} ({\bf lms\+\_\+device\+\_\+t} $\ast$$\ast${\bf device}, const {\bf lms\+\_\+info\+\_\+str\+\_\+t} {\bf info}, {\bf void} $\ast${\bf args})
+\item 
+{\bf A\+P\+I\+\_\+\+E\+X\+P\+O\+RT} {\bf int} {\bf C\+A\+L\+L\+\_\+\+C\+O\+NV} {\bf L\+M\+S\+\_\+\+Close} ({\bf lms\+\_\+device\+\_\+t} $\ast${\bf device})
+\item 
+{\bf A\+P\+I\+\_\+\+E\+X\+P\+O\+RT} {\bf int} {\bf C\+A\+L\+L\+\_\+\+C\+O\+NV} {\bf L\+M\+S\+\_\+\+Disconnect} ({\bf lms\+\_\+device\+\_\+t} $\ast${\bf device})
+\item 
+{\bf A\+P\+I\+\_\+\+E\+X\+P\+O\+RT} bool {\bf C\+A\+L\+L\+\_\+\+C\+O\+NV} {\bf L\+M\+S\+\_\+\+Is\+Open} ({\bf lms\+\_\+device\+\_\+t} $\ast${\bf device}, {\bf int} {\bf port})
+\item 
+{\bf A\+P\+I\+\_\+\+E\+X\+P\+O\+RT} {\bf int} {\bf C\+A\+L\+L\+\_\+\+C\+O\+NV} {\bf L\+M\+S\+\_\+\+Reset} ({\bf lms\+\_\+device\+\_\+t} $\ast${\bf device})
+\item 
+{\bf A\+P\+I\+\_\+\+E\+X\+P\+O\+RT} {\bf int} {\bf C\+A\+L\+L\+\_\+\+C\+O\+NV} {\bf L\+M\+S\+\_\+\+Enable\+Channel} ({\bf lms\+\_\+device\+\_\+t} $\ast${\bf device}, bool {\bf dir\+\_\+tx}, size\+\_\+t {\bf chan}, bool {\bf enabled})
+\item 
+{\bf A\+P\+I\+\_\+\+E\+X\+P\+O\+RT} {\bf int} {\bf C\+A\+L\+L\+\_\+\+C\+O\+NV} {\bf L\+M\+S\+\_\+\+Set\+Sample\+Rate} ({\bf lms\+\_\+device\+\_\+t} $\ast${\bf device}, {\bf float\+\_\+type} {\bf rate}, size\+\_\+t {\bf oversample})
+\item 
+{\bf A\+P\+I\+\_\+\+E\+X\+P\+O\+RT} {\bf int} {\bf C\+A\+L\+L\+\_\+\+C\+O\+NV} {\bf L\+M\+S\+\_\+\+Set\+Sample\+Rate\+Dir} ({\bf lms\+\_\+device\+\_\+t} $\ast${\bf device}, bool {\bf dir\+\_\+tx}, {\bf float\+\_\+type} {\bf rate}, size\+\_\+t {\bf oversample})
+\item 
+{\bf A\+P\+I\+\_\+\+E\+X\+P\+O\+RT} {\bf int} {\bf C\+A\+L\+L\+\_\+\+C\+O\+NV} {\bf L\+M\+S\+\_\+\+Get\+Sample\+Rate} ({\bf lms\+\_\+device\+\_\+t} $\ast${\bf device}, bool {\bf dir\+\_\+tx}, size\+\_\+t {\bf chan}, {\bf float\+\_\+type} $\ast${\bf host\+\_\+\+Hz}, {\bf float\+\_\+type} $\ast${\bf rf\+\_\+\+Hz})
+\item 
+{\bf A\+P\+I\+\_\+\+E\+X\+P\+O\+RT} {\bf int} {\bf C\+A\+L\+L\+\_\+\+C\+O\+NV} {\bf L\+M\+S\+\_\+\+Get\+Sample\+Rate\+Range} ({\bf lms\+\_\+device\+\_\+t} $\ast${\bf device}, bool {\bf dir\+\_\+tx}, {\bf lms\+\_\+range\+\_\+t} $\ast${\bf range})
+\item 
+{\bf A\+P\+I\+\_\+\+E\+X\+P\+O\+RT} {\bf int} {\bf C\+A\+L\+L\+\_\+\+C\+O\+NV} {\bf L\+M\+S\+\_\+\+Init} ({\bf lms\+\_\+device\+\_\+t} $\ast${\bf device})
+\item 
+{\bf A\+P\+I\+\_\+\+E\+X\+P\+O\+RT} {\bf int} {\bf C\+A\+L\+L\+\_\+\+C\+O\+NV} {\bf L\+M\+S\+\_\+\+Read\+Custom\+Board\+Param} ({\bf lms\+\_\+device\+\_\+t} $\ast${\bf device}, uint8\+\_\+t param\+\_\+id, {\bf float\+\_\+type} $\ast${\bf val}, {\bf lms\+\_\+name\+\_\+t} {\bf units})
+\item 
+{\bf A\+P\+I\+\_\+\+E\+X\+P\+O\+RT} {\bf int} {\bf C\+A\+L\+L\+\_\+\+C\+O\+NV} {\bf L\+M\+S\+\_\+\+Write\+Custom\+Board\+Param} ({\bf lms\+\_\+device\+\_\+t} $\ast${\bf device}, uint8\+\_\+t param\+\_\+id, {\bf float\+\_\+type} {\bf val}, const {\bf lms\+\_\+name\+\_\+t} {\bf units})
+\item 
+{\bf A\+P\+I\+\_\+\+E\+X\+P\+O\+RT} {\bf int} {\bf C\+A\+L\+L\+\_\+\+C\+O\+NV} {\bf L\+M\+S\+\_\+\+V\+C\+T\+C\+X\+O\+Write} ({\bf lms\+\_\+device\+\_\+t} $\ast${\bf device}, uint16\+\_\+t {\bf val})
+\item 
+{\bf A\+P\+I\+\_\+\+E\+X\+P\+O\+RT} {\bf int} {\bf C\+A\+L\+L\+\_\+\+C\+O\+NV} {\bf L\+M\+S\+\_\+\+V\+C\+T\+C\+X\+O\+Read} ({\bf lms\+\_\+device\+\_\+t} $\ast${\bf device}, uint16\+\_\+t $\ast${\bf val})
+\item 
+{\bf A\+P\+I\+\_\+\+E\+X\+P\+O\+RT} {\bf int} {\bf C\+A\+L\+L\+\_\+\+C\+O\+NV} {\bf L\+M\+S\+\_\+\+Get\+Clock\+Freq} ({\bf lms\+\_\+device\+\_\+t} $\ast${\bf device}, size\+\_\+t {\bf clk\+\_\+id}, {\bf float\+\_\+type} $\ast${\bf freq})
+\item 
+{\bf A\+P\+I\+\_\+\+E\+X\+P\+O\+RT} {\bf int} {\bf C\+A\+L\+L\+\_\+\+C\+O\+NV} {\bf L\+M\+S\+\_\+\+Set\+Clock\+Freq} ({\bf lms\+\_\+device\+\_\+t} $\ast${\bf device}, size\+\_\+t {\bf clk\+\_\+id}, {\bf float\+\_\+type} {\bf freq})
+\item 
+{\bf A\+P\+I\+\_\+\+E\+X\+P\+O\+RT} {\bf int} {\bf C\+A\+L\+L\+\_\+\+C\+O\+NV} {\bf L\+M\+S\+\_\+\+Synchronize} ({\bf lms\+\_\+device\+\_\+t} $\ast$dev, bool {\bf to\+Chip})
+\item 
+{\bf A\+P\+I\+\_\+\+E\+X\+P\+O\+RT} {\bf int} {\bf C\+A\+L\+L\+\_\+\+C\+O\+NV} {\bf L\+M\+S\+\_\+\+G\+P\+I\+O\+Read} ({\bf lms\+\_\+device\+\_\+t} $\ast$dev, uint8\+\_\+t $\ast${\bf buffer}, size\+\_\+t {\bf len})
+\item 
+{\bf A\+P\+I\+\_\+\+E\+X\+P\+O\+RT} {\bf int} {\bf C\+A\+L\+L\+\_\+\+C\+O\+NV} {\bf L\+M\+S\+\_\+\+G\+P\+I\+O\+Write} ({\bf lms\+\_\+device\+\_\+t} $\ast$dev, const uint8\+\_\+t $\ast${\bf buffer}, size\+\_\+t {\bf len})
+\item 
+{\bf A\+P\+I\+\_\+\+E\+X\+P\+O\+RT} {\bf int} {\bf C\+A\+L\+L\+\_\+\+C\+O\+NV} {\bf L\+M\+S\+\_\+\+G\+P\+I\+O\+Dir\+Read} ({\bf lms\+\_\+device\+\_\+t} $\ast$dev, uint8\+\_\+t $\ast${\bf buffer}, size\+\_\+t {\bf len})
+\item 
+{\bf A\+P\+I\+\_\+\+E\+X\+P\+O\+RT} {\bf int} {\bf C\+A\+L\+L\+\_\+\+C\+O\+NV} {\bf L\+M\+S\+\_\+\+G\+P\+I\+O\+Dir\+Write} ({\bf lms\+\_\+device\+\_\+t} $\ast$dev, const uint8\+\_\+t $\ast${\bf buffer}, size\+\_\+t {\bf len})
+\item 
+{\bf A\+P\+I\+\_\+\+E\+X\+P\+O\+RT} {\bf int} {\bf C\+A\+L\+L\+\_\+\+C\+O\+NV} {\bf L\+M\+S\+\_\+\+Enable\+Calib\+Cache} ({\bf lms\+\_\+device\+\_\+t} $\ast$dev, bool {\bf enable})
+\item 
+{\bf A\+P\+I\+\_\+\+E\+X\+P\+O\+RT} {\bf int} {\bf C\+A\+L\+L\+\_\+\+C\+O\+NV} {\bf L\+M\+S\+\_\+\+Get\+Chip\+Temperature} ({\bf lms\+\_\+device\+\_\+t} $\ast$dev, size\+\_\+t {\bf ind}, {\bf float\+\_\+type} $\ast${\bf temp})
+\item 
+{\bf A\+P\+I\+\_\+\+E\+X\+P\+O\+RT} {\bf int} {\bf C\+A\+L\+L\+\_\+\+C\+O\+NV} {\bf L\+M\+S\+\_\+\+Get\+Num\+Channels} ({\bf lms\+\_\+device\+\_\+t} $\ast${\bf device}, bool {\bf dir\+\_\+tx})
+\item 
+{\bf A\+P\+I\+\_\+\+E\+X\+P\+O\+RT} {\bf int} {\bf C\+A\+L\+L\+\_\+\+C\+O\+NV} {\bf L\+M\+S\+\_\+\+Set\+L\+O\+Frequency} ({\bf lms\+\_\+device\+\_\+t} $\ast${\bf device}, bool {\bf dir\+\_\+tx}, size\+\_\+t {\bf chan}, {\bf float\+\_\+type} {\bf frequency})
+\item 
+{\bf A\+P\+I\+\_\+\+E\+X\+P\+O\+RT} {\bf int} {\bf C\+A\+L\+L\+\_\+\+C\+O\+NV} {\bf L\+M\+S\+\_\+\+Get\+L\+O\+Frequency} ({\bf lms\+\_\+device\+\_\+t} $\ast${\bf device}, bool {\bf dir\+\_\+tx}, size\+\_\+t {\bf chan}, {\bf float\+\_\+type} $\ast${\bf frequency})
+\item 
+{\bf A\+P\+I\+\_\+\+E\+X\+P\+O\+RT} {\bf int} {\bf C\+A\+L\+L\+\_\+\+C\+O\+NV} {\bf L\+M\+S\+\_\+\+Get\+L\+O\+Frequency\+Range} ({\bf lms\+\_\+device\+\_\+t} $\ast${\bf device}, bool {\bf dir\+\_\+tx}, {\bf lms\+\_\+range\+\_\+t} $\ast${\bf range})
+\item 
+{\bf A\+P\+I\+\_\+\+E\+X\+P\+O\+RT} {\bf int} {\bf C\+A\+L\+L\+\_\+\+C\+O\+NV} {\bf L\+M\+S\+\_\+\+Get\+Antenna\+List} ({\bf lms\+\_\+device\+\_\+t} $\ast${\bf device}, bool {\bf dir\+\_\+tx}, size\+\_\+t {\bf chan}, {\bf lms\+\_\+name\+\_\+t} $\ast${\bf list})
+\item 
+{\bf A\+P\+I\+\_\+\+E\+X\+P\+O\+RT} {\bf int} {\bf C\+A\+L\+L\+\_\+\+C\+O\+NV} {\bf L\+M\+S\+\_\+\+Set\+Antenna} ({\bf lms\+\_\+device\+\_\+t} $\ast${\bf device}, bool {\bf dir\+\_\+tx}, size\+\_\+t {\bf chan}, size\+\_\+t path)
+\item 
+{\bf A\+P\+I\+\_\+\+E\+X\+P\+O\+RT} {\bf int} {\bf C\+A\+L\+L\+\_\+\+C\+O\+NV} {\bf L\+M\+S\+\_\+\+Get\+Antenna} ({\bf lms\+\_\+device\+\_\+t} $\ast${\bf device}, bool {\bf dir\+\_\+tx}, size\+\_\+t {\bf chan})
+\item 
+{\bf A\+P\+I\+\_\+\+E\+X\+P\+O\+RT} {\bf int} {\bf C\+A\+L\+L\+\_\+\+C\+O\+NV} {\bf L\+M\+S\+\_\+\+Get\+Antenna\+BW} ({\bf lms\+\_\+device\+\_\+t} $\ast${\bf device}, bool {\bf dir\+\_\+tx}, size\+\_\+t {\bf chan}, size\+\_\+t path, {\bf lms\+\_\+range\+\_\+t} $\ast${\bf range})
+\item 
+{\bf A\+P\+I\+\_\+\+E\+X\+P\+O\+RT} {\bf int} {\bf C\+A\+L\+L\+\_\+\+C\+O\+NV} {\bf L\+M\+S\+\_\+\+Set\+L\+P\+F\+BW} ({\bf lms\+\_\+device\+\_\+t} $\ast${\bf device}, bool {\bf dir\+\_\+tx}, size\+\_\+t {\bf chan}, {\bf float\+\_\+type} {\bf bandwidth})
+\item 
+{\bf A\+P\+I\+\_\+\+E\+X\+P\+O\+RT} {\bf int} {\bf C\+A\+L\+L\+\_\+\+C\+O\+NV} {\bf L\+M\+S\+\_\+\+Get\+L\+P\+F\+BW} ({\bf lms\+\_\+device\+\_\+t} $\ast${\bf device}, bool {\bf dir\+\_\+tx}, size\+\_\+t {\bf chan}, {\bf float\+\_\+type} $\ast${\bf bandwidth})
+\item 
+{\bf A\+P\+I\+\_\+\+E\+X\+P\+O\+RT} {\bf int} {\bf C\+A\+L\+L\+\_\+\+C\+O\+NV} {\bf L\+M\+S\+\_\+\+Set\+L\+PF} ({\bf lms\+\_\+device\+\_\+t} $\ast${\bf device}, bool {\bf dir\+\_\+tx}, size\+\_\+t {\bf chan}, bool {\bf enabled})
+\item 
+{\bf A\+P\+I\+\_\+\+E\+X\+P\+O\+RT} {\bf int} {\bf C\+A\+L\+L\+\_\+\+C\+O\+NV} {\bf L\+M\+S\+\_\+\+Set\+G\+F\+I\+R\+L\+PF} ({\bf lms\+\_\+device\+\_\+t} $\ast${\bf device}, bool {\bf dir\+\_\+tx}, size\+\_\+t {\bf chan}, bool {\bf enabled}, {\bf float\+\_\+type} {\bf bandwidth})
+\item 
+{\bf A\+P\+I\+\_\+\+E\+X\+P\+O\+RT} {\bf int} {\bf C\+A\+L\+L\+\_\+\+C\+O\+NV} {\bf L\+M\+S\+\_\+\+Get\+L\+P\+F\+B\+W\+Range} ({\bf lms\+\_\+device\+\_\+t} $\ast${\bf device}, bool {\bf dir\+\_\+tx}, {\bf lms\+\_\+range\+\_\+t} $\ast${\bf range})
+\item 
+{\bf A\+P\+I\+\_\+\+E\+X\+P\+O\+RT} {\bf int} {\bf C\+A\+L\+L\+\_\+\+C\+O\+NV} {\bf L\+M\+S\+\_\+\+Set\+Normalized\+Gain} ({\bf lms\+\_\+device\+\_\+t} $\ast${\bf device}, bool {\bf dir\+\_\+tx}, size\+\_\+t {\bf chan}, {\bf float\+\_\+type} {\bf gain})
+\item 
+{\bf A\+P\+I\+\_\+\+E\+X\+P\+O\+RT} {\bf int} {\bf C\+A\+L\+L\+\_\+\+C\+O\+NV} {\bf L\+M\+S\+\_\+\+Set\+GaindB} ({\bf lms\+\_\+device\+\_\+t} $\ast${\bf device}, bool {\bf dir\+\_\+tx}, size\+\_\+t {\bf chan}, unsigned {\bf gain})
+\item 
+{\bf A\+P\+I\+\_\+\+E\+X\+P\+O\+RT} {\bf int} {\bf C\+A\+L\+L\+\_\+\+C\+O\+NV} {\bf L\+M\+S\+\_\+\+Get\+Normalized\+Gain} ({\bf lms\+\_\+device\+\_\+t} $\ast${\bf device}, bool {\bf dir\+\_\+tx}, size\+\_\+t {\bf chan}, {\bf float\+\_\+type} $\ast${\bf gain})
+\item 
+{\bf A\+P\+I\+\_\+\+E\+X\+P\+O\+RT} {\bf int} {\bf C\+A\+L\+L\+\_\+\+C\+O\+NV} {\bf L\+M\+S\+\_\+\+Get\+GaindB} ({\bf lms\+\_\+device\+\_\+t} $\ast${\bf device}, bool {\bf dir\+\_\+tx}, size\+\_\+t {\bf chan}, unsigned $\ast${\bf gain})
+\item 
+{\bf A\+P\+I\+\_\+\+E\+X\+P\+O\+RT} {\bf int} {\bf C\+A\+L\+L\+\_\+\+C\+O\+NV} {\bf L\+M\+S\+\_\+\+Calibrate} ({\bf lms\+\_\+device\+\_\+t} $\ast${\bf device}, bool {\bf dir\+\_\+tx}, size\+\_\+t {\bf chan}, double {\bf bw}, unsigned {\bf flags})
+\item 
+{\bf A\+P\+I\+\_\+\+E\+X\+P\+O\+RT} {\bf int} {\bf C\+A\+L\+L\+\_\+\+C\+O\+NV} {\bf L\+M\+S\+\_\+\+Load\+Config} ({\bf lms\+\_\+device\+\_\+t} $\ast${\bf device}, const char $\ast${\bf filename})
+\item 
+{\bf A\+P\+I\+\_\+\+E\+X\+P\+O\+RT} {\bf int} {\bf C\+A\+L\+L\+\_\+\+C\+O\+NV} {\bf L\+M\+S\+\_\+\+Save\+Config} ({\bf lms\+\_\+device\+\_\+t} $\ast${\bf device}, const char $\ast${\bf filename})
+\item 
+{\bf A\+P\+I\+\_\+\+E\+X\+P\+O\+RT} {\bf int} {\bf C\+A\+L\+L\+\_\+\+C\+O\+NV} {\bf L\+M\+S\+\_\+\+Set\+Test\+Signal} ({\bf lms\+\_\+device\+\_\+t} $\ast${\bf device}, bool {\bf dir\+\_\+tx}, size\+\_\+t {\bf chan}, {\bf lms\+\_\+testsig\+\_\+t} {\bf sig}, int16\+\_\+t {\bf dc\+\_\+i}, int16\+\_\+t {\bf dc\+\_\+q})
+\item 
+{\bf A\+P\+I\+\_\+\+E\+X\+P\+O\+RT} {\bf int} {\bf C\+A\+L\+L\+\_\+\+C\+O\+NV} {\bf L\+M\+S\+\_\+\+Get\+Test\+Signal} ({\bf lms\+\_\+device\+\_\+t} $\ast${\bf device}, bool {\bf dir\+\_\+tx}, size\+\_\+t {\bf chan}, {\bf lms\+\_\+testsig\+\_\+t} $\ast${\bf sig})
+\item 
+{\bf A\+P\+I\+\_\+\+E\+X\+P\+O\+RT} {\bf int} {\bf C\+A\+L\+L\+\_\+\+C\+O\+NV} {\bf L\+M\+S\+\_\+\+Set\+N\+C\+O\+Frequency} ({\bf lms\+\_\+device\+\_\+t} $\ast${\bf device}, bool {\bf dir\+\_\+tx}, size\+\_\+t ch, const {\bf float\+\_\+type} $\ast${\bf freq}, {\bf float\+\_\+type} {\bf pho})
+\item 
+{\bf A\+P\+I\+\_\+\+E\+X\+P\+O\+RT} {\bf int} {\bf C\+A\+L\+L\+\_\+\+C\+O\+NV} {\bf L\+M\+S\+\_\+\+Get\+N\+C\+O\+Frequency} ({\bf lms\+\_\+device\+\_\+t} $\ast${\bf device}, bool {\bf dir\+\_\+tx}, size\+\_\+t {\bf chan}, {\bf float\+\_\+type} $\ast${\bf freq}, {\bf float\+\_\+type} $\ast${\bf pho})
+\item 
+{\bf A\+P\+I\+\_\+\+E\+X\+P\+O\+RT} {\bf int} {\bf C\+A\+L\+L\+\_\+\+C\+O\+NV} {\bf L\+M\+S\+\_\+\+Set\+N\+C\+O\+Phase} ({\bf lms\+\_\+device\+\_\+t} $\ast${\bf device}, bool {\bf dir\+\_\+tx}, size\+\_\+t ch, const {\bf float\+\_\+type} $\ast${\bf phase}, {\bf float\+\_\+type} {\bf fcw})
+\item 
+{\bf A\+P\+I\+\_\+\+E\+X\+P\+O\+RT} {\bf int} {\bf C\+A\+L\+L\+\_\+\+C\+O\+NV} {\bf L\+M\+S\+\_\+\+Get\+N\+C\+O\+Phase} ({\bf lms\+\_\+device\+\_\+t} $\ast${\bf device}, bool {\bf dir\+\_\+tx}, size\+\_\+t ch, {\bf float\+\_\+type} $\ast${\bf phase}, {\bf float\+\_\+type} $\ast${\bf fcw})
+\item 
+{\bf A\+P\+I\+\_\+\+E\+X\+P\+O\+RT} {\bf int} {\bf C\+A\+L\+L\+\_\+\+C\+O\+NV} {\bf L\+M\+S\+\_\+\+Set\+N\+C\+O\+Index} ({\bf lms\+\_\+device\+\_\+t} $\ast${\bf device}, bool {\bf dir\+\_\+tx}, size\+\_\+t {\bf chan}, {\bf int} {\bf ind}, bool down)
+\item 
+{\bf A\+P\+I\+\_\+\+E\+X\+P\+O\+RT} {\bf int} {\bf C\+A\+L\+L\+\_\+\+C\+O\+NV} {\bf L\+M\+S\+\_\+\+Get\+N\+C\+O\+Index} ({\bf lms\+\_\+device\+\_\+t} $\ast${\bf device}, bool {\bf dir\+\_\+tx}, size\+\_\+t {\bf chan})
+\item 
+{\bf A\+P\+I\+\_\+\+E\+X\+P\+O\+RT} {\bf int} {\bf C\+A\+L\+L\+\_\+\+C\+O\+NV} {\bf L\+M\+S\+\_\+\+Read\+L\+M\+S\+Reg} ({\bf lms\+\_\+device\+\_\+t} $\ast${\bf device}, uint32\+\_\+t {\bf address}, uint16\+\_\+t $\ast${\bf val})
+\item 
+{\bf A\+P\+I\+\_\+\+E\+X\+P\+O\+RT} {\bf int} {\bf C\+A\+L\+L\+\_\+\+C\+O\+NV} {\bf L\+M\+S\+\_\+\+Write\+L\+M\+S\+Reg} ({\bf lms\+\_\+device\+\_\+t} $\ast${\bf device}, uint32\+\_\+t {\bf address}, uint16\+\_\+t {\bf val})
+\item 
+{\bf A\+P\+I\+\_\+\+E\+X\+P\+O\+RT} {\bf int} {\bf C\+A\+L\+L\+\_\+\+C\+O\+NV} {\bf L\+M\+S\+\_\+\+Read\+F\+P\+G\+A\+Reg} ({\bf lms\+\_\+device\+\_\+t} $\ast${\bf device}, uint32\+\_\+t {\bf address}, uint16\+\_\+t $\ast${\bf val})
+\item 
+{\bf A\+P\+I\+\_\+\+E\+X\+P\+O\+RT} {\bf int} {\bf C\+A\+L\+L\+\_\+\+C\+O\+NV} {\bf L\+M\+S\+\_\+\+Write\+F\+P\+G\+A\+Reg} ({\bf lms\+\_\+device\+\_\+t} $\ast${\bf device}, uint32\+\_\+t {\bf address}, uint16\+\_\+t {\bf val})
+\item 
+{\bf A\+P\+I\+\_\+\+E\+X\+P\+O\+RT} {\bf int} {\bf C\+A\+L\+L\+\_\+\+C\+O\+NV} {\bf L\+M\+S\+\_\+\+Read\+Param} ({\bf lms\+\_\+device\+\_\+t} $\ast${\bf device}, struct {\bf L\+M\+S7\+Parameter} param, uint16\+\_\+t $\ast${\bf val})
+\item 
+{\bf A\+P\+I\+\_\+\+E\+X\+P\+O\+RT} {\bf int} {\bf C\+A\+L\+L\+\_\+\+C\+O\+NV} {\bf L\+M\+S\+\_\+\+Write\+Param} ({\bf lms\+\_\+device\+\_\+t} $\ast${\bf device}, struct {\bf L\+M\+S7\+Parameter} param, uint16\+\_\+t {\bf val})
+\item 
+{\bf A\+P\+I\+\_\+\+E\+X\+P\+O\+RT} {\bf int} {\bf C\+A\+L\+L\+\_\+\+C\+O\+NV} {\bf L\+M\+S\+\_\+\+Set\+G\+F\+I\+R\+Coeff} ({\bf lms\+\_\+device\+\_\+t} $\ast${\bf device}, bool {\bf dir\+\_\+tx}, size\+\_\+t {\bf chan}, {\bf lms\+\_\+gfir\+\_\+t} {\bf filt}, const {\bf float\+\_\+type} $\ast${\bf coef}, size\+\_\+t {\bf count})
+\item 
+{\bf A\+P\+I\+\_\+\+E\+X\+P\+O\+RT} {\bf int} {\bf C\+A\+L\+L\+\_\+\+C\+O\+NV} {\bf L\+M\+S\+\_\+\+Get\+G\+F\+I\+R\+Coeff} ({\bf lms\+\_\+device\+\_\+t} $\ast${\bf device}, bool {\bf dir\+\_\+tx}, size\+\_\+t {\bf chan}, {\bf lms\+\_\+gfir\+\_\+t} {\bf filt}, {\bf float\+\_\+type} $\ast${\bf coef})
+\item 
+{\bf A\+P\+I\+\_\+\+E\+X\+P\+O\+RT} {\bf int} {\bf C\+A\+L\+L\+\_\+\+C\+O\+NV} {\bf L\+M\+S\+\_\+\+Set\+G\+F\+IR} ({\bf lms\+\_\+device\+\_\+t} $\ast${\bf device}, bool {\bf dir\+\_\+tx}, size\+\_\+t {\bf chan}, {\bf lms\+\_\+gfir\+\_\+t} {\bf filt}, bool {\bf enabled})
+\item 
+{\bf A\+P\+I\+\_\+\+E\+X\+P\+O\+RT} {\bf int} {\bf C\+A\+L\+L\+\_\+\+C\+O\+NV} {\bf L\+M\+S\+\_\+\+Setup\+Stream} ({\bf lms\+\_\+device\+\_\+t} $\ast${\bf device}, {\bf lms\+\_\+stream\+\_\+t} $\ast${\bf stream})
+\item 
+{\bf A\+P\+I\+\_\+\+E\+X\+P\+O\+RT} {\bf int} {\bf C\+A\+L\+L\+\_\+\+C\+O\+NV} {\bf L\+M\+S\+\_\+\+Destroy\+Stream} ({\bf lms\+\_\+device\+\_\+t} $\ast${\bf device}, {\bf lms\+\_\+stream\+\_\+t} $\ast${\bf stream})
+\item 
+{\bf A\+P\+I\+\_\+\+E\+X\+P\+O\+RT} {\bf int} {\bf C\+A\+L\+L\+\_\+\+C\+O\+NV} {\bf L\+M\+S\+\_\+\+Start\+Stream} ({\bf lms\+\_\+stream\+\_\+t} $\ast${\bf stream})
+\item 
+{\bf A\+P\+I\+\_\+\+E\+X\+P\+O\+RT} {\bf int} {\bf C\+A\+L\+L\+\_\+\+C\+O\+NV} {\bf L\+M\+S\+\_\+\+Stop\+Stream} ({\bf lms\+\_\+stream\+\_\+t} $\ast${\bf stream})
+\item 
+{\bf A\+P\+I\+\_\+\+E\+X\+P\+O\+RT} {\bf int} {\bf C\+A\+L\+L\+\_\+\+C\+O\+NV} {\bf L\+M\+S\+\_\+\+Recv\+Stream} ({\bf lms\+\_\+stream\+\_\+t} $\ast${\bf stream}, {\bf void} $\ast${\bf samples}, size\+\_\+t {\bf sample\+\_\+count}, {\bf lms\+\_\+stream\+\_\+meta\+\_\+t} $\ast${\bf meta}, unsigned {\bf timeout\+\_\+ms})
+\item 
+{\bf A\+P\+I\+\_\+\+E\+X\+P\+O\+RT} {\bf int} {\bf C\+A\+L\+L\+\_\+\+C\+O\+NV} {\bf L\+M\+S\+\_\+\+Send\+Stream} ({\bf lms\+\_\+stream\+\_\+t} $\ast${\bf stream}, const {\bf void} $\ast${\bf samples}, size\+\_\+t {\bf sample\+\_\+count}, const {\bf lms\+\_\+stream\+\_\+meta\+\_\+t} $\ast${\bf meta}, unsigned {\bf timeout\+\_\+ms})
+\item 
+{\bf A\+P\+I\+\_\+\+E\+X\+P\+O\+RT} {\bf int} {\bf C\+A\+L\+L\+\_\+\+C\+O\+NV} {\bf L\+M\+S\+\_\+\+Upload\+W\+FM} ({\bf lms\+\_\+device\+\_\+t} $\ast${\bf device}, const {\bf void} $\ast$$\ast${\bf samples}, uint8\+\_\+t {\bf ch\+Count}, size\+\_\+t {\bf sample\+\_\+count}, {\bf int} {\bf format})
+\item 
+{\bf A\+P\+I\+\_\+\+E\+X\+P\+O\+RT} {\bf int} {\bf C\+A\+L\+L\+\_\+\+C\+O\+NV} {\bf L\+M\+S\+\_\+\+Enable\+Tx\+W\+FM} ({\bf lms\+\_\+device\+\_\+t} $\ast${\bf device}, unsigned ch, bool {\bf active})
+\item 
+{\bf A\+P\+I\+\_\+\+E\+X\+P\+O\+RT} {\bf int} {\bf C\+A\+L\+L\+\_\+\+C\+O\+NV} {\bf L\+M\+S\+\_\+\+Get\+Stream\+Status} ({\bf lms\+\_\+stream\+\_\+t} $\ast${\bf stream}, {\bf lms\+\_\+stream\+\_\+status\+\_\+t} $\ast${\bf status})
+\item 
+{\bf A\+P\+I\+\_\+\+E\+X\+P\+O\+RT} const {\bf lms\+\_\+dev\+\_\+info\+\_\+t} $\ast${\bf C\+A\+L\+L\+\_\+\+C\+O\+NV} {\bf L\+M\+S\+\_\+\+Get\+Device\+Info} ({\bf lms\+\_\+device\+\_\+t} $\ast${\bf device})
+\item 
+{\bf A\+P\+I\+\_\+\+E\+X\+P\+O\+RT} {\bf int} {\bf C\+A\+L\+L\+\_\+\+C\+O\+NV} {\bf L\+M\+S\+\_\+\+Get\+Program\+Modes} ({\bf lms\+\_\+device\+\_\+t} $\ast${\bf device}, {\bf lms\+\_\+name\+\_\+t} $\ast${\bf list})
+\item 
+{\bf A\+P\+I\+\_\+\+E\+X\+P\+O\+RT} {\bf int} {\bf C\+A\+L\+L\+\_\+\+C\+O\+NV} {\bf L\+M\+S\+\_\+\+Program} ({\bf lms\+\_\+device\+\_\+t} $\ast${\bf device}, const char $\ast${\bf data}, size\+\_\+t {\bf size}, const {\bf lms\+\_\+name\+\_\+t} {\bf mode}, {\bf lms\+\_\+prog\+\_\+callback\+\_\+t} {\bf callback})
+\item 
+{\bf A\+P\+I\+\_\+\+E\+X\+P\+O\+RT} const char $\ast${\bf C\+A\+L\+L\+\_\+\+C\+O\+NV} {\bf L\+M\+S\+\_\+\+Get\+Last\+Error\+Message} ({\bf void})
+\item 
+{\bf A\+P\+I\+\_\+\+E\+X\+P\+O\+RT} const char $\ast$ {\bf L\+M\+S\+\_\+\+Get\+Library\+Version} ()
+\item 
+static {\bf void} {\bf A\+P\+I\+Msg\+Handler} (const {\bf lime\+::\+Log\+Level} level, const char $\ast${\bf message})
+\item 
+{\bf A\+P\+I\+\_\+\+E\+X\+P\+O\+RT} {\bf void} {\bf L\+M\+S\+\_\+\+Register\+Log\+Handler} ({\bf L\+M\+S\+\_\+\+Log\+Handler} handler)
+\item 
+{\bf A\+P\+I\+\_\+\+E\+X\+P\+O\+RT} {\bf int} {\bf C\+A\+L\+L\+\_\+\+C\+O\+NV} {\bf L\+M\+S\+\_\+\+Transfer\+L\+M\+S64C} ({\bf lms\+\_\+device\+\_\+t} $\ast$dev, {\bf int} cmd, uint8\+\_\+t $\ast${\bf data}, size\+\_\+t $\ast${\bf len})
+\end{DoxyCompactItemize}
+\subsubsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+static {\bf L\+M\+S\+\_\+\+Log\+Handler} {\bf api\+\_\+msg\+\_\+handler}
+\end{DoxyCompactItemize}
+
+
+\subsubsection{Function Documentation}
+\index{lms7\+\_\+api.\+cpp@{lms7\+\_\+api.\+cpp}!A\+P\+I\+Msg\+Handler@{A\+P\+I\+Msg\+Handler}}
+\index{A\+P\+I\+Msg\+Handler@{A\+P\+I\+Msg\+Handler}!lms7\+\_\+api.\+cpp@{lms7\+\_\+api.\+cpp}}
+\paragraph[{A\+P\+I\+Msg\+Handler(const lime\+::\+Log\+Level level, const char $\ast$message)}]{\setlength{\rightskip}{0pt plus 5cm}static {\bf void} A\+P\+I\+Msg\+Handler (
+\begin{DoxyParamCaption}
+\item[{const {\bf lime\+::\+Log\+Level}}]{level, }
+\item[{const char $\ast$}]{message}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [static]}}\label{lms7__api_8cpp_a87d015dada5fe98f9ffbe5a967bf8e18}
+
+
+Definition at line {\bf 1362} of file {\bf lms7\+\_\+api.\+cpp}.
+
+
+
+References {\bf api\+\_\+msg\+\_\+handler}.
+
+
+
+Referenced by {\bf L\+M\+S\+\_\+\+Register\+Log\+Handler()}.
+
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=330pt]{df/de1/lms7__api_8cpp_a87d015dada5fe98f9ffbe5a967bf8e18_icgraph}
+\end{center}
+\end{figure}
+
+
+\index{lms7\+\_\+api.\+cpp@{lms7\+\_\+api.\+cpp}!L\+M\+S\+\_\+\+Calibrate@{L\+M\+S\+\_\+\+Calibrate}}
+\index{L\+M\+S\+\_\+\+Calibrate@{L\+M\+S\+\_\+\+Calibrate}!lms7\+\_\+api.\+cpp@{lms7\+\_\+api.\+cpp}}
+\paragraph[{L\+M\+S\+\_\+\+Calibrate(lms\+\_\+device\+\_\+t $\ast$device, bool dir\+\_\+tx, size\+\_\+t chan, double bw, unsigned flags)}]{\setlength{\rightskip}{0pt plus 5cm}{\bf A\+P\+I\+\_\+\+E\+X\+P\+O\+RT} {\bf int} {\bf C\+A\+L\+L\+\_\+\+C\+O\+NV} L\+M\+S\+\_\+\+Calibrate (
+\begin{DoxyParamCaption}
+\item[{{\bf lms\+\_\+device\+\_\+t} $\ast$}]{device, }
+\item[{bool}]{dir\+\_\+tx, }
+\item[{size\+\_\+t}]{chan, }
+\item[{double}]{bw, }
+\item[{unsigned}]{flags}
+\end{DoxyParamCaption}
+)}\label{lms7__api_8cpp_a30253e6e7221c70d726b6bb06c69e43e}
+
+
+Definition at line {\bf 727} of file {\bf lms7\+\_\+api.\+cpp}.
+
+
+
+References {\bf lime\+::\+L\+M\+S7\+\_\+\+Device\+::\+Calibrate()}, {\bf lime\+::\+L\+M\+S7\+\_\+\+Device\+::\+Get\+Num\+Channels()}, {\bf lms()}, {\bf lime\+::\+L\+M\+S7\+\_\+\+Device\+::\+Read\+L\+M\+S\+Reg()}, and {\bf lime\+::\+Report\+Error()}.
+
+
+
+Referenced by {\bf device\+Cal\+Sweep()}, {\bf main()}, {\bf lms7002\+\_\+pnl\+Calibrations\+\_\+view\+::\+Onbtn\+Calibrate\+All()}, {\bf lms7002\+\_\+pnl\+Calibrations\+\_\+view\+::\+Onbtn\+Calibrate\+Rx()}, and {\bf lms7002\+\_\+pnl\+Calibrations\+\_\+view\+::\+Onbtn\+Calibrate\+Tx()}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{df/de1/lms7__api_8cpp_a30253e6e7221c70d726b6bb06c69e43e_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{df/de1/lms7__api_8cpp_a30253e6e7221c70d726b6bb06c69e43e_icgraph}
+\end{center}
+\end{figure}
+
+
+\index{lms7\+\_\+api.\+cpp@{lms7\+\_\+api.\+cpp}!L\+M\+S\+\_\+\+Close@{L\+M\+S\+\_\+\+Close}}
+\index{L\+M\+S\+\_\+\+Close@{L\+M\+S\+\_\+\+Close}!lms7\+\_\+api.\+cpp@{lms7\+\_\+api.\+cpp}}
+\paragraph[{L\+M\+S\+\_\+\+Close(lms\+\_\+device\+\_\+t $\ast$device)}]{\setlength{\rightskip}{0pt plus 5cm}{\bf A\+P\+I\+\_\+\+E\+X\+P\+O\+RT} {\bf int} {\bf C\+A\+L\+L\+\_\+\+C\+O\+NV} L\+M\+S\+\_\+\+Close (
+\begin{DoxyParamCaption}
+\item[{{\bf lms\+\_\+device\+\_\+t} $\ast$}]{device}
+\end{DoxyParamCaption}
+)}\label{lms7__api_8cpp_ae044945e05694db11b7427f16a58fa17}
+
+
+Definition at line {\bf 64} of file {\bf lms7\+\_\+api.\+cpp}.
+
+
+
+References {\bf lime\+::error()}, {\bf lms()}, and {\bf L\+M\+S\+\_\+\+S\+U\+C\+C\+E\+SS}.
+
+
+
+Referenced by {\bf device\+Cal\+Sweep()}, {\bf error()}, {\bf Free\+Resources()}, {\bf main()}, and {\bf L\+M\+S7\+Suite\+App\+Frame\+::$\sim$\+L\+M\+S7\+Suite\+App\+Frame()}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{df/de1/lms7__api_8cpp_ae044945e05694db11b7427f16a58fa17_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{df/de1/lms7__api_8cpp_ae044945e05694db11b7427f16a58fa17_icgraph}
+\end{center}
+\end{figure}
+
+
+\index{lms7\+\_\+api.\+cpp@{lms7\+\_\+api.\+cpp}!L\+M\+S\+\_\+\+Destroy\+Stream@{L\+M\+S\+\_\+\+Destroy\+Stream}}
+\index{L\+M\+S\+\_\+\+Destroy\+Stream@{L\+M\+S\+\_\+\+Destroy\+Stream}!lms7\+\_\+api.\+cpp@{lms7\+\_\+api.\+cpp}}
+\paragraph[{L\+M\+S\+\_\+\+Destroy\+Stream(lms\+\_\+device\+\_\+t $\ast$device, lms\+\_\+stream\+\_\+t $\ast$stream)}]{\setlength{\rightskip}{0pt plus 5cm}{\bf A\+P\+I\+\_\+\+E\+X\+P\+O\+RT} {\bf int} {\bf C\+A\+L\+L\+\_\+\+C\+O\+NV} L\+M\+S\+\_\+\+Destroy\+Stream (
+\begin{DoxyParamCaption}
+\item[{{\bf lms\+\_\+device\+\_\+t} $\ast$}]{device, }
+\item[{{\bf lms\+\_\+stream\+\_\+t} $\ast$}]{stream}
+\end{DoxyParamCaption}
+)}\label{lms7__api_8cpp_aec228383d063d7eaa75b8aa6498daff9}
+
+
+Definition at line {\bf 1170} of file {\bf lms7\+\_\+api.\+cpp}.
+
+
+
+References {\bf lime\+::\+L\+M\+S7\+\_\+\+Device\+::\+Destroy\+Stream()}, {\bf lms\+\_\+stream\+\_\+t\+::handle}, {\bf lms()}, and {\bf lime\+::\+Report\+Error()}.
+
+
+
+Referenced by {\bf main()}, {\bf Stop\+Stream()}, and {\bf fftviewer\+\_\+fr\+F\+F\+Tviewer\+::\+Streaming\+Loop()}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{df/de1/lms7__api_8cpp_aec228383d063d7eaa75b8aa6498daff9_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{df/de1/lms7__api_8cpp_aec228383d063d7eaa75b8aa6498daff9_icgraph}
+\end{center}
+\end{figure}
+
+
+\index{lms7\+\_\+api.\+cpp@{lms7\+\_\+api.\+cpp}!L\+M\+S\+\_\+\+Disconnect@{L\+M\+S\+\_\+\+Disconnect}}
+\index{L\+M\+S\+\_\+\+Disconnect@{L\+M\+S\+\_\+\+Disconnect}!lms7\+\_\+api.\+cpp@{lms7\+\_\+api.\+cpp}}
+\paragraph[{L\+M\+S\+\_\+\+Disconnect(lms\+\_\+device\+\_\+t $\ast$device)}]{\setlength{\rightskip}{0pt plus 5cm}{\bf A\+P\+I\+\_\+\+E\+X\+P\+O\+RT} {\bf int} {\bf C\+A\+L\+L\+\_\+\+C\+O\+NV} L\+M\+S\+\_\+\+Disconnect (
+\begin{DoxyParamCaption}
+\item[{{\bf lms\+\_\+device\+\_\+t} $\ast$}]{device}
+\end{DoxyParamCaption}
+)}\label{lms7__api_8cpp_acdfe59bbc2bf45c133a65c515a3787b3}
+
+
+Definition at line {\bf 76} of file {\bf lms7\+\_\+api.\+cpp}.
+
+
+
+References {\bf lime\+::\+Report\+Error()}, and {\bf lime\+::warning()}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{df/de1/lms7__api_8cpp_acdfe59bbc2bf45c133a65c515a3787b3_cgraph}
+\end{center}
+\end{figure}
+
+
+\index{lms7\+\_\+api.\+cpp@{lms7\+\_\+api.\+cpp}!L\+M\+S\+\_\+\+Enable\+Calib\+Cache@{L\+M\+S\+\_\+\+Enable\+Calib\+Cache}}
+\index{L\+M\+S\+\_\+\+Enable\+Calib\+Cache@{L\+M\+S\+\_\+\+Enable\+Calib\+Cache}!lms7\+\_\+api.\+cpp@{lms7\+\_\+api.\+cpp}}
+\paragraph[{L\+M\+S\+\_\+\+Enable\+Calib\+Cache(lms\+\_\+device\+\_\+t $\ast$dev, bool enable)}]{\setlength{\rightskip}{0pt plus 5cm}{\bf A\+P\+I\+\_\+\+E\+X\+P\+O\+RT} {\bf int} {\bf C\+A\+L\+L\+\_\+\+C\+O\+NV} L\+M\+S\+\_\+\+Enable\+Calib\+Cache (
+\begin{DoxyParamCaption}
+\item[{{\bf lms\+\_\+device\+\_\+t} $\ast$}]{dev, }
+\item[{bool}]{enable}
+\end{DoxyParamCaption}
+)}\label{lms7__api_8cpp_a874c42499ec6b140f9037f7b3d9ddc8b}
+
+
+Definition at line {\bf 363} of file {\bf lms7\+\_\+api.\+cpp}.
+
+
+
+References {\bf lime\+::\+L\+M\+S7\+\_\+\+Device\+::\+Enable\+Calib\+Cache()}, {\bf lms()}, and {\bf lime\+::\+Report\+Error()}.
+
+
+
+Referenced by {\bf device\+Cal\+Sweep()}, {\bf L\+M\+S7\+Suite\+App\+Frame\+::\+On\+Change\+Cache\+Settings()}, and {\bf L\+M\+S7\+Suite\+App\+Frame\+::\+On\+Control\+Board\+Connect()}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{df/de1/lms7__api_8cpp_a874c42499ec6b140f9037f7b3d9ddc8b_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{df/de1/lms7__api_8cpp_a874c42499ec6b140f9037f7b3d9ddc8b_icgraph}
+\end{center}
+\end{figure}
+
+
+\index{lms7\+\_\+api.\+cpp@{lms7\+\_\+api.\+cpp}!L\+M\+S\+\_\+\+Enable\+Channel@{L\+M\+S\+\_\+\+Enable\+Channel}}
+\index{L\+M\+S\+\_\+\+Enable\+Channel@{L\+M\+S\+\_\+\+Enable\+Channel}!lms7\+\_\+api.\+cpp@{lms7\+\_\+api.\+cpp}}
+\paragraph[{L\+M\+S\+\_\+\+Enable\+Channel(lms\+\_\+device\+\_\+t $\ast$device, bool dir\+\_\+tx, size\+\_\+t chan, bool enabled)}]{\setlength{\rightskip}{0pt plus 5cm}{\bf A\+P\+I\+\_\+\+E\+X\+P\+O\+RT} {\bf int} {\bf C\+A\+L\+L\+\_\+\+C\+O\+NV} L\+M\+S\+\_\+\+Enable\+Channel (
+\begin{DoxyParamCaption}
+\item[{{\bf lms\+\_\+device\+\_\+t} $\ast$}]{device, }
+\item[{bool}]{dir\+\_\+tx, }
+\item[{size\+\_\+t}]{chan, }
+\item[{bool}]{enabled}
+\end{DoxyParamCaption}
+)}\label{lms7__api_8cpp_a221f83ab83d4423b6b810551d261731f}
+
+
+Definition at line {\bf 115} of file {\bf lms7\+\_\+api.\+cpp}.
+
+
+
+References {\bf lime\+::\+L\+M\+S7\+\_\+\+Device\+::\+Enable\+Channel()}, {\bf lms()}, and {\bf lime\+::\+Report\+Error()}.
+
+
+
+Referenced by {\bf device\+Cal\+Sweep()}, {\bf main()}, and {\bf lms7002\+\_\+main\+Panel\+::\+On\+Enable\+M\+I\+M\+Ochecked()}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{df/de1/lms7__api_8cpp_a221f83ab83d4423b6b810551d261731f_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{df/de1/lms7__api_8cpp_a221f83ab83d4423b6b810551d261731f_icgraph}
+\end{center}
+\end{figure}
+
+
+\index{lms7\+\_\+api.\+cpp@{lms7\+\_\+api.\+cpp}!L\+M\+S\+\_\+\+Enable\+Tx\+W\+FM@{L\+M\+S\+\_\+\+Enable\+Tx\+W\+FM}}
+\index{L\+M\+S\+\_\+\+Enable\+Tx\+W\+FM@{L\+M\+S\+\_\+\+Enable\+Tx\+W\+FM}!lms7\+\_\+api.\+cpp@{lms7\+\_\+api.\+cpp}}
+\paragraph[{L\+M\+S\+\_\+\+Enable\+Tx\+W\+F\+M(lms\+\_\+device\+\_\+t $\ast$device, unsigned ch, bool active)}]{\setlength{\rightskip}{0pt plus 5cm}{\bf A\+P\+I\+\_\+\+E\+X\+P\+O\+RT} {\bf int} {\bf C\+A\+L\+L\+\_\+\+C\+O\+NV} L\+M\+S\+\_\+\+Enable\+Tx\+W\+FM (
+\begin{DoxyParamCaption}
+\item[{{\bf lms\+\_\+device\+\_\+t} $\ast$}]{device, }
+\item[{unsigned}]{ch, }
+\item[{bool}]{active}
+\end{DoxyParamCaption}
+)}\label{lms7__api_8cpp_abd52e9c4a89706ff53c3c59894f1b932}
+
+
+Definition at line {\bf 1255} of file {\bf lms7\+\_\+api.\+cpp}.
+
+
+
+References {\bf L\+M\+S\+\_\+\+Read\+F\+P\+G\+A\+Reg()}, {\bf L\+M\+S\+\_\+\+Write\+F\+P\+G\+A\+Reg()}, and {\bf status}.
+
+
+
+Referenced by {\bf D\+E\+F\+U\+N\+\_\+\+D\+L\+D()}, {\bf Free\+Resources()}, {\bf F\+P\+G\+Acontrols\+\_\+wxgui\+::\+Onbtn\+Play\+W\+F\+M\+Click()}, {\bf F\+P\+G\+Acontrols\+\_\+wxgui\+::\+Onbtn\+Stop\+W\+F\+M\+Click()}, and {\bf F\+P\+G\+Acontrols\+\_\+wxgui\+::\+Upload\+File()}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{df/de1/lms7__api_8cpp_abd52e9c4a89706ff53c3c59894f1b932_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{df/de1/lms7__api_8cpp_abd52e9c4a89706ff53c3c59894f1b932_icgraph}
+\end{center}
+\end{figure}
+
+
+\index{lms7\+\_\+api.\+cpp@{lms7\+\_\+api.\+cpp}!L\+M\+S\+\_\+\+Get\+Antenna@{L\+M\+S\+\_\+\+Get\+Antenna}}
+\index{L\+M\+S\+\_\+\+Get\+Antenna@{L\+M\+S\+\_\+\+Get\+Antenna}!lms7\+\_\+api.\+cpp@{lms7\+\_\+api.\+cpp}}
+\paragraph[{L\+M\+S\+\_\+\+Get\+Antenna(lms\+\_\+device\+\_\+t $\ast$device, bool dir\+\_\+tx, size\+\_\+t chan)}]{\setlength{\rightskip}{0pt plus 5cm}{\bf A\+P\+I\+\_\+\+E\+X\+P\+O\+RT} {\bf int} {\bf C\+A\+L\+L\+\_\+\+C\+O\+NV} L\+M\+S\+\_\+\+Get\+Antenna (
+\begin{DoxyParamCaption}
+\item[{{\bf lms\+\_\+device\+\_\+t} $\ast$}]{device, }
+\item[{bool}]{dir\+\_\+tx, }
+\item[{size\+\_\+t}]{chan}
+\end{DoxyParamCaption}
+)}\label{lms7__api_8cpp_a619495ec9963b6c399dc4ab7ec0ac929}
+
+
+Definition at line {\bf 508} of file {\bf lms7\+\_\+api.\+cpp}.
+
+
+
+References {\bf lime\+::\+L\+M\+S7\+\_\+\+Device\+::\+Get\+Path()}, {\bf lms()}, and {\bf lime\+::\+Report\+Error()}.
+
+
+
+Referenced by {\bf main()}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{df/de1/lms7__api_8cpp_a619495ec9963b6c399dc4ab7ec0ac929_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=248pt]{df/de1/lms7__api_8cpp_a619495ec9963b6c399dc4ab7ec0ac929_icgraph}
+\end{center}
+\end{figure}
+
+
+\index{lms7\+\_\+api.\+cpp@{lms7\+\_\+api.\+cpp}!L\+M\+S\+\_\+\+Get\+Antenna\+BW@{L\+M\+S\+\_\+\+Get\+Antenna\+BW}}
+\index{L\+M\+S\+\_\+\+Get\+Antenna\+BW@{L\+M\+S\+\_\+\+Get\+Antenna\+BW}!lms7\+\_\+api.\+cpp@{lms7\+\_\+api.\+cpp}}
+\paragraph[{L\+M\+S\+\_\+\+Get\+Antenna\+B\+W(lms\+\_\+device\+\_\+t $\ast$device, bool dir\+\_\+tx, size\+\_\+t chan, size\+\_\+t path, lms\+\_\+range\+\_\+t $\ast$range)}]{\setlength{\rightskip}{0pt plus 5cm}{\bf A\+P\+I\+\_\+\+E\+X\+P\+O\+RT} {\bf int} {\bf C\+A\+L\+L\+\_\+\+C\+O\+NV} L\+M\+S\+\_\+\+Get\+Antenna\+BW (
+\begin{DoxyParamCaption}
+\item[{{\bf lms\+\_\+device\+\_\+t} $\ast$}]{device, }
+\item[{bool}]{dir\+\_\+tx, }
+\item[{size\+\_\+t}]{chan, }
+\item[{size\+\_\+t}]{path, }
+\item[{{\bf lms\+\_\+range\+\_\+t} $\ast$}]{range}
+\end{DoxyParamCaption}
+)}\label{lms7__api_8cpp_a517d932f45e8f2f728ad0f61507ceb52}
+
+
+Definition at line {\bf 521} of file {\bf lms7\+\_\+api.\+cpp}.
+
+
+
+References {\bf lime\+::\+L\+M\+S7\+\_\+\+Device\+::\+Get\+Rx\+Path\+Band()}, {\bf lime\+::\+L\+M\+S7\+\_\+\+Device\+::\+Get\+Tx\+Path\+Band()}, {\bf lms()}, {\bf L\+M\+S\+\_\+\+S\+U\+C\+C\+E\+SS}, {\bf lime\+::\+L\+M\+S7\+\_\+\+Device\+::\+Range\+::max}, {\bf lms\+\_\+range\+\_\+t\+::max}, {\bf lime\+::\+L\+M\+S7\+\_\+\+Device\+::\+Range\+::min}, {\bf lms\+\_\+range\+\_\+t\+::min}, {\bf lime\+::\+Report\+Error()}, and {\bf lms\+\_\+range\+\_\+t\+::step}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{df/de1/lms7__api_8cpp_a517d932f45e8f2f728ad0f61507ceb52_cgraph}
+\end{center}
+\end{figure}
+
+
+\index{lms7\+\_\+api.\+cpp@{lms7\+\_\+api.\+cpp}!L\+M\+S\+\_\+\+Get\+Antenna\+List@{L\+M\+S\+\_\+\+Get\+Antenna\+List}}
+\index{L\+M\+S\+\_\+\+Get\+Antenna\+List@{L\+M\+S\+\_\+\+Get\+Antenna\+List}!lms7\+\_\+api.\+cpp@{lms7\+\_\+api.\+cpp}}
+\paragraph[{L\+M\+S\+\_\+\+Get\+Antenna\+List(lms\+\_\+device\+\_\+t $\ast$device, bool dir\+\_\+tx, size\+\_\+t chan, lms\+\_\+name\+\_\+t $\ast$list)}]{\setlength{\rightskip}{0pt plus 5cm}{\bf A\+P\+I\+\_\+\+E\+X\+P\+O\+RT} {\bf int} {\bf C\+A\+L\+L\+\_\+\+C\+O\+NV} L\+M\+S\+\_\+\+Get\+Antenna\+List (
+\begin{DoxyParamCaption}
+\item[{{\bf lms\+\_\+device\+\_\+t} $\ast$}]{device, }
+\item[{bool}]{dir\+\_\+tx, }
+\item[{size\+\_\+t}]{chan, }
+\item[{{\bf lms\+\_\+name\+\_\+t} $\ast$}]{list}
+\end{DoxyParamCaption}
+)}\label{lms7__api_8cpp_aa91eeed3941fc1695de93d53af5f5a64}
+
+
+Definition at line {\bf 460} of file {\bf lms7\+\_\+api.\+cpp}.
+
+
+
+References {\bf lime\+::\+L\+M\+S7\+\_\+\+Device\+::\+Get\+Num\+Channels()}, {\bf lime\+::\+L\+M\+S7\+\_\+\+Device\+::\+Get\+Path\+Names()}, {\bf i}, {\bf lms()}, and {\bf lime\+::\+Report\+Error()}.
+
+
+
+Referenced by {\bf main()}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{df/de1/lms7__api_8cpp_aa91eeed3941fc1695de93d53af5f5a64_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=264pt]{df/de1/lms7__api_8cpp_aa91eeed3941fc1695de93d53af5f5a64_icgraph}
+\end{center}
+\end{figure}
+
+
+\index{lms7\+\_\+api.\+cpp@{lms7\+\_\+api.\+cpp}!L\+M\+S\+\_\+\+Get\+Chip\+Temperature@{L\+M\+S\+\_\+\+Get\+Chip\+Temperature}}
+\index{L\+M\+S\+\_\+\+Get\+Chip\+Temperature@{L\+M\+S\+\_\+\+Get\+Chip\+Temperature}!lms7\+\_\+api.\+cpp@{lms7\+\_\+api.\+cpp}}
+\paragraph[{L\+M\+S\+\_\+\+Get\+Chip\+Temperature(lms\+\_\+device\+\_\+t $\ast$dev, size\+\_\+t ind, float\+\_\+type $\ast$temp)}]{\setlength{\rightskip}{0pt plus 5cm}{\bf A\+P\+I\+\_\+\+E\+X\+P\+O\+RT} {\bf int} {\bf C\+A\+L\+L\+\_\+\+C\+O\+NV} L\+M\+S\+\_\+\+Get\+Chip\+Temperature (
+\begin{DoxyParamCaption}
+\item[{{\bf lms\+\_\+device\+\_\+t} $\ast$}]{dev, }
+\item[{size\+\_\+t}]{ind, }
+\item[{{\bf float\+\_\+type} $\ast$}]{temp}
+\end{DoxyParamCaption}
+)}\label{lms7__api_8cpp_ac1c5a04e011a57401b5f58806a5bf399}
+
+
+Definition at line {\bf 375} of file {\bf lms7\+\_\+api.\+cpp}.
+
+
+
+References {\bf lime\+::\+L\+M\+S7\+\_\+\+Device\+::\+Get\+Chip\+Temperature()}, {\bf lms()}, {\bf lime\+::\+L\+M\+S7\+\_\+\+Device\+::\+Read\+L\+M\+S\+Reg()}, and {\bf lime\+::\+Report\+Error()}.
+
+
+
+Referenced by {\bf lms7002\+\_\+main\+Panel\+::\+On\+Read\+Temperature()}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{df/de1/lms7__api_8cpp_ac1c5a04e011a57401b5f58806a5bf399_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{df/de1/lms7__api_8cpp_ac1c5a04e011a57401b5f58806a5bf399_icgraph}
+\end{center}
+\end{figure}
+
+
+\index{lms7\+\_\+api.\+cpp@{lms7\+\_\+api.\+cpp}!L\+M\+S\+\_\+\+Get\+Clock\+Freq@{L\+M\+S\+\_\+\+Get\+Clock\+Freq}}
+\index{L\+M\+S\+\_\+\+Get\+Clock\+Freq@{L\+M\+S\+\_\+\+Get\+Clock\+Freq}!lms7\+\_\+api.\+cpp@{lms7\+\_\+api.\+cpp}}
+\paragraph[{L\+M\+S\+\_\+\+Get\+Clock\+Freq(lms\+\_\+device\+\_\+t $\ast$device, size\+\_\+t clk\+\_\+id, float\+\_\+type $\ast$freq)}]{\setlength{\rightskip}{0pt plus 5cm}{\bf A\+P\+I\+\_\+\+E\+X\+P\+O\+RT} {\bf int} {\bf C\+A\+L\+L\+\_\+\+C\+O\+NV} L\+M\+S\+\_\+\+Get\+Clock\+Freq (
+\begin{DoxyParamCaption}
+\item[{{\bf lms\+\_\+device\+\_\+t} $\ast$}]{device, }
+\item[{size\+\_\+t}]{clk\+\_\+id, }
+\item[{{\bf float\+\_\+type} $\ast$}]{freq}
+\end{DoxyParamCaption}
+)}\label{lms7__api_8cpp_a819ba3d694971caec63c4f4ddcd93669}
+
+
+Definition at line {\bf 260} of file {\bf lms7\+\_\+api.\+cpp}.
+
+
+
+References {\bf lime\+::\+L\+M\+S7\+\_\+\+Device\+::\+Get\+Clock\+Freq()}, {\bf lms()}, and {\bf lime\+::\+Report\+Error()}.
+
+
+
+Referenced by {\bf A\+D\+F4002\+\_\+wxgui\+::\+Initialize()}, {\bf lms7002\+\_\+pnl\+C\+L\+K\+G\+E\+N\+\_\+view\+::\+Initialize()}, {\bf lms7002\+\_\+pnl\+S\+X\+\_\+view\+::\+Onbtn\+Change\+Ref\+Clk\+Click()}, {\bf lms7002\+\_\+pnl\+Calibrations\+\_\+view\+::\+Update\+G\+U\+I()}, {\bf lms7002\+\_\+pnl\+C\+L\+K\+G\+E\+N\+\_\+view\+::\+Update\+G\+U\+I()}, {\bf lms7002\+\_\+pnl\+Tx\+T\+S\+P\+\_\+view\+::\+Update\+G\+U\+I()}, {\bf lms7002\+\_\+pnl\+S\+X\+\_\+view\+::\+Update\+G\+U\+I()}, and {\bf lms7002\+\_\+pnl\+C\+L\+K\+G\+E\+N\+\_\+view\+::\+Update\+Interface\+Frequencies()}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{df/de1/lms7__api_8cpp_a819ba3d694971caec63c4f4ddcd93669_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{df/de1/lms7__api_8cpp_a819ba3d694971caec63c4f4ddcd93669_icgraph}
+\end{center}
+\end{figure}
+
+
+\index{lms7\+\_\+api.\+cpp@{lms7\+\_\+api.\+cpp}!L\+M\+S\+\_\+\+Get\+Device\+Info@{L\+M\+S\+\_\+\+Get\+Device\+Info}}
+\index{L\+M\+S\+\_\+\+Get\+Device\+Info@{L\+M\+S\+\_\+\+Get\+Device\+Info}!lms7\+\_\+api.\+cpp@{lms7\+\_\+api.\+cpp}}
+\paragraph[{L\+M\+S\+\_\+\+Get\+Device\+Info(lms\+\_\+device\+\_\+t $\ast$device)}]{\setlength{\rightskip}{0pt plus 5cm}{\bf A\+P\+I\+\_\+\+E\+X\+P\+O\+RT} const {\bf lms\+\_\+dev\+\_\+info\+\_\+t}$\ast$ {\bf C\+A\+L\+L\+\_\+\+C\+O\+NV} L\+M\+S\+\_\+\+Get\+Device\+Info (
+\begin{DoxyParamCaption}
+\item[{{\bf lms\+\_\+device\+\_\+t} $\ast$}]{device}
+\end{DoxyParamCaption}
+)}\label{lms7__api_8cpp_a9b072759ccce533468db9bb3c97a417d}
+
+
+Definition at line {\bf 1291} of file {\bf lms7\+\_\+api.\+cpp}.
+
+
+
+References {\bf lime\+::\+L\+M\+S7\+\_\+\+Device\+::\+Get\+Connection()}, {\bf lime\+::\+L\+M\+S7\+\_\+\+Device\+::\+Get\+Info()}, {\bf lms()}, and {\bf lime\+::\+Report\+Error()}.
+
+
+
+Referenced by {\bf pnl\+Lime\+S\+D\+R\+::\+Initialize()}, {\bf pnl\+Board\+Controls\+::\+Initialize()}, {\bf L\+M\+S\+\_\+\+Programing\+\_\+wxgui\+::\+Onbtn\+Open\+Click()}, {\bf L\+M\+S7\+Suite\+App\+Frame\+::\+On\+Control\+Board\+Connect()}, {\bf dlg\+Device\+Info\+::\+On\+Get\+Info()}, {\bf L\+M\+S7\+Suite\+App\+Frame\+::\+On\+Show\+Si5351\+C()}, {\bf Print\+Device\+Info()}, and {\bf Myriad7\+\_\+wxgui\+::\+Update\+Panel()}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{df/de1/lms7__api_8cpp_a9b072759ccce533468db9bb3c97a417d_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{df/de1/lms7__api_8cpp_a9b072759ccce533468db9bb3c97a417d_icgraph}
+\end{center}
+\end{figure}
+
+
+\index{lms7\+\_\+api.\+cpp@{lms7\+\_\+api.\+cpp}!L\+M\+S\+\_\+\+Get\+Device\+List@{L\+M\+S\+\_\+\+Get\+Device\+List}}
+\index{L\+M\+S\+\_\+\+Get\+Device\+List@{L\+M\+S\+\_\+\+Get\+Device\+List}!lms7\+\_\+api.\+cpp@{lms7\+\_\+api.\+cpp}}
+\paragraph[{L\+M\+S\+\_\+\+Get\+Device\+List(lms\+\_\+info\+\_\+str\+\_\+t $\ast$dev\+\_\+list)}]{\setlength{\rightskip}{0pt plus 5cm}{\bf A\+P\+I\+\_\+\+E\+X\+P\+O\+RT} {\bf int} {\bf C\+A\+L\+L\+\_\+\+C\+O\+NV} L\+M\+S\+\_\+\+Get\+Device\+List (
+\begin{DoxyParamCaption}
+\item[{{\bf lms\+\_\+info\+\_\+str\+\_\+t} $\ast$}]{dev\+\_\+list}
+\end{DoxyParamCaption}
+)}\label{lms7__api_8cpp_a3ffae35743c28a5cb809b38d7ae0b31a}
+
+
+Definition at line {\bf 15} of file {\bf lms7\+\_\+api.\+cpp}.
+
+
+
+References {\bf lime\+::\+Connection\+Registry\+::find\+Connections()}, and {\bf i}.
+
+
+
+Referenced by {\bf D\+E\+F\+U\+N\+\_\+\+D\+L\+D()}, {\bf dlg\+Connection\+Settings\+::\+Get\+Device\+List()}, and {\bf main()}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{df/de1/lms7__api_8cpp_a3ffae35743c28a5cb809b38d7ae0b31a_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{df/de1/lms7__api_8cpp_a3ffae35743c28a5cb809b38d7ae0b31a_icgraph}
+\end{center}
+\end{figure}
+
+
+\index{lms7\+\_\+api.\+cpp@{lms7\+\_\+api.\+cpp}!L\+M\+S\+\_\+\+Get\+GaindB@{L\+M\+S\+\_\+\+Get\+GaindB}}
+\index{L\+M\+S\+\_\+\+Get\+GaindB@{L\+M\+S\+\_\+\+Get\+GaindB}!lms7\+\_\+api.\+cpp@{lms7\+\_\+api.\+cpp}}
+\paragraph[{L\+M\+S\+\_\+\+Get\+Gaind\+B(lms\+\_\+device\+\_\+t $\ast$device, bool dir\+\_\+tx, size\+\_\+t chan, unsigned $\ast$gain)}]{\setlength{\rightskip}{0pt plus 5cm}{\bf A\+P\+I\+\_\+\+E\+X\+P\+O\+RT} {\bf int} {\bf C\+A\+L\+L\+\_\+\+C\+O\+NV} L\+M\+S\+\_\+\+Get\+GaindB (
+\begin{DoxyParamCaption}
+\item[{{\bf lms\+\_\+device\+\_\+t} $\ast$}]{device, }
+\item[{bool}]{dir\+\_\+tx, }
+\item[{size\+\_\+t}]{chan, }
+\item[{unsigned $\ast$}]{gain}
+\end{DoxyParamCaption}
+)}\label{lms7__api_8cpp_a234cd6b4e32973d627ae369c353bbd56}
+
+
+Definition at line {\bf 707} of file {\bf lms7\+\_\+api.\+cpp}.
+
+
+
+References {\bf lime\+::\+L\+M\+S7\+\_\+\+Device\+::\+Get\+Gain()}, {\bf lime\+::\+L\+M\+S7\+\_\+\+Device\+::\+Get\+Num\+Channels()}, {\bf lms()}, {\bf L\+M\+S\+\_\+\+S\+U\+C\+C\+E\+SS}, and {\bf lime\+::\+Report\+Error()}.
+
+
+
+Referenced by {\bf main()}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{df/de1/lms7__api_8cpp_a234cd6b4e32973d627ae369c353bbd56_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=244pt]{df/de1/lms7__api_8cpp_a234cd6b4e32973d627ae369c353bbd56_icgraph}
+\end{center}
+\end{figure}
+
+
+\index{lms7\+\_\+api.\+cpp@{lms7\+\_\+api.\+cpp}!L\+M\+S\+\_\+\+Get\+G\+F\+I\+R\+Coeff@{L\+M\+S\+\_\+\+Get\+G\+F\+I\+R\+Coeff}}
+\index{L\+M\+S\+\_\+\+Get\+G\+F\+I\+R\+Coeff@{L\+M\+S\+\_\+\+Get\+G\+F\+I\+R\+Coeff}!lms7\+\_\+api.\+cpp@{lms7\+\_\+api.\+cpp}}
+\paragraph[{L\+M\+S\+\_\+\+Get\+G\+F\+I\+R\+Coeff(lms\+\_\+device\+\_\+t $\ast$device, bool dir\+\_\+tx, size\+\_\+t chan, lms\+\_\+gfir\+\_\+t filt, float\+\_\+type $\ast$coef)}]{\setlength{\rightskip}{0pt plus 5cm}{\bf A\+P\+I\+\_\+\+E\+X\+P\+O\+RT} {\bf int} {\bf C\+A\+L\+L\+\_\+\+C\+O\+NV} L\+M\+S\+\_\+\+Get\+G\+F\+I\+R\+Coeff (
+\begin{DoxyParamCaption}
+\item[{{\bf lms\+\_\+device\+\_\+t} $\ast$}]{device, }
+\item[{bool}]{dir\+\_\+tx, }
+\item[{size\+\_\+t}]{chan, }
+\item[{{\bf lms\+\_\+gfir\+\_\+t}}]{filt, }
+\item[{{\bf float\+\_\+type} $\ast$}]{coef}
+\end{DoxyParamCaption}
+)}\label{lms7__api_8cpp_a4cb5c68cc1a3bb7e63f2b64b3d7ca15c}
+
+
+Definition at line {\bf 1103} of file {\bf lms7\+\_\+api.\+cpp}.
+
+
+
+References {\bf lime\+::\+L\+M\+S7\+\_\+\+Device\+::\+Get\+G\+F\+I\+R\+Coef()}, {\bf lime\+::\+L\+M\+S7\+\_\+\+Device\+::\+Get\+Num\+Channels()}, {\bf lms()}, and {\bf lime\+::\+Report\+Error()}.
+
+
+
+Referenced by {\bf lms7002\+\_\+pnl\+Rx\+T\+S\+P\+\_\+view\+::onbtn\+G\+F\+I\+R1\+Coef()}, {\bf lms7002\+\_\+pnl\+Tx\+T\+S\+P\+\_\+view\+::onbtn\+G\+F\+I\+R1\+Coef()}, {\bf lms7002\+\_\+pnl\+Tx\+T\+S\+P\+\_\+view\+::onbtn\+G\+F\+I\+R2\+Coef()}, {\bf lms7002\+\_\+pnl\+Rx\+T\+S\+P\+\_\+view\+::onbtn\+G\+F\+I\+R2\+Coef()}, {\bf lms7002\+\_\+pnl\+Rx\+T\+S\+P\+\_\+view\+::onbtn\+G\+F\+I\+R3\+Coef()}, and {\bf lms7002\+\_\+pnl\+Tx\+T\+S\+P\+\_\+view\+::onbtn\+G\+F\+I\+R3\+Coef()}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{df/de1/lms7__api_8cpp_a4cb5c68cc1a3bb7e63f2b64b3d7ca15c_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{df/de1/lms7__api_8cpp_a4cb5c68cc1a3bb7e63f2b64b3d7ca15c_icgraph}
+\end{center}
+\end{figure}
+
+
+\index{lms7\+\_\+api.\+cpp@{lms7\+\_\+api.\+cpp}!L\+M\+S\+\_\+\+Get\+Last\+Error\+Message@{L\+M\+S\+\_\+\+Get\+Last\+Error\+Message}}
+\index{L\+M\+S\+\_\+\+Get\+Last\+Error\+Message@{L\+M\+S\+\_\+\+Get\+Last\+Error\+Message}!lms7\+\_\+api.\+cpp@{lms7\+\_\+api.\+cpp}}
+\paragraph[{L\+M\+S\+\_\+\+Get\+Last\+Error\+Message(void)}]{\setlength{\rightskip}{0pt plus 5cm}{\bf A\+P\+I\+\_\+\+E\+X\+P\+O\+RT} const char$\ast$ {\bf C\+A\+L\+L\+\_\+\+C\+O\+NV} L\+M\+S\+\_\+\+Get\+Last\+Error\+Message (
+\begin{DoxyParamCaption}
+\item[{{\bf void}}]{}
+\end{DoxyParamCaption}
+)}\label{lms7__api_8cpp_a50e22f8ed4b6a628841c5f8b4a0be215}
+
+
+Definition at line {\bf 1349} of file {\bf lms7\+\_\+api.\+cpp}.
+
+
+
+References {\bf lime\+::\+Get\+Last\+Error\+Message()}.
+
+
+
+Referenced by {\bf D\+E\+F\+U\+N\+\_\+\+D\+L\+D()}, {\bf device\+Cal\+Sweep()}, {\bf lms7002\+\_\+pnl\+Calibrations\+\_\+view\+::\+Onbtn\+Calibrate\+All()}, {\bf lms7002\+\_\+pnl\+Calibrations\+\_\+view\+::\+Onbtn\+Calibrate\+Rx()}, and {\bf lms7002\+\_\+pnl\+Calibrations\+\_\+view\+::\+Onbtn\+Calibrate\+Tx()}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{df/de1/lms7__api_8cpp_a50e22f8ed4b6a628841c5f8b4a0be215_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{df/de1/lms7__api_8cpp_a50e22f8ed4b6a628841c5f8b4a0be215_icgraph}
+\end{center}
+\end{figure}
+
+
+\index{lms7\+\_\+api.\+cpp@{lms7\+\_\+api.\+cpp}!L\+M\+S\+\_\+\+Get\+Library\+Version@{L\+M\+S\+\_\+\+Get\+Library\+Version}}
+\index{L\+M\+S\+\_\+\+Get\+Library\+Version@{L\+M\+S\+\_\+\+Get\+Library\+Version}!lms7\+\_\+api.\+cpp@{lms7\+\_\+api.\+cpp}}
+\paragraph[{L\+M\+S\+\_\+\+Get\+Library\+Version()}]{\setlength{\rightskip}{0pt plus 5cm}{\bf A\+P\+I\+\_\+\+E\+X\+P\+O\+RT} const char$\ast$ L\+M\+S\+\_\+\+Get\+Library\+Version (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}\label{lms7__api_8cpp_aaedd3df900d0ae0b74a6c33b9232d663}
+
+
+Definition at line {\bf 1354} of file {\bf lms7\+\_\+api.\+cpp}.
+
+
+
+References {\bf lime\+::\+Get\+Library\+Version()}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{df/de1/lms7__api_8cpp_aaedd3df900d0ae0b74a6c33b9232d663_cgraph}
+\end{center}
+\end{figure}
+
+
+\index{lms7\+\_\+api.\+cpp@{lms7\+\_\+api.\+cpp}!L\+M\+S\+\_\+\+Get\+L\+O\+Frequency@{L\+M\+S\+\_\+\+Get\+L\+O\+Frequency}}
+\index{L\+M\+S\+\_\+\+Get\+L\+O\+Frequency@{L\+M\+S\+\_\+\+Get\+L\+O\+Frequency}!lms7\+\_\+api.\+cpp@{lms7\+\_\+api.\+cpp}}
+\paragraph[{L\+M\+S\+\_\+\+Get\+L\+O\+Frequency(lms\+\_\+device\+\_\+t $\ast$device, bool dir\+\_\+tx, size\+\_\+t chan, float\+\_\+type $\ast$frequency)}]{\setlength{\rightskip}{0pt plus 5cm}{\bf A\+P\+I\+\_\+\+E\+X\+P\+O\+RT} {\bf int} {\bf C\+A\+L\+L\+\_\+\+C\+O\+NV} L\+M\+S\+\_\+\+Get\+L\+O\+Frequency (
+\begin{DoxyParamCaption}
+\item[{{\bf lms\+\_\+device\+\_\+t} $\ast$}]{device, }
+\item[{bool}]{dir\+\_\+tx, }
+\item[{size\+\_\+t}]{chan, }
+\item[{{\bf float\+\_\+type} $\ast$}]{frequency}
+\end{DoxyParamCaption}
+)}\label{lms7__api_8cpp_a0abde7a7cb9049f96c3d33de71eabd2a}
+
+
+Definition at line {\bf 424} of file {\bf lms7\+\_\+api.\+cpp}.
+
+
+
+References {\bf lime\+::\+L\+M\+S7\+\_\+\+Device\+::\+Get\+Frequency()}, {\bf lime\+::\+L\+M\+S7\+\_\+\+Device\+::\+Get\+Num\+Channels()}, {\bf lms()}, {\bf L\+M\+S\+\_\+\+S\+U\+C\+C\+E\+SS}, and {\bf lime\+::\+Report\+Error()}.
+
+
+
+Referenced by {\bf main()}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{df/de1/lms7__api_8cpp_a0abde7a7cb9049f96c3d33de71eabd2a_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=270pt]{df/de1/lms7__api_8cpp_a0abde7a7cb9049f96c3d33de71eabd2a_icgraph}
+\end{center}
+\end{figure}
+
+
+\index{lms7\+\_\+api.\+cpp@{lms7\+\_\+api.\+cpp}!L\+M\+S\+\_\+\+Get\+L\+O\+Frequency\+Range@{L\+M\+S\+\_\+\+Get\+L\+O\+Frequency\+Range}}
+\index{L\+M\+S\+\_\+\+Get\+L\+O\+Frequency\+Range@{L\+M\+S\+\_\+\+Get\+L\+O\+Frequency\+Range}!lms7\+\_\+api.\+cpp@{lms7\+\_\+api.\+cpp}}
+\paragraph[{L\+M\+S\+\_\+\+Get\+L\+O\+Frequency\+Range(lms\+\_\+device\+\_\+t $\ast$device, bool dir\+\_\+tx, lms\+\_\+range\+\_\+t $\ast$range)}]{\setlength{\rightskip}{0pt plus 5cm}{\bf A\+P\+I\+\_\+\+E\+X\+P\+O\+RT} {\bf int} {\bf C\+A\+L\+L\+\_\+\+C\+O\+NV} L\+M\+S\+\_\+\+Get\+L\+O\+Frequency\+Range (
+\begin{DoxyParamCaption}
+\item[{{\bf lms\+\_\+device\+\_\+t} $\ast$}]{device, }
+\item[{bool}]{dir\+\_\+tx, }
+\item[{{\bf lms\+\_\+range\+\_\+t} $\ast$}]{range}
+\end{DoxyParamCaption}
+)}\label{lms7__api_8cpp_a4fb02282949f45ec15baddc0c591c325}
+
+
+Definition at line {\bf 444} of file {\bf lms7\+\_\+api.\+cpp}.
+
+
+
+References {\bf lime\+::\+L\+M\+S7\+\_\+\+Device\+::\+Get\+Frequency\+Range()}, {\bf lms()}, {\bf L\+M\+S\+\_\+\+S\+U\+C\+C\+E\+SS}, {\bf lms\+\_\+range\+\_\+t\+::max}, {\bf lms\+\_\+range\+\_\+t\+::min}, {\bf lime\+::\+Report\+Error()}, and {\bf lms\+\_\+range\+\_\+t\+::step}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{df/de1/lms7__api_8cpp_a4fb02282949f45ec15baddc0c591c325_cgraph}
+\end{center}
+\end{figure}
+
+
+\index{lms7\+\_\+api.\+cpp@{lms7\+\_\+api.\+cpp}!L\+M\+S\+\_\+\+Get\+L\+P\+F\+BW@{L\+M\+S\+\_\+\+Get\+L\+P\+F\+BW}}
+\index{L\+M\+S\+\_\+\+Get\+L\+P\+F\+BW@{L\+M\+S\+\_\+\+Get\+L\+P\+F\+BW}!lms7\+\_\+api.\+cpp@{lms7\+\_\+api.\+cpp}}
+\paragraph[{L\+M\+S\+\_\+\+Get\+L\+P\+F\+B\+W(lms\+\_\+device\+\_\+t $\ast$device, bool dir\+\_\+tx, size\+\_\+t chan, float\+\_\+type $\ast$bandwidth)}]{\setlength{\rightskip}{0pt plus 5cm}{\bf A\+P\+I\+\_\+\+E\+X\+P\+O\+RT} {\bf int} {\bf C\+A\+L\+L\+\_\+\+C\+O\+NV} L\+M\+S\+\_\+\+Get\+L\+P\+F\+BW (
+\begin{DoxyParamCaption}
+\item[{{\bf lms\+\_\+device\+\_\+t} $\ast$}]{device, }
+\item[{bool}]{dir\+\_\+tx, }
+\item[{size\+\_\+t}]{chan, }
+\item[{{\bf float\+\_\+type} $\ast$}]{bandwidth}
+\end{DoxyParamCaption}
+)}\label{lms7__api_8cpp_a07244b37a3f21bf20f626eddc9b3d399}
+
+
+Definition at line {\bf 562} of file {\bf lms7\+\_\+api.\+cpp}.
+
+
+
+References {\bf lime\+::\+L\+M\+S7\+\_\+\+Device\+::\+Get\+L\+P\+F\+B\+W()}, {\bf lime\+::\+L\+M\+S7\+\_\+\+Device\+::\+Get\+Num\+Channels()}, {\bf lms()}, {\bf L\+M\+S\+\_\+\+S\+U\+C\+C\+E\+SS}, and {\bf lime\+::\+Report\+Error()}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{df/de1/lms7__api_8cpp_a07244b37a3f21bf20f626eddc9b3d399_cgraph}
+\end{center}
+\end{figure}
+
+
+\index{lms7\+\_\+api.\+cpp@{lms7\+\_\+api.\+cpp}!L\+M\+S\+\_\+\+Get\+L\+P\+F\+B\+W\+Range@{L\+M\+S\+\_\+\+Get\+L\+P\+F\+B\+W\+Range}}
+\index{L\+M\+S\+\_\+\+Get\+L\+P\+F\+B\+W\+Range@{L\+M\+S\+\_\+\+Get\+L\+P\+F\+B\+W\+Range}!lms7\+\_\+api.\+cpp@{lms7\+\_\+api.\+cpp}}
+\paragraph[{L\+M\+S\+\_\+\+Get\+L\+P\+F\+B\+W\+Range(lms\+\_\+device\+\_\+t $\ast$device, bool dir\+\_\+tx, lms\+\_\+range\+\_\+t $\ast$range)}]{\setlength{\rightskip}{0pt plus 5cm}{\bf A\+P\+I\+\_\+\+E\+X\+P\+O\+RT} {\bf int} {\bf C\+A\+L\+L\+\_\+\+C\+O\+NV} L\+M\+S\+\_\+\+Get\+L\+P\+F\+B\+W\+Range (
+\begin{DoxyParamCaption}
+\item[{{\bf lms\+\_\+device\+\_\+t} $\ast$}]{device, }
+\item[{bool}]{dir\+\_\+tx, }
+\item[{{\bf lms\+\_\+range\+\_\+t} $\ast$}]{range}
+\end{DoxyParamCaption}
+)}\label{lms7__api_8cpp_aa1ef3ea17a29cb1b087d4bcfbf481169}
+
+
+Definition at line {\bf 623} of file {\bf lms7\+\_\+api.\+cpp}.
+
+
+
+References {\bf lime\+::\+L\+M\+S7\+\_\+\+Device\+::\+Get\+L\+P\+F\+Range()}, {\bf lms()}, {\bf L\+M\+S\+\_\+\+S\+U\+C\+C\+E\+SS}, {\bf lms\+\_\+range\+\_\+t\+::max}, {\bf lms\+\_\+range\+\_\+t\+::min}, {\bf lime\+::\+Report\+Error()}, and {\bf lms\+\_\+range\+\_\+t\+::step}.
+
+
+
+Referenced by {\bf main()}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{df/de1/lms7__api_8cpp_aa1ef3ea17a29cb1b087d4bcfbf481169_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=275pt]{df/de1/lms7__api_8cpp_aa1ef3ea17a29cb1b087d4bcfbf481169_icgraph}
+\end{center}
+\end{figure}
+
+
+\index{lms7\+\_\+api.\+cpp@{lms7\+\_\+api.\+cpp}!L\+M\+S\+\_\+\+Get\+N\+C\+O\+Frequency@{L\+M\+S\+\_\+\+Get\+N\+C\+O\+Frequency}}
+\index{L\+M\+S\+\_\+\+Get\+N\+C\+O\+Frequency@{L\+M\+S\+\_\+\+Get\+N\+C\+O\+Frequency}!lms7\+\_\+api.\+cpp@{lms7\+\_\+api.\+cpp}}
+\paragraph[{L\+M\+S\+\_\+\+Get\+N\+C\+O\+Frequency(lms\+\_\+device\+\_\+t $\ast$device, bool dir\+\_\+tx, size\+\_\+t chan, float\+\_\+type $\ast$freq, float\+\_\+type $\ast$pho)}]{\setlength{\rightskip}{0pt plus 5cm}{\bf A\+P\+I\+\_\+\+E\+X\+P\+O\+RT} {\bf int} {\bf C\+A\+L\+L\+\_\+\+C\+O\+NV} L\+M\+S\+\_\+\+Get\+N\+C\+O\+Frequency (
+\begin{DoxyParamCaption}
+\item[{{\bf lms\+\_\+device\+\_\+t} $\ast$}]{device, }
+\item[{bool}]{dir\+\_\+tx, }
+\item[{size\+\_\+t}]{chan, }
+\item[{{\bf float\+\_\+type} $\ast$}]{freq, }
+\item[{{\bf float\+\_\+type} $\ast$}]{pho}
+\end{DoxyParamCaption}
+)}\label{lms7__api_8cpp_ad5b3bc6ed16354143b419d596cc0a40d}
+
+
+Definition at line {\bf 856} of file {\bf lms7\+\_\+api.\+cpp}.
+
+
+
+References {\bf lime\+::\+L\+M\+S7\+\_\+\+Device\+::\+Get\+N\+C\+O\+Freq()}, {\bf lime\+::\+L\+M\+S7\+\_\+\+Device\+::\+Get\+Num\+Channels()}, {\bf i}, {\bf lms()}, {\bf L\+M\+S\+\_\+\+N\+C\+O\+\_\+\+V\+A\+L\+\_\+\+C\+O\+U\+NT}, {\bf lime\+::\+L\+M\+S7\+\_\+\+Device\+::\+Read\+L\+M\+S\+Reg()}, and {\bf lime\+::\+Report\+Error()}.
+
+
+
+Referenced by {\bf lms7002\+\_\+pnl\+S\+X\+\_\+view\+::\+Update\+G\+U\+I()}, {\bf lms7002\+\_\+pnl\+Tx\+T\+S\+P\+\_\+view\+::\+Update\+N\+C\+Oinputs()}, and {\bf lms7002\+\_\+pnl\+Rx\+T\+S\+P\+\_\+view\+::\+Update\+N\+C\+Oinputs()}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{df/de1/lms7__api_8cpp_ad5b3bc6ed16354143b419d596cc0a40d_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{df/de1/lms7__api_8cpp_ad5b3bc6ed16354143b419d596cc0a40d_icgraph}
+\end{center}
+\end{figure}
+
+
+\index{lms7\+\_\+api.\+cpp@{lms7\+\_\+api.\+cpp}!L\+M\+S\+\_\+\+Get\+N\+C\+O\+Index@{L\+M\+S\+\_\+\+Get\+N\+C\+O\+Index}}
+\index{L\+M\+S\+\_\+\+Get\+N\+C\+O\+Index@{L\+M\+S\+\_\+\+Get\+N\+C\+O\+Index}!lms7\+\_\+api.\+cpp@{lms7\+\_\+api.\+cpp}}
+\paragraph[{L\+M\+S\+\_\+\+Get\+N\+C\+O\+Index(lms\+\_\+device\+\_\+t $\ast$device, bool dir\+\_\+tx, size\+\_\+t chan)}]{\setlength{\rightskip}{0pt plus 5cm}{\bf A\+P\+I\+\_\+\+E\+X\+P\+O\+RT} {\bf int} {\bf C\+A\+L\+L\+\_\+\+C\+O\+NV} L\+M\+S\+\_\+\+Get\+N\+C\+O\+Index (
+\begin{DoxyParamCaption}
+\item[{{\bf lms\+\_\+device\+\_\+t} $\ast$}]{device, }
+\item[{bool}]{dir\+\_\+tx, }
+\item[{size\+\_\+t}]{chan}
+\end{DoxyParamCaption}
+)}\label{lms7__api_8cpp_a9d75d3288737dbda49e13f73b44de983}
+
+
+Definition at line {\bf 971} of file {\bf lms7\+\_\+api.\+cpp}.
+
+
+
+References {\bf lime\+::\+L\+M\+S7\+\_\+\+Device\+::\+Get\+Num\+Channels()}, {\bf lms()}, {\bf L\+M\+S7\+\_\+\+C\+M\+I\+X\+\_\+\+B\+Y\+P\+\_\+\+R\+X\+T\+SP}, {\bf L\+M\+S7\+\_\+\+C\+M\+I\+X\+\_\+\+B\+Y\+P\+\_\+\+T\+X\+T\+SP}, {\bf L\+M\+S7\+\_\+\+S\+E\+L\+\_\+\+RX}, {\bf L\+M\+S7\+\_\+\+S\+E\+L\+\_\+\+TX}, {\bf lime\+::\+L\+M\+S7\+\_\+\+Device\+::\+Read\+Param()}, and {\bf lime\+::\+Report\+Error()}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{df/de1/lms7__api_8cpp_a9d75d3288737dbda49e13f73b44de983_cgraph}
+\end{center}
+\end{figure}
+
+
+\index{lms7\+\_\+api.\+cpp@{lms7\+\_\+api.\+cpp}!L\+M\+S\+\_\+\+Get\+N\+C\+O\+Phase@{L\+M\+S\+\_\+\+Get\+N\+C\+O\+Phase}}
+\index{L\+M\+S\+\_\+\+Get\+N\+C\+O\+Phase@{L\+M\+S\+\_\+\+Get\+N\+C\+O\+Phase}!lms7\+\_\+api.\+cpp@{lms7\+\_\+api.\+cpp}}
+\paragraph[{L\+M\+S\+\_\+\+Get\+N\+C\+O\+Phase(lms\+\_\+device\+\_\+t $\ast$device, bool dir\+\_\+tx, size\+\_\+t ch, float\+\_\+type $\ast$phase, float\+\_\+type $\ast$fcw)}]{\setlength{\rightskip}{0pt plus 5cm}{\bf A\+P\+I\+\_\+\+E\+X\+P\+O\+RT} {\bf int} {\bf C\+A\+L\+L\+\_\+\+C\+O\+NV} L\+M\+S\+\_\+\+Get\+N\+C\+O\+Phase (
+\begin{DoxyParamCaption}
+\item[{{\bf lms\+\_\+device\+\_\+t} $\ast$}]{device, }
+\item[{bool}]{dir\+\_\+tx, }
+\item[{size\+\_\+t}]{ch, }
+\item[{{\bf float\+\_\+type} $\ast$}]{phase, }
+\item[{{\bf float\+\_\+type} $\ast$}]{fcw}
+\end{DoxyParamCaption}
+)}\label{lms7__api_8cpp_a7c4442adb41c97eaf877ddf5fedfb26e}
+
+
+Definition at line {\bf 914} of file {\bf lms7\+\_\+api.\+cpp}.
+
+
+
+References {\bf lime\+::\+L\+M\+S7\+\_\+\+Device\+::\+Get\+N\+C\+O\+Freq()}, {\bf lime\+::\+L\+M\+S7\+\_\+\+Device\+::\+Get\+N\+C\+O\+Phase()}, {\bf lime\+::\+L\+M\+S7\+\_\+\+Device\+::\+Get\+Num\+Channels()}, {\bf i}, {\bf lms()}, {\bf L\+M\+S\+\_\+\+N\+C\+O\+\_\+\+V\+A\+L\+\_\+\+C\+O\+U\+NT}, and {\bf lime\+::\+Report\+Error()}.
+
+
+
+Referenced by {\bf lms7002\+\_\+pnl\+Tx\+T\+S\+P\+\_\+view\+::\+Update\+N\+C\+Oinputs()}, and {\bf lms7002\+\_\+pnl\+Rx\+T\+S\+P\+\_\+view\+::\+Update\+N\+C\+Oinputs()}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{df/de1/lms7__api_8cpp_a7c4442adb41c97eaf877ddf5fedfb26e_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{df/de1/lms7__api_8cpp_a7c4442adb41c97eaf877ddf5fedfb26e_icgraph}
+\end{center}
+\end{figure}
+
+
+\index{lms7\+\_\+api.\+cpp@{lms7\+\_\+api.\+cpp}!L\+M\+S\+\_\+\+Get\+Normalized\+Gain@{L\+M\+S\+\_\+\+Get\+Normalized\+Gain}}
+\index{L\+M\+S\+\_\+\+Get\+Normalized\+Gain@{L\+M\+S\+\_\+\+Get\+Normalized\+Gain}!lms7\+\_\+api.\+cpp@{lms7\+\_\+api.\+cpp}}
+\paragraph[{L\+M\+S\+\_\+\+Get\+Normalized\+Gain(lms\+\_\+device\+\_\+t $\ast$device, bool dir\+\_\+tx, size\+\_\+t chan, float\+\_\+type $\ast$gain)}]{\setlength{\rightskip}{0pt plus 5cm}{\bf A\+P\+I\+\_\+\+E\+X\+P\+O\+RT} {\bf int} {\bf C\+A\+L\+L\+\_\+\+C\+O\+NV} L\+M\+S\+\_\+\+Get\+Normalized\+Gain (
+\begin{DoxyParamCaption}
+\item[{{\bf lms\+\_\+device\+\_\+t} $\ast$}]{device, }
+\item[{bool}]{dir\+\_\+tx, }
+\item[{size\+\_\+t}]{chan, }
+\item[{{\bf float\+\_\+type} $\ast$}]{gain}
+\end{DoxyParamCaption}
+)}\label{lms7__api_8cpp_a8f560ebdc5a13f2337926acbe13a4120}
+
+
+Definition at line {\bf 685} of file {\bf lms7\+\_\+api.\+cpp}.
+
+
+
+References {\bf lime\+::\+L\+M\+S7\+\_\+\+Device\+::\+Get\+Gain()}, {\bf lime\+::\+L\+M\+S7\+\_\+\+Device\+::\+Get\+Gain\+Range()}, {\bf lime\+::\+L\+M\+S7\+\_\+\+Device\+::\+Get\+Num\+Channels()}, {\bf lms()}, {\bf L\+M\+S\+\_\+\+S\+U\+C\+C\+E\+SS}, {\bf lms\+\_\+range\+\_\+t\+::max}, {\bf lms\+\_\+range\+\_\+t\+::min}, {\bf range}, and {\bf lime\+::\+Report\+Error()}.
+
+
+
+Referenced by {\bf main()}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{df/de1/lms7__api_8cpp_a8f560ebdc5a13f2337926acbe13a4120_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=282pt]{df/de1/lms7__api_8cpp_a8f560ebdc5a13f2337926acbe13a4120_icgraph}
+\end{center}
+\end{figure}
+
+
+\index{lms7\+\_\+api.\+cpp@{lms7\+\_\+api.\+cpp}!L\+M\+S\+\_\+\+Get\+Num\+Channels@{L\+M\+S\+\_\+\+Get\+Num\+Channels}}
+\index{L\+M\+S\+\_\+\+Get\+Num\+Channels@{L\+M\+S\+\_\+\+Get\+Num\+Channels}!lms7\+\_\+api.\+cpp@{lms7\+\_\+api.\+cpp}}
+\paragraph[{L\+M\+S\+\_\+\+Get\+Num\+Channels(lms\+\_\+device\+\_\+t $\ast$device, bool dir\+\_\+tx)}]{\setlength{\rightskip}{0pt plus 5cm}{\bf A\+P\+I\+\_\+\+E\+X\+P\+O\+RT} {\bf int} {\bf C\+A\+L\+L\+\_\+\+C\+O\+NV} L\+M\+S\+\_\+\+Get\+Num\+Channels (
+\begin{DoxyParamCaption}
+\item[{{\bf lms\+\_\+device\+\_\+t} $\ast$}]{device, }
+\item[{bool}]{dir\+\_\+tx}
+\end{DoxyParamCaption}
+)}\label{lms7__api_8cpp_aff8fc19d9453348757cdb2fabb9f7cfd}
+
+
+Definition at line {\bf 393} of file {\bf lms7\+\_\+api.\+cpp}.
+
+
+
+References {\bf lime\+::\+L\+M\+S7\+\_\+\+Device\+::\+Get\+Num\+Channels()}, {\bf lms()}, and {\bf lime\+::\+Report\+Error()}.
+
+
+
+Referenced by {\bf device\+Cal\+Sweep()}, {\bf F\+P\+G\+Acontrols\+\_\+wxgui\+::\+Initialize()}, {\bf fftviewer\+\_\+fr\+F\+F\+Tviewer\+::\+Initialize()}, {\bf main()}, {\bf lms7002\+\_\+main\+Panel\+::\+On\+Enable\+M\+I\+M\+Ochecked()}, and {\bf fftviewer\+\_\+fr\+F\+F\+Tviewer\+::\+Streaming\+Loop()}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{df/de1/lms7__api_8cpp_aff8fc19d9453348757cdb2fabb9f7cfd_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{df/de1/lms7__api_8cpp_aff8fc19d9453348757cdb2fabb9f7cfd_icgraph}
+\end{center}
+\end{figure}
+
+
+\index{lms7\+\_\+api.\+cpp@{lms7\+\_\+api.\+cpp}!L\+M\+S\+\_\+\+Get\+Program\+Modes@{L\+M\+S\+\_\+\+Get\+Program\+Modes}}
+\index{L\+M\+S\+\_\+\+Get\+Program\+Modes@{L\+M\+S\+\_\+\+Get\+Program\+Modes}!lms7\+\_\+api.\+cpp@{lms7\+\_\+api.\+cpp}}
+\paragraph[{L\+M\+S\+\_\+\+Get\+Program\+Modes(lms\+\_\+device\+\_\+t $\ast$device, lms\+\_\+name\+\_\+t $\ast$list)}]{\setlength{\rightskip}{0pt plus 5cm}{\bf A\+P\+I\+\_\+\+E\+X\+P\+O\+RT} {\bf int} {\bf C\+A\+L\+L\+\_\+\+C\+O\+NV} L\+M\+S\+\_\+\+Get\+Program\+Modes (
+\begin{DoxyParamCaption}
+\item[{{\bf lms\+\_\+device\+\_\+t} $\ast$}]{device, }
+\item[{{\bf lms\+\_\+name\+\_\+t} $\ast$}]{list}
+\end{DoxyParamCaption}
+)}\label{lms7__api_8cpp_a10bb9c9c3d45543be59d29908bde7ba9}
+
+
+Definition at line {\bf 1315} of file {\bf lms7\+\_\+api.\+cpp}.
+
+
+
+References {\bf lime\+::\+L\+M\+S7\+\_\+\+Device\+::\+Get\+Program\+Modes()}, {\bf i}, {\bf lms()}, and {\bf lime\+::\+Report\+Error()}.
+
+
+
+Referenced by {\bf L\+M\+S\+\_\+\+Programing\+\_\+wxgui\+::\+Set\+Connection()}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{df/de1/lms7__api_8cpp_a10bb9c9c3d45543be59d29908bde7ba9_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{df/de1/lms7__api_8cpp_a10bb9c9c3d45543be59d29908bde7ba9_icgraph}
+\end{center}
+\end{figure}
+
+
+\index{lms7\+\_\+api.\+cpp@{lms7\+\_\+api.\+cpp}!L\+M\+S\+\_\+\+Get\+Sample\+Rate@{L\+M\+S\+\_\+\+Get\+Sample\+Rate}}
+\index{L\+M\+S\+\_\+\+Get\+Sample\+Rate@{L\+M\+S\+\_\+\+Get\+Sample\+Rate}!lms7\+\_\+api.\+cpp@{lms7\+\_\+api.\+cpp}}
+\paragraph[{L\+M\+S\+\_\+\+Get\+Sample\+Rate(lms\+\_\+device\+\_\+t $\ast$device, bool dir\+\_\+tx, size\+\_\+t chan, float\+\_\+type $\ast$host\+\_\+\+Hz, float\+\_\+type $\ast$rf\+\_\+\+Hz)}]{\setlength{\rightskip}{0pt plus 5cm}{\bf A\+P\+I\+\_\+\+E\+X\+P\+O\+RT} {\bf int} {\bf C\+A\+L\+L\+\_\+\+C\+O\+NV} L\+M\+S\+\_\+\+Get\+Sample\+Rate (
+\begin{DoxyParamCaption}
+\item[{{\bf lms\+\_\+device\+\_\+t} $\ast$}]{device, }
+\item[{bool}]{dir\+\_\+tx, }
+\item[{size\+\_\+t}]{chan, }
+\item[{{\bf float\+\_\+type} $\ast$}]{host\+\_\+\+Hz, }
+\item[{{\bf float\+\_\+type} $\ast$}]{rf\+\_\+\+Hz}
+\end{DoxyParamCaption}
+)}\label{lms7__api_8cpp_a558a76ff122d71bfe6af57262ea8ed0f}
+
+
+Definition at line {\bf 154} of file {\bf lms7\+\_\+api.\+cpp}.
+
+
+
+References {\bf lime\+::\+L\+M\+S7\+\_\+\+Device\+::\+Get\+Num\+Channels()}, {\bf lime\+::\+L\+M\+S7\+\_\+\+Device\+::\+Get\+Rate()}, {\bf lms()}, {\bf L\+M\+S\+\_\+\+S\+U\+C\+C\+E\+SS}, {\bf rate}, and {\bf lime\+::\+Report\+Error()}.
+
+
+
+Referenced by {\bf pnl\+Q\+Spark\+::\+Initialize()}, {\bf main()}, and {\bf fftviewer\+\_\+fr\+F\+F\+Tviewer\+::\+Set\+Nyquist\+Frequency()}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{df/de1/lms7__api_8cpp_a558a76ff122d71bfe6af57262ea8ed0f_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{df/de1/lms7__api_8cpp_a558a76ff122d71bfe6af57262ea8ed0f_icgraph}
+\end{center}
+\end{figure}
+
+
+\index{lms7\+\_\+api.\+cpp@{lms7\+\_\+api.\+cpp}!L\+M\+S\+\_\+\+Get\+Sample\+Rate\+Range@{L\+M\+S\+\_\+\+Get\+Sample\+Rate\+Range}}
+\index{L\+M\+S\+\_\+\+Get\+Sample\+Rate\+Range@{L\+M\+S\+\_\+\+Get\+Sample\+Rate\+Range}!lms7\+\_\+api.\+cpp@{lms7\+\_\+api.\+cpp}}
+\paragraph[{L\+M\+S\+\_\+\+Get\+Sample\+Rate\+Range(lms\+\_\+device\+\_\+t $\ast$device, bool dir\+\_\+tx, lms\+\_\+range\+\_\+t $\ast$range)}]{\setlength{\rightskip}{0pt plus 5cm}{\bf A\+P\+I\+\_\+\+E\+X\+P\+O\+RT} {\bf int} {\bf C\+A\+L\+L\+\_\+\+C\+O\+NV} L\+M\+S\+\_\+\+Get\+Sample\+Rate\+Range (
+\begin{DoxyParamCaption}
+\item[{{\bf lms\+\_\+device\+\_\+t} $\ast$}]{device, }
+\item[{bool}]{dir\+\_\+tx, }
+\item[{{\bf lms\+\_\+range\+\_\+t} $\ast$}]{range}
+\end{DoxyParamCaption}
+)}\label{lms7__api_8cpp_a2be0ab821f7a13e137c807521bb0e467}
+
+
+Definition at line {\bf 178} of file {\bf lms7\+\_\+api.\+cpp}.
+
+
+
+References {\bf lime\+::\+L\+M\+S7\+\_\+\+Device\+::\+Get\+Rate\+Range()}, {\bf lms()}, {\bf L\+M\+S\+\_\+\+S\+U\+C\+C\+E\+SS}, {\bf lms\+\_\+range\+\_\+t\+::max}, {\bf lms\+\_\+range\+\_\+t\+::min}, and {\bf lime\+::\+Report\+Error()}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{df/de1/lms7__api_8cpp_a2be0ab821f7a13e137c807521bb0e467_cgraph}
+\end{center}
+\end{figure}
+
+
+\index{lms7\+\_\+api.\+cpp@{lms7\+\_\+api.\+cpp}!L\+M\+S\+\_\+\+Get\+Stream\+Status@{L\+M\+S\+\_\+\+Get\+Stream\+Status}}
+\index{L\+M\+S\+\_\+\+Get\+Stream\+Status@{L\+M\+S\+\_\+\+Get\+Stream\+Status}!lms7\+\_\+api.\+cpp@{lms7\+\_\+api.\+cpp}}
+\paragraph[{L\+M\+S\+\_\+\+Get\+Stream\+Status(lms\+\_\+stream\+\_\+t $\ast$stream, lms\+\_\+stream\+\_\+status\+\_\+t $\ast$status)}]{\setlength{\rightskip}{0pt plus 5cm}{\bf A\+P\+I\+\_\+\+E\+X\+P\+O\+RT} {\bf int} {\bf C\+A\+L\+L\+\_\+\+C\+O\+NV} L\+M\+S\+\_\+\+Get\+Stream\+Status (
+\begin{DoxyParamCaption}
+\item[{{\bf lms\+\_\+stream\+\_\+t} $\ast$}]{stream, }
+\item[{{\bf lms\+\_\+stream\+\_\+status\+\_\+t} $\ast$}]{status}
+\end{DoxyParamCaption}
+)}\label{lms7__api_8cpp_a3fb6de3c631d876585f137ca3c03a7d9}
+
+
+Definition at line {\bf 1272} of file {\bf lms7\+\_\+api.\+cpp}.
+
+
+
+References {\bf lime\+::\+Stream\+Channel\+::\+Info\+::active}, {\bf lms\+\_\+stream\+\_\+status\+\_\+t\+::active}, {\bf lime\+::\+Stream\+Channel\+::\+Info\+::dropped\+Packets}, {\bf lms\+\_\+stream\+\_\+status\+\_\+t\+::dropped\+Packets}, {\bf lms\+\_\+stream\+\_\+status\+\_\+t\+::fifo\+Filled\+Count}, {\bf lime\+::\+Stream\+Channel\+::\+Info\+::fifo\+Items\+Count}, {\bf lime\+::\+Stream\+Channel\+::\+Info\+::fifo\+Size}, {\bf lms\+\_\+stream\+\_\+status\+\_\+t\+::fifo\+Size}, {\bf lime\+::\+Stream\+Channel\+::\+Get\+Info()}, {\bf lms\+\_\+stream\+\_\+t\+::handle}, {\bf info}, {\bf lime\+::\+Stream\+Channel\+::\+Info\+::link\+Rate}, {\bf lms\+\_\+stream\+\_\+status\+\_\+t\+::link\+Rate}, {\bf lime\+::\+Stream\+Channel\+::\+Info\+::overrun}, {\bf lms\+\_\+stream\+\_\+status\+\_\+t\+::overrun}, {\bf lime\+::\+Stream\+Channel\+::\+Info\+::timestamp}, {\bf lms\+\_\+stream\+\_\+status\+\_\+t\+::timestamp}, {\bf lime\+::\+Stream\+Channel\+::\+Info\+::underrun}, and {\bf lms\+\_\+stream\+\_\+status\+\_\+t\+::underrun}.
+
+
+
+Referenced by {\bf main()}, and {\bf fftviewer\+\_\+fr\+F\+F\+Tviewer\+::\+On\+Update\+Stats()}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{df/de1/lms7__api_8cpp_a3fb6de3c631d876585f137ca3c03a7d9_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{df/de1/lms7__api_8cpp_a3fb6de3c631d876585f137ca3c03a7d9_icgraph}
+\end{center}
+\end{figure}
+
+
+\index{lms7\+\_\+api.\+cpp@{lms7\+\_\+api.\+cpp}!L\+M\+S\+\_\+\+Get\+Test\+Signal@{L\+M\+S\+\_\+\+Get\+Test\+Signal}}
+\index{L\+M\+S\+\_\+\+Get\+Test\+Signal@{L\+M\+S\+\_\+\+Get\+Test\+Signal}!lms7\+\_\+api.\+cpp@{lms7\+\_\+api.\+cpp}}
+\paragraph[{L\+M\+S\+\_\+\+Get\+Test\+Signal(lms\+\_\+device\+\_\+t $\ast$device, bool dir\+\_\+tx, size\+\_\+t chan, lms\+\_\+testsig\+\_\+t $\ast$sig)}]{\setlength{\rightskip}{0pt plus 5cm}{\bf A\+P\+I\+\_\+\+E\+X\+P\+O\+RT} {\bf int} {\bf C\+A\+L\+L\+\_\+\+C\+O\+NV} L\+M\+S\+\_\+\+Get\+Test\+Signal (
+\begin{DoxyParamCaption}
+\item[{{\bf lms\+\_\+device\+\_\+t} $\ast$}]{device, }
+\item[{bool}]{dir\+\_\+tx, }
+\item[{size\+\_\+t}]{chan, }
+\item[{{\bf lms\+\_\+testsig\+\_\+t} $\ast$}]{sig}
+\end{DoxyParamCaption}
+)}\label{lms7__api_8cpp_a0555e1812314d548c15e6cbddcc06612}
+
+
+Definition at line {\bf 804} of file {\bf lms7\+\_\+api.\+cpp}.
+
+
+
+References {\bf lime\+::\+L\+M\+S7\+\_\+\+Device\+::\+Get\+Num\+Channels()}, {\bf lime\+::\+L\+M\+S7\+\_\+\+Device\+::\+Get\+Test\+Signal()}, {\bf lms()}, {\bf L\+M\+S\+\_\+\+S\+U\+C\+C\+E\+SS}, and {\bf lime\+::\+Report\+Error()}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{df/de1/lms7__api_8cpp_a0555e1812314d548c15e6cbddcc06612_cgraph}
+\end{center}
+\end{figure}
+
+
+\index{lms7\+\_\+api.\+cpp@{lms7\+\_\+api.\+cpp}!L\+M\+S\+\_\+\+G\+P\+I\+O\+Dir\+Read@{L\+M\+S\+\_\+\+G\+P\+I\+O\+Dir\+Read}}
+\index{L\+M\+S\+\_\+\+G\+P\+I\+O\+Dir\+Read@{L\+M\+S\+\_\+\+G\+P\+I\+O\+Dir\+Read}!lms7\+\_\+api.\+cpp@{lms7\+\_\+api.\+cpp}}
+\paragraph[{L\+M\+S\+\_\+\+G\+P\+I\+O\+Dir\+Read(lms\+\_\+device\+\_\+t $\ast$dev, uint8\+\_\+t $\ast$buffer, size\+\_\+t len)}]{\setlength{\rightskip}{0pt plus 5cm}{\bf A\+P\+I\+\_\+\+E\+X\+P\+O\+RT} {\bf int} {\bf C\+A\+L\+L\+\_\+\+C\+O\+NV} L\+M\+S\+\_\+\+G\+P\+I\+O\+Dir\+Read (
+\begin{DoxyParamCaption}
+\item[{{\bf lms\+\_\+device\+\_\+t} $\ast$}]{dev, }
+\item[{uint8\+\_\+t $\ast$}]{buffer, }
+\item[{size\+\_\+t}]{len}
+\end{DoxyParamCaption}
+)}\label{lms7__api_8cpp_abe30a21f85c65d4400a179afcd2c07c4}
+
+
+Definition at line {\bf 329} of file {\bf lms7\+\_\+api.\+cpp}.
+
+
+
+References {\bf lime\+::\+L\+M\+S7\+\_\+\+Device\+::\+Get\+Connection()}, {\bf lms()}, and {\bf lime\+::\+Report\+Error()}.
+
+
+
+Referenced by {\bf pnl\+Lime\+S\+D\+R\+::\+Update\+Panel()}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{df/de1/lms7__api_8cpp_abe30a21f85c65d4400a179afcd2c07c4_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{df/de1/lms7__api_8cpp_abe30a21f85c65d4400a179afcd2c07c4_icgraph}
+\end{center}
+\end{figure}
+
+
+\index{lms7\+\_\+api.\+cpp@{lms7\+\_\+api.\+cpp}!L\+M\+S\+\_\+\+G\+P\+I\+O\+Dir\+Write@{L\+M\+S\+\_\+\+G\+P\+I\+O\+Dir\+Write}}
+\index{L\+M\+S\+\_\+\+G\+P\+I\+O\+Dir\+Write@{L\+M\+S\+\_\+\+G\+P\+I\+O\+Dir\+Write}!lms7\+\_\+api.\+cpp@{lms7\+\_\+api.\+cpp}}
+\paragraph[{L\+M\+S\+\_\+\+G\+P\+I\+O\+Dir\+Write(lms\+\_\+device\+\_\+t $\ast$dev, const uint8\+\_\+t $\ast$buffer, size\+\_\+t len)}]{\setlength{\rightskip}{0pt plus 5cm}{\bf A\+P\+I\+\_\+\+E\+X\+P\+O\+RT} {\bf int} {\bf C\+A\+L\+L\+\_\+\+C\+O\+NV} L\+M\+S\+\_\+\+G\+P\+I\+O\+Dir\+Write (
+\begin{DoxyParamCaption}
+\item[{{\bf lms\+\_\+device\+\_\+t} $\ast$}]{dev, }
+\item[{const uint8\+\_\+t $\ast$}]{buffer, }
+\item[{size\+\_\+t}]{len}
+\end{DoxyParamCaption}
+)}\label{lms7__api_8cpp_acf47e711bafa0e173d0471b2091b98ee}
+
+
+Definition at line {\bf 346} of file {\bf lms7\+\_\+api.\+cpp}.
+
+
+
+References {\bf lime\+::\+L\+M\+S7\+\_\+\+Device\+::\+Get\+Connection()}, {\bf lms()}, and {\bf lime\+::\+Report\+Error()}.
+
+
+
+Referenced by {\bf main()}, and {\bf pnl\+Lime\+S\+D\+R\+::\+On\+Usr\+G\+P\+I\+O\+Dir\+Change()}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{df/de1/lms7__api_8cpp_acf47e711bafa0e173d0471b2091b98ee_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{df/de1/lms7__api_8cpp_acf47e711bafa0e173d0471b2091b98ee_icgraph}
+\end{center}
+\end{figure}
+
+
+\index{lms7\+\_\+api.\+cpp@{lms7\+\_\+api.\+cpp}!L\+M\+S\+\_\+\+G\+P\+I\+O\+Read@{L\+M\+S\+\_\+\+G\+P\+I\+O\+Read}}
+\index{L\+M\+S\+\_\+\+G\+P\+I\+O\+Read@{L\+M\+S\+\_\+\+G\+P\+I\+O\+Read}!lms7\+\_\+api.\+cpp@{lms7\+\_\+api.\+cpp}}
+\paragraph[{L\+M\+S\+\_\+\+G\+P\+I\+O\+Read(lms\+\_\+device\+\_\+t $\ast$dev, uint8\+\_\+t $\ast$buffer, size\+\_\+t len)}]{\setlength{\rightskip}{0pt plus 5cm}{\bf A\+P\+I\+\_\+\+E\+X\+P\+O\+RT} {\bf int} {\bf C\+A\+L\+L\+\_\+\+C\+O\+NV} L\+M\+S\+\_\+\+G\+P\+I\+O\+Read (
+\begin{DoxyParamCaption}
+\item[{{\bf lms\+\_\+device\+\_\+t} $\ast$}]{dev, }
+\item[{uint8\+\_\+t $\ast$}]{buffer, }
+\item[{size\+\_\+t}]{len}
+\end{DoxyParamCaption}
+)}\label{lms7__api_8cpp_a81b5c1b4a4b0317e5106fe1db0e7fac7}
+
+
+Definition at line {\bf 295} of file {\bf lms7\+\_\+api.\+cpp}.
+
+
+
+References {\bf lime\+::\+L\+M\+S7\+\_\+\+Device\+::\+Get\+Connection()}, {\bf lms()}, and {\bf lime\+::\+Report\+Error()}.
+
+
+
+Referenced by {\bf main()}, {\bf R\+F\+Spark\+\_\+wxgui\+::\+On\+Read\+G\+P\+I\+O()}, {\bf pnl\+Buffers\+::\+Update\+Panel()}, {\bf Myriad7\+\_\+wxgui\+::\+Update\+Panel()}, and {\bf pnl\+Lime\+S\+D\+R\+::\+Update\+Panel()}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{df/de1/lms7__api_8cpp_a81b5c1b4a4b0317e5106fe1db0e7fac7_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{df/de1/lms7__api_8cpp_a81b5c1b4a4b0317e5106fe1db0e7fac7_icgraph}
+\end{center}
+\end{figure}
+
+
+\index{lms7\+\_\+api.\+cpp@{lms7\+\_\+api.\+cpp}!L\+M\+S\+\_\+\+G\+P\+I\+O\+Write@{L\+M\+S\+\_\+\+G\+P\+I\+O\+Write}}
+\index{L\+M\+S\+\_\+\+G\+P\+I\+O\+Write@{L\+M\+S\+\_\+\+G\+P\+I\+O\+Write}!lms7\+\_\+api.\+cpp@{lms7\+\_\+api.\+cpp}}
+\paragraph[{L\+M\+S\+\_\+\+G\+P\+I\+O\+Write(lms\+\_\+device\+\_\+t $\ast$dev, const uint8\+\_\+t $\ast$buffer, size\+\_\+t len)}]{\setlength{\rightskip}{0pt plus 5cm}{\bf A\+P\+I\+\_\+\+E\+X\+P\+O\+RT} {\bf int} {\bf C\+A\+L\+L\+\_\+\+C\+O\+NV} L\+M\+S\+\_\+\+G\+P\+I\+O\+Write (
+\begin{DoxyParamCaption}
+\item[{{\bf lms\+\_\+device\+\_\+t} $\ast$}]{dev, }
+\item[{const uint8\+\_\+t $\ast$}]{buffer, }
+\item[{size\+\_\+t}]{len}
+\end{DoxyParamCaption}
+)}\label{lms7__api_8cpp_a4ff082a4601470c2d76f9fc93afe21dd}
+
+
+Definition at line {\bf 312} of file {\bf lms7\+\_\+api.\+cpp}.
+
+
+
+References {\bf lime\+::\+L\+M\+S7\+\_\+\+Device\+::\+Get\+Connection()}, {\bf lms()}, and {\bf lime\+::\+Report\+Error()}.
+
+
+
+Referenced by {\bf main()}, {\bf pnl\+Buffers\+::\+On\+G\+P\+I\+Ochanged()}, {\bf pnl\+Lime\+S\+D\+R\+::\+On\+Usr\+G\+P\+I\+O\+Change()}, {\bf R\+F\+Spark\+\_\+wxgui\+::\+On\+Write\+G\+P\+I\+O()}, and {\bf Myriad7\+\_\+wxgui\+::\+Parameter\+Change\+Handler()}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{df/de1/lms7__api_8cpp_a4ff082a4601470c2d76f9fc93afe21dd_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{df/de1/lms7__api_8cpp_a4ff082a4601470c2d76f9fc93afe21dd_icgraph}
+\end{center}
+\end{figure}
+
+
+\index{lms7\+\_\+api.\+cpp@{lms7\+\_\+api.\+cpp}!L\+M\+S\+\_\+\+Init@{L\+M\+S\+\_\+\+Init}}
+\index{L\+M\+S\+\_\+\+Init@{L\+M\+S\+\_\+\+Init}!lms7\+\_\+api.\+cpp@{lms7\+\_\+api.\+cpp}}
+\paragraph[{L\+M\+S\+\_\+\+Init(lms\+\_\+device\+\_\+t $\ast$device)}]{\setlength{\rightskip}{0pt plus 5cm}{\bf A\+P\+I\+\_\+\+E\+X\+P\+O\+RT} {\bf int} {\bf C\+A\+L\+L\+\_\+\+C\+O\+NV} L\+M\+S\+\_\+\+Init (
+\begin{DoxyParamCaption}
+\item[{{\bf lms\+\_\+device\+\_\+t} $\ast$}]{device}
+\end{DoxyParamCaption}
+)}\label{lms7__api_8cpp_a804769c6df1bb5c86829f6211c0c56aa}
+
+
+Definition at line {\bf 193} of file {\bf lms7\+\_\+api.\+cpp}.
+
+
+
+References {\bf lime\+::\+L\+M\+S7\+\_\+\+Device\+::\+Init()}, {\bf lms()}, and {\bf lime\+::\+Report\+Error()}.
+
+
+
+Referenced by {\bf main()}, and {\bf lms7002\+\_\+main\+Panel\+::\+On\+Load\+Default()}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{df/de1/lms7__api_8cpp_a804769c6df1bb5c86829f6211c0c56aa_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=282pt]{df/de1/lms7__api_8cpp_a804769c6df1bb5c86829f6211c0c56aa_icgraph}
+\end{center}
+\end{figure}
+
+
+\index{lms7\+\_\+api.\+cpp@{lms7\+\_\+api.\+cpp}!L\+M\+S\+\_\+\+Is\+Open@{L\+M\+S\+\_\+\+Is\+Open}}
+\index{L\+M\+S\+\_\+\+Is\+Open@{L\+M\+S\+\_\+\+Is\+Open}!lms7\+\_\+api.\+cpp@{lms7\+\_\+api.\+cpp}}
+\paragraph[{L\+M\+S\+\_\+\+Is\+Open(lms\+\_\+device\+\_\+t $\ast$device, int port)}]{\setlength{\rightskip}{0pt plus 5cm}{\bf A\+P\+I\+\_\+\+E\+X\+P\+O\+RT} bool {\bf C\+A\+L\+L\+\_\+\+C\+O\+NV} L\+M\+S\+\_\+\+Is\+Open (
+\begin{DoxyParamCaption}
+\item[{{\bf lms\+\_\+device\+\_\+t} $\ast$}]{device, }
+\item[{{\bf int}}]{port}
+\end{DoxyParamCaption}
+)}\label{lms7__api_8cpp_ac1ada16ec7c071bc36a4ebf28c43b31f}
+
+
+Definition at line {\bf 87} of file {\bf lms7\+\_\+api.\+cpp}.
+
+
+
+References {\bf lime\+::\+L\+M\+S7\+\_\+\+Device\+::\+Get\+Connection()}, {\bf lime\+::\+I\+Connection\+::\+Is\+Open()}, {\bf lms()}, and {\bf lime\+::warning()}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{df/de1/lms7__api_8cpp_ac1ada16ec7c071bc36a4ebf28c43b31f_cgraph}
+\end{center}
+\end{figure}
+
+
+\index{lms7\+\_\+api.\+cpp@{lms7\+\_\+api.\+cpp}!L\+M\+S\+\_\+\+Load\+Config@{L\+M\+S\+\_\+\+Load\+Config}}
+\index{L\+M\+S\+\_\+\+Load\+Config@{L\+M\+S\+\_\+\+Load\+Config}!lms7\+\_\+api.\+cpp@{lms7\+\_\+api.\+cpp}}
+\paragraph[{L\+M\+S\+\_\+\+Load\+Config(lms\+\_\+device\+\_\+t $\ast$device, const char $\ast$filename)}]{\setlength{\rightskip}{0pt plus 5cm}{\bf A\+P\+I\+\_\+\+E\+X\+P\+O\+RT} {\bf int} {\bf C\+A\+L\+L\+\_\+\+C\+O\+NV} L\+M\+S\+\_\+\+Load\+Config (
+\begin{DoxyParamCaption}
+\item[{{\bf lms\+\_\+device\+\_\+t} $\ast$}]{device, }
+\item[{const char $\ast$}]{filename}
+\end{DoxyParamCaption}
+)}\label{lms7__api_8cpp_a6ed2978c8a23248e27406725a293a3c3}
+
+
+Definition at line {\bf 751} of file {\bf lms7\+\_\+api.\+cpp}.
+
+
+
+References {\bf lms()}, {\bf lime\+::\+L\+M\+S7\+\_\+\+Device\+::\+Load\+Config()}, and {\bf lime\+::\+Report\+Error()}.
+
+
+
+Referenced by {\bf D\+E\+F\+U\+N\+\_\+\+D\+L\+D()}, and {\bf lms7002\+\_\+main\+Panel\+::\+On\+Open\+Project()}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{df/de1/lms7__api_8cpp_a6ed2978c8a23248e27406725a293a3c3_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=318pt]{df/de1/lms7__api_8cpp_a6ed2978c8a23248e27406725a293a3c3_icgraph}
+\end{center}
+\end{figure}
+
+
+\index{lms7\+\_\+api.\+cpp@{lms7\+\_\+api.\+cpp}!L\+M\+S\+\_\+\+Open@{L\+M\+S\+\_\+\+Open}}
+\index{L\+M\+S\+\_\+\+Open@{L\+M\+S\+\_\+\+Open}!lms7\+\_\+api.\+cpp@{lms7\+\_\+api.\+cpp}}
+\paragraph[{L\+M\+S\+\_\+\+Open(lms\+\_\+device\+\_\+t $\ast$$\ast$device, const lms\+\_\+info\+\_\+str\+\_\+t info, void $\ast$args)}]{\setlength{\rightskip}{0pt plus 5cm}{\bf A\+P\+I\+\_\+\+E\+X\+P\+O\+RT} {\bf int} {\bf C\+A\+L\+L\+\_\+\+C\+O\+NV} L\+M\+S\+\_\+\+Open (
+\begin{DoxyParamCaption}
+\item[{{\bf lms\+\_\+device\+\_\+t} $\ast$$\ast$}]{device, }
+\item[{const {\bf lms\+\_\+info\+\_\+str\+\_\+t}}]{info, }
+\item[{{\bf void} $\ast$}]{args}
+\end{DoxyParamCaption}
+)}\label{lms7__api_8cpp_abd4183e72a6b36d5ed36b4f2fb3841aa}
+
+
+Definition at line {\bf 34} of file {\bf lms7\+\_\+api.\+cpp}.
+
+
+
+References {\bf lime\+::\+L\+M\+S7\+\_\+\+Device\+::\+Create\+Device()}, {\bf lime\+::error()}, {\bf lime\+::\+Connection\+Registry\+::find\+Connections()}, {\bf i}, and {\bf L\+M\+S\+\_\+\+S\+U\+C\+C\+E\+SS}.
+
+
+
+Referenced by {\bf D\+E\+F\+U\+N\+\_\+\+D\+L\+D()}, {\bf device\+Cal\+Sweep()}, and {\bf main()}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{df/de1/lms7__api_8cpp_abd4183e72a6b36d5ed36b4f2fb3841aa_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=345pt]{df/de1/lms7__api_8cpp_abd4183e72a6b36d5ed36b4f2fb3841aa_icgraph}
+\end{center}
+\end{figure}
+
+
+\index{lms7\+\_\+api.\+cpp@{lms7\+\_\+api.\+cpp}!L\+M\+S\+\_\+\+Program@{L\+M\+S\+\_\+\+Program}}
+\index{L\+M\+S\+\_\+\+Program@{L\+M\+S\+\_\+\+Program}!lms7\+\_\+api.\+cpp@{lms7\+\_\+api.\+cpp}}
+\paragraph[{L\+M\+S\+\_\+\+Program(lms\+\_\+device\+\_\+t $\ast$device, const char $\ast$data, size\+\_\+t size, const lms\+\_\+name\+\_\+t mode, lms\+\_\+prog\+\_\+callback\+\_\+t callback)}]{\setlength{\rightskip}{0pt plus 5cm}{\bf A\+P\+I\+\_\+\+E\+X\+P\+O\+RT} {\bf int} {\bf C\+A\+L\+L\+\_\+\+C\+O\+NV} L\+M\+S\+\_\+\+Program (
+\begin{DoxyParamCaption}
+\item[{{\bf lms\+\_\+device\+\_\+t} $\ast$}]{device, }
+\item[{const char $\ast$}]{data, }
+\item[{size\+\_\+t}]{size, }
+\item[{const {\bf lms\+\_\+name\+\_\+t}}]{mode, }
+\item[{{\bf lms\+\_\+prog\+\_\+callback\+\_\+t}}]{callback}
+\end{DoxyParamCaption}
+)}\label{lms7__api_8cpp_a1f9be91569904f87e02b61153f8f24c3}
+
+
+Definition at line {\bf 1336} of file {\bf lms7\+\_\+api.\+cpp}.
+
+
+
+References {\bf lms()}, {\bf lime\+::\+L\+M\+S7\+\_\+\+Device\+::\+Program()}, and {\bf lime\+::\+Report\+Error()}.
+
+
+
+Referenced by {\bf L\+M\+S\+\_\+\+Programing\+\_\+wxgui\+::\+Do\+Programming()}, {\bf lms7002\+\_\+pnl\+M\+C\+U\+\_\+\+B\+D\+\_\+view\+::\+Onbtn\+Start\+Programming\+Click()}, {\bf lms7002\+\_\+pnl\+M\+C\+U\+\_\+\+B\+D\+\_\+view\+::\+Onchk\+Reset\+Click()}, and {\bf lms7002\+\_\+pnl\+R3\+\_\+view\+::\+Parameter\+Change\+Handler()}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{df/de1/lms7__api_8cpp_a1f9be91569904f87e02b61153f8f24c3_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{df/de1/lms7__api_8cpp_a1f9be91569904f87e02b61153f8f24c3_icgraph}
+\end{center}
+\end{figure}
+
+
+\index{lms7\+\_\+api.\+cpp@{lms7\+\_\+api.\+cpp}!L\+M\+S\+\_\+\+Read\+Custom\+Board\+Param@{L\+M\+S\+\_\+\+Read\+Custom\+Board\+Param}}
+\index{L\+M\+S\+\_\+\+Read\+Custom\+Board\+Param@{L\+M\+S\+\_\+\+Read\+Custom\+Board\+Param}!lms7\+\_\+api.\+cpp@{lms7\+\_\+api.\+cpp}}
+\paragraph[{L\+M\+S\+\_\+\+Read\+Custom\+Board\+Param(lms\+\_\+device\+\_\+t $\ast$device, uint8\+\_\+t param\+\_\+id, float\+\_\+type $\ast$val, lms\+\_\+name\+\_\+t units)}]{\setlength{\rightskip}{0pt plus 5cm}{\bf A\+P\+I\+\_\+\+E\+X\+P\+O\+RT} {\bf int} {\bf C\+A\+L\+L\+\_\+\+C\+O\+NV} L\+M\+S\+\_\+\+Read\+Custom\+Board\+Param (
+\begin{DoxyParamCaption}
+\item[{{\bf lms\+\_\+device\+\_\+t} $\ast$}]{device, }
+\item[{uint8\+\_\+t}]{param\+\_\+id, }
+\item[{{\bf float\+\_\+type} $\ast$}]{val, }
+\item[{{\bf lms\+\_\+name\+\_\+t}}]{units}
+\end{DoxyParamCaption}
+)}\label{lms7__api_8cpp_af7e9535a812f022b6c566144e2fea45a}
+
+
+Definition at line {\bf 206} of file {\bf lms7\+\_\+api.\+cpp}.
+
+
+
+References {\bf lime\+::\+L\+M\+S7\+\_\+\+Device\+::\+Get\+Connection()}, {\bf lms()}, and {\bf lime\+::\+Report\+Error()}.
+
+
+
+Referenced by {\bf L\+M\+S\+\_\+\+V\+C\+T\+C\+X\+O\+Read()}, {\bf pnl\+Board\+Controls\+::\+On\+Custom\+Read()}, {\bf pnl\+Ultimate\+E\+V\+B\+::\+On\+Read\+All()}, {\bf pnl\+Board\+Controls\+::\+On\+Read\+All()}, and {\bf R\+F\+Spark\+\_\+wxgui\+::\+On\+Refresh\+All\+A\+D\+C()}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{df/de1/lms7__api_8cpp_af7e9535a812f022b6c566144e2fea45a_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{df/de1/lms7__api_8cpp_af7e9535a812f022b6c566144e2fea45a_icgraph}
+\end{center}
+\end{figure}
+
+
+\index{lms7\+\_\+api.\+cpp@{lms7\+\_\+api.\+cpp}!L\+M\+S\+\_\+\+Read\+F\+P\+G\+A\+Reg@{L\+M\+S\+\_\+\+Read\+F\+P\+G\+A\+Reg}}
+\index{L\+M\+S\+\_\+\+Read\+F\+P\+G\+A\+Reg@{L\+M\+S\+\_\+\+Read\+F\+P\+G\+A\+Reg}!lms7\+\_\+api.\+cpp@{lms7\+\_\+api.\+cpp}}
+\paragraph[{L\+M\+S\+\_\+\+Read\+F\+P\+G\+A\+Reg(lms\+\_\+device\+\_\+t $\ast$device, uint32\+\_\+t address, uint16\+\_\+t $\ast$val)}]{\setlength{\rightskip}{0pt plus 5cm}{\bf A\+P\+I\+\_\+\+E\+X\+P\+O\+RT} {\bf int} {\bf C\+A\+L\+L\+\_\+\+C\+O\+NV} L\+M\+S\+\_\+\+Read\+F\+P\+G\+A\+Reg (
+\begin{DoxyParamCaption}
+\item[{{\bf lms\+\_\+device\+\_\+t} $\ast$}]{device, }
+\item[{uint32\+\_\+t}]{address, }
+\item[{uint16\+\_\+t $\ast$}]{val}
+\end{DoxyParamCaption}
+)}\label{lms7__api_8cpp_a9732243494479ad720f1b4d8cc12c3f7}
+
+
+Definition at line {\bf 1020} of file {\bf lms7\+\_\+api.\+cpp}.
+
+
+
+References {\bf address}, {\bf lime\+::\+L\+M\+S7\+\_\+\+Device\+::\+Get\+Connection()}, {\bf lms()}, {\bf L\+M\+S\+\_\+\+S\+U\+C\+C\+E\+SS}, {\bf lime\+::\+Report\+Error()}, and {\bf val}.
+
+
+
+Referenced by {\bf L\+M\+S\+\_\+\+Enable\+Tx\+W\+F\+M()}, {\bf S\+P\+I\+\_\+wxgui\+::\+On\+Board\+Read()}, {\bf pnl\+Q\+Spark\+::\+Onbtn\+Update\+All()}, {\bf F\+P\+G\+Acontrols\+\_\+wxgui\+::\+On\+Chk\+Digital\+Loopback\+Enable\+Click()}, {\bf pnl\+Q\+Spark\+::\+Register\+Parameter\+Change\+Handler()}, {\bf pnlu\+Lime\+S\+D\+R\+::\+Update\+Panel()}, and {\bf pnl\+Lime\+S\+D\+R\+::\+Update\+Panel()}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{df/de1/lms7__api_8cpp_a9732243494479ad720f1b4d8cc12c3f7_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{df/de1/lms7__api_8cpp_a9732243494479ad720f1b4d8cc12c3f7_icgraph}
+\end{center}
+\end{figure}
+
+
+\index{lms7\+\_\+api.\+cpp@{lms7\+\_\+api.\+cpp}!L\+M\+S\+\_\+\+Read\+L\+M\+S\+Reg@{L\+M\+S\+\_\+\+Read\+L\+M\+S\+Reg}}
+\index{L\+M\+S\+\_\+\+Read\+L\+M\+S\+Reg@{L\+M\+S\+\_\+\+Read\+L\+M\+S\+Reg}!lms7\+\_\+api.\+cpp@{lms7\+\_\+api.\+cpp}}
+\paragraph[{L\+M\+S\+\_\+\+Read\+L\+M\+S\+Reg(lms\+\_\+device\+\_\+t $\ast$device, uint32\+\_\+t address, uint16\+\_\+t $\ast$val)}]{\setlength{\rightskip}{0pt plus 5cm}{\bf A\+P\+I\+\_\+\+E\+X\+P\+O\+RT} {\bf int} {\bf C\+A\+L\+L\+\_\+\+C\+O\+NV} L\+M\+S\+\_\+\+Read\+L\+M\+S\+Reg (
+\begin{DoxyParamCaption}
+\item[{{\bf lms\+\_\+device\+\_\+t} $\ast$}]{device, }
+\item[{uint32\+\_\+t}]{address, }
+\item[{uint16\+\_\+t $\ast$}]{val}
+\end{DoxyParamCaption}
+)}\label{lms7__api_8cpp_ae9cff988809ec272435f4d18a7682493}
+
+
+Definition at line {\bf 995} of file {\bf lms7\+\_\+api.\+cpp}.
+
+
+
+References {\bf lms()}, {\bf lime\+::\+L\+M\+S7\+\_\+\+Device\+::\+Read\+L\+M\+S\+Reg()}, and {\bf lime\+::\+Report\+Error()}.
+
+
+
+Referenced by {\bf lms7002\+\_\+pnl\+R3\+\_\+view\+::\+M\+C\+U\+\_\+\+Run\+Procedure()}, {\bf lms7002\+\_\+pnl\+R3\+\_\+view\+::\+M\+C\+U\+\_\+\+Wait\+For\+Status()}, {\bf lms7002\+\_\+pnl\+Rx\+T\+S\+P\+\_\+view\+::\+Onbtn\+Read\+B\+I\+S\+T\+Signature()}, {\bf lms7002\+\_\+pnl\+Rx\+T\+S\+P\+\_\+view\+::\+Onbtn\+Read\+R\+S\+S\+I()}, {\bf S\+P\+I\+\_\+wxgui\+::on\+L\+M\+Sread()}, {\bf lms7002\+\_\+pnl\+M\+C\+U\+\_\+\+B\+D\+\_\+view\+::\+On\+Reg\+Write\+Read()}, {\bf lms7002\+\_\+pnl\+R3\+\_\+view\+::\+On\+Write\+Rx\+D\+C()}, {\bf lms7002\+\_\+pnl\+R3\+\_\+view\+::\+On\+Write\+Tx\+D\+C()}, {\bf lms7002\+\_\+pnl\+R3\+\_\+view\+::\+Parameter\+Change\+Handler()}, {\bf lms7002\+\_\+pnl\+M\+C\+U\+\_\+\+B\+D\+\_\+view\+::\+Read\+One\+Byte()}, {\bf lms7002\+\_\+pnl\+R3\+\_\+view\+::\+Update\+G\+U\+I\+Slow()}, {\bf L\+M\+S7002\+M\+\_\+\+Novena\+\_\+wxgui\+::\+Update\+Panel()}, {\bf lms7002\+\_\+main\+Panel\+::\+Update\+Visible\+Panel()}, {\bf lms7002\+\_\+pnl\+M\+C\+U\+\_\+\+B\+D\+\_\+view\+::\+Wait\+\_\+\+C\+L\+K\+\_\+\+Cycles()}, and {\bf lms7002\+\_\+pnl\+M\+C\+U\+\_\+\+B\+D\+\_\+view\+::\+Wait\+Until\+Written()}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{df/de1/lms7__api_8cpp_ae9cff988809ec272435f4d18a7682493_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{df/de1/lms7__api_8cpp_ae9cff988809ec272435f4d18a7682493_icgraph}
+\end{center}
+\end{figure}
+
+
+\index{lms7\+\_\+api.\+cpp@{lms7\+\_\+api.\+cpp}!L\+M\+S\+\_\+\+Read\+Param@{L\+M\+S\+\_\+\+Read\+Param}}
+\index{L\+M\+S\+\_\+\+Read\+Param@{L\+M\+S\+\_\+\+Read\+Param}!lms7\+\_\+api.\+cpp@{lms7\+\_\+api.\+cpp}}
+\paragraph[{L\+M\+S\+\_\+\+Read\+Param(lms\+\_\+device\+\_\+t $\ast$device, struct L\+M\+S7\+Parameter param, uint16\+\_\+t $\ast$val)}]{\setlength{\rightskip}{0pt plus 5cm}{\bf A\+P\+I\+\_\+\+E\+X\+P\+O\+RT} {\bf int} {\bf C\+A\+L\+L\+\_\+\+C\+O\+NV} L\+M\+S\+\_\+\+Read\+Param (
+\begin{DoxyParamCaption}
+\item[{{\bf lms\+\_\+device\+\_\+t} $\ast$}]{device, }
+\item[{struct {\bf L\+M\+S7\+Parameter}}]{param, }
+\item[{uint16\+\_\+t $\ast$}]{val}
+\end{DoxyParamCaption}
+)}\label{lms7__api_8cpp_af7e27adc91d37b2464a10990b1f39c9b}
+
+
+Definition at line {\bf 1062} of file {\bf lms7\+\_\+api.\+cpp}.
+
+
+
+References {\bf lms()}, {\bf L\+M\+S\+\_\+\+S\+U\+C\+C\+E\+SS}, {\bf lime\+::\+L\+M\+S7\+\_\+\+Device\+::\+Read\+Param()}, and {\bf lime\+::\+Report\+Error()}.
+
+
+
+Referenced by {\bf lms7002\+\_\+pnl\+L\+D\+O\+\_\+view\+::\+Initialize()}, {\bf lms7002\+\_\+pnl\+Gains\+\_\+view\+::\+Initialize()}, {\bf lms7002\+\_\+pnl\+Lime\+Light\+P\+A\+D\+\_\+view\+::\+Initialize()}, {\bf lms7002\+\_\+pnl\+T\+B\+B\+\_\+view\+::\+Initialize()}, {\bf lms7002\+\_\+pnl\+Calibrations\+\_\+view\+::\+Initialize()}, {\bf lms7002\+\_\+pnl\+Tx\+T\+S\+P\+\_\+view\+::\+Initialize()}, {\bf lms7002\+\_\+pnl\+Rx\+T\+S\+P\+\_\+view\+::\+Initialize()}, {\bf lms7002\+\_\+pnl\+R3\+\_\+view\+::\+Initialize()}, {\bf lms7002\+\_\+pnl\+S\+X\+\_\+view\+::\+Onbtn\+Calculate\+Click()}, {\bf lms7002\+\_\+pnl\+Calibrations\+\_\+view\+::\+Onbtn\+Calibrate\+All()}, {\bf lms7002\+\_\+pnl\+Calibrations\+\_\+view\+::\+Onbtn\+Calibrate\+Rx()}, {\bf lms7002\+\_\+pnl\+Calibrations\+\_\+view\+::\+Onbtn\+Calibrate\+Tx()}, {\bf lms7002\+\_\+pnl\+S\+X\+\_\+view\+::\+Onbtn\+Change\+Ref\+Clk\+Click()}, {\bf lms7002\+\_\+pnl\+Tx\+T\+S\+P\+\_\+view\+::onbtn\+G\+F\+I\+R1\+Coef()}, {\bf lms7002\+\_\+pnl\+Rx\+T\+S\+P\+\_\+view\+::onbtn\+G\+F\+I\+R1\+Coef()}, {\bf lms7002\+\_\+pnl\+Tx\+T\+S\+P\+\_\+view\+::onbtn\+G\+F\+I\+R2\+Coef()}, {\bf lms7002\+\_\+pnl\+Rx\+T\+S\+P\+\_\+view\+::onbtn\+G\+F\+I\+R2\+Coef()}, {\bf lms7002\+\_\+pnl\+Tx\+T\+S\+P\+\_\+view\+::onbtn\+G\+F\+I\+R3\+Coef()}, {\bf lms7002\+\_\+pnl\+Rx\+T\+S\+P\+\_\+view\+::onbtn\+G\+F\+I\+R3\+Coef()}, {\bf lms7002\+\_\+pnl\+Tx\+T\+S\+P\+\_\+view\+::onbtn\+Read\+B\+I\+S\+T\+Signature()}, {\bf lms7002\+\_\+pnl\+S\+X\+\_\+view\+::\+Onbtn\+Read\+Comparators()}, {\bf lms7002\+\_\+pnl\+C\+L\+K\+G\+E\+N\+\_\+view\+::\+Onbtn\+Read\+Comparators()}, {\bf lms7002\+\_\+pnl\+B\+I\+S\+T\+\_\+view\+::onbtn\+Read\+Signature()}, {\bf lms7002\+\_\+pnl\+Lime\+Light\+P\+A\+D\+\_\+view\+::onbtn\+Read\+Ver\+Rev\+Mask()}, {\bf lms7002\+\_\+pnl\+C\+L\+K\+G\+E\+N\+\_\+view\+::onbtn\+Tune\+Click()}, {\bf lms7002\+\_\+pnl\+S\+X\+\_\+view\+::\+Onbtn\+Tune\+Click()}, {\bf lms7002\+\_\+pnl\+T\+B\+B\+\_\+view\+::\+Onbtn\+Tune\+Filter()}, {\bf lms7002\+\_\+pnl\+R\+B\+B\+\_\+view\+::\+Onbtn\+Tune\+Filter()}, {\bf lms7002\+\_\+pnl\+T\+B\+B\+\_\+view\+::\+Onbtn\+Tune\+Tx\+Gain()}, {\bf lms7002\+\_\+pnl\+C\+L\+K\+G\+E\+N\+\_\+view\+::\+Onbtn\+Update\+Coarse()}, {\bf lms7002\+\_\+pnl\+Tx\+T\+S\+P\+\_\+view\+::\+Onbtn\+Upload\+N\+C\+O\+Click()}, {\bf lms7002\+\_\+pnl\+Rx\+T\+S\+P\+\_\+view\+::\+Onbtn\+Upload\+N\+C\+O\+Click()}, {\bf lms7002\+\_\+main\+Panel\+::\+On\+Enable\+M\+I\+M\+Ochecked()}, {\bf lms7002\+\_\+pnl\+S\+X\+\_\+view\+::\+On\+Enable\+Ref\+Spur\+Cancelation()}, {\bf lms7002\+\_\+pnl\+Tx\+T\+S\+P\+\_\+view\+::\+P\+H\+Oinput\+Changed()}, {\bf lms7002\+\_\+pnl\+Rx\+T\+S\+P\+\_\+view\+::\+P\+H\+Oinput\+Changed()}, {\bf lms7002\+\_\+pnl\+Gains\+\_\+view\+::\+Update\+G\+U\+I()}, {\bf lms7002\+\_\+pnl\+T\+R\+F\+\_\+view\+::\+Update\+G\+U\+I()}, {\bf lms7002\+\_\+pnl\+Lime\+Light\+P\+A\+D\+\_\+view\+::\+Update\+G\+U\+I()}, {\bf lms7002\+\_\+pnl\+R\+B\+B\+\_\+view\+::\+Update\+G\+U\+I()}, {\bf lms7002\+\_\+pnl\+T\+B\+B\+\_\+view\+::\+Update\+G\+U\+I()}, {\bf lms7002\+\_\+pnl\+R\+F\+E\+\_\+view\+::\+Update\+G\+U\+I()}, {\bf lms7002\+\_\+pnl\+Calibrations\+\_\+view\+::\+Update\+G\+U\+I()}, {\bf lms7002\+\_\+pnl\+C\+L\+K\+G\+E\+N\+\_\+view\+::\+Update\+G\+U\+I()}, {\bf lms7002\+\_\+pnl\+Tx\+T\+S\+P\+\_\+view\+::\+Update\+G\+U\+I()}, {\bf lms7002\+\_\+pnl\+S\+X\+\_\+view\+::\+Update\+G\+U\+I()}, {\bf lms7002\+\_\+pnl\+Rx\+T\+S\+P\+\_\+view\+::\+Update\+G\+U\+I()}, {\bf lms7002\+\_\+main\+Panel\+::\+Update\+G\+U\+I()}, {\bf lms7002\+\_\+pnl\+R3\+\_\+view\+::\+Update\+G\+U\+I()}, {\bf lms7002\+\_\+pnl\+Tx\+T\+S\+P\+\_\+view\+::\+Update\+N\+C\+Oinputs()}, and {\bf lms7002\+\_\+pnl\+Rx\+T\+S\+P\+\_\+view\+::\+Update\+N\+C\+Oinputs()}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{df/de1/lms7__api_8cpp_af7e27adc91d37b2464a10990b1f39c9b_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{df/de1/lms7__api_8cpp_af7e27adc91d37b2464a10990b1f39c9b_icgraph}
+\end{center}
+\end{figure}
+
+
+\index{lms7\+\_\+api.\+cpp@{lms7\+\_\+api.\+cpp}!L\+M\+S\+\_\+\+Recv\+Stream@{L\+M\+S\+\_\+\+Recv\+Stream}}
+\index{L\+M\+S\+\_\+\+Recv\+Stream@{L\+M\+S\+\_\+\+Recv\+Stream}!lms7\+\_\+api.\+cpp@{lms7\+\_\+api.\+cpp}}
+\paragraph[{L\+M\+S\+\_\+\+Recv\+Stream(lms\+\_\+stream\+\_\+t $\ast$stream, void $\ast$samples, size\+\_\+t sample\+\_\+count, lms\+\_\+stream\+\_\+meta\+\_\+t $\ast$meta, unsigned timeout\+\_\+ms)}]{\setlength{\rightskip}{0pt plus 5cm}{\bf A\+P\+I\+\_\+\+E\+X\+P\+O\+RT} {\bf int} {\bf C\+A\+L\+L\+\_\+\+C\+O\+NV} L\+M\+S\+\_\+\+Recv\+Stream (
+\begin{DoxyParamCaption}
+\item[{{\bf lms\+\_\+stream\+\_\+t} $\ast$}]{stream, }
+\item[{{\bf void} $\ast$}]{samples, }
+\item[{size\+\_\+t}]{sample\+\_\+count, }
+\item[{{\bf lms\+\_\+stream\+\_\+meta\+\_\+t} $\ast$}]{meta, }
+\item[{unsigned}]{timeout\+\_\+ms}
+\end{DoxyParamCaption}
+)}\label{lms7__api_8cpp_aaa4aebcb24e6d95ca2381747f6e344cf}
+
+
+Definition at line {\bf 1193} of file {\bf lms7\+\_\+api.\+cpp}.
+
+
+
+References {\bf lime\+::\+Stream\+Channel\+::\+Metadata\+::flags}, {\bf lms\+\_\+stream\+\_\+t\+::handle}, {\bf if()}, {\bf lime\+::\+Stream\+Channel\+::\+Read()}, {\bf status}, {\bf lime\+::\+Ring\+F\+I\+F\+O\+::\+S\+Y\+N\+C\+\_\+\+T\+I\+M\+E\+S\+T\+A\+MP}, {\bf lms\+\_\+stream\+\_\+meta\+\_\+t\+::timestamp}, and {\bf lms\+\_\+stream\+\_\+meta\+\_\+t\+::wait\+For\+Timestamp}.
+
+
+
+Referenced by {\bf D\+E\+F\+U\+N\+\_\+\+D\+L\+D()}, {\bf main()}, and {\bf fftviewer\+\_\+fr\+F\+F\+Tviewer\+::\+Streaming\+Loop()}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{df/de1/lms7__api_8cpp_aaa4aebcb24e6d95ca2381747f6e344cf_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{df/de1/lms7__api_8cpp_aaa4aebcb24e6d95ca2381747f6e344cf_icgraph}
+\end{center}
+\end{figure}
+
+
+\index{lms7\+\_\+api.\+cpp@{lms7\+\_\+api.\+cpp}!L\+M\+S\+\_\+\+Register\+Log\+Handler@{L\+M\+S\+\_\+\+Register\+Log\+Handler}}
+\index{L\+M\+S\+\_\+\+Register\+Log\+Handler@{L\+M\+S\+\_\+\+Register\+Log\+Handler}!lms7\+\_\+api.\+cpp@{lms7\+\_\+api.\+cpp}}
+\paragraph[{L\+M\+S\+\_\+\+Register\+Log\+Handler(\+L\+M\+S\+\_\+\+Log\+Handler handler)}]{\setlength{\rightskip}{0pt plus 5cm}{\bf A\+P\+I\+\_\+\+E\+X\+P\+O\+RT} {\bf void} L\+M\+S\+\_\+\+Register\+Log\+Handler (
+\begin{DoxyParamCaption}
+\item[{{\bf L\+M\+S\+\_\+\+Log\+Handler}}]{handler}
+\end{DoxyParamCaption}
+)}\label{lms7__api_8cpp_a75a5fa868806ccec9b7f1959418a726e}
+
+
+Definition at line {\bf 1367} of file {\bf lms7\+\_\+api.\+cpp}.
+
+
+
+References {\bf api\+\_\+msg\+\_\+handler}, {\bf A\+P\+I\+Msg\+Handler()}, and {\bf lime\+::register\+Log\+Handler()}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{df/de1/lms7__api_8cpp_a75a5fa868806ccec9b7f1959418a726e_cgraph}
+\end{center}
+\end{figure}
+
+
+\index{lms7\+\_\+api.\+cpp@{lms7\+\_\+api.\+cpp}!L\+M\+S\+\_\+\+Reset@{L\+M\+S\+\_\+\+Reset}}
+\index{L\+M\+S\+\_\+\+Reset@{L\+M\+S\+\_\+\+Reset}!lms7\+\_\+api.\+cpp@{lms7\+\_\+api.\+cpp}}
+\paragraph[{L\+M\+S\+\_\+\+Reset(lms\+\_\+device\+\_\+t $\ast$device)}]{\setlength{\rightskip}{0pt plus 5cm}{\bf A\+P\+I\+\_\+\+E\+X\+P\+O\+RT} {\bf int} {\bf C\+A\+L\+L\+\_\+\+C\+O\+NV} L\+M\+S\+\_\+\+Reset (
+\begin{DoxyParamCaption}
+\item[{{\bf lms\+\_\+device\+\_\+t} $\ast$}]{device}
+\end{DoxyParamCaption}
+)}\label{lms7__api_8cpp_a3c38c0cdc0f0e576ee2933ecb7e5a45d}
+
+
+Definition at line {\bf 103} of file {\bf lms7\+\_\+api.\+cpp}.
+
+
+
+References {\bf lms()}, {\bf lime\+::\+Report\+Error()}, and {\bf lime\+::\+L\+M\+S7\+\_\+\+Device\+::\+Reset()}.
+
+
+
+Referenced by {\bf lms7002\+\_\+main\+Panel\+::\+On\+New\+Project()}, and {\bf lms7002\+\_\+main\+Panel\+::\+On\+Reset\+Chip()}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{df/de1/lms7__api_8cpp_a3c38c0cdc0f0e576ee2933ecb7e5a45d_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=294pt]{df/de1/lms7__api_8cpp_a3c38c0cdc0f0e576ee2933ecb7e5a45d_icgraph}
+\end{center}
+\end{figure}
+
+
+\index{lms7\+\_\+api.\+cpp@{lms7\+\_\+api.\+cpp}!L\+M\+S\+\_\+\+Save\+Config@{L\+M\+S\+\_\+\+Save\+Config}}
+\index{L\+M\+S\+\_\+\+Save\+Config@{L\+M\+S\+\_\+\+Save\+Config}!lms7\+\_\+api.\+cpp@{lms7\+\_\+api.\+cpp}}
+\paragraph[{L\+M\+S\+\_\+\+Save\+Config(lms\+\_\+device\+\_\+t $\ast$device, const char $\ast$filename)}]{\setlength{\rightskip}{0pt plus 5cm}{\bf A\+P\+I\+\_\+\+E\+X\+P\+O\+RT} {\bf int} {\bf C\+A\+L\+L\+\_\+\+C\+O\+NV} L\+M\+S\+\_\+\+Save\+Config (
+\begin{DoxyParamCaption}
+\item[{{\bf lms\+\_\+device\+\_\+t} $\ast$}]{device, }
+\item[{const char $\ast$}]{filename}
+\end{DoxyParamCaption}
+)}\label{lms7__api_8cpp_a2160d093e5c947adbaddafec1e041427}
+
+
+Definition at line {\bf 764} of file {\bf lms7\+\_\+api.\+cpp}.
+
+
+
+References {\bf lms()}, {\bf lime\+::\+Report\+Error()}, and {\bf lime\+::\+L\+M\+S7\+\_\+\+Device\+::\+Save\+Config()}.
+
+
+
+Referenced by {\bf lms7002\+\_\+main\+Panel\+::\+On\+Save\+Project()}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{df/de1/lms7__api_8cpp_a2160d093e5c947adbaddafec1e041427_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=319pt]{df/de1/lms7__api_8cpp_a2160d093e5c947adbaddafec1e041427_icgraph}
+\end{center}
+\end{figure}
+
+
+\index{lms7\+\_\+api.\+cpp@{lms7\+\_\+api.\+cpp}!L\+M\+S\+\_\+\+Send\+Stream@{L\+M\+S\+\_\+\+Send\+Stream}}
+\index{L\+M\+S\+\_\+\+Send\+Stream@{L\+M\+S\+\_\+\+Send\+Stream}!lms7\+\_\+api.\+cpp@{lms7\+\_\+api.\+cpp}}
+\paragraph[{L\+M\+S\+\_\+\+Send\+Stream(lms\+\_\+stream\+\_\+t $\ast$stream, const void $\ast$samples, size\+\_\+t sample\+\_\+count, const lms\+\_\+stream\+\_\+meta\+\_\+t $\ast$meta, unsigned timeout\+\_\+ms)}]{\setlength{\rightskip}{0pt plus 5cm}{\bf A\+P\+I\+\_\+\+E\+X\+P\+O\+RT} {\bf int} {\bf C\+A\+L\+L\+\_\+\+C\+O\+NV} L\+M\+S\+\_\+\+Send\+Stream (
+\begin{DoxyParamCaption}
+\item[{{\bf lms\+\_\+stream\+\_\+t} $\ast$}]{stream, }
+\item[{const {\bf void} $\ast$}]{samples, }
+\item[{size\+\_\+t}]{sample\+\_\+count, }
+\item[{const {\bf lms\+\_\+stream\+\_\+meta\+\_\+t} $\ast$}]{meta, }
+\item[{unsigned}]{timeout\+\_\+ms}
+\end{DoxyParamCaption}
+)}\label{lms7__api_8cpp_ac81a4c776facecae17e6e5567585ad46}
+
+
+Definition at line {\bf 1213} of file {\bf lms7\+\_\+api.\+cpp}.
+
+
+
+References {\bf lime\+::\+Ring\+F\+I\+F\+O\+::\+E\+N\+D\+\_\+\+B\+U\+R\+ST}, {\bf lime\+::\+Stream\+Channel\+::\+Metadata\+::flags}, {\bf lms\+\_\+stream\+\_\+meta\+\_\+t\+::flush\+Partial\+Packet}, {\bf lms\+\_\+stream\+\_\+t\+::handle}, {\bf if()}, {\bf lime\+::\+Ring\+F\+I\+F\+O\+::\+S\+Y\+N\+C\+\_\+\+T\+I\+M\+E\+S\+T\+A\+MP}, {\bf lms\+\_\+stream\+\_\+meta\+\_\+t\+::timestamp}, {\bf lms\+\_\+stream\+\_\+meta\+\_\+t\+::wait\+For\+Timestamp}, and {\bf lime\+::\+Stream\+Channel\+::\+Write()}.
+
+
+
+Referenced by {\bf D\+E\+F\+U\+N\+\_\+\+D\+L\+D()}, {\bf main()}, and {\bf fftviewer\+\_\+fr\+F\+F\+Tviewer\+::\+Streaming\+Loop()}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{df/de1/lms7__api_8cpp_ac81a4c776facecae17e6e5567585ad46_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{df/de1/lms7__api_8cpp_ac81a4c776facecae17e6e5567585ad46_icgraph}
+\end{center}
+\end{figure}
+
+
+\index{lms7\+\_\+api.\+cpp@{lms7\+\_\+api.\+cpp}!L\+M\+S\+\_\+\+Set\+Antenna@{L\+M\+S\+\_\+\+Set\+Antenna}}
+\index{L\+M\+S\+\_\+\+Set\+Antenna@{L\+M\+S\+\_\+\+Set\+Antenna}!lms7\+\_\+api.\+cpp@{lms7\+\_\+api.\+cpp}}
+\paragraph[{L\+M\+S\+\_\+\+Set\+Antenna(lms\+\_\+device\+\_\+t $\ast$device, bool dir\+\_\+tx, size\+\_\+t chan, size\+\_\+t path)}]{\setlength{\rightskip}{0pt plus 5cm}{\bf A\+P\+I\+\_\+\+E\+X\+P\+O\+RT} {\bf int} {\bf C\+A\+L\+L\+\_\+\+C\+O\+NV} L\+M\+S\+\_\+\+Set\+Antenna (
+\begin{DoxyParamCaption}
+\item[{{\bf lms\+\_\+device\+\_\+t} $\ast$}]{device, }
+\item[{bool}]{dir\+\_\+tx, }
+\item[{size\+\_\+t}]{chan, }
+\item[{size\+\_\+t}]{path}
+\end{DoxyParamCaption}
+)}\label{lms7__api_8cpp_aa2fd012951a9807f1277eeae69278025}
+
+
+Definition at line {\bf 486} of file {\bf lms7\+\_\+api.\+cpp}.
+
+
+
+References {\bf lime\+::\+L\+M\+S7\+\_\+\+Device\+::\+Get\+Num\+Channels()}, {\bf lms()}, {\bf L\+M\+S\+\_\+\+S\+U\+C\+C\+E\+SS}, {\bf lime\+::\+Report\+Error()}, and {\bf lime\+::\+L\+M\+S7\+\_\+\+Device\+::\+Set\+Path()}.
+
+
+
+Referenced by {\bf device\+Cal\+Sweep()}, and {\bf main()}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{df/de1/lms7__api_8cpp_aa2fd012951a9807f1277eeae69278025_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{df/de1/lms7__api_8cpp_aa2fd012951a9807f1277eeae69278025_icgraph}
+\end{center}
+\end{figure}
+
+
+\index{lms7\+\_\+api.\+cpp@{lms7\+\_\+api.\+cpp}!L\+M\+S\+\_\+\+Set\+Clock\+Freq@{L\+M\+S\+\_\+\+Set\+Clock\+Freq}}
+\index{L\+M\+S\+\_\+\+Set\+Clock\+Freq@{L\+M\+S\+\_\+\+Set\+Clock\+Freq}!lms7\+\_\+api.\+cpp@{lms7\+\_\+api.\+cpp}}
+\paragraph[{L\+M\+S\+\_\+\+Set\+Clock\+Freq(lms\+\_\+device\+\_\+t $\ast$device, size\+\_\+t clk\+\_\+id, float\+\_\+type freq)}]{\setlength{\rightskip}{0pt plus 5cm}{\bf A\+P\+I\+\_\+\+E\+X\+P\+O\+RT} {\bf int} {\bf C\+A\+L\+L\+\_\+\+C\+O\+NV} L\+M\+S\+\_\+\+Set\+Clock\+Freq (
+\begin{DoxyParamCaption}
+\item[{{\bf lms\+\_\+device\+\_\+t} $\ast$}]{device, }
+\item[{size\+\_\+t}]{clk\+\_\+id, }
+\item[{{\bf float\+\_\+type}}]{freq}
+\end{DoxyParamCaption}
+)}\label{lms7__api_8cpp_af73c9ae3c39c8e5843b2ee6fb4774ec2}
+
+
+Definition at line {\bf 272} of file {\bf lms7\+\_\+api.\+cpp}.
+
+
+
+References {\bf lms()}, {\bf lime\+::\+Report\+Error()}, and {\bf lime\+::\+L\+M\+S7\+\_\+\+Device\+::\+Set\+Clock\+Freq()}.
+
+
+
+Referenced by {\bf lms7002\+\_\+pnl\+S\+X\+\_\+view\+::\+Onbtn\+Calculate\+Click()}, {\bf lms7002\+\_\+pnl\+S\+X\+\_\+view\+::\+Onbtn\+Change\+Ref\+Clk\+Click()}, and {\bf lms7002\+\_\+pnl\+S\+X\+\_\+view\+::\+Onbtn\+Tune\+Click()}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{df/de1/lms7__api_8cpp_af73c9ae3c39c8e5843b2ee6fb4774ec2_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{df/de1/lms7__api_8cpp_af73c9ae3c39c8e5843b2ee6fb4774ec2_icgraph}
+\end{center}
+\end{figure}
+
+
+\index{lms7\+\_\+api.\+cpp@{lms7\+\_\+api.\+cpp}!L\+M\+S\+\_\+\+Set\+GaindB@{L\+M\+S\+\_\+\+Set\+GaindB}}
+\index{L\+M\+S\+\_\+\+Set\+GaindB@{L\+M\+S\+\_\+\+Set\+GaindB}!lms7\+\_\+api.\+cpp@{lms7\+\_\+api.\+cpp}}
+\paragraph[{L\+M\+S\+\_\+\+Set\+Gaind\+B(lms\+\_\+device\+\_\+t $\ast$device, bool dir\+\_\+tx, size\+\_\+t chan, unsigned gain)}]{\setlength{\rightskip}{0pt plus 5cm}{\bf A\+P\+I\+\_\+\+E\+X\+P\+O\+RT} {\bf int} {\bf C\+A\+L\+L\+\_\+\+C\+O\+NV} L\+M\+S\+\_\+\+Set\+GaindB (
+\begin{DoxyParamCaption}
+\item[{{\bf lms\+\_\+device\+\_\+t} $\ast$}]{device, }
+\item[{bool}]{dir\+\_\+tx, }
+\item[{size\+\_\+t}]{chan, }
+\item[{unsigned}]{gain}
+\end{DoxyParamCaption}
+)}\label{lms7__api_8cpp_a19d4810a0cf125cf82420f5c6bfcee6f}
+
+
+Definition at line {\bf 665} of file {\bf lms7\+\_\+api.\+cpp}.
+
+
+
+References {\bf lime\+::\+L\+M\+S7\+\_\+\+Device\+::\+Get\+Num\+Channels()}, {\bf lms()}, {\bf lime\+::\+Report\+Error()}, and {\bf lime\+::\+L\+M\+S7\+\_\+\+Device\+::\+Set\+Gain()}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{df/de1/lms7__api_8cpp_a19d4810a0cf125cf82420f5c6bfcee6f_cgraph}
+\end{center}
+\end{figure}
+
+
+\index{lms7\+\_\+api.\+cpp@{lms7\+\_\+api.\+cpp}!L\+M\+S\+\_\+\+Set\+G\+F\+IR@{L\+M\+S\+\_\+\+Set\+G\+F\+IR}}
+\index{L\+M\+S\+\_\+\+Set\+G\+F\+IR@{L\+M\+S\+\_\+\+Set\+G\+F\+IR}!lms7\+\_\+api.\+cpp@{lms7\+\_\+api.\+cpp}}
+\paragraph[{L\+M\+S\+\_\+\+Set\+G\+F\+I\+R(lms\+\_\+device\+\_\+t $\ast$device, bool dir\+\_\+tx, size\+\_\+t chan, lms\+\_\+gfir\+\_\+t filt, bool enabled)}]{\setlength{\rightskip}{0pt plus 5cm}{\bf A\+P\+I\+\_\+\+E\+X\+P\+O\+RT} {\bf int} {\bf C\+A\+L\+L\+\_\+\+C\+O\+NV} L\+M\+S\+\_\+\+Set\+G\+F\+IR (
+\begin{DoxyParamCaption}
+\item[{{\bf lms\+\_\+device\+\_\+t} $\ast$}]{device, }
+\item[{bool}]{dir\+\_\+tx, }
+\item[{size\+\_\+t}]{chan, }
+\item[{{\bf lms\+\_\+gfir\+\_\+t}}]{filt, }
+\item[{bool}]{enabled}
+\end{DoxyParamCaption}
+)}\label{lms7__api_8cpp_a42ad53181cb5107da3744b1768b177d9}
+
+
+Definition at line {\bf 1120} of file {\bf lms7\+\_\+api.\+cpp}.
+
+
+
+References {\bf lime\+::\+L\+M\+S7\+\_\+\+Device\+::\+Get\+Num\+Channels()}, {\bf lms()}, {\bf lime\+::\+Report\+Error()}, and {\bf lime\+::\+L\+M\+S7\+\_\+\+Device\+::\+Set\+G\+F\+I\+R()}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{df/de1/lms7__api_8cpp_a42ad53181cb5107da3744b1768b177d9_cgraph}
+\end{center}
+\end{figure}
+
+
+\index{lms7\+\_\+api.\+cpp@{lms7\+\_\+api.\+cpp}!L\+M\+S\+\_\+\+Set\+G\+F\+I\+R\+Coeff@{L\+M\+S\+\_\+\+Set\+G\+F\+I\+R\+Coeff}}
+\index{L\+M\+S\+\_\+\+Set\+G\+F\+I\+R\+Coeff@{L\+M\+S\+\_\+\+Set\+G\+F\+I\+R\+Coeff}!lms7\+\_\+api.\+cpp@{lms7\+\_\+api.\+cpp}}
+\paragraph[{L\+M\+S\+\_\+\+Set\+G\+F\+I\+R\+Coeff(lms\+\_\+device\+\_\+t $\ast$device, bool dir\+\_\+tx, size\+\_\+t chan, lms\+\_\+gfir\+\_\+t filt, const float\+\_\+type $\ast$coef, size\+\_\+t count)}]{\setlength{\rightskip}{0pt plus 5cm}{\bf A\+P\+I\+\_\+\+E\+X\+P\+O\+RT} {\bf int} {\bf C\+A\+L\+L\+\_\+\+C\+O\+NV} L\+M\+S\+\_\+\+Set\+G\+F\+I\+R\+Coeff (
+\begin{DoxyParamCaption}
+\item[{{\bf lms\+\_\+device\+\_\+t} $\ast$}]{device, }
+\item[{bool}]{dir\+\_\+tx, }
+\item[{size\+\_\+t}]{chan, }
+\item[{{\bf lms\+\_\+gfir\+\_\+t}}]{filt, }
+\item[{const {\bf float\+\_\+type} $\ast$}]{coef, }
+\item[{size\+\_\+t}]{count}
+\end{DoxyParamCaption}
+)}\label{lms7__api_8cpp_ad9538f07489ca171e270728fa1f6cc32}
+
+
+Definition at line {\bf 1086} of file {\bf lms7\+\_\+api.\+cpp}.
+
+
+
+References {\bf lime\+::\+L\+M\+S7\+\_\+\+Device\+::\+Get\+Num\+Channels()}, {\bf lms()}, {\bf lime\+::\+Report\+Error()}, and {\bf lime\+::\+L\+M\+S7\+\_\+\+Device\+::\+Set\+G\+F\+I\+R\+Coef()}.
+
+
+
+Referenced by {\bf lms7002\+\_\+pnl\+Rx\+T\+S\+P\+\_\+view\+::onbtn\+G\+F\+I\+R1\+Coef()}, {\bf lms7002\+\_\+pnl\+Tx\+T\+S\+P\+\_\+view\+::onbtn\+G\+F\+I\+R1\+Coef()}, {\bf lms7002\+\_\+pnl\+Tx\+T\+S\+P\+\_\+view\+::onbtn\+G\+F\+I\+R2\+Coef()}, {\bf lms7002\+\_\+pnl\+Rx\+T\+S\+P\+\_\+view\+::onbtn\+G\+F\+I\+R2\+Coef()}, {\bf lms7002\+\_\+pnl\+Rx\+T\+S\+P\+\_\+view\+::onbtn\+G\+F\+I\+R3\+Coef()}, and {\bf lms7002\+\_\+pnl\+Tx\+T\+S\+P\+\_\+view\+::onbtn\+G\+F\+I\+R3\+Coef()}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{df/de1/lms7__api_8cpp_ad9538f07489ca171e270728fa1f6cc32_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{df/de1/lms7__api_8cpp_ad9538f07489ca171e270728fa1f6cc32_icgraph}
+\end{center}
+\end{figure}
+
+
+\index{lms7\+\_\+api.\+cpp@{lms7\+\_\+api.\+cpp}!L\+M\+S\+\_\+\+Set\+G\+F\+I\+R\+L\+PF@{L\+M\+S\+\_\+\+Set\+G\+F\+I\+R\+L\+PF}}
+\index{L\+M\+S\+\_\+\+Set\+G\+F\+I\+R\+L\+PF@{L\+M\+S\+\_\+\+Set\+G\+F\+I\+R\+L\+PF}!lms7\+\_\+api.\+cpp@{lms7\+\_\+api.\+cpp}}
+\paragraph[{L\+M\+S\+\_\+\+Set\+G\+F\+I\+R\+L\+P\+F(lms\+\_\+device\+\_\+t $\ast$device, bool dir\+\_\+tx, size\+\_\+t chan, bool enabled, float\+\_\+type bandwidth)}]{\setlength{\rightskip}{0pt plus 5cm}{\bf A\+P\+I\+\_\+\+E\+X\+P\+O\+RT} {\bf int} {\bf C\+A\+L\+L\+\_\+\+C\+O\+NV} L\+M\+S\+\_\+\+Set\+G\+F\+I\+R\+L\+PF (
+\begin{DoxyParamCaption}
+\item[{{\bf lms\+\_\+device\+\_\+t} $\ast$}]{device, }
+\item[{bool}]{dir\+\_\+tx, }
+\item[{size\+\_\+t}]{chan, }
+\item[{bool}]{enabled, }
+\item[{{\bf float\+\_\+type}}]{bandwidth}
+\end{DoxyParamCaption}
+)}\label{lms7__api_8cpp_abf1f79d0561a8242ffe356d497f5f970}
+
+
+Definition at line {\bf 599} of file {\bf lms7\+\_\+api.\+cpp}.
+
+
+
+References {\bf lime\+::\+L\+M\+S7\+\_\+\+Device\+::\+Configure\+G\+F\+I\+R()}, {\bf lime\+::\+L\+M\+S7\+\_\+\+Device\+::\+Get\+Num\+Channels()}, {\bf lms()}, and {\bf lime\+::\+Report\+Error()}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{df/de1/lms7__api_8cpp_abf1f79d0561a8242ffe356d497f5f970_cgraph}
+\end{center}
+\end{figure}
+
+
+\index{lms7\+\_\+api.\+cpp@{lms7\+\_\+api.\+cpp}!L\+M\+S\+\_\+\+Set\+L\+O\+Frequency@{L\+M\+S\+\_\+\+Set\+L\+O\+Frequency}}
+\index{L\+M\+S\+\_\+\+Set\+L\+O\+Frequency@{L\+M\+S\+\_\+\+Set\+L\+O\+Frequency}!lms7\+\_\+api.\+cpp@{lms7\+\_\+api.\+cpp}}
+\paragraph[{L\+M\+S\+\_\+\+Set\+L\+O\+Frequency(lms\+\_\+device\+\_\+t $\ast$device, bool dir\+\_\+tx, size\+\_\+t chan, float\+\_\+type frequency)}]{\setlength{\rightskip}{0pt plus 5cm}{\bf A\+P\+I\+\_\+\+E\+X\+P\+O\+RT} {\bf int} {\bf C\+A\+L\+L\+\_\+\+C\+O\+NV} L\+M\+S\+\_\+\+Set\+L\+O\+Frequency (
+\begin{DoxyParamCaption}
+\item[{{\bf lms\+\_\+device\+\_\+t} $\ast$}]{device, }
+\item[{bool}]{dir\+\_\+tx, }
+\item[{size\+\_\+t}]{chan, }
+\item[{{\bf float\+\_\+type}}]{frequency}
+\end{DoxyParamCaption}
+)}\label{lms7__api_8cpp_a2c59e97985e0dfccf935c8bd78d5248d}
+
+
+Definition at line {\bf 405} of file {\bf lms7\+\_\+api.\+cpp}.
+
+
+
+References {\bf lime\+::\+L\+M\+S7\+\_\+\+Device\+::\+Get\+Num\+Channels()}, {\bf lms()}, {\bf lime\+::\+Report\+Error()}, and {\bf lime\+::\+L\+M\+S7\+\_\+\+Device\+::\+Set\+Frequency()}.
+
+
+
+Referenced by {\bf device\+Cal\+Sweep()}, and {\bf main()}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{df/de1/lms7__api_8cpp_a2c59e97985e0dfccf935c8bd78d5248d_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{df/de1/lms7__api_8cpp_a2c59e97985e0dfccf935c8bd78d5248d_icgraph}
+\end{center}
+\end{figure}
+
+
+\index{lms7\+\_\+api.\+cpp@{lms7\+\_\+api.\+cpp}!L\+M\+S\+\_\+\+Set\+L\+PF@{L\+M\+S\+\_\+\+Set\+L\+PF}}
+\index{L\+M\+S\+\_\+\+Set\+L\+PF@{L\+M\+S\+\_\+\+Set\+L\+PF}!lms7\+\_\+api.\+cpp@{lms7\+\_\+api.\+cpp}}
+\paragraph[{L\+M\+S\+\_\+\+Set\+L\+P\+F(lms\+\_\+device\+\_\+t $\ast$device, bool dir\+\_\+tx, size\+\_\+t chan, bool enabled)}]{\setlength{\rightskip}{0pt plus 5cm}{\bf A\+P\+I\+\_\+\+E\+X\+P\+O\+RT} {\bf int} {\bf C\+A\+L\+L\+\_\+\+C\+O\+NV} L\+M\+S\+\_\+\+Set\+L\+PF (
+\begin{DoxyParamCaption}
+\item[{{\bf lms\+\_\+device\+\_\+t} $\ast$}]{device, }
+\item[{bool}]{dir\+\_\+tx, }
+\item[{size\+\_\+t}]{chan, }
+\item[{bool}]{enabled}
+\end{DoxyParamCaption}
+)}\label{lms7__api_8cpp_a034c656a4f48a2b5591e3f2256147dc0}
+
+
+Definition at line {\bf 581} of file {\bf lms7\+\_\+api.\+cpp}.
+
+
+
+References {\bf lime\+::\+L\+M\+S7\+\_\+\+Device\+::\+Get\+Num\+Channels()}, {\bf lms()}, {\bf lime\+::\+Report\+Error()}, and {\bf lime\+::\+L\+M\+S7\+\_\+\+Device\+::\+Set\+L\+P\+F()}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{df/de1/lms7__api_8cpp_a034c656a4f48a2b5591e3f2256147dc0_cgraph}
+\end{center}
+\end{figure}
+
+
+\index{lms7\+\_\+api.\+cpp@{lms7\+\_\+api.\+cpp}!L\+M\+S\+\_\+\+Set\+L\+P\+F\+BW@{L\+M\+S\+\_\+\+Set\+L\+P\+F\+BW}}
+\index{L\+M\+S\+\_\+\+Set\+L\+P\+F\+BW@{L\+M\+S\+\_\+\+Set\+L\+P\+F\+BW}!lms7\+\_\+api.\+cpp@{lms7\+\_\+api.\+cpp}}
+\paragraph[{L\+M\+S\+\_\+\+Set\+L\+P\+F\+B\+W(lms\+\_\+device\+\_\+t $\ast$device, bool dir\+\_\+tx, size\+\_\+t chan, float\+\_\+type bandwidth)}]{\setlength{\rightskip}{0pt plus 5cm}{\bf A\+P\+I\+\_\+\+E\+X\+P\+O\+RT} {\bf int} {\bf C\+A\+L\+L\+\_\+\+C\+O\+NV} L\+M\+S\+\_\+\+Set\+L\+P\+F\+BW (
+\begin{DoxyParamCaption}
+\item[{{\bf lms\+\_\+device\+\_\+t} $\ast$}]{device, }
+\item[{bool}]{dir\+\_\+tx, }
+\item[{size\+\_\+t}]{chan, }
+\item[{{\bf float\+\_\+type}}]{bandwidth}
+\end{DoxyParamCaption}
+)}\label{lms7__api_8cpp_ad7c91857ba6e83bf060e5359420925a7}
+
+
+Definition at line {\bf 543} of file {\bf lms7\+\_\+api.\+cpp}.
+
+
+
+References {\bf lime\+::\+L\+M\+S7\+\_\+\+Device\+::\+Get\+Num\+Channels()}, {\bf lms()}, {\bf lime\+::\+Report\+Error()}, and {\bf lime\+::\+L\+M\+S7\+\_\+\+Device\+::\+Set\+L\+P\+F()}.
+
+
+
+Referenced by {\bf main()}, {\bf lms7002\+\_\+pnl\+T\+B\+B\+\_\+view\+::\+Onbtn\+Tune\+Filter()}, and {\bf lms7002\+\_\+pnl\+R\+B\+B\+\_\+view\+::\+Onbtn\+Tune\+Filter()}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{df/de1/lms7__api_8cpp_ad7c91857ba6e83bf060e5359420925a7_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=326pt]{df/de1/lms7__api_8cpp_ad7c91857ba6e83bf060e5359420925a7_icgraph}
+\end{center}
+\end{figure}
+
+
+\index{lms7\+\_\+api.\+cpp@{lms7\+\_\+api.\+cpp}!L\+M\+S\+\_\+\+Set\+N\+C\+O\+Frequency@{L\+M\+S\+\_\+\+Set\+N\+C\+O\+Frequency}}
+\index{L\+M\+S\+\_\+\+Set\+N\+C\+O\+Frequency@{L\+M\+S\+\_\+\+Set\+N\+C\+O\+Frequency}!lms7\+\_\+api.\+cpp@{lms7\+\_\+api.\+cpp}}
+\paragraph[{L\+M\+S\+\_\+\+Set\+N\+C\+O\+Frequency(lms\+\_\+device\+\_\+t $\ast$device, bool dir\+\_\+tx, size\+\_\+t ch, const float\+\_\+type $\ast$freq, float\+\_\+type pho)}]{\setlength{\rightskip}{0pt plus 5cm}{\bf A\+P\+I\+\_\+\+E\+X\+P\+O\+RT} {\bf int} {\bf C\+A\+L\+L\+\_\+\+C\+O\+NV} L\+M\+S\+\_\+\+Set\+N\+C\+O\+Frequency (
+\begin{DoxyParamCaption}
+\item[{{\bf lms\+\_\+device\+\_\+t} $\ast$}]{device, }
+\item[{bool}]{dir\+\_\+tx, }
+\item[{size\+\_\+t}]{ch, }
+\item[{const {\bf float\+\_\+type} $\ast$}]{freq, }
+\item[{{\bf float\+\_\+type}}]{pho}
+\end{DoxyParamCaption}
+)}\label{lms7__api_8cpp_ab14f8727a406a5e550828dde1db3fb15}
+
+
+Definition at line {\bf 828} of file {\bf lms7\+\_\+api.\+cpp}.
+
+
+
+References {\bf lime\+::\+L\+M\+S7\+\_\+\+Device\+::\+Get\+L\+M\+S()}, {\bf lime\+::\+L\+M\+S7\+\_\+\+Device\+::\+Get\+Num\+Channels()}, {\bf i}, {\bf lms()}, {\bf L\+M\+S7\+\_\+\+C\+M\+I\+X\+\_\+\+B\+Y\+P\+\_\+\+R\+X\+T\+SP}, {\bf L\+M\+S7\+\_\+\+C\+M\+I\+X\+\_\+\+B\+Y\+P\+\_\+\+T\+X\+T\+SP}, {\bf L\+M\+S7\+\_\+\+S\+E\+L\+\_\+\+RX}, {\bf L\+M\+S7\+\_\+\+S\+E\+L\+\_\+\+TX}, {\bf L\+M\+S\+\_\+\+N\+C\+O\+\_\+\+V\+A\+L\+\_\+\+C\+O\+U\+NT}, {\bf lime\+::\+Report\+Error()}, {\bf lime\+::\+L\+M\+S7\+\_\+\+Device\+::\+Set\+N\+C\+O\+Freq()}, {\bf lime\+::\+L\+M\+S7002\+M\+::\+Set\+N\+C\+O\+Phase\+Offset\+For\+Mode0()}, and {\bf lime\+::\+L\+M\+S7\+\_\+\+Device\+::\+Write\+Param()}.
+
+
+
+Referenced by {\bf lms7002\+\_\+pnl\+Rx\+T\+S\+P\+\_\+view\+::\+Onbtn\+Upload\+N\+C\+O\+Click()}, {\bf lms7002\+\_\+pnl\+Tx\+T\+S\+P\+\_\+view\+::\+Onbtn\+Upload\+N\+C\+O\+Click()}, {\bf lms7002\+\_\+pnl\+Tx\+T\+S\+P\+\_\+view\+::\+P\+H\+Oinput\+Changed()}, and {\bf lms7002\+\_\+pnl\+Rx\+T\+S\+P\+\_\+view\+::\+P\+H\+Oinput\+Changed()}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{df/de1/lms7__api_8cpp_ab14f8727a406a5e550828dde1db3fb15_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{df/de1/lms7__api_8cpp_ab14f8727a406a5e550828dde1db3fb15_icgraph}
+\end{center}
+\end{figure}
+
+
+\index{lms7\+\_\+api.\+cpp@{lms7\+\_\+api.\+cpp}!L\+M\+S\+\_\+\+Set\+N\+C\+O\+Index@{L\+M\+S\+\_\+\+Set\+N\+C\+O\+Index}}
+\index{L\+M\+S\+\_\+\+Set\+N\+C\+O\+Index@{L\+M\+S\+\_\+\+Set\+N\+C\+O\+Index}!lms7\+\_\+api.\+cpp@{lms7\+\_\+api.\+cpp}}
+\paragraph[{L\+M\+S\+\_\+\+Set\+N\+C\+O\+Index(lms\+\_\+device\+\_\+t $\ast$device, bool dir\+\_\+tx, size\+\_\+t chan, int ind, bool down)}]{\setlength{\rightskip}{0pt plus 5cm}{\bf A\+P\+I\+\_\+\+E\+X\+P\+O\+RT} {\bf int} {\bf C\+A\+L\+L\+\_\+\+C\+O\+NV} L\+M\+S\+\_\+\+Set\+N\+C\+O\+Index (
+\begin{DoxyParamCaption}
+\item[{{\bf lms\+\_\+device\+\_\+t} $\ast$}]{device, }
+\item[{bool}]{dir\+\_\+tx, }
+\item[{size\+\_\+t}]{chan, }
+\item[{{\bf int}}]{ind, }
+\item[{bool}]{down}
+\end{DoxyParamCaption}
+)}\label{lms7__api_8cpp_ab513c5ce7137992cc694dbd645e14444}
+
+
+Definition at line {\bf 940} of file {\bf lms7\+\_\+api.\+cpp}.
+
+
+
+References {\bf lime\+::\+L\+M\+S7\+\_\+\+Device\+::\+Get\+Num\+Channels()}, {\bf lms()}, {\bf L\+M\+S7\+\_\+\+C\+M\+I\+X\+\_\+\+B\+Y\+P\+\_\+\+R\+X\+T\+SP}, {\bf L\+M\+S7\+\_\+\+C\+M\+I\+X\+\_\+\+B\+Y\+P\+\_\+\+T\+X\+T\+SP}, {\bf L\+M\+S7\+\_\+\+C\+M\+I\+X\+\_\+\+G\+A\+I\+N\+\_\+\+R\+X\+T\+SP}, {\bf L\+M\+S7\+\_\+\+C\+M\+I\+X\+\_\+\+G\+A\+I\+N\+\_\+\+T\+X\+T\+SP}, {\bf L\+M\+S7\+\_\+\+C\+M\+I\+X\+\_\+\+S\+C\+\_\+\+R\+X\+T\+SP}, {\bf L\+M\+S7\+\_\+\+C\+M\+I\+X\+\_\+\+S\+C\+\_\+\+T\+X\+T\+SP}, {\bf L\+M\+S7\+\_\+\+S\+E\+L\+\_\+\+RX}, {\bf L\+M\+S7\+\_\+\+S\+E\+L\+\_\+\+TX}, {\bf L\+M\+S\+\_\+\+N\+C\+O\+\_\+\+V\+A\+L\+\_\+\+C\+O\+U\+NT}, {\bf lime\+::\+Report\+Error()}, and {\bf lime\+::\+L\+M\+S7\+\_\+\+Device\+::\+Write\+Param()}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{df/de1/lms7__api_8cpp_ab513c5ce7137992cc694dbd645e14444_cgraph}
+\end{center}
+\end{figure}
+
+
+\index{lms7\+\_\+api.\+cpp@{lms7\+\_\+api.\+cpp}!L\+M\+S\+\_\+\+Set\+N\+C\+O\+Phase@{L\+M\+S\+\_\+\+Set\+N\+C\+O\+Phase}}
+\index{L\+M\+S\+\_\+\+Set\+N\+C\+O\+Phase@{L\+M\+S\+\_\+\+Set\+N\+C\+O\+Phase}!lms7\+\_\+api.\+cpp@{lms7\+\_\+api.\+cpp}}
+\paragraph[{L\+M\+S\+\_\+\+Set\+N\+C\+O\+Phase(lms\+\_\+device\+\_\+t $\ast$device, bool dir\+\_\+tx, size\+\_\+t ch, const float\+\_\+type $\ast$phase, float\+\_\+type fcw)}]{\setlength{\rightskip}{0pt plus 5cm}{\bf A\+P\+I\+\_\+\+E\+X\+P\+O\+RT} {\bf int} {\bf C\+A\+L\+L\+\_\+\+C\+O\+NV} L\+M\+S\+\_\+\+Set\+N\+C\+O\+Phase (
+\begin{DoxyParamCaption}
+\item[{{\bf lms\+\_\+device\+\_\+t} $\ast$}]{device, }
+\item[{bool}]{dir\+\_\+tx, }
+\item[{size\+\_\+t}]{ch, }
+\item[{const {\bf float\+\_\+type} $\ast$}]{phase, }
+\item[{{\bf float\+\_\+type}}]{fcw}
+\end{DoxyParamCaption}
+)}\label{lms7__api_8cpp_a77d3890ed90bd26431505ca6ea5a4e95}
+
+
+Definition at line {\bf 884} of file {\bf lms7\+\_\+api.\+cpp}.
+
+
+
+References {\bf lime\+::\+L\+M\+S7\+\_\+\+Device\+::\+Get\+Num\+Channels()}, {\bf i}, {\bf lms()}, {\bf L\+M\+S7\+\_\+\+S\+E\+L\+\_\+\+RX}, {\bf L\+M\+S7\+\_\+\+S\+E\+L\+\_\+\+TX}, {\bf L\+M\+S\+\_\+\+N\+C\+O\+\_\+\+V\+A\+L\+\_\+\+C\+O\+U\+NT}, {\bf lime\+::\+Report\+Error()}, {\bf lime\+::\+L\+M\+S7\+\_\+\+Device\+::\+Set\+N\+C\+O\+Freq()}, {\bf lime\+::\+L\+M\+S7\+\_\+\+Device\+::\+Set\+N\+C\+O\+Phase()}, and {\bf lime\+::\+L\+M\+S7\+\_\+\+Device\+::\+Write\+Param()}.
+
+
+
+Referenced by {\bf lms7002\+\_\+pnl\+Rx\+T\+S\+P\+\_\+view\+::\+Onbtn\+Upload\+N\+C\+O\+Click()}, {\bf lms7002\+\_\+pnl\+Tx\+T\+S\+P\+\_\+view\+::\+Onbtn\+Upload\+N\+C\+O\+Click()}, {\bf lms7002\+\_\+pnl\+Tx\+T\+S\+P\+\_\+view\+::\+P\+H\+Oinput\+Changed()}, and {\bf lms7002\+\_\+pnl\+Rx\+T\+S\+P\+\_\+view\+::\+P\+H\+Oinput\+Changed()}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{df/de1/lms7__api_8cpp_a77d3890ed90bd26431505ca6ea5a4e95_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{df/de1/lms7__api_8cpp_a77d3890ed90bd26431505ca6ea5a4e95_icgraph}
+\end{center}
+\end{figure}
+
+
+\index{lms7\+\_\+api.\+cpp@{lms7\+\_\+api.\+cpp}!L\+M\+S\+\_\+\+Set\+Normalized\+Gain@{L\+M\+S\+\_\+\+Set\+Normalized\+Gain}}
+\index{L\+M\+S\+\_\+\+Set\+Normalized\+Gain@{L\+M\+S\+\_\+\+Set\+Normalized\+Gain}!lms7\+\_\+api.\+cpp@{lms7\+\_\+api.\+cpp}}
+\paragraph[{L\+M\+S\+\_\+\+Set\+Normalized\+Gain(lms\+\_\+device\+\_\+t $\ast$device, bool dir\+\_\+tx, size\+\_\+t chan, float\+\_\+type gain)}]{\setlength{\rightskip}{0pt plus 5cm}{\bf A\+P\+I\+\_\+\+E\+X\+P\+O\+RT} {\bf int} {\bf C\+A\+L\+L\+\_\+\+C\+O\+NV} L\+M\+S\+\_\+\+Set\+Normalized\+Gain (
+\begin{DoxyParamCaption}
+\item[{{\bf lms\+\_\+device\+\_\+t} $\ast$}]{device, }
+\item[{bool}]{dir\+\_\+tx, }
+\item[{size\+\_\+t}]{chan, }
+\item[{{\bf float\+\_\+type}}]{gain}
+\end{DoxyParamCaption}
+)}\label{lms7__api_8cpp_ad56e10da5335c7c8f74e31dd85d1e288}
+
+
+Definition at line {\bf 641} of file {\bf lms7\+\_\+api.\+cpp}.
+
+
+
+References {\bf lime\+::\+L\+M\+S7\+\_\+\+Device\+::\+Get\+Gain\+Range()}, {\bf lime\+::\+L\+M\+S7\+\_\+\+Device\+::\+Get\+Num\+Channels()}, {\bf lms()}, {\bf lms\+\_\+range\+\_\+t\+::max}, {\bf lms\+\_\+range\+\_\+t\+::min}, {\bf range}, {\bf lime\+::\+Report\+Error()}, and {\bf lime\+::\+L\+M\+S7\+\_\+\+Device\+::\+Set\+Gain()}.
+
+
+
+Referenced by {\bf main()}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{df/de1/lms7__api_8cpp_ad56e10da5335c7c8f74e31dd85d1e288_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=281pt]{df/de1/lms7__api_8cpp_ad56e10da5335c7c8f74e31dd85d1e288_icgraph}
+\end{center}
+\end{figure}
+
+
+\index{lms7\+\_\+api.\+cpp@{lms7\+\_\+api.\+cpp}!L\+M\+S\+\_\+\+Set\+Sample\+Rate@{L\+M\+S\+\_\+\+Set\+Sample\+Rate}}
+\index{L\+M\+S\+\_\+\+Set\+Sample\+Rate@{L\+M\+S\+\_\+\+Set\+Sample\+Rate}!lms7\+\_\+api.\+cpp@{lms7\+\_\+api.\+cpp}}
+\paragraph[{L\+M\+S\+\_\+\+Set\+Sample\+Rate(lms\+\_\+device\+\_\+t $\ast$device, float\+\_\+type rate, size\+\_\+t oversample)}]{\setlength{\rightskip}{0pt plus 5cm}{\bf A\+P\+I\+\_\+\+E\+X\+P\+O\+RT} {\bf int} {\bf C\+A\+L\+L\+\_\+\+C\+O\+NV} L\+M\+S\+\_\+\+Set\+Sample\+Rate (
+\begin{DoxyParamCaption}
+\item[{{\bf lms\+\_\+device\+\_\+t} $\ast$}]{device, }
+\item[{{\bf float\+\_\+type}}]{rate, }
+\item[{size\+\_\+t}]{oversample}
+\end{DoxyParamCaption}
+)}\label{lms7__api_8cpp_a545f1221449b14be75f3f7855af13dfa}
+
+
+Definition at line {\bf 128} of file {\bf lms7\+\_\+api.\+cpp}.
+
+
+
+References {\bf lms()}, {\bf lime\+::\+Report\+Error()}, and {\bf lime\+::\+L\+M\+S7\+\_\+\+Device\+::\+Set\+Rate()}.
+
+
+
+Referenced by {\bf main()}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{df/de1/lms7__api_8cpp_a545f1221449b14be75f3f7855af13dfa_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=265pt]{df/de1/lms7__api_8cpp_a545f1221449b14be75f3f7855af13dfa_icgraph}
+\end{center}
+\end{figure}
+
+
+\index{lms7\+\_\+api.\+cpp@{lms7\+\_\+api.\+cpp}!L\+M\+S\+\_\+\+Set\+Sample\+Rate\+Dir@{L\+M\+S\+\_\+\+Set\+Sample\+Rate\+Dir}}
+\index{L\+M\+S\+\_\+\+Set\+Sample\+Rate\+Dir@{L\+M\+S\+\_\+\+Set\+Sample\+Rate\+Dir}!lms7\+\_\+api.\+cpp@{lms7\+\_\+api.\+cpp}}
+\paragraph[{L\+M\+S\+\_\+\+Set\+Sample\+Rate\+Dir(lms\+\_\+device\+\_\+t $\ast$device, bool dir\+\_\+tx, float\+\_\+type rate, size\+\_\+t oversample)}]{\setlength{\rightskip}{0pt plus 5cm}{\bf A\+P\+I\+\_\+\+E\+X\+P\+O\+RT} {\bf int} {\bf C\+A\+L\+L\+\_\+\+C\+O\+NV} L\+M\+S\+\_\+\+Set\+Sample\+Rate\+Dir (
+\begin{DoxyParamCaption}
+\item[{{\bf lms\+\_\+device\+\_\+t} $\ast$}]{device, }
+\item[{bool}]{dir\+\_\+tx, }
+\item[{{\bf float\+\_\+type}}]{rate, }
+\item[{size\+\_\+t}]{oversample}
+\end{DoxyParamCaption}
+)}\label{lms7__api_8cpp_a6e8212534d71682a77b6c0a2c8d201bb}
+
+
+Definition at line {\bf 141} of file {\bf lms7\+\_\+api.\+cpp}.
+
+
+
+References {\bf lms()}, {\bf lime\+::\+Report\+Error()}, and {\bf lime\+::\+L\+M\+S7\+\_\+\+Device\+::\+Set\+Rate()}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{df/de1/lms7__api_8cpp_a6e8212534d71682a77b6c0a2c8d201bb_cgraph}
+\end{center}
+\end{figure}
+
+
+\index{lms7\+\_\+api.\+cpp@{lms7\+\_\+api.\+cpp}!L\+M\+S\+\_\+\+Set\+Test\+Signal@{L\+M\+S\+\_\+\+Set\+Test\+Signal}}
+\index{L\+M\+S\+\_\+\+Set\+Test\+Signal@{L\+M\+S\+\_\+\+Set\+Test\+Signal}!lms7\+\_\+api.\+cpp@{lms7\+\_\+api.\+cpp}}
+\paragraph[{L\+M\+S\+\_\+\+Set\+Test\+Signal(lms\+\_\+device\+\_\+t $\ast$device, bool dir\+\_\+tx, size\+\_\+t chan, lms\+\_\+testsig\+\_\+t sig, int16\+\_\+t dc\+\_\+i, int16\+\_\+t dc\+\_\+q)}]{\setlength{\rightskip}{0pt plus 5cm}{\bf A\+P\+I\+\_\+\+E\+X\+P\+O\+RT} {\bf int} {\bf C\+A\+L\+L\+\_\+\+C\+O\+NV} L\+M\+S\+\_\+\+Set\+Test\+Signal (
+\begin{DoxyParamCaption}
+\item[{{\bf lms\+\_\+device\+\_\+t} $\ast$}]{device, }
+\item[{bool}]{dir\+\_\+tx, }
+\item[{size\+\_\+t}]{chan, }
+\item[{{\bf lms\+\_\+testsig\+\_\+t}}]{sig, }
+\item[{int16\+\_\+t}]{dc\+\_\+i, }
+\item[{int16\+\_\+t}]{dc\+\_\+q}
+\end{DoxyParamCaption}
+)}\label{lms7__api_8cpp_ac9e743da5a20e2b337238e94644b2c1a}
+
+
+Definition at line {\bf 777} of file {\bf lms7\+\_\+api.\+cpp}.
+
+
+
+References {\bf lime\+::\+L\+M\+S7\+\_\+\+Device\+::\+Get\+Num\+Channels()}, {\bf lms()}, {\bf L\+M\+S\+\_\+\+S\+U\+C\+C\+E\+SS}, {\bf L\+M\+S\+\_\+\+T\+E\+S\+T\+S\+I\+G\+\_\+\+DC}, {\bf lime\+::\+Report\+Error()}, and {\bf lime\+::\+L\+M\+S7\+\_\+\+Device\+::\+Set\+Test\+Signal()}.
+
+
+
+Referenced by {\bf main()}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{df/de1/lms7__api_8cpp_ac9e743da5a20e2b337238e94644b2c1a_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=258pt]{df/de1/lms7__api_8cpp_ac9e743da5a20e2b337238e94644b2c1a_icgraph}
+\end{center}
+\end{figure}
+
+
+\index{lms7\+\_\+api.\+cpp@{lms7\+\_\+api.\+cpp}!L\+M\+S\+\_\+\+Setup\+Stream@{L\+M\+S\+\_\+\+Setup\+Stream}}
+\index{L\+M\+S\+\_\+\+Setup\+Stream@{L\+M\+S\+\_\+\+Setup\+Stream}!lms7\+\_\+api.\+cpp@{lms7\+\_\+api.\+cpp}}
+\paragraph[{L\+M\+S\+\_\+\+Setup\+Stream(lms\+\_\+device\+\_\+t $\ast$device, lms\+\_\+stream\+\_\+t $\ast$stream)}]{\setlength{\rightskip}{0pt plus 5cm}{\bf A\+P\+I\+\_\+\+E\+X\+P\+O\+RT} {\bf int} {\bf C\+A\+L\+L\+\_\+\+C\+O\+NV} L\+M\+S\+\_\+\+Setup\+Stream (
+\begin{DoxyParamCaption}
+\item[{{\bf lms\+\_\+device\+\_\+t} $\ast$}]{device, }
+\item[{{\bf lms\+\_\+stream\+\_\+t} $\ast$}]{stream}
+\end{DoxyParamCaption}
+)}\label{lms7__api_8cpp_a77a9a5cd43aea28499a07f93951640b2}
+
+
+Definition at line {\bf 1138} of file {\bf lms7\+\_\+api.\+cpp}.
+
+
+
+References {\bf lime\+::\+Stream\+Config\+::buffer\+Length}, {\bf lms\+\_\+stream\+\_\+t\+::channel}, {\bf lime\+::\+Stream\+Config\+::channel\+ID}, {\bf lms\+\_\+stream\+\_\+t\+::data\+Fmt}, {\bf lms\+\_\+stream\+\_\+t\+::fifo\+Size}, {\bf lime\+::\+Stream\+Config\+::\+F\+M\+T\+\_\+\+F\+L\+O\+A\+T32}, {\bf lime\+::\+Stream\+Config\+::\+F\+M\+T\+\_\+\+I\+N\+T12}, {\bf lime\+::\+Stream\+Config\+::\+F\+M\+T\+\_\+\+I\+N\+T16}, {\bf lime\+::\+Stream\+Config\+::format}, {\bf lms\+\_\+stream\+\_\+t\+::handle}, {\bf lime\+::\+Stream\+Config\+::is\+Tx}, {\bf lms\+\_\+stream\+\_\+t\+::is\+Tx}, {\bf lms()}, {\bf lms\+\_\+stream\+\_\+t\+::\+L\+M\+S\+\_\+\+F\+M\+T\+\_\+\+F32}, {\bf lms\+\_\+stream\+\_\+t\+::\+L\+M\+S\+\_\+\+F\+M\+T\+\_\+\+I12}, {\bf lms\+\_\+stream\+\_\+t\+::\+L\+M\+S\+\_\+\+F\+M\+T\+\_\+\+I16}, {\bf lime\+::\+Stream\+Config\+::performance\+Latency}, {\bf lime\+::\+Report\+Error()}, {\bf lime\+::\+L\+M\+S7\+\_\+\+Device\+::\+Setup\+Stream()}, and {\bf lms\+\_\+stream\+\_\+t\+::throughput\+Vs\+Latency}.
+
+
+
+Referenced by {\bf D\+E\+F\+U\+N\+\_\+\+D\+L\+D()}, {\bf main()}, and {\bf fftviewer\+\_\+fr\+F\+F\+Tviewer\+::\+Streaming\+Loop()}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{df/de1/lms7__api_8cpp_a77a9a5cd43aea28499a07f93951640b2_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{df/de1/lms7__api_8cpp_a77a9a5cd43aea28499a07f93951640b2_icgraph}
+\end{center}
+\end{figure}
+
+
+\index{lms7\+\_\+api.\+cpp@{lms7\+\_\+api.\+cpp}!L\+M\+S\+\_\+\+Start\+Stream@{L\+M\+S\+\_\+\+Start\+Stream}}
+\index{L\+M\+S\+\_\+\+Start\+Stream@{L\+M\+S\+\_\+\+Start\+Stream}!lms7\+\_\+api.\+cpp@{lms7\+\_\+api.\+cpp}}
+\paragraph[{L\+M\+S\+\_\+\+Start\+Stream(lms\+\_\+stream\+\_\+t $\ast$stream)}]{\setlength{\rightskip}{0pt plus 5cm}{\bf A\+P\+I\+\_\+\+E\+X\+P\+O\+RT} {\bf int} {\bf C\+A\+L\+L\+\_\+\+C\+O\+NV} L\+M\+S\+\_\+\+Start\+Stream (
+\begin{DoxyParamCaption}
+\item[{{\bf lms\+\_\+stream\+\_\+t} $\ast$}]{stream}
+\end{DoxyParamCaption}
+)}\label{lms7__api_8cpp_acb3467ac8414b8e81217fb7c4e8adf87}
+
+
+Definition at line {\bf 1179} of file {\bf lms7\+\_\+api.\+cpp}.
+
+
+
+References {\bf lms\+\_\+stream\+\_\+t\+::handle}.
+
+
+
+Referenced by {\bf D\+E\+F\+U\+N\+\_\+\+D\+L\+D()}, {\bf main()}, and {\bf fftviewer\+\_\+fr\+F\+F\+Tviewer\+::\+Streaming\+Loop()}.
+
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{df/de1/lms7__api_8cpp_acb3467ac8414b8e81217fb7c4e8adf87_icgraph}
+\end{center}
+\end{figure}
+
+
+\index{lms7\+\_\+api.\+cpp@{lms7\+\_\+api.\+cpp}!L\+M\+S\+\_\+\+Stop\+Stream@{L\+M\+S\+\_\+\+Stop\+Stream}}
+\index{L\+M\+S\+\_\+\+Stop\+Stream@{L\+M\+S\+\_\+\+Stop\+Stream}!lms7\+\_\+api.\+cpp@{lms7\+\_\+api.\+cpp}}
+\paragraph[{L\+M\+S\+\_\+\+Stop\+Stream(lms\+\_\+stream\+\_\+t $\ast$stream)}]{\setlength{\rightskip}{0pt plus 5cm}{\bf A\+P\+I\+\_\+\+E\+X\+P\+O\+RT} {\bf int} {\bf C\+A\+L\+L\+\_\+\+C\+O\+NV} L\+M\+S\+\_\+\+Stop\+Stream (
+\begin{DoxyParamCaption}
+\item[{{\bf lms\+\_\+stream\+\_\+t} $\ast$}]{stream}
+\end{DoxyParamCaption}
+)}\label{lms7__api_8cpp_a68d4a388aa6674666739fa0220237c4e}
+
+
+Definition at line {\bf 1186} of file {\bf lms7\+\_\+api.\+cpp}.
+
+
+
+References {\bf lms\+\_\+stream\+\_\+t\+::handle}.
+
+
+
+Referenced by {\bf main()}, {\bf Stop\+Stream()}, and {\bf fftviewer\+\_\+fr\+F\+F\+Tviewer\+::\+Streaming\+Loop()}.
+
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{df/de1/lms7__api_8cpp_a68d4a388aa6674666739fa0220237c4e_icgraph}
+\end{center}
+\end{figure}
+
+
+\index{lms7\+\_\+api.\+cpp@{lms7\+\_\+api.\+cpp}!L\+M\+S\+\_\+\+Synchronize@{L\+M\+S\+\_\+\+Synchronize}}
+\index{L\+M\+S\+\_\+\+Synchronize@{L\+M\+S\+\_\+\+Synchronize}!lms7\+\_\+api.\+cpp@{lms7\+\_\+api.\+cpp}}
+\paragraph[{L\+M\+S\+\_\+\+Synchronize(lms\+\_\+device\+\_\+t $\ast$dev, bool to\+Chip)}]{\setlength{\rightskip}{0pt plus 5cm}{\bf A\+P\+I\+\_\+\+E\+X\+P\+O\+RT} {\bf int} {\bf C\+A\+L\+L\+\_\+\+C\+O\+NV} L\+M\+S\+\_\+\+Synchronize (
+\begin{DoxyParamCaption}
+\item[{{\bf lms\+\_\+device\+\_\+t} $\ast$}]{dev, }
+\item[{bool}]{to\+Chip}
+\end{DoxyParamCaption}
+)}\label{lms7__api_8cpp_a2ccb0cffc848f216211007df824b3c65}
+
+
+Definition at line {\bf 283} of file {\bf lms7\+\_\+api.\+cpp}.
+
+
+
+References {\bf lms()}, {\bf lime\+::\+Report\+Error()}, and {\bf lime\+::\+L\+M\+S7\+\_\+\+Device\+::\+Synchronize()}.
+
+
+
+Referenced by {\bf D\+E\+F\+U\+N\+\_\+\+D\+L\+D()}, {\bf lms7002\+\_\+pnl\+T\+B\+B\+\_\+view\+::\+Onbtn\+Tune\+Filter()}, {\bf lms7002\+\_\+pnl\+R\+B\+B\+\_\+view\+::\+Onbtn\+Tune\+Filter()}, {\bf lms7002\+\_\+pnl\+T\+B\+B\+\_\+view\+::\+Onbtn\+Tune\+Tx\+Gain()}, {\bf lms7002\+\_\+main\+Panel\+::\+On\+Download\+All()}, {\bf lms7002\+\_\+main\+Panel\+::\+On\+Upload\+All()}, and {\bf lms7002\+\_\+pnl\+R3\+\_\+view\+::\+Update\+G\+U\+I()}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{df/de1/lms7__api_8cpp_a2ccb0cffc848f216211007df824b3c65_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{df/de1/lms7__api_8cpp_a2ccb0cffc848f216211007df824b3c65_icgraph}
+\end{center}
+\end{figure}
+
+
+\index{lms7\+\_\+api.\+cpp@{lms7\+\_\+api.\+cpp}!L\+M\+S\+\_\+\+Transfer\+L\+M\+S64C@{L\+M\+S\+\_\+\+Transfer\+L\+M\+S64C}}
+\index{L\+M\+S\+\_\+\+Transfer\+L\+M\+S64C@{L\+M\+S\+\_\+\+Transfer\+L\+M\+S64C}!lms7\+\_\+api.\+cpp@{lms7\+\_\+api.\+cpp}}
+\paragraph[{L\+M\+S\+\_\+\+Transfer\+L\+M\+S64\+C(lms\+\_\+device\+\_\+t $\ast$dev, int cmd, uint8\+\_\+t $\ast$data, size\+\_\+t $\ast$len)}]{\setlength{\rightskip}{0pt plus 5cm}{\bf A\+P\+I\+\_\+\+E\+X\+P\+O\+RT} {\bf int} {\bf C\+A\+L\+L\+\_\+\+C\+O\+NV} L\+M\+S\+\_\+\+Transfer\+L\+M\+S64C (
+\begin{DoxyParamCaption}
+\item[{{\bf lms\+\_\+device\+\_\+t} $\ast$}]{dev, }
+\item[{{\bf int}}]{cmd, }
+\item[{uint8\+\_\+t $\ast$}]{data, }
+\item[{size\+\_\+t $\ast$}]{len}
+\end{DoxyParamCaption}
+)}\label{lms7__api_8cpp_acdd37504896783997722571ef56f0717}
+
+
+Definition at line {\bf 1373} of file {\bf lms7\+\_\+api.\+cpp}.
+
+
+
+References {\bf lime\+::\+L\+M\+S64\+C\+Protocol\+::\+Generic\+Packet\+::cmd}, {\bf lime\+::\+L\+M\+S7\+\_\+\+Device\+::\+Get\+Connection()}, {\bf i}, {\bf lime\+::\+L\+M\+S64\+C\+Protocol\+::\+Generic\+Packet\+::in\+Buffer}, {\bf len}, {\bf lms()}, {\bf lime\+::\+L\+M\+S64\+C\+Protocol\+::\+Generic\+Packet\+::out\+Buffer}, {\bf port}, {\bf lime\+::\+Report\+Error()}, {\bf lime\+::\+L\+M\+S64\+C\+Protocol\+::\+Generic\+Packet\+::status}, {\bf lime\+::status2string()}, {\bf lime\+::\+S\+T\+A\+T\+U\+S\+\_\+\+C\+O\+M\+P\+L\+E\+T\+E\+D\+\_\+\+C\+MD}, and {\bf lime\+::\+L\+M\+S64\+C\+Protocol\+::\+Transfer\+Packet()}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{df/de1/lms7__api_8cpp_acdd37504896783997722571ef56f0717_cgraph}
+\end{center}
+\end{figure}
+
+
+\index{lms7\+\_\+api.\+cpp@{lms7\+\_\+api.\+cpp}!L\+M\+S\+\_\+\+Upload\+W\+FM@{L\+M\+S\+\_\+\+Upload\+W\+FM}}
+\index{L\+M\+S\+\_\+\+Upload\+W\+FM@{L\+M\+S\+\_\+\+Upload\+W\+FM}!lms7\+\_\+api.\+cpp@{lms7\+\_\+api.\+cpp}}
+\paragraph[{L\+M\+S\+\_\+\+Upload\+W\+F\+M(lms\+\_\+device\+\_\+t $\ast$device, const void $\ast$$\ast$samples, uint8\+\_\+t ch\+Count, size\+\_\+t sample\+\_\+count, int format)}]{\setlength{\rightskip}{0pt plus 5cm}{\bf A\+P\+I\+\_\+\+E\+X\+P\+O\+RT} {\bf int} {\bf C\+A\+L\+L\+\_\+\+C\+O\+NV} L\+M\+S\+\_\+\+Upload\+W\+FM (
+\begin{DoxyParamCaption}
+\item[{{\bf lms\+\_\+device\+\_\+t} $\ast$}]{device, }
+\item[{const {\bf void} $\ast$$\ast$}]{samples, }
+\item[{uint8\+\_\+t}]{ch\+Count, }
+\item[{size\+\_\+t}]{sample\+\_\+count, }
+\item[{{\bf int}}]{format}
+\end{DoxyParamCaption}
+)}\label{lms7__api_8cpp_a39a8acd245a2fe634b228c8fdfc3dbb0}
+
+
+Definition at line {\bf 1231} of file {\bf lms7\+\_\+api.\+cpp}.
+
+
+
+References {\bf lms()}, and {\bf lime\+::\+L\+M\+S7\+\_\+\+Device\+::\+Upload\+W\+F\+M()}.
+
+
+
+Referenced by {\bf D\+E\+F\+U\+N\+\_\+\+D\+L\+D()}, and {\bf F\+P\+G\+Acontrols\+\_\+wxgui\+::\+Upload\+File()}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{df/de1/lms7__api_8cpp_a39a8acd245a2fe634b228c8fdfc3dbb0_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=322pt]{df/de1/lms7__api_8cpp_a39a8acd245a2fe634b228c8fdfc3dbb0_icgraph}
+\end{center}
+\end{figure}
+
+
+\index{lms7\+\_\+api.\+cpp@{lms7\+\_\+api.\+cpp}!L\+M\+S\+\_\+\+V\+C\+T\+C\+X\+O\+Read@{L\+M\+S\+\_\+\+V\+C\+T\+C\+X\+O\+Read}}
+\index{L\+M\+S\+\_\+\+V\+C\+T\+C\+X\+O\+Read@{L\+M\+S\+\_\+\+V\+C\+T\+C\+X\+O\+Read}!lms7\+\_\+api.\+cpp@{lms7\+\_\+api.\+cpp}}
+\paragraph[{L\+M\+S\+\_\+\+V\+C\+T\+C\+X\+O\+Read(lms\+\_\+device\+\_\+t $\ast$device, uint16\+\_\+t $\ast$val)}]{\setlength{\rightskip}{0pt plus 5cm}{\bf A\+P\+I\+\_\+\+E\+X\+P\+O\+RT} {\bf int} {\bf C\+A\+L\+L\+\_\+\+C\+O\+NV} L\+M\+S\+\_\+\+V\+C\+T\+C\+X\+O\+Read (
+\begin{DoxyParamCaption}
+\item[{{\bf lms\+\_\+device\+\_\+t} $\ast$}]{device, }
+\item[{uint16\+\_\+t $\ast$}]{val}
+\end{DoxyParamCaption}
+)}\label{lms7__api_8cpp_aaaff7555972e1f8787b2cde2051a265e}
+
+
+Definition at line {\bf 251} of file {\bf lms7\+\_\+api.\+cpp}.
+
+
+
+References {\bf L\+M\+S\+\_\+\+Read\+Custom\+Board\+Param()}, and {\bf units}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{df/de1/lms7__api_8cpp_aaaff7555972e1f8787b2cde2051a265e_cgraph}
+\end{center}
+\end{figure}
+
+
+\index{lms7\+\_\+api.\+cpp@{lms7\+\_\+api.\+cpp}!L\+M\+S\+\_\+\+V\+C\+T\+C\+X\+O\+Write@{L\+M\+S\+\_\+\+V\+C\+T\+C\+X\+O\+Write}}
+\index{L\+M\+S\+\_\+\+V\+C\+T\+C\+X\+O\+Write@{L\+M\+S\+\_\+\+V\+C\+T\+C\+X\+O\+Write}!lms7\+\_\+api.\+cpp@{lms7\+\_\+api.\+cpp}}
+\paragraph[{L\+M\+S\+\_\+\+V\+C\+T\+C\+X\+O\+Write(lms\+\_\+device\+\_\+t $\ast$device, uint16\+\_\+t val)}]{\setlength{\rightskip}{0pt plus 5cm}{\bf A\+P\+I\+\_\+\+E\+X\+P\+O\+RT} {\bf int} {\bf C\+A\+L\+L\+\_\+\+C\+O\+NV} L\+M\+S\+\_\+\+V\+C\+T\+C\+X\+O\+Write (
+\begin{DoxyParamCaption}
+\item[{{\bf lms\+\_\+device\+\_\+t} $\ast$}]{device, }
+\item[{uint16\+\_\+t}]{val}
+\end{DoxyParamCaption}
+)}\label{lms7__api_8cpp_a44f360df25cba3aa40c5de8be4b1e397}
+
+
+Definition at line {\bf 246} of file {\bf lms7\+\_\+api.\+cpp}.
+
+
+
+References {\bf L\+M\+S\+\_\+\+Write\+Custom\+Board\+Param()}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{df/de1/lms7__api_8cpp_a44f360df25cba3aa40c5de8be4b1e397_cgraph}
+\end{center}
+\end{figure}
+
+
+\index{lms7\+\_\+api.\+cpp@{lms7\+\_\+api.\+cpp}!L\+M\+S\+\_\+\+Write\+Custom\+Board\+Param@{L\+M\+S\+\_\+\+Write\+Custom\+Board\+Param}}
+\index{L\+M\+S\+\_\+\+Write\+Custom\+Board\+Param@{L\+M\+S\+\_\+\+Write\+Custom\+Board\+Param}!lms7\+\_\+api.\+cpp@{lms7\+\_\+api.\+cpp}}
+\paragraph[{L\+M\+S\+\_\+\+Write\+Custom\+Board\+Param(lms\+\_\+device\+\_\+t $\ast$device, uint8\+\_\+t param\+\_\+id, float\+\_\+type val, const lms\+\_\+name\+\_\+t units)}]{\setlength{\rightskip}{0pt plus 5cm}{\bf A\+P\+I\+\_\+\+E\+X\+P\+O\+RT} {\bf int} {\bf C\+A\+L\+L\+\_\+\+C\+O\+NV} L\+M\+S\+\_\+\+Write\+Custom\+Board\+Param (
+\begin{DoxyParamCaption}
+\item[{{\bf lms\+\_\+device\+\_\+t} $\ast$}]{device, }
+\item[{uint8\+\_\+t}]{param\+\_\+id, }
+\item[{{\bf float\+\_\+type}}]{val, }
+\item[{const {\bf lms\+\_\+name\+\_\+t}}]{units}
+\end{DoxyParamCaption}
+)}\label{lms7__api_8cpp_a33751cada624efd567e37df81a57c639}
+
+
+Definition at line {\bf 227} of file {\bf lms7\+\_\+api.\+cpp}.
+
+
+
+References {\bf lime\+::\+L\+M\+S7\+\_\+\+Device\+::\+Get\+Connection()}, {\bf lms()}, {\bf lime\+::\+Report\+Error()}, and {\bf units}.
+
+
+
+Referenced by {\bf L\+M\+S\+\_\+\+V\+C\+T\+C\+X\+O\+Write()}, {\bf pnl\+Board\+Controls\+::\+On\+Custom\+Write()}, {\bf pnl\+Board\+Controls\+::\+On\+Set\+D\+A\+Cvalues()}, and {\bf pnl\+Board\+Controls\+::\+On\+Write\+All()}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{df/de1/lms7__api_8cpp_a33751cada624efd567e37df81a57c639_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{df/de1/lms7__api_8cpp_a33751cada624efd567e37df81a57c639_icgraph}
+\end{center}
+\end{figure}
+
+
+\index{lms7\+\_\+api.\+cpp@{lms7\+\_\+api.\+cpp}!L\+M\+S\+\_\+\+Write\+F\+P\+G\+A\+Reg@{L\+M\+S\+\_\+\+Write\+F\+P\+G\+A\+Reg}}
+\index{L\+M\+S\+\_\+\+Write\+F\+P\+G\+A\+Reg@{L\+M\+S\+\_\+\+Write\+F\+P\+G\+A\+Reg}!lms7\+\_\+api.\+cpp@{lms7\+\_\+api.\+cpp}}
+\paragraph[{L\+M\+S\+\_\+\+Write\+F\+P\+G\+A\+Reg(lms\+\_\+device\+\_\+t $\ast$device, uint32\+\_\+t address, uint16\+\_\+t val)}]{\setlength{\rightskip}{0pt plus 5cm}{\bf A\+P\+I\+\_\+\+E\+X\+P\+O\+RT} {\bf int} {\bf C\+A\+L\+L\+\_\+\+C\+O\+NV} L\+M\+S\+\_\+\+Write\+F\+P\+G\+A\+Reg (
+\begin{DoxyParamCaption}
+\item[{{\bf lms\+\_\+device\+\_\+t} $\ast$}]{device, }
+\item[{uint32\+\_\+t}]{address, }
+\item[{uint16\+\_\+t}]{val}
+\end{DoxyParamCaption}
+)}\label{lms7__api_8cpp_a00772bc179a978aa279a6ce238a24c18}
+
+
+Definition at line {\bf 1044} of file {\bf lms7\+\_\+api.\+cpp}.
+
+
+
+References {\bf lime\+::\+L\+M\+S7\+\_\+\+Device\+::\+Get\+Connection()}, {\bf lms()}, and {\bf lime\+::\+Report\+Error()}.
+
+
+
+Referenced by {\bf pnl\+Q\+Spark\+::\+Initialize()}, {\bf L\+M\+S\+\_\+\+Enable\+Tx\+W\+F\+M()}, {\bf S\+P\+I\+\_\+wxgui\+::on\+Board\+Write()}, {\bf pnl\+Q\+Spark\+::\+Onbtn\+Update\+All()}, {\bf F\+P\+G\+Acontrols\+\_\+wxgui\+::\+On\+Chk\+Digital\+Loopback\+Enable\+Click()}, {\bf pnl\+Lime\+S\+D\+R\+::\+On\+G\+P\+I\+O\+Change()}, {\bf pnlu\+Lime\+S\+D\+R\+::\+On\+Loopback\+Change()}, {\bf pnl\+Q\+Spark\+::\+On\+Nco\+Frequency\+Changed()}, {\bf pnl\+Q\+Spark\+::\+On\+Switch\+To\+Channel\+A()}, {\bf pnl\+Q\+Spark\+::\+On\+Switch\+To\+Channel\+B()}, and {\bf pnl\+Q\+Spark\+::\+Register\+Parameter\+Change\+Handler()}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{df/de1/lms7__api_8cpp_a00772bc179a978aa279a6ce238a24c18_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{df/de1/lms7__api_8cpp_a00772bc179a978aa279a6ce238a24c18_icgraph}
+\end{center}
+\end{figure}
+
+
+\index{lms7\+\_\+api.\+cpp@{lms7\+\_\+api.\+cpp}!L\+M\+S\+\_\+\+Write\+L\+M\+S\+Reg@{L\+M\+S\+\_\+\+Write\+L\+M\+S\+Reg}}
+\index{L\+M\+S\+\_\+\+Write\+L\+M\+S\+Reg@{L\+M\+S\+\_\+\+Write\+L\+M\+S\+Reg}!lms7\+\_\+api.\+cpp@{lms7\+\_\+api.\+cpp}}
+\paragraph[{L\+M\+S\+\_\+\+Write\+L\+M\+S\+Reg(lms\+\_\+device\+\_\+t $\ast$device, uint32\+\_\+t address, uint16\+\_\+t val)}]{\setlength{\rightskip}{0pt plus 5cm}{\bf A\+P\+I\+\_\+\+E\+X\+P\+O\+RT} {\bf int} {\bf C\+A\+L\+L\+\_\+\+C\+O\+NV} L\+M\+S\+\_\+\+Write\+L\+M\+S\+Reg (
+\begin{DoxyParamCaption}
+\item[{{\bf lms\+\_\+device\+\_\+t} $\ast$}]{device, }
+\item[{uint32\+\_\+t}]{address, }
+\item[{uint16\+\_\+t}]{val}
+\end{DoxyParamCaption}
+)}\label{lms7__api_8cpp_afd3d3c3227c91840a1c127805c3a3032}
+
+
+Definition at line {\bf 1008} of file {\bf lms7\+\_\+api.\+cpp}.
+
+
+
+References {\bf lms()}, {\bf lime\+::\+Report\+Error()}, and {\bf lime\+::\+L\+M\+S7\+\_\+\+Device\+::\+Write\+L\+M\+S\+Reg()}.
+
+
+
+Referenced by {\bf lms7002\+\_\+pnl\+M\+C\+U\+\_\+\+B\+D\+\_\+view\+::\+Debug\+Mode\+Exit\+\_\+\+M\+C\+U()}, {\bf lms7002\+\_\+pnl\+M\+C\+U\+\_\+\+B\+D\+\_\+view\+::\+Debug\+Mode\+Set\+\_\+\+M\+C\+U()}, {\bf lms7002\+\_\+pnl\+R3\+\_\+view\+::\+M\+C\+U\+\_\+\+Run\+Procedure()}, {\bf lms7002\+\_\+pnl\+R3\+\_\+view\+::\+M\+C\+U\+\_\+\+Wait\+For\+Status()}, {\bf lms7002\+\_\+pnl\+M\+C\+U\+\_\+\+B\+D\+\_\+view\+::\+One\+\_\+byte\+\_\+command()}, {\bf S\+P\+I\+\_\+wxgui\+::on\+L\+M\+Swrite()}, {\bf lms7002\+\_\+pnl\+M\+C\+U\+\_\+\+B\+D\+\_\+view\+::\+Onm\+\_\+c\+Ctrl\+Baseband\+Select()}, {\bf lms7002\+\_\+pnl\+M\+C\+U\+\_\+\+B\+D\+\_\+view\+::\+Onm\+\_\+c\+Ctrl\+M\+C\+U\+\_\+\+B\+D\+Select()}, {\bf lms7002\+\_\+pnl\+M\+C\+U\+\_\+\+B\+D\+\_\+view\+::\+On\+Reg\+Write\+Read()}, {\bf lms7002\+\_\+pnl\+R3\+\_\+view\+::\+On\+Write\+Rx\+D\+C()}, {\bf lms7002\+\_\+pnl\+R3\+\_\+view\+::\+On\+Write\+Tx\+D\+C()}, {\bf L\+M\+S7002\+M\+\_\+\+Novena\+\_\+wxgui\+::\+Parameter\+Change\+Handler()}, {\bf lms7002\+\_\+pnl\+R3\+\_\+view\+::\+Parameter\+Change\+Handler()}, {\bf lms7002\+\_\+pnl\+M\+C\+U\+\_\+\+B\+D\+\_\+view\+::\+Run\+Test\+\_\+\+M\+C\+U()}, {\bf lms7002\+\_\+pnl\+M\+C\+U\+\_\+\+B\+D\+\_\+view\+::\+Three\+\_\+byte\+\_\+command()}, {\bf lms7002\+\_\+pnl\+R3\+\_\+view\+::\+Update\+G\+U\+I()}, and {\bf lms7002\+\_\+pnl\+R3\+\_\+view\+::\+Update\+G\+U\+I\+Slow()}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{df/de1/lms7__api_8cpp_afd3d3c3227c91840a1c127805c3a3032_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{df/de1/lms7__api_8cpp_afd3d3c3227c91840a1c127805c3a3032_icgraph}
+\end{center}
+\end{figure}
+
+
+\index{lms7\+\_\+api.\+cpp@{lms7\+\_\+api.\+cpp}!L\+M\+S\+\_\+\+Write\+Param@{L\+M\+S\+\_\+\+Write\+Param}}
+\index{L\+M\+S\+\_\+\+Write\+Param@{L\+M\+S\+\_\+\+Write\+Param}!lms7\+\_\+api.\+cpp@{lms7\+\_\+api.\+cpp}}
+\paragraph[{L\+M\+S\+\_\+\+Write\+Param(lms\+\_\+device\+\_\+t $\ast$device, struct L\+M\+S7\+Parameter param, uint16\+\_\+t val)}]{\setlength{\rightskip}{0pt plus 5cm}{\bf A\+P\+I\+\_\+\+E\+X\+P\+O\+RT} {\bf int} {\bf C\+A\+L\+L\+\_\+\+C\+O\+NV} L\+M\+S\+\_\+\+Write\+Param (
+\begin{DoxyParamCaption}
+\item[{{\bf lms\+\_\+device\+\_\+t} $\ast$}]{device, }
+\item[{struct {\bf L\+M\+S7\+Parameter}}]{param, }
+\item[{uint16\+\_\+t}]{val}
+\end{DoxyParamCaption}
+)}\label{lms7__api_8cpp_a29da2b25b3336c31d75b70bb4eb32673}
+
+
+Definition at line {\bf 1074} of file {\bf lms7\+\_\+api.\+cpp}.
+
+
+
+References {\bf lms()}, {\bf lime\+::\+Report\+Error()}, and {\bf lime\+::\+L\+M\+S7\+\_\+\+Device\+::\+Write\+Param()}.
+
+
+
+Referenced by {\bf lms7002\+\_\+pnl\+T\+R\+F\+\_\+view\+::\+On\+Band\+Change()}, {\bf lms7002\+\_\+pnl\+Rx\+T\+S\+P\+\_\+view\+::\+Onbtn\+Load\+D\+C\+I\+Click()}, {\bf lms7002\+\_\+pnl\+Tx\+T\+S\+P\+\_\+view\+::\+Onbtn\+Load\+D\+C\+I\+Click()}, {\bf lms7002\+\_\+pnl\+Tx\+T\+S\+P\+\_\+view\+::\+Onbtn\+Load\+D\+C\+Q\+Click()}, {\bf lms7002\+\_\+pnl\+Rx\+T\+S\+P\+\_\+view\+::\+Onbtn\+Load\+D\+C\+Q\+Click()}, {\bf lms7002\+\_\+pnl\+Rx\+T\+S\+P\+\_\+view\+::\+Onbtn\+Read\+B\+I\+S\+T\+Signature()}, {\bf lms7002\+\_\+pnl\+Rx\+T\+S\+P\+\_\+view\+::\+Onbtn\+Read\+R\+S\+S\+I()}, {\bf lms7002\+\_\+pnl\+Tx\+T\+S\+P\+\_\+view\+::\+Onbtn\+Upload\+N\+C\+O\+Click()}, {\bf lms7002\+\_\+pnl\+Rx\+T\+S\+P\+\_\+view\+::\+Onbtn\+Upload\+N\+C\+O\+Click()}, {\bf lms7002\+\_\+pnl\+R\+B\+B\+\_\+view\+::\+Oncmb\+B\+B\+Loopback\+Selected()}, {\bf L\+M\+S7\+Suite\+App\+Frame\+::\+On\+Control\+Board\+Connect()}, {\bf lms7002\+\_\+main\+Panel\+::\+On\+Enable\+M\+I\+M\+Ochecked()}, {\bf lms7002\+\_\+pnl\+S\+X\+\_\+view\+::\+On\+Enable\+Ref\+Spur\+Cancelation()}, {\bf lms7002\+\_\+main\+Panel\+::\+On\+Lms\+Device\+Select()}, {\bf lms7002\+\_\+pnl\+Tx\+T\+S\+P\+\_\+view\+::\+On\+N\+C\+O\+Selection\+Change()}, {\bf lms7002\+\_\+pnl\+Rx\+T\+S\+P\+\_\+view\+::\+On\+N\+C\+O\+Selection\+Change()}, {\bf lms7002\+\_\+main\+Panel\+::\+On\+New\+Project()}, {\bf lms7002\+\_\+main\+Panel\+::\+Onnotebook\+\_\+modules\+Page\+Changed()}, {\bf lms7002\+\_\+main\+Panel\+::\+On\+Open\+Project()}, {\bf lms7002\+\_\+main\+Panel\+::\+On\+Switch\+To\+Channel\+A()}, {\bf lms7002\+\_\+main\+Panel\+::\+On\+Switch\+To\+Channel\+B()}, {\bf lms7002\+\_\+pnl\+T\+B\+B\+\_\+view\+::\+Parameter\+Change\+Handler()}, {\bf lms7002\+\_\+pnl\+L\+D\+O\+\_\+view\+::\+Parameter\+Change\+Handler()}, {\bf lms7002\+\_\+pnl\+A\+F\+E\+\_\+view\+::\+Parameter\+Change\+Handler()}, {\bf lms7002\+\_\+pnl\+R\+B\+B\+\_\+view\+::\+Parameter\+Change\+Handler()}, {\bf lms7002\+\_\+pnl\+C\+L\+K\+G\+E\+N\+\_\+view\+::\+Parameter\+Change\+Handler()}, {\bf lms7002\+\_\+pnl\+T\+R\+F\+\_\+view\+::\+Parameter\+Change\+Handler()}, {\bf lms7002\+\_\+pnl\+B\+I\+A\+S\+\_\+view\+::\+Parameter\+Change\+Handler()}, {\bf lms7002\+\_\+pnl\+S\+X\+\_\+view\+::\+Parameter\+Change\+Handler()}, {\bf lms7002\+\_\+pnl\+B\+I\+S\+T\+\_\+view\+::\+Parameter\+Change\+Handler()}, {\bf lms7002\+\_\+pnl\+Lime\+Light\+P\+A\+D\+\_\+view\+::\+Parameter\+Change\+Handler()}, {\bf lms7002\+\_\+pnl\+Calibrations\+\_\+view\+::\+Parameter\+Change\+Handler()}, {\bf lms7002\+\_\+pnl\+Gains\+\_\+view\+::\+Parameter\+Change\+Handler()}, {\bf lms7002\+\_\+pnl\+X\+B\+U\+F\+\_\+view\+::\+Parameter\+Change\+Handler()}, {\bf lms7002\+\_\+pnl\+R\+F\+E\+\_\+view\+::\+Parameter\+Change\+Handler()}, {\bf lms7002\+\_\+pnl\+Rx\+T\+S\+P\+\_\+view\+::\+Parameter\+Change\+Handler()}, {\bf lms7002\+\_\+pnl\+Tx\+T\+S\+P\+\_\+view\+::\+Parameter\+Change\+Handler()}, {\bf lms7002\+\_\+pnl\+C\+D\+S\+\_\+view\+::\+Parameter\+Change\+Handler()}, {\bf lms7002\+\_\+pnl\+R3\+\_\+view\+::\+Parameter\+Change\+Handler()}, {\bf lms7002\+\_\+pnl\+T\+R\+F\+\_\+view\+::\+Update\+G\+U\+I()}, {\bf lms7002\+\_\+pnl\+R\+B\+B\+\_\+view\+::\+Update\+G\+U\+I()}, and {\bf lms7002\+\_\+main\+Panel\+::\+Update\+G\+U\+I()}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{df/de1/lms7__api_8cpp_a29da2b25b3336c31d75b70bb4eb32673_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{df/de1/lms7__api_8cpp_a29da2b25b3336c31d75b70bb4eb32673_icgraph}
+\end{center}
+\end{figure}
+
+
+
+
+\subsubsection{Variable Documentation}
+\index{lms7\+\_\+api.\+cpp@{lms7\+\_\+api.\+cpp}!api\+\_\+msg\+\_\+handler@{api\+\_\+msg\+\_\+handler}}
+\index{api\+\_\+msg\+\_\+handler@{api\+\_\+msg\+\_\+handler}!lms7\+\_\+api.\+cpp@{lms7\+\_\+api.\+cpp}}
+\paragraph[{api\+\_\+msg\+\_\+handler}]{\setlength{\rightskip}{0pt plus 5cm}{\bf L\+M\+S\+\_\+\+Log\+Handler} api\+\_\+msg\+\_\+handler\hspace{0.3cm}{\ttfamily [static]}}\label{lms7__api_8cpp_adb072caafd5dd49158beff108c9d50a2}
+
+
+Definition at line {\bf 1361} of file {\bf lms7\+\_\+api.\+cpp}.
+
+
+
+Referenced by {\bf A\+P\+I\+Msg\+Handler()}, and {\bf L\+M\+S\+\_\+\+Register\+Log\+Handler()}.
+

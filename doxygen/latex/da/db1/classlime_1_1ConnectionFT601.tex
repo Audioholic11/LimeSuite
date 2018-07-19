@@ -1,0 +1,891 @@
+\subsection{lime\+:\+:Connection\+F\+T601 Class Reference}
+\label{classlime_1_1ConnectionFT601}\index{lime\+::\+Connection\+F\+T601@{lime\+::\+Connection\+F\+T601}}
+
+
+{\ttfamily \#include $<$Connection\+F\+T601.\+h$>$}
+
+
+
+Inheritance diagram for lime\+:\+:Connection\+F\+T601\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=550pt]{d2/d56/classlime_1_1ConnectionFT601__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for lime\+:\+:Connection\+F\+T601\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=550pt]{d2/dbb/classlime_1_1ConnectionFT601__coll__graph}
+\end{center}
+\end{figure}
+\subsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+class {\bf U\+S\+B\+Transfer\+Context}
+\begin{DoxyCompactList}\small\item\em Wrapper class for holding U\+SB asynchronous transfers contexts. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+{\bf Connection\+F\+T601} ({\bf void} $\ast$arg)
+\item 
+{\bf Connection\+F\+T601} ({\bf void} $\ast$ctx, const {\bf Connection\+Handle} \&handle)
+\begin{DoxyCompactList}\small\item\em Initializes port type and object necessary to communicate to usb device. \end{DoxyCompactList}\item 
+virtual {\bf $\sim$\+Connection\+F\+T601} ({\bf void})
+\begin{DoxyCompactList}\small\item\em Closes connection to chip and deallocates used memory. \end{DoxyCompactList}\item 
+{\bf int} {\bf Open} (const std\+::string \&serial, {\bf int} vid, {\bf int} pid)
+\begin{DoxyCompactList}\small\item\em Tries to open connected U\+SB device and find communication endpoints. \end{DoxyCompactList}\item 
+{\bf void} {\bf Close} ()
+\begin{DoxyCompactList}\small\item\em Closes communication to device. \end{DoxyCompactList}\item 
+bool {\bf Is\+Open} ()
+\begin{DoxyCompactList}\small\item\em Returns connection status. \end{DoxyCompactList}\item 
+{\bf int} {\bf Get\+Opened\+Index} ()
+\item 
+{\bf int} {\bf Write} (const unsigned char $\ast${\bf buffer}, {\bf int} {\bf length}, {\bf int} {\bf timeout\+\_\+ms}=100) override
+\begin{DoxyCompactList}\small\item\em Sends given data buffer to chip through U\+SB port. \end{DoxyCompactList}\item 
+{\bf int} {\bf Read} (unsigned char $\ast${\bf buffer}, {\bf int} {\bf length}, {\bf int} {\bf timeout\+\_\+ms}=100) override
+\begin{DoxyCompactList}\small\item\em Reads data coming from the chip through U\+SB port. \end{DoxyCompactList}\item 
+{\bf int} {\bf Program\+Write} (const char $\ast$data\+\_\+src, size\+\_\+t {\bf length}, {\bf int} prog\+\_\+mode, {\bf int} {\bf device}, {\bf Programming\+Callback} {\bf callback}) override
+\begin{DoxyCompactList}\small\item\em Uploads program to selected device. \end{DoxyCompactList}\item 
+{\bf Device\+Info} {\bf Get\+Device\+Info} ({\bf void}) override
+\end{DoxyCompactItemize}
+\subsubsection*{Protected Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+{\bf int} {\bf Get\+Buffers\+Count} () const override
+\item 
+{\bf int} {\bf Check\+Stream\+Size} ({\bf int} {\bf size}) const override
+\item 
+{\bf int} {\bf Begin\+Data\+Reading} (char $\ast${\bf buffer}, uint32\+\_\+t {\bf length}, {\bf int} ep) override
+\begin{DoxyCompactList}\small\item\em Starts asynchronous data reading from board. \end{DoxyCompactList}\item 
+bool {\bf Wait\+For\+Reading} ({\bf int} context\+Handle, unsigned {\bf int} {\bf timeout\+\_\+ms}) override
+\begin{DoxyCompactList}\small\item\em Waits for asynchronous data reception. \end{DoxyCompactList}\item 
+{\bf int} {\bf Finish\+Data\+Reading} (char $\ast${\bf buffer}, uint32\+\_\+t {\bf length}, {\bf int} context\+Handle) override
+\begin{DoxyCompactList}\small\item\em Finishes asynchronous data reading from board. \end{DoxyCompactList}\item 
+{\bf void} {\bf Abort\+Reading} ({\bf int} ep) override
+\begin{DoxyCompactList}\small\item\em Aborts reading operations. \end{DoxyCompactList}\item 
+{\bf int} {\bf Begin\+Data\+Sending} (const char $\ast${\bf buffer}, uint32\+\_\+t {\bf length}, {\bf int} ep) override
+\begin{DoxyCompactList}\small\item\em Starts asynchronous data Sending to board. \end{DoxyCompactList}\item 
+bool {\bf Wait\+For\+Sending} ({\bf int} context\+Handle, uint32\+\_\+t {\bf timeout\+\_\+ms}) override
+\begin{DoxyCompactList}\small\item\em Waits for asynchronous data sending. \end{DoxyCompactList}\item 
+{\bf int} {\bf Finish\+Data\+Sending} (const char $\ast${\bf buffer}, uint32\+\_\+t {\bf length}, {\bf int} context\+Handle) override
+\begin{DoxyCompactList}\small\item\em Finishes asynchronous data sending to board. \end{DoxyCompactList}\item 
+{\bf void} {\bf Abort\+Sending} ({\bf int} ep) override
+\begin{DoxyCompactList}\small\item\em Aborts sending operations. \end{DoxyCompactList}\item 
+{\bf int} {\bf Reset\+Stream\+Buffers} () override
+\begin{DoxyCompactList}\small\item\em Read raw stream data from device streaming port. \end{DoxyCompactList}\item 
+{\bf e\+Connection\+Type} {\bf Get\+Type} ({\bf void})
+\begin{DoxyCompactList}\small\item\em implement in base class \end{DoxyCompactList}\item 
+{\bf int} {\bf Reinit\+Pipe} (unsigned char ep)
+\end{DoxyCompactItemize}
+\subsubsection*{Protected Attributes}
+\begin{DoxyCompactItemize}
+\item 
+{\bf U\+S\+B\+Transfer\+Context} {\bf contexts} [{\bf U\+S\+B\+\_\+\+M\+A\+X\+\_\+\+C\+O\+N\+T\+E\+X\+TS}]
+\item 
+{\bf U\+S\+B\+Transfer\+Context} {\bf contexts\+To\+Send} [{\bf U\+S\+B\+\_\+\+M\+A\+X\+\_\+\+C\+O\+N\+T\+E\+X\+TS}]
+\item 
+bool {\bf is\+Connected}
+\item 
+{\bf F\+T\+\_\+\+H\+A\+N\+D\+LE} {\bf m\+F\+T\+Handle}
+\item 
+std\+::mutex {\bf m\+Extra\+Usb\+Mutex}
+\item 
+uint64\+\_\+t {\bf m\+Serial}
+\end{DoxyCompactItemize}
+\subsubsection*{Static Protected Attributes}
+\begin{DoxyCompactItemize}
+\item 
+static const {\bf int} {\bf U\+S\+B\+\_\+\+M\+A\+X\+\_\+\+C\+O\+N\+T\+E\+X\+TS} = 16
+\item 
+static const {\bf int} {\bf stream\+Wr\+Ep} = 0x03
+\item 
+static const {\bf int} {\bf stream\+Rd\+Ep} = 0x83
+\item 
+static const {\bf int} {\bf ctrl\+Wr\+Ep} = 0x02
+\item 
+static const {\bf int} {\bf ctrl\+Rd\+Ep} = 0x82
+\end{DoxyCompactItemize}
+\subsubsection*{Additional Inherited Members}
+
+
+\subsubsection{Detailed Description}
+
+
+Definition at line {\bf 29} of file {\bf Connection\+F\+T601.\+h}.
+
+
+
+\subsubsection{Constructor \& Destructor Documentation}
+\index{lime\+::\+Connection\+F\+T601@{lime\+::\+Connection\+F\+T601}!Connection\+F\+T601@{Connection\+F\+T601}}
+\index{Connection\+F\+T601@{Connection\+F\+T601}!lime\+::\+Connection\+F\+T601@{lime\+::\+Connection\+F\+T601}}
+\paragraph[{Connection\+F\+T601(void $\ast$arg)}]{\setlength{\rightskip}{0pt plus 5cm}Connection\+F\+T601\+::\+Connection\+F\+T601 (
+\begin{DoxyParamCaption}
+\item[{{\bf void} $\ast$}]{arg}
+\end{DoxyParamCaption}
+)}\label{classlime_1_1ConnectionFT601_a26389bd364539a0cf8cab458f445f501}
+
+
+Definition at line {\bf 26} of file {\bf Connection\+F\+T601.\+cpp}.
+
+\index{lime\+::\+Connection\+F\+T601@{lime\+::\+Connection\+F\+T601}!Connection\+F\+T601@{Connection\+F\+T601}}
+\index{Connection\+F\+T601@{Connection\+F\+T601}!lime\+::\+Connection\+F\+T601@{lime\+::\+Connection\+F\+T601}}
+\paragraph[{Connection\+F\+T601(void $\ast$ctx, const Connection\+Handle \&handle)}]{\setlength{\rightskip}{0pt plus 5cm}Connection\+F\+T601\+::\+Connection\+F\+T601 (
+\begin{DoxyParamCaption}
+\item[{{\bf void} $\ast$}]{ctx, }
+\item[{const {\bf Connection\+Handle} \&}]{handle}
+\end{DoxyParamCaption}
+)}\label{classlime_1_1ConnectionFT601_a3056ddbde25f035ee0f56f418ddf3c32}
+
+
+Initializes port type and object necessary to communicate to usb device. 
+
+
+
+Definition at line {\bf 40} of file {\bf Connection\+F\+T601.\+cpp}.
+
+
+
+References {\bf lime\+::\+Connection\+Handle\+::addr}, {\bf lime\+::error()}, and {\bf lime\+::\+Connection\+Handle\+::serial}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{da/db1/classlime_1_1ConnectionFT601_a3056ddbde25f035ee0f56f418ddf3c32_cgraph}
+\end{center}
+\end{figure}
+
+
+\index{lime\+::\+Connection\+F\+T601@{lime\+::\+Connection\+F\+T601}!````~Connection\+F\+T601@{$\sim$\+Connection\+F\+T601}}
+\index{````~Connection\+F\+T601@{$\sim$\+Connection\+F\+T601}!lime\+::\+Connection\+F\+T601@{lime\+::\+Connection\+F\+T601}}
+\paragraph[{$\sim$\+Connection\+F\+T601(void)}]{\setlength{\rightskip}{0pt plus 5cm}Connection\+F\+T601\+::$\sim$\+Connection\+F\+T601 (
+\begin{DoxyParamCaption}
+\item[{{\bf void}}]{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [virtual]}}\label{classlime_1_1ConnectionFT601_aa24dbde8f9fb8668b500cee87fbb8fc7}
+
+
+Closes connection to chip and deallocates used memory. 
+
+
+
+Definition at line {\bf 63} of file {\bf Connection\+F\+T601.\+cpp}.
+
+
+
+\subsubsection{Member Function Documentation}
+\index{lime\+::\+Connection\+F\+T601@{lime\+::\+Connection\+F\+T601}!Abort\+Reading@{Abort\+Reading}}
+\index{Abort\+Reading@{Abort\+Reading}!lime\+::\+Connection\+F\+T601@{lime\+::\+Connection\+F\+T601}}
+\paragraph[{Abort\+Reading(int ep) override}]{\setlength{\rightskip}{0pt plus 5cm}{\bf void} Connection\+F\+T601\+::\+Abort\+Reading (
+\begin{DoxyParamCaption}
+\item[{{\bf int}}]{ep}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [protected]}, {\ttfamily [virtual]}}\label{classlime_1_1ConnectionFT601_a91dd36e4e4dfe55c34a1485afc8160f5}
+
+
+Aborts reading operations. 
+
+
+
+Reimplemented from {\bf lime\+::\+I\+Connection} \doxyref{}{p.}{d2/de5/classlime_1_1IConnection_ae6bc7a7556e13862df14e98ccf4b9409}.
+
+
+
+Definition at line {\bf 530} of file {\bf Connection\+F\+T601.\+cpp}.
+
+
+
+References {\bf i}.
+
+\index{lime\+::\+Connection\+F\+T601@{lime\+::\+Connection\+F\+T601}!Abort\+Sending@{Abort\+Sending}}
+\index{Abort\+Sending@{Abort\+Sending}!lime\+::\+Connection\+F\+T601@{lime\+::\+Connection\+F\+T601}}
+\paragraph[{Abort\+Sending(int ep) override}]{\setlength{\rightskip}{0pt plus 5cm}{\bf void} Connection\+F\+T601\+::\+Abort\+Sending (
+\begin{DoxyParamCaption}
+\item[{{\bf int}}]{ep}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [protected]}, {\ttfamily [virtual]}}\label{classlime_1_1ConnectionFT601_ac6ef14a56ccacc96fae3dc152bf8fb86}
+
+
+Aborts sending operations. 
+
+
+
+Reimplemented from {\bf lime\+::\+I\+Connection} \doxyref{}{p.}{d2/de5/classlime_1_1IConnection_a36928cc55493e86385e4ff582ef2c02b}.
+
+
+
+Definition at line {\bf 674} of file {\bf Connection\+F\+T601.\+cpp}.
+
+
+
+References {\bf i}.
+
+\index{lime\+::\+Connection\+F\+T601@{lime\+::\+Connection\+F\+T601}!Begin\+Data\+Reading@{Begin\+Data\+Reading}}
+\index{Begin\+Data\+Reading@{Begin\+Data\+Reading}!lime\+::\+Connection\+F\+T601@{lime\+::\+Connection\+F\+T601}}
+\paragraph[{Begin\+Data\+Reading(char $\ast$buffer, uint32\+\_\+t length, int ep) override}]{\setlength{\rightskip}{0pt plus 5cm}{\bf int} Connection\+F\+T601\+::\+Begin\+Data\+Reading (
+\begin{DoxyParamCaption}
+\item[{char $\ast$}]{buffer, }
+\item[{uint32\+\_\+t}]{length, }
+\item[{{\bf int}}]{ep}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [protected]}, {\ttfamily [virtual]}}\label{classlime_1_1ConnectionFT601_afc5a108646d70aa0b4b98c3a57a031c0}
+
+
+Starts asynchronous data reading from board. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em $\ast$buffer} & buffer where to store received data \\
+\hline
+{\em length} & number of bytes to read \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+handle of transfer context 
+\end{DoxyReturn}
+
+
+Reimplemented from {\bf lime\+::\+I\+Connection} \doxyref{}{p.}{d2/de5/classlime_1_1IConnection_ac9ec0b2a4288d7732d7e2e03f5606401}.
+
+
+
+Definition at line {\bf 421} of file {\bf Connection\+F\+T601.\+cpp}.
+
+
+
+References {\bf lime\+::error()}, {\bf F\+T\+\_\+\+I\+O\+\_\+\+P\+E\+N\+D\+I\+NG}, {\bf F\+T\+\_\+\+OK}, {\bf i}, and {\bf status}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{da/db1/classlime_1_1ConnectionFT601_afc5a108646d70aa0b4b98c3a57a031c0_cgraph}
+\end{center}
+\end{figure}
+
+
+\index{lime\+::\+Connection\+F\+T601@{lime\+::\+Connection\+F\+T601}!Begin\+Data\+Sending@{Begin\+Data\+Sending}}
+\index{Begin\+Data\+Sending@{Begin\+Data\+Sending}!lime\+::\+Connection\+F\+T601@{lime\+::\+Connection\+F\+T601}}
+\paragraph[{Begin\+Data\+Sending(const char $\ast$buffer, uint32\+\_\+t length, int ep) override}]{\setlength{\rightskip}{0pt plus 5cm}{\bf int} Connection\+F\+T601\+::\+Begin\+Data\+Sending (
+\begin{DoxyParamCaption}
+\item[{const char $\ast$}]{buffer, }
+\item[{uint32\+\_\+t}]{length, }
+\item[{{\bf int}}]{ep}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [protected]}, {\ttfamily [virtual]}}\label{classlime_1_1ConnectionFT601_ad5831c2ecfbb88522e94b8305c682ac0}
+
+
+Starts asynchronous data Sending to board. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em $\ast$buffer} & buffer to send \\
+\hline
+{\em length} & number of bytes to send \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+handle of transfer context 
+\end{DoxyReturn}
+
+
+Reimplemented from {\bf lime\+::\+I\+Connection} \doxyref{}{p.}{d2/de5/classlime_1_1IConnection_afdfa152ab699f516cd0fb479ec98bcc8}.
+
+
+
+Definition at line {\bf 569} of file {\bf Connection\+F\+T601.\+cpp}.
+
+
+
+References {\bf lime\+::error()}, {\bf F\+T\+\_\+\+I\+O\+\_\+\+P\+E\+N\+D\+I\+NG}, {\bf F\+T\+\_\+\+OK}, {\bf i}, and {\bf status}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{da/db1/classlime_1_1ConnectionFT601_ad5831c2ecfbb88522e94b8305c682ac0_cgraph}
+\end{center}
+\end{figure}
+
+
+\index{lime\+::\+Connection\+F\+T601@{lime\+::\+Connection\+F\+T601}!Check\+Stream\+Size@{Check\+Stream\+Size}}
+\index{Check\+Stream\+Size@{Check\+Stream\+Size}!lime\+::\+Connection\+F\+T601@{lime\+::\+Connection\+F\+T601}}
+\paragraph[{Check\+Stream\+Size(int size) const override}]{\setlength{\rightskip}{0pt plus 5cm}{\bf int} Connection\+F\+T601\+::\+Check\+Stream\+Size (
+\begin{DoxyParamCaption}
+\item[{{\bf int}}]{size}
+\end{DoxyParamCaption}
+) const\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [protected]}, {\ttfamily [virtual]}}\label{classlime_1_1ConnectionFT601_a5b3a29a90afba294c7cf4e535a701ac5}
+
+
+Reimplemented from {\bf lime\+::\+I\+Connection} \doxyref{}{p.}{d2/de5/classlime_1_1IConnection_a533ff580f219bbec2b556b265c1e1355}.
+
+
+
+Definition at line {\bf 410} of file {\bf Connection\+F\+T601.\+cpp}.
+
+\index{lime\+::\+Connection\+F\+T601@{lime\+::\+Connection\+F\+T601}!Close@{Close}}
+\index{Close@{Close}!lime\+::\+Connection\+F\+T601@{lime\+::\+Connection\+F\+T601}}
+\paragraph[{Close()}]{\setlength{\rightskip}{0pt plus 5cm}{\bf void} Connection\+F\+T601\+::\+Close (
+\begin{DoxyParamCaption}
+\item[{{\bf void}}]{}
+\end{DoxyParamCaption}
+)}\label{classlime_1_1ConnectionFT601_ac7d7e54d4222c538f486055e1b4ff48a}
+
+
+Closes communication to device. 
+
+
+
+Definition at line {\bf 225} of file {\bf Connection\+F\+T601.\+cpp}.
+
+\index{lime\+::\+Connection\+F\+T601@{lime\+::\+Connection\+F\+T601}!Finish\+Data\+Reading@{Finish\+Data\+Reading}}
+\index{Finish\+Data\+Reading@{Finish\+Data\+Reading}!lime\+::\+Connection\+F\+T601@{lime\+::\+Connection\+F\+T601}}
+\paragraph[{Finish\+Data\+Reading(char $\ast$buffer, uint32\+\_\+t length, int context\+Handle) override}]{\setlength{\rightskip}{0pt plus 5cm}{\bf int} Connection\+F\+T601\+::\+Finish\+Data\+Reading (
+\begin{DoxyParamCaption}
+\item[{char $\ast$}]{buffer, }
+\item[{uint32\+\_\+t}]{length, }
+\item[{{\bf int}}]{context\+Handle}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [protected]}, {\ttfamily [virtual]}}\label{classlime_1_1ConnectionFT601_aab8b49d60f0856c6a91705d39e5c3448}
+
+
+Finishes asynchronous data reading from board. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em buffer} & array where to store received data \\
+\hline
+{\em length} & number of bytes to read \\
+\hline
+{\em context\+Handle} & handle of which context to finish \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+false failure, true number of bytes received 
+\end{DoxyReturn}
+
+
+Reimplemented from {\bf lime\+::\+I\+Connection} \doxyref{}{p.}{d2/de5/classlime_1_1IConnection_a900a18a24b131295005bd5bf88856840}.
+
+
+
+Definition at line {\bf 502} of file {\bf Connection\+F\+T601.\+cpp}.
+
+
+
+References {\bf F\+T\+\_\+\+OK}.
+
+\index{lime\+::\+Connection\+F\+T601@{lime\+::\+Connection\+F\+T601}!Finish\+Data\+Sending@{Finish\+Data\+Sending}}
+\index{Finish\+Data\+Sending@{Finish\+Data\+Sending}!lime\+::\+Connection\+F\+T601@{lime\+::\+Connection\+F\+T601}}
+\paragraph[{Finish\+Data\+Sending(const char $\ast$buffer, uint32\+\_\+t length, int context\+Handle) override}]{\setlength{\rightskip}{0pt plus 5cm}{\bf int} Connection\+F\+T601\+::\+Finish\+Data\+Sending (
+\begin{DoxyParamCaption}
+\item[{const char $\ast$}]{buffer, }
+\item[{uint32\+\_\+t}]{length, }
+\item[{{\bf int}}]{context\+Handle}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [protected]}, {\ttfamily [virtual]}}\label{classlime_1_1ConnectionFT601_a931402012fe8d9142fdb70aaee31306b}
+
+
+Finishes asynchronous data sending to board. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em buffer} & array where to store received data \\
+\hline
+{\em length} & number of bytes to read \\
+\hline
+{\em context\+Handle} & handle of which context to finish \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+false failure, true number of bytes sent 
+\end{DoxyReturn}
+
+
+Reimplemented from {\bf lime\+::\+I\+Connection} \doxyref{}{p.}{d2/de5/classlime_1_1IConnection_a7039b9d4f3b8fc03be3272dcabc51e09}.
+
+
+
+Definition at line {\bf 646} of file {\bf Connection\+F\+T601.\+cpp}.
+
+
+
+References {\bf F\+T\+\_\+\+OK}.
+
+\index{lime\+::\+Connection\+F\+T601@{lime\+::\+Connection\+F\+T601}!Get\+Buffers\+Count@{Get\+Buffers\+Count}}
+\index{Get\+Buffers\+Count@{Get\+Buffers\+Count}!lime\+::\+Connection\+F\+T601@{lime\+::\+Connection\+F\+T601}}
+\paragraph[{Get\+Buffers\+Count() const override}]{\setlength{\rightskip}{0pt plus 5cm}{\bf int} Connection\+F\+T601\+::\+Get\+Buffers\+Count (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+) const\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [protected]}, {\ttfamily [virtual]}}\label{classlime_1_1ConnectionFT601_ae655e7695f9ea40551d5f9e7a9934d85}
+
+
+Reimplemented from {\bf lime\+::\+I\+Connection} \doxyref{}{p.}{d2/de5/classlime_1_1IConnection_a5cf560f39a0b0fa2dc4079ae74f22925}.
+
+
+
+Definition at line {\bf 405} of file {\bf Connection\+F\+T601.\+cpp}.
+
+\index{lime\+::\+Connection\+F\+T601@{lime\+::\+Connection\+F\+T601}!Get\+Device\+Info@{Get\+Device\+Info}}
+\index{Get\+Device\+Info@{Get\+Device\+Info}!lime\+::\+Connection\+F\+T601@{lime\+::\+Connection\+F\+T601}}
+\paragraph[{Get\+Device\+Info(void) override}]{\setlength{\rightskip}{0pt plus 5cm}{\bf Device\+Info} Connection\+F\+T601\+::\+Get\+Device\+Info (
+\begin{DoxyParamCaption}
+\item[{{\bf void}}]{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [virtual]}}\label{classlime_1_1ConnectionFT601_a8b8e55feb9651092bc14b54b0295342c}
+Get information about a device for displaying helpful information or for making device-\/specific decisions. 
+
+Reimplemented from {\bf lime\+::\+L\+M\+S64\+C\+Protocol} \doxyref{}{p.}{de/d46/classlime_1_1LMS64CProtocol_a7ce609a043243a35fe13445380f5ada6}.
+
+
+
+Definition at line {\bf 770} of file {\bf Connection\+F\+T601.\+cpp}.
+
+
+
+References {\bf lime\+::\+Device\+Info\+::board\+Serial\+Number}, and {\bf info}.
+
+\index{lime\+::\+Connection\+F\+T601@{lime\+::\+Connection\+F\+T601}!Get\+Opened\+Index@{Get\+Opened\+Index}}
+\index{Get\+Opened\+Index@{Get\+Opened\+Index}!lime\+::\+Connection\+F\+T601@{lime\+::\+Connection\+F\+T601}}
+\paragraph[{Get\+Opened\+Index()}]{\setlength{\rightskip}{0pt plus 5cm}{\bf int} lime\+::\+Connection\+F\+T601\+::\+Get\+Opened\+Index (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}\label{classlime_1_1ConnectionFT601_a5bd829175edad6c92132446ac5065aef}
+\index{lime\+::\+Connection\+F\+T601@{lime\+::\+Connection\+F\+T601}!Get\+Type@{Get\+Type}}
+\index{Get\+Type@{Get\+Type}!lime\+::\+Connection\+F\+T601@{lime\+::\+Connection\+F\+T601}}
+\paragraph[{Get\+Type(void)}]{\setlength{\rightskip}{0pt plus 5cm}{\bf e\+Connection\+Type} lime\+::\+Connection\+F\+T601\+::\+Get\+Type (
+\begin{DoxyParamCaption}
+\item[{{\bf void}}]{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [protected]}, {\ttfamily [virtual]}}\label{classlime_1_1ConnectionFT601_a7f87f759781136de1e931e07bac66dd6}
+
+
+implement in base class 
+
+
+
+Implements {\bf lime\+::\+L\+M\+S64\+C\+Protocol} \doxyref{}{p.}{de/d46/classlime_1_1LMS64CProtocol_ab766d6322a66164891a296359c2b9019}.
+
+
+
+Definition at line {\bf 98} of file {\bf Connection\+F\+T601.\+h}.
+
+
+
+References {\bf lime\+::\+L\+M\+S64\+C\+Protocol\+::\+U\+S\+B\+\_\+\+P\+O\+RT}.
+
+\index{lime\+::\+Connection\+F\+T601@{lime\+::\+Connection\+F\+T601}!Is\+Open@{Is\+Open}}
+\index{Is\+Open@{Is\+Open}!lime\+::\+Connection\+F\+T601@{lime\+::\+Connection\+F\+T601}}
+\paragraph[{Is\+Open()}]{\setlength{\rightskip}{0pt plus 5cm}bool Connection\+F\+T601\+::\+Is\+Open (
+\begin{DoxyParamCaption}
+\item[{{\bf void}}]{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [virtual]}}\label{classlime_1_1ConnectionFT601_a42fe706ec4a35857de4d40ce532ae147}
+
+
+Returns connection status. 
+
+\begin{DoxyReturn}{Returns}
+1-\/connection open, 0-\/connection closed. 
+\end{DoxyReturn}
+
+
+Reimplemented from {\bf lime\+::\+I\+Connection} \doxyref{}{p.}{d2/de5/classlime_1_1IConnection_abf1c25c85e31e262ded3e33e65cc58e3}.
+
+
+
+Definition at line {\bf 245} of file {\bf Connection\+F\+T601.\+cpp}.
+
+\index{lime\+::\+Connection\+F\+T601@{lime\+::\+Connection\+F\+T601}!Open@{Open}}
+\index{Open@{Open}!lime\+::\+Connection\+F\+T601@{lime\+::\+Connection\+F\+T601}}
+\paragraph[{Open(const std\+::string \&serial, int vid, int pid)}]{\setlength{\rightskip}{0pt plus 5cm}{\bf int} Connection\+F\+T601\+::\+Open (
+\begin{DoxyParamCaption}
+\item[{const std\+::string \&}]{serial, }
+\item[{{\bf int}}]{vid, }
+\item[{{\bf int}}]{pid}
+\end{DoxyParamCaption}
+)}\label{classlime_1_1ConnectionFT601_a0ee233bcaf4defc88d8cd964d257c4df}
+
+
+Tries to open connected U\+SB device and find communication endpoints. 
+
+\begin{DoxyReturn}{Returns}
+Returns 0-\/\+Success, other-\/\+End\+Points not found or device didn\textquotesingle{}t connect. 
+\end{DoxyReturn}
+
+
+Definition at line {\bf 131} of file {\bf Connection\+F\+T601.\+cpp}.
+
+
+
+References {\bf lime\+::debug()}, {\bf lime\+::error()}, {\bf F\+T\+\_\+\+F\+A\+I\+L\+ED}, {\bf F\+T\+\_\+\+OK}, {\bf F\+T\+\_\+\+O\+P\+E\+N\+\_\+\+B\+Y\+\_\+\+S\+E\+R\+I\+A\+L\+\_\+\+N\+U\+M\+B\+ER}, {\bf i}, and {\bf lime\+::\+Report\+Error()}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{da/db1/classlime_1_1ConnectionFT601_a0ee233bcaf4defc88d8cd964d257c4df_cgraph}
+\end{center}
+\end{figure}
+
+
+\index{lime\+::\+Connection\+F\+T601@{lime\+::\+Connection\+F\+T601}!Program\+Write@{Program\+Write}}
+\index{Program\+Write@{Program\+Write}!lime\+::\+Connection\+F\+T601@{lime\+::\+Connection\+F\+T601}}
+\paragraph[{Program\+Write(const char $\ast$data\+\_\+src, size\+\_\+t length, int prog\+\_\+mode, int device, Programming\+Callback callback) override}]{\setlength{\rightskip}{0pt plus 5cm}{\bf int} Connection\+F\+T601\+::\+Program\+Write (
+\begin{DoxyParamCaption}
+\item[{const char $\ast$}]{buffer, }
+\item[{size\+\_\+t}]{length, }
+\item[{{\bf int}}]{programming\+Mode, }
+\item[{{\bf int}}]{index, }
+\item[{{\bf Programming\+Callback}}]{callback}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [virtual]}}\label{classlime_1_1ConnectionFT601_a2d7b20e833efa2b82568494129dc1042}
+
+
+Uploads program to selected device. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em buffer} & binary program data \\
+\hline
+{\em length} & buffer length \\
+\hline
+{\em programming\+Mode} & to R\+AM, to F\+L\+A\+SH, to E\+E\+P\+R\+OM, etc.. \\
+\hline
+{\em index} & target device number \\
+\hline
+{\em callback} & callback for progress reporting or early termination \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+the operation success state
+\end{DoxyReturn}
+Can be used to program M\+CU, \doxyref{F\+P\+GA}{p.}{db/dcf/classlime_1_1FPGA}, write external on board memory. This could be a quite long operation, use callback to get progress info or to terminate early 
+
+Reimplemented from {\bf lime\+::\+L\+M\+S64\+C\+Protocol} \doxyref{}{p.}{de/d46/classlime_1_1LMS64CProtocol_a286c211f73249bddb8a39da39c1b7f7a}.
+
+
+
+Definition at line {\bf 730} of file {\bf Connection\+F\+T601.\+cpp}.
+
+
+
+References {\bf buffer}, {\bf callback}, {\bf device}, and {\bf lime\+::error()}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{da/db1/classlime_1_1ConnectionFT601_a2d7b20e833efa2b82568494129dc1042_cgraph}
+\end{center}
+\end{figure}
+
+
+\index{lime\+::\+Connection\+F\+T601@{lime\+::\+Connection\+F\+T601}!Read@{Read}}
+\index{Read@{Read}!lime\+::\+Connection\+F\+T601@{lime\+::\+Connection\+F\+T601}}
+\paragraph[{Read(unsigned char $\ast$buffer, int length, int timeout\+\_\+ms=100) override}]{\setlength{\rightskip}{0pt plus 5cm}{\bf int} Connection\+F\+T601\+::\+Read (
+\begin{DoxyParamCaption}
+\item[{unsigned char $\ast$}]{buffer, }
+\item[{{\bf int}}]{length, }
+\item[{{\bf int}}]{timeout\+\_\+ms = {\ttfamily 100}}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [virtual]}}\label{classlime_1_1ConnectionFT601_a5da6da82d5881a0985ea929190565c25}
+
+
+Reads data coming from the chip through U\+SB port. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em buffer} & pointer to array where received data will be copied, array must be big enough to fit received data. \\
+\hline
+{\em length} & number of bytes to read from chip. \\
+\hline
+{\em timeout\+\_\+ms} & timeout limit for operation in milliseconds \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+number of bytes received. 
+\end{DoxyReturn}
+
+
+Implements {\bf lime\+::\+L\+M\+S64\+C\+Protocol} \doxyref{}{p.}{de/d46/classlime_1_1LMS64CProtocol_ab9e954443ee121eff8e1e6d4f8de3d4b}.
+
+
+
+Definition at line {\bf 321} of file {\bf Connection\+F\+T601.\+cpp}.
+
+
+
+References {\bf lime\+::error()}, {\bf F\+T\+\_\+\+I\+O\+\_\+\+P\+E\+N\+D\+I\+NG}, {\bf F\+T\+\_\+\+OK}, and {\bf len}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{da/db1/classlime_1_1ConnectionFT601_a5da6da82d5881a0985ea929190565c25_cgraph}
+\end{center}
+\end{figure}
+
+
+\index{lime\+::\+Connection\+F\+T601@{lime\+::\+Connection\+F\+T601}!Reinit\+Pipe@{Reinit\+Pipe}}
+\index{Reinit\+Pipe@{Reinit\+Pipe}!lime\+::\+Connection\+F\+T601@{lime\+::\+Connection\+F\+T601}}
+\paragraph[{Reinit\+Pipe(unsigned char ep)}]{\setlength{\rightskip}{0pt plus 5cm}{\bf int} Connection\+F\+T601\+::\+Reinit\+Pipe (
+\begin{DoxyParamCaption}
+\item[{unsigned char}]{ep}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [protected]}}\label{classlime_1_1ConnectionFT601_a7cd966311c739aa344e1731c13e9b179}
+
+
+Definition at line {\bf 251} of file {\bf Connection\+F\+T601.\+cpp}.
+
+\index{lime\+::\+Connection\+F\+T601@{lime\+::\+Connection\+F\+T601}!Reset\+Stream\+Buffers@{Reset\+Stream\+Buffers}}
+\index{Reset\+Stream\+Buffers@{Reset\+Stream\+Buffers}!lime\+::\+Connection\+F\+T601@{lime\+::\+Connection\+F\+T601}}
+\paragraph[{Reset\+Stream\+Buffers() override}]{\setlength{\rightskip}{0pt plus 5cm}{\bf int} Connection\+F\+T601\+::\+Reset\+Stream\+Buffers (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [protected]}, {\ttfamily [virtual]}}\label{classlime_1_1ConnectionFT601_a54533443d66d618165d2d96ec70ed934}
+
+
+Read raw stream data from device streaming port. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em buffer} & read buffer pointer \\
+\hline
+{\em length} & number of bytes to read \\
+\hline
+{\em ep\+Index} & endpoint identifier? \\
+\hline
+{\em timeout\+\_\+ms} & timeout in milliseconds \\
+\hline
+\end{DoxyParams}
+
+
+Reimplemented from {\bf lime\+::\+I\+Connection} \doxyref{}{p.}{d2/de5/classlime_1_1IConnection_a9be4843aa2121bac2d49eb60d0f45781}.
+
+
+
+Definition at line {\bf 704} of file {\bf Connection\+F\+T601.\+cpp}.
+
+
+
+References {\bf F\+T\+\_\+\+OK}.
+
+\index{lime\+::\+Connection\+F\+T601@{lime\+::\+Connection\+F\+T601}!Wait\+For\+Reading@{Wait\+For\+Reading}}
+\index{Wait\+For\+Reading@{Wait\+For\+Reading}!lime\+::\+Connection\+F\+T601@{lime\+::\+Connection\+F\+T601}}
+\paragraph[{Wait\+For\+Reading(int context\+Handle, unsigned int timeout\+\_\+ms) override}]{\setlength{\rightskip}{0pt plus 5cm}bool Connection\+F\+T601\+::\+Wait\+For\+Reading (
+\begin{DoxyParamCaption}
+\item[{{\bf int}}]{context\+Handle, }
+\item[{unsigned {\bf int}}]{timeout\+\_\+ms}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [protected]}, {\ttfamily [virtual]}}\label{classlime_1_1ConnectionFT601_af9d270b2ae5655cd3b8d906530017d83}
+
+
+Waits for asynchronous data reception. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em context\+Handle} & handle of which context data to wait \\
+\hline
+{\em timeout\+\_\+ms} & number of miliseconds to wait \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+1-\/data received, 0-\/data not received 
+\end{DoxyReturn}
+
+
+Reimplemented from {\bf lime\+::\+I\+Connection} \doxyref{}{p.}{d2/de5/classlime_1_1IConnection_a5499673a78953387558d5d7ba3c19802}.
+
+
+
+Definition at line {\bf 470} of file {\bf Connection\+F\+T601.\+cpp}.
+
+
+
+References {\bf t1}, {\bf t2}, and {\bf timeout\+\_\+ms}.
+
+\index{lime\+::\+Connection\+F\+T601@{lime\+::\+Connection\+F\+T601}!Wait\+For\+Sending@{Wait\+For\+Sending}}
+\index{Wait\+For\+Sending@{Wait\+For\+Sending}!lime\+::\+Connection\+F\+T601@{lime\+::\+Connection\+F\+T601}}
+\paragraph[{Wait\+For\+Sending(int context\+Handle, uint32\+\_\+t timeout\+\_\+ms) override}]{\setlength{\rightskip}{0pt plus 5cm}bool Connection\+F\+T601\+::\+Wait\+For\+Sending (
+\begin{DoxyParamCaption}
+\item[{{\bf int}}]{context\+Handle, }
+\item[{uint32\+\_\+t}]{timeout\+\_\+ms}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [protected]}, {\ttfamily [virtual]}}\label{classlime_1_1ConnectionFT601_a9b1dc492964b0b37faae089c556acc08}
+
+
+Waits for asynchronous data sending. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em context\+Handle} & handle of which context data to wait \\
+\hline
+{\em timeout\+\_\+ms} & number of miliseconds to wait \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+1-\/data received, 0-\/data not received 
+\end{DoxyReturn}
+
+
+Reimplemented from {\bf lime\+::\+I\+Connection} \doxyref{}{p.}{d2/de5/classlime_1_1IConnection_aa71b788a3a6735ed7169013dc719ebe2}.
+
+
+
+Definition at line {\bf 615} of file {\bf Connection\+F\+T601.\+cpp}.
+
+
+
+References {\bf t1}, {\bf t2}, and {\bf timeout\+\_\+ms}.
+
+\index{lime\+::\+Connection\+F\+T601@{lime\+::\+Connection\+F\+T601}!Write@{Write}}
+\index{Write@{Write}!lime\+::\+Connection\+F\+T601@{lime\+::\+Connection\+F\+T601}}
+\paragraph[{Write(const unsigned char $\ast$buffer, int length, int timeout\+\_\+ms=100) override}]{\setlength{\rightskip}{0pt plus 5cm}{\bf int} Connection\+F\+T601\+::\+Write (
+\begin{DoxyParamCaption}
+\item[{const unsigned char $\ast$}]{buffer, }
+\item[{{\bf int}}]{length, }
+\item[{{\bf int}}]{timeout\+\_\+ms = {\ttfamily 100}}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [virtual]}}\label{classlime_1_1ConnectionFT601_a10bfb2993b8d18819f4e3b0a0fe6b524}
+
+
+Sends given data buffer to chip through U\+SB port. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em buffer} & data buffer, must not be longer than 64 bytes. \\
+\hline
+{\em length} & given buffer size. \\
+\hline
+{\em timeout\+\_\+ms} & timeout limit for operation in milliseconds \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+number of bytes sent. 
+\end{DoxyReturn}
+
+
+Implements {\bf lime\+::\+L\+M\+S64\+C\+Protocol} \doxyref{}{p.}{de/d46/classlime_1_1LMS64CProtocol_aa78b82a017792421b61bc6a99b4c55c0}.
+
+
+
+Definition at line {\bf 266} of file {\bf Connection\+F\+T601.\+cpp}.
+
+
+
+References {\bf F\+T\+\_\+\+I\+O\+\_\+\+P\+E\+N\+D\+I\+NG}, {\bf F\+T\+\_\+\+OK}, and {\bf len}.
+
+
+
+\subsubsection{Member Data Documentation}
+\index{lime\+::\+Connection\+F\+T601@{lime\+::\+Connection\+F\+T601}!contexts@{contexts}}
+\index{contexts@{contexts}!lime\+::\+Connection\+F\+T601@{lime\+::\+Connection\+F\+T601}}
+\paragraph[{contexts}]{\setlength{\rightskip}{0pt plus 5cm}{\bf U\+S\+B\+Transfer\+Context} lime\+::\+Connection\+F\+T601\+::contexts[{\bf U\+S\+B\+\_\+\+M\+A\+X\+\_\+\+C\+O\+N\+T\+E\+X\+TS}]\hspace{0.3cm}{\ttfamily [protected]}}\label{classlime_1_1ConnectionFT601_ac6b6a58ae8ff57b4a4e21fbbaab991ac}
+
+
+Definition at line {\bf 102} of file {\bf Connection\+F\+T601.\+h}.
+
+\index{lime\+::\+Connection\+F\+T601@{lime\+::\+Connection\+F\+T601}!contexts\+To\+Send@{contexts\+To\+Send}}
+\index{contexts\+To\+Send@{contexts\+To\+Send}!lime\+::\+Connection\+F\+T601@{lime\+::\+Connection\+F\+T601}}
+\paragraph[{contexts\+To\+Send}]{\setlength{\rightskip}{0pt plus 5cm}{\bf U\+S\+B\+Transfer\+Context} lime\+::\+Connection\+F\+T601\+::contexts\+To\+Send[{\bf U\+S\+B\+\_\+\+M\+A\+X\+\_\+\+C\+O\+N\+T\+E\+X\+TS}]\hspace{0.3cm}{\ttfamily [protected]}}\label{classlime_1_1ConnectionFT601_aa3ea020957352ee5c110775fe12f4d21}
+
+
+Definition at line {\bf 103} of file {\bf Connection\+F\+T601.\+h}.
+
+\index{lime\+::\+Connection\+F\+T601@{lime\+::\+Connection\+F\+T601}!ctrl\+Rd\+Ep@{ctrl\+Rd\+Ep}}
+\index{ctrl\+Rd\+Ep@{ctrl\+Rd\+Ep}!lime\+::\+Connection\+F\+T601@{lime\+::\+Connection\+F\+T601}}
+\paragraph[{ctrl\+Rd\+Ep}]{\setlength{\rightskip}{0pt plus 5cm}const {\bf int} Connection\+F\+T601\+::ctrl\+Rd\+Ep = 0x82\hspace{0.3cm}{\ttfamily [static]}, {\ttfamily [protected]}}\label{classlime_1_1ConnectionFT601_a7baa497bbfff7098a56de74abe1e7dce}
+
+
+Definition at line {\bf 110} of file {\bf Connection\+F\+T601.\+h}.
+
+\index{lime\+::\+Connection\+F\+T601@{lime\+::\+Connection\+F\+T601}!ctrl\+Wr\+Ep@{ctrl\+Wr\+Ep}}
+\index{ctrl\+Wr\+Ep@{ctrl\+Wr\+Ep}!lime\+::\+Connection\+F\+T601@{lime\+::\+Connection\+F\+T601}}
+\paragraph[{ctrl\+Wr\+Ep}]{\setlength{\rightskip}{0pt plus 5cm}const {\bf int} Connection\+F\+T601\+::ctrl\+Wr\+Ep = 0x02\hspace{0.3cm}{\ttfamily [static]}, {\ttfamily [protected]}}\label{classlime_1_1ConnectionFT601_ae2d4ae89120abf8f58145605d5b68613}
+
+
+Definition at line {\bf 109} of file {\bf Connection\+F\+T601.\+h}.
+
+\index{lime\+::\+Connection\+F\+T601@{lime\+::\+Connection\+F\+T601}!is\+Connected@{is\+Connected}}
+\index{is\+Connected@{is\+Connected}!lime\+::\+Connection\+F\+T601@{lime\+::\+Connection\+F\+T601}}
+\paragraph[{is\+Connected}]{\setlength{\rightskip}{0pt plus 5cm}bool lime\+::\+Connection\+F\+T601\+::is\+Connected\hspace{0.3cm}{\ttfamily [protected]}}\label{classlime_1_1ConnectionFT601_a363185c39aa5b785ce1929d7c9d8757b}
+
+
+Definition at line {\bf 105} of file {\bf Connection\+F\+T601.\+h}.
+
+\index{lime\+::\+Connection\+F\+T601@{lime\+::\+Connection\+F\+T601}!m\+Extra\+Usb\+Mutex@{m\+Extra\+Usb\+Mutex}}
+\index{m\+Extra\+Usb\+Mutex@{m\+Extra\+Usb\+Mutex}!lime\+::\+Connection\+F\+T601@{lime\+::\+Connection\+F\+T601}}
+\paragraph[{m\+Extra\+Usb\+Mutex}]{\setlength{\rightskip}{0pt plus 5cm}std\+::mutex lime\+::\+Connection\+F\+T601\+::m\+Extra\+Usb\+Mutex\hspace{0.3cm}{\ttfamily [protected]}}\label{classlime_1_1ConnectionFT601_ad07d796ae865249f575044a42761d72f}
+
+
+Definition at line {\bf 121} of file {\bf Connection\+F\+T601.\+h}.
+
+\index{lime\+::\+Connection\+F\+T601@{lime\+::\+Connection\+F\+T601}!m\+F\+T\+Handle@{m\+F\+T\+Handle}}
+\index{m\+F\+T\+Handle@{m\+F\+T\+Handle}!lime\+::\+Connection\+F\+T601@{lime\+::\+Connection\+F\+T601}}
+\paragraph[{m\+F\+T\+Handle}]{\setlength{\rightskip}{0pt plus 5cm}{\bf F\+T\+\_\+\+H\+A\+N\+D\+LE} lime\+::\+Connection\+F\+T601\+::m\+F\+T\+Handle\hspace{0.3cm}{\ttfamily [protected]}}\label{classlime_1_1ConnectionFT601_af45f03aff700aebe3a13ab6e4641e868}
+
+
+Definition at line {\bf 112} of file {\bf Connection\+F\+T601.\+h}.
+
+\index{lime\+::\+Connection\+F\+T601@{lime\+::\+Connection\+F\+T601}!m\+Serial@{m\+Serial}}
+\index{m\+Serial@{m\+Serial}!lime\+::\+Connection\+F\+T601@{lime\+::\+Connection\+F\+T601}}
+\paragraph[{m\+Serial}]{\setlength{\rightskip}{0pt plus 5cm}uint64\+\_\+t lime\+::\+Connection\+F\+T601\+::m\+Serial\hspace{0.3cm}{\ttfamily [protected]}}\label{classlime_1_1ConnectionFT601_a7661fe710c14e34cb44dc9249f2c20d7}
+
+
+Definition at line {\bf 122} of file {\bf Connection\+F\+T601.\+h}.
+
+\index{lime\+::\+Connection\+F\+T601@{lime\+::\+Connection\+F\+T601}!stream\+Rd\+Ep@{stream\+Rd\+Ep}}
+\index{stream\+Rd\+Ep@{stream\+Rd\+Ep}!lime\+::\+Connection\+F\+T601@{lime\+::\+Connection\+F\+T601}}
+\paragraph[{stream\+Rd\+Ep}]{\setlength{\rightskip}{0pt plus 5cm}const {\bf int} Connection\+F\+T601\+::stream\+Rd\+Ep = 0x83\hspace{0.3cm}{\ttfamily [static]}, {\ttfamily [protected]}}\label{classlime_1_1ConnectionFT601_aad568bb330a33b61f0a6e4ac74d162f5}
+
+
+Definition at line {\bf 108} of file {\bf Connection\+F\+T601.\+h}.
+
+\index{lime\+::\+Connection\+F\+T601@{lime\+::\+Connection\+F\+T601}!stream\+Wr\+Ep@{stream\+Wr\+Ep}}
+\index{stream\+Wr\+Ep@{stream\+Wr\+Ep}!lime\+::\+Connection\+F\+T601@{lime\+::\+Connection\+F\+T601}}
+\paragraph[{stream\+Wr\+Ep}]{\setlength{\rightskip}{0pt plus 5cm}const {\bf int} Connection\+F\+T601\+::stream\+Wr\+Ep = 0x03\hspace{0.3cm}{\ttfamily [static]}, {\ttfamily [protected]}}\label{classlime_1_1ConnectionFT601_a397693378aa89c9c19b154db35a310ff}
+
+
+Definition at line {\bf 107} of file {\bf Connection\+F\+T601.\+h}.
+
+\index{lime\+::\+Connection\+F\+T601@{lime\+::\+Connection\+F\+T601}!U\+S\+B\+\_\+\+M\+A\+X\+\_\+\+C\+O\+N\+T\+E\+X\+TS@{U\+S\+B\+\_\+\+M\+A\+X\+\_\+\+C\+O\+N\+T\+E\+X\+TS}}
+\index{U\+S\+B\+\_\+\+M\+A\+X\+\_\+\+C\+O\+N\+T\+E\+X\+TS@{U\+S\+B\+\_\+\+M\+A\+X\+\_\+\+C\+O\+N\+T\+E\+X\+TS}!lime\+::\+Connection\+F\+T601@{lime\+::\+Connection\+F\+T601}}
+\paragraph[{U\+S\+B\+\_\+\+M\+A\+X\+\_\+\+C\+O\+N\+T\+E\+X\+TS}]{\setlength{\rightskip}{0pt plus 5cm}const {\bf int} lime\+::\+Connection\+F\+T601\+::\+U\+S\+B\+\_\+\+M\+A\+X\+\_\+\+C\+O\+N\+T\+E\+X\+TS = 16\hspace{0.3cm}{\ttfamily [static]}, {\ttfamily [protected]}}\label{classlime_1_1ConnectionFT601_af8ede9ee2e8b6bc773457e8d6dc24fa1}
+
+
+Definition at line {\bf 100} of file {\bf Connection\+F\+T601.\+h}.
+
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+/home/erik/prefix/default/src/limesuite-\/dev/src/\+Connection\+F\+T\+D\+I/{\bf Connection\+F\+T601.\+h}\item 
+/home/erik/prefix/default/src/limesuite-\/dev/src/\+Connection\+F\+T\+D\+I/{\bf Connection\+F\+T601.\+cpp}\end{DoxyCompactItemize}

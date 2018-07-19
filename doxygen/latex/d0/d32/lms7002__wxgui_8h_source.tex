@@ -1,0 +1,2264 @@
+\subsection{lms7002\+\_\+wxgui.\+h}
+\label{lms7002__wxgui_8h_source}\index{/home/erik/prefix/default/src/limesuite-\/dev/src/lms7002\+\_\+wxgui/lms7002\+\_\+wxgui.\+h@{/home/erik/prefix/default/src/limesuite-\/dev/src/lms7002\+\_\+wxgui/lms7002\+\_\+wxgui.\+h}}
+
+\begin{DoxyCode}
+00001 \textcolor{comment}{// C++ code generated with wxFormBuilder (version Jan 23 2018)}
+00003 \textcolor{comment}{// http://www.wxformbuilder.org/}
+00004 \textcolor{comment}{//}
+00005 \textcolor{comment}{// PLEASE DO *NOT* EDIT THIS FILE!}
+00007 \textcolor{comment}{}
+00008 \textcolor{preprocessor}{#ifndef \_\_LMS7002\_WXGUI\_H\_\_}
+00009 \textcolor{preprocessor}{#define \_\_LMS7002\_WXGUI\_H\_\_}
+00010 
+00011 \textcolor{preprocessor}{#include <wx/artprov.h>}
+00012 \textcolor{preprocessor}{#include <wx/xrc/xmlres.h>}
+00013 \textcolor{keyword}{class }NumericSlider;
+00014 \textcolor{keyword}{class }lms7002_pnlAFE_view;
+00015 \textcolor{keyword}{class }lms7002_pnlBIAS_view;
+00016 \textcolor{keyword}{class }lms7002_pnlBIST_view;
+00017 \textcolor{keyword}{class }lms7002_pnlCDS_view;
+00018 \textcolor{keyword}{class }lms7002_pnlCLKGEN_view;
+00019 \textcolor{keyword}{class }lms7002_pnlCalibrations_view;
+00020 \textcolor{keyword}{class }lms7002_pnlGains_view;
+00021 \textcolor{keyword}{class }lms7002_pnlLDO_view;
+00022 \textcolor{keyword}{class }lms7002_pnlLimeLightPAD_view;
+00023 \textcolor{keyword}{class }lms7002_pnlRBB_view;
+00024 \textcolor{keyword}{class }lms7002_pnlRFE_view;
+00025 \textcolor{keyword}{class }lms7002_pnlRxTSP_view;
+00026 \textcolor{keyword}{class }lms7002_pnlSX_view;
+00027 \textcolor{keyword}{class }lms7002_pnlTBB_view;
+00028 \textcolor{keyword}{class }lms7002_pnlTRF_view;
+00029 \textcolor{keyword}{class }lms7002_pnlTxTSP_view;
+00030 \textcolor{keyword}{class }lms7002_pnlXBUF_view;
+00031 
+00032 \textcolor{preprocessor}{#include <wx/string.h>}
+00033 \textcolor{preprocessor}{#include <wx/button.h>}
+00034 \textcolor{preprocessor}{#include <wx/gdicmn.h>}
+00035 \textcolor{preprocessor}{#include <wx/font.h>}
+00036 \textcolor{preprocessor}{#include <wx/colour.h>}
+00037 \textcolor{preprocessor}{#include <wx/settings.h>}
+00038 \textcolor{preprocessor}{#include <wx/combobox.h>}
+00039 \textcolor{preprocessor}{#include <wx/radiobut.h>}
+00040 \textcolor{preprocessor}{#include <wx/checkbox.h>}
+00041 \textcolor{preprocessor}{#include <wx/sizer.h>}
+00042 \textcolor{preprocessor}{#include <wx/stattext.h>}
+00043 \textcolor{preprocessor}{#include <wx/panel.h>}
+00044 \textcolor{preprocessor}{#include <wx/bitmap.h>}
+00045 \textcolor{preprocessor}{#include <wx/image.h>}
+00046 \textcolor{preprocessor}{#include <wx/icon.h>}
+00047 \textcolor{preprocessor}{#include <wx/notebook.h>}
+00048 \textcolor{preprocessor}{#include <wx/statbox.h>}
+00049 \textcolor{preprocessor}{#include <wx/spinctrl.h>}
+00050 \textcolor{preprocessor}{#include <wx/radiobox.h>}
+00051 \textcolor{preprocessor}{#include <wx/textctrl.h>}
+00052 \textcolor{preprocessor}{#include <wx/choice.h>}
+00053 \textcolor{preprocessor}{#include <wx/gauge.h>}
+00054 \textcolor{preprocessor}{#include <wx/grid.h>}
+00055 \textcolor{preprocessor}{#include <wx/dialog.h>}
+00056 
+00058 
+00062 \textcolor{keyword}{class }mainPanel : \textcolor{keyword}{public} wxPanel 
+00063 \{
+00064     \textcolor{keyword}{private}:
+00065     
+00066     \textcolor{keyword}{protected}:
+00067         \textcolor{keyword}{enum}
+00068         \{
+00069             ID_G_LNA_RFE = 2048,
+00070             ID_BTN_CH_A,
+00071             ID_BTN_CH_B,
+00072             ID_BTN_CHIP_TO_GUI,
+00073             ID_BTN_RESET_CHIP,
+00074             ID_TABS_NOTEBOOK,
+00075             ID_TAB_CALIBRATIONS,
+00076             ID_TAB_RFE,
+00077             ID_TAB_RBB,
+00078             ID_TAB_TRF,
+00079             ID_TAB_TBB,
+00080             ID_TAB_AFE,
+00081             ID_TAB_BIAS,
+00082             ID_TAB_LDO,
+00083             ID_TAB_XBUF,
+00084             ID_TAB_CGEN,
+00085             ID_TAB_SXR,
+00086             ID_TAB_SXT,
+00087             ID_TAB_LIMELIGHT,
+00088             ID_TAB_TXTSP,
+00089             ID_TAB_RXTSP,
+00090             ID_TAB_CDS,
+00091             ID_TAB_BIST,
+00092             ID_TAB_GAINS
+00093         \};
+00094         
+00095         wxButton* ID_BUTTON2;
+00096         wxButton* ID_BUTTON3;
+00097         wxComboBox* cmbLmsDevice;
+00098         wxRadioButton* rbChannelA;
+00099         wxRadioButton* rbChannelB;
+00100         wxCheckBox* chkEnableMIMO;
+00101         wxButton* btnDownloadAll;
+00102         wxButton* btnUploadAll;
+00103         wxButton* btnResetChip;
+00104         wxButton* btnLoadDefault;
+00105         wxStaticText* txtTemperature;
+00106         wxButton* btnReadTemperature;
+00107         wxNotebook* tabsNotebook;
+00108         
+00109         \textcolor{comment}{// Virtual event handlers, overide them in your derived class}
+00110         \textcolor{keyword}{virtual} \textcolor{keywordtype}{void} OnOpenProject( wxCommandEvent& event ) \{ \textcolor{keyword}{event}.Skip(); \}
+00111         \textcolor{keyword}{virtual} \textcolor{keywordtype}{void} OnSaveProject( wxCommandEvent& event ) \{ \textcolor{keyword}{event}.Skip(); \}
+00112         \textcolor{keyword}{virtual} \textcolor{keywordtype}{void} OnLmsDeviceSelect( wxCommandEvent& event ) \{ \textcolor{keyword}{event}.Skip(); \}
+00113         \textcolor{keyword}{virtual} \textcolor{keywordtype}{void} OnSwitchToChannelA( wxCommandEvent& event ) \{ \textcolor{keyword}{event}.Skip(); \}
+00114         \textcolor{keyword}{virtual} \textcolor{keywordtype}{void} OnSwitchToChannelB( wxCommandEvent& event ) \{ \textcolor{keyword}{event}.Skip(); \}
+00115         \textcolor{keyword}{virtual} \textcolor{keywordtype}{void} OnEnableMIMOchecked( wxCommandEvent& event ) \{ \textcolor{keyword}{event}.Skip(); \}
+00116         \textcolor{keyword}{virtual} \textcolor{keywordtype}{void} OnDownloadAll( wxCommandEvent& event ) \{ \textcolor{keyword}{event}.Skip(); \}
+00117         \textcolor{keyword}{virtual} \textcolor{keywordtype}{void} OnUploadAll( wxCommandEvent& event ) \{ \textcolor{keyword}{event}.Skip(); \}
+00118         \textcolor{keyword}{virtual} \textcolor{keywordtype}{void} OnResetChip( wxCommandEvent& event ) \{ \textcolor{keyword}{event}.Skip(); \}
+00119         \textcolor{keyword}{virtual} \textcolor{keywordtype}{void} OnLoadDefault( wxCommandEvent& event ) \{ \textcolor{keyword}{event}.Skip(); \}
+00120         \textcolor{keyword}{virtual} \textcolor{keywordtype}{void} OnReadTemperature( wxCommandEvent& event ) \{ \textcolor{keyword}{event}.Skip(); \}
+00121         \textcolor{keyword}{virtual} \textcolor{keywordtype}{void} Onnotebook_modulesPageChanged( wxNotebookEvent& event ) \{ \textcolor{keyword}{event}.Skip(); \}
+00122         
+00123     
+00124     \textcolor{keyword}{public}:
+00125         lms7002_pnlCalibrations_view* mTabCalibrations;
+00126         lms7002_pnlRFE_view* mTabRFE;
+00127         lms7002_pnlRBB_view* mTabRBB;
+00128         lms7002_pnlTRF_view* mTabTRF;
+00129         lms7002_pnlTBB_view* mTabTBB;
+00130         lms7002_pnlAFE_view* mTabAFE;
+00131         lms7002_pnlBIAS_view* mTabBIAS;
+00132         lms7002_pnlLDO_view* mTabLDO;
+00133         lms7002_pnlXBUF_view* mTabXBUF;
+00134         lms7002_pnlCLKGEN_view* mTabCGEN;
+00135         lms7002_pnlSX_view* mTabSXR;
+00136         lms7002_pnlSX_view* mTabSXT;
+00137         lms7002_pnlLimeLightPAD_view* mTabLimeLight;
+00138         lms7002_pnlTxTSP_view* mTabTxTSP;
+00139         lms7002_pnlRxTSP_view* mTabRxTSP;
+00140         lms7002_pnlCDS_view* mTabCDS;
+00141         lms7002_pnlBIST_view* mTabBIST;
+00142         lms7002_pnlGains_view* mTabTrxGain;
+00143         
+00144         mainPanel( wxWindow* parent, wxWindowID \textcolor{keywordtype}{id} = wxID\_ANY, \textcolor{keyword}{const} wxPoint& pos = wxDefaultPosition, \textcolor{keyword}{
+      const} wxSize& size = wxDefaultSize, \textcolor{keywordtype}{long} style = wxTAB\_TRAVERSAL ); 
+00145         ~mainPanel();
+00146     
+00147 \};
+00148 
+00152 \textcolor{keyword}{class }pnlRFE_view : \textcolor{keyword}{public} wxPanel 
+00153 \{
+00154     \textcolor{keyword}{private}:
+00155     
+00156     \textcolor{keyword}{protected}:
+00157         \textcolor{keyword}{enum}
+00158         \{
+00159             ID\_PD\_LNA\_RFE = 2048,
+00160             ID_PD_RLOOPB_1_RFE,
+00161             ID_PD_RLOOPB_2_RFE,
+00162             ID_PD_MXLOBUF_RFE,
+00163             ID_PD_QGEN_RFE,
+00164             ID_PD_RSSI_RFE,
+00165             ID_PD_TIA_RFE,
+00166             ID_EN_G_RFE,
+00167             ID_EN_DIR_RFE,
+00168             ID_EN_INSHSW_LB1_RFE,
+00169             ID_EN_INSHSW_LB2_RFE,
+00170             ID_EN_INSHSW_L_RFE,
+00171             ID_EN_INSHSW_W_RFE,
+00172             ID_SEL_PATH_RFE,
+00173             ID_CAP_RXMXO_RFE,
+00174             ID_CGSIN_LNA_RFE,
+00175             ID_RCOMP_TIA_RFE,
+00176             ID_RFB_TIA_RFE,
+00177             ID_EN_NEXTRX_RFE,
+00178             ID_ICT_LNACMO_RFE,
+00179             ID_ICT_LNA_RFE,
+00180             ID_DCOFFI_RFE,
+00181             ID_DCOFFQ_RFE,
+00182             ID_ICT_LODC_RFE,
+00183             ID_EN_DCOFF_RXFE_RFE,
+00184             ID_CCOMP_TIA_RFE,
+00185             ID_CFB_TIA_RFE,
+00186             ID_G_LNA_RFE,
+00187             ID_G_RXLOOPB_RFE,
+00188             ID_G_TIA_RFE,
+00189             ID_ICT_LOOPB_RFE,
+00190             ID_ICT_TIAMAIN_RFE,
+00191             ID_ICT_TIAOUT_RFE,
+00192             ID_CDC_I_RFE,
+00193             ID\_CDC\_Q\_RFE
+00194         \};
+00195         
+00196         wxCheckBox* chkPD_LNA_RFE;
+00197         wxCheckBox* chkPD_RLOOPB_1_RFE;
+00198         wxCheckBox* chkPD_RLOOPB_2_RFE;
+00199         wxCheckBox* chkPD_MXLOBUF_RFE;
+00200         wxCheckBox* chkPD_QGEN_RFE;
+00201         wxCheckBox* chkPD_RSSI_RFE;
+00202         wxCheckBox* chkPD_TIA_RFE;
+00203         wxCheckBox* chkEN_G_RFE;
+00204         wxCheckBox* chkEN_DIR_RFE;
+00205         wxCheckBox* chkEN_INSHSW_LB1_RFE;
+00206         wxCheckBox* chkEN_INSHSW_LB2_RFE;
+00207         wxCheckBox* chkEN_INSHSW_L_RFE;
+00208         wxCheckBox* chkEN_INSHSW_W_RFE;
+00209         wxStaticText* ID_STATICTEXT1;
+00210         wxComboBox* cmbSEL_PATH_RFE;
+00211         wxStaticText* ID_STATICTEXT2;
+00212         wxComboBox* cmbCAP_RXMXO_RFE;
+00213         wxStaticText* ID_STATICTEXT3;
+00214         wxComboBox* cmbCGSIN_LNA_RFE;
+00215         wxStaticText* ID_STATICTEXT4;
+00216         wxComboBox* cmbRCOMP_TIA_RFE;
+00217         wxStaticText* ID_STATICTEXT5;
+00218         wxComboBox* cmbRFB_TIA_RFE;
+00219         wxCheckBox* chkEN_NEXTRX_RFE;
+00220         wxStaticText* ID_STATICTEXT12;
+00221         wxComboBox* cmbICT_LNACMO_RFE;
+00222         wxStaticText* ID_STATICTEXT13;
+00223         wxComboBox* cmbICT_LNA_RFE;
+00224         wxStaticText* ID_STATICTEXT6;
+00225         NumericSlider* cmbDCOFFI_RFE;
+00226         wxStaticText* ID_STATICTEXT7;
+00227         NumericSlider* cmbDCOFFQ_RFE;
+00228         wxStaticText* ID_STATICTEXT8;
+00229         wxComboBox* cmbICT_LODC_RFE;
+00230         wxCheckBox* chkEN_DCOFF_RXFE_RFE;
+00231         wxStaticText* ID_STATICTEXT14;
+00232         wxComboBox* cmbCCOMP_TIA_RFE;
+00233         wxStaticText* ID_STATICTEXT15;
+00234         NumericSlider* cmbCFB_TIA_RFE;
+00235         wxStaticText* ID_STATICTEXT16;
+00236         wxComboBox* cmbG_LNA_RFE;
+00237         wxStaticText* ID_STATICTEXT17;
+00238         wxComboBox* cmbG_RXLOOPB_RFE;
+00239         wxStaticText* ID_STATICTEXT18;
+00240         wxComboBox* cmbG_TIA_RFE;
+00241         wxStaticText* ID_STATICTEXT9;
+00242         wxComboBox* cmbICT_LOOPB_RFE;
+00243         wxStaticText* ID_STATICTEXT10;
+00244         NumericSlider* cmbICT_TIAMAIN_RFE;
+00245         wxStaticText* ID_STATICTEXT11;
+00246         NumericSlider* cmbICT_TIAOUT_RFE;
+00247         wxStaticText* ID_STATICTEXT19;
+00248         wxComboBox* cmbCDC_I_RFE;
+00249         wxStaticText* ID_STATICTEXT20;
+00250         wxComboBox* cmbCDC_Q_RFE;
+00251         
+00252         \textcolor{comment}{// Virtual event handlers, overide them in your derived class}
+00253         \textcolor{keyword}{virtual} \textcolor{keywordtype}{void} ParameterChangeHandler( wxCommandEvent& event ) \{ \textcolor{keyword}{event}.Skip(); \}
+00254         \textcolor{keyword}{virtual} \textcolor{keywordtype}{void} ParameterChangeHandler( wxSpinEvent& event ) \{ \textcolor{keyword}{event}.Skip(); \}
+00255         
+00256     
+00257     \textcolor{keyword}{public}:
+00258         
+00259         pnlRFE_view( wxWindow* parent, wxWindowID \textcolor{keywordtype}{id} = wxID\_ANY, \textcolor{keyword}{const} wxPoint& pos = wxDefaultPosition, \textcolor{keyword}{
+      const} wxSize& size = wxDefaultSize, \textcolor{keywordtype}{long} style = wxTAB\_TRAVERSAL ); 
+00260         ~pnlRFE_view();
+00261     
+00262 \};
+00263 
+00267 \textcolor{keyword}{class }pnlRBB_view : \textcolor{keyword}{public} wxPanel 
+00268 \{
+00269     \textcolor{keyword}{private}:
+00270     
+00271     \textcolor{keyword}{protected}:
+00272         \textcolor{keyword}{enum}
+00273         \{
+00274             ID\_PD\_LPFH\_RBB = 2048,
+00275             ID_PD_LPFL_RBB,
+00276             ID_PD_PGA_RBB,
+00277             ID_EN_G_RBB,
+00278             ID_EN_DIR_RBB,
+00279             ID_BBLoopback,
+00280             ID_INPUT_CTL_PGA_RBB,
+00281             ID_G_PGA_RBB,
+00282             ID_C_CTL_PGA_RBB,
+00283             ID_OSW_PGA_RBB,
+00284             ID_R_CTL_LPF_RBB,
+00285             ID_C_CTL_LPFH_RBB,
+00286             ID_C_CTL_LPFL_RBB,
+00287             ID_TXT_LOWBW,
+00288             ID_BTN_TUNE_FILTER,
+00289             ID_RCC_CTL_LPFH_RBB,
+00290             ID_RCC_CTL_LPFL_RBB,
+00291             ID_ICT_LPF_IN_RBB,
+00292             ID_ICT_LPF_OUT_RBB,
+00293             ID_ICT_PGA_OUT_RBB,
+00294             ID_ICT_PGA_IN_RBB,
+00295             ID\_RCC\_CTL\_PGA\_RBB
+00296         \};
+00297         
+00298         wxCheckBox* chkPD_LPFH_RBB;
+00299         wxCheckBox* chkPD_LPFL_RBB;
+00300         wxCheckBox* chkPD_PGA_RBB;
+00301         wxCheckBox* chkEN_G_RBB;
+00302         wxCheckBox* chkEN_DIR_RBB;
+00303         wxStaticText* ID_STATICTEXT14;
+00304         wxComboBox* cmbBBLoopback;
+00305         wxStaticText* ID_STATICTEXT1;
+00306         wxComboBox* cmbINPUT_CTL_PGA_RBB;
+00307         wxStaticText* ID_STATICTEXT2;
+00308         wxComboBox* cmbG_PGA_RBB;
+00309         wxStaticText* ID_STATICTEXT3;
+00310         NumericSlider* cmbC_CTL_PGA_RBB;
+00311         wxRadioBox* rgrOSW_PGA_RBB;
+00312         wxStaticText* ID_STATICTEXT4;
+00313         wxComboBox* cmbR_CTL_LPF_RBB;
+00314         wxStaticText* ID_STATICTEXT5;
+00315         NumericSlider* cmbC_CTL_LPFH_RBB;
+00316         wxStaticText* ID_STATICTEXT6;
+00317         NumericSlider* cmbC_CTL_LPFL_RBB;
+00318         wxStaticText* m_staticText309;
+00319         wxTextCtrl* txtLowBW_MHz;
+00320         wxButton* btnTuneFilter;
+00321         wxStaticText* ID_STATICTEXT7;
+00322         wxComboBox* cmbRCC_CTL_LPFH_RBB;
+00323         wxStaticText* ID_STATICTEXT8;
+00324         wxComboBox* cmbRCC_CTL_LPFL_RBB;
+00325         wxStaticText* ID_STATICTEXT9;
+00326         wxComboBox* cmbICT_LPF_IN_RBB;
+00327         wxStaticText* ID_STATICTEXT10;
+00328         wxComboBox* cmbICT_LPF_OUT_RBB;
+00329         wxStaticText* ID_STATICTEXT11;
+00330         wxComboBox* cmbICT_PGA_OUT_RBB;
+00331         wxStaticText* ID_STATICTEXT12;
+00332         wxComboBox* cmbICT_PGA_IN_RBB;
+00333         wxStaticText* ID_STATICTEXT13;
+00334         wxComboBox* cmbRCC_CTL_PGA_RBB;
+00335         
+00336         \textcolor{comment}{// Virtual event handlers, overide them in your derived class}
+00337         \textcolor{keyword}{virtual} \textcolor{keywordtype}{void} ParameterChangeHandler( wxCommandEvent& event ) \{ \textcolor{keyword}{event}.Skip(); \}
+00338         \textcolor{keyword}{virtual} \textcolor{keywordtype}{void} OncmbBBLoopbackSelected( wxCommandEvent& event ) \{ \textcolor{keyword}{event}.Skip(); \}
+00339         \textcolor{keyword}{virtual} \textcolor{keywordtype}{void} ParameterChangeHandler( wxSpinEvent& event ) \{ \textcolor{keyword}{event}.Skip(); \}
+00340         \textcolor{keyword}{virtual} \textcolor{keywordtype}{void} OnbtnTuneFilter( wxCommandEvent& event ) \{ \textcolor{keyword}{event}.Skip(); \}
+00341         
+00342     
+00343     \textcolor{keyword}{public}:
+00344         
+00345         pnlRBB_view( wxWindow* parent, wxWindowID \textcolor{keywordtype}{id} = wxID\_ANY, \textcolor{keyword}{const} wxPoint& pos = wxDefaultPosition, \textcolor{keyword}{
+      const} wxSize& size = wxDefaultSize, \textcolor{keywordtype}{long} style = wxTAB\_TRAVERSAL ); 
+00346         ~pnlRBB_view();
+00347     
+00348 \};
+00349 
+00353 \textcolor{keyword}{class }pnlTRF_view : \textcolor{keyword}{public} wxPanel 
+00354 \{
+00355     \textcolor{keyword}{private}:
+00356     
+00357     \textcolor{keyword}{protected}:
+00358         \textcolor{keyword}{enum}
+00359         \{
+00360             ID\_PD\_PDET\_TRF = 2048,
+00361             ID_PD_TLOBUF_TRF,
+00362             ID_PD_TXPAD_TRF,
+00363             ID_EN_G_TRF,
+00364             ID_EN_DIR_TRF,
+00365             ID_LOADR_PDET_TRF,
+00366             ID_ICT_LIN_TXPAD_TRF,
+00367             ID_ICT_MAIN_TXPAD_TRF,
+00368             ID_CDC_I_TRF,
+00369             ID_CDC_Q_TRF,
+00370             ID_GCAS_GNDREF_TXPAD_TRF,
+00371             ID_EN_NEXTTX_TRF,
+00372             ID_EN_LOOPB_TXPAD_TRF,
+00373             ID_TXFEoutput,
+00374             ID_EN_LOWBWLOMX_TMX_TRF,
+00375             ID_EN_AMPHF_PDET_TRF,
+00376             ID_F_TXPAD_TRF,
+00377             ID_L_LOOPB_TXPAD_TRF,
+00378             ID_LOSS_LIN_TXPAD_TRF,
+00379             ID_LOSS_MAIN_TXPAD_TRF,
+00380             ID_VGCAS_TXPAD_TRF,
+00381             ID_LOBIASN_TXM_TRF,
+00382             ID\_LOBIASP\_TXX\_TRF
+00383         \};
+00384         
+00385         wxCheckBox* chkPD_PDET_TRF;
+00386         wxCheckBox* chkPD_TLOBUF_TRF;
+00387         wxCheckBox* chkPD_TXPAD_TRF;
+00388         wxCheckBox* chkEN_G_TRF;
+00389         wxCheckBox* chkEN_DIR_TRF;
+00390         wxStaticText* ID_STATICTEXT11;
+00391         wxComboBox* cmbLOADR_PDET_TRF;
+00392         wxStaticText* ID_STATICTEXT12;
+00393         wxComboBox* cmbICT_LIN_TXPAD_TRF;
+00394         wxStaticText* ID_STATICTEXT13;
+00395         wxComboBox* cmbICT_MAIN_TXPAD_TRF;
+00396         wxStaticText* ID_STATICTEXT14;
+00397         wxComboBox* cmbCDC_I_TRF;
+00398         wxStaticText* ID_STATICTEXT15;
+00399         wxComboBox* cmbCDC_Q_TRF;
+00400         wxRadioBox* rgrGCAS_GNDREF_TXPAD_TRF;
+00401         wxCheckBox* chkEN_NEXTTX_TRF;
+00402         wxCheckBox* chkEN_LOOPB_TXPAD_TRF;
+00403         wxStaticText* ID_STATICTEXT16;
+00404         wxComboBox* cmbTXFEoutput;
+00405         wxStaticText* ID_STATICTEXT1;
+00406         wxComboBox* cmbEN_LOWBWLOMX_TMX_TRF;
+00407         wxStaticText* ID_STATICTEXT3;
+00408         wxComboBox* cmbEN_AMPHF_PDET_TRF;
+00409         wxStaticText* ID_STATICTEXT4;
+00410         wxComboBox* cmbF_TXPAD_TRF;
+00411         wxStaticText* ID_STATICTEXT5;
+00412         wxComboBox* cmbL_LOOPB_TXPAD_TRF;
+00413         wxStaticText* ID_STATICTEXT6;
+00414         wxComboBox* cmbLOSS_LIN_TXPAD_TRF;
+00415         wxStaticText* ID_STATICTEXT7;
+00416         wxComboBox* cmbLOSS_MAIN_TXPAD_TRF;
+00417         wxStaticText* ID_STATICTEXT8;
+00418         wxComboBox* cmbVGCAS_TXPAD_TRF;
+00419         wxStaticText* ID_STATICTEXT9;
+00420         wxComboBox* cmbLOBIASN_TXM_TRF;
+00421         wxStaticText* ID_STATICTEXT10;
+00422         wxComboBox* cmbLOBIASP_TXX_TRF;
+00423         
+00424         \textcolor{comment}{// Virtual event handlers, overide them in your derived class}
+00425         \textcolor{keyword}{virtual} \textcolor{keywordtype}{void} ParameterChangeHandler( wxCommandEvent& event ) \{ \textcolor{keyword}{event}.Skip(); \}
+00426         \textcolor{keyword}{virtual} \textcolor{keywordtype}{void} OnBandChange( wxCommandEvent& event ) \{ \textcolor{keyword}{event}.Skip(); \}
+00427         
+00428     
+00429     \textcolor{keyword}{public}:
+00430         
+00431         pnlTRF_view( wxWindow* parent, wxWindowID \textcolor{keywordtype}{id} = wxID\_ANY, \textcolor{keyword}{const} wxPoint& pos = wxDefaultPosition, \textcolor{keyword}{
+      const} wxSize& size = wxDefaultSize, \textcolor{keywordtype}{long} style = wxTAB\_TRAVERSAL ); 
+00432         ~pnlTRF_view();
+00433     
+00434 \};
+00435 
+00439 \textcolor{keyword}{class }pnlTBB_view : \textcolor{keyword}{public} wxPanel 
+00440 \{
+00441     \textcolor{keyword}{private}:
+00442     
+00443     \textcolor{keyword}{protected}:
+00444         \textcolor{keyword}{enum}
+00445         \{
+00446             ID\_PD\_LPFH\_TBB = 2048,
+00447             ID_PD_LPFIAMP_TBB,
+00448             ID_PD_LPFLAD_TBB,
+00449             ID_PD_LPFS5_TBB,
+00450             ID_EN_G_TBB,
+00451             ID_EN_DIR_TBB,
+00452             ID_BYPLADDER_TBB,
+00453             ID_LOOPB_TBB,
+00454             ID_TSTIN_TBB,
+00455             ID_CG_IAMP_TBB,
+00456             ID_ICT_IAMP_FRP_TBB,
+00457             ID_ICT_IAMP_GG_FRP_TBB,
+00458             ID_ICT_LPFS5_F_TBB,
+00459             ID_ICT_LPFS5_PT_TBB,
+00460             ID_ICT_LPF_H_PT_TBB,
+00461             ID_ICT_LPFH_F_TBB,
+00462             ID_ICT_LPFLAD_F_TBB,
+00463             ID_ICT_LPFLAD_PT_TBB,
+00464             ID_RCAL_LPFH_TBB,
+00465             ID_RCAL_LPFLAD_TBB,
+00466             ID_RCAL_LPFS5_TBB,
+00467             ID_CCAL_LPFLAD_TBB,
+00468             ID\_BTN\_TUNE\_FILTER
+00469         \};
+00470         
+00471         wxCheckBox* chkPD_LPFH_TBB;
+00472         wxCheckBox* chkPD_LPFIAMP_TBB;
+00473         wxCheckBox* chkPD_LPFLAD_TBB;
+00474         wxCheckBox* chkPD_LPFS5_TBB;
+00475         wxCheckBox* chkEN_G_TBB;
+00476         wxCheckBox* chkEN_DIR_TBB;
+00477         wxCheckBox* chkBYPLADDER_TBB;
+00478         wxCheckBox* chkR5_LPF_BYP_TBB;
+00479         wxStaticText* ID_STATICTEXT1;
+00480         wxComboBox* cmbLOOPB_TBB;
+00481         wxStaticText* ID_STATICTEXT5;
+00482         wxComboBox* cmbTSTIN_TBB;
+00483         wxStaticText* ID_STATICTEXT2;
+00484         NumericSlider* cmbCG_IAMP_TBB;
+00485         wxStaticText* ID_STATICTEXT3;
+00486         NumericSlider* cmbICT_IAMP_FRP_TBB;
+00487         wxStaticText* ID_STATICTEXT4;
+00488         NumericSlider* cmbICT_IAMP_GG_FRP_TBB;
+00489         wxStaticText* ID_STATICTEXT6;
+00490         wxComboBox* cmbICT_LPFS5_F_TBB;
+00491         wxStaticText* ID_STATICTEXT7;
+00492         wxComboBox* cmbICT_LPFS5_PT_TBB;
+00493         wxStaticText* ID_STATICTEXT8;
+00494         wxComboBox* cmbICT_LPF_H_PT_TBB;
+00495         wxStaticText* ID_STATICTEXT9;
+00496         wxComboBox* cmbICT_LPFH_F_TBB;
+00497         wxStaticText* ID_STATICTEXT10;
+00498         wxComboBox* cmbICT_LPFLAD_F_TBB;
+00499         wxStaticText* ID_STATICTEXT11;
+00500         wxComboBox* cmbICT_LPFLAD_PT_TBB;
+00501         wxStaticText* ID_STATICTEXT12;
+00502         NumericSlider* cmbRCAL_LPFH_TBB;
+00503         wxStaticText* ID_STATICTEXT13;
+00504         NumericSlider* cmbRCAL_LPFLAD_TBB;
+00505         wxStaticText* ID_STATICTEXT15;
+00506         NumericSlider* cmbRCAL_LPFS5_TBB;
+00507         wxStaticText* ID_STATICTEXT14;
+00508         NumericSlider* cmbCCAL_LPFLAD_TBB;
+00509         wxStaticText* lblFilterInputName;
+00510         wxTextCtrl* txtFilterFrequency;
+00511         wxButton* btnTuneFilter;
+00512         wxButton* btnTuneTxGain;
+00513         
+00514         \textcolor{comment}{// Virtual event handlers, overide them in your derived class}
+00515         \textcolor{keyword}{virtual} \textcolor{keywordtype}{void} ParameterChangeHandler( wxCommandEvent& event ) \{ \textcolor{keyword}{event}.Skip(); \}
+00516         \textcolor{keyword}{virtual} \textcolor{keywordtype}{void} ParameterChangeHandler( wxSpinEvent& event ) \{ \textcolor{keyword}{event}.Skip(); \}
+00517         \textcolor{keyword}{virtual} \textcolor{keywordtype}{void} OnbtnTuneFilter( wxCommandEvent& event ) \{ \textcolor{keyword}{event}.Skip(); \}
+00518         \textcolor{keyword}{virtual} \textcolor{keywordtype}{void} OnbtnTuneTxGain( wxCommandEvent& event ) \{ \textcolor{keyword}{event}.Skip(); \}
+00519         
+00520     
+00521     \textcolor{keyword}{public}:
+00522         
+00523         pnlTBB_view( wxWindow* parent, wxWindowID \textcolor{keywordtype}{id} = wxID\_ANY, \textcolor{keyword}{const} wxPoint& pos = wxDefaultPosition, \textcolor{keyword}{
+      const} wxSize& size = wxDefaultSize, \textcolor{keywordtype}{long} style = wxTAB\_TRAVERSAL ); 
+00524         ~pnlTBB_view();
+00525     
+00526 \};
+00527 
+00531 \textcolor{keyword}{class }pnlAFE_view : \textcolor{keyword}{public} wxPanel 
+00532 \{
+00533     \textcolor{keyword}{private}:
+00534     
+00535     \textcolor{keyword}{protected}:
+00536         \textcolor{keyword}{enum}
+00537         \{
+00538             ID\_PD\_AFE = 2048,
+00539             ID_PD_RX_AFE1,
+00540             ID_PD_RX_AFE2,
+00541             ID_PD_TX_AFE1,
+00542             ID_PD_TX_AFE2,
+00543             ID_EN_G_AFE,
+00544             ID_ISEL_DAC_AFE,
+00545             ID_MUX_AFE_1,
+00546             ID_MUX_AFE_2,
+00547             ID\_MODE\_INTERLEAVE\_AFE
+00548         \};
+00549         
+00550         wxCheckBox* chkPD_AFE;
+00551         wxCheckBox* chkPD_RX_AFE1;
+00552         wxCheckBox* chkPD_RX_AFE2;
+00553         wxCheckBox* chkPD_TX_AFE1;
+00554         wxCheckBox* chkPD_TX_AFE2;
+00555         wxCheckBox* chkEN_G_AFE;
+00556         wxStaticText* ID_STATICTEXT1;
+00557         wxComboBox* cmbISEL_DAC_AFE;
+00558         wxStaticText* ID_STATICTEXT2;
+00559         wxComboBox* cmbMUX_AFE_1;
+00560         wxStaticText* ID_STATICTEXT3;
+00561         wxComboBox* cmbMUX_AFE_2;
+00562         wxRadioBox* rgrMODE_INTERLEAVE_AFE;
+00563         
+00564         \textcolor{comment}{// Virtual event handlers, overide them in your derived class}
+00565         \textcolor{keyword}{virtual} \textcolor{keywordtype}{void} ParameterChangeHandler( wxCommandEvent& event ) \{ \textcolor{keyword}{event}.Skip(); \}
+00566         
+00567     
+00568     \textcolor{keyword}{public}:
+00569         
+00570         pnlAFE_view( wxWindow* parent, wxWindowID \textcolor{keywordtype}{id} = wxID\_ANY, \textcolor{keyword}{const} wxPoint& pos = wxDefaultPosition, \textcolor{keyword}{
+      const} wxSize& size = wxDefaultSize, \textcolor{keywordtype}{long} style = wxTAB\_TRAVERSAL ); 
+00571         ~pnlAFE_view();
+00572     
+00573 \};
+00574 
+00578 \textcolor{keyword}{class }pnlBIAS_view : \textcolor{keyword}{public} wxPanel 
+00579 \{
+00580     \textcolor{keyword}{private}:
+00581     
+00582     \textcolor{keyword}{protected}:
+00583         \textcolor{keyword}{enum}
+00584         \{
+00585             ID\_PD\_FRP\_BIAS = 2048,
+00586             ID_PD_F_BIAS,
+00587             ID_PD_PTRP_BIAS,
+00588             ID_PD_PT_BIAS,
+00589             ID_PD_BIAS_MASTER,
+00590             ID_MUX_BIAS_OUT,
+00591             ID\_RP\_CALIB\_BIAS
+00592         \};
+00593         
+00594         wxCheckBox* chkPD_FRP_BIAS;
+00595         wxCheckBox* chkPD_F_BIAS;
+00596         wxCheckBox* chkPD_PTRP_BIAS;
+00597         wxCheckBox* chkPD_PT_BIAS;
+00598         wxCheckBox* chkPD_BIAS_MASTER;
+00599         wxStaticText* ID_STATICTEXT1;
+00600         wxComboBox* cmbMUX_BIAS_OUT;
+00601         wxStaticText* ID_STATICTEXT2;
+00602         wxComboBox* cmbRP_CALIB_BIAS;
+00603         wxButton* btnCalibrateRP_BIAS;
+00604         
+00605         \textcolor{comment}{// Virtual event handlers, overide them in your derived class}
+00606         \textcolor{keyword}{virtual} \textcolor{keywordtype}{void} ParameterChangeHandler( wxCommandEvent& event ) \{ \textcolor{keyword}{event}.Skip(); \}
+00607         \textcolor{keyword}{virtual} \textcolor{keywordtype}{void} OnCalibrateRP_BIAS( wxCommandEvent& event ) \{ \textcolor{keyword}{event}.Skip(); \}
+00608         
+00609     
+00610     \textcolor{keyword}{public}:
+00611         
+00612         pnlBIAS_view( wxWindow* parent, wxWindowID \textcolor{keywordtype}{id} = wxID\_ANY, \textcolor{keyword}{const} wxPoint& pos = wxDefaultPosition, \textcolor{keyword}{
+      const} wxSize& size = wxDefaultSize, \textcolor{keywordtype}{long} style = wxTAB\_TRAVERSAL ); 
+00613         ~pnlBIAS_view();
+00614     
+00615 \};
+00616 
+00620 \textcolor{keyword}{class }pnlLDO_view : \textcolor{keyword}{public} wxPanel 
+00621 \{
+00622     \textcolor{keyword}{private}:
+00623     
+00624     \textcolor{keyword}{protected}:
+00625         \textcolor{keyword}{enum}
+00626         \{
+00627             ID\_EN\_G\_LDOP = 2048,
+00628             ID_EN_G_LDO,
+00629             ID_EN_LDO_DIVGN,
+00630             ID_EN_LDO_DIGGN,
+00631             ID_EN_LDO_CPGN,
+00632             ID_EN_LDO_VCOGN,
+00633             ID_EN_LDO_MXRFE,
+00634             ID_EN_LDO_LNA14,
+00635             ID_EN_LDO_LNA12,
+00636             ID_EN_LDO_TIA14,
+00637             ID_EN_LDO_DIVSXT,
+00638             ID_EN_LDO_DIGSXT,
+00639             ID_EN_LDO_CPSXT,
+00640             ID_EN_LDO_VCOSXT,
+00641             ID_EN_LDO_DIVSXR,
+00642             ID_EN_LDO_DIGSXR,
+00643             ID_EN_LDO_CPSXR,
+00644             ID_EN_LDO_VCOSXR,
+00645             ID_PD_LDO_DIGIp1,
+00646             ID_PD_LDO_DIGIp2,
+00647             ID_EN_LDO_TXBUF,
+00648             ID_EN_LDO_RXBUF,
+00649             ID_EN_LDO_TPAD,
+00650             ID_EN_LDO_TLOB,
+00651             ID_PD_LDO_SPIBUF,
+00652             ID_RDIV_TXBUF,
+00653             ID_EN_LDO_AFE,
+00654             ID_EN_LDO_TBB,
+00655             ID_EN_LDO_RBB,
+00656             ID_EN_LDO_TIA12,
+00657             ID_EN_LDO_DIG,
+00658             ID_SPDUP_LDO_TBB,
+00659             ID_SPDUP_LDO_TIA12,
+00660             ID_SPDUP_LDO_TIA14,
+00661             ID_SPDUP_LDO_TLOB,
+00662             ID_SPDUP_LDO_TPAD,
+00663             ID_SPDUP_LDO_TXBUF,
+00664             ID_SPDUP_LDO_VCOGN,
+00665             ID_SPDUP_LDO_DIVSXR,
+00666             ID_SPDUP_LDO_DIVSXT,
+00667             ID_SPDUP_LDO_AFE,
+00668             ID_SPDUP_LDO_CPGN,
+00669             ID_SPDUP_LDO_VCOSXR,
+00670             ID_SPDUP_LDO_VCOSXT,
+00671             ID_SPDUP_LDO_DIG,
+00672             ID_SPDUP_LDO_DIGGN,
+00673             ID_SPDUP_LDO_DIGSXR,
+00674             ID_SPDUP_LDO_DIGSXT,
+00675             ID_SPDUP_LDO_DIVGN,
+00676             ID_SPDUP_LDO_CPSXR,
+00677             ID_SPDUP_LDO_CPSXT,
+00678             ID_SPDUP_LDO_LNA12,
+00679             ID_SPDUP_LDO_LNA14,
+00680             ID_SPDUP_LDO_MXRFE,
+00681             ID_SPDUP_LDO_RBB,
+00682             ID_SPDUP_LDO_RXBUF,
+00683             ID_SPDUP_LDO_SPIBUF,
+00684             ID_SPDUP_LDO_DIGIp2,
+00685             ID_SPDUP_LDO_DIGIp1,
+00686             ID_EN_LOADIMP_LDO_TBB,
+00687             ID_EN_LOADIMP_LDO_TIA12,
+00688             ID_EN_LOADIMP_LDO_TIA14,
+00689             ID_EN_LOADIMP_LDO_TLOB,
+00690             ID_EN_LOADIMP_LDO_TPAD,
+00691             ID_EN_LOADIMP_LDO_TXBUF,
+00692             ID_EN_LOADIMP_LDO_VCOGN,
+00693             ID_EN_LOADIMP_LDO_VCOSXR,
+00694             ID_EN_LOADIMP_LDO_VCOSXT,
+00695             ID_EN_LOADIMP_LDO_AFE,
+00696             ID_EN_LOADIMP_LDO_CPGN,
+00697             ID_EN_LOADIMP_LDO_DIVSXR,
+00698             ID_EN_LOADIMP_LDO_DIVSXT,
+00699             ID_EN_LOADIMP_LDO_DIG,
+00700             ID_EN_LOADIMP_LDO_DIGGN,
+00701             ID_EN_LOADIMP_LDO_DIGSXR,
+00702             ID_EN_LOADIMP_LDO_DIGSXT,
+00703             ID_EN_LOADIMP_LDO_DIVGN,
+00704             ID_EN_LOADIMP_LDO_CPSXR,
+00705             ID_EN_LOADIMP_LDO_CPSXT,
+00706             ID_EN_LOADIMP_LDO_LNA12,
+00707             ID_EN_LOADIMP_LDO_LNA14,
+00708             ID_EN_LOADIMP_LDO_MXRFE,
+00709             ID_EN_LOADIMP_LDO_RBB,
+00710             ID_EN_LOADIMP_LDO_RXBUF,
+00711             ID_EN_LOADIMP_LDO_SPIBUF,
+00712             ID_EN_LOADIMP_LDO_DIGIp2,
+00713             ID_EN_LOADIMP_LDO_DIGIp1,
+00714             ID_RDIV_VCOSXR,
+00715             ID_RDIV_VCOSXT,
+00716             ID_RDIV_VCOGN,
+00717             ID_RDIV_TLOB,
+00718             ID_RDIV_TPAD,
+00719             ID_RDIV_TIA12,
+00720             ID_RDIV_TIA14,
+00721             ID_RDIV_RXBUF,
+00722             ID_RDIV_TBB,
+00723             ID_RDIV_MXRFE,
+00724             ID_RDIV_RBB,
+00725             ID_RDIV_LNA12,
+00726             ID_RDIV_LNA14,
+00727             ID_RDIV_DIVSXR,
+00728             ID_RDIV_DIVSXT,
+00729             ID_RDIV_DIGSXT,
+00730             ID_RDIV_DIVGN,
+00731             ID_RDIV_DIGGN,
+00732             ID_RDIV_DIGSXR,
+00733             ID_RDIV_CPSXT,
+00734             ID_RDIV_DIG,
+00735             ID_RDIV_CPGN,
+00736             ID_RDIV_CPSXR,
+00737             ID_RDIV_SPIBUF,
+00738             ID_RDIV_AFE,
+00739             ID_RDIV_DIGIp2,
+00740             ID\_RDIV\_DIGIp1
+00741         \};
+00742         
+00743         wxNotebook* ID_NOTEBOOK1;
+00744         wxPanel* ID_PANEL3;
+00745         wxCheckBox* chkEN_G_LDOP;
+00746         wxCheckBox* chkEN_G_LDO;
+00747         wxCheckBox* chkEN_LDO_DIVGN;
+00748         wxCheckBox* chkEN_LDO_DIGGN;
+00749         wxCheckBox* chkEN_LDO_CPGN;
+00750         wxCheckBox* chkEN_LDO_VCOGN;
+00751         wxCheckBox* chkEN_LDO_MXRFE;
+00752         wxCheckBox* chkEN_LDO_LNA14;
+00753         wxCheckBox* chkEN_LDO_LNA12;
+00754         wxCheckBox* chkEN_LDO_TIA14;
+00755         wxCheckBox* chkEN_LDO_DIVSXT;
+00756         wxCheckBox* chkEN_LDO_DIGSXT;
+00757         wxCheckBox* chkEN_LDO_CPSXT;
+00758         wxCheckBox* chkEN_LDO_VCOSXT;
+00759         wxCheckBox* chkEN_LDO_DIVSXR;
+00760         wxCheckBox* chkEN_LDO_DIGSXR;
+00761         wxCheckBox* chkEN_LDO_CPSXR;
+00762         wxCheckBox* chkEN_LDO_VCOSXR;
+00763         wxCheckBox* chkPD_LDO_DIGIp1;
+00764         wxCheckBox* chkPD_LDO_DIGIp2;
+00765         wxCheckBox* chkEN_LDO_TXBUF;
+00766         wxCheckBox* chkEN_LDO_RXBUF;
+00767         wxCheckBox* chkEN_LDO_TPAD;
+00768         wxCheckBox* chkEN_LDO_TLOB;
+00769         wxCheckBox* chkPD_LDO_SPIBUF;
+00770         wxStaticText* m_staticText349;
+00771         wxComboBox* cmbISINK_SPIBUFF;
+00772         wxCheckBox* chkEN_LDO_AFE;
+00773         wxCheckBox* chkEN_LDO_TBB;
+00774         wxCheckBox* chkEN_LDO_RBB;
+00775         wxCheckBox* chkEN_LDO_TIA12;
+00776         wxCheckBox* chkEN_LDO_DIG;
+00777         wxCheckBox* chkSPDUP_LDO_TBB;
+00778         wxCheckBox* chkSPDUP_LDO_TIA12;
+00779         wxCheckBox* chkSPDUP_LDO_TIA14;
+00780         wxCheckBox* chkSPDUP_LDO_TLOB;
+00781         wxCheckBox* chkSPDUP_LDO_TPAD;
+00782         wxCheckBox* chkSPDUP_LDO_TXBUF;
+00783         wxCheckBox* chkSPDUP_LDO_VCOGN;
+00784         wxCheckBox* chkSPDUP_LDO_DIVSXR;
+00785         wxCheckBox* chkSPDUP_LDO_DIVSXT;
+00786         wxCheckBox* chkSPDUP_LDO_AFE;
+00787         wxCheckBox* chkSPDUP_LDO_CPGN;
+00788         wxCheckBox* chkSPDUP_LDO_VCOSXR;
+00789         wxCheckBox* chkSPDUP_LDO_VCOSXT;
+00790         wxCheckBox* chkSPDUP_LDO_DIG;
+00791         wxCheckBox* chkSPDUP_LDO_DIGGN;
+00792         wxCheckBox* chkSPDUP_LDO_DIGSXR;
+00793         wxCheckBox* chkSPDUP_LDO_DIGSXT;
+00794         wxCheckBox* chkSPDUP_LDO_DIVGN;
+00795         wxCheckBox* chkSPDUP_LDO_CPSXR;
+00796         wxCheckBox* chkSPDUP_LDO_CPSXT;
+00797         wxCheckBox* chkSPDUP_LDO_LNA12;
+00798         wxCheckBox* chkSPDUP_LDO_LNA14;
+00799         wxCheckBox* chkSPDUP_LDO_MXRFE;
+00800         wxCheckBox* chkSPDUP_LDO_RBB;
+00801         wxCheckBox* chkSPDUP_LDO_RXBUF;
+00802         wxCheckBox* chkSPDUP_LDO_SPIBUF;
+00803         wxCheckBox* chkSPDUP_LDO_DIGIp2;
+00804         wxCheckBox* chkSPDUP_LDO_DIGIp1;
+00805         wxCheckBox* chkEN_LOADIMP_LDO_TBB;
+00806         wxCheckBox* chkEN_LOADIMP_LDO_TIA12;
+00807         wxCheckBox* chkEN_LOADIMP_LDO_TIA14;
+00808         wxCheckBox* chkEN_LOADIMP_LDO_TLOB;
+00809         wxCheckBox* chkEN_LOADIMP_LDO_TPAD;
+00810         wxCheckBox* chkEN_LOADIMP_LDO_TXBUF;
+00811         wxCheckBox* chkEN_LOADIMP_LDO_VCOGN;
+00812         wxCheckBox* chkEN_LOADIMP_LDO_VCOSXR;
+00813         wxCheckBox* chkEN_LOADIMP_LDO_VCOSXT;
+00814         wxCheckBox* chkEN_LOADIMP_LDO_AFE;
+00815         wxCheckBox* chkEN_LOADIMP_LDO_CPGN;
+00816         wxCheckBox* chkEN_LOADIMP_LDO_DIVSXR;
+00817         wxCheckBox* chkEN_LOADIMP_LDO_DIVSXT;
+00818         wxCheckBox* chkEN_LOADIMP_LDO_DIG;
+00819         wxCheckBox* chkEN_LOADIMP_LDO_DIGGN;
+00820         wxCheckBox* chkEN_LOADIMP_LDO_DIGSXR;
+00821         wxCheckBox* chkEN_LOADIMP_LDO_DIGSXT;
+00822         wxCheckBox* chkEN_LOADIMP_LDO_DIVGN;
+00823         wxCheckBox* chkEN_LOADIMP_LDO_CPSXR;
+00824         wxCheckBox* chkEN_LOADIMP_LDO_CPSXT;
+00825         wxCheckBox* chkEN_LOADIMP_LDO_LNA12;
+00826         wxCheckBox* chkEN_LOADIMP_LDO_LNA14;
+00827         wxCheckBox* chkEN_LOADIMP_LDO_MXRFE;
+00828         wxCheckBox* chkEN_LOADIMP_LDO_RBB;
+00829         wxCheckBox* chkEN_LOADIMP_LDO_RXBUF;
+00830         wxCheckBox* chkEN_LOADIMP_LDO_SPIBUF;
+00831         wxCheckBox* chkEN_LOADIMP_LDO_DIGIp2;
+00832         wxCheckBox* chkEN_LOADIMP_LDO_DIGIp1;
+00833         wxPanel* ID_PANEL2;
+00834         wxStaticText* ID_STATICTEXT1;
+00835         wxComboBox* cmbRDIV_VCOSXR;
+00836         wxStaticText* ID_STATICTEXT2;
+00837         wxComboBox* cmbRDIV_VCOSXT;
+00838         wxStaticText* ID_STATICTEXT3;
+00839         wxComboBox* cmbRDIV_TXBUF;
+00840         wxStaticText* ID_STATICTEXT4;
+00841         wxComboBox* cmbRDIV_VCOGN;
+00842         wxStaticText* ID_STATICTEXT5;
+00843         wxComboBox* cmbRDIV_TLOB;
+00844         wxStaticText* ID_STATICTEXT6;
+00845         wxComboBox* cmbRDIV_TPAD;
+00846         wxStaticText* ID_STATICTEXT7;
+00847         wxComboBox* cmbRDIV_TIA12;
+00848         wxStaticText* ID_STATICTEXT8;
+00849         wxComboBox* cmbRDIV_TIA14;
+00850         wxStaticText* ID_STATICTEXT9;
+00851         wxComboBox* cmbRDIV_RXBUF;
+00852         wxStaticText* ID_STATICTEXT10;
+00853         wxComboBox* cmbRDIV_TBB;
+00854         wxStaticText* ID_STATICTEXT11;
+00855         wxComboBox* cmbRDIV_MXRFE;
+00856         wxStaticText* ID_STATICTEXT12;
+00857         wxComboBox* cmbRDIV_RBB;
+00858         wxStaticText* ID_STATICTEXT13;
+00859         wxComboBox* cmbRDIV_LNA12;
+00860         wxStaticText* ID_STATICTEXT14;
+00861         wxComboBox* cmbRDIV_LNA14;
+00862         wxStaticText* ID_STATICTEXT15;
+00863         wxComboBox* cmbRDIV_DIVSXR;
+00864         wxStaticText* ID_STATICTEXT16;
+00865         wxComboBox* cmbRDIV_DIVSXT;
+00866         wxStaticText* ID_STATICTEXT17;
+00867         wxComboBox* cmbRDIV_DIGSXT;
+00868         wxStaticText* ID_STATICTEXT18;
+00869         wxComboBox* cmbRDIV_DIVGN;
+00870         wxStaticText* ID_STATICTEXT19;
+00871         wxComboBox* cmbRDIV_DIGGN;
+00872         wxStaticText* ID_STATICTEXT20;
+00873         wxComboBox* cmbRDIV_DIGSXR;
+00874         wxStaticText* ID_STATICTEXT21;
+00875         wxComboBox* cmbRDIV_CPSXT;
+00876         wxStaticText* ID_STATICTEXT22;
+00877         wxComboBox* cmbRDIV_DIG;
+00878         wxStaticText* ID_STATICTEXT23;
+00879         wxComboBox* cmbRDIV_CPGN;
+00880         wxStaticText* ID_STATICTEXT24;
+00881         wxComboBox* cmbRDIV_CPSXR;
+00882         wxStaticText* ID_STATICTEXT25;
+00883         wxComboBox* cmbRDIV_SPIBUF;
+00884         wxStaticText* ID_STATICTEXT26;
+00885         wxComboBox* cmbRDIV_AFE;
+00886         wxStaticText* ID_STATICTEXT27;
+00887         wxComboBox* cmbRDIV_DIGIp2;
+00888         wxStaticText* ID_STATICTEXT28;
+00889         wxComboBox* cmbRDIV_DIGIp1;
+00890         
+00891         \textcolor{comment}{// Virtual event handlers, overide them in your derived class}
+00892         \textcolor{keyword}{virtual} \textcolor{keywordtype}{void} ParameterChangeHandler( wxCommandEvent& event ) \{ \textcolor{keyword}{event}.Skip(); \}
+00893         
+00894     
+00895     \textcolor{keyword}{public}:
+00896         
+00897         pnlLDO_view( wxWindow* parent, wxWindowID \textcolor{keywordtype}{id} = wxID\_ANY, \textcolor{keyword}{const} wxPoint& pos = wxDefaultPosition, \textcolor{keyword}{
+      const} wxSize& size = wxSize( 1180,550 ), \textcolor{keywordtype}{long} style = wxTAB\_TRAVERSAL ); 
+00898         ~pnlLDO_view();
+00899     
+00900 \};
+00901 
+00905 \textcolor{keyword}{class }pnlXBUF_view : \textcolor{keyword}{public} wxPanel 
+00906 \{
+00907     \textcolor{keyword}{private}:
+00908     
+00909     \textcolor{keyword}{protected}:
+00910         \textcolor{keyword}{enum}
+00911         \{
+00912             ID\_PD\_XBUF\_RX = 2048,
+00913             ID_PD_XBUF_TX,
+00914             ID_EN_G_XBUF,
+00915             ID_SLFB_XBUF_RX,
+00916             ID_SLFB_XBUF_TX,
+00917             ID_BYP_XBUF_RX,
+00918             ID_BYP_XBUF_TX,
+00919             ID_EN_OUT2_XBUF_TX,
+00920             ID\_EN\_TBUFIN\_XBUF\_RX
+00921         \};
+00922         
+00923         wxCheckBox* chkPD_XBUF_RX;
+00924         wxCheckBox* chkPD_XBUF_TX;
+00925         wxCheckBox* chkEN_G_XBUF;
+00926         wxCheckBox* chkSLFB_XBUF_RX;
+00927         wxCheckBox* chkSLFB_XBUF_TX;
+00928         wxCheckBox* chkBYP_XBUF_RX;
+00929         wxCheckBox* chkBYP_XBUF_TX;
+00930         wxCheckBox* chkEN_OUT2_XBUF_TX;
+00931         wxCheckBox* chkEN_TBUFIN_XBUF_RX;
+00932         
+00933         \textcolor{comment}{// Virtual event handlers, overide them in your derived class}
+00934         \textcolor{keyword}{virtual} \textcolor{keywordtype}{void} ParameterChangeHandler( wxCommandEvent& event ) \{ \textcolor{keyword}{event}.Skip(); \}
+00935         
+00936     
+00937     \textcolor{keyword}{public}:
+00938         
+00939         pnlXBUF_view( wxWindow* parent, wxWindowID \textcolor{keywordtype}{id} = wxID\_ANY, \textcolor{keyword}{const} wxPoint& pos = wxDefaultPosition, \textcolor{keyword}{
+      const} wxSize& size = wxDefaultSize, \textcolor{keywordtype}{long} style = wxTAB\_TRAVERSAL ); 
+00940         ~pnlXBUF_view();
+00941     
+00942 \};
+00943 
+00947 \textcolor{keyword}{class }pnlCLKGEN_view : \textcolor{keyword}{public} wxPanel 
+00948 \{
+00949     \textcolor{keyword}{private}:
+00950     
+00951     \textcolor{keyword}{protected}:
+00952         \textcolor{keyword}{enum}
+00953         \{
+00954             ID\_PD\_CP\_CGEN = 2048,
+00955             ID_PD_FDIV_FB_CGEN,
+00956             ID_PD_FDIV_O_CGEN,
+00957             ID_PD_SDM_CGEN,
+00958             ID_PD_VCO_CGEN,
+00959             ID_PD_VCO_COMP_CGEN,
+00960             ID_EN_G_CGEN,
+00961             ID_SPDUP_VCO_CGEN,
+00962             ID_RESET_N_CGEN,
+00963             ID_EN_COARSE_CKLGEN,
+00964             ID_EN_INTONLY_SDM_CGEN,
+00965             ID_EN_SDM_CLK_CGEN,
+00966             ID_REV_SDMCLK_CGEN,
+00967             ID_SX_DITHER_EN_CGEN,
+00968             ID_REV_CLKDAC_CGEN,
+00969             ID_REV_CLKADC_CGEN,
+00970             ID_REVPH_PFD_CGEN,
+00971             ID_COARSE_START_CGEN,
+00972             ID_SEL_SDMCLK_CGEN,
+00973             ID_TST_CGEN,
+00974             ID_CP2_CGEN,
+00975             ID_CP3_CGEN,
+00976             ID_CZ_CGEN,
+00977             ID_EN_ADCCLKH_CLKGN,
+00978             ID_CLKH_OV_CLKL_CGEN,
+00979             ID_GFIR1_N_TXTSP,
+00980             ID_AUTO_PHASE,
+00981             ID_INT_SDM_CGEN,
+00982             ID_FRAC_SDM_CGEN,
+00983             ID_VCO_CMPHO_CGEN,
+00984             ID_VCO_CMPLO_CGEN,
+00985             ID_COARSE_STEPDONE_CGEN,
+00986             ID_COARSEPLL_COMPO_CGEN,
+00987             ID_CSW_VCO_CGEN,
+00988             ID_ICT_VCO_CGEN,
+00989             ID_IOFFSET_CP_CGEN,
+00990             ID\_IPULSE\_CP\_CGEN
+00991         \};
+00992         
+00993         wxCheckBox* chkPD_CP_CGEN;
+00994         wxCheckBox* chkPD_FDIV_FB_CGEN;
+00995         wxCheckBox* chkPD_FDIV_O_CGEN;
+00996         wxCheckBox* chkPD_SDM_CGEN;
+00997         wxCheckBox* chkPD_VCO_CGEN;
+00998         wxCheckBox* chkPD_VCO_COMP_CGEN;
+00999         wxCheckBox* chkEN_G_CGEN;
+01000         wxCheckBox* chkSPDUP_VCO_CGEN;
+01001         wxCheckBox* chkRESET_N_CGEN;
+01002         wxCheckBox* chkEN_COARSE_CKLGEN;
+01003         wxCheckBox* chkEN_INTONLY_SDM_CGEN;
+01004         wxCheckBox* chkEN_SDM_CLK_CGEN;
+01005         wxCheckBox* chkREV_SDMCLK_CGEN;
+01006         wxCheckBox* chkSX_DITHER_EN_CGEN;
+01007         wxCheckBox* chkREV_CLKDAC_CGEN;
+01008         wxCheckBox* chkREV_CLKADC_CGEN;
+01009         wxCheckBox* chkREVPH_PFD_CGEN;
+01010         wxCheckBox* chkCOARSE_START_CGEN;
+01011         wxRadioBox* rgrSEL_SDMCLK_CGEN;
+01012         wxStaticText* ID_STATICTEXT4;
+01013         wxComboBox* cmbTST_CGEN;
+01014         wxStaticText* ID_STATICTEXT13;
+01015         wxComboBox* cmbCP2_CGEN;
+01016         wxStaticText* ID_STATICTEXT14;
+01017         wxComboBox* cmbCP3_CGEN;
+01018         wxStaticText* ID_STATICTEXT15;
+01019         wxComboBox* cmbCZ_CGEN;
+01020         wxRadioBox* cmbEN_ADCCLKH_CLKGN;
+01021         wxStaticText* m_staticText369;
+01022         wxStaticText* lblRxTSPfreq;
+01023         wxStaticText* m_staticText367;
+01024         wxStaticText* lblTxTSPfreq;
+01025         wxStaticText* ID_STATICTEXT10;
+01026         wxStaticText* ID_STATICTEXT18;
+01027         wxStaticText* ID_STATICTEXT3;
+01028         wxTextCtrl* txtFrequency;
+01029         wxComboBox* cmbCLKH_OV_CLKL_CGEN;
+01030         wxTextCtrl* txtFrequencyCLKL;
+01031         wxStaticText* ID_STATICTEXT101;
+01032         wxStaticText* ID_STATICTEXT102;
+01033         wxCheckBox* chkAutoPhase;
+01034         wxButton* btnCalculate;
+01035         wxButton* btnTune;
+01036         wxStaticText* ID_STATICTEXT7;
+01037         wxStaticText* lblINT_SDM_CGEN;
+01038         wxStaticText* ID_STATICTEXT23;
+01039         wxStaticText* lblRefClk_MHz;
+01040         wxStaticText* ID_STATICTEXT21;
+01041         wxStaticText* lblFRAC_SDM_CGEN;
+01042         wxStaticText* ID_STATICTEXT2;
+01043         wxStaticText* lblDivider;
+01044         wxStaticText* ID_STATICTEXT25;
+01045         wxStaticText* lblRealOutFrequency;
+01046         wxStaticText* ID_STATICTEXT161;
+01047         wxStaticText* lblVCO_CMPHO_CGEN;
+01048         wxStaticText* ID_STATICTEXT171;
+01049         wxStaticText* lblVCO_CMPLO_CGEN;
+01050         wxButton* btnUpdateValues1;
+01051         wxStaticText* ID_STATICTEXT5;
+01052         wxStaticText* lblCOARSE_STEPDONE_CGEN;
+01053         wxStaticText* ID_STATICTEXT6;
+01054         wxStaticText* lblCOARSEPLL_COMPO_CGEN;
+01055         wxButton* btnUpdateCoarse;
+01056         wxStaticText* ID_STATICTEXT20;
+01057         NumericSlider* cmbCSW_VCO_CGEN;
+01058         wxStaticText* ID_STATICTEXT9;
+01059         NumericSlider* cmbICT_VCO_CGEN;
+01060         wxButton* btnShowVCO;
+01061         wxStaticText* ID_STATICTEXT16;
+01062         NumericSlider* cmbIOFFSET_CP_CGEN;
+01063         wxStaticText* ID_STATICTEXT17;
+01064         NumericSlider* cmbIPULSE_CP_CGEN;
+01065         wxFlexGridSizer* sizerR3;
+01066         
+01067         \textcolor{comment}{// Virtual event handlers, overide them in your derived class}
+01068         \textcolor{keyword}{virtual} \textcolor{keywordtype}{void} ParameterChangeHandler( wxCommandEvent& event ) \{ \textcolor{keyword}{event}.Skip(); \}
+01069         \textcolor{keyword}{virtual} \textcolor{keywordtype}{void} onbtnCalculateClick( wxSpinEvent& event ) \{ \textcolor{keyword}{event}.Skip(); \}
+01070         \textcolor{keyword}{virtual} \textcolor{keywordtype}{void} OnAutoPhase( wxCommandEvent& event ) \{ \textcolor{keyword}{event}.Skip(); \}
+01071         \textcolor{keyword}{virtual} \textcolor{keywordtype}{void} onbtnCalculateClick( wxCommandEvent& event ) \{ \textcolor{keyword}{event}.Skip(); \}
+01072         \textcolor{keyword}{virtual} \textcolor{keywordtype}{void} onbtnTuneClick( wxCommandEvent& event ) \{ \textcolor{keyword}{event}.Skip(); \}
+01073         \textcolor{keyword}{virtual} \textcolor{keywordtype}{void} OnbtnReadComparators( wxCommandEvent& event ) \{ \textcolor{keyword}{event}.Skip(); \}
+01074         \textcolor{keyword}{virtual} \textcolor{keywordtype}{void} OnbtnUpdateCoarse( wxCommandEvent& event ) \{ \textcolor{keyword}{event}.Skip(); \}
+01075         \textcolor{keyword}{virtual} \textcolor{keywordtype}{void} ParameterChangeHandler( wxSpinEvent& event ) \{ \textcolor{keyword}{event}.Skip(); \}
+01076         \textcolor{keyword}{virtual} \textcolor{keywordtype}{void} OnShowVCOclicked( wxCommandEvent& event ) \{ \textcolor{keyword}{event}.Skip(); \}
+01077         
+01078     
+01079     \textcolor{keyword}{public}:
+01080         wxSpinCtrl* rxPhase;
+01081         wxSpinCtrl* txPhase;
+01082         
+01083         pnlCLKGEN_view( wxWindow* parent, wxWindowID \textcolor{keywordtype}{id} = wxID\_ANY, \textcolor{keyword}{const} wxPoint& pos = wxDefaultPosition,
+       \textcolor{keyword}{const} wxSize& size = wxDefaultSize, \textcolor{keywordtype}{long} style = wxTAB\_TRAVERSAL ); 
+01084         ~pnlCLKGEN_view();
+01085     
+01086 \};
+01087 
+01091 \textcolor{keyword}{class }pnlSX_view : \textcolor{keyword}{public} wxPanel 
+01092 \{
+01093     \textcolor{keyword}{private}:
+01094     
+01095     \textcolor{keyword}{protected}:
+01096         \textcolor{keyword}{enum}
+01097         \{
+01098             ID\_PD\_FBDIV = 2048,
+01099             ID_PD_LOCH_T2RBUF,
+01100             ID_PD_CP,
+01101             ID_PD_FDIV,
+01102             ID_PD_SDM,
+01103             ID_PD_VCO_COMP,
+01104             ID_PD_VCO,
+01105             ID_EN_G,
+01106             ID_EN_DIR_SXRSXT,
+01107             ID_RESET_N,
+01108             ID_SPDUP_VCO,
+01109             ID_BYPLDO_VCO,
+01110             ID_EN_COARSEPLL,
+01111             ID_CURLIM_VCO,
+01112             ID_REVPH_PFD,
+01113             ID_EN_INTONLY_SDM,
+01114             ID_EN_SDM_CLK,
+01115             ID_REV_SDMCLK,
+01116             ID_SX_DITHER_EN,
+01117             ID_EN_DIV2_DIVPROGenabled,
+01118             ID_TST_SX,
+01119             ID_PW_DIV2_LOCH,
+01120             ID_PW_DIV4_LOCH,
+01121             ID_DIV_LOCH,
+01122             ID_CP2_PLL,
+01123             ID_CP3_PLL,
+01124             ID_CZ,
+01125             ID_SEL_VCO,
+01126             ID_EN_DIV2_DIVPROG,
+01127             ID_VCO_CMPHO,
+01128             ID_VCO_CMPLO,
+01129             ID_CSW_VCO,
+01130             ID_ICT_VCO,
+01131             ID_BTN_SHOW_VCO,
+01132             ID_VDIV_VCO,
+01133             ID_IPULSE_CP,
+01134             ID_SEL_SDMCLK,
+01135             ID_RSEL_LDO_VCO,
+01136             ID\_IOFFSET\_CP
+01137         \};
+01138         
+01139         wxCheckBox* chkPD_FBDIV;
+01140         wxCheckBox* chkPD_LOCH_T2RBUF;
+01141         wxCheckBox* chkPD_CP;
+01142         wxCheckBox* chkPD_FDIV;
+01143         wxCheckBox* chkPD_SDM;
+01144         wxCheckBox* chkPD_VCO_COMP;
+01145         wxCheckBox* chkPD_VCO;
+01146         wxCheckBox* chkEN_G;
+01147         wxCheckBox* chkEN_DIR_SXRSXT;
+01148         wxCheckBox* chkRESET_N;
+01149         wxCheckBox* chkSPDUP_VCO;
+01150         wxCheckBox* chkBYPLDO_VCO;
+01151         wxCheckBox* chkEN_COARSEPLL;
+01152         wxCheckBox* chkCURLIM_VCO;
+01153         wxCheckBox* chkREVPH_PFD;
+01154         wxCheckBox* chkEN_INTONLY_SDM;
+01155         wxCheckBox* chkEN_SDM_CLK;
+01156         wxCheckBox* chkREV_SDMCLK;
+01157         wxCheckBox* chkSX_DITHER_EN;
+01158         wxCheckBox* chkEN_DIV2_DIVPROGenabled;
+01159         wxStaticText* ID_STATICTEXT7;
+01160         wxComboBox* cmbTST_SX;
+01161         wxStaticText* ID_STATICTEXT4;
+01162         wxSpinCtrl* ctrPW_DIV2_LOCH;
+01163         wxStaticText* ID_STATICTEXT5;
+01164         wxSpinCtrl* ctrPW_DIV4_LOCH;
+01165         wxStaticText* ID_STATICTEXT6;
+01166         wxSpinCtrl* ctrDIV_LOCH;
+01167         wxStaticText* ID_STATICTEXT18;
+01168         wxComboBox* cmbCP2_PLL;
+01169         wxStaticText* ID_STATICTEXT19;
+01170         wxComboBox* cmbCP3_PLL;
+01171         wxStaticText* ID_STATICTEXT20;
+01172         wxComboBox* cmbCZ;
+01173         wxRadioBox* rgrSEL_VCO;
+01174         wxTextCtrl* txtFrequency;
+01175         wxButton* btnCalculate;
+01176         wxButton* btnTune;
+01177         wxButton* ID_BUTTON5;
+01178         wxPanel* pnlRefClkSpur;
+01179         wxStaticBoxSizer* RefClkSpurSizer;
+01180         wxCheckBox* chkEnableRefSpurCancelation;
+01181         wxStaticText* m_staticText359;
+01182         wxTextCtrl* txtRefSpurBW;
+01183         wxStaticText* ID_STATICTEXT2;
+01184         wxStaticText* lblINT_SDM;
+01185         wxStaticText* ID_STATICTEXT21;
+01186         wxStaticText* lblFRAC_SDM;
+01187         wxStaticText* ID_STATICTEXT25;
+01188         wxStaticText* lblRealOutFrequency;
+01189         wxStaticText* ID_STATICTEXT23;
+01190         wxStaticText* lblDivider;
+01191         wxStaticText* ID_STATICTEXT30;
+01192         wxStaticText* lblEN_DIV2_DIVPROG;
+01193         wxButton* btnChangeRefClk;
+01194         wxStaticText* lblRefClk_MHz;
+01195         wxStaticText* ID_STATICTEXT16;
+01196         wxStaticText* lblVCO_CMPHO;
+01197         wxStaticText* ID_STATICTEXT17;
+01198         wxStaticText* lblVCO_CMPLO;
+01199         wxButton* btnUpdateValues;
+01200         wxStaticText* ID_STATICTEXT1;
+01201         NumericSlider* ctrCSW_VCO;
+01202         wxStaticText* ID_STATICTEXT10;
+01203         NumericSlider* cmbICT_VCO;
+01204         wxButton* btnShowVCOparams;
+01205         wxStaticText* ID_STATICTEXT9;
+01206         wxComboBox* cmbVDIV_VCO;
+01207         wxStaticText* ID_STATICTEXT13;
+01208         wxComboBox* cmbIPULSE_CP;
+01209         wxStaticText* ID_STATICTEXT8;
+01210         wxComboBox* cmbSEL_SDMCLK;
+01211         wxStaticText* ID_STATICTEXT11;
+01212         wxComboBox* cmbRSEL_LDO_VCO;
+01213         wxStaticText* ID_STATICTEXT12;
+01214         wxComboBox* cmbIOFFSET_CP;
+01215         wxFlexGridSizer* sizerR3;
+01216         
+01217         \textcolor{comment}{// Virtual event handlers, overide them in your derived class}
+01218         \textcolor{keyword}{virtual} \textcolor{keywordtype}{void} ParameterChangeHandler( wxCommandEvent& event ) \{ \textcolor{keyword}{event}.Skip(); \}
+01219         \textcolor{keyword}{virtual} \textcolor{keywordtype}{void} OnDIV2PrescalerChange( wxCommandEvent& event ) \{ \textcolor{keyword}{event}.Skip(); \}
+01220         \textcolor{keyword}{virtual} \textcolor{keywordtype}{void} ParameterChangeHandler( wxSpinEvent& event ) \{ \textcolor{keyword}{event}.Skip(); \}
+01221         \textcolor{keyword}{virtual} \textcolor{keywordtype}{void} OnbtnCalculateClick( wxCommandEvent& event ) \{ \textcolor{keyword}{event}.Skip(); \}
+01222         \textcolor{keyword}{virtual} \textcolor{keywordtype}{void} OnbtnTuneClick( wxCommandEvent& event ) \{ \textcolor{keyword}{event}.Skip(); \}
+01223         \textcolor{keyword}{virtual} \textcolor{keywordtype}{void} OnEnableRefSpurCancelation( wxCommandEvent& event ) \{ \textcolor{keyword}{event}.Skip(); \}
+01224         \textcolor{keyword}{virtual} \textcolor{keywordtype}{void} OnbtnChangeRefClkClick( wxCommandEvent& event ) \{ \textcolor{keyword}{event}.Skip(); \}
+01225         \textcolor{keyword}{virtual} \textcolor{keywordtype}{void} OnbtnReadComparators( wxCommandEvent& event ) \{ \textcolor{keyword}{event}.Skip(); \}
+01226         \textcolor{keyword}{virtual} \textcolor{keywordtype}{void} OnShowVCOclicked( wxCommandEvent& event ) \{ \textcolor{keyword}{event}.Skip(); \}
+01227         
+01228     
+01229     \textcolor{keyword}{public}:
+01230         
+01231         pnlSX_view( wxWindow* parent, wxWindowID \textcolor{keywordtype}{id} = wxID\_ANY, \textcolor{keyword}{const} wxPoint& pos = wxDefaultPosition, \textcolor{keyword}{
+      const} wxSize& size = wxDefaultSize, \textcolor{keywordtype}{long} style = wxTAB\_TRAVERSAL ); 
+01232         ~pnlSX_view();
+01233     
+01234 \};
+01235 
+01239 \textcolor{keyword}{class }pnlLimeLightPAD_view : \textcolor{keyword}{public} wxPanel 
+01240 \{
+01241     \textcolor{keyword}{private}:
+01242     
+01243     \textcolor{keyword}{protected}:
+01244         \textcolor{keyword}{enum}
+01245         \{
+01246             ID\_SDA\_PE = 2048,
+01247             ID_SCL_PE,
+01248             ID_RX_CLK_PE,
+01249             ID_SDIO_PE,
+01250             ID_SDO_PE,
+01251             ID_TX_CLK_PE,
+01252             ID_SEN_PE,
+01253             ID_DIQ1_PE,
+01254             ID_TXNRX1_PE,
+01255             ID_SCLK_PE,
+01256             ID_DIQ2_PE,
+01257             ID_TXNRX2_PE,
+01258             ID_IQ_SEL_EN_1_PE,
+01259             ID_FCLK1_PE,
+01260             ID_MCLK1_PE,
+01261             ID_IQ_SEL_EN_2_PE,
+01262             ID_FCLK2_PE,
+01263             ID_MCLK2_PE,
+01264             ID_SRST_RXFIFO,
+01265             ID_SRST_TXFIFO,
+01266             ID_LRST_TX_A,
+01267             ID_LRST_TX_B,
+01268             ID_LRST_RX_A,
+01269             ID_LRST_RX_B,
+01270             ID_MRST_TX_A,
+01271             ID_MRST_TX_B,
+01272             ID_MRST_RX_A,
+01273             ID_MRST_RX_B,
+01274             ID_RXEN_A,
+01275             ID_TXEN_A,
+01276             ID_RXEN_B,
+01277             ID_TXEN_B,
+01278             ID_MIMO_SISO,
+01279             ID_MOD_EN,
+01280             ID_LML_FIDM1,
+01281             ID_LML_FIDM2,
+01282             ID_LML_MODE1,
+01283             ID_LML_MODE2,
+01284             ID_LML_TXNRXIQ1,
+01285             ID_LML_TXNRXIQ2,
+01286             ID_SDA_DS,
+01287             ID_SCL_DS,
+01288             ID_SDIO_DS,
+01289             ID_DIQ2_DS,
+01290             ID_DIQ1_DS,
+01291             ID_RX_MUX,
+01292             ID_TX_MUX,
+01293             ID_SPIMODE,
+01294             ID_VER,
+01295             ID_REV,
+01296             ID_MASK,
+01297             ID_LML1_S3S,
+01298             ID_LML1_S2S,
+01299             ID_LML1_S1S,
+01300             ID_LML1_S0S,
+01301             ID_LML2_S3S,
+01302             ID_LML2_S2S,
+01303             ID_LML2_S1S,
+01304             ID_LML2_S0S,
+01305             ID_LML1_BQP,
+01306             ID_LML1_BIP,
+01307             ID_LML1_AQP,
+01308             ID_LML1_AIP,
+01309             ID_LML2_BQP,
+01310             ID_LML2_BIP,
+01311             ID_LML2_AQP,
+01312             ID_LML2_AIP,
+01313             ID_TXRDCLK_MUX,
+01314             ID_TXWRCLK_MUX,
+01315             ID_RXRDCLK_MUX,
+01316             ID_RXWRCLK_MUX,
+01317             ID_MCLK2SRC,
+01318             ID_MCLK1SRC,
+01319             ID_TXDIVEN,
+01320             ID_TXTSPCLKA_DIV,
+01321             ID_RXDIVEN,
+01322             ID_RXTSPCLKA_DIV,
+01323             ID_MCLK1DLY,
+01324             ID_MCLK2DLY,
+01325             ID_FCLK1_INV,
+01326             ID_FCLK2_INV,
+01327             ID_FCLK1DLY,
+01328             ID_FCLK2DLY,
+01329             ID_LML1_TX_PST,
+01330             ID_LML1_TX_PRE,
+01331             ID_LML1_RX_PST,
+01332             ID_LML1_RX_PRE,
+01333             ID_LML2_TX_PST,
+01334             ID_LML2_TX_PRE,
+01335             ID_LML2_RX_PST,
+01336             ID_LML2_RX_PRE,
+01337             ID_DIQDIRCTR1,
+01338             ID_DIQDIR1,
+01339             ID_ENABLEDIRCTR1,
+01340             ID_ENABLEDIR1,
+01341             ID_DIQDIRCTR2,
+01342             ID_DIQDIR2,
+01343             ID_ENABLEDIRCTR2,
+01344             ID\_ENABLEDIR2
+01345         \};
+01346         
+01347         wxNotebook* ID_NOTEBOOK1;
+01348         wxPanel* ID_PANEL1;
+01349         wxCheckBox* chkSDA_PE;
+01350         wxCheckBox* chkSCL_PE;
+01351         wxCheckBox* chkRX_CLK_PE;
+01352         wxCheckBox* chkSDIO_PE;
+01353         wxCheckBox* chkSDO_PE;
+01354         wxCheckBox* chkTX_CLK_PE;
+01355         wxCheckBox* chkSEN_PE;
+01356         wxCheckBox* chkDIQ1_PE;
+01357         wxCheckBox* chkTXNRX1_PE;
+01358         wxCheckBox* chkSCLK_PE;
+01359         wxCheckBox* chkDIQ2_PE;
+01360         wxCheckBox* chkTXNRX2_PE;
+01361         wxCheckBox* chkIQ_SEL_EN_1_PE;
+01362         wxCheckBox* chkFCLK1_PE;
+01363         wxCheckBox* chkMCLK1_PE;
+01364         wxCheckBox* chkIQ_SEL_EN_2_PE;
+01365         wxCheckBox* chkFCLK2_PE;
+01366         wxCheckBox* chkMCLK2_PE;
+01367         wxCheckBox* chkSRST_RXFIFO;
+01368         wxCheckBox* chkSRST_TXFIFO;
+01369         wxCheckBox* chkLRST_TX_A;
+01370         wxCheckBox* chkLRST_TX_B;
+01371         wxCheckBox* chkLRST_RX_A;
+01372         wxCheckBox* chkLRST_RX_B;
+01373         wxCheckBox* chkMRST_TX_A;
+01374         wxCheckBox* chkMRST_TX_B;
+01375         wxCheckBox* chkMRST_RX_A;
+01376         wxCheckBox* chkMRST_RX_B;
+01377         wxCheckBox* chkRXEN_A;
+01378         wxCheckBox* chkTXEN_A;
+01379         wxCheckBox* chkRXEN_B;
+01380         wxCheckBox* chkTXEN_B;
+01381         wxCheckBox* chkMIMO_SISO;
+01382         wxCheckBox* chkMOD_EN;
+01383         wxRadioBox* rgrLML_FIDM1;
+01384         wxRadioBox* rgrLML_FIDM2;
+01385         wxRadioBox* rgrLML_MODE1;
+01386         wxRadioBox* rgrLML_MODE2;
+01387         wxRadioBox* rgrLML_TXNRXIQ1;
+01388         wxRadioBox* rgrLML_TXNRXIQ2;
+01389         wxCheckBox* chkLML1_TRXIQPULSE;
+01390         wxCheckBox* chkLML2_TRXIQPULSE;
+01391         wxCheckBox* chkLML1_SISODDR;
+01392         wxCheckBox* chkLML2_SISODDR;
+01393         wxRadioBox* rgrSDA_DS;
+01394         wxRadioBox* rgrSCL_DS;
+01395         wxRadioBox* rgrSDIO_DS;
+01396         wxRadioBox* rgrDIQ2_DS;
+01397         wxRadioBox* rgrDIQ1_DS;
+01398         wxRadioBox* rgrRX_MUX;
+01399         wxRadioBox* rgrTX_MUX;
+01400         wxRadioBox* rgrSPIMODE;
+01401         wxStaticText* ID_STATICTEXT36;
+01402         wxStaticText* lblVER;
+01403         wxStaticText* ID_STATICTEXT38;
+01404         wxStaticText* lblREV;
+01405         wxStaticText* ID_STATICTEXT40;
+01406         wxStaticText* lblMASK;
+01407         wxButton* btnReadVerRevMask;
+01408         wxPanel* ID_PANEL2;
+01409         wxStaticText* ID_STATICTEXT1;
+01410         wxComboBox* cmbLML1_S3S;
+01411         wxStaticText* ID_STATICTEXT2;
+01412         wxComboBox* cmbLML1_S2S;
+01413         wxStaticText* ID_STATICTEXT3;
+01414         wxComboBox* cmbLML1_S1S;
+01415         wxStaticText* ID_STATICTEXT4;
+01416         wxComboBox* cmbLML1_S0S;
+01417         wxStaticText* ID_STATICTEXT9;
+01418         wxComboBox* cmbLML2_S3S;
+01419         wxStaticText* ID_STATICTEXT10;
+01420         wxComboBox* cmbLML2_S2S;
+01421         wxStaticText* ID_STATICTEXT11;
+01422         wxComboBox* cmbLML2_S1S;
+01423         wxStaticText* ID_STATICTEXT12;
+01424         wxComboBox* cmbLML2_S0S;
+01425         wxStaticText* ID_STATICTEXT5;
+01426         wxComboBox* cmbLML1_BQP;
+01427         wxStaticText* ID_STATICTEXT6;
+01428         wxComboBox* cmbLML1_BIP;
+01429         wxStaticText* ID_STATICTEXT7;
+01430         wxComboBox* cmbLML1_AQP;
+01431         wxStaticText* ID_STATICTEXT8;
+01432         wxComboBox* cmbLML1_AIP;
+01433         wxStaticText* ID_STATICTEXT13;
+01434         wxComboBox* cmbLML2_BQP;
+01435         wxStaticText* ID_STATICTEXT14;
+01436         wxComboBox* cmbLML2_BIP;
+01437         wxStaticText* ID_STATICTEXT15;
+01438         wxComboBox* cmbLML2_AQP;
+01439         wxStaticText* ID_STATICTEXT16;
+01440         wxComboBox* cmbLML2_AIP;
+01441         wxStaticText* ID_STATICTEXT25;
+01442         wxComboBox* cmbTXRDCLK_MUX;
+01443         wxStaticText* ID_STATICTEXT26;
+01444         wxComboBox* cmbTXWRCLK_MUX;
+01445         wxStaticText* ID_STATICTEXT27;
+01446         wxComboBox* cmbRXRDCLK_MUX;
+01447         wxStaticText* ID_STATICTEXT28;
+01448         wxComboBox* cmbRXWRCLK_MUX;
+01449         wxStaticText* ID_STATICTEXT29;
+01450         wxComboBox* cmbMCLK2SRC;
+01451         wxStaticText* ID_STATICTEXT30;
+01452         wxComboBox* cmbMCLK1SRC;
+01453         wxCheckBox* chkTXDIVEN;
+01454         wxSpinCtrl* cmbTXTSPCLKA_DIV;
+01455         wxCheckBox* chkRXDIVEN;
+01456         wxSpinCtrl* cmbRXTSPCLKA_DIV;
+01457         wxStaticText* ID_STATICTEXT37;
+01458         wxSpinCtrl* cmbMCLK1DLY;
+01459         wxStaticText* ID_STATICTEXT39;
+01460         wxSpinCtrl* cmbMCLK2DLY;
+01461         wxCheckBox* chkFCLK1_INV;
+01462         wxCheckBox* chkFCLK2_INV;
+01463         wxCheckBox* chkMCLK1_INV;
+01464         wxCheckBox* chkMCLK2_INV;
+01465         wxStaticText* ID_STATICTEXT301;
+01466         wxComboBox* cmbFCLK1_DLY;
+01467         wxStaticText* ID_STATICTEXT302;
+01468         wxComboBox* cmbFCLK2_DLY;
+01469         wxStaticText* ID_STATICTEXT303;
+01470         wxComboBox* cmbMCLK1_DLY;
+01471         wxStaticText* ID_STATICTEXT304;
+01472         wxComboBox* cmbMCLK2_DLY;
+01473         wxStaticText* ID_STATICTEXT17;
+01474         wxSpinCtrl* cmbLML1_TX_PST;
+01475         wxStaticText* ID_STATICTEXT18;
+01476         wxSpinCtrl* cmbLML1_TX_PRE;
+01477         wxStaticText* ID_STATICTEXT19;
+01478         wxSpinCtrl* cmbLML1_RX_PST;
+01479         wxStaticText* ID_STATICTEXT20;
+01480         wxSpinCtrl* cmbLML1_RX_PRE;
+01481         wxStaticText* ID_STATICTEXT21;
+01482         wxSpinCtrl* cmbLML2_TX_PST;
+01483         wxStaticText* ID_STATICTEXT22;
+01484         wxSpinCtrl* cmbLML2_TX_PRE;
+01485         wxStaticText* ID_STATICTEXT23;
+01486         wxSpinCtrl* cmbLML2_RX_PST;
+01487         wxStaticText* ID_STATICTEXT24;
+01488         wxSpinCtrl* cmbLML2_RX_PRE;
+01489         wxRadioBox* rgrDIQDIRCTR1;
+01490         wxRadioBox* rgrDIQDIR1;
+01491         wxRadioBox* rgrENABLEDIRCTR1;
+01492         wxRadioBox* rgrENABLEDIR1;
+01493         wxRadioBox* rgrDIQDIRCTR2;
+01494         wxRadioBox* rgrDIQDIR2;
+01495         wxRadioBox* rgrENABLEDIRCTR2;
+01496         wxRadioBox* rgrENABLEDIR2;
+01497         
+01498         \textcolor{comment}{// Virtual event handlers, overide them in your derived class}
+01499         \textcolor{keyword}{virtual} \textcolor{keywordtype}{void} ParameterChangeHandler( wxCommandEvent& event ) \{ \textcolor{keyword}{event}.Skip(); \}
+01500         \textcolor{keyword}{virtual} \textcolor{keywordtype}{void} onbtnReadVerRevMask( wxCommandEvent& event ) \{ \textcolor{keyword}{event}.Skip(); \}
+01501         \textcolor{keyword}{virtual} \textcolor{keywordtype}{void} ParameterChangeHandler( wxSpinEvent& event ) \{ \textcolor{keyword}{event}.Skip(); \}
+01502         
+01503     
+01504     \textcolor{keyword}{public}:
+01505         
+01506         pnlLimeLightPAD_view( wxWindow* parent, wxWindowID \textcolor{keywordtype}{id} = wxID\_ANY, \textcolor{keyword}{const} wxPoint& pos = 
+      wxDefaultPosition, \textcolor{keyword}{const} wxSize& size = wxDefaultSize, \textcolor{keywordtype}{long} style = wxTAB\_TRAVERSAL ); 
+01507         ~pnlLimeLightPAD_view();
+01508     
+01509 \};
+01510 
+01514 \textcolor{keyword}{class }pnlTxTSP_view : \textcolor{keyword}{public} wxPanel 
+01515 \{
+01516     \textcolor{keyword}{private}:
+01517     
+01518     \textcolor{keyword}{protected}:
+01519         \textcolor{keyword}{enum}
+01520         \{
+01521             ID\_EN\_TXTSP = 2048,
+01522             ID_DC_BYP_TXTSP,
+01523             ID_GC_BYP_TXTSP,
+01524             ID_PH_BYP_TXTSP,
+01525             ID_CMIX_BYP_TXTSP,
+01526             ID_ISINC_BYP_TXTSP,
+01527             ID_GFIR1_BYP_TXTSP,
+01528             ID_GFIR2_BYP_TXTSP,
+01529             ID_GFIR3_BYP_TXTSP,
+01530             ID_BSTART_TXTSP,
+01531             ID_BSTATE_TXTSP,
+01532             ID_BSIGI_TXTSP,
+01533             ID_BSIGQ_TXTSP,
+01534             ID_MODE_TX,
+01535             ID_DTHBIT_TX,
+01536             ID_TSGSWAPIQ_TXTSP,
+01537             ID_TSGFCW_TXTSP,
+01538             ID_TSGMODE_TXTSP,
+01539             ID_INSEL_TXTSP,
+01540             ID_TSGFC_TXTSP,
+01541             ID_DC_REG_TXTSP,
+01542             ID_CMIX_SC_TXTSP,
+01543             ID_CMIX_GAIN_TXTSP,
+01544             ID_HBI_OVR_TXTSP,
+01545             ID_GFIR1_L_TXTSP,
+01546             ID_GFIR1_N_TXTSP,
+01547             ID_GFIR2_L_TXTSP,
+01548             ID_GFIR2_N_TXTSP,
+01549             ID_GFIR3_L_TXTSP,
+01550             ID_GFIR3_N_TXTSP,
+01551             ID_IQCORR_TXTSP,
+01552             ID_GCORRI_TXTSP,
+01553             ID_GCORRQ_TXTSP,
+01554             ID_DCCORRI_TXTSP,
+01555             ID\_DCCORRQ\_TXTSP
+01556         \};
+01557         
+01558         wxCheckBox* chkEN_TXTSP;
+01559         wxCheckBox* chkDC_BYP_TXTSP;
+01560         wxCheckBox* chkGC_BYP_TXTSP;
+01561         wxCheckBox* chkPH_BYP_TXTSP;
+01562         wxCheckBox* chkCMIX_BYP_TXTSP;
+01563         wxCheckBox* chkISINC_BYP_TXTSP;
+01564         wxCheckBox* chkGFIR1_BYP_TXTSP;
+01565         wxCheckBox* chkGFIR2_BYP_TXTSP;
+01566         wxCheckBox* chkGFIR3_BYP_TXTSP;
+01567         wxCheckBox* chkBSTART_TXTSP;
+01568         wxStaticText* ID_STATICTEXT2;
+01569         wxStaticText* lblBSTATE_TXTSP;
+01570         wxStaticText* ID_STATICTEXT1;
+01571         wxStaticText* lblBSIGI_TXTSP;
+01572         wxStaticText* ID_STATICTEXT3;
+01573         wxStaticText* lblBSIGQ_TXTSP;
+01574         wxButton* btnReadBIST;
+01575         wxFlexGridSizer* sizerNCOgrid;
+01576         wxStaticText* tableTitleCol1;
+01577         wxStaticText* tableTitleCol2;
+01578         wxRadioButton* rgrSEL0;
+01579         wxTextCtrl* txtFCWPHO0;
+01580         wxStaticText* txtAnglePHO0;
+01581         wxRadioButton* rgrSEL01;
+01582         wxTextCtrl* txtFCWPHO01;
+01583         wxStaticText* txtAnglePHO01;
+01584         wxRadioButton* rgrSEL02;
+01585         wxTextCtrl* txtFCWPHO02;
+01586         wxStaticText* txtAnglePHO02;
+01587         wxRadioButton* rgrSEL03;
+01588         wxTextCtrl* txtFCWPHO03;
+01589         wxStaticText* txtAnglePHO03;
+01590         wxRadioButton* rgrSEL04;
+01591         wxTextCtrl* txtFCWPHO04;
+01592         wxStaticText* txtAnglePHO04;
+01593         wxRadioButton* rgrSEL05;
+01594         wxTextCtrl* txtFCWPHO05;
+01595         wxStaticText* txtAnglePHO05;
+01596         wxRadioButton* rgrSEL06;
+01597         wxTextCtrl* txtFCWPHO06;
+01598         wxStaticText* txtAnglePHO06;
+01599         wxRadioButton* rgrSEL07;
+01600         wxTextCtrl* txtFCWPHO07;
+01601         wxStaticText* txtAnglePHO07;
+01602         wxRadioButton* rgrSEL08;
+01603         wxTextCtrl* txtFCWPHO08;
+01604         wxStaticText* txtAnglePHO08;
+01605         wxRadioButton* rgrSEL09;
+01606         wxTextCtrl* txtFCWPHO09;
+01607         wxStaticText* txtAnglePHO09;
+01608         wxRadioButton* rgrSEL10;
+01609         wxTextCtrl* txtFCWPHO10;
+01610         wxStaticText* txtAnglePHO10;
+01611         wxRadioButton* rgrSEL11;
+01612         wxTextCtrl* txtFCWPHO11;
+01613         wxStaticText* txtAnglePHO11;
+01614         wxRadioButton* rgrSEL12;
+01615         wxTextCtrl* txtFCWPHO12;
+01616         wxStaticText* txtAnglePHO12;
+01617         wxRadioButton* rgrSEL13;
+01618         wxTextCtrl* txtFCWPHO13;
+01619         wxStaticText* txtAnglePHO13;
+01620         wxRadioButton* rgrSEL14;
+01621         wxTextCtrl* txtFCWPHO14;
+01622         wxStaticText* txtAnglePHO14;
+01623         wxRadioButton* rgrSEL15;
+01624         wxTextCtrl* txtFCWPHO15;
+01625         wxStaticText* txtAnglePHO15;
+01626         wxStaticText* ID_STATICTEXT21;
+01627         wxStaticText* lblRefClk;
+01628         wxButton* btnUploadNCO;
+01629         wxRadioBox* rgrMODE_TX;
+01630         wxStaticText* lblFCWPHOmodeName;
+01631         wxTextCtrl* txtFCWPHOmodeAdditional;
+01632         wxStaticText* ID_STATICTEXT25;
+01633         wxComboBox* cmbDTHBIT_TX;
+01634         wxCheckBox* chkTSGSWAPIQ_TXTSP;
+01635         wxRadioBox* rgrTSGFCW_TXTSP;
+01636         wxRadioBox* rgrTSGMODE_TXTSP;
+01637         wxRadioBox* rgrINSEL_TXTSP;
+01638         wxRadioBox* rgrTSGFC_TXTSP;
+01639         wxStaticText* ID_STATICTEXT23;
+01640         wxTextCtrl* txtDC_REG_TXTSP;
+01641         wxButton* btnLoadDCI;
+01642         wxButton* btnLoadDCQ;
+01643         wxComboBox* cmbCMIX_SC_TXTSP;
+01644         wxStaticText* ID_STATICTEXT24;
+01645         wxComboBox* cmbCMIX_GAIN_TXTSP;
+01646         wxStaticText* ID_STATICTEXT7;
+01647         wxComboBox* cmbHBI_OVR_TXTSP;
+01648         wxStaticText* ID_STATICTEXT10;
+01649         wxComboBox* cmbGFIR1_L_TXTSP;
+01650         wxStaticText* ID_STATICTEXT11;
+01651         wxSpinCtrl* cmbGFIR1_N_TXTSP;
+01652         wxButton* btnGFIR1Coef;
+01653         wxStaticText* ID_STATICTEXT12;
+01654         wxComboBox* cmbGFIR2_L_TXTSP;
+01655         wxStaticText* ID_STATICTEXT13;
+01656         wxSpinCtrl* cmbGFIR2_N_TXTSP;
+01657         wxButton* btnGFIR2Coef;
+01658         wxStaticText* ID_STATICTEXT14;
+01659         wxComboBox* cmbGFIR3_L_TXTSP;
+01660         wxStaticText* ID_STATICTEXT15;
+01661         wxSpinCtrl* cmbGFIR3_N_TXTSP;
+01662         wxButton* btnGFIR3Coef;
+01663         NumericSlider* cmbIQCORR_TXTSP;
+01664         wxStaticText* ID_STATICTEXT16;
+01665         wxStaticText* txtPhaseAlpha;
+01666         wxStaticText* ID_STATICTEXT5;
+01667         NumericSlider* cmbGCORRI_TXTSP;
+01668         wxStaticText* ID_STATICTEXT4;
+01669         NumericSlider* cmbGCORRQ_TXTSP;
+01670         wxButton* ID_BUTTON10;
+01671         wxStaticText* ID_STATICTEXT8;
+01672         NumericSlider* cmbDCCORRI_TXTSP;
+01673         wxStaticText* ID_STATICTEXT9;
+01674         NumericSlider* cmbDCCORRQ_TXTSP;
+01675         
+01676         \textcolor{comment}{// Virtual event handlers, overide them in your derived class}
+01677         \textcolor{keyword}{virtual} \textcolor{keywordtype}{void} ParameterChangeHandler( wxCommandEvent& event ) \{ \textcolor{keyword}{event}.Skip(); \}
+01678         \textcolor{keyword}{virtual} \textcolor{keywordtype}{void} onbtnReadBISTSignature( wxCommandEvent& event ) \{ \textcolor{keyword}{event}.Skip(); \}
+01679         \textcolor{keyword}{virtual} \textcolor{keywordtype}{void} OnNCOSelectionChange( wxCommandEvent& event ) \{ \textcolor{keyword}{event}.Skip(); \}
+01680         \textcolor{keyword}{virtual} \textcolor{keywordtype}{void} PHOinputChanged( wxCommandEvent& event ) \{ \textcolor{keyword}{event}.Skip(); \}
+01681         \textcolor{keyword}{virtual} \textcolor{keywordtype}{void} OnbtnUploadNCOClick( wxCommandEvent& event ) \{ \textcolor{keyword}{event}.Skip(); \}
+01682         \textcolor{keyword}{virtual} \textcolor{keywordtype}{void} txtFCWPHOmodeAdditional_OnMouseWheel( wxMouseEvent& event ) \{ \textcolor{keyword}{event}.Skip(); \}
+01683         \textcolor{keyword}{virtual} \textcolor{keywordtype}{void} OnbtnLoadDCIClick( wxCommandEvent& event ) \{ \textcolor{keyword}{event}.Skip(); \}
+01684         \textcolor{keyword}{virtual} \textcolor{keywordtype}{void} OnbtnLoadDCQClick( wxCommandEvent& event ) \{ \textcolor{keyword}{event}.Skip(); \}
+01685         \textcolor{keyword}{virtual} \textcolor{keywordtype}{void} ParameterChangeHandler( wxSpinEvent& event ) \{ \textcolor{keyword}{event}.Skip(); \}
+01686         \textcolor{keyword}{virtual} \textcolor{keywordtype}{void} onbtnGFIR1Coef( wxCommandEvent& event ) \{ \textcolor{keyword}{event}.Skip(); \}
+01687         \textcolor{keyword}{virtual} \textcolor{keywordtype}{void} onbtnGFIR2Coef( wxCommandEvent& event ) \{ \textcolor{keyword}{event}.Skip(); \}
+01688         \textcolor{keyword}{virtual} \textcolor{keywordtype}{void} onbtnGFIR3Coef( wxCommandEvent& event ) \{ \textcolor{keyword}{event}.Skip(); \}
+01689         
+01690     
+01691     \textcolor{keyword}{public}:
+01692         
+01693         pnlTxTSP_view( wxWindow* parent, wxWindowID \textcolor{keywordtype}{id} = wxID\_ANY, \textcolor{keyword}{const} wxPoint& pos = wxDefaultPosition, \textcolor{keyword}{
+      const} wxSize& size = wxDefaultSize, \textcolor{keywordtype}{long} style = wxTAB\_TRAVERSAL ); 
+01694         ~pnlTxTSP_view();
+01695     
+01696 \};
+01697 
+01701 \textcolor{keyword}{class }pnlRxTSP_view : \textcolor{keyword}{public} wxPanel 
+01702 \{
+01703     \textcolor{keyword}{private}:
+01704     
+01705     \textcolor{keyword}{protected}:
+01706         \textcolor{keyword}{enum}
+01707         \{
+01708             ID\_EN\_RXTSP = 2048,
+01709             ID_DC_BYP_RXTSP,
+01710             ID_GC_BYP_RXTSP,
+01711             ID_PH_BYP_RXTSP,
+01712             ID_CMIX_BYP_RXTSP,
+01713             ID_AGC_BYP_RXTSP,
+01714             ID_GFIR1_BYP_RXTSP,
+01715             ID_GFIR2_BYP_RXTSP,
+01716             ID_GFIR3_BYP_RXTSP,
+01717             ID_BSTART_RXTSP,
+01718             ID_MODE_RX,
+01719             ID_DTHBIT_RX,
+01720             ID_TSGSWAPIQ_RXTSP,
+01721             ID_TSGFCW_RXTSP,
+01722             ID_TSGMODE_RXTSP,
+01723             ID_INSEL_RXTSP,
+01724             ID_TSGFC_RXTSP,
+01725             ID_DCCORR_AVG,
+01726             ID_DC_REG_RXTSP,
+01727             ID_CMIX_SC_RXTSP,
+01728             ID_CMIX_GAIN_RXTSP,
+01729             ID_HBD_OVR_RXTSP,
+01730             ID_GFIR1_L_RXTSP,
+01731             ID_GFIR1_N_RXTSP,
+01732             ID_GFIR2_L_RXTSP,
+01733             ID_GFIR2_N_RXTSP,
+01734             ID_GFIR3_L_RXTSP,
+01735             ID_GFIR3_N_RXTSP,
+01736             ID_IQCORR_RXTSP,
+01737             ID_GCORRI_RXTSP,
+01738             ID_GCORRQ_RXTSP,
+01739             ID_AGC_MODE_RXTSP,
+01740             ID_AGC_AVG_RXTSP,
+01741             ID_AGC_K_RXTSP,
+01742             ID\_AGC\_ADESIRED\_RXTSP
+01743         \};
+01744         
+01745         wxCheckBox* chkEN_RXTSP;
+01746         wxCheckBox* chkDC_BYP_RXTSP;
+01747         wxCheckBox* chkDC_LOOP_RXTSP;
+01748         wxCheckBox* chkGC_BYP_RXTSP;
+01749         wxCheckBox* chkPH_BYP_RXTSP;
+01750         wxCheckBox* chkCMIX_BYP_RXTSP;
+01751         wxCheckBox* chkAGC_BYP_RXTSP;
+01752         wxCheckBox* chkGFIR1_BYP_RXTSP;
+01753         wxCheckBox* chkGFIR2_BYP_RXTSP;
+01754         wxCheckBox* chkGFIR3_BYP_RXTSP;
+01755         wxStaticText* ID_STATICTEXT29;
+01756         wxStaticText* lblBISTI;
+01757         wxStaticText* ID_STATICTEXT30;
+01758         wxStaticText* lblBSTATE_I;
+01759         wxStaticText* ID_STATICTEXT31;
+01760         wxStaticText* lblBISTQ;
+01761         wxStaticText* ID_STATICTEXT32;
+01762         wxStaticText* lblBSTATE_Q;
+01763         wxCheckBox* chkBSTART_RXTSP;
+01764         wxButton* btnReadBIST;
+01765         wxStaticText* ID_STATICTEXT71;
+01766         wxStaticText* lblADCI;
+01767         wxStaticText* ID_STATICTEXT28;
+01768         wxStaticText* lblADCQ;
+01769         wxStaticText* ID_STATICTEXT51;
+01770         wxStaticText* lblRSSI;
+01771         wxCheckBox* chkCAPSEL_ADC_RXTSP;
+01772         wxButton* ID_BUTTON1;
+01773         wxFlexGridSizer* sizerNCOgrid;
+01774         wxStaticText* tableTitleCol1;
+01775         wxStaticText* tableTitleCol2;
+01776         wxRadioButton* rgrSEL0;
+01777         wxTextCtrl* txtFCWPHO0;
+01778         wxStaticText* txtAnglePHO0;
+01779         wxRadioButton* rgrSEL01;
+01780         wxTextCtrl* txtFCWPHO01;
+01781         wxStaticText* txtAnglePHO01;
+01782         wxRadioButton* rgrSEL02;
+01783         wxTextCtrl* txtFCWPHO02;
+01784         wxStaticText* txtAnglePHO02;
+01785         wxRadioButton* rgrSEL03;
+01786         wxTextCtrl* txtFCWPHO03;
+01787         wxStaticText* txtAnglePHO03;
+01788         wxRadioButton* rgrSEL04;
+01789         wxTextCtrl* txtFCWPHO04;
+01790         wxStaticText* txtAnglePHO04;
+01791         wxRadioButton* rgrSEL05;
+01792         wxTextCtrl* txtFCWPHO05;
+01793         wxStaticText* txtAnglePHO05;
+01794         wxRadioButton* rgrSEL06;
+01795         wxTextCtrl* txtFCWPHO06;
+01796         wxStaticText* txtAnglePHO06;
+01797         wxRadioButton* rgrSEL07;
+01798         wxTextCtrl* txtFCWPHO07;
+01799         wxStaticText* txtAnglePHO07;
+01800         wxRadioButton* rgrSEL08;
+01801         wxTextCtrl* txtFCWPHO08;
+01802         wxStaticText* txtAnglePHO08;
+01803         wxRadioButton* rgrSEL09;
+01804         wxTextCtrl* txtFCWPHO09;
+01805         wxStaticText* txtAnglePHO09;
+01806         wxRadioButton* rgrSEL10;
+01807         wxTextCtrl* txtFCWPHO10;
+01808         wxStaticText* txtAnglePHO10;
+01809         wxRadioButton* rgrSEL11;
+01810         wxTextCtrl* txtFCWPHO11;
+01811         wxStaticText* txtAnglePHO11;
+01812         wxRadioButton* rgrSEL12;
+01813         wxTextCtrl* txtFCWPHO12;
+01814         wxStaticText* txtAnglePHO12;
+01815         wxRadioButton* rgrSEL13;
+01816         wxTextCtrl* txtFCWPHO13;
+01817         wxStaticText* txtAnglePHO13;
+01818         wxRadioButton* rgrSEL14;
+01819         wxTextCtrl* txtFCWPHO14;
+01820         wxStaticText* txtAnglePHO14;
+01821         wxRadioButton* rgrSEL15;
+01822         wxTextCtrl* txtFCWPHO15;
+01823         wxStaticText* txtAnglePHO15;
+01824         wxStaticText* ID_STATICTEXT21;
+01825         wxStaticText* lblRefClk;
+01826         wxButton* btnUploadNCO;
+01827         wxRadioBox* rgrMODE_RX;
+01828         wxStaticText* lblFCWPHOmodeName;
+01829         wxTextCtrl* txtFCWPHOmodeAdditional;
+01830         wxStaticText* ID_STATICTEXT25;
+01831         wxComboBox* cmbDTHBIT_RX;
+01832         wxCheckBox* chkTSGSWAPIQ_RXTSP;
+01833         wxRadioBox* rgrTSGFCW_RXTSP;
+01834         wxRadioBox* rgrTSGMODE_RXTSP;
+01835         wxRadioBox* rgrINSEL_RXTSP;
+01836         wxRadioBox* rgrTSGFC_RXTSP;
+01837         wxComboBox* cmbDCCORR_AVG;
+01838         wxStaticText* ID_STATICTEXT23;
+01839         wxTextCtrl* txtDC_REG_RXTSP;
+01840         wxButton* btnLoadDCI;
+01841         wxButton* btnLoadDCQ;
+01842         wxComboBox* cmbCMIX_SC_RXTSP;
+01843         wxStaticText* ID_STATICTEXT24;
+01844         wxComboBox* cmbCMIX_GAIN_RXTSP;
+01845         wxStaticText* ID_STATICTEXT7;
+01846         wxComboBox* cmbHBD_OVR_RXTSP;
+01847         wxStaticText* ID_STATICTEXT72;
+01848         wxComboBox* cmbHBD_DLY;
+01849         wxStaticText* ID_STATICTEXT10;
+01850         wxComboBox* cmbGFIR1_L_RXTSP;
+01851         wxStaticText* ID_STATICTEXT11;
+01852         wxSpinCtrl* cmbGFIR1_N_RXTSP;
+01853         wxButton* btnGFIR1Coef;
+01854         wxStaticText* ID_STATICTEXT12;
+01855         wxComboBox* cmbGFIR2_L_RXTSP;
+01856         wxStaticText* ID_STATICTEXT13;
+01857         wxSpinCtrl* cmbGFIR2_N_RXTSP;
+01858         wxButton* btnGFIR2Coef;
+01859         wxStaticText* ID_STATICTEXT14;
+01860         wxComboBox* cmbGFIR3_L_RXTSP;
+01861         wxStaticText* ID_STATICTEXT15;
+01862         wxSpinCtrl* cmbGFIR3_N_RXTSP;
+01863         wxButton* btnGFIR3Coef;
+01864         NumericSlider* cmbIQCORR_RXTSP;
+01865         wxStaticText* ID_STATICTEXT16;
+01866         wxStaticText* txtPhaseAlpha;
+01867         wxStaticText* ID_STATICTEXT5;
+01868         NumericSlider* cmbGCORRI_RXTSP;
+01869         wxStaticText* ID_STATICTEXT4;
+01870         NumericSlider* cmbGCORRQ_RXTSP;
+01871         wxButton* ID_BUTTON10;
+01872         wxStaticText* ID_STATICTEXT91;
+01873         wxComboBox* cmbAGC_MODE_RXTSP;
+01874         wxStaticText* ID_STATICTEXT3;
+01875         wxComboBox* cmbAGC_AVG_RXTSP;
+01876         wxStaticText* ID_STATICTEXT1;
+01877         NumericSlider* spinAGC_K_RXTSP;
+01878         wxStaticText* ID_STATICTEXT2;
+01879         NumericSlider* cmbAGC_ADESIRED_RXTSP;
+01880         
+01881         \textcolor{comment}{// Virtual event handlers, overide them in your derived class}
+01882         \textcolor{keyword}{virtual} \textcolor{keywordtype}{void} ParameterChangeHandler( wxCommandEvent& event ) \{ \textcolor{keyword}{event}.Skip(); \}
+01883         \textcolor{keyword}{virtual} \textcolor{keywordtype}{void} OnbtnReadBISTSignature( wxCommandEvent& event ) \{ \textcolor{keyword}{event}.Skip(); \}
+01884         \textcolor{keyword}{virtual} \textcolor{keywordtype}{void} OnbtnReadRSSI( wxCommandEvent& event ) \{ \textcolor{keyword}{event}.Skip(); \}
+01885         \textcolor{keyword}{virtual} \textcolor{keywordtype}{void} OnNCOSelectionChange( wxCommandEvent& event ) \{ \textcolor{keyword}{event}.Skip(); \}
+01886         \textcolor{keyword}{virtual} \textcolor{keywordtype}{void} PHOinputChanged( wxCommandEvent& event ) \{ \textcolor{keyword}{event}.Skip(); \}
+01887         \textcolor{keyword}{virtual} \textcolor{keywordtype}{void} OnbtnUploadNCOClick( wxCommandEvent& event ) \{ \textcolor{keyword}{event}.Skip(); \}
+01888         \textcolor{keyword}{virtual} \textcolor{keywordtype}{void} txtFCWPHOmodeAdditional_OnMouseWheel( wxMouseEvent& event ) \{ \textcolor{keyword}{event}.Skip(); \}
+01889         \textcolor{keyword}{virtual} \textcolor{keywordtype}{void} OnbtnLoadDCIClick( wxCommandEvent& event ) \{ \textcolor{keyword}{event}.Skip(); \}
+01890         \textcolor{keyword}{virtual} \textcolor{keywordtype}{void} OnbtnLoadDCQClick( wxCommandEvent& event ) \{ \textcolor{keyword}{event}.Skip(); \}
+01891         \textcolor{keyword}{virtual} \textcolor{keywordtype}{void} ParameterChangeHandler( wxSpinEvent& event ) \{ \textcolor{keyword}{event}.Skip(); \}
+01892         \textcolor{keyword}{virtual} \textcolor{keywordtype}{void} onbtnGFIR1Coef( wxCommandEvent& event ) \{ \textcolor{keyword}{event}.Skip(); \}
+01893         \textcolor{keyword}{virtual} \textcolor{keywordtype}{void} onbtnGFIR2Coef( wxCommandEvent& event ) \{ \textcolor{keyword}{event}.Skip(); \}
+01894         \textcolor{keyword}{virtual} \textcolor{keywordtype}{void} onbtnGFIR3Coef( wxCommandEvent& event ) \{ \textcolor{keyword}{event}.Skip(); \}
+01895         
+01896     
+01897     \textcolor{keyword}{public}:
+01898         
+01899         pnlRxTSP_view( wxWindow* parent, wxWindowID \textcolor{keywordtype}{id} = wxID\_ANY, \textcolor{keyword}{const} wxPoint& pos = wxDefaultPosition, \textcolor{keyword}{
+      const} wxSize& size = wxDefaultSize, \textcolor{keywordtype}{long} style = wxTAB\_TRAVERSAL ); 
+01900         ~pnlRxTSP_view();
+01901     
+01902 \};
+01903 
+01907 \textcolor{keyword}{class }pnlCDS_view : \textcolor{keyword}{public} wxPanel 
+01908 \{
+01909     \textcolor{keyword}{private}:
+01910     
+01911     \textcolor{keyword}{protected}:
+01912         \textcolor{keyword}{enum}
+01913         \{
+01914             ID\_CDSN\_TXBTSP = 2048,
+01915             ID_CDSN_TXATSP,
+01916             ID_CDSN_RXBTSP,
+01917             ID_CDSN_RXATSP,
+01918             ID_CDSN_TXBLML,
+01919             ID_CDSN_TXALML,
+01920             ID_CDSN_RXBLML,
+01921             ID_CDSN_RXALML ,
+01922             ID_CDSN_MCLK2,
+01923             ID_CDSN_MCLK1,
+01924             ID_CDS_MCLK2,
+01925             ID_CDS_MCLK1,
+01926             ID_CDS_TXBTSP,
+01927             ID_CDS_TXATSP,
+01928             ID_CDS_RXBTSP,
+01929             ID_CDS_RXATSP,
+01930             ID_CDS_TXBLML,
+01931             ID_CDS_TXALML,
+01932             ID_CDS_RXBLML,
+01933             ID\_CDS\_RXALML
+01934         \};
+01935         
+01936         wxCheckBox* chkCDSN_TXBTSP;
+01937         wxCheckBox* chkCDSN_TXATSP;
+01938         wxCheckBox* chkCDSN_RXBTSP;
+01939         wxCheckBox* chkCDSN_RXATSP;
+01940         wxCheckBox* chkCDSN_TXBLML;
+01941         wxCheckBox* chkCDSN_TXALML;
+01942         wxCheckBox* chkCDSN_RXBLML;
+01943         wxCheckBox* chkCDSN_RXALML ;
+01944         wxCheckBox* chkCDSN_MCLK2;
+01945         wxCheckBox* chkCDSN_MCLK1;
+01946         wxRadioBox* rgrCDS_MCLK2;
+01947         wxRadioBox* rgrCDS_MCLK1;
+01948         wxRadioBox* rgrCDS_TXBTSP;
+01949         wxRadioBox* rgrCDS_TXATSP;
+01950         wxRadioBox* rgrCDS_RXBTSP;
+01951         wxRadioBox* rgrCDS_RXATSP;
+01952         wxRadioBox* rgrCDS_TXBLML;
+01953         wxRadioBox* rgrCDS_TXALML;
+01954         wxRadioBox* rgrCDS_RXBLML;
+01955         wxRadioBox* rgrCDS_RXALML;
+01956         
+01957         \textcolor{comment}{// Virtual event handlers, overide them in your derived class}
+01958         \textcolor{keyword}{virtual} \textcolor{keywordtype}{void} ParameterChangeHandler( wxCommandEvent& event ) \{ \textcolor{keyword}{event}.Skip(); \}
+01959         
+01960     
+01961     \textcolor{keyword}{public}:
+01962         
+01963         pnlCDS_view( wxWindow* parent, wxWindowID \textcolor{keywordtype}{id} = wxID\_ANY, \textcolor{keyword}{const} wxPoint& pos = wxDefaultPosition, \textcolor{keyword}{
+      const} wxSize& size = wxDefaultSize, \textcolor{keywordtype}{long} style = wxTAB\_TRAVERSAL ); 
+01964         ~pnlCDS_view();
+01965     
+01966 \};
+01967 
+01971 \textcolor{keyword}{class }pnlBIST_view : \textcolor{keyword}{public} wxPanel 
+01972 \{
+01973     \textcolor{keyword}{private}:
+01974     
+01975     \textcolor{keyword}{protected}:
+01976         \textcolor{keyword}{enum}
+01977         \{
+01978             ID\_BENC = 2048,
+01979             ID_SDM_TSTO_CGEN,
+01980             ID_BENR,
+01981             ID_SDM_TSTO_SXR,
+01982             ID_BENT,
+01983             ID_SDM_TSTO_SXT,
+01984             ID_BSTART,
+01985             ID_BSTATE,
+01986             ID_BSIGT,
+01987             ID_BSIGR,
+01988             ID_BSIGC,
+01989             ID\_BTN\_READ\_SIGNATURE
+01990         \};
+01991         
+01992         wxCheckBox* chkBENC;
+01993         wxCheckBox* chkSDM_TSTO_CGEN;
+01994         wxCheckBox* chkBENR;
+01995         wxCheckBox* chkSDM_TSTO_SXR;
+01996         wxCheckBox* chkBENT;
+01997         wxCheckBox* chkSDM_TSTO_SXT;
+01998         wxCheckBox* chkBSTART;
+01999         wxStaticText* ID_STATICTEXT2;
+02000         wxStaticText* lblBSTATE;
+02001         wxStaticText* ID_STATICTEXT1;
+02002         wxStaticText* lblBSIGT;
+02003         wxStaticText* ID_STATICTEXT3;
+02004         wxStaticText* lblBSIGR;
+02005         wxStaticText* ID_STATICTEXT4;
+02006         wxStaticText* lblBSIGC;
+02007         wxButton* btnReadSignature;
+02008         
+02009         \textcolor{comment}{// Virtual event handlers, overide them in your derived class}
+02010         \textcolor{keyword}{virtual} \textcolor{keywordtype}{void} ParameterChangeHandler( wxCommandEvent& event ) \{ \textcolor{keyword}{event}.Skip(); \}
+02011         \textcolor{keyword}{virtual} \textcolor{keywordtype}{void} onbtnReadSignature( wxCommandEvent& event ) \{ \textcolor{keyword}{event}.Skip(); \}
+02012         
+02013     
+02014     \textcolor{keyword}{public}:
+02015         
+02016         pnlBIST_view( wxWindow* parent, wxWindowID \textcolor{keywordtype}{id} = wxID\_ANY, \textcolor{keyword}{const} wxPoint& pos = wxDefaultPosition, \textcolor{keyword}{
+      const} wxSize& size = wxDefaultSize, \textcolor{keywordtype}{long} style = wxTAB\_TRAVERSAL ); 
+02017         ~pnlBIST_view();
+02018     
+02019 \};
+02020 
+02024 \textcolor{keyword}{class }pnlMCU_BD_view : \textcolor{keyword}{public} wxPanel 
+02025 \{
+02026     \textcolor{keyword}{private}:
+02027     
+02028     \textcolor{keyword}{protected}:
+02029         \textcolor{keyword}{enum}
+02030         \{
+02031             ID\_CHECKBOX\_RESETMCU = 2048,
+02032             ID_TESTNO,
+02033             ID_DEBUGMODE,
+02034             ID_RUNINSTR,
+02035             ID_INSTRNO,
+02036             ID_RESETPC,
+02037             ID_SELDIV,
+02038             ID_RADIOBUTTON4,
+02039             ID\_RADIOBUTTON5
+02040         \};
+02041         
+02042         wxStaticText* ID_STATICTEXT1;
+02043         wxButton* Button_LOADHEX;
+02044         wxCheckBox* chkReset;
+02045         wxRadioBox* rgrMode;
+02046         wxButton* btnStartProgramming;
+02047         wxStaticText* ID_S_PROGFINISHED;
+02048         wxStaticText* ID_STATICTEXT3;
+02049         wxButton* btnRunTest;
+02050         wxStaticText* ID_STATICTEXT4;
+02051         wxTextCtrl* m_sTestNo;
+02052         wxButton* btnRunProductionTest;
+02053         wxCheckBox* DebugMode;
+02054         wxButton* RunInstr;
+02055         wxStaticText* ID_STATICTEXT6;
+02056         wxTextCtrl* InstrNo;
+02057         wxButton* ResetPC;
+02058         wxStaticText* ID_STATICTEXT7;
+02059         wxStaticText* PCValue;
+02060         wxButton* ViewSFRs;
+02061         wxButton* ViewIRAM;
+02062         wxButton* EraseIRAM;
+02063         wxStaticText* ID_STATICTEXT10;
+02064         wxChoice* SelDiv;
+02065         wxRadioButton* m_cCtrlBaseband;
+02066         wxRadioButton* m_cCtrlMCU_BD;
+02067         wxStaticText* ID_STATICTEXT5;
+02068         wxChoice* cmbRegAddr;
+02069         wxRadioButton* rbtnRegWrite;
+02070         wxStaticText* ID_STATICTEXT11;
+02071         wxTextCtrl* txtRegValueWr;
+02072         wxRadioButton* rbtnRegRead;
+02073         wxStaticText* ReadResult;
+02074         wxButton* btnRdWr;
+02075         wxStaticText* ID_STATICTEXT2;
+02076         wxGauge* progressBar;
+02077         wxStaticText* lblProgCodeFile;
+02078         wxStaticText* lblTestResultsFile;
+02079         
+02080         \textcolor{comment}{// Virtual event handlers, overide them in your derived class}
+02081         \textcolor{keyword}{virtual} \textcolor{keywordtype}{void} OnButton_LOADHexClick( wxCommandEvent& event ) \{ \textcolor{keyword}{event}.Skip(); \}
+02082         \textcolor{keyword}{virtual} \textcolor{keywordtype}{void} OnchkResetClick( wxCommandEvent& event ) \{ \textcolor{keyword}{event}.Skip(); \}
+02083         \textcolor{keyword}{virtual} \textcolor{keywordtype}{void} OnbtnStartProgrammingClick( wxCommandEvent& event ) \{ \textcolor{keyword}{event}.Skip(); \}
+02084         \textcolor{keyword}{virtual} \textcolor{keywordtype}{void} OnbtnRunTestClick( wxCommandEvent& event ) \{ \textcolor{keyword}{event}.Skip(); \}
+02085         \textcolor{keyword}{virtual} \textcolor{keywordtype}{void} OnbtnRunProductionTestClicked( wxCommandEvent& event ) \{ \textcolor{keyword}{event}.Skip(); \}
+02086         \textcolor{keyword}{virtual} \textcolor{keywordtype}{void} OnDebugModeClick( wxCommandEvent& event ) \{ \textcolor{keyword}{event}.Skip(); \}
+02087         \textcolor{keyword}{virtual} \textcolor{keywordtype}{void} OnRunInstruction( wxCommandEvent& event ) \{ \textcolor{keyword}{event}.Skip(); \}
+02088         \textcolor{keyword}{virtual} \textcolor{keywordtype}{void} OnResetPCClick( wxCommandEvent& event ) \{ \textcolor{keyword}{event}.Skip(); \}
+02089         \textcolor{keyword}{virtual} \textcolor{keywordtype}{void} OnViewSFRsClick( wxCommandEvent& event ) \{ \textcolor{keyword}{event}.Skip(); \}
+02090         \textcolor{keyword}{virtual} \textcolor{keywordtype}{void} OnViewIRAMClick( wxCommandEvent& event ) \{ \textcolor{keyword}{event}.Skip(); \}
+02091         \textcolor{keyword}{virtual} \textcolor{keywordtype}{void} OnEraseIRAMClick( wxCommandEvent& event ) \{ \textcolor{keyword}{event}.Skip(); \}
+02092         \textcolor{keyword}{virtual} \textcolor{keywordtype}{void} OnSelDivSelect( wxCommandEvent& event ) \{ \textcolor{keyword}{event}.Skip(); \}
+02093         \textcolor{keyword}{virtual} \textcolor{keywordtype}{void} Onm_cCtrlBasebandSelect( wxCommandEvent& event ) \{ \textcolor{keyword}{event}.Skip(); \}
+02094         \textcolor{keyword}{virtual} \textcolor{keywordtype}{void} Onm_cCtrlMCU_BDSelect( wxCommandEvent& event ) \{ \textcolor{keyword}{event}.Skip(); \}
+02095         \textcolor{keyword}{virtual} \textcolor{keywordtype}{void} OnRegWriteRead( wxCommandEvent& event ) \{ \textcolor{keyword}{event}.Skip(); \}
+02096         
+02097     
+02098     \textcolor{keyword}{public}:
+02099         
+02100         pnlMCU_BD_view( wxWindow* parent, wxWindowID \textcolor{keywordtype}{id} = wxID\_ANY, \textcolor{keyword}{const} wxPoint& pos = wxDefaultPosition,
+       \textcolor{keyword}{const} wxSize& size = wxSize( -1,-1 ), \textcolor{keywordtype}{long} style = wxTAB\_TRAVERSAL ); 
+02101         ~pnlMCU_BD_view();
+02102     
+02103 \};
+02104 
+02108 \textcolor{keyword}{class }pnlCalibrations_view : \textcolor{keyword}{public} wxPanel 
+02109 \{
+02110     \textcolor{keyword}{private}:
+02111     
+02112     \textcolor{keyword}{protected}:
+02113         \textcolor{keyword}{enum}
+02114         \{
+02115             ID\_GCORRI\_RXTSP = 2048,
+02116             ID_GCORRQ_RXTSP,
+02117             ID_IQCORR_RXTSP,
+02118             ID_DCOFFI_RFE,
+02119             ID_DCOFFQ_RFE,
+02120             ID_EN_DCOFF_RXFE_RFE,
+02121             ID_DCMODE,
+02122             ID_GCORRI_TXTSP,
+02123             ID_GCORRQ_TXTSP,
+02124             ID_IQCORR_TXTSP,
+02125             ID_DCCORRI_TXTSP,
+02126             ID\_DCCORRQ\_TXTSP
+02127         \};
+02128         
+02129         wxStaticText* ID_STATICTEXT51;
+02130         NumericSlider* cmbGCORRI_RXTSP;
+02131         wxStaticText* ID_STATICTEXT41;
+02132         NumericSlider* cmbGCORRQ_RXTSP;
+02133         wxButton* ID_BUTTON101;
+02134         NumericSlider* cmbIQCORR_RXTSP;
+02135         wxStaticText* ID_STATICTEXT161;
+02136         wxStaticText* txtPhaseAlpha1;
+02137         wxStaticText* ID_STATICTEXT6;
+02138         NumericSlider* cmbDCOFFI_RFE;
+02139         wxStaticText* ID_STATICTEXT7;
+02140         NumericSlider* cmbDCOFFQ_RFE;
+02141         wxCheckBox* chkEN_DCOFF_RXFE_RFE;
+02142         wxCheckBox* chkDCMODE;
+02143         wxButton* btnCalibrateRx;
+02144         wxStaticText* ID_STATICTEXT5;
+02145         NumericSlider* cmbGCORRI_TXTSP;
+02146         wxStaticText* ID_STATICTEXT4;
+02147         NumericSlider* cmbGCORRQ_TXTSP;
+02148         wxButton* ID_BUTTON10;
+02149         NumericSlider* cmbIQCORR_TXTSP;
+02150         wxStaticText* ID_STATICTEXT16;
+02151         wxStaticText* txtPhaseAlpha;
+02152         wxStaticText* ID_STATICTEXT8;
+02153         NumericSlider* cmbDCCORRI_TXTSP;
+02154         wxStaticText* ID_STATICTEXT9;
+02155         NumericSlider* cmbDCCORRQ_TXTSP;
+02156         wxButton* btnCalibrateTx;
+02157         wxButton* btnCalibrateAll;
+02158         wxStaticText* m_staticText431;
+02159         wxStaticText* lblCGENrefClk;
+02160         wxStaticText* m_staticText372;
+02161         wxTextCtrl* txtCalibrationBW;
+02162         wxRadioBox* rgrCalibrationMethod;
+02163         wxStaticText* lblCalibrationNote;
+02164         
+02165         \textcolor{comment}{// Virtual event handlers, overide them in your derived class}
+02166         \textcolor{keyword}{virtual} \textcolor{keywordtype}{void} ParameterChangeHandler( wxSpinEvent& event ) \{ \textcolor{keyword}{event}.Skip(); \}
+02167         \textcolor{keyword}{virtual} \textcolor{keywordtype}{void} ParameterChangeHandler( wxCommandEvent& event ) \{ \textcolor{keyword}{event}.Skip(); \}
+02168         \textcolor{keyword}{virtual} \textcolor{keywordtype}{void} OnbtnCalibrateRx( wxCommandEvent& event ) \{ \textcolor{keyword}{event}.Skip(); \}
+02169         \textcolor{keyword}{virtual} \textcolor{keywordtype}{void} OnbtnCalibrateTx( wxCommandEvent& event ) \{ \textcolor{keyword}{event}.Skip(); \}
+02170         \textcolor{keyword}{virtual} \textcolor{keywordtype}{void} OnbtnCalibrateAll( wxCommandEvent& event ) \{ \textcolor{keyword}{event}.Skip(); \}
+02171         \textcolor{keyword}{virtual} \textcolor{keywordtype}{void} OnCalibrationMethodChange( wxCommandEvent& event ) \{ \textcolor{keyword}{event}.Skip(); \}
+02172         
+02173     
+02174     \textcolor{keyword}{public}:
+02175         
+02176         pnlCalibrations_view( wxWindow* parent, wxWindowID \textcolor{keywordtype}{id} = wxID\_ANY, \textcolor{keyword}{const} wxPoint& pos = 
+      wxDefaultPosition, \textcolor{keyword}{const} wxSize& size = wxSize( -1,-1 ), \textcolor{keywordtype}{long} style = wxTAB\_TRAVERSAL ); 
+02177         ~pnlCalibrations_view();
+02178     
+02179 \};
+02180 
+02184 \textcolor{keyword}{class }pnlGains_view : \textcolor{keyword}{public} wxPanel 
+02185 \{
+02186     \textcolor{keyword}{private}:
+02187     
+02188     \textcolor{keyword}{protected}:
+02189         \textcolor{keyword}{enum}
+02190         \{
+02191             ID\_EN\_NEXTRX\_RFE = 2048,
+02192             ID_G_LNA_RFE,
+02193             ID_G_TIA_RFE,
+02194             ID_G_PGA_RBB,
+02195             ID_C_CTL_PGA_RBB,
+02196             ID_LOSS_LIN_TXPAD_TRF,
+02197             ID_LOSS_MAIN_TXPAD_TRF,
+02198             ID\_CG\_IAMP\_TBB
+02199         \};
+02200         
+02201         wxCheckBox* chkTRX_GAIN_SRC;
+02202         wxComboBox* cmbG_LNA_RFE;
+02203         wxComboBox* cmbG_TIA_RFE;
+02204         wxComboBox* cmbG_PGA_RBB;
+02205         NumericSlider* cmbC_CTL_PGA_RBB;
+02206         wxComboBox* cmbLOSS_LIN_TXPAD_TRF;
+02207         wxComboBox* cmbLOSS_MAIN_TXPAD_TRF;
+02208         NumericSlider* cmbCG_IAMP_TBB;
+02209         wxCheckBox* chkAGC;
+02210         wxStaticText* m_staticText360;
+02211         wxTextCtrl* txtCrestFactor;
+02212         
+02213         \textcolor{comment}{// Virtual event handlers, overide them in your derived class}
+02214         \textcolor{keyword}{virtual} \textcolor{keywordtype}{void} ParameterChangeHandler( wxCommandEvent& event ) \{ \textcolor{keyword}{event}.Skip(); \}
+02215         \textcolor{keyword}{virtual} \textcolor{keywordtype}{void} ParameterChangeHandler( wxSpinEvent& event ) \{ \textcolor{keyword}{event}.Skip(); \}
+02216         \textcolor{keyword}{virtual} \textcolor{keywordtype}{void} OnAGCStateChange( wxCommandEvent& event ) \{ \textcolor{keyword}{event}.Skip(); \}
+02217         
+02218     
+02219     \textcolor{keyword}{public}:
+02220         
+02221         pnlGains_view( wxWindow* parent, wxWindowID \textcolor{keywordtype}{id} = wxID\_ANY, \textcolor{keyword}{const} wxPoint& pos = wxDefaultPosition, \textcolor{keyword}{
+      const} wxSize& size = wxSize( -1,-1 ), \textcolor{keywordtype}{long} style = wxTAB\_TRAVERSAL ); 
+02222         ~pnlGains_view();
+02223     
+02224 \};
+02225 
+02229 \textcolor{keyword}{class }dlgGFIR_Coefficients : \textcolor{keyword}{public} wxDialog 
+02230 \{
+02231     \textcolor{keyword}{private}:
+02232     
+02233     \textcolor{keyword}{protected}:
+02234         wxButton* btnLoadFromFile;
+02235         wxButton* btnSaveToFile;
+02236         wxButton* btnClearTable;
+02237         wxStaticText* ID_STATICTEXT3;
+02238         wxSpinCtrl* spinCoefCount;
+02239         wxGrid* gridCoef;
+02240         wxButton* btnOk;
+02241         wxButton* btnCancel;
+02242         
+02243         \textcolor{comment}{// Virtual event handlers, overide them in your derived class}
+02244         \textcolor{keyword}{virtual} \textcolor{keywordtype}{void} OnLoadFromFile( wxCommandEvent& event ) \{ \textcolor{keyword}{event}.Skip(); \}
+02245         \textcolor{keyword}{virtual} \textcolor{keywordtype}{void} OnSaveToFile( wxCommandEvent& event ) \{ \textcolor{keyword}{event}.Skip(); \}
+02246         \textcolor{keyword}{virtual} \textcolor{keywordtype}{void} OnClearTable( wxCommandEvent& event ) \{ \textcolor{keyword}{event}.Skip(); \}
+02247         \textcolor{keyword}{virtual} \textcolor{keywordtype}{void} OnspinCoefCountChange( wxSpinEvent& event ) \{ \textcolor{keyword}{event}.Skip(); \}
+02248         \textcolor{keyword}{virtual} \textcolor{keywordtype}{void} OnBtnOkClick( wxCommandEvent& event ) \{ \textcolor{keyword}{event}.Skip(); \}
+02249         \textcolor{keyword}{virtual} \textcolor{keywordtype}{void} OnBtnCancelClick( wxCommandEvent& event ) \{ \textcolor{keyword}{event}.Skip(); \}
+02250         
+02251     
+02252     \textcolor{keyword}{public}:
+02253         
+02254         dlgGFIR_Coefficients( wxWindow* parent, wxWindowID \textcolor{keywordtype}{id} = wxID\_ANY, \textcolor{keyword}{const} wxString& title = wxT(\textcolor{stringliteral}{"
+      Coefficients"}), \textcolor{keyword}{const} wxPoint& pos = wxDefaultPosition, \textcolor{keyword}{const} wxSize& size = wxDefaultSize, \textcolor{keywordtype}{long} style = 
+      wxDEFAULT\_DIALOG\_STYLE ); 
+02255         ~dlgGFIR_Coefficients();
+02256     
+02257 \};
+02258 
+02262 \textcolor{keyword}{class }dlgVCOfrequencies : \textcolor{keyword}{public} wxDialog 
+02263 \{
+02264     \textcolor{keyword}{private}:
+02265     
+02266     \textcolor{keyword}{protected}:
+02267         wxStaticText* m_staticText341;
+02268         wxTextCtrl* txtVCOH_low;
+02269         wxStaticText* m_staticText342;
+02270         wxTextCtrl* txtVCOH_high;
+02271         wxStaticText* m_staticText3411;
+02272         wxTextCtrl* txtVCOM_low;
+02273         wxStaticText* m_staticText3421;
+02274         wxTextCtrl* txtVCOM_high;
+02275         wxStaticText* m_staticText3412;
+02276         wxTextCtrl* txtVCOL_low;
+02277         wxStaticText* m_staticText3422;
+02278         wxTextCtrl* txtVCOL_high;
+02279         wxStaticText* m_staticText3413;
+02280         wxTextCtrl* txtVCOCGEN_low;
+02281         wxStaticText* m_staticText3423;
+02282         wxTextCtrl* txtVCOCGEN_high;
+02283         wxButton* btnOk;
+02284         wxButton* btnCancel;
+02285         wxButton* btnLoadFile;
+02286         wxButton* btnSaveFile;
+02287         
+02288         \textcolor{comment}{// Virtual event handlers, overide them in your derived class}
+02289         \textcolor{keyword}{virtual} \textcolor{keywordtype}{void} OnBtnOkClick( wxCommandEvent& event ) \{ \textcolor{keyword}{event}.Skip(); \}
+02290         \textcolor{keyword}{virtual} \textcolor{keywordtype}{void} OnBtnCancelClick( wxCommandEvent& event ) \{ \textcolor{keyword}{event}.Skip(); \}
+02291         \textcolor{keyword}{virtual} \textcolor{keywordtype}{void} OnLoadFile( wxCommandEvent& event ) \{ \textcolor{keyword}{event}.Skip(); \}
+02292         \textcolor{keyword}{virtual} \textcolor{keywordtype}{void} OnSaveFile( wxCommandEvent& event ) \{ \textcolor{keyword}{event}.Skip(); \}
+02293         
+02294     
+02295     \textcolor{keyword}{public}:
+02296         
+02297         dlgVCOfrequencies( wxWindow* parent, wxWindowID \textcolor{keywordtype}{id} = wxID\_ANY, \textcolor{keyword}{const} wxString& title = wxT(\textcolor{stringliteral}{"VCO
+       frequencies"}), \textcolor{keyword}{const} wxPoint& pos = wxDefaultPosition, \textcolor{keyword}{const} wxSize& size = wxDefaultSize, \textcolor{keywordtype}{long} style = 
+      wxDEFAULT\_DIALOG\_STYLE ); 
+02298         ~dlgVCOfrequencies();
+02299     
+02300 \};
+02301 
+02302 \textcolor{preprocessor}{#endif //\_\_LMS7002\_WXGUI\_H\_\_}
+\end{DoxyCode}

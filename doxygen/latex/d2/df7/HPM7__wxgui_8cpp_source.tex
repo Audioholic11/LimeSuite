@@ -1,0 +1,364 @@
+\subsection{H\+P\+M7\+\_\+wxgui.\+cpp}
+\label{HPM7__wxgui_8cpp_source}\index{/home/erik/prefix/default/src/limesuite-\/dev/src/\+H\+P\+M7/\+H\+P\+M7\+\_\+wxgui.\+cpp@{/home/erik/prefix/default/src/limesuite-\/dev/src/\+H\+P\+M7/\+H\+P\+M7\+\_\+wxgui.\+cpp}}
+
+\begin{DoxyCode}
+00001 
+00007 \textcolor{preprocessor}{#include "HPM7_wxgui.h"}
+00008 \textcolor{preprocessor}{#include "lms7suiteEvents.h"}
+00009 
+00010 \textcolor{preprocessor}{#include <wx/sizer.h>}
+00011 \textcolor{preprocessor}{#include <wx/stattext.h>}
+00012 \textcolor{preprocessor}{#include <wx/button.h>}
+00013 \textcolor{preprocessor}{#include <wx/image.h>}
+00014 \textcolor{preprocessor}{#include <wx/string.h>}
+00015 \textcolor{preprocessor}{#include <wx/combobox.h>}
+00016 \textcolor{preprocessor}{#include <wx/checkbox.h>}
+00017 \textcolor{preprocessor}{#include <wx/msgdlg.h>}
+00018 \textcolor{preprocessor}{#include <vector>}
+00019 \textcolor{preprocessor}{#include "LMS64CCommands.h"}
+00020 \textcolor{preprocessor}{#include "lms7_device.h"}
+00021 
+00022 
+00023 BEGIN\_EVENT\_TABLE(HPM7_wxgui, wxFrame)
+00024 
+00025 END\_EVENT\_TABLE()
+00026 
+00027 HPM7_wxgui::HPM7_wxgui(wxWindow* parent, wxWindowID \textcolor{keywordtype}{id}, const wxString &title, const wxPoint& pos, const 
+      wxSize& size, \textcolor{keywordtype}{long} styles)
+00028 \{
+00029     m\_serPort = \textcolor{keyword}{nullptr};
+00030     Create(parent, \textcolor{keywordtype}{id}, title, wxDefaultPosition, wxDefaultSize, styles, \_T(\textcolor{stringliteral}{"id"}));
+00031 \textcolor{preprocessor}{#ifdef WIN32}
+00032     SetBackgroundColour(wxSystemSettings::GetColour(wxSYS\_COLOUR\_BTNFACE));
+00033 \textcolor{preprocessor}{#endif}
+00034     wxFlexGridSizer* mainSizer = \textcolor{keyword}{new} wxFlexGridSizer(0, 3, 5, 5);
+00035     wxFlexGridSizer* tunersSizer = \textcolor{keyword}{new} wxFlexGridSizer(0, 3, 5, 5);
+00036     wxStaticBoxSizer* tunerGroup;
+00037     wxStaticText* stext;
+00038     wxString tunerNames[] = \{
+00039         \_(\textcolor{stringliteral}{"TUNER\_A\_IN"}),
+00040         \_(\textcolor{stringliteral}{"TUNER\_A\_MID"}),
+00041         \_(\textcolor{stringliteral}{"TUNER\_A\_OUT"}),
+00042         \_(\textcolor{stringliteral}{"TUNER\_B\_IN"}),
+00043         \_(\textcolor{stringliteral}{"TUNER\_B\_MID"}),
+00044         \_(\textcolor{stringliteral}{"TUNER\_B\_OUT"})
+00045     \};
+00046 
+00047     wxArrayString ssc1\_choices;
+00048     \textcolor{keywordflow}{for} (\textcolor{keywordtype}{int} i = 0; i < pow(2.0, 5); ++i)
+00049         ssc1\_choices.push\_back(wxString::Format(\textcolor{stringliteral}{"%i"}, i));
+00050     wxArrayString ssc2\_choices;
+00051     \textcolor{keywordflow}{for} (\textcolor{keywordtype}{int} i = 0; i < pow(2.0, 4); ++i)
+00052         ssc2\_choices.push\_back(wxString::Format(\textcolor{stringliteral}{"%i"}, i));
+00053 
+00054     \textcolor{keywordflow}{for} (\textcolor{keywordtype}{int} i = 0; i < 6; ++i)
+00055     \{
+00056         tunerIds.push\_back(wxNewId());
+00057         cmbSSC1ids.push\_back(wxNewId());
+00058         tunerGroup = \textcolor{keyword}{new} wxStaticBoxSizer(wxVERTICAL, \textcolor{keyword}{this}, tunerNames[i]);
+00059         chkEB.push\_back(\textcolor{keyword}{new} wxCheckBox(\textcolor{keyword}{this}, tunerIds[i], \_(\textcolor{stringliteral}{"Ext. branch (F11)"})));
+00060         Connect(tunerIds[i], wxEVT\_CHECKBOX, (wxObjectEventFunction)&
+      HPM7_wxgui::OnTunerSSC2change);
+00061         tunerGroup->Add(chkEB[i], 1, wxALIGN\_LEFT | wxALIGN\_TOP, 0);
+00062         chkTP.push\_back(\textcolor{keyword}{new} wxCheckBox(\textcolor{keyword}{this}, tunerIds[i], \_(\textcolor{stringliteral}{"Through path (F10)"})));
+00063         Connect(tunerIds[i], wxEVT\_CHECKBOX, (wxObjectEventFunction)&HPM7\_wxgui::OnTunerSSC2change);
+00064         tunerGroup->Add(chkTP[i], 1, wxALIGN\_LEFT | wxALIGN\_TOP, 0);
+00065 
+00066         stext = \textcolor{keyword}{new} wxStaticText(\textcolor{keyword}{this}, wxNewId(), \_(\textcolor{stringliteral}{"SSC2 (F9-F6)"}));
+00067         tunerGroup->Add(stext);
+00068         cmbSSC2.push\_back(\textcolor{keyword}{new} wxComboBox(\textcolor{keyword}{this}, tunerIds[i], ssc2\_choices[0], wxDefaultPosition, 
+      wxDefaultSize, ssc2\_choices));
+00069         Connect(tunerIds[i], wxEVT\_COMBOBOX, (wxObjectEventFunction)&HPM7\_wxgui::OnTunerSSC2change);
+00070         cmbSSC2[i]->SetSelection(0);
+00071         tunerGroup->Add(cmbSSC2[i], 1, wxALIGN\_LEFT | wxALIGN\_TOP | wxEXPAND, 0);
+00072 
+00073         stext = \textcolor{keyword}{new} wxStaticText(\textcolor{keyword}{this}, wxNewId(), \_(\textcolor{stringliteral}{"SSC1 (F5-F1)"}));
+00074         tunerGroup->Add(stext);
+00075         cmbSSC1.push\_back(\textcolor{keyword}{new} wxComboBox(\textcolor{keyword}{this}, cmbSSC1ids[i], ssc1\_choices[0], wxDefaultPosition, 
+      wxDefaultSize, ssc1\_choices));
+00076         Connect(cmbSSC1ids[i], wxEVT\_COMBOBOX, (wxObjectEventFunction)&
+      HPM7_wxgui::OnTunerSSC1change);
+00077         cmbSSC1[i]->SetSelection(0);
+00078         tunerGroup->Add(cmbSSC1[i], 1, wxALIGN\_LEFT | wxALIGN\_TOP | wxEXPAND, 0);
+00079         tunersSizer->Add(tunerGroup);
+00080     \}
+00081 
+00082     wxFlexGridSizer* leftCollumn = \textcolor{keyword}{new} wxFlexGridSizer(0, 1, 5, 5);
+00083     btnUpdateAll = \textcolor{keyword}{new} wxButton(\textcolor{keyword}{this}, wxNewId(), \_(\textcolor{stringliteral}{"Read All"}));
+00084     Connect(btnUpdateAll->GetId(), wxEVT\_COMMAND\_BUTTON\_CLICKED, (wxObjectEventFunction)&
+      HPM7_wxgui::DownloadAll);
+00085     leftCollumn->Add(btnUpdateAll, 1, wxALIGN\_LEFT | wxALIGN\_TOP, 0);
+00086     wxFlexGridSizer* gpioControls = \textcolor{keyword}{new} wxFlexGridSizer(0, 1, 5, 5);
+00087     \textcolor{keyword}{const} wxString activePathChoices[] = \{ \_(\textcolor{stringliteral}{"No path active"}), \_(\textcolor{stringliteral}{"LNAH"}), \_(\textcolor{stringliteral}{"LNAL"}), \_(\textcolor{stringliteral}{"LNAW"}) \};
+00088     \textcolor{comment}{// GPIO1 GPIO0}
+00089     \textcolor{comment}{//   0     0  not used}
+00090     \textcolor{comment}{//   0     1  LNAW\_A&B (Wide band)}
+00091     \textcolor{comment}{//   1     0  LNAH\_A&B (High band)}
+00092     \textcolor{comment}{//   1     1  LNAL\_A&B (Low band)}
+00093     cmbActivePath = \textcolor{keyword}{new} wxComboBox(\textcolor{keyword}{this}, wxNewId(), activePathChoices[1], wxDefaultPosition, wxDefaultSize,
+       4, activePathChoices);
+00094     Connect(cmbActivePath->GetId(), wxEVT\_COMBOBOX, (wxObjectEventFunction)&
+      HPM7_wxgui::OnGPIOchange);
+00095     gpioControls->Add(\textcolor{keyword}{new} wxStaticText(\textcolor{keyword}{this}, wxID\_ANY, \_(\textcolor{stringliteral}{"Active path to RXFE:"})), 1, wxALIGN\_LEFT | 
+      wxALIGN\_TOP | wxEXPAND, 0);
+00096     gpioControls->Add(cmbActivePath, 1, wxALIGN\_LEFT | wxALIGN\_TOP | wxEXPAND, 5);
+00097 
+00098     gpioControls->Add(\textcolor{keyword}{new} wxStaticText(\textcolor{keyword}{this}, wxID\_ANY, \_(\textcolor{stringliteral}{"TxFE output selection"})), 1, wxALIGN\_LEFT | 
+      wxALIGN\_TOP | wxEXPAND, 0);
+00099     \textcolor{keyword}{const} wxString bandChoices[] = \{ \_(\textcolor{stringliteral}{"Band1"}), \_(\textcolor{stringliteral}{"Band2"}) \};
+00100     \textcolor{comment}{// GPIO2}
+00101     \textcolor{comment}{//   0  TXA\_2 output}
+00102     \textcolor{comment}{//   1  TXA\_1 output amplified}
+00103     cmbBand = \textcolor{keyword}{new} wxComboBox(\textcolor{keyword}{this}, wxNewId(), bandChoices[0], wxDefaultPosition, wxDefaultSize, 2, 
+      bandChoices);
+00104     Connect(cmbBand->GetId(), wxEVT\_COMBOBOX, (wxObjectEventFunction)&
+      HPM7_wxgui::OnGPIOchange);
+00105     gpioControls->Add(cmbBand, 1, wxALIGN\_LEFT | wxALIGN\_TOP | wxEXPAND, 5);
+00106 
+00107     gpioControls->Add(\textcolor{keyword}{new} wxStaticText(\textcolor{keyword}{this}, wxID\_ANY, \_(\textcolor{stringliteral}{"Enable external LNA:"})), 1, wxALIGN\_LEFT | 
+      wxALIGN\_TOP | wxEXPAND, 0);
+00108     \textcolor{keyword}{const} wxString lnaChoices[] = \{ \_(\textcolor{stringliteral}{"Bypass LNA"}), \_(\textcolor{stringliteral}{"Enable LNA"})\};
+00109     \textcolor{comment}{//GPIO3}
+00110     \textcolor{comment}{//  0  Bypass LNA}
+00111     \textcolor{comment}{//  1  Enable LNA}
+00112     cmbLNA = \textcolor{keyword}{new} wxComboBox(\textcolor{keyword}{this}, wxNewId(), lnaChoices[1], wxDefaultPosition, wxDefaultSize, 2, lnaChoices
+      );
+00113     Connect(cmbLNA->GetId(), wxEVT\_COMBOBOX, (wxObjectEventFunction)&
+      HPM7_wxgui::OnGPIOchange);
+00114     gpioControls->Add(cmbLNA, 1, wxALIGN\_LEFT | wxALIGN\_TOP | wxEXPAND, 5);
+00115 
+00116     gpioControls->Add(\textcolor{keyword}{new} wxStaticText(\textcolor{keyword}{this}, wxID\_ANY, \_(\textcolor{stringliteral}{"PAs Vd Driver:"})), 1, wxALIGN\_LEFT | wxALIGN\_TOP 
+      | wxEXPAND, 0);
+00117     \textcolor{keyword}{const} wxString paChoices[] = \{ \_(\textcolor{stringliteral}{"5V"}), \_(\textcolor{stringliteral}{"2V"}) \};
+00118     \textcolor{comment}{//GPIO4}
+00119     \textcolor{comment}{//  0  5V}
+00120     \textcolor{comment}{//  1  2V}
+00121     cmbPAdriver = \textcolor{keyword}{new} wxComboBox(\textcolor{keyword}{this}, wxNewId(), paChoices[0], wxDefaultPosition, wxDefaultSize, 2, 
+      paChoices);
+00122     Connect(cmbPAdriver->GetId(), wxEVT\_COMBOBOX, (wxObjectEventFunction)&
+      HPM7_wxgui::OnGPIOchange);
+00123     gpioControls->Add(cmbPAdriver, 1, wxALIGN\_LEFT | wxALIGN\_TOP | wxEXPAND, 5);
+00124     leftCollumn->Add(gpioControls, 1, wxALIGN\_LEFT | wxALIGN\_TOP | wxEXPAND, 0);
+00125 
+00126     \textcolor{comment}{//DACs}
+00127     wxFlexGridSizer* dacSizer = \textcolor{keyword}{new} wxFlexGridSizer(0, 2, 5, 5);
+00128     wxArrayString dac\_choices;
+00129     \textcolor{keywordflow}{for} (\textcolor{keywordtype}{int} i = 0; i < 256; ++i)
+00130         dac\_choices.push\_back(wxString::Format(\textcolor{stringliteral}{"%.2f V"}, i*3.3/256));
+00131     cmbDAC\_A = \textcolor{keyword}{new} wxComboBox(\textcolor{keyword}{this}, wxNewId(), \textcolor{stringliteral}{"0"}, wxDefaultPosition, wxSize(64, -1), dac\_choices);
+00132     dacSizer->Add(\textcolor{keyword}{new} wxStaticText(\textcolor{keyword}{this}, wxNewId(), \textcolor{stringliteral}{"DAC\_A: "}), 1, wxALIGN\_LEFT | wxALIGN\_CENTER\_VERTICAL, 
+      0);
+00133     dacSizer->Add(cmbDAC\_A, 1, wxALIGN\_LEFT | wxALIGN\_CENTER\_VERTICAL, 0);
+00134 
+00135     cmbDAC\_B = \textcolor{keyword}{new} wxComboBox(\textcolor{keyword}{this}, wxNewId(), \textcolor{stringliteral}{"0"}, wxDefaultPosition, wxSize(64, -1), dac\_choices);
+00136     dacSizer->Add(\textcolor{keyword}{new} wxStaticText(\textcolor{keyword}{this}, wxNewId(), \textcolor{stringliteral}{"DAC\_B: "}), 1, wxALIGN\_LEFT | wxALIGN\_CENTER\_VERTICAL, 
+      0);
+00137     dacSizer->Add(cmbDAC\_B, 1, wxALIGN\_LEFT | wxALIGN\_CENTER\_VERTICAL, 0);
+00138     Connect(cmbDAC\_A->GetId(), wxEVT\_COMBOBOX, (wxObjectEventFunction)&
+      HPM7_wxgui::OnDACchange);
+00139     Connect(cmbDAC\_B->GetId(), wxEVT\_COMBOBOX, (wxObjectEventFunction)&
+      HPM7_wxgui::OnDACchange);
+00140     wxStaticBoxSizer* dacGroup = \textcolor{keyword}{new} wxStaticBoxSizer(wxVERTICAL, \textcolor{keyword}{this}, \_(\textcolor{stringliteral}{"DAC"}));
+00141     dacGroup->Add(dacSizer);
+00142 
+00143     leftCollumn->Add(dacGroup);
+00144     mainSizer->Add(leftCollumn);
+00145     mainSizer->Add(tunersSizer);
+00146 
+00147     SetSizer(mainSizer);
+00148     mainSizer->Fit(\textcolor{keyword}{this});
+00149     mainSizer->SetSizeHints(\textcolor{keyword}{this});
+00150     Layout();
+00151 \}
+00152 
+00153 \textcolor{keywordtype}{void} HPM7_wxgui::Initialize(lms_device_t* dev)
+00154 \{
+00155     lime::LMS7_Device* lms = (lime::LMS7_Device*)dev;
+00156     m_serPort = \textcolor{keyword}{dynamic\_cast<}lime::LMS64CProtocol *\textcolor{keyword}{>}(lms->GetConnection());
+00157 \}
+00158 
+00159 HPM7_wxgui::~HPM7_wxgui()
+00160 \{
+00161 
+00162 \}
+00163 
+00164 \textcolor{keywordtype}{void} HPM7_wxgui::OnTunerSSC1change(wxCommandEvent& event)
+00165 \{
+00166     \textcolor{keywordflow}{if} (m_serPort == \textcolor{keyword}{nullptr} || m_serPort->IsOpen() == \textcolor{keyword}{false})
+00167     \{
+00168         wxMessageBox(\_(\textcolor{stringliteral}{"Board not connected"}), \_(\textcolor{stringliteral}{"Warning"}));
+00169         \textcolor{keywordflow}{return};
+00170     \}
+00171 
+00172     \textcolor{keywordtype}{unsigned} tunerIndex = 0;
+00173     \textcolor{keywordflow}{for} (tunerIndex = 0; tunerIndex < cmbSSC1.size(); ++tunerIndex)
+00174         \textcolor{keywordflow}{if} (event.GetId() == cmbSSC1[tunerIndex]->GetId())
+00175             \textcolor{keywordflow}{break};
+00176     \textcolor{keywordflow}{if} (tunerIndex >= cmbSSC1.size())
+00177         \textcolor{keywordflow}{return};
+00178 
+00179     lime::LMS64CProtocol::GenericPacket pkt;
+00180     pkt.cmd = lime::CMD_MYRIAD_WR;
+00181     pkt.outBuffer.push\_back( 0x20 + tunerIndex * 2 );
+00182     pkt.outBuffer.push\_back( event.GetInt() );
+00183     m_serPort->TransferPacket(pkt);
+00184 \}
+00185 
+00186 \textcolor{keywordtype}{void} HPM7_wxgui::OnTunerSSC2change(wxCommandEvent& event)
+00187 \{
+00188     \textcolor{keywordflow}{if} (m_serPort == \textcolor{keyword}{nullptr} || m_serPort->IsOpen() == \textcolor{keyword}{false})
+00189     \{
+00190         wxMessageBox(\_(\textcolor{stringliteral}{"Board not connected"}), \_(\textcolor{stringliteral}{"Warning"}));
+00191         \textcolor{keywordflow}{return};
+00192     \}
+00193     \textcolor{keywordtype}{unsigned} tunerIndex = 0;
+00194     \textcolor{keywordflow}{for} (tunerIndex = 0; tunerIndex < tunerIds.size(); ++tunerIndex)
+00195         \textcolor{keywordflow}{if} (event.GetId() == tunerIds[tunerIndex])
+00196             \textcolor{keywordflow}{break};
+00197 
+00198     \textcolor{keywordflow}{if} (tunerIndex >= tunerIds.size())
+00199         \textcolor{keywordflow}{return};
+00200 
+00201     lime::LMS64CProtocol::GenericPacket pkt;
+00202     pkt.cmd = lime::CMD_MYRIAD_WR;
+00203     pkt.outBuffer.push\_back(0x21 + tunerIndex*2);
+00204     \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{char} value = chkEB[tunerIndex]->GetValue() << 5;
+00205     value |= chkTP[tunerIndex]->GetValue() << 4;
+00206     value |= (cmbSSC2[tunerIndex]->GetSelection() & 0xF);
+00207     pkt.outBuffer.push\_back(value);
+00208     m_serPort->TransferPacket(pkt);
+00209 \}
+00210 
+00211 \textcolor{keywordtype}{void} HPM7_wxgui::OnGPIOchange(wxCommandEvent& event)
+00212 \{
+00213     \textcolor{keywordflow}{if} (UploadGPIO() != 0)
+00214         \textcolor{keywordflow}{return};
+00215 
+00216     wxCommandEvent evt;
+00217     evt.SetEventObject(\textcolor{keyword}{this});
+00218     \textcolor{keywordflow}{if} (event.GetId() == cmbActivePath->GetId())
+00219     \{
+00220         evt.SetEventType(LMS7\_RXPATH\_CHANGED);
+00221         evt.SetInt(event.GetInt());
+00222         wxPostEvent(\textcolor{keyword}{this}, evt);
+00223     \}
+00224     \textcolor{keywordflow}{else} \textcolor{keywordflow}{if} (event.GetId() == cmbBand->GetId())
+00225     \{
+00226         evt.SetEventType(LMS7\_TXBAND\_CHANGED);
+00227         evt.SetInt(event.GetInt());
+00228         wxPostEvent(\textcolor{keyword}{this}, evt);
+00229     \}
+00230 \}
+00231 
+00232 \textcolor{keywordtype}{void} HPM7_wxgui::DownloadAll(wxCommandEvent& event)
+00233 \{
+00234     \textcolor{keywordflow}{if} (m_serPort == \textcolor{keyword}{nullptr} || m_serPort->IsOpen() == \textcolor{keyword}{false})
+00235     \{
+00236         wxMessageBox(\_(\textcolor{stringliteral}{"Board not connected"}), \_(\textcolor{stringliteral}{"Warning"}));
+00237         \textcolor{keywordflow}{return};
+00238     \}
+00239     lime::LMS64CProtocol::GenericPacket pkt;
+00240     pkt.cmd = lime::CMD_MYRIAD_RD;
+00241     pkt.outBuffer.push\_back(0x10);
+00242     \textcolor{keywordflow}{for} (\textcolor{keywordtype}{int} i = 0; i < 12; ++i)
+00243         pkt.outBuffer.push\_back(0x20 + i);
+00244     pkt.outBuffer.push\_back(0x30);
+00245     pkt.outBuffer.push\_back(0x31);
+00246 
+00247     \textcolor{keywordflow}{if} (m_serPort->TransferPacket(pkt) != 0)
+00248     \{
+00249         wxMessageBox(\_(\textcolor{stringliteral}{"Failed to read board parameters"}));
+00250         \textcolor{keywordflow}{return};
+00251     \}
+00252 
+00253     assert(pkt.inBuffer.size() >= 14);
+00254     cmbActivePath->SetSelection(pkt.inBuffer[1] & 0x3);
+00255     cmbBand->SetSelection((pkt.inBuffer[1] >> 2) & 0x1);
+00256     cmbLNA->SetSelection((pkt.inBuffer[1] >> 3) & 0x1);
+00257     cmbPAdriver->SetSelection((pkt.inBuffer[1] >> 4) & 0x1);
+00258 
+00259     \textcolor{keywordtype}{int} index = 3;
+00260     \textcolor{keywordflow}{for} (\textcolor{keywordtype}{unsigned} i = 0; i < chkEB.size(); ++i)
+00261     \{
+00262         cmbSSC1[i]->SetSelection(pkt.inBuffer[index] & 0x1F);
+00263         index+=2;
+00264         chkEB[i]->SetValue((pkt.inBuffer[index] >> 5) & 1);
+00265         chkTP[i]->SetValue((pkt.inBuffer[index] >> 4) & 1);
+00266         cmbSSC2[i]->SetSelection(pkt.inBuffer[index] & 0xF);
+00267         index += 2;
+00268     \}
+00269 
+00270     cmbDAC_A->SetSelection(pkt.inBuffer[index]);
+00271     index += 2;
+00272 cmbDAC_B->SetSelection(pkt.inBuffer[index]);
+00273 \}
+00274 
+00275 \textcolor{keywordtype}{void} HPM7_wxgui::OnDACchange(wxCommandEvent& event)
+00276 \{
+00277     \textcolor{keywordflow}{if} (m_serPort == \textcolor{keyword}{nullptr} || m_serPort->IsOpen() == \textcolor{keyword}{false})
+00278     \{
+00279         wxMessageBox(\_(\textcolor{stringliteral}{"Board not connected"}), \_(\textcolor{stringliteral}{"Warning"}));
+00280         \textcolor{keywordflow}{return};
+00281     \}
+00282     lime::LMS64CProtocol::GenericPacket pkt;
+00283     pkt.cmd = lime::CMD_MYRIAD_WR;
+00284 
+00285     \textcolor{keywordflow}{if} (event.GetEventObject() == cmbDAC_A)
+00286     \{
+00287         pkt.outBuffer.push\_back(0x30);
+00288         pkt.outBuffer.push\_back(cmbDAC_A->GetSelection());
+00289     \}
+00290     \textcolor{keywordflow}{else} \textcolor{keywordflow}{if} (event.GetEventObject() == cmbDAC_B)
+00291     \{
+00292         pkt.outBuffer.push\_back(0x31);
+00293         pkt.outBuffer.push\_back(cmbDAC_B->GetSelection());
+00294     \}
+00295     m_serPort->TransferPacket(pkt);
+00296 \}
+00297 
+00298 \textcolor{keywordtype}{void} HPM7_wxgui::SelectBand(\textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{int} i)
+00299 \{
+00300     \textcolor{keywordflow}{if} (cmbBand)
+00301         cmbBand->SetSelection(i & 0x1);
+00302     UploadGPIO();
+00303 \}
+00304 
+00305 \textcolor{keywordtype}{void} HPM7_wxgui::SelectRxPath(\textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{int} i)
+00306 \{
+00307     \textcolor{keywordflow}{if} (cmbActivePath)
+00308         cmbActivePath->SetSelection(i & 0x3);
+00309     UploadGPIO();
+00310 \}
+00311 
+00312 \textcolor{keywordtype}{bool} HPM7_wxgui::UploadGPIO()
+00313 \{
+00314     \textcolor{keywordflow}{if} (m_serPort == \textcolor{keyword}{nullptr} || m_serPort->IsOpen() == \textcolor{keyword}{false})
+00315     \{
+00316         wxMessageBox(\_(\textcolor{stringliteral}{"Uploading HPM7 GPIO, board not connected"}), \_(\textcolor{stringliteral}{"Warning"}));
+00317         \textcolor{keywordflow}{return} \textcolor{keyword}{false};
+00318     \}
+00319 
+00320     lime::LMS64CProtocol::GenericPacket pkt;
+00321     pkt.cmd = lime::CMD_MYRIAD_WR;
+00322     pkt.outBuffer.push\_back(0x10);
+00323     \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{char} value = 0;
+00324     \textcolor{keywordtype}{int} activePath = cmbActivePath->GetSelection();
+00325     \textcolor{keywordflow}{switch} (activePath)
+00326     \{
+00327     \textcolor{keywordflow}{case} 0: value |= 0; \textcolor{keywordflow}{break};
+00328     \textcolor{keywordflow}{case} 1: value |= 2; \textcolor{keywordflow}{break};
+00329     \textcolor{keywordflow}{case} 2: value |= 3; \textcolor{keywordflow}{break};
+00330     \textcolor{keywordflow}{case} 3: value |= 1; \textcolor{keywordflow}{break};
+00331     \}
+00332     value |= (cmbBand->GetSelection() & 0x1) << 2;
+00333     value |= (cmbLNA->GetSelection() & 0x1) << 3;
+00334     value |= (cmbPAdriver->GetSelection() & 0x1) << 4;
+00335     pkt.outBuffer.push\_back(value);
+00336     \textcolor{keywordflow}{if} (m_serPort->TransferPacket(pkt) != 0)
+00337     \{
+00338         wxMessageBox(\_(\textcolor{stringliteral}{"Uploading HPM7 GPIO failed"}), \_(\textcolor{stringliteral}{"Warning"}));
+00339         \textcolor{keywordflow}{return} \textcolor{keyword}{false};
+00340     \}
+00341 \textcolor{keywordflow}{return} \textcolor{keyword}{true};
+00342 \}
+\end{DoxyCode}

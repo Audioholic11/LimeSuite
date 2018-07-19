@@ -1,0 +1,142 @@
+\subsection{Connection\+F\+T601.\+h}
+\label{ConnectionFT601_8h_source}\index{/home/erik/prefix/default/src/limesuite-\/dev/src/\+Connection\+F\+T\+D\+I/\+Connection\+F\+T601.\+h@{/home/erik/prefix/default/src/limesuite-\/dev/src/\+Connection\+F\+T\+D\+I/\+Connection\+F\+T601.\+h}}
+
+\begin{DoxyCode}
+00001 
+00007 \textcolor{preprocessor}{#pragma once}
+00008 \textcolor{preprocessor}{#include <ConnectionRegistry.h>}
+00009 \textcolor{preprocessor}{#include <IConnection.h>}
+00010 \textcolor{preprocessor}{#include "LMS64CProtocol.h"}
+00011 \textcolor{preprocessor}{#include <vector>}
+00012 \textcolor{preprocessor}{#include <string>}
+00013 \textcolor{preprocessor}{#include <atomic>}
+00014 \textcolor{preprocessor}{#include <memory>}
+00015 \textcolor{preprocessor}{#include <thread>}
+00016 
+00017 \textcolor{preprocessor}{#ifndef \_\_unix\_\_}
+00018 \textcolor{preprocessor}{#include "windows.h"}
+00019 \textcolor{preprocessor}{#include "FTD3XXLibrary/FTD3XX.h"}
+00020 \textcolor{preprocessor}{#else}
+00021 \textcolor{preprocessor}{#include <libusb.h>}
+00022 \textcolor{preprocessor}{#include <mutex>}
+00023 \textcolor{preprocessor}{#include <condition\_variable>}
+00024 \textcolor{preprocessor}{#include <chrono>}
+00025 \textcolor{preprocessor}{#endif}
+00026 
+00027 \textcolor{keyword}{namespace }lime\{
+00028 
+00029 \textcolor{keyword}{class }ConnectionFT601 : \textcolor{keyword}{public} LMS64CProtocol
+00030 \{
+00031 \textcolor{keyword}{public}:
+00034     \textcolor{keyword}{class }USBTransferContext
+00035     \{
+00036     \textcolor{keyword}{public}:
+00037         USBTransferContext() : used(false)
+00038         \{
+00039 \textcolor{preprocessor}{#ifndef \_\_unix\_\_}
+00040             context = NULL;
+00041 \textcolor{preprocessor}{#else}
+00042             transfer = libusb\_alloc\_transfer(0);
+00043             bytesXfered = 0;
+00044             done = 0;
+00045 \textcolor{preprocessor}{#endif}
+00046         \}
+00047         ~USBTransferContext()
+00048         \{
+00049 \textcolor{preprocessor}{#ifdef \_\_unix\_\_}
+00050             libusb\_free\_transfer(transfer);
+00051 \textcolor{preprocessor}{#endif}
+00052         \}
+00053         \textcolor{keywordtype}{bool} used;
+00054 \textcolor{preprocessor}{#ifndef \_\_unix\_\_}
+00055         PUCHAR context;
+00056         OVERLAPPED inOvLap;
+00057 \textcolor{preprocessor}{#else}
+00058         libusb\_transfer* transfer;
+00059         \textcolor{keywordtype}{long} bytesXfered;
+00060         std::atomic<bool> done;
+00061         std::mutex transferLock;
+00062         std::condition\_variable cv;
+00063 \textcolor{preprocessor}{#endif}
+00064     \};
+00065 
+00066     ConnectionFT601(\textcolor{keywordtype}{void} *arg);
+00067     ConnectionFT601(\textcolor{keywordtype}{void} *ctx, \textcolor{keyword}{const} ConnectionHandle &handle);
+00068 
+00069     \textcolor{keyword}{virtual} ~ConnectionFT601(\textcolor{keywordtype}{void});
+00070 
+00071     \textcolor{keywordtype}{int} Open(\textcolor{keyword}{const} std::string &serial, \textcolor{keywordtype}{int} vid, \textcolor{keywordtype}{int} pid);
+00072     \textcolor{keywordtype}{void} Close();
+00073     \textcolor{keywordtype}{bool} IsOpen();
+00074     \textcolor{keywordtype}{int} GetOpenedIndex();
+00075 
+00076     \textcolor{keywordtype}{int} Write(\textcolor{keyword}{const} \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{char} *buffer, \textcolor{keywordtype}{int} length, \textcolor{keywordtype}{int} timeout_ms = 100) \textcolor{keyword}{override};
+00077     \textcolor{keywordtype}{int} Read(\textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{char} *buffer, \textcolor{keywordtype}{int} length, \textcolor{keywordtype}{int} timeout_ms = 100) \textcolor{keyword}{override};
+00078 
+00079     \textcolor{keywordtype}{int} ProgramWrite(\textcolor{keyword}{const} \textcolor{keywordtype}{char} *data\_src, \textcolor{keywordtype}{size\_t} length, \textcolor{keywordtype}{int} prog\_mode, \textcolor{keywordtype}{int} 
+      device, ProgrammingCallback callback) \textcolor{keyword}{override};
+00080     
+00081     DeviceInfo GetDeviceInfo(\textcolor{keywordtype}{void})\textcolor{keyword}{override};
+00082 
+00083 \textcolor{keyword}{protected}:
+00084     \textcolor{keywordtype}{int} GetBuffersCount() \textcolor{keyword}{const override};
+00085     \textcolor{keywordtype}{int} CheckStreamSize(\textcolor{keywordtype}{int} size) \textcolor{keyword}{const override};
+00086     \textcolor{keywordtype}{int} BeginDataReading(\textcolor{keywordtype}{char}* buffer, uint32\_t length, \textcolor{keywordtype}{int} ep) \textcolor{keyword}{override};
+00087     \textcolor{keywordtype}{bool} WaitForReading(\textcolor{keywordtype}{int} contextHandle, \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{int} timeout_ms) \textcolor{keyword}{override};
+00088     \textcolor{keywordtype}{int} FinishDataReading(\textcolor{keywordtype}{char}* buffer, uint32\_t length, \textcolor{keywordtype}{int} contextHandle) \textcolor{keyword}{override};
+00089     \textcolor{keywordtype}{void} AbortReading(\textcolor{keywordtype}{int} ep) \textcolor{keyword}{override};
+00090 
+00091     \textcolor{keywordtype}{int} BeginDataSending(\textcolor{keyword}{const} \textcolor{keywordtype}{char}* buffer, uint32\_t length, \textcolor{keywordtype}{int} ep) \textcolor{keyword}{override};
+00092     \textcolor{keywordtype}{bool} WaitForSending(\textcolor{keywordtype}{int} contextHandle, uint32\_t timeout_ms) \textcolor{keyword}{override};
+00093     \textcolor{keywordtype}{int} FinishDataSending(\textcolor{keyword}{const} \textcolor{keywordtype}{char}* buffer, uint32\_t length, \textcolor{keywordtype}{int} contextHandle) \textcolor{keyword}{override};
+00094     \textcolor{keywordtype}{void} AbortSending(\textcolor{keywordtype}{int} ep) \textcolor{keyword}{override};
+00095     
+00096     \textcolor{keywordtype}{int} ResetStreamBuffers() \textcolor{keyword}{override};
+00097 
+00098     eConnectionType GetType(\textcolor{keywordtype}{void}) \{\textcolor{keywordflow}{return} USB_PORT;\}
+00099     
+00100     \textcolor{keyword}{static} \textcolor{keyword}{const} \textcolor{keywordtype}{int} USB_MAX_CONTEXTS = 16; \textcolor{comment}{//maximum number of contexts for asynchronous transfers}
+00101 
+00102     USBTransferContext contexts[USB_MAX_CONTEXTS];
+00103     USBTransferContext contextsToSend[USB_MAX_CONTEXTS];
+00104 
+00105     \textcolor{keywordtype}{bool} isConnected;
+00106 
+00107     \textcolor{keyword}{static} \textcolor{keyword}{const} \textcolor{keywordtype}{int} streamWrEp;
+00108     \textcolor{keyword}{static} \textcolor{keyword}{const} \textcolor{keywordtype}{int} streamRdEp;
+00109     \textcolor{keyword}{static} \textcolor{keyword}{const} \textcolor{keywordtype}{int} ctrlWrEp;
+00110     \textcolor{keyword}{static} \textcolor{keyword}{const} \textcolor{keywordtype}{int} ctrlRdEp;
+00111 \textcolor{preprocessor}{#ifndef \_\_unix\_\_}
+00112     FT_HANDLE mFTHandle;
+00113     \textcolor{keywordtype}{int} ReinitPipe(\textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{char} ep);
+00114 \textcolor{preprocessor}{#else}
+00115     \textcolor{keywordtype}{int} FT\_SetStreamPipe(\textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{char} ep, \textcolor{keywordtype}{size\_t} size);
+00116     \textcolor{keywordtype}{int} FT\_FlushPipe(\textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{char} ep);
+00117     uint32\_t mUsbCounter;
+00118     libusb\_device\_handle *dev\_handle; \textcolor{comment}{//a device handle}
+00119     libusb\_context *ctx; \textcolor{comment}{//a libusb session}
+00120 \textcolor{preprocessor}{#endif}
+00121     std::mutex mExtraUsbMutex;
+00122     uint64\_t mSerial;
+00123 \};
+00124 
+00125 \textcolor{keyword}{class }ConnectionFT601Entry : \textcolor{keyword}{public} ConnectionRegistryEntry
+00126 \{
+00127 \textcolor{keyword}{public}:
+00128     ConnectionFT601Entry(\textcolor{keywordtype}{void});
+00129     ~ConnectionFT601Entry(\textcolor{keywordtype}{void});
+00130     std::vector<ConnectionHandle> enumerate(\textcolor{keyword}{const} ConnectionHandle &hint);
+00131     IConnection *make(\textcolor{keyword}{const} ConnectionHandle &handle);
+00132 \textcolor{keyword}{private}:
+00133 \textcolor{preprocessor}{#ifndef \_\_unix\_\_}
+00134     FT_HANDLE* mFTHandle;
+00135 \textcolor{preprocessor}{#else}
+00136     libusb\_context *ctx; \textcolor{comment}{//a libusb session}
+00137     std::thread mUSBProcessingThread;
+00138     \textcolor{keywordtype}{void} handle\_libusb\_events();
+00139     std::atomic<bool> mProcessUSBEvents;
+00140 \textcolor{preprocessor}{#endif}
+00141 \};
+00142 
+00143 \}
+\end{DoxyCode}

@@ -1,0 +1,123 @@
+\subsection{basic\+T\+X.\+cpp}
+\label{basicTX_8cpp_source}\index{/home/erik/prefix/default/src/limesuite-\/dev/src/examples/basic\+T\+X.\+cpp@{/home/erik/prefix/default/src/limesuite-\/dev/src/examples/basic\+T\+X.\+cpp}}
+
+\begin{DoxyCode}
+00001 
+00006 \textcolor{preprocessor}{#include <iostream>}
+00007 \textcolor{preprocessor}{#include <chrono>}
+00008 \textcolor{preprocessor}{#include <math.h>}
+00009 \textcolor{preprocessor}{#include "lime/LimeSuite.h"}
+00010 
+00011 \textcolor{keyword}{using namespace }std;
+00012 
+00013 \textcolor{comment}{//Device structure, should be initialize to NULL}
+00014 lms_device_t* device = NULL;
+00015 
+00016 \textcolor{keywordtype}{int} error()
+00017 \{
+00018     \textcolor{keywordflow}{if} (device != NULL)
+00019     LMS_Close(device);
+00020     exit(-1);
+00021 \}
+00022 
+00023 \textcolor{keywordtype}{int} main(\textcolor{keywordtype}{int} argc, \textcolor{keywordtype}{char}** argv)
+00024 \{
+00025     \textcolor{keyword}{const} \textcolor{keywordtype}{double} frequency = 500e6;  \textcolor{comment}{//center frequency to 500 MHz}
+00026     \textcolor{keyword}{const} \textcolor{keywordtype}{double} sample\_rate = 5e6;    \textcolor{comment}{//sample rate to 5 MHz}
+00027     \textcolor{keyword}{const} \textcolor{keywordtype}{double} tone\_freq = 1e6; \textcolor{comment}{//tone frequency}
+00028     \textcolor{comment}{//Find devices}
+00029     \textcolor{keywordtype}{int} n;
+00030     lms_info_str_t list[8]; \textcolor{comment}{//should be large enough to hold all detected devices}
+00031     \textcolor{keywordflow}{if} ((n = LMS_GetDeviceList(list)) < 0) \textcolor{comment}{//NULL can be passed to only get number of devices}
+00032         error();
+00033 
+00034     cout << \textcolor{stringliteral}{"Devices found: "} << n << endl; \textcolor{comment}{//print number of devices}
+00035     \textcolor{keywordflow}{if} (n < 1)
+00036         \textcolor{keywordflow}{return} -1;
+00037 
+00038     \textcolor{comment}{//open the first device}
+00039     \textcolor{keywordflow}{if} (LMS_Open(&device, list[0], NULL))
+00040         error();
+00041 
+00042     \textcolor{comment}{//Initialize device with default configuration}
+00043     \textcolor{comment}{//Do not use if you want to keep existing configuration}
+00044     \textcolor{comment}{//Use LMS\_LoadConfig(device, "/path/to/file.ini") to load config from INI}
+00045     \textcolor{keywordflow}{if} (LMS_Init(device)!=0)
+00046         error();
+00047 
+00048     \textcolor{comment}{//Enable TX channel,Channels are numbered starting at 0}
+00049     \textcolor{keywordflow}{if} (LMS_EnableChannel(device, LMS_CH_TX, 0, \textcolor{keyword}{true})!=0)
+00050         error();
+00051 
+00052     \textcolor{comment}{//Set sample rate}
+00053     \textcolor{keywordflow}{if} (LMS_SetSampleRate(device, sample\_rate, 0)!=0)
+00054         error();
+00055     cout << \textcolor{stringliteral}{"Sample rate: "} << sample\_rate/1e6 << \textcolor{stringliteral}{" MHz"} << endl;
+00056 
+00057     \textcolor{comment}{//Set center frequency}
+00058     \textcolor{keywordflow}{if} (LMS_SetLOFrequency(device,LMS_CH_TX, 0, frequency)!=0)
+00059         error();
+00060     cout << \textcolor{stringliteral}{"Center frequency: "} << frequency/1e6 << \textcolor{stringliteral}{" MHz"} << endl;
+00061 
+00062     \textcolor{comment}{//select TX1\_1 antenna}
+00063     \textcolor{keywordflow}{if} (LMS_SetAntenna(device, LMS_CH_TX, 0, LMS_PATH_TX1)!=0)
+00064         error();
+00065 
+00066     \textcolor{comment}{//set TX gain}
+00067     \textcolor{keywordflow}{if} (LMS_SetNormalizedGain(device, LMS_CH_TX, 0, 0.7) != 0)
+00068         error();
+00069 
+00070     \textcolor{comment}{//Streaming Setup}
+00071 
+00072     lms_stream_t tx\_stream;                 \textcolor{comment}{//stream structure}
+00073     tx\_stream.channel = 0;                  \textcolor{comment}{//channel number}
+00074     tx\_stream.fifoSize = 256*1024;          \textcolor{comment}{//fifo size in samples}
+00075     tx\_stream.throughputVsLatency = 0.5;    \textcolor{comment}{//0 min latency, 1 max throughput}
+00076     tx\_stream.dataFmt = lms_stream_t::LMS_FMT_F32; \textcolor{comment}{//floating point samples}
+00077     tx\_stream.isTx = \textcolor{keyword}{true};                  \textcolor{comment}{//TX channel}
+00078     LMS_SetupStream(device, &tx\_stream);
+00079 
+00080     \textcolor{comment}{//Initialize data buffers}
+00081     \textcolor{keyword}{const} \textcolor{keywordtype}{int} tx\_size = 1024*8;
+00082     \textcolor{keywordtype}{float} tx\_buffer[2*tx\_size];     \textcolor{comment}{//buffer to hold complex values (2*samples))}
+00083     \textcolor{keywordflow}{for} (\textcolor{keywordtype}{int} i = 0; i <tx\_size; i++) \{      \textcolor{comment}{//generate TX tone}
+00084         \textcolor{keyword}{const} \textcolor{keywordtype}{double} pi = acos(-1);
+00085         \textcolor{keywordtype}{double} w = 2*pi*i*tone\_freq/sample\_rate;
+00086         tx\_buffer[2*i] = cos(w);
+00087         tx\_buffer[2*i+1] = sin(w);
+00088     \}
+00089     cout << \textcolor{stringliteral}{"Tx tone frequency: "} << tone\_freq/1e6 << \textcolor{stringliteral}{" MHz"} << endl;
+00090 
+00091     LMS_StartStream(&tx\_stream);         \textcolor{comment}{//Start streaming}
+00092     \textcolor{comment}{//Streaming}
+00093     \textcolor{keyword}{auto} t1 = chrono::high\_resolution\_clock::now();
+00094     \textcolor{keyword}{auto} t2 = t1;
+00095     \textcolor{keywordflow}{while} (chrono::high\_resolution\_clock::now() - t1 < chrono::seconds(10)) \textcolor{comment}{//run for 10 seconds}
+00096     \{
+00097         \textcolor{comment}{//Transmit samples}
+00098         \textcolor{keywordtype}{int} ret = LMS_SendStream(&tx\_stream, tx\_buffer, tx\_size, \textcolor{keyword}{nullptr}, 1000);
+00099         \textcolor{keywordflow}{if} (ret != tx\_size)
+00100             cout << \textcolor{stringliteral}{"error: samples sent: "} << ret << \textcolor{stringliteral}{"/"} << tx\_size << endl;
+00101         \textcolor{comment}{//Print data rate (once per second)}
+00102         \textcolor{keywordflow}{if} (chrono::high\_resolution\_clock::now() - t2 > chrono::seconds(1))
+00103         \{
+00104             t2 = chrono::high\_resolution\_clock::now();
+00105             lms_stream_status_t status;
+00106             LMS_GetStreamStatus(&tx\_stream, &status);  \textcolor{comment}{//Get stream status}
+00107             cout << \textcolor{stringliteral}{"TX data rate: "} << status.linkRate / 1e6 << \textcolor{stringliteral}{" MB/s\(\backslash\)n"}; \textcolor{comment}{//link data rate}
+00108         \}
+00109     \}
+00110     \textcolor{comment}{//Stop streaming}
+00111     LMS_StopStream(&tx\_stream);
+00112     LMS_DestroyStream(device, &tx\_stream);
+00113 
+00114     \textcolor{comment}{//Disable TX channel}
+00115     \textcolor{keywordflow}{if} (LMS_EnableChannel(device, LMS_CH_TX, 0, \textcolor{keyword}{false})!=0)
+00116         error();
+00117 
+00118     \textcolor{comment}{//Close device}
+00119     \textcolor{keywordflow}{if} (LMS_Close(device)==0)
+00120         cout << \textcolor{stringliteral}{"Closed"} << endl;
+00121     \textcolor{keywordflow}{return} 0;
+00122 \}
+\end{DoxyCode}

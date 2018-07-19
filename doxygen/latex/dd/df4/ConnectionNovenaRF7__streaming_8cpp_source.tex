@@ -1,0 +1,608 @@
+\subsection{Connection\+Novena\+R\+F7\+\_\+streaming.\+cpp}
+\label{ConnectionNovenaRF7__streaming_8cpp_source}\index{/home/erik/prefix/default/src/limesuite-\/dev/src/\+Connection\+Novena\+R\+F7/\+Connection\+Novena\+R\+F7\+\_\+streaming.\+cpp@{/home/erik/prefix/default/src/limesuite-\/dev/src/\+Connection\+Novena\+R\+F7/\+Connection\+Novena\+R\+F7\+\_\+streaming.\+cpp}}
+
+\begin{DoxyCode}
+00001 \textcolor{preprocessor}{#include "ConnectionNovenaRF7.h"}
+00002 
+00003 \textcolor{preprocessor}{#include <stdio.h>}
+00004 \textcolor{preprocessor}{#include <stdlib.h>}
+00005 \textcolor{preprocessor}{#include <fcntl.h>}
+00006 \textcolor{preprocessor}{#include <errno.h>}
+00007 \textcolor{preprocessor}{#include <string.h>}
+00008 \textcolor{preprocessor}{#include <sys/stat.h>}
+00009 \textcolor{preprocessor}{#include <fstream>}
+00010 \textcolor{preprocessor}{#include <chrono>}
+00011 \textcolor{preprocessor}{#include <thread>}
+00012 \textcolor{preprocessor}{#include "IConnection.h"}
+00013 \textcolor{preprocessor}{#include "ErrorReporting.h"}
+00014 
+00015 \textcolor{preprocessor}{#if defined(\_\_GNUC\_\_) || defined(\_\_GNUG\_\_)}
+00016 \textcolor{preprocessor}{#include <unistd.h>}
+00017 \textcolor{preprocessor}{#include <sys/time.h>}
+00018 \textcolor{preprocessor}{#endif}
+00019 
+00020 \textcolor{preprocessor}{#ifdef \_\_linux\_\_}
+00021 \textcolor{preprocessor}{#include <sys/mman.h>}
+00022 \textcolor{preprocessor}{#include <stdint.h>}
+00023 \textcolor{preprocessor}{#include <stdint.h>}
+00024 \textcolor{preprocessor}{#include <unistd.h>}
+00025 \textcolor{preprocessor}{#include <stdio.h>}
+00026 \textcolor{preprocessor}{#include <stdlib.h>}
+00027 \textcolor{preprocessor}{#include <getopt.h>}
+00028 \textcolor{preprocessor}{#include <fcntl.h>}
+00029 \textcolor{preprocessor}{#include <sys/ioctl.h>}
+00030 \textcolor{preprocessor}{#include <linux/types.h>}
+00031 \textcolor{preprocessor}{#include <linux/spi/spidev.h>}
+00032 \textcolor{preprocessor}{#endif}
+00033 
+00034 \textcolor{preprocessor}{#define IMX6\_EIM\_BASE\_ADDR 0x021b8000}
+00035 \textcolor{preprocessor}{#define IMX6\_EIM\_CS0\_BASE (0x00)}
+00036 \textcolor{preprocessor}{#define IMX6\_EIM\_CS1\_BASE (0x18)}
+00037 \textcolor{preprocessor}{#define IMX6\_EIM\_CS2\_BASE (0x30)}
+00038 \textcolor{preprocessor}{#define IMX6\_EIM\_CS3\_BASE (0x48)}
+00039 \textcolor{preprocessor}{#define IMX6\_EIM\_WCR (0x90)}
+00040 \textcolor{preprocessor}{#define IMX6\_EIM\_WIAR (0x94)}
+00041 
+00042 \textcolor{preprocessor}{#define IMX6\_EIM\_CS0\_BASE\_ADDR 0x08040000}
+00043 \textcolor{preprocessor}{#define IMX6\_EIM\_CS1\_BASE\_ADDR 0x0c040000}
+00044 
+00045 \textcolor{preprocessor}{#define DATA\_FIFO\_ADDR (IMX6\_EIM\_CS1\_BASE\_ADDR + 0xf000)}
+00046 
+00047 \textcolor{keyword}{using namespace }std;
+00048 \textcolor{keyword}{using namespace }lime;
+00049 
+00050 \textcolor{keyword}{static} \textcolor{keyword}{const} \textcolor{keywordtype}{int} cSPI_SPEED = 5000000;
+00051 
+00052 \textcolor{preprocessor}{#ifdef \_\_linux\_\_}
+00053 \textcolor{keyword}{static} \textcolor{keywordtype}{int}   *mem\_32 = 0;
+00054 \textcolor{keyword}{static} \textcolor{keywordtype}{short} *mem\_16 = 0;
+00055 \textcolor{keyword}{static} \textcolor{keywordtype}{char}  *mem\_8 = 0;
+00056 \textcolor{keyword}{static} \textcolor{keywordtype}{int}   *prev\_mem\_range = 0;
+00057 \textcolor{keyword}{static} \textcolor{keywordtype}{int} mem\_fd = 0;
+00058 \textcolor{keyword}{static} \textcolor{keywordtype}{int} fd = 0;
+00059 \textcolor{preprocessor}{#endif}
+00060 
+00061 \textcolor{keywordtype}{bool} eim_configured = \textcolor{keyword}{false};
+00062 
+00063 \textcolor{keywordtype}{int} fpga_send(\textcolor{keywordtype}{unsigned} \textcolor{keyword}{const} \textcolor{keywordtype}{int} addr, \textcolor{keyword}{const} \textcolor{keywordtype}{char}* buf, \textcolor{keyword}{const} \textcolor{keywordtype}{int} len)
+00064 \{
+00065 \textcolor{preprocessor}{#ifdef \_\_linux\_\_}
+00066     \textcolor{keywordtype}{void}* mem\_base = 0;
+00067     \textcolor{keywordflow}{if}(mem\_32)
+00068         munmap(mem\_32, 0xFFFF);
+00069     \textcolor{keywordflow}{if}(fd)
+00070         close(fd);
+00071 
+00072     fd = open(\textcolor{stringliteral}{"/dev/mem"}, O\_RDWR | O\_SYNC);
+00073     \textcolor{keywordflow}{if}( fd < 0 )
+00074     \{
+00075         perror(\textcolor{stringliteral}{"Unable to open /dev/mem"});
+00076         fd = 0;
+00077         \textcolor{keywordflow}{return} -1;
+00078     \}
+00079 
+00080     \textcolor{keyword}{const} \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{int} map\_size = 4096;
+00081     \textcolor{keyword}{const} \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{int} map\_mask = map\_size-1;
+00082 
+00083     mem\_base = mmap(0, map\_size, PROT\_READ | PROT\_WRITE, MAP\_SHARED, fd, addr & ~map\_mask);
+00084     \textcolor{keywordflow}{if}(mem\_base < 0)
+00085     \{
+00086         printf(\textcolor{stringliteral}{"error mapping memory\(\backslash\)n"});
+00087         \textcolor{keywordflow}{return} -1;
+00088     \}
+00089 
+00090     \textcolor{keywordtype}{size\_t} virt\_addr = size\_t(mem\_base) + (size\_t(addr) & map\_mask);
+00091     \textcolor{keywordflow}{for}(\textcolor{keywordtype}{unsigned} i=0; i<len/\textcolor{keyword}{sizeof}(\textcolor{keywordtype}{unsigned} short); ++i)
+00092     \{
+00093         *(\textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{short}*)(virt\_addr+i*2) = ((\textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{short}*)buf)[i];
+00094     \}
+00095     \textcolor{keywordflow}{if}(munmap(mem\_base, map\_size) == -1)
+00096         \textcolor{keywordflow}{return} -2;
+00097     close(fd);
+00098 \textcolor{preprocessor}{#endif}
+00099     \textcolor{keywordflow}{return} 0;
+00100 \}
+00101 
+00102 \textcolor{keywordtype}{int} fpga_read(\textcolor{keywordtype}{unsigned} \textcolor{keyword}{const} \textcolor{keywordtype}{int} addr, \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{short} *buf, \textcolor{keyword}{const} \textcolor{keywordtype}{int} len)
+00103 \{
+00104 \textcolor{preprocessor}{#ifdef \_\_linux\_\_}
+00105     \textcolor{keywordtype}{void}* mem\_base = 0;
+00106 
+00107     \textcolor{keywordflow}{if}(mem\_32)
+00108         munmap(mem\_32, 0xFFFF);
+00109     \textcolor{keywordflow}{if}(fd)
+00110         close(fd);
+00111 
+00112     fd = open(\textcolor{stringliteral}{"/dev/mem"}, O\_RDWR | O\_SYNC);
+00113     \textcolor{keywordflow}{if}( fd < 0 )
+00114     \{
+00115         perror(\textcolor{stringliteral}{"Unable to open /dev/mem"});
+00116         fd = 0;
+00117         \textcolor{keywordflow}{return} -1;
+00118     \}
+00119 
+00120     \textcolor{keyword}{const} \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{int} map\_size = 4096;
+00121     \textcolor{keyword}{const} \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{int} map\_mask = map\_size-1;
+00122 
+00123     mem\_base = mmap(0, map\_size, PROT\_READ | PROT\_WRITE, MAP\_SHARED, fd, addr & ~map\_mask);
+00124     \textcolor{comment}{//mem\_base = ioremap\_wc(addr & ~map\_mask, map\_size);}
+00125     \textcolor{keywordflow}{if}(mem\_base < 0)
+00126     \{
+00127         printf(\textcolor{stringliteral}{"error mapping memory\(\backslash\)n"});
+00128         \textcolor{keywordflow}{return} -1;
+00129     \}
+00130     \textcolor{keywordtype}{size\_t} virt\_addr = size\_t(mem\_base) + (size\_t(addr) & map\_mask);
+00131     memcpy(buf, (\textcolor{keywordtype}{void} *)virt\_addr, len);
+00132     \textcolor{keywordflow}{if}(munmap(mem\_base, map\_size) == -1)
+00133     \{
+00134         printf(\textcolor{stringliteral}{"munmap failed\(\backslash\)n"});
+00135         \textcolor{keywordflow}{return} -2;
+00136     \}
+00137     close(fd);
+00138 \textcolor{preprocessor}{#endif}
+00139     \textcolor{keywordflow}{return} 0;
+00140 \}
+00141 
+00142 \textcolor{keywordtype}{int} readKernelMemory(\textcolor{keywordtype}{long} offset, \textcolor{keywordtype}{int} virtualized, \textcolor{keywordtype}{int} size)
+00143 \{
+00144 \textcolor{preprocessor}{#ifdef \_\_linux\_\_}
+00145     \textcolor{keywordtype}{int} result(0);
+00146 
+00147     \textcolor{keywordtype}{int} *mem\_range = (\textcolor{keywordtype}{int} *)(offset & ~0xFFFF);
+00148     \textcolor{keywordflow}{if} (mem\_range != prev\_mem\_range)
+00149     \{
+00150         prev\_mem\_range = mem\_range;
+00151 
+00152         \textcolor{keywordflow}{if} (mem\_32)
+00153             munmap(mem\_32, 0xFFFF);
+00154         \textcolor{keywordflow}{if} (mem\_fd)
+00155             close(mem\_fd);
+00156 
+00157         \textcolor{keywordflow}{if} (virtualized)
+00158         \{
+00159             mem\_fd = open(\textcolor{stringliteral}{"/dev/kmem"}, O\_RDWR);
+00160             \textcolor{keywordflow}{if} (mem\_fd < 0)
+00161             \{
+00162                 printf(\textcolor{stringliteral}{"%s %s\(\backslash\)n"}, \textcolor{stringliteral}{"Couldn't open /dev/mem"}, strerror(errno));
+00163                 mem\_fd = 0;
+00164                 \textcolor{keywordflow}{return} -1;
+00165             \}
+00166         \}
+00167         \textcolor{keywordflow}{else}
+00168         \{
+00169             mem\_fd = open(\textcolor{stringliteral}{"/dev/mem"}, O\_RDWR);
+00170             \textcolor{keywordflow}{if} (mem\_fd < 0)
+00171             \{
+00172                 printf(\textcolor{stringliteral}{"%s %s\(\backslash\)n"}, \textcolor{stringliteral}{"Couldn't open /dev/mem"}, strerror(errno));
+00173                 mem\_fd = 0;
+00174                 \textcolor{keywordflow}{return} -1;
+00175             \}
+00176         \}
+00177 
+00178         mem\_32 = (\textcolor{keywordtype}{int} *)mmap(0, 0xffff, PROT\_READ | PROT\_WRITE, MAP\_SHARED, mem\_fd, offset&~0xFFFF);
+00179         \textcolor{keywordflow}{if} ((\textcolor{keywordtype}{void} *)-1 == mem\_32)
+00180         \{
+00181             printf(\textcolor{stringliteral}{"%s %s\(\backslash\)n"}, \textcolor{stringliteral}{"Couldn't mmap /dev/kmem: "}, strerror(errno));
+00182 
+00183             \textcolor{keywordflow}{if} (-1 == close(mem\_fd))
+00184                 printf(\textcolor{stringliteral}{"%s %s\(\backslash\)n"}, \textcolor{stringliteral}{"Also couldn't close /dev/kmem: "}, strerror(errno));
+00185 
+00186             mem\_fd = 0;
+00187             \textcolor{keywordflow}{return} -1;
+00188         \}
+00189         mem\_16 = (\textcolor{keywordtype}{short} *)mem\_32;
+00190         mem\_8 = (\textcolor{keywordtype}{char} *)mem\_32;
+00191     \}
+00192 
+00193     \textcolor{keywordtype}{int} scaled\_offset = (offset - (offset&~0xFFFF));
+00194     \textcolor{keywordflow}{if} (size == 1)
+00195     \{
+00196         \textcolor{keywordflow}{if} (mem\_8)
+00197             result = mem\_8[scaled\_offset / \textcolor{keyword}{sizeof}(char)];
+00198     \}
+00199     \textcolor{keywordflow}{else} \textcolor{keywordflow}{if} (size == 2)
+00200     \{
+00201         \textcolor{keywordflow}{if} (mem\_16)
+00202             result = mem\_16[scaled\_offset / \textcolor{keyword}{sizeof}(short)];
+00203     \}
+00204     \textcolor{keywordflow}{else}
+00205     \{
+00206         \textcolor{keywordflow}{if} (mem\_32)
+00207             result = mem\_32[scaled\_offset / \textcolor{keyword}{sizeof}(long)];
+00208     \}
+00209 
+00210     \textcolor{keywordflow}{return} result;
+00211 \textcolor{preprocessor}{#else}
+00212     \textcolor{keywordflow}{return} 0;
+00213 \textcolor{preprocessor}{#endif}
+00214 \}
+00215 
+00216 \textcolor{keywordtype}{int} writeKernelMemory(\textcolor{keywordtype}{long} offset, \textcolor{keywordtype}{long} value, \textcolor{keywordtype}{int} virtualized, \textcolor{keywordtype}{int} size)
+00217 \{
+00218 \textcolor{preprocessor}{#ifdef \_\_linux\_\_}
+00219     \textcolor{keywordtype}{int} old\_value = readKernelMemory(offset, virtualized, size);
+00220     \textcolor{keywordtype}{int} scaled\_offset = (offset - (offset&~0xFFFF));
+00221     \textcolor{keywordflow}{if} (size == 1)
+00222     \{
+00223         \textcolor{keywordflow}{if} (mem\_8)
+00224             mem\_8[scaled\_offset / \textcolor{keyword}{sizeof}(char)] = value;
+00225     \}
+00226     \textcolor{keywordflow}{else} \textcolor{keywordflow}{if} (size == 2)
+00227     \{
+00228         \textcolor{keywordflow}{if} (mem\_16)
+00229             mem\_16[scaled\_offset / \textcolor{keyword}{sizeof}(short)] = value;
+00230     \}
+00231     \textcolor{keywordflow}{else}
+00232     \{
+00233         \textcolor{keywordflow}{if} (mem\_32)
+00234             mem\_32[scaled\_offset / \textcolor{keyword}{sizeof}(long)] = value;
+00235     \}
+00236     \textcolor{keywordflow}{return} old\_value;
+00237 \textcolor{preprocessor}{#endif // \_\_linux\_\_}
+00238     \textcolor{keywordflow}{return} 0;
+00239 \}
+00240 
+00241 \textcolor{keywordtype}{int} prep_eim_burst()
+00242 \{
+00243     \textcolor{keywordflow}{if}(eim_configured == \textcolor{keyword}{true})
+00244         \textcolor{keywordflow}{return} 1;
+00245     eim_configured = \textcolor{keyword}{true};
+00246     \textcolor{comment}{// set up pads to be mapped to EIM}
+00247     \textcolor{keywordflow}{for} (\textcolor{keywordtype}{int} i = 0; i < 16; i++)
+00248     \{
+00249         writeKernelMemory(0x20e0114 + i*4, 0x0, 0, 4); \textcolor{comment}{// mux mapping}
+00250         writeKernelMemory(0x20e0428 + i*4, 0xb0b1, 0, 4); \textcolor{comment}{// pad strength config'd for a 100MHz rate}
+00251     \}
+00252 
+00253     \textcolor{comment}{// mux mapping}
+00254     writeKernelMemory(0x20e046c - 0x314, 0x0, 0, 4); \textcolor{comment}{// BCLK}
+00255     writeKernelMemory(0x20e040c - 0x314, 0x0, 0, 4); \textcolor{comment}{// CS0}
+00256     writeKernelMemory(0x20e0410 - 0x314, 0x0, 0, 4); \textcolor{comment}{// CS1}
+00257     writeKernelMemory(0x20e0414 - 0x314, 0x0, 0, 4); \textcolor{comment}{// OE}
+00258     writeKernelMemory(0x20e0418 - 0x314, 0x0, 0, 4); \textcolor{comment}{// RW}
+00259     writeKernelMemory(0x20e041c - 0x314, 0x0, 0, 4); \textcolor{comment}{// LBA}
+00260     writeKernelMemory(0x20e0468 - 0x314, 0x0, 0, 4); \textcolor{comment}{// WAIT}
+00261     writeKernelMemory(0x20e0408 - 0x314, 0x0, 0, 4); \textcolor{comment}{// A16}
+00262     writeKernelMemory(0x20e0404 - 0x314, 0x0, 0, 4); \textcolor{comment}{// A17}
+00263     writeKernelMemory(0x20e0400 - 0x314, 0x0, 0, 4); \textcolor{comment}{// A18}
+00264     writeKernelMemory(0x20e0400 - 0x314, 0x0, 0, 4); \textcolor{comment}{// A18}
+00265 
+00266     \textcolor{comment}{// pad strength}
+00267     writeKernelMemory(0x20e046c, 0xb0b1, 0, 4); \textcolor{comment}{// BCLK}
+00268     writeKernelMemory(0x20e040c, 0xb0b1, 0, 4); \textcolor{comment}{// CS0}
+00269     writeKernelMemory(0x20e0410, 0xb0b1, 0, 4); \textcolor{comment}{// CS1}
+00270     writeKernelMemory(0x20e0414, 0xb0b1, 0, 4); \textcolor{comment}{// OE}
+00271     writeKernelMemory(0x20e0418, 0xb0b1, 0, 4); \textcolor{comment}{// RW}
+00272     writeKernelMemory(0x20e041c, 0xb0b1, 0, 4); \textcolor{comment}{// LBA}
+00273     writeKernelMemory(0x20e0468, 0xb0b1, 0, 4); \textcolor{comment}{// WAIT}
+00274     writeKernelMemory(0x20e0408, 0xb0b1, 0, 4); \textcolor{comment}{// A16}
+00275     writeKernelMemory(0x20e0404, 0xb0b1, 0, 4); \textcolor{comment}{// A17}
+00276     writeKernelMemory(0x20e0400, 0xb0b1, 0, 4); \textcolor{comment}{// A18}
+00277 
+00278     writeKernelMemory(0x020c4080, 0xcf3, 0, 4); \textcolor{comment}{// ungate eim slow clocks}
+00279 
+00280     \textcolor{comment}{// EIM\_CSnGCR1}
+00281     \textcolor{comment}{// rework timing for sync use}
+00282     \textcolor{comment}{// PSZ WP GBC AUS CSREC SP DSZ BCS BCD WC BL CREP CRE RFL WFL MUM SRD SWR CSEN}
+00283 
+00284     \textcolor{keywordtype}{int} PSZ = 1 << 28; \textcolor{comment}{// 2048 words page size}
+00285     \textcolor{keywordtype}{int} WP = 0 << 27; \textcolor{comment}{//(not protected)}
+00286     \textcolor{keywordtype}{int} GBC = 1 << 24; \textcolor{comment}{//min 1 cycles between chip select changes}
+00287     \textcolor{keywordtype}{int} AUS = 0 << 23; \textcolor{comment}{//0 address shifted according to port size / 1: unshifted}
+00288     \textcolor{keywordtype}{int} CSREC = 1 << 20; \textcolor{comment}{//min 1 cycles between CS, OE, WE signals}
+00289     \textcolor{keywordtype}{int} SP = 0 << 19; \textcolor{comment}{//no supervisor protect (user mode access allowed)}
+00290     \textcolor{keywordtype}{int} DSZ = 1 << 16; \textcolor{comment}{//16-bit port resides on DATA[15:0]}
+00291     \textcolor{keywordtype}{int} BCS = 0 << 14; \textcolor{comment}{//0 clock delay for burst generation}
+00292     \textcolor{keywordtype}{int} BCD = 0 << 12; \textcolor{comment}{//divide EIM clock by 1 for burst clock}
+00293     \textcolor{keywordtype}{int} WC = 1 << 11; \textcolor{comment}{//write accesses are continuous burst length}
+00294     \textcolor{keywordtype}{int} BL = 2 << 8; \textcolor{comment}{//32 word memory wrap length}
+00295     \textcolor{keywordtype}{int} CREP = 1 << 7; \textcolor{comment}{//non-PSRAM, set to 1}
+00296     \textcolor{keywordtype}{int} CRE = 0 << 6; \textcolor{comment}{//CRE is disabled}
+00297     \textcolor{keywordtype}{int} RFL = 1 << 5; \textcolor{comment}{//fixed latency reads}
+00298     \textcolor{keywordtype}{int} WFL = 1 << 4; \textcolor{comment}{//fixed latency writes}
+00299     \textcolor{keywordtype}{int} MUM = 1 << 3; \textcolor{comment}{//multiplexed mode enabled}
+00300     \textcolor{keywordtype}{int} SRD = 1 << 2; \textcolor{comment}{//synch reads}
+00301     \textcolor{keywordtype}{int} SWR = 1 << 1; \textcolor{comment}{//synch writes}
+00302     \textcolor{keywordtype}{int} CSEN = 1; \textcolor{comment}{//chip select is enabled}
+00303     \textcolor{keywordtype}{int} EIM\_CSnGCR1 = PSZ|WP|GBC|AUS|CSREC|SP|DSZ|BCS|BCD|WC|BL|CREP|CRE|RFL|WFL|MUM|SRD|SWR|CSEN;
+00304     printf(\textcolor{stringliteral}{"EIM\_CSnGCR1 0x%08X\(\backslash\)n"}, EIM\_CSnGCR1);
+00305 
+00306     writeKernelMemory(0x21b8000, EIM\_CSnGCR1, 0, 4);
+00307     writeKernelMemory(0x21b8000+24, EIM\_CSnGCR1, 0, 4);
+00308     writeKernelMemory(0x21b8000+48, EIM\_CSnGCR1, 0, 4);
+00309 
+00310     \textcolor{comment}{// EIM\_CS0GCR2}
+00311     \textcolor{keywordtype}{int} MUX16\_BYP\_GRANT = 1 << 12;
+00312     \textcolor{keywordtype}{int} DAP = 0 << 9;
+00313     \textcolor{keywordtype}{int} DAE = 0 << 8;
+00314     \textcolor{keywordtype}{int} DAPS = 0 << 4;
+00315     \textcolor{keywordtype}{int} ADH = 0; \textcolor{comment}{// address hold time after ADC negation(0 cycles)}
+00316     \textcolor{keywordtype}{int} EIM\_CSnGCR2 = MUX16\_BYP\_GRANT|DAP|DAE|DAPS|ADH;
+00317     printf(\textcolor{stringliteral}{"EIM\_CSnGCR2 0x%08X\(\backslash\)n"}, EIM\_CSnGCR2);
+00318     writeKernelMemory(0x21b8004, EIM\_CSnGCR2, 0, 4);
+00319     writeKernelMemory(0x21b8004+24, EIM\_CSnGCR2, 0, 4);
+00320     writeKernelMemory(0x21b8004+48, EIM\_CSnGCR2, 0, 4);
+00321 
+00322     \textcolor{comment}{// EIM\_CS0RCR1}
+00323     \textcolor{comment}{// RWSC RADVA RAL RADVN OEA OEN RCSA RCSN}
+00324     \textcolor{keywordtype}{int} RWSC = 9 << 24;
+00325     \textcolor{keywordtype}{int} RADVA = 0 << 20;
+00326     \textcolor{keywordtype}{int} RAL = 0 << 19;
+00327     \textcolor{keywordtype}{int} RADVN = 1 << 16;
+00328     \textcolor{keywordtype}{int} OEA = 4 << 12;
+00329     \textcolor{keywordtype}{int} OEN = 0 << 8;
+00330     \textcolor{keywordtype}{int} RCSA = 0 << 4;
+00331     \textcolor{keywordtype}{int} RCSN = 0;
+00332     \textcolor{keywordtype}{int} EIM\_CSnRCR1 = RWSC|RADVA|RAL|RADVN|OEA|OEN|RCSA|RCSN;
+00333     writeKernelMemory(0x21b8008, EIM\_CSnRCR1, 0, 4);
+00334     writeKernelMemory(0x21b8008+24, EIM\_CSnRCR1, 0, 4);
+00335     writeKernelMemory(0x21b8008+48, EIM\_CSnRCR1, 0, 4);
+00336     printf(\textcolor{stringliteral}{"EIM\_CSnRCR1 0x%08X\(\backslash\)n"}, EIM\_CSnRCR1);
+00337 
+00338     \textcolor{comment}{// EIM\_CS0RCR2}
+00339     \textcolor{comment}{// APR PAT RL RBEA RBEN}
+00340     \textcolor{keywordtype}{int} APR = 0 << 15; \textcolor{comment}{// 0 mandatory because MUM = 1}
+00341     \textcolor{keywordtype}{int} PAT = 0 << 12; \textcolor{comment}{// XXX because APR = 0}
+00342     \textcolor{keywordtype}{int} RL = 0 << 8; \textcolor{comment}{//}
+00343     \textcolor{keywordtype}{int} RBEA = 0 << 4; \textcolor{comment}{//these match RCSA/RCSN from previous field}
+00344     \textcolor{keywordtype}{int} RBE = 0 << 3;
+00345     \textcolor{keywordtype}{int} RBEN = 0;
+00346     \textcolor{keywordtype}{int} EIM\_CSnRCR2 = APR|PAT|RL|RBEA|RBE|RBEN;
+00347     writeKernelMemory(0x21b800c, EIM\_CSnRCR2, 0, 4);
+00348     writeKernelMemory(0x21b800c+24, EIM\_CSnRCR2, 0, 4);
+00349     writeKernelMemory(0x21b800c+48, EIM\_CSnRCR2, 0, 4);
+00350     printf(\textcolor{stringliteral}{"EIM\_CSnRCR2 0x%08X\(\backslash\)n"}, EIM\_CSnRCR2);
+00351 
+00352     \textcolor{comment}{// EIM\_CS0WCR1}
+00353     \textcolor{comment}{// WAL WBED WWSC WADVA WADVN WBEA WBEN WEA WEN WCSA WCSN}
+00354     \textcolor{keywordtype}{int} WAL = 0 << 31; \textcolor{comment}{//use WADVN}
+00355     \textcolor{keywordtype}{int} WBED = 0 << 30; \textcolor{comment}{//allow BE during write}
+00356     \textcolor{keywordtype}{int} WWSC = 9 << 24; \textcolor{comment}{// write wait states}
+00357     \textcolor{keywordtype}{int} WADVA = 0 << 21; \textcolor{comment}{//same as RADVA}
+00358     \textcolor{keywordtype}{int} WADVN = 2 << 18; \textcolor{comment}{//this sets WE length to 1 (this value +1)}
+00359     \textcolor{keywordtype}{int} WBEA = 0 << 15; \textcolor{comment}{//same as RBEA}
+00360     \textcolor{keywordtype}{int} WBEN = 0 << 12; \textcolor{comment}{//same as RBEN}
+00361     \textcolor{keywordtype}{int} WEA = 4 << 9; \textcolor{comment}{//0 cycles between beginning of access and WE assertion}
+00362     \textcolor{keywordtype}{int} WEN = 0 << 6; \textcolor{comment}{//1 cycles to end of WE assertion}
+00363     \textcolor{keywordtype}{int} WCSA = 0 << 3; \textcolor{comment}{//cycles to CS assertion}
+00364     \textcolor{keywordtype}{int} WCSN = 0 ; \textcolor{comment}{//cycles to CS negation}
+00365     \textcolor{keywordtype}{int} EIM\_CSnWCR1 = WAL|WBED|WWSC|WADVA|WADVN|WBEA|WBEN|WEA|WEN|WCSA|WCSN;
+00366     printf(\textcolor{stringliteral}{"EIM\_CSnWCR1 0x%08X\(\backslash\)n"}, EIM\_CSnWCR1);
+00367     writeKernelMemory(0x21b8010, EIM\_CSnWCR1, 0, 4);
+00368     writeKernelMemory(0x21b8010+24, EIM\_CSnWCR1, 0, 4); \textcolor{comment}{//cs1}
+00369     writeKernelMemory(0x21b8010+48, EIM\_CSnWCR1, 0, 4); \textcolor{comment}{//cs2}
+00370 
+00371     \textcolor{comment}{// EIM\_WCR}
+00372     \textcolor{keywordtype}{int} WDOG\_LIMIT = 3 << 9;
+00373     \textcolor{keywordtype}{int} WDOG\_EN = 1 << 8;
+00374     \textcolor{keywordtype}{int} INTPOL = 0 << 5;
+00375     \textcolor{keywordtype}{int} INTEN = 0 << 4;
+00376     \textcolor{keywordtype}{int} GBCD = 0 << 1; \textcolor{comment}{//0 //don't divide the burst clock}
+00377     \textcolor{keywordtype}{int} BCM = 1; \textcolor{comment}{//free-run BCLK}
+00378     \textcolor{keywordtype}{int} EIM\_WCR = WDOG\_LIMIT|WDOG\_EN|INTPOL|INTEN|GBCD|BCM;
+00379     writeKernelMemory(0x21b8090, EIM\_WCR, 0, 4);
+00380     printf(\textcolor{stringliteral}{"EIM\_WCR 0x%08X\(\backslash\)n"}, EIM\_WCR);
+00381 
+00382     \textcolor{comment}{// EIM\_WIAR}
+00383     \textcolor{keywordtype}{int} ACLK\_EN = 1 << 4;
+00384     \textcolor{keywordtype}{int} ERRST = 0 << 3;
+00385     \textcolor{keywordtype}{int} INT = 0 << 2;
+00386     \textcolor{keywordtype}{int} IPS\_ACK = 0 << 1;
+00387     \textcolor{keywordtype}{int} IPS\_REQ = 0;
+00388     \textcolor{keywordtype}{int} EIM\_WIAR = ACLK\_EN|ERRST|INT|IPS\_ACK|IPS\_REQ;
+00389     writeKernelMemory(0x21b8094, EIM\_WIAR, 0, 4);
+00390     printf(\textcolor{stringliteral}{"EIM\_WIAR 0x%08X\(\backslash\)n"}, EIM\_WIAR);
+00391 
+00392     printf( \textcolor{stringliteral}{"resetting CS0 space to 64M and enabling 32M CS1 and 32M CS2 space.\(\backslash\)n"} );
+00393     writeKernelMemory( 0x20e0004, (readKernelMemory(0x20e0004, 0, 4) & 0xFFFFF000) | 0x04B, 0, 4);
+00394     printf(\textcolor{stringliteral}{"EIM configured\(\backslash\)n"});
+00395     \textcolor{keywordflow}{return} 0;
+00396 \}
+00397 
+00398 \textcolor{keywordtype}{void} ConnectionNovenaRF7::ReceivePacketsLoop(\textcolor{keyword}{const} ThreadData args)
+00399 \{
+00400     prep_eim_burst();
+00401     ConnectionNovenaRF7 *pthis = args.dataPort;
+00402     \textcolor{keyword}{auto} terminate = args.terminate;
+00403     \textcolor{keyword}{auto} dataRate\_Bps = args.dataRate_Bps;
+00404 
+00405     uint32\_t samplesCollected = 0;
+00406     \textcolor{keyword}{auto} t1 = chrono::high\_resolution\_clock::now();
+00407     \textcolor{keyword}{auto} t2 = chrono::high\_resolution\_clock::now();
+00408 
+00409     \textcolor{keyword}{const} \textcolor{keywordtype}{int} buffer\_size = 32768*2;
+00410     \textcolor{keywordtype}{char} buffer[buffer\_size];
+00411     memset(buffer, 0, buffer\_size);
+00412 
+00413     \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{long} totalBytesReceived = 0;
+00414     \textcolor{keywordtype}{int} m\_bufferFailures = 0;
+00415     int16\_t sample;
+00416 
+00417     \textcolor{keyword}{const} \textcolor{keywordtype}{int} bytesToRead = 4096;
+00418     \textcolor{keyword}{const} \textcolor{keywordtype}{int} FPGAbufferSize = 32768*2;
+00419 
+00420     \textcolor{comment}{//int dataSource = 0;}
+00421     \textcolor{keyword}{const} uint16\_t NOVENA\_DATA\_SRC\_ADDR = 0x0702;
+00422     uint16\_t controlRegValue = 0;
+00423     pthis->ReadRegister(NOVENA\_DATA\_SRC\_ADDR, controlRegValue);
+00424 
+00425     \textcolor{comment}{//dataSource = (controlRegValue >> 12) & 0x3;}
+00426     \textcolor{comment}{//reset FIFO}
+00427     pthis->WriteRegister(NOVENA\_DATA\_SRC\_ADDR, (controlRegValue & 0x7FFF));
+00428     pthis->WriteRegister(NOVENA\_DATA\_SRC\_ADDR, (controlRegValue & 0x7FFF) | 0x8000);
+00429     pthis->WriteRegister(NOVENA\_DATA\_SRC\_ADDR, (controlRegValue & 0x7FFF));
+00430     \textcolor{comment}{//set data source}
+00431     \textcolor{comment}{//pthis->Reg\_write(NOVENA\_DATA\_SRC\_ADDR, (controlRegValue & 0x8FFF) | (dataSource << 12));}
+00432     \textcolor{comment}{//request data}
+00433     pthis->WriteRegister(NOVENA\_DATA\_SRC\_ADDR, (controlRegValue & 0xBFFF));
+00434     pthis->WriteRegister(NOVENA\_DATA\_SRC\_ADDR, (controlRegValue & 0xBFFF)| 0x4000);
+00435 
+00436     vector<complex16\_t> samples(FPGAbufferSize/4);
+00437     uint64\_t timestamp = 0;
+00438     uint32\_t droppedSamples = 0;
+00439 
+00440     \textcolor{keywordflow}{while} (terminate->load() == \textcolor{keyword}{false})
+00441     \{
+00442         std::this\_thread::sleep\_for(std::chrono::milliseconds(2));
+00443 
+00444         \textcolor{keywordtype}{int} bytesReceived = 0;
+00445 \textcolor{preprocessor}{#ifndef NDEBUG}
+00446         printf(\textcolor{stringliteral}{"--- FPGA FIFO UPDATE ---\(\backslash\)n"});
+00447 \textcolor{preprocessor}{#endif}
+00448         \textcolor{keywordflow}{for} (\textcolor{keywordtype}{int} bb = 0; bb<FPGAbufferSize; bb += bytesToRead)
+00449         \{
+00450             fpga_read(0xC000000, (\textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{short}*)&buffer[bb], bytesToRead);
+00451             totalBytesReceived += bytesToRead;
+00452             bytesReceived += bytesToRead;
+00453         \}
+00454     \textcolor{comment}{//reset FIFO}
+00455         pthis->WriteRegister(NOVENA\_DATA\_SRC\_ADDR, (controlRegValue & 0x7FFF));
+00456         pthis->WriteRegister(NOVENA\_DATA\_SRC\_ADDR, (controlRegValue & 0x7FFF) | 0x8000);
+00457         pthis->WriteRegister(NOVENA\_DATA\_SRC\_ADDR, (controlRegValue & 0x7FFF));
+00458         \textcolor{comment}{//request data}
+00459         pthis->WriteRegister(NOVENA\_DATA\_SRC\_ADDR, (controlRegValue & 0xBFFF));
+00460         pthis->WriteRegister(NOVENA\_DATA\_SRC\_ADDR, (controlRegValue & 0xBFFF)| 0x4000);
+00461 
+00462         \textcolor{keywordflow}{if} (bytesReceived > 0)
+00463         \{
+00464             \textcolor{keywordtype}{char}* bufStart = buffer;
+00465             \textcolor{keywordflow}{for} (\textcolor{keywordtype}{int} p = 0; p < bytesReceived; p += 4)
+00466             \{
+00467                 sample = (bufStart[p + 1] & 0x0F);
+00468                 sample = sample << 8;
+00469                 sample |= (bufStart[p] & 0xFF);
+00470                 sample = sample << 4;
+00471                 sample = sample >> 4;
+00472                 samples[samplesCollected].i = sample;
+00473 
+00474                 sample = (bufStart[p + 1] & 0x0F);
+00475                 sample = sample << 8;
+00476                 sample |= (bufStart[p] & 0xFF);
+00477                 sample = sample << 4;
+00478                 sample = sample >> 4;
+00479                 samples[samplesCollected].q = sample;
+00480 
+00481                 ++samplesCollected;
+00482             \}
+00483 
+00484             IStreamChannel::Metadata meta;
+00485             meta.timestamp = timestamp;
+00486             timestamp += samplesCollected;
+00487             meta.flags = 0;
+00488             uint32\_t samplesPushed = args.channels[0]->Write((\textcolor{keyword}{const} \textcolor{keywordtype}{void}*)samples.data(), samplesCollected,
+       &meta, 100);
+00489             \textcolor{keywordflow}{if}(samplesPushed != samplesCollected)
+00490                 droppedSamples += samplesCollected-samplesPushed;
+00491             samplesCollected = 0;
+00492         \}
+00493         \textcolor{keywordflow}{else}
+00494         \{
+00495             ++m\_bufferFailures;
+00496         \}
+00497 
+00498         t2 = chrono::high\_resolution\_clock::now();
+00499         \textcolor{keywordtype}{long} timePeriod = std::chrono::duration\_cast<std::chrono::milliseconds>(
+      t2 - t1).count();
+00500         \textcolor{keywordflow}{if} (timePeriod >= 1000)
+00501         \{
+00502             \textcolor{keywordtype}{float} m\_dataRate = 1000.0*totalBytesReceived / timePeriod;
+00503             t1 = t2;
+00504             totalBytesReceived = 0;
+00505 
+00506             \textcolor{keywordflow}{if}(dataRate\_Bps)
+00507                 dataRate\_Bps->store(m\_dataRate);
+00508 \textcolor{preprocessor}{#ifndef NDEBUG}
+00509             printf(\textcolor{stringliteral}{"Rx: %.0f kB/s failures:%i\(\backslash\)n"}, m\_dataRate / 1000.0, m\_bufferFailures);
+00510 \textcolor{preprocessor}{#endif}
+00511             m\_bufferFailures = 0;
+00512             droppedSamples = 0;
+00513         \}
+00514         memset(buffer, 0, buffer\_size);
+00515     \}
+00516 \textcolor{preprocessor}{#ifndef NDEBUG}
+00517     printf(\textcolor{stringliteral}{"Rx finished\(\backslash\)n"});
+00518 \textcolor{preprocessor}{#endif}
+00519 \}
+00520 
+00521 \textcolor{keywordtype}{int} ConnectionNovenaRF7::ReadStream(\textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} streamID, \textcolor{keywordtype}{void}* buffs, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} 
+      length, \textcolor{keyword}{const} \textcolor{keywordtype}{long} timeout_ms, StreamMetadata &metadata)
+00522 \{
+00523     assert(streamID != 0);
+00524     lime::IStreamChannel* channel = (lime::IStreamChannel*)streamID;
+00525     lime::IStreamChannel::Metadata meta;
+00526     meta.flags = 0;
+00527     meta.flags |= metadata.hasTimestamp ? lime::IStreamChannel::Metadata::SYNC\_TIMESTAMP : 0;
+00528     meta.timestamp = metadata.timestamp;
+00529     \textcolor{keywordtype}{int} status = channel->Read(buffs, length, &meta, timeout\_ms);
+00530     metadata.timestamp = meta.timestamp;
+00531     \textcolor{keywordflow}{return} status;
+00532 \}
+00533 
+00534 \textcolor{keywordtype}{int} ConnectionNovenaRF7::WriteStream(\textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} streamID, \textcolor{keyword}{const} \textcolor{keywordtype}{void}* buffs, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} 
+      length, \textcolor{keyword}{const} \textcolor{keywordtype}{long} timeout_ms, \textcolor{keyword}{const} StreamMetadata &metadata)
+00535 \{
+00536     \textcolor{keywordflow}{return} -1;
+00537 \}
+00538 
+00539 \textcolor{keywordtype}{int} ConnectionNovenaRF7::SetupStream(\textcolor{keywordtype}{size\_t} &streamID, \textcolor{keyword}{const} StreamConfig &config)
+00540 \{
+00541     \textcolor{keywordflow}{if}(rxRunning.load() == \textcolor{keyword}{true})
+00542         \textcolor{keywordflow}{return} ReportError(EPERM, \textcolor{stringliteral}{"All streams must be stopped before doing setups"});
+00543     streamID = ~0;
+00544     StreamChannel* stream = \textcolor{keyword}{new} StreamChannel(\textcolor{keyword}{this});
+00545     stream->config = config;
+00546     \textcolor{comment}{//TODO check for duplicate streams}
+00547     \textcolor{keywordflow}{if}(config.isTx)
+00548         \textcolor{keywordflow}{return} ReportError(ENOTSUP, \textcolor{stringliteral}{"Transmitting not supported"});
+00549     \textcolor{keywordflow}{else}
+00550         mRxStreams.push\_back(stream);
+00551     streamID = size\_t(stream);
+00552     \textcolor{keywordflow}{return} 0; \textcolor{comment}{//success}
+00553 \}
+00554 
+00555 \textcolor{keywordtype}{int} ConnectionNovenaRF7::CloseStream(\textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} streamID)
+00556 \{
+00557     \textcolor{keywordflow}{if}(rxRunning.load() == \textcolor{keyword}{true})
+00558         \textcolor{keywordflow}{return} ReportError(EPERM, \textcolor{stringliteral}{"All streams must be stopped before closing"});
+00559     StreamChannel *stream = (StreamChannel*)streamID;
+00560     \textcolor{keywordflow}{for}(\textcolor{keyword}{auto} i=mRxStreams.begin(); i!=mRxStreams.end(); ++i)
+00561     \{
+00562         \textcolor{keywordflow}{if}(*i==stream)
+00563         \{
+00564             \textcolor{keyword}{delete} *i;
+00565             mRxStreams.erase(i);
+00566             \textcolor{keywordflow}{break};
+00567         \}
+00568     \}
+00569     \textcolor{keywordflow}{return} 0;
+00570 \}
+00571 
+00572 \textcolor{keywordtype}{size\_t} ConnectionNovenaRF7::GetStreamSize(\textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} streamID)
+00573 \{
+00574     \textcolor{keywordflow}{return} 16384;
+00575 \}
+00576 
+00577 \textcolor{keywordtype}{int} ConnectionNovenaRF7::ControlStream(\textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} streamID, \textcolor{keyword}{const} \textcolor{keywordtype}{bool} enable)
+00578 \{
+00579     \textcolor{keyword}{auto} *stream = (StreamChannel* )streamID;
+00580     assert(stream != \textcolor{keyword}{nullptr});
+00581 
+00582     \textcolor{keywordflow}{if}(enable)
+00583         \textcolor{keywordflow}{return} stream->Start();
+00584     \textcolor{keywordflow}{else}
+00585         \textcolor{keywordflow}{return} stream->Stop();
+00586 \}
+00587 
+00588 \textcolor{keywordtype}{int} ConnectionNovenaRF7::ReadStreamStatus(\textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} streamID, \textcolor{keyword}{const} \textcolor{keywordtype}{long} 
+      timeout_ms, StreamMetadata &metadata)
+00589 \{
+00590     assert(streamID != 0);
+00591     lime::IStreamChannel* channel = (lime::IStreamChannel*)streamID;
+00592     StreamChannel::Info info = channel->GetInfo();
+00593     metadata.hasTimestamp = \textcolor{keyword}{false};
+00594     metadata.timestamp = info.timestamp;
+00595     metadata.lateTimestamp = info.underrun > 0;
+00596     metadata.packetDropped = info.droppedPackets > 0;
+00597     \textcolor{keywordflow}{return} 0;
+00598 \}
+\end{DoxyCode}

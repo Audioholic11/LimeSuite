@@ -1,0 +1,406 @@
+\subsection{lime\+:\+:Ring\+F\+I\+FO Class Reference}
+\label{classlime_1_1RingFIFO}\index{lime\+::\+Ring\+F\+I\+FO@{lime\+::\+Ring\+F\+I\+FO}}
+
+
+{\ttfamily \#include $<$fifo.\+h$>$}
+
+
+
+Collaboration diagram for lime\+:\+:Ring\+F\+I\+FO\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=202pt]{d7/dcb/classlime_1_1RingFIFO__coll__graph}
+\end{center}
+\end{figure}
+\subsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct {\bf Buffer\+Info}
+\end{DoxyCompactItemize}
+\subsubsection*{Public Types}
+\begin{DoxyCompactItemize}
+\item 
+enum {\bf Stream\+Flags} \{ {\bf S\+Y\+N\+C\+\_\+\+T\+I\+M\+E\+S\+T\+A\+MP} = 1, 
+{\bf E\+N\+D\+\_\+\+B\+U\+R\+ST} = 2, 
+{\bf O\+V\+E\+R\+W\+R\+I\+T\+E\+\_\+\+O\+LD} = 4
+ \}
+\end{DoxyCompactItemize}
+\subsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+{\bf Buffer\+Info} {\bf Get\+Info} ()
+\begin{DoxyCompactList}\small\item\em Returns information about F\+I\+FO size and fullness. \end{DoxyCompactList}\item 
+{\bf Ring\+F\+I\+FO} (const uint32\+\_\+t buf\+Length)
+\begin{DoxyCompactList}\small\item\em Initializes F\+I\+FO memory. \end{DoxyCompactList}\item 
+{\bf $\sim$\+Ring\+F\+I\+FO} ()
+\item 
+uint32\+\_\+t {\bf push\+\_\+samples} (const {\bf complex16\+\_\+t} $\ast${\bf buffer}, const uint32\+\_\+t samples\+Count, const uint8\+\_\+t channels\+Count, uint64\+\_\+t timestamp, const uint32\+\_\+t {\bf timeout\+\_\+ms}, const uint32\+\_\+t {\bf flags}=0)
+\begin{DoxyCompactList}\small\item\em inserts samples to F\+I\+FO, operation is thread-\/safe \end{DoxyCompactList}\item 
+uint32\+\_\+t {\bf pop\+\_\+samples} ({\bf complex16\+\_\+t} $\ast${\bf buffer}, const uint32\+\_\+t samples\+Count, const uint8\+\_\+t channels\+Count, uint64\+\_\+t $\ast$timestamp, const uint32\+\_\+t {\bf timeout\+\_\+ms}, uint32\+\_\+t $\ast${\bf flags}=nullptr)
+\begin{DoxyCompactList}\small\item\em Takes samples out of F\+I\+FO, operation is thread-\/safe. \end{DoxyCompactList}\item 
+{\bf void} {\bf Clear} ()
+\end{DoxyCompactItemize}
+\subsubsection*{Protected Attributes}
+\begin{DoxyCompactItemize}
+\item 
+const uint32\+\_\+t {\bf m\+Buffer\+Size}
+\item 
+{\bf Samples\+Packet} $\ast$ {\bf m\+Buffer}
+\item 
+uint32\+\_\+t {\bf m\+Head}
+\item 
+uint32\+\_\+t {\bf m\+Tail}
+\item 
+uint32\+\_\+t {\bf m\+Elements\+Filled}
+\item 
+std\+::mutex {\bf lock}
+\item 
+std\+::condition\+\_\+variable {\bf has\+Items}
+\end{DoxyCompactItemize}
+
+
+\subsubsection{Detailed Description}
+
+
+Definition at line {\bf 17} of file {\bf fifo.\+h}.
+
+
+
+\subsubsection{Member Enumeration Documentation}
+\index{lime\+::\+Ring\+F\+I\+FO@{lime\+::\+Ring\+F\+I\+FO}!Stream\+Flags@{Stream\+Flags}}
+\index{Stream\+Flags@{Stream\+Flags}!lime\+::\+Ring\+F\+I\+FO@{lime\+::\+Ring\+F\+I\+FO}}
+\paragraph[{Stream\+Flags}]{\setlength{\rightskip}{0pt plus 5cm}enum {\bf lime\+::\+Ring\+F\+I\+F\+O\+::\+Stream\+Flags}}\label{classlime_1_1RingFIFO_a404bc48120694e3484f7fd3376847df7}
+\begin{Desc}
+\item[Enumerator]\par
+\begin{description}
+\index{S\+Y\+N\+C\+\_\+\+T\+I\+M\+E\+S\+T\+A\+MP@{S\+Y\+N\+C\+\_\+\+T\+I\+M\+E\+S\+T\+A\+MP}!lime\+::\+Ring\+F\+I\+FO@{lime\+::\+Ring\+F\+I\+FO}}\index{lime\+::\+Ring\+F\+I\+FO@{lime\+::\+Ring\+F\+I\+FO}!S\+Y\+N\+C\+\_\+\+T\+I\+M\+E\+S\+T\+A\+MP@{S\+Y\+N\+C\+\_\+\+T\+I\+M\+E\+S\+T\+A\+MP}}\item[{\em 
+S\+Y\+N\+C\+\_\+\+T\+I\+M\+E\+S\+T\+A\+MP\label{classlime_1_1RingFIFO_a404bc48120694e3484f7fd3376847df7a82ba781d23c34de5e04a53d7a806d307}
+}]\index{E\+N\+D\+\_\+\+B\+U\+R\+ST@{E\+N\+D\+\_\+\+B\+U\+R\+ST}!lime\+::\+Ring\+F\+I\+FO@{lime\+::\+Ring\+F\+I\+FO}}\index{lime\+::\+Ring\+F\+I\+FO@{lime\+::\+Ring\+F\+I\+FO}!E\+N\+D\+\_\+\+B\+U\+R\+ST@{E\+N\+D\+\_\+\+B\+U\+R\+ST}}\item[{\em 
+E\+N\+D\+\_\+\+B\+U\+R\+ST\label{classlime_1_1RingFIFO_a404bc48120694e3484f7fd3376847df7a08f85d022194c93d94df80207cd20820}
+}]\index{O\+V\+E\+R\+W\+R\+I\+T\+E\+\_\+\+O\+LD@{O\+V\+E\+R\+W\+R\+I\+T\+E\+\_\+\+O\+LD}!lime\+::\+Ring\+F\+I\+FO@{lime\+::\+Ring\+F\+I\+FO}}\index{lime\+::\+Ring\+F\+I\+FO@{lime\+::\+Ring\+F\+I\+FO}!O\+V\+E\+R\+W\+R\+I\+T\+E\+\_\+\+O\+LD@{O\+V\+E\+R\+W\+R\+I\+T\+E\+\_\+\+O\+LD}}\item[{\em 
+O\+V\+E\+R\+W\+R\+I\+T\+E\+\_\+\+O\+LD\label{classlime_1_1RingFIFO_a404bc48120694e3484f7fd3376847df7a58614fcef3995f535744660a59ace5e3}
+}]\end{description}
+\end{Desc}
+
+
+Definition at line {\bf 27} of file {\bf fifo.\+h}.
+
+
+
+\subsubsection{Constructor \& Destructor Documentation}
+\index{lime\+::\+Ring\+F\+I\+FO@{lime\+::\+Ring\+F\+I\+FO}!Ring\+F\+I\+FO@{Ring\+F\+I\+FO}}
+\index{Ring\+F\+I\+FO@{Ring\+F\+I\+FO}!lime\+::\+Ring\+F\+I\+FO@{lime\+::\+Ring\+F\+I\+FO}}
+\paragraph[{Ring\+F\+I\+F\+O(const uint32\+\_\+t buf\+Length)}]{\setlength{\rightskip}{0pt plus 5cm}lime\+::\+Ring\+F\+I\+F\+O\+::\+Ring\+F\+I\+FO (
+\begin{DoxyParamCaption}
+\item[{const uint32\+\_\+t}]{buf\+Length}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inline]}}\label{classlime_1_1RingFIFO_a95a2a1799bf60e463e70a56359ece067}
+
+
+Initializes F\+I\+FO memory. 
+
+
+
+Definition at line {\bf 45} of file {\bf fifo.\+h}.
+
+
+
+References {\bf Clear()}, {\bf m\+Buffer}, and {\bf m\+Buffer\+Size}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{d2/d97/classlime_1_1RingFIFO_a95a2a1799bf60e463e70a56359ece067_cgraph}
+\end{center}
+\end{figure}
+
+
+\index{lime\+::\+Ring\+F\+I\+FO@{lime\+::\+Ring\+F\+I\+FO}!````~Ring\+F\+I\+FO@{$\sim$\+Ring\+F\+I\+FO}}
+\index{````~Ring\+F\+I\+FO@{$\sim$\+Ring\+F\+I\+FO}!lime\+::\+Ring\+F\+I\+FO@{lime\+::\+Ring\+F\+I\+FO}}
+\paragraph[{$\sim$\+Ring\+F\+I\+F\+O()}]{\setlength{\rightskip}{0pt plus 5cm}lime\+::\+Ring\+F\+I\+F\+O\+::$\sim$\+Ring\+F\+I\+FO (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inline]}}\label{classlime_1_1RingFIFO_aeeab7905813d8eef75205799347655be}
+
+
+Definition at line {\bf 51} of file {\bf fifo.\+h}.
+
+
+
+References {\bf m\+Buffer}.
+
+
+
+\subsubsection{Member Function Documentation}
+\index{lime\+::\+Ring\+F\+I\+FO@{lime\+::\+Ring\+F\+I\+FO}!Clear@{Clear}}
+\index{Clear@{Clear}!lime\+::\+Ring\+F\+I\+FO@{lime\+::\+Ring\+F\+I\+FO}}
+\paragraph[{Clear()}]{\setlength{\rightskip}{0pt plus 5cm}{\bf void} lime\+::\+Ring\+F\+I\+F\+O\+::\+Clear (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inline]}}\label{classlime_1_1RingFIFO_a372922d302d9ccacdf8fa60078e522b2}
+
+
+Definition at line {\bf 171} of file {\bf fifo.\+h}.
+
+
+
+References {\bf lock}, {\bf m\+Elements\+Filled}, {\bf m\+Head}, and {\bf m\+Tail}.
+
+
+
+Referenced by {\bf Ring\+F\+I\+F\+O()}, {\bf lime\+::\+Connection\+Novena\+R\+F7\+::\+Stream\+Channel\+::\+Start()}, and {\bf lime\+::\+Stream\+Channel\+::\+Start()}.
+
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{d2/d97/classlime_1_1RingFIFO_a372922d302d9ccacdf8fa60078e522b2_icgraph}
+\end{center}
+\end{figure}
+
+
+\index{lime\+::\+Ring\+F\+I\+FO@{lime\+::\+Ring\+F\+I\+FO}!Get\+Info@{Get\+Info}}
+\index{Get\+Info@{Get\+Info}!lime\+::\+Ring\+F\+I\+FO@{lime\+::\+Ring\+F\+I\+FO}}
+\paragraph[{Get\+Info()}]{\setlength{\rightskip}{0pt plus 5cm}{\bf Buffer\+Info} lime\+::\+Ring\+F\+I\+F\+O\+::\+Get\+Info (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inline]}}\label{classlime_1_1RingFIFO_ae561a1a581ee1a5ceff5cfe2dbe8d721}
+
+
+Returns information about F\+I\+FO size and fullness. 
+
+
+
+Definition at line {\bf 35} of file {\bf fifo.\+h}.
+
+
+
+References {\bf lime\+::\+Ring\+F\+I\+F\+O\+::\+Buffer\+Info\+::items\+Filled}, {\bf lock}, {\bf lime\+::\+Samples\+Packet\+::max\+Samples\+In\+Packet}, {\bf m\+Buffer}, {\bf m\+Buffer\+Size}, {\bf m\+Elements\+Filled}, and {\bf lime\+::\+Ring\+F\+I\+F\+O\+::\+Buffer\+Info\+::size}.
+
+
+
+Referenced by {\bf lime\+::\+Connection\+Novena\+R\+F7\+::\+Stream\+Channel\+::\+Get\+Info()}, and {\bf lime\+::\+Stream\+Channel\+::\+Get\+Info()}.
+
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{d2/d97/classlime_1_1RingFIFO_ae561a1a581ee1a5ceff5cfe2dbe8d721_icgraph}
+\end{center}
+\end{figure}
+
+
+\index{lime\+::\+Ring\+F\+I\+FO@{lime\+::\+Ring\+F\+I\+FO}!pop\+\_\+samples@{pop\+\_\+samples}}
+\index{pop\+\_\+samples@{pop\+\_\+samples}!lime\+::\+Ring\+F\+I\+FO@{lime\+::\+Ring\+F\+I\+FO}}
+\paragraph[{pop\+\_\+samples(complex16\+\_\+t $\ast$buffer, const uint32\+\_\+t samples\+Count, const uint8\+\_\+t channels\+Count, uint64\+\_\+t $\ast$timestamp, const uint32\+\_\+t timeout\+\_\+ms, uint32\+\_\+t $\ast$flags=nullptr)}]{\setlength{\rightskip}{0pt plus 5cm}uint32\+\_\+t lime\+::\+Ring\+F\+I\+F\+O\+::pop\+\_\+samples (
+\begin{DoxyParamCaption}
+\item[{{\bf complex16\+\_\+t} $\ast$}]{buffer, }
+\item[{const uint32\+\_\+t}]{samples\+Count, }
+\item[{const uint8\+\_\+t}]{channels\+Count, }
+\item[{uint64\+\_\+t $\ast$}]{timestamp, }
+\item[{const uint32\+\_\+t}]{timeout\+\_\+ms, }
+\item[{uint32\+\_\+t $\ast$}]{flags = {\ttfamily nullptr}}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inline]}}\label{classlime_1_1RingFIFO_ae54a42ddc5616b4a465659ff6eda00cd}
+
+
+Takes samples out of F\+I\+FO, operation is thread-\/safe. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em buffer} & pointers to destination arrays for each channel\textquotesingle{}s samples data, each array must be big enough to contain  number of samples. \\
+\hline
+{\em samples\+Count} & number of samples to pop \\
+\hline
+{\em channels\+Count} & number of channels to pop \\
+\hline
+{\em timestamp} & returns timestamp of the first sample in buffer \\
+\hline
+{\em timeout\+\_\+ms} & timeout duration for operation \\
+\hline
+{\em flags} & optional flags associated with the samples \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+number of samples popped 
+\end{DoxyReturn}
+
+
+Definition at line {\bf 121} of file {\bf fifo.\+h}.
+
+
+
+References {\bf E\+N\+D\+\_\+\+B\+U\+R\+ST}, {\bf lime\+::\+Samples\+Packet\+::first}, {\bf lime\+::\+Samples\+Packet\+::flags}, {\bf flags}, {\bf has\+Items}, {\bf lime\+::\+Samples\+Packet\+::last}, {\bf lock}, {\bf m\+Buffer}, {\bf m\+Buffer\+Size}, {\bf m\+Elements\+Filled}, {\bf m\+Head}, {\bf samples}, and {\bf lime\+::\+Samples\+Packet\+::timestamp}.
+
+
+
+Referenced by {\bf lime\+::\+Connection\+Novena\+R\+F7\+::\+Stream\+Channel\+::\+Read()}, and {\bf lime\+::\+Stream\+Channel\+::\+Read()}.
+
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{d2/d97/classlime_1_1RingFIFO_ae54a42ddc5616b4a465659ff6eda00cd_icgraph}
+\end{center}
+\end{figure}
+
+
+\index{lime\+::\+Ring\+F\+I\+FO@{lime\+::\+Ring\+F\+I\+FO}!push\+\_\+samples@{push\+\_\+samples}}
+\index{push\+\_\+samples@{push\+\_\+samples}!lime\+::\+Ring\+F\+I\+FO@{lime\+::\+Ring\+F\+I\+FO}}
+\paragraph[{push\+\_\+samples(const complex16\+\_\+t $\ast$buffer, const uint32\+\_\+t samples\+Count, const uint8\+\_\+t channels\+Count, uint64\+\_\+t timestamp, const uint32\+\_\+t timeout\+\_\+ms, const uint32\+\_\+t flags=0)}]{\setlength{\rightskip}{0pt plus 5cm}uint32\+\_\+t lime\+::\+Ring\+F\+I\+F\+O\+::push\+\_\+samples (
+\begin{DoxyParamCaption}
+\item[{const {\bf complex16\+\_\+t} $\ast$}]{buffer, }
+\item[{const uint32\+\_\+t}]{samples\+Count, }
+\item[{const uint8\+\_\+t}]{channels\+Count, }
+\item[{uint64\+\_\+t}]{timestamp, }
+\item[{const uint32\+\_\+t}]{timeout\+\_\+ms, }
+\item[{const uint32\+\_\+t}]{flags = {\ttfamily 0}}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inline]}}\label{classlime_1_1RingFIFO_a72300f9751c4dd10b7e6a30588803cfa}
+
+
+inserts samples to F\+I\+FO, operation is thread-\/safe 
+
+
+\begin{DoxyParams}{Parameters}
+{\em buffer} & pointers to arrays containing samples data of each channel \\
+\hline
+{\em samples\+Count} & number of samples to insert from each buffer channel \\
+\hline
+{\em channels\+Count} & number of channels to insert \\
+\hline
+{\em timeout\+\_\+ms} & timeout duration for operation \\
+\hline
+{\em flags} & optional flags associated with the samples \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+number of items inserted 
+\end{DoxyReturn}
+
+
+Definition at line {\bf 64} of file {\bf fifo.\+h}.
+
+
+
+References {\bf lime\+::\+Samples\+Packet\+::first}, {\bf lime\+::\+Samples\+Packet\+::flags}, {\bf flags}, {\bf has\+Items}, {\bf lime\+::\+Samples\+Packet\+::last}, {\bf lock}, {\bf lime\+::\+Samples\+Packet\+::max\+Samples\+In\+Packet}, {\bf m\+Buffer}, {\bf m\+Buffer\+Size}, {\bf m\+Elements\+Filled}, {\bf m\+Head}, {\bf m\+Tail}, {\bf O\+V\+E\+R\+W\+R\+I\+T\+E\+\_\+\+O\+LD}, {\bf samples}, {\bf S\+Y\+N\+C\+\_\+\+T\+I\+M\+E\+S\+T\+A\+MP}, {\bf t1}, {\bf t2}, and {\bf lime\+::\+Samples\+Packet\+::timestamp}.
+
+
+
+Referenced by {\bf lime\+::\+Connection\+Novena\+R\+F7\+::\+Stream\+Channel\+::\+Write()}, and {\bf lime\+::\+Stream\+Channel\+::\+Write()}.
+
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{d2/d97/classlime_1_1RingFIFO_a72300f9751c4dd10b7e6a30588803cfa_icgraph}
+\end{center}
+\end{figure}
+
+
+
+
+\subsubsection{Member Data Documentation}
+\index{lime\+::\+Ring\+F\+I\+FO@{lime\+::\+Ring\+F\+I\+FO}!has\+Items@{has\+Items}}
+\index{has\+Items@{has\+Items}!lime\+::\+Ring\+F\+I\+FO@{lime\+::\+Ring\+F\+I\+FO}}
+\paragraph[{has\+Items}]{\setlength{\rightskip}{0pt plus 5cm}std\+::condition\+\_\+variable lime\+::\+Ring\+F\+I\+F\+O\+::has\+Items\hspace{0.3cm}{\ttfamily [protected]}}\label{classlime_1_1RingFIFO_a5916b95554475303110371a3dc022c24}
+
+
+Definition at line {\bf 186} of file {\bf fifo.\+h}.
+
+
+
+Referenced by {\bf pop\+\_\+samples()}, and {\bf push\+\_\+samples()}.
+
+\index{lime\+::\+Ring\+F\+I\+FO@{lime\+::\+Ring\+F\+I\+FO}!lock@{lock}}
+\index{lock@{lock}!lime\+::\+Ring\+F\+I\+FO@{lime\+::\+Ring\+F\+I\+FO}}
+\paragraph[{lock}]{\setlength{\rightskip}{0pt plus 5cm}std\+::mutex lime\+::\+Ring\+F\+I\+F\+O\+::lock\hspace{0.3cm}{\ttfamily [protected]}}\label{classlime_1_1RingFIFO_a71a641d759a357d3f0d011100b179872}
+
+
+Definition at line {\bf 185} of file {\bf fifo.\+h}.
+
+
+
+Referenced by {\bf Clear()}, {\bf lime\+::\+Concurrent\+Queue$<$ T $>$\+::empty()}, {\bf Get\+Info()}, {\bf pop\+\_\+samples()}, {\bf lime\+::\+Concurrent\+Queue$<$ T $>$\+::push()}, {\bf push\+\_\+samples()}, {\bf lime\+::\+Concurrent\+Queue$<$ T $>$\+::try\+\_\+pop()}, and {\bf lime\+::\+Concurrent\+Queue$<$ T $>$\+::wait\+\_\+and\+\_\+pop()}.
+
+\index{lime\+::\+Ring\+F\+I\+FO@{lime\+::\+Ring\+F\+I\+FO}!m\+Buffer@{m\+Buffer}}
+\index{m\+Buffer@{m\+Buffer}!lime\+::\+Ring\+F\+I\+FO@{lime\+::\+Ring\+F\+I\+FO}}
+\paragraph[{m\+Buffer}]{\setlength{\rightskip}{0pt plus 5cm}{\bf Samples\+Packet}$\ast$ lime\+::\+Ring\+F\+I\+F\+O\+::m\+Buffer\hspace{0.3cm}{\ttfamily [protected]}}\label{classlime_1_1RingFIFO_ad3b9ef198edb51819d6500638d83a2df}
+
+
+Definition at line {\bf 181} of file {\bf fifo.\+h}.
+
+
+
+Referenced by {\bf Get\+Info()}, {\bf pop\+\_\+samples()}, {\bf push\+\_\+samples()}, {\bf Ring\+F\+I\+F\+O()}, and {\bf $\sim$\+Ring\+F\+I\+F\+O()}.
+
+\index{lime\+::\+Ring\+F\+I\+FO@{lime\+::\+Ring\+F\+I\+FO}!m\+Buffer\+Size@{m\+Buffer\+Size}}
+\index{m\+Buffer\+Size@{m\+Buffer\+Size}!lime\+::\+Ring\+F\+I\+FO@{lime\+::\+Ring\+F\+I\+FO}}
+\paragraph[{m\+Buffer\+Size}]{\setlength{\rightskip}{0pt plus 5cm}const uint32\+\_\+t lime\+::\+Ring\+F\+I\+F\+O\+::m\+Buffer\+Size\hspace{0.3cm}{\ttfamily [protected]}}\label{classlime_1_1RingFIFO_a3d252067ce4324188b1bc46459e7678a}
+
+
+Definition at line {\bf 180} of file {\bf fifo.\+h}.
+
+
+
+Referenced by {\bf Get\+Info()}, {\bf pop\+\_\+samples()}, {\bf push\+\_\+samples()}, and {\bf Ring\+F\+I\+F\+O()}.
+
+\index{lime\+::\+Ring\+F\+I\+FO@{lime\+::\+Ring\+F\+I\+FO}!m\+Elements\+Filled@{m\+Elements\+Filled}}
+\index{m\+Elements\+Filled@{m\+Elements\+Filled}!lime\+::\+Ring\+F\+I\+FO@{lime\+::\+Ring\+F\+I\+FO}}
+\paragraph[{m\+Elements\+Filled}]{\setlength{\rightskip}{0pt plus 5cm}uint32\+\_\+t lime\+::\+Ring\+F\+I\+F\+O\+::m\+Elements\+Filled\hspace{0.3cm}{\ttfamily [protected]}}\label{classlime_1_1RingFIFO_a48d0a36f75ecde0cd9b1dc6e47042d20}
+
+
+Definition at line {\bf 184} of file {\bf fifo.\+h}.
+
+
+
+Referenced by {\bf Clear()}, {\bf Get\+Info()}, {\bf pop\+\_\+samples()}, and {\bf push\+\_\+samples()}.
+
+\index{lime\+::\+Ring\+F\+I\+FO@{lime\+::\+Ring\+F\+I\+FO}!m\+Head@{m\+Head}}
+\index{m\+Head@{m\+Head}!lime\+::\+Ring\+F\+I\+FO@{lime\+::\+Ring\+F\+I\+FO}}
+\paragraph[{m\+Head}]{\setlength{\rightskip}{0pt plus 5cm}uint32\+\_\+t lime\+::\+Ring\+F\+I\+F\+O\+::m\+Head\hspace{0.3cm}{\ttfamily [protected]}}\label{classlime_1_1RingFIFO_afe97521130b0ad257f4cf2dea3f1a699}
+
+
+Definition at line {\bf 182} of file {\bf fifo.\+h}.
+
+
+
+Referenced by {\bf Clear()}, {\bf pop\+\_\+samples()}, and {\bf push\+\_\+samples()}.
+
+\index{lime\+::\+Ring\+F\+I\+FO@{lime\+::\+Ring\+F\+I\+FO}!m\+Tail@{m\+Tail}}
+\index{m\+Tail@{m\+Tail}!lime\+::\+Ring\+F\+I\+FO@{lime\+::\+Ring\+F\+I\+FO}}
+\paragraph[{m\+Tail}]{\setlength{\rightskip}{0pt plus 5cm}uint32\+\_\+t lime\+::\+Ring\+F\+I\+F\+O\+::m\+Tail\hspace{0.3cm}{\ttfamily [protected]}}\label{classlime_1_1RingFIFO_a6b05435dbd1b5b466eea5859a3e7166c}
+
+
+Definition at line {\bf 183} of file {\bf fifo.\+h}.
+
+
+
+Referenced by {\bf Clear()}, and {\bf push\+\_\+samples()}.
+
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+/home/erik/prefix/default/src/limesuite-\/dev/src/protocols/{\bf fifo.\+h}\end{DoxyCompactItemize}

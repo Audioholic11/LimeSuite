@@ -1,0 +1,466 @@
+\subsection{/home/erik/prefix/default/src/limesuite-\/dev/mcu\+\_\+program/host\+\_\+src/main.cpp File Reference}
+\label{mcu__program_2host__src_2main_8cpp}\index{/home/erik/prefix/default/src/limesuite-\/dev/mcu\+\_\+program/host\+\_\+src/main.\+cpp@{/home/erik/prefix/default/src/limesuite-\/dev/mcu\+\_\+program/host\+\_\+src/main.\+cpp}}
+{\ttfamily \#include $<$stdio.\+h$>$}\\*
+{\ttfamily \#include \char`\"{}lms7002m\+\_\+calibrations.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}lms7002m\+\_\+controls.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}lms7002m\+\_\+filters.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}spi.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}mcu.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}mcu\+Hex\+Bin.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}M\+C\+U\+\_\+\+B\+D.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}L\+M\+S\+Boards.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}L\+M\+S7002\+M.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}I\+Connection.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}Connection\+Registry.\+h\char`\"{}}\\*
+{\ttfamily \#include $<$chrono$>$}\\*
+{\ttfamily \#include $<$fstream$>$}\\*
+{\ttfamily \#include $<$gnu\+Plot\+Pipe.\+h$>$}\\*
+{\ttfamily \#include $<$math.\+h$>$}\\*
+{\ttfamily \#include \char`\"{}mcu\+\_\+defines.\+h\char`\"{}}\\*
+Include dependency graph for main.\+cpp\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{d2/de8/mcu__program_2host__src_2main_8cpp__incl}
+\end{center}
+\end{figure}
+\subsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+class {\bf Board\+Loopback\+Store}
+\end{DoxyCompactItemize}
+\subsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+uint8\+\_\+t {\bf Get\+Ext\+Loop\+Pair} ({\bf lime\+::\+L\+M\+S7002M} \&ctr, bool calibrating\+Tx)
+\item 
+int16\+\_\+t {\bf Read\+D\+C\+Corrector} (bool {\bf tx}, uint8\+\_\+t channel)
+\item 
+{\bf int} {\bf Set\+Ext\+Loopback} ({\bf lime\+::\+I\+Connection} $\ast${\bf port}, uint8\+\_\+t ch, bool {\bf enable})
+\item 
+uint8\+\_\+t {\bf Upload\+M\+C\+U\+Parameters} (float ref, float {\bf bandwidth})
+\item 
+{\bf void} {\bf D\+C\+IQ} ()
+\item 
+{\bf void} {\bf Filters} ()
+\item 
+{\bf int} {\bf main} ({\bf int} argc, char $\ast$$\ast$argv)
+\end{DoxyCompactItemize}
+\subsubsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+{\bf lime\+::\+I\+Connection} $\ast$ {\bf ser\+Port} = nullptr
+\item 
+{\bf lime\+::\+L\+M\+S7002M} {\bf lms\+Control}
+\item 
+static bool {\bf use\+M\+CU} =1
+\item 
+static bool {\bf tx} = 1
+\item 
+static bool {\bf filters} = 0
+\item 
+static float {\bf F\+BW} = 5e6
+\item 
+static bool {\bf ext\+Loop} = false
+\item 
+float {\bf Ref\+Clk}
+\item 
+uint8\+\_\+t {\bf ext\+Loopback\+Pair}
+\end{DoxyCompactItemize}
+
+
+\subsubsection{Function Documentation}
+\index{mcu\+\_\+program/host\+\_\+src/main.\+cpp@{mcu\+\_\+program/host\+\_\+src/main.\+cpp}!D\+C\+IQ@{D\+C\+IQ}}
+\index{D\+C\+IQ@{D\+C\+IQ}!mcu\+\_\+program/host\+\_\+src/main.\+cpp@{mcu\+\_\+program/host\+\_\+src/main.\+cpp}}
+\paragraph[{D\+C\+I\+Q()}]{\setlength{\rightskip}{0pt plus 5cm}{\bf void} D\+C\+IQ (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}\label{mcu__program_2host__src_2main_8cpp_a2bb1d2fcd6182ef32aff315f85d13c53}
+
+
+Definition at line {\bf 174} of file {\bf main.\+cpp}.
+
+
+
+References {\bf Calibrate\+Rx()}, {\bf Calibrate\+Tx()}, {\bf ext\+Loop}, {\bf ext\+Loopback\+Pair}, {\bf F\+BW}, {\bf freq}, {\bf G\+C\+O\+R\+R\+I\+\_\+\+R\+X\+T\+SP}, {\bf G\+C\+O\+R\+R\+I\+\_\+\+T\+X\+T\+SP}, {\bf G\+C\+O\+R\+R\+Q\+\_\+\+R\+X\+T\+SP}, {\bf G\+C\+O\+R\+R\+Q\+\_\+\+T\+X\+T\+SP}, {\bf lime\+::\+L\+M\+S7002\+M\+::\+Get\+\_\+\+S\+P\+I\+\_\+\+Reg\+\_\+bits()}, {\bf lime\+::\+L\+M\+S7002\+M\+::\+Get\+Connection()}, {\bf Get\+Ext\+Loop\+Pair()}, {\bf I\+Q\+C\+O\+R\+R\+\_\+\+R\+X\+T\+SP}, {\bf I\+Q\+C\+O\+R\+R\+\_\+\+T\+X\+T\+SP}, {\bf L\+M\+S7param}, {\bf lime\+::\+L\+M\+S7002\+M\+::\+Load\+D\+C\+\_\+\+R\+E\+G\+\_\+\+I\+Q()}, {\bf M\+C\+U\+\_\+\+E\+X\+T\+\_\+\+L\+O\+O\+P\+B\+A\+C\+K\+\_\+\+P\+A\+IR}, {\bf M\+C\+U\+\_\+\+N\+O\+\_\+\+E\+R\+R\+OR}, {\bf M\+C\+U\+\_\+\+Run\+Procedure()}, {\bf M\+C\+U\+\_\+\+Set\+Parameter()}, {\bf M\+C\+U\+\_\+\+Wait\+For\+Status()}, {\bf lime\+::\+L\+M\+S7002\+M\+::\+Modify\+\_\+\+S\+P\+I\+\_\+\+Reg\+\_\+bits()}, {\bf Read\+D\+C\+Corrector()}, {\bf Ref\+Clk}, {\bf Set\+Ext\+Loopback()}, {\bf status}, {\bf t1}, {\bf t2}, {\bf T\+S\+G\+M\+O\+D\+E\+\_\+\+T\+X\+T\+SP}, {\bf tx}, {\bf Upload\+M\+C\+U\+Parameters()}, and {\bf use\+M\+CU}.
+
+
+
+Referenced by {\bf main()}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=550pt]{dd/d0b/mcu__program_2host__src_2main_8cpp_a2bb1d2fcd6182ef32aff315f85d13c53_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=196pt]{dd/d0b/mcu__program_2host__src_2main_8cpp_a2bb1d2fcd6182ef32aff315f85d13c53_icgraph}
+\end{center}
+\end{figure}
+
+
+\index{mcu\+\_\+program/host\+\_\+src/main.\+cpp@{mcu\+\_\+program/host\+\_\+src/main.\+cpp}!Filters@{Filters}}
+\index{Filters@{Filters}!mcu\+\_\+program/host\+\_\+src/main.\+cpp@{mcu\+\_\+program/host\+\_\+src/main.\+cpp}}
+\paragraph[{Filters()}]{\setlength{\rightskip}{0pt plus 5cm}{\bf void} Filters (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}\label{mcu__program_2host__src_2main_8cpp_ad4dcf2055b7114f8eacfa8cb11e5bbd5}
+
+
+Definition at line {\bf 268} of file {\bf main.\+cpp}.
+
+
+
+References {\bf C\+\_\+\+C\+T\+L\+\_\+\+L\+P\+F\+L\+\_\+\+R\+BB}, {\bf C\+C\+A\+L\+\_\+\+L\+P\+F\+L\+A\+D\+\_\+\+T\+BB}, {\bf C\+C\+O\+M\+P\+\_\+\+T\+I\+A\+\_\+\+R\+FE}, {\bf C\+F\+B\+\_\+\+T\+I\+A\+\_\+\+R\+FE}, {\bf F\+BW}, {\bf lime\+::\+L\+M\+S7002\+M\+::\+Get\+\_\+\+S\+P\+I\+\_\+\+Reg\+\_\+bits()}, {\bf L\+M\+S7param}, {\bf lime\+::\+L\+M\+S7002\+M\+::\+Load\+D\+C\+\_\+\+R\+E\+G\+\_\+\+I\+Q()}, {\bf M\+C\+U\+\_\+\+N\+O\+\_\+\+E\+R\+R\+OR}, {\bf M\+C\+U\+\_\+\+Run\+Procedure()}, {\bf M\+C\+U\+\_\+\+Wait\+For\+Status()}, {\bf lime\+::\+L\+M\+S7002\+M\+::\+Modify\+\_\+\+S\+P\+I\+\_\+\+Reg\+\_\+bits()}, {\bf R\+C\+A\+L\+\_\+\+L\+P\+F\+H\+\_\+\+T\+BB}, {\bf R\+C\+A\+L\+\_\+\+L\+P\+F\+L\+A\+D\+\_\+\+T\+BB}, {\bf R\+C\+C\+\_\+\+C\+T\+L\+\_\+\+L\+P\+F\+H\+\_\+\+R\+BB}, {\bf R\+C\+C\+\_\+\+C\+T\+L\+\_\+\+L\+P\+F\+L\+\_\+\+R\+BB}, {\bf R\+C\+O\+M\+P\+\_\+\+T\+I\+A\+\_\+\+R\+FE}, {\bf Ref\+Clk}, {\bf status}, {\bf t1}, {\bf t2}, {\bf T\+S\+G\+M\+O\+D\+E\+\_\+\+T\+X\+T\+SP}, {\bf Tune\+Rx\+Filter()}, {\bf Tune\+Tx\+Filter()}, {\bf tx}, {\bf Upload\+M\+C\+U\+Parameters()}, and {\bf use\+M\+CU}.
+
+
+
+Referenced by {\bf main()}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{dd/d0b/mcu__program_2host__src_2main_8cpp_ad4dcf2055b7114f8eacfa8cb11e5bbd5_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=198pt]{dd/d0b/mcu__program_2host__src_2main_8cpp_ad4dcf2055b7114f8eacfa8cb11e5bbd5_icgraph}
+\end{center}
+\end{figure}
+
+
+\index{mcu\+\_\+program/host\+\_\+src/main.\+cpp@{mcu\+\_\+program/host\+\_\+src/main.\+cpp}!Get\+Ext\+Loop\+Pair@{Get\+Ext\+Loop\+Pair}}
+\index{Get\+Ext\+Loop\+Pair@{Get\+Ext\+Loop\+Pair}!mcu\+\_\+program/host\+\_\+src/main.\+cpp@{mcu\+\_\+program/host\+\_\+src/main.\+cpp}}
+\paragraph[{Get\+Ext\+Loop\+Pair(lime\+::\+L\+M\+S7002\+M \&ctr, bool calibrating\+Tx)}]{\setlength{\rightskip}{0pt plus 5cm}uint8\+\_\+t Get\+Ext\+Loop\+Pair (
+\begin{DoxyParamCaption}
+\item[{{\bf lime\+::\+L\+M\+S7002M} \&}]{ctr, }
+\item[{bool}]{calibrating\+Tx}
+\end{DoxyParamCaption}
+)}\label{mcu__program_2host__src_2main_8cpp_aae861597a6ee5685bc7d473230026596}
+
+
+Definition at line {\bf 33} of file {\bf main.\+cpp}.
+
+
+
+References {\bf lime\+::\+Device\+Info\+::device\+Name}, {\bf lime\+::\+L\+M\+S7002\+M\+::\+Get\+\_\+\+S\+P\+I\+\_\+\+Reg\+\_\+bits()}, {\bf lime\+::\+L\+M\+S7002\+M\+::\+Get\+Connection()}, {\bf lime\+::\+I\+Connection\+::\+Get\+Device\+Info()}, {\bf lime\+::\+Get\+Device\+Name()}, {\bf L\+M\+S7\+\_\+\+S\+E\+L\+\_\+\+B\+A\+N\+D1\+\_\+\+T\+RF}, {\bf L\+M\+S7\+\_\+\+S\+E\+L\+\_\+\+B\+A\+N\+D2\+\_\+\+T\+RF}, {\bf L\+M\+S7\+\_\+\+S\+E\+L\+\_\+\+P\+A\+T\+H\+\_\+\+R\+FE}, {\bf lime\+::\+L\+M\+S\+\_\+\+D\+E\+V\+\_\+\+L\+I\+M\+E\+S\+DR}, {\bf lime\+::\+L\+M\+S\+\_\+\+D\+E\+V\+\_\+\+L\+I\+M\+E\+S\+D\+R\+M\+I\+NI}, and {\bf port}.
+
+
+
+Referenced by {\bf D\+C\+I\+Q()}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{dd/d0b/mcu__program_2host__src_2main_8cpp_aae861597a6ee5685bc7d473230026596_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=318pt]{dd/d0b/mcu__program_2host__src_2main_8cpp_aae861597a6ee5685bc7d473230026596_icgraph}
+\end{center}
+\end{figure}
+
+
+\index{mcu\+\_\+program/host\+\_\+src/main.\+cpp@{mcu\+\_\+program/host\+\_\+src/main.\+cpp}!main@{main}}
+\index{main@{main}!mcu\+\_\+program/host\+\_\+src/main.\+cpp@{mcu\+\_\+program/host\+\_\+src/main.\+cpp}}
+\paragraph[{main(int argc, char $\ast$$\ast$argv)}]{\setlength{\rightskip}{0pt plus 5cm}{\bf int} main (
+\begin{DoxyParamCaption}
+\item[{{\bf int}}]{argc, }
+\item[{char $\ast$$\ast$}]{argv}
+\end{DoxyParamCaption}
+)}\label{mcu__program_2host__src_2main_8cpp_a3c04138a5bfe5d72780bb7e82a18e627}
+
+
+Definition at line {\bf 317} of file {\bf main.\+cpp}.
+
+
+
+References {\bf D\+C\+I\+Q()}, {\bf filename}, {\bf filters}, {\bf Filters()}, {\bf lime\+::\+Connection\+Registry\+::find\+Connections()}, {\bf lime\+::\+Connection\+Registry\+::free\+Connection()}, {\bf lime\+::\+I\+Connection\+::\+Get\+Device\+Info()}, {\bf lime\+::\+L\+M\+S7002\+M\+::\+Get\+Reference\+Clk\+\_\+\+S\+X()}, {\bf i}, {\bf info}, {\bf lime\+::\+I\+Connection\+::\+Is\+Open()}, {\bf L\+M\+S7param}, {\bf lime\+::\+L\+M\+S7002\+M\+::\+Load\+Config()}, {\bf lime\+::\+Connection\+Registry\+::make\+Connection()}, {\bf M\+C\+U\+\_\+\+H\+E\+X2\+B\+I\+N()}, {\bf M\+C\+U\+\_\+\+Upload\+Program()}, {\bf lime\+::\+L\+M\+S7002\+M\+::\+Modify\+\_\+\+S\+P\+I\+\_\+\+Reg\+\_\+bits()}, {\bf Ref\+Clk}, {\bf ser\+Port}, {\bf lime\+::\+L\+M\+S7002\+M\+::\+Set\+Connection()}, {\bf lime\+::\+L\+M\+S7002\+M\+::\+S\+P\+I\+\_\+write()}, {\bf status}, {\bf T\+S\+G\+M\+O\+D\+E\+\_\+\+T\+X\+T\+SP}, {\bf tx}, {\bf lime\+::\+L\+M\+S7002\+M\+::\+Upload\+All()}, and {\bf use\+M\+CU}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=550pt]{dd/d0b/mcu__program_2host__src_2main_8cpp_a3c04138a5bfe5d72780bb7e82a18e627_cgraph}
+\end{center}
+\end{figure}
+
+
+\index{mcu\+\_\+program/host\+\_\+src/main.\+cpp@{mcu\+\_\+program/host\+\_\+src/main.\+cpp}!Read\+D\+C\+Corrector@{Read\+D\+C\+Corrector}}
+\index{Read\+D\+C\+Corrector@{Read\+D\+C\+Corrector}!mcu\+\_\+program/host\+\_\+src/main.\+cpp@{mcu\+\_\+program/host\+\_\+src/main.\+cpp}}
+\paragraph[{Read\+D\+C\+Corrector(bool tx, uint8\+\_\+t channel)}]{\setlength{\rightskip}{0pt plus 5cm}int16\+\_\+t Read\+D\+C\+Corrector (
+\begin{DoxyParamCaption}
+\item[{bool}]{tx, }
+\item[{uint8\+\_\+t}]{channel}
+\end{DoxyParamCaption}
+)}\label{mcu__program_2host__src_2main_8cpp_a40ff0a4133c0f2ec29bd92d557c20d0e}
+
+
+Definition at line {\bf 51} of file {\bf main.\+cpp}.
+
+
+
+References {\bf S\+P\+I\+\_\+read()}, and {\bf S\+P\+I\+\_\+write()}.
+
+
+
+Referenced by {\bf D\+C\+I\+Q()}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=270pt]{dd/d0b/mcu__program_2host__src_2main_8cpp_a40ff0a4133c0f2ec29bd92d557c20d0e_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=327pt]{dd/d0b/mcu__program_2host__src_2main_8cpp_a40ff0a4133c0f2ec29bd92d557c20d0e_icgraph}
+\end{center}
+\end{figure}
+
+
+\index{mcu\+\_\+program/host\+\_\+src/main.\+cpp@{mcu\+\_\+program/host\+\_\+src/main.\+cpp}!Set\+Ext\+Loopback@{Set\+Ext\+Loopback}}
+\index{Set\+Ext\+Loopback@{Set\+Ext\+Loopback}!mcu\+\_\+program/host\+\_\+src/main.\+cpp@{mcu\+\_\+program/host\+\_\+src/main.\+cpp}}
+\paragraph[{Set\+Ext\+Loopback(lime\+::\+I\+Connection $\ast$port, uint8\+\_\+t ch, bool enable)}]{\setlength{\rightskip}{0pt plus 5cm}{\bf int} Set\+Ext\+Loopback (
+\begin{DoxyParamCaption}
+\item[{{\bf lime\+::\+I\+Connection} $\ast$}]{port, }
+\item[{uint8\+\_\+t}]{ch, }
+\item[{bool}]{enable}
+\end{DoxyParamCaption}
+)}\label{mcu__program_2host__src_2main_8cpp_a2832a6e9527625a2c7947d9c31069ada}
+
+
+Definition at line {\bf 88} of file {\bf main.\+cpp}.
+
+
+
+References {\bf lime\+::\+Device\+Info\+::device\+Name}, {\bf lime\+::\+I\+Connection\+::\+Get\+Device\+Info()}, {\bf lime\+::\+Get\+Device\+Name()}, {\bf lime\+::\+L\+M\+S\+\_\+\+D\+E\+V\+\_\+\+L\+I\+M\+E\+S\+DR}, {\bf lime\+::\+L\+M\+S\+\_\+\+D\+E\+V\+\_\+\+L\+I\+M\+E\+S\+D\+R\+M\+I\+NI}, {\bf lime\+::\+I\+Connection\+::\+Read\+L\+M\+S7002\+M\+S\+P\+I()}, {\bf lime\+::\+I\+Connection\+::\+Read\+Register()}, {\bf status}, {\bf tx}, and {\bf lime\+::\+I\+Connection\+::\+Write\+Register()}.
+
+
+
+Referenced by {\bf D\+C\+I\+Q()}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{dd/d0b/mcu__program_2host__src_2main_8cpp_a2832a6e9527625a2c7947d9c31069ada_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=321pt]{dd/d0b/mcu__program_2host__src_2main_8cpp_a2832a6e9527625a2c7947d9c31069ada_icgraph}
+\end{center}
+\end{figure}
+
+
+\index{mcu\+\_\+program/host\+\_\+src/main.\+cpp@{mcu\+\_\+program/host\+\_\+src/main.\+cpp}!Upload\+M\+C\+U\+Parameters@{Upload\+M\+C\+U\+Parameters}}
+\index{Upload\+M\+C\+U\+Parameters@{Upload\+M\+C\+U\+Parameters}!mcu\+\_\+program/host\+\_\+src/main.\+cpp@{mcu\+\_\+program/host\+\_\+src/main.\+cpp}}
+\paragraph[{Upload\+M\+C\+U\+Parameters(float ref, float bandwidth)}]{\setlength{\rightskip}{0pt plus 5cm}uint8\+\_\+t Upload\+M\+C\+U\+Parameters (
+\begin{DoxyParamCaption}
+\item[{float}]{ref, }
+\item[{float}]{bandwidth}
+\end{DoxyParamCaption}
+)}\label{mcu__program_2host__src_2main_8cpp_afec3045ef2caa0e35ae650a25a908aac}
+
+
+Definition at line {\bf 164} of file {\bf main.\+cpp}.
+
+
+
+References {\bf M\+C\+U\+\_\+\+BW}, {\bf M\+C\+U\+\_\+\+N\+O\+\_\+\+E\+R\+R\+OR}, {\bf M\+C\+U\+\_\+\+R\+E\+F\+\_\+\+C\+LK}, {\bf M\+C\+U\+\_\+\+Set\+Parameter()}, and {\bf status}.
+
+
+
+Referenced by {\bf D\+C\+I\+Q()}, and {\bf Filters()}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{dd/d0b/mcu__program_2host__src_2main_8cpp_afec3045ef2caa0e35ae650a25a908aac_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{dd/d0b/mcu__program_2host__src_2main_8cpp_afec3045ef2caa0e35ae650a25a908aac_icgraph}
+\end{center}
+\end{figure}
+
+
+
+
+\subsubsection{Variable Documentation}
+\index{mcu\+\_\+program/host\+\_\+src/main.\+cpp@{mcu\+\_\+program/host\+\_\+src/main.\+cpp}!ext\+Loop@{ext\+Loop}}
+\index{ext\+Loop@{ext\+Loop}!mcu\+\_\+program/host\+\_\+src/main.\+cpp@{mcu\+\_\+program/host\+\_\+src/main.\+cpp}}
+\paragraph[{ext\+Loop}]{\setlength{\rightskip}{0pt plus 5cm}bool ext\+Loop = false\hspace{0.3cm}{\ttfamily [static]}}\label{mcu__program_2host__src_2main_8cpp_ac2730ac1fb56dba5789305fcf9fa83c7}
+
+
+Definition at line {\bf 29} of file {\bf main.\+cpp}.
+
+
+
+Referenced by {\bf D\+C\+I\+Q()}.
+
+\index{mcu\+\_\+program/host\+\_\+src/main.\+cpp@{mcu\+\_\+program/host\+\_\+src/main.\+cpp}!ext\+Loopback\+Pair@{ext\+Loopback\+Pair}}
+\index{ext\+Loopback\+Pair@{ext\+Loopback\+Pair}!mcu\+\_\+program/host\+\_\+src/main.\+cpp@{mcu\+\_\+program/host\+\_\+src/main.\+cpp}}
+\paragraph[{ext\+Loopback\+Pair}]{\setlength{\rightskip}{0pt plus 5cm}uint8\+\_\+t ext\+Loopback\+Pair}\label{mcu__program_2host__src_2main_8cpp_ac7d7f1c9dac1f8b84d0997fdc4cbc5a4}
+
+
+Definition at line {\bf 83} of file {\bf lms7002m\+\_\+calibrations.\+c}.
+
+
+
+Referenced by {\bf D\+C\+I\+Q()}.
+
+\index{mcu\+\_\+program/host\+\_\+src/main.\+cpp@{mcu\+\_\+program/host\+\_\+src/main.\+cpp}!F\+BW@{F\+BW}}
+\index{F\+BW@{F\+BW}!mcu\+\_\+program/host\+\_\+src/main.\+cpp@{mcu\+\_\+program/host\+\_\+src/main.\+cpp}}
+\paragraph[{F\+BW}]{\setlength{\rightskip}{0pt plus 5cm}float F\+BW = 5e6\hspace{0.3cm}{\ttfamily [static]}}\label{mcu__program_2host__src_2main_8cpp_a8f852802fdcf8ddcab9c2839bab16378}
+
+
+Definition at line {\bf 28} of file {\bf main.\+cpp}.
+
+
+
+Referenced by {\bf D\+C\+I\+Q()}, and {\bf Filters()}.
+
+\index{mcu\+\_\+program/host\+\_\+src/main.\+cpp@{mcu\+\_\+program/host\+\_\+src/main.\+cpp}!filters@{filters}}
+\index{filters@{filters}!mcu\+\_\+program/host\+\_\+src/main.\+cpp@{mcu\+\_\+program/host\+\_\+src/main.\+cpp}}
+\paragraph[{filters}]{\setlength{\rightskip}{0pt plus 5cm}bool filters = 0\hspace{0.3cm}{\ttfamily [static]}}\label{mcu__program_2host__src_2main_8cpp_a2f663b7f8a538484a5d539ab2a9b17f2}
+
+
+Definition at line {\bf 27} of file {\bf main.\+cpp}.
+
+
+
+Referenced by {\bf main()}.
+
+\index{mcu\+\_\+program/host\+\_\+src/main.\+cpp@{mcu\+\_\+program/host\+\_\+src/main.\+cpp}!lms\+Control@{lms\+Control}}
+\index{lms\+Control@{lms\+Control}!mcu\+\_\+program/host\+\_\+src/main.\+cpp@{mcu\+\_\+program/host\+\_\+src/main.\+cpp}}
+\paragraph[{lms\+Control}]{\setlength{\rightskip}{0pt plus 5cm}{\bf lime\+::\+L\+M\+S7002M} lms\+Control}\label{mcu__program_2host__src_2main_8cpp_a6c6bcdbf15702afd57f66befd85febd4}
+
+
+Definition at line {\bf 22} of file {\bf main.\+cpp}.
+
+
+
+Referenced by {\bf F\+P\+G\+Acontrols\+\_\+wxgui\+::\+F\+P\+G\+Acontrols\+\_\+wxgui()}, {\bf pnl\+Buffers\+::\+Initialize()}, {\bf pnlu\+Lime\+S\+D\+R\+::\+Initialize()}, {\bf Myriad7\+\_\+wxgui\+::\+Initialize()}, {\bf pnl\+Lime\+S\+D\+R\+::\+Initialize()}, {\bf Si5351\+C\+\_\+wxgui\+::\+Initialize()}, {\bf F\+P\+G\+Acontrols\+\_\+wxgui\+::\+Initialize()}, {\bf A\+D\+F4002\+\_\+wxgui\+::\+Initialize()}, {\bf pnl\+Ultimate\+E\+V\+B\+::\+Initialize()}, {\bf fftviewer\+\_\+fr\+F\+F\+Tviewer\+::\+Initialize()}, {\bf A\+D\+F4002\+\_\+wxgui\+::\+Onbtn\+Calc\+Send\+Click()}, {\bf Si5351\+C\+\_\+wxgui\+::\+Onbtn\+Clear\+Status\+Click()}, {\bf Si5351\+C\+\_\+wxgui\+::\+Onbtn\+Configure\+Clock\+Click()}, {\bf Si5351\+C\+\_\+wxgui\+::\+Onbtn\+Load\+File\+Click()}, {\bf F\+P\+G\+Acontrols\+\_\+wxgui\+::\+Onbtn\+Play\+W\+F\+M\+Click()}, {\bf Si5351\+C\+\_\+wxgui\+::\+Onbtn\+Read\+Status\+Click()}, {\bf Si5351\+C\+\_\+wxgui\+::\+Onbtn\+Reset\+To\+Defaults\+Click()}, {\bf F\+P\+G\+Acontrols\+\_\+wxgui\+::\+Onbtn\+Stop\+W\+F\+M\+Click()}, {\bf A\+D\+F4002\+\_\+wxgui\+::\+Onbtn\+Upload\+Click()}, {\bf F\+P\+G\+Acontrols\+\_\+wxgui\+::\+On\+Chk\+Digital\+Loopback\+Enable\+Click()}, {\bf pnl\+Lime\+S\+D\+R\+::\+On\+G\+P\+I\+O\+Change()}, {\bf pnl\+Buffers\+::\+On\+G\+P\+I\+Ochanged()}, {\bf pnlu\+Lime\+S\+D\+R\+::\+On\+Loopback\+Change()}, {\bf pnl\+Ultimate\+E\+V\+B\+::\+On\+Read\+All()}, {\bf pnl\+Lime\+S\+D\+R\+::\+On\+Usr\+G\+P\+I\+O\+Change()}, {\bf pnl\+Lime\+S\+D\+R\+::\+On\+Usr\+G\+P\+I\+O\+Dir\+Change()}, {\bf Myriad7\+\_\+wxgui\+::\+Parameter\+Change\+Handler()}, {\bf pnl\+Buffers\+::pnl\+Buffers()}, {\bf pnl\+Lime\+S\+D\+R\+::pnl\+Lime\+S\+D\+R()}, {\bf pnlu\+Lime\+S\+D\+R\+::pnlu\+Lime\+S\+D\+R()}, {\bf pnl\+Ultimate\+E\+V\+B\+::pnl\+Ultimate\+E\+V\+B()}, {\bf Si5351\+C\+\_\+wxgui\+::\+Si5351\+C\+\_\+wxgui()}, {\bf T\+E\+S\+T\+\_\+\+F()}, {\bf pnl\+Buffers\+::\+Update\+Panel()}, {\bf pnlu\+Lime\+S\+D\+R\+::\+Update\+Panel()}, {\bf Myriad7\+\_\+wxgui\+::\+Update\+Panel()}, {\bf pnl\+Lime\+S\+D\+R\+::\+Update\+Panel()}, and {\bf F\+P\+G\+Acontrols\+\_\+wxgui\+::\+Upload\+File()}.
+
+\index{mcu\+\_\+program/host\+\_\+src/main.\+cpp@{mcu\+\_\+program/host\+\_\+src/main.\+cpp}!Ref\+Clk@{Ref\+Clk}}
+\index{Ref\+Clk@{Ref\+Clk}!mcu\+\_\+program/host\+\_\+src/main.\+cpp@{mcu\+\_\+program/host\+\_\+src/main.\+cpp}}
+\paragraph[{Ref\+Clk}]{\setlength{\rightskip}{0pt plus 5cm}float Ref\+Clk}\label{mcu__program_2host__src_2main_8cpp_a163eabd7296e51e8ba07ab89686c406c}
+
+
+Definition at line {\bf 22} of file {\bf lms7002m\+\_\+controls.\+c}.
+
+
+
+Referenced by {\bf D\+C\+I\+Q()}, {\bf Filters()}, and {\bf main()}.
+
+\index{mcu\+\_\+program/host\+\_\+src/main.\+cpp@{mcu\+\_\+program/host\+\_\+src/main.\+cpp}!ser\+Port@{ser\+Port}}
+\index{ser\+Port@{ser\+Port}!mcu\+\_\+program/host\+\_\+src/main.\+cpp@{mcu\+\_\+program/host\+\_\+src/main.\+cpp}}
+\paragraph[{ser\+Port}]{\setlength{\rightskip}{0pt plus 5cm}{\bf lime\+::\+I\+Connection}$\ast$ ser\+Port = nullptr}\label{mcu__program_2host__src_2main_8cpp_a0d20ae1076940f5f69e66c3c90cb4f98}
+
+
+Definition at line {\bf 21} of file {\bf main.\+cpp}.
+
+
+
+Referenced by {\bf L\+M\+S7002\+M\+\_\+\+Novena\+\_\+wxgui\+::\+Initialize()}, {\bf main()}, and {\bf T\+E\+S\+T\+\_\+\+F()}.
+
+\index{mcu\+\_\+program/host\+\_\+src/main.\+cpp@{mcu\+\_\+program/host\+\_\+src/main.\+cpp}!tx@{tx}}
+\index{tx@{tx}!mcu\+\_\+program/host\+\_\+src/main.\+cpp@{mcu\+\_\+program/host\+\_\+src/main.\+cpp}}
+\paragraph[{tx}]{\setlength{\rightskip}{0pt plus 5cm}bool tx = 1\hspace{0.3cm}{\ttfamily [static]}}\label{mcu__program_2host__src_2main_8cpp_a3b1e88519ca75747960d51b86b2c5e95}
+
+
+Definition at line {\bf 26} of file {\bf main.\+cpp}.
+
+
+
+Referenced by {\bf D\+C\+I\+Q()}, {\bf D\+E\+F\+U\+N\+\_\+\+D\+L\+D()}, {\bf Filters()}, {\bf Soapy\+L\+M\+S7\+::get\+Antenna()}, {\bf main()}, {\bf Soapy\+L\+M\+S7\+::set\+Antenna()}, and {\bf Set\+Ext\+Loopback()}.
+
+\index{mcu\+\_\+program/host\+\_\+src/main.\+cpp@{mcu\+\_\+program/host\+\_\+src/main.\+cpp}!use\+M\+CU@{use\+M\+CU}}
+\index{use\+M\+CU@{use\+M\+CU}!mcu\+\_\+program/host\+\_\+src/main.\+cpp@{mcu\+\_\+program/host\+\_\+src/main.\+cpp}}
+\paragraph[{use\+M\+CU}]{\setlength{\rightskip}{0pt plus 5cm}bool use\+M\+CU =1\hspace{0.3cm}{\ttfamily [static]}}\label{mcu__program_2host__src_2main_8cpp_ad04f6bbff39cf4031f761f3e5773c452}
+
+
+Definition at line {\bf 25} of file {\bf main.\+cpp}.
+
+
+
+Referenced by {\bf D\+C\+I\+Q()}, {\bf Filters()}, and {\bf main()}.
+

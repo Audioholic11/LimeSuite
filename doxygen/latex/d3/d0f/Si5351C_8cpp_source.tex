@@ -1,0 +1,835 @@
+\subsection{Si5351\+C.\+cpp}
+\label{Si5351C_8cpp_source}\index{/home/erik/prefix/default/src/limesuite-\/dev/src/\+Si5351\+C/\+Si5351\+C.\+cpp@{/home/erik/prefix/default/src/limesuite-\/dev/src/\+Si5351\+C/\+Si5351\+C.\+cpp}}
+
+\begin{DoxyCode}
+00001 
+00007 \textcolor{preprocessor}{#include "Si5351C.h"}
+00008 \textcolor{preprocessor}{#include "IConnection.h"}
+00009 \textcolor{preprocessor}{#include "Logger.h"}
+00010 \textcolor{preprocessor}{#include <math.h>}
+00011 \textcolor{preprocessor}{#include <iomanip>}
+00012 \textcolor{preprocessor}{#include <fstream>}
+00013 \textcolor{preprocessor}{#include <set>}
+00014 \textcolor{preprocessor}{#include <map>}
+00015 \textcolor{preprocessor}{#include <cstring>}
+00016 \textcolor{preprocessor}{#include <cassert>}
+00017 \textcolor{preprocessor}{#include <ciso646>} \textcolor{comment}{// alternative operators for visual c++: not, and, or...}
+00018 
+00019 \textcolor{keyword}{using namespace }std;
+00020 \textcolor{keyword}{using namespace }lime;
+00021 
+00023 \textcolor{keywordtype}{void} realToFrac(\textcolor{keyword}{const} \textcolor{keywordtype}{float} real, \textcolor{keywordtype}{int} &A, \textcolor{keywordtype}{int} &B, \textcolor{keywordtype}{int} &C)
+00024 \{
+00025     A = (int)real;
+00026     B = (int)((real - A) * 1048576 + 0.5);
+00027     C = 1048576;
+00028 
+00029     \textcolor{keywordtype}{int} a = B;
+00030     \textcolor{keywordtype}{int} b = C;
+00031     \textcolor{keywordtype}{int} temp;
+00032     \textcolor{keywordflow}{while}( b!= 0) \textcolor{comment}{// greatest common divider}
+00033     \{
+00034         temp = a % b;
+00035         a = b;
+00036         b = temp;
+00037     \}
+00038     B = B/a;
+00039     C = C/a;
+00040 \}
+00041 
+00043 \textcolor{keyword}{const} \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{char} Si5351C::m\_defaultConfiguration[] =
+00044 \{ 0,0x00,
+00045   1,0x00,
+00046   2,0x08,
+00047   3,0x00,
+00048   4,0x00,
+00049   5,0x00,
+00050   6,0x00,
+00051   7,0x00,
+00052   8,0x00,
+00053   9,0x00,
+00054  10,0x00,
+00055  11,0x00,
+00056  12,0x00,
+00057  13,0x00,
+00058  14,0x00,
+00059  15,0x04,
+00060  16,0x4F,
+00061  17,0x4F,
+00062  18,0x4F,
+00063  19,0x4F,
+00064  20,0x4F,
+00065  21,0x4F,
+00066  22,0x0F,
+00067  23,0x0F,
+00068  24,0x00,
+00069  25,0x00,
+00070  26,0x00,
+00071  27,0x80,
+00072  28,0x00,
+00073  29,0x0B,
+00074  30,0x2F,
+00075  31,0x00,
+00076  32,0x00,
+00077  33,0x00,
+00078  34,0x00,
+00079  35,0x00,
+00080  36,0x00,
+00081  37,0x00,
+00082  38,0x00,
+00083  39,0x00,
+00084  40,0x00,
+00085  41,0x00,
+00086  42,0x00,
+00087  43,0x01,
+00088  44,0x00,
+00089  45,0x0D,
+00090  46,0x00,
+00091  47,0x00,
+00092  48,0x00,
+00093  49,0x00,
+00094  50,0x00,
+00095  51,0x01,
+00096  52,0x00,
+00097  53,0x0D,
+00098  54,0x00,
+00099  55,0x00,
+00100  56,0x00,
+00101  57,0x00,
+00102  58,0x00,
+00103  59,0x01,
+00104  60,0x00,
+00105  61,0x0D,
+00106  62,0x00,
+00107  63,0x00,
+00108  64,0x00,
+00109  65,0x00,
+00110  66,0x00,
+00111  67,0x01,
+00112  68,0x00,
+00113  69,0x0D,
+00114  70,0x00,
+00115  71,0x00,
+00116  72,0x00,
+00117  73,0x00,
+00118  74,0x00,
+00119  75,0x01,
+00120  76,0x00,
+00121  77,0x0D,
+00122  78,0x00,
+00123  79,0x00,
+00124  80,0x00,
+00125  81,0x00,
+00126  82,0x00,
+00127  83,0x01,
+00128  84,0x00,
+00129  85,0x0D,
+00130  86,0x00,
+00131  87,0x00,
+00132  88,0x00,
+00133  89,0x00,
+00134  90,0x1E,
+00135  91,0x1E,
+00136  92,0x00,
+00137  93,0x00,
+00138  94,0x00,
+00139  95,0x00,
+00140  96,0x00,
+00141  97,0x00,
+00142  98,0x00,
+00143  99,0x00,
+00144 100,0x00,
+00145 101,0x00,
+00146 102,0x00,
+00147 103,0x00,
+00148 104,0x00,
+00149 105,0x00,
+00150 106,0x00,
+00151 107,0x00,
+00152 108,0x00,
+00153 109,0x00,
+00154 110,0x00,
+00155 111,0x00,
+00156 112,0x00,
+00157 113,0x00,
+00158 114,0x00,
+00159 115,0x00,
+00160 116,0x00,
+00161 117,0x00,
+00162 118,0x00,
+00163 119,0x00,
+00164 120,0x00,
+00165 121,0x00,
+00166 122,0x00,
+00167 123,0x00,
+00168 124,0x00,
+00169 125,0x00,
+00170 126,0x00,
+00171 127,0x00,
+00172 128,0x00,
+00173 129,0x00,
+00174 130,0x00,
+00175 131,0x00,
+00176 132,0x00,
+00177 133,0x00,
+00178 134,0x00,
+00179 135,0x00,
+00180 136,0x00,
+00181 137,0x00,
+00182 138,0x00,
+00183 139,0x00,
+00184 140,0x00,
+00185 141,0x00,
+00186 142,0x00,
+00187 143,0x00,
+00188 144,0x00,
+00189 145,0x00,
+00190 146,0x00,
+00191 147,0x00,
+00192 148,0x00,
+00193 149,0x00,
+00194 150,0x00,
+00195 151,0x00,
+00196 152,0x00,
+00197 153,0x00,
+00198 154,0x00,
+00199 155,0x00,
+00200 156,0x00,
+00201 157,0x00,
+00202 158,0x00,
+00203 159,0x00,
+00204 160,0x00,
+00205 161,0x00,
+00206 162,0x00,
+00207 163,0x00,
+00208 164,0x00,
+00209 165,0x00,
+00210 166,0x00,
+00211 167,0x00,
+00212 168,0x00,
+00213 169,0x00,
+00214 170,0x00,
+00215 171,0x00,
+00216 172,0x00,
+00217 173,0x00,
+00218 174,0x00,
+00219 175,0x00,
+00220 176,0x00,
+00221 177,0x00,
+00222 178,0x00,
+00223 179,0x00,
+00224 180,0x00,
+00225 181,0x30,
+00226 182,0x00,
+00227 183,0xD2,
+00228 184,0x60,
+00229 185,0x60,
+00230 186,0x00,
+00231 187,0xC0,
+00232 188,0x00,
+00233 189,0x00,
+00234 190,0x00,
+00235 191,0x00,
+00236 192,0x00,
+00237 193,0x00,
+00238 194,0x00,
+00239 195,0x00,
+00240 196,0x00,
+00241 197,0x00,
+00242 198,0x00,
+00243 199,0x00,
+00244 200,0x00,
+00245 201,0x00,
+00246 202,0x00,
+00247 203,0x00,
+00248 204,0x00,
+00249 205,0x00,
+00250 206,0x00,
+00251 207,0x00,
+00252 208,0x00,
+00253 209,0x00,
+00254 210,0x00,
+00255 211,0x00,
+00256 212,0x00,
+00257 213,0x00,
+00258 214,0x00,
+00259 215,0x00,
+00260 216,0x00,
+00261 217,0x00,
+00262 218,0x00,
+00263 219,0x00,
+00264 220,0x00,
+00265 221,0x0D,
+00266 222,0x00,
+00267 223,0x00,
+00268 224,0x00,
+00269 225,0x00,
+00270 226,0x00,
+00271 227,0x00,
+00272 228,0x00,
+00273 229,0x00,
+00274 230,0x00,
+00275 231,0x00,
+00276 232,0x00\};
+00277 
+00278 \textcolor{comment}{// ---------------------------------------------------------------------------}
+00279 Si5351C::Si5351C()
+00280 \{
+00281     memset(m\_newConfiguration, 0, 255);
+00282     \textcolor{keywordflow}{for}(\textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{int} i=0; i<\textcolor{keyword}{sizeof}(m\_defaultConfiguration); i+=2)
+00283     \{
+00284         m\_newConfiguration[m\_defaultConfiguration[i]] = m\_defaultConfiguration[i+1];
+00285     \}
+00286     device = NULL;
+00287 \}
+00288 \textcolor{comment}{// ---------------------------------------------------------------------------}
+00289 
+00290 Si5351C::~Si5351C()
+00291 \{
+00292 
+00293 \}
+00294 
+00297 Si5351C::Status Si5351C::UploadConfiguration()
+00298 \{
+00299     \textcolor{keywordflow}{if} (!device || device->IsOpen() == \textcolor{keyword}{false})
+00300         \textcolor{keywordflow}{return} FAILED;
+00301 
+00302     std::string outBuffer;
+00303     \textcolor{comment}{//Disable outputs}
+00304     outBuffer.push\_back(3);
+00305     outBuffer.push\_back(0xFF);
+00306     \textcolor{comment}{//Power down all output drivers}
+00307     \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} i=0; i<8; ++i)
+00308     \{
+00309         outBuffer.push\_back(16 + i);
+00310         outBuffer.push\_back(0x84);
+00311     \}
+00312     \textcolor{comment}{//write new configuration}
+00313     \textcolor{keywordflow}{for} (\textcolor{keywordtype}{int} i = 15; i <= 92; ++i)
+00314     \{
+00315         outBuffer.push\_back(i);
+00316         outBuffer.push\_back(m\_newConfiguration[i]);
+00317     \}
+00318     \textcolor{keywordflow}{for} (\textcolor{keywordtype}{int} i = 149; i <= 170; ++i)
+00319     \{
+00320         outBuffer.push\_back(i);
+00321         outBuffer.push\_back(m\_newConfiguration[i]);
+00322     \}
+00323     \textcolor{comment}{//apply soft reset}
+00324     outBuffer.push\_back(177);
+00325     outBuffer.push\_back(0xAC);
+00326     \textcolor{comment}{//Enabe desired outputs}
+00327     outBuffer.push\_back(3);
+00328     outBuffer.push\_back(m\_newConfiguration[3]);
+00329 
+00330     \textcolor{keywordtype}{int} status;
+00331     status = device->WriteI2C(addrSi5351, outBuffer);
+00332     \textcolor{keywordflow}{if} (status != 0)
+00333         \textcolor{keywordflow}{return} FAILED;
+00334     \textcolor{keywordflow}{return} SUCCESS;
+00335 \}
+00336 
+00337 \textcolor{comment}{// ---------------------------------------------------------------------------}
+00342 \textcolor{comment}{}\textcolor{keywordtype}{void} Si5351C::Initialize(IConnection *mng)
+00343 \{
+00344     device = mng;
+00345     \textcolor{keywordflow}{if} (device != \textcolor{keyword}{nullptr} and device->IsOpen())
+00346         addrSi5351 = 0x20;
+00347 \}
+00348 
+00353 \textcolor{keywordtype}{bool} Si5351C::LoadRegValuesFromFile(\textcolor{keywordtype}{string} FName)
+00354 \{
+00355     fstream fin;
+00356     fin.open(FName.c\_str(), ios::in);
+00357 
+00358     \textcolor{keyword}{const} \textcolor{keywordtype}{int} len = 1024;
+00359     \textcolor{keywordtype}{char} line[len];
+00360 
+00361     \textcolor{keywordtype}{int} addr;
+00362     \textcolor{keywordtype}{int} value;
+00363 
+00364     \textcolor{keywordflow}{while}(!fin.eof())
+00365     \{
+00366         fin.getline(line, len);
+00367         \textcolor{keywordflow}{if}( line[0] == \textcolor{charliteral}{'#'})
+00368             \textcolor{keywordflow}{continue};
+00369         \textcolor{keywordflow}{if}( strcmp(line, \textcolor{stringliteral}{"#END\_PROFILE"}) == 0)
+00370             \textcolor{keywordflow}{break};
+00371         sscanf(line, \textcolor{stringliteral}{"%i,%x"},&addr,&value);
+00372         m\_newConfiguration[addr] = value;
+00373     \}
+00374 
+00375     fin.close();
+00376     \textcolor{keywordflow}{return} \textcolor{keyword}{false};
+00377 \};
+00378 
+00385 \textcolor{keywordtype}{void} Si5351C::FindVCO(Si5351_Channel *clocks, Si5351_PLL *plls, \textcolor{keyword}{const} \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{long} Fmin, \textcolor{keyword}{const} \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{
+      long} Fmax)
+00386 \{
+00387     \textcolor{keywordtype}{int} clockCount = 8;
+00388     \textcolor{comment}{//reset output parameters}
+00389     \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} i=0; i<clockCount; i++)
+00390     \{
+00391         clocks[i].pllSource = 0;
+00392         clocks[i].int_mode = 0;
+00393         clocks[i].multisynthDivider = 8;
+00394     \}
+00395 
+00396     \textcolor{keywordtype}{bool} clk6satisfied = !clocks[6].powered;
+00397     \textcolor{keywordtype}{bool} clk7satisfied = !clocks[7].powered;
+00398 
+00399     \textcolor{keywordtype}{bool} pllAused = \textcolor{keyword}{false};
+00400     \textcolor{keywordtype}{bool} pllBused = \textcolor{keyword}{false};
+00401 
+00402     map< unsigned long, int> availableFrequenciesPLLA; \textcolor{comment}{//all available frequencies for VCO}
+00403     map< unsigned long, int> availableFrequenciesPLLB; \textcolor{comment}{//all available frequencies for VCO}
+00404 
+00405     \textcolor{comment}{//if clk6 or clk7 is used make available frequencies according to them}
+00406     \textcolor{keywordflow}{if}(clocks[6].powered || clocks[7].powered)
+00407     \{
+00408         set<unsigned long> clk6freqs;
+00409         set<unsigned long> clk7freqs;
+00410         set<unsigned long> sharedFreqs;
+00411         \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{int} mult = 6;
+00412         \textcolor{keywordflow}{if}(!clk6satisfied)
+00413         \{
+00414             \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{long} freq = clocks[6].outputFreqHz;
+00415             \textcolor{keywordflow}{while}(freq <= Fmax && mult <= 254)
+00416             \{
+00417                 freq = clocks[6].outputFreqHz*mult;
+00418                 \textcolor{keywordflow}{if}(freq >= Fmin && freq <= Fmax)
+00419                 \{
+00420                     clk6freqs.insert(freq);
+00421                 \}
+00422                 mult += 2;
+00423             \}
+00424         \}
+00425         mult = 6;
+00426         \textcolor{keywordflow}{if}(!clk7satisfied)
+00427         \{
+00428             \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{long} freq = clocks[7].outputFreqHz;
+00429             \textcolor{keywordflow}{while}(freq <= Fmax && mult <= 254)
+00430             \{
+00431                 freq = clocks[7].outputFreqHz*mult;
+00432                 \textcolor{keywordflow}{if}(freq >= Fmin && freq <= Fmax)
+00433                 \{
+00434                     clk7freqs.insert(freq);
+00435                 \}
+00436                 mult += 2;
+00437             \}
+00438         \}
+00439         \textcolor{keywordtype}{bool} canShare = \textcolor{keyword}{false};
+00440         \textcolor{comment}{//find if clk6 and clk7 can share the same pll}
+00441         \textcolor{keywordflow}{for} (set<unsigned long>::iterator it6=clk6freqs.begin(); it6!=clk6freqs.end(); ++it6)
+00442         \{
+00443             \textcolor{keywordflow}{for} (set<unsigned long>::iterator it7=clk7freqs.begin(); it7!=clk7freqs.end(); ++it7)
+00444             \{
+00445                 \textcolor{keywordflow}{if}(*it6 == *it7)
+00446                 \{
+00447                     canShare = \textcolor{keyword}{true};
+00448                     sharedFreqs.insert(*it6);
+00449                 \}
+00450             \}
+00451         \}
+00452         \textcolor{keywordflow}{if}(canShare) \textcolor{comment}{//assign PLLA for both clocks}
+00453         \{
+00454             clocks[6].pllSource = 0;
+00455             clocks[7].pllSource = 0;
+00456             pllAused = \textcolor{keyword}{true};
+00457             \textcolor{keywordflow}{for} (set<unsigned long>::iterator it=sharedFreqs.begin(); it!=sharedFreqs.end(); ++it)
+00458             \{
+00459                 availableFrequenciesPLLA.insert( pair<unsigned long, int> (*it, 0) );
+00460             \}
+00461             clk6satisfied = \textcolor{keyword}{true};
+00462             clk7satisfied = \textcolor{keyword}{true};
+00463         \}
+00464         \textcolor{keywordflow}{else} \textcolor{comment}{//if clocks 6 and 7 can't share pll, assign pllA to clk6 and pllB to clk7}
+00465         \{
+00466             \textcolor{keywordflow}{if}(!clk6satisfied)
+00467             \{
+00468                 clocks[6].pllSource = 0;
+00469                 clk6satisfied = \textcolor{keyword}{true};
+00470                 pllAused = \textcolor{keyword}{true};
+00471                 \textcolor{keywordflow}{for} (set<unsigned long>::iterator it6=clk6freqs.begin(); it6!=clk6freqs.end(); ++it6)
+00472                 \{
+00473                     availableFrequenciesPLLA.insert( pair<unsigned long, int>(*it6, 0) );
+00474                 \}
+00475             \}
+00476             \textcolor{keywordflow}{if}(!clk7satisfied)
+00477             \{
+00478                 clocks[7].pllSource = 1;
+00479                 clk7satisfied = \textcolor{keyword}{true};
+00480                 pllBused = \textcolor{keyword}{true};
+00481                 \textcolor{keywordflow}{for} (set<unsigned long>::iterator it7=clk7freqs.begin(); it7!=clk7freqs.end(); ++it7)
+00482                 \{
+00483                     availableFrequenciesPLLB.insert( pair<unsigned long, int> (*it7, 0) );
+00484                 \}
+00485             \}
+00486         \}
+00487     \}
+00488 
+00489     \textcolor{comment}{//PLLA stage, find  all clocks that have integer coefficients with PLLA}
+00490     \textcolor{comment}{//if pllA is not used by clk6 or clk7, fill available frequencies according to clk1-clk5 clocks}
+00491     \textcolor{keywordflow}{if}( availableFrequenciesPLLA.size() == 0 && !pllAused)
+00492     \{
+00493         \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} i=0; i<6; ++i)
+00494         \{
+00495             \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{long} freq = clocks[i].outputFreqHz > Fmin ? clocks[i].
+      outputFreqHz : (clocks[i].outputFreqHz*((Fmin/clocks[i].outputFreqHz) + ((Fmin%clocks[
+      i].outputFreqHz)!=0)));
+00496             \textcolor{keywordflow}{while}(freq >= Fmin && freq <= Fmax)
+00497             \{
+00498                 \textcolor{comment}{//add all output frequency multiples that are in VCO interval}
+00499                 availableFrequenciesPLLA.insert( pair<unsigned long, int> (freq, 0));
+00500                 freq += clocks[i].outputFreqHz;
+00501             \}
+00502         \}
+00503     \}
+00504 
+00505     \textcolor{keywordtype}{int} bestScore = 0; \textcolor{comment}{//score shows how many outputs have integer dividers}
+00506     \textcolor{comment}{//calculate scores for all available frequencies}
+00507     \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{long} bestVCOA = 0;
+00508     \textcolor{keywordflow}{for} (map<unsigned long, int>::iterator it=availableFrequenciesPLLA.begin(); it!=
+      availableFrequenciesPLLA.end(); ++it)
+00509     \{
+00510         \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} i=0; i<8; ++i)
+00511         \{
+00512             \textcolor{keywordflow}{if}(clocks[i].outputFreqHz == 0 || !clocks[i].powered)
+00513                 \textcolor{keywordflow}{continue};
+00514 
+00515             \textcolor{keywordflow}{if}( (it->first % clocks[i].outputFreqHz) == 0)
+00516             \{
+00517                 it->second = it->second+1;
+00518             \}
+00519         \}
+00520         \textcolor{keywordflow}{if}(it->second >= bestScore)
+00521         \{
+00522             bestScore = it->second;
+00523             bestVCOA = it->first;
+00524         \}
+00525     \}
+00526     \textcolor{comment}{//scores calculated}
+00527     \textcolor{comment}{//cout << "PLLA stage: " << endl;}
+00528     \textcolor{comment}{//cout << "best score: " << bestScore << "     best VCO: " << bestVCOA << endl;}
+00529     plls[0].VCO_Hz = bestVCOA;
+00530     plls[0].feedbackDivider = (double)bestVCOA/plls[0].inputFreqHz;
+00531 
+00532     \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} i=0; i<clockCount; ++i)
+00533     \{
+00534         \textcolor{keywordflow}{if}(clocks[i].outputFreqHz == 0 || !clocks[i].powered)
+00535             \textcolor{keywordflow}{continue};
+00536 
+00537         clocks[i].multisynthDivider = bestVCOA/clocks[i].outputFreqHz;
+00538         \textcolor{keywordflow}{if}(bestVCOA%clocks[i].outputFreqHz == 0)
+00539         \{
+00540             clocks[i].int_mode = \textcolor{keyword}{true};
+00541             clocks[i].multisynthDivider = bestVCOA/clocks[i].outputFreqHz;
+00542         \}
+00543         \textcolor{keywordflow}{else}
+00544         \{
+00545             clocks[i].int_mode = \textcolor{keyword}{false};
+00546             clocks[i].multisynthDivider = (double)bestVCOA/clocks[i].outputFreqHz;
+00547         \}
+00548         clocks[i].pllSource = 0;
+00549     \}
+00550 
+00551 
+00552     \textcolor{comment}{//PLLB stage, find  all clocks that have integer coefficients with PLLB}
+00553     \textcolor{comment}{//if pllB is not used by clk6 or clk7, fill available frequencies according to clk1-clk5 clocks, that
+       don't have integer dividers}
+00554     \textcolor{keywordflow}{if}( availableFrequenciesPLLB.size() == 0 && !pllBused)
+00555     \{
+00556         \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} i=0; i<6; ++i)
+00557         \{
+00558             \textcolor{keywordflow}{if}(clocks[i].outputFreqHz == 0 || !clocks[i].powered)
+00559                 \textcolor{keywordflow}{continue};
+00560 
+00561             \textcolor{keywordflow}{if}(clocks[i].int\_mode) \textcolor{comment}{//skip clocks with integer dividers}
+00562                 \textcolor{keywordflow}{continue};
+00563             \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{long} freq = clocks[i].outputFreqHz > Fmin ? clocks[i].
+      outputFreqHz : (clocks[i].outputFreqHz*((Fmin/clocks[i].outputFreqHz) + ((Fmin%clocks[
+      i].outputFreqHz)!=0)));
+00564             \textcolor{keywordflow}{while}(freq >= Fmin && freq <= Fmax)
+00565             \{
+00566                 availableFrequenciesPLLB.insert( pair<unsigned long, int> (freq, 0));
+00567                 freq += clocks[i].outputFreqHz;
+00568             \}
+00569         \}
+00570     \}
+00571 
+00572     bestScore = 0;
+00573     \textcolor{comment}{//calculate scores for all available frequencies}
+00574     \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{long} bestVCOB = 0;
+00575     \textcolor{keywordflow}{for} (map<unsigned long, int>::iterator it=availableFrequenciesPLLB.begin(); it!=
+      availableFrequenciesPLLB.end(); ++it)
+00576     \{
+00577         \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} i=0; i<8; ++i)
+00578         \{
+00579             \textcolor{keywordflow}{if}(clocks[i].outputFreqHz == 0 || !clocks[i].powered)
+00580                 \textcolor{keywordflow}{continue};
+00581 
+00582             \textcolor{keywordflow}{if}( (it->first % clocks[i].outputFreqHz) == 0)
+00583             \{
+00584                 it->second = it->second+1;
+00585             \}
+00586         \}
+00587         \textcolor{keywordflow}{if}(it->second >= bestScore)
+00588         \{
+00589             bestScore = it->second;
+00590             bestVCOB = it->first;
+00591         \}
+00592     \}
+00593     \textcolor{comment}{//scores calculated}
+00594 \textcolor{comment}{//    cout << "PLLB stage: " << endl;}
+00595 \textcolor{comment}{//    cout << "best score: " << bestScore << "     best VCO: " << bestVCOB << endl;}
+00596     \textcolor{keywordflow}{if}(bestVCOB == 0) \textcolor{comment}{//just in case if pllb is not used make it the same frequency as plla}
+00597         bestVCOB = bestVCOA;
+00598     plls[1].VCO_Hz = bestVCOB;
+00599     plls[1].feedbackDivider = (double)bestVCOB/plls[0].inputFreqHz;
+00600     \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} i=0; i<clockCount; ++i)
+00601     \{
+00602         \textcolor{keywordflow}{if}(clocks[i].outputFreqHz == 0 || !clocks[i].powered)
+00603                 \textcolor{keywordflow}{continue};
+00604 
+00605         \textcolor{keywordflow}{if}(clocks[i].int\_mode)
+00606             \textcolor{keywordflow}{continue};
+00607         clocks[i].multisynthDivider = bestVCOB/clocks[i].outputFreqHz;
+00608         \textcolor{keywordflow}{if}(bestVCOB%clocks[i].outputFreqHz == 0)
+00609         \{
+00610             clocks[i].int_mode = \textcolor{keyword}{true};
+00611             clocks[i].multisynthDivider = bestVCOB/clocks[i].outputFreqHz;
+00612         \}
+00613         \textcolor{keywordflow}{else}
+00614         \{
+00615             clocks[i].int_mode = \textcolor{keyword}{false};
+00616             clocks[i].multisynthDivider = (double)bestVCOB/clocks[i].outputFreqHz;
+00617         \}
+00618         clocks[i].pllSource = 1;
+00619     \}
+00620 \}
+00621 
+00622 
+00626 Si5351C::Status Si5351C::ConfigureClocks()
+00627 \{
+00628     FindVCO(CLK, PLL, 600000000, 900000000);
+00629     \textcolor{keywordtype}{int} addr;
+00630     m\_newConfiguration[3] = 0;
+00631     \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} i=0; i<8; ++i)
+00632     \{
+00633         m\_newConfiguration[3] |= (!CLK[i].powered) << i; \textcolor{comment}{//enabled}
+00634         m\_newConfiguration[16+i] = 0;
+00635         m\_newConfiguration[16+i] |= !CLK[i].powered << 7; \textcolor{comment}{// powered}
+00636 
+00637         \textcolor{keywordflow}{if}(CLK[i].int\_mode)
+00638         \{
+00639             m\_newConfiguration[16+i] |= 1 << 6; \textcolor{comment}{//integer mode}
+00640         \}
+00641         \textcolor{keywordflow}{else}
+00642             m\_newConfiguration[16+i] |= 0 << 6;
+00643 
+00644         m\_newConfiguration[16+i] |= CLK[i].pllSource << 5; \textcolor{comment}{//PLL source}
+00645         m\_newConfiguration[16+i] |= CLK[i].inverted << 4; \textcolor{comment}{// invert}
+00646         m\_newConfiguration[16+i] |= 3 << 2;
+00647         m\_newConfiguration[16+i] |= 3;
+00648 
+00649         addr = 42+i*8;
+00650         \textcolor{keywordtype}{int} DivA, DivB, DivC;
+00651         realToFrac(CLK[i].multisynthDivider, DivA, DivB, DivC);
+00652 
+00653         lime::info(\textcolor{stringliteral}{"CLK%d fOut = %g MHz  Multisynth Divider %d %d/%d  R divider = %d source = %s"},
+00654             i, CLK[i].outputFreqHz/1000000.0, DivA, DivB, DivC, CLK[i].outputDivider, (CLK[
+      i].pllSource == 0 ? \textcolor{stringliteral}{"PLLA"} : \textcolor{stringliteral}{"PLLB"}));
+00655 
+00656         \textcolor{keywordflow}{if}( CLK[i].multisynthDivider < 8 || 900 < CLK[i].multisynthDivider)
+00657         \{
+00658             lime::error(\textcolor{stringliteral}{"Si5351C - Output multisynth divider is outside [8;900] interval."});
+00659             \textcolor{keywordflow}{return} FAILED;
+00660         \}
+00661 
+00662         \textcolor{keywordflow}{if}(i<6)
+00663         \{
+00664             \textcolor{keywordflow}{if}(CLK[i].outputFreqHz <= 150000000)
+00665             \{
+00666                 \textcolor{keywordtype}{unsigned} MSX\_P1 = 128 * DivA + floor(128 * ( (\textcolor{keywordtype}{float})DivB/DivC)) - 512;
+00667                 \textcolor{keywordtype}{unsigned} MSX\_P2 = 128 * DivB - DivC * floor( 128 * DivB/DivC );
+00668                 \textcolor{keywordtype}{unsigned} MSX\_P3 = DivC;
+00669 
+00670                 m\_newConfiguration[addr] = MSX\_P3 >> 8;
+00671                 m\_newConfiguration[addr+1] = MSX\_P3;
+00672 
+00673                 m\_newConfiguration[addr+2] = 0;
+00674                 m\_newConfiguration[addr+2] |= (MSX\_P1 >> 16 ) & 0x03;
+00675                 m\_newConfiguration[addr+3] = MSX\_P1 >> 8;
+00676                 m\_newConfiguration[addr+4] = MSX\_P1;
+00677 
+00678                 m\_newConfiguration[addr+5] = 0;
+00679                 m\_newConfiguration[addr+5] = (MSX\_P2 >> 16) & 0x0F;
+00680                 m\_newConfiguration[addr+5] |= (MSX\_P3 >> 16) << 4;
+00681 
+00682                 m\_newConfiguration[addr+6] = MSX\_P2;
+00683                 m\_newConfiguration[addr+7] = MSX\_P2 >> 8;
+00684             \}
+00685             \textcolor{keywordflow}{else} \textcolor{keywordflow}{if}( CLK[i].outputFreqHz <= 160000000) \textcolor{comment}{// AVAILABLE ONLY ON 0-5 MULTISYNTHS}
+00686             \{
+00687                 lime::error(\textcolor{stringliteral}{"Si5351C - clock configuring for more than 150 MHz not implemented"});
+00688                 \textcolor{keywordflow}{return} FAILED;
+00689             \}
+00690         \}
+00691         \textcolor{keywordflow}{else} \textcolor{comment}{// CLK6 and CLK7 only integer mode}
+00692         \{
+00693             \textcolor{keywordflow}{if}(CLK[i].outputFreqHz <= 150000000)
+00694             \{
+00695                 \textcolor{keywordflow}{if}(i==6)
+00696                 \{
+00697                     m\_newConfiguration[90] = DivA;
+00698                     \textcolor{keywordflow}{if}(DivA%2 != 0)
+00699                     \{
+00700                         lime::error(\textcolor{stringliteral}{"Si5351C - CLK6 multisynth divider is not even integer"});
+00701                         \textcolor{keywordflow}{return} FAILED;
+00702                     \}
+00703                 \}
+00704                 \textcolor{keywordflow}{else}
+00705                 \{
+00706                     m\_newConfiguration[91] = DivA;
+00707                     \textcolor{keywordflow}{if}(DivA%2 != 0)
+00708                     \{
+00709                         lime::error(\textcolor{stringliteral}{"Si5351C - CLK7 multisynth divider is not even integer"});
+00710                         \textcolor{keywordflow}{return} FAILED;
+00711                     \}
+00712                 \}
+00713             \}
+00714             \textcolor{keywordflow}{else} \textcolor{keywordflow}{if}( CLK[i].outputFreqHz <= 160000000) \textcolor{comment}{// AVAILABLE ONLY ON 0-5 MULTISYNTHS}
+00715             \{
+00716                 lime::error(\textcolor{stringliteral}{"Si5351C - clock configuring for more than 150 MHz not implemented"});
+00717                 \textcolor{keywordflow}{return} FAILED;
+00718             \}
+00719         \}
+00720     \}
+00721 
+00722     \textcolor{comment}{//configure pll}
+00723     \textcolor{comment}{//set input clk source}
+00724     m\_newConfiguration[15] = m\_newConfiguration[15] & 0xF3;
+00725     m\_newConfiguration[15] |= (PLL[0].CLK\_SRC & 1) << 2;
+00726     m\_newConfiguration[15] |= (PLL[1].CLK\_SRC & 1) << 3;
+00727     \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} i=0; i<2; ++i)
+00728     \{
+00729         addr = 26+i*8;
+00730         \textcolor{keywordflow}{if}(PLL[i].feedbackDivider < 15 || PLL[i].feedbackDivider > 90)
+00731         \{
+00732             lime::error(\textcolor{stringliteral}{"Si5351C - VCO frequency divider out of range [15:90]."});
+00733             \textcolor{keywordflow}{return} FAILED;
+00734         \}
+00735         \textcolor{keywordflow}{if}( PLL[i].VCO\_Hz < 600000000 || PLL[i].VCO\_Hz > 900000000)
+00736         \{
+00737             lime::error(\textcolor{stringliteral}{"Si5351C - Can't calculate valid VCO frequency."});
+00738             \textcolor{keywordflow}{return} FAILED;
+00739         \}
+00740 
+00741         \textcolor{comment}{//calculate MSNx\_P1, MSNx\_P2, MSNx\_P3}
+00742         \textcolor{keywordtype}{int} MSNx\_P1;
+00743         \textcolor{keywordtype}{int} MSNx\_P2;
+00744         \textcolor{keywordtype}{int} MSNx\_P3;
+00745 
+00746         \textcolor{keywordtype}{int} DivA;
+00747         \textcolor{keywordtype}{int} DivB;
+00748         \textcolor{keywordtype}{int} DivC;
+00749         realToFrac(PLL[i].feedbackDivider, DivA, DivB, DivC);
+00750         lime::info(\textcolor{stringliteral}{"Si5351C: VCO%s = %g MHz  Feedback Divider %d %d/%d"},
+00751             (i==0 ? \textcolor{stringliteral}{"A"} : \textcolor{stringliteral}{"B"}), PLL[i].VCO\_Hz/1000000.0, DivA, DivB, DivC);
+00752 
+00753         MSNx\_P1 = 128 * DivA + floor(128 * ( (\textcolor{keywordtype}{float})DivB/DivC)) - 512;
+00754         MSNx\_P2 = 128 * DivB - DivC * floor( 128 * DivB/DivC );
+00755         MSNx\_P3 = DivC;
+00756 
+00757         m\_newConfiguration[addr+4] = MSNx\_P1;
+00758         m\_newConfiguration[addr+3] = MSNx\_P1 >> 8;
+00759         m\_newConfiguration[addr+2] = MSNx\_P1 >> 16;
+00760 
+00761         m\_newConfiguration[addr+7] = MSNx\_P2;
+00762         m\_newConfiguration[addr+6] = MSNx\_P2 >> 8;
+00763         m\_newConfiguration[addr+5] = 0;
+00764         m\_newConfiguration[addr+5] = (MSNx\_P2 >> 16) & 0x0F;
+00765 
+00766         m\_newConfiguration[addr+5] |= (MSNx\_P3 >> 16) << 4;
+00767         m\_newConfiguration[addr+1] |= MSNx\_P3;
+00768         m\_newConfiguration[addr] |= MSNx\_P3 >> 8;
+00769     \}
+00770     \textcolor{keywordflow}{return} SUCCESS;
+00771 \}
+00772 
+00779 \textcolor{keywordtype}{void} Si5351C::SetClock(\textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{char} \textcolor{keywordtype}{id}, \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{long} fOut\_Hz, \textcolor{keywordtype}{bool} enabled, \textcolor{keywordtype}{bool} inverted)
+00780 \{
+00781     \textcolor{keywordflow}{if}( \textcolor{keywordtype}{id} < 8)
+00782     \{
+00783         \textcolor{keywordflow}{if}(fOut\_Hz < 8000 || fOut\_Hz > 160000000)
+00784         \{
+00785             lime::error(\textcolor{stringliteral}{"Si5351C - CLK%d output frequency must be between 8kHz and 160MHz. fOut\_MHz = %g"}, 
+      (\textcolor{keywordtype}{int})\textcolor{keywordtype}{id}, fOut\_Hz/1000000.0);
+00786             \textcolor{keywordflow}{return};
+00787         \}
+00788         CLK[id].powered = enabled;
+00789         CLK[id].inverted = inverted;
+00790         CLK[id].outputFreqHz = fOut\_Hz;
+00791     \}
+00792 \}
+00793 
+00798 \textcolor{keywordtype}{void} Si5351C::SetPLL(\textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{char} \textcolor{keywordtype}{id}, \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{long} CLKIN\_Hz, \textcolor{keywordtype}{int} CLK\_SRC)
+00799 \{
+00800     \textcolor{keywordflow}{if} (\textcolor{keywordtype}{id} < 2)
+00801     \{
+00802         PLL[id].inputFreqHz = CLKIN\_Hz;
+00803         PLL[id].CLK\_SRC = CLK\_SRC;
+00804     \}
+00805 \}
+00806 
+00809 \textcolor{keywordtype}{void} Si5351C::Reset()
+00810 \{
+00811     memset(m\_newConfiguration, 0, 255);
+00812     \textcolor{keywordflow}{for}(\textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{int} i=0; i<\textcolor{keyword}{sizeof}(m\_defaultConfiguration); i+=2)
+00813     \{
+00814         m\_newConfiguration[m\_defaultConfiguration[i]] = m\_defaultConfiguration[i+1];
+00815     \}
+00816 \}
+00817 
+00818 Si5351C::StatusBits Si5351C::GetStatusBits()
+00819 \{
+00820     StatusBits stat;
+00821     \textcolor{keywordflow}{if}(!device)
+00822         \textcolor{keywordflow}{return} stat;
+00823     std::string dataIo;
+00824     dataIo.push\_back(0);
+00825     dataIo.push\_back(1);
+00826 
+00827     \textcolor{keywordtype}{int} status;
+00828     status = device->ReadI2C(addrSi5351, 2, dataIo);
+00829     \textcolor{keywordflow}{if} (status != 0)
+00830         \textcolor{keywordflow}{return} stat;
+00831     uint8\_t reg0 = dataIo[0] & 0xFF;
+00832     uint8\_t reg1 = dataIo[1] & 0xFF;
+00833     stat.sys_init = (reg0 >> 7);
+00834     stat.lol_b = (reg0 >> 6) & 0x1;
+00835     stat.lol_a = (reg0 >> 5) & 0x1;
+00836     stat.los = (reg0 >> 4) & 0x1;
+00837     stat.sys_init_stky = (reg1 >> 7);
+00838     stat.lol_b_stky = (reg1 >> 6) & 0x1;
+00839     stat.lol_a_stky = (reg1 >> 5) & 0x1;
+00840     stat.los_stky = (reg1 >> 4) & 0x1;
+00841     \textcolor{keywordflow}{return} stat;
+00842 \}
+00843 
+00844 Si5351C::Status Si5351C::ClearStatus()
+00845 \{
+00846     \textcolor{keywordflow}{if}(!device)
+00847         \textcolor{keywordflow}{return} FAILED;
+00848 
+00849     std::string dataWr;
+00850     dataWr.push\_back(1);
+00851     dataWr.push\_back(0x1);
+00852 
+00853     \textcolor{keywordtype}{int} status;
+00854     status = device->WriteI2C(addrSi5351, dataWr);
+00855     \textcolor{keywordflow}{if} (status != 0)
+00856         \textcolor{keywordflow}{return} FAILED;
+00857     \textcolor{keywordflow}{return} SUCCESS;
+00858 \}
+\end{DoxyCode}

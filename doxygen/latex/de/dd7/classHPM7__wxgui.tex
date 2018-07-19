@@ -1,0 +1,681 @@
+\subsection{H\+P\+M7\+\_\+wxgui Class Reference}
+\label{classHPM7__wxgui}\index{H\+P\+M7\+\_\+wxgui@{H\+P\+M7\+\_\+wxgui}}
+
+
+{\ttfamily \#include $<$H\+P\+M7\+\_\+wxgui.\+h$>$}
+
+
+
+Inheritance diagram for H\+P\+M7\+\_\+wxgui\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=204pt]{d4/d08/classHPM7__wxgui__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for H\+P\+M7\+\_\+wxgui\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=550pt]{d2/db8/classHPM7__wxgui__coll__graph}
+\end{center}
+\end{figure}
+\subsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+{\bf H\+P\+M7\+\_\+wxgui} (wx\+Window $\ast$parent, wx\+Window\+ID {\bf id}=wx\+I\+D\+\_\+\+A\+NY, const wx\+String \&title=wx\+Empty\+String, const wx\+Point \&pos=wx\+Default\+Position, const wx\+Size \&{\bf size}=wx\+Default\+Size, long styles=0)
+\item 
+virtual {\bf void} {\bf Initialize} ({\bf lms\+\_\+device\+\_\+t} $\ast${\bf ser\+Port})
+\item 
+virtual {\bf $\sim$\+H\+P\+M7\+\_\+wxgui} ()
+\item 
+{\bf void} {\bf Select\+Band} (unsigned {\bf int} {\bf i})
+\item 
+{\bf void} {\bf Select\+Rx\+Path} (unsigned {\bf int} {\bf i})
+\item 
+bool {\bf Upload\+G\+P\+IO} ()
+\end{DoxyCompactItemize}
+\subsubsection*{Protected Attributes}
+\begin{DoxyCompactItemize}
+\item 
+wx\+Combo\+Box $\ast$ {\bf cmb\+Active\+Path}
+\item 
+wx\+Combo\+Box $\ast$ {\bf cmb\+Band}
+\item 
+wx\+Combo\+Box $\ast$ {\bf cmb\+L\+NA}
+\item 
+wx\+Combo\+Box $\ast$ {\bf cmb\+P\+Adriver}
+\item 
+{\bf std\+::vector}$<$ long $>$ {\bf tuner\+Ids}
+\item 
+{\bf std\+::vector}$<$ wx\+Check\+Box $\ast$ $>$ {\bf chk\+EB}
+\item 
+{\bf std\+::vector}$<$ wx\+Check\+Box $\ast$ $>$ {\bf chk\+TP}
+\item 
+{\bf std\+::vector}$<$ wx\+Combo\+Box $\ast$ $>$ {\bf cmb\+S\+S\+C1}
+\item 
+{\bf std\+::vector}$<$ wx\+Combo\+Box $\ast$ $>$ {\bf cmb\+S\+S\+C2}
+\item 
+wx\+Button $\ast$ {\bf btn\+Update\+All}
+\item 
+wx\+Combo\+Box $\ast$ {\bf cmb\+D\+A\+C\+\_\+A}
+\item 
+wx\+Combo\+Box $\ast$ {\bf cmb\+D\+A\+C\+\_\+B}
+\item 
+{\bf lime\+::\+L\+M\+S64\+C\+Protocol} $\ast$ {\bf m\+\_\+ser\+Port}
+\end{DoxyCompactItemize}
+\subsubsection*{Private Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+{\bf void} {\bf Download\+All} (wx\+Command\+Event \&event)
+\item 
+{\bf void} {\bf On\+G\+P\+I\+Ochange} (wx\+Command\+Event \&event)
+\item 
+{\bf void} {\bf On\+Tuner\+S\+S\+C1change} (wx\+Command\+Event \&event)
+\item 
+{\bf void} {\bf On\+Tuner\+S\+S\+C2change} (wx\+Command\+Event \&event)
+\item 
+{\bf void} {\bf On\+D\+A\+Cchange} (wx\+Command\+Event \&event)
+\end{DoxyCompactItemize}
+\subsubsection*{Private Attributes}
+\begin{DoxyCompactItemize}
+\item 
+{\bf std\+::vector}$<$ long $>$ {\bf ch\+E\+Bids}
+\item 
+{\bf std\+::vector}$<$ long $>$ {\bf ch\+T\+Pids}
+\item 
+{\bf std\+::vector}$<$ long $>$ {\bf cmb\+S\+S\+C1ids}
+\item 
+{\bf std\+::vector}$<$ long $>$ {\bf cmb\+S\+S\+C2ids}
+\end{DoxyCompactItemize}
+
+
+\subsubsection{Detailed Description}
+
+
+Definition at line {\bf 22} of file {\bf H\+P\+M7\+\_\+wxgui.\+h}.
+
+
+
+\subsubsection{Constructor \& Destructor Documentation}
+\index{H\+P\+M7\+\_\+wxgui@{H\+P\+M7\+\_\+wxgui}!H\+P\+M7\+\_\+wxgui@{H\+P\+M7\+\_\+wxgui}}
+\index{H\+P\+M7\+\_\+wxgui@{H\+P\+M7\+\_\+wxgui}!H\+P\+M7\+\_\+wxgui@{H\+P\+M7\+\_\+wxgui}}
+\paragraph[{H\+P\+M7\+\_\+wxgui(wx\+Window $\ast$parent, wx\+Window\+I\+D id=wx\+I\+D\+\_\+\+A\+N\+Y, const wx\+String \&title=wx\+Empty\+String, const wx\+Point \&pos=wx\+Default\+Position, const wx\+Size \&size=wx\+Default\+Size, long styles=0)}]{\setlength{\rightskip}{0pt plus 5cm}H\+P\+M7\+\_\+wxgui\+::\+H\+P\+M7\+\_\+wxgui (
+\begin{DoxyParamCaption}
+\item[{wx\+Window $\ast$}]{parent, }
+\item[{wx\+Window\+ID}]{id = {\ttfamily wxID\+\_\+ANY}, }
+\item[{const wx\+String \&}]{title = {\ttfamily wxEmptyString}, }
+\item[{const wx\+Point \&}]{pos = {\ttfamily wxDefaultPosition}, }
+\item[{const wx\+Size \&}]{size = {\ttfamily wxDefaultSize}, }
+\item[{long}]{styles = {\ttfamily 0}}
+\end{DoxyParamCaption}
+)}\label{classHPM7__wxgui_a61c12a41a473e34a36151983a34cfd06}
+
+
+Definition at line {\bf 27} of file {\bf H\+P\+M7\+\_\+wxgui.\+cpp}.
+
+
+
+References {\bf Download\+All()}, {\bf i}, {\bf On\+D\+A\+Cchange()}, {\bf On\+G\+P\+I\+Ochange()}, {\bf On\+Tuner\+S\+S\+C1change()}, and {\bf On\+Tuner\+S\+S\+C2change()}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{de/dd7/classHPM7__wxgui_a61c12a41a473e34a36151983a34cfd06_cgraph}
+\end{center}
+\end{figure}
+
+
+\index{H\+P\+M7\+\_\+wxgui@{H\+P\+M7\+\_\+wxgui}!````~H\+P\+M7\+\_\+wxgui@{$\sim$\+H\+P\+M7\+\_\+wxgui}}
+\index{````~H\+P\+M7\+\_\+wxgui@{$\sim$\+H\+P\+M7\+\_\+wxgui}!H\+P\+M7\+\_\+wxgui@{H\+P\+M7\+\_\+wxgui}}
+\paragraph[{$\sim$\+H\+P\+M7\+\_\+wxgui()}]{\setlength{\rightskip}{0pt plus 5cm}H\+P\+M7\+\_\+wxgui\+::$\sim$\+H\+P\+M7\+\_\+wxgui (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [virtual]}}\label{classHPM7__wxgui_ad7d600fd5408fd21c72fd00913118a25}
+
+
+Definition at line {\bf 159} of file {\bf H\+P\+M7\+\_\+wxgui.\+cpp}.
+
+
+
+\subsubsection{Member Function Documentation}
+\index{H\+P\+M7\+\_\+wxgui@{H\+P\+M7\+\_\+wxgui}!Download\+All@{Download\+All}}
+\index{Download\+All@{Download\+All}!H\+P\+M7\+\_\+wxgui@{H\+P\+M7\+\_\+wxgui}}
+\paragraph[{Download\+All(wx\+Command\+Event \&event)}]{\setlength{\rightskip}{0pt plus 5cm}{\bf void} H\+P\+M7\+\_\+wxgui\+::\+Download\+All (
+\begin{DoxyParamCaption}
+\item[{wx\+Command\+Event \&}]{event}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [private]}}\label{classHPM7__wxgui_a84f041158261c06f51675ebcbec523cd}
+
+
+Definition at line {\bf 232} of file {\bf H\+P\+M7\+\_\+wxgui.\+cpp}.
+
+
+
+References {\bf chk\+EB}, {\bf chk\+TP}, {\bf cmb\+Active\+Path}, {\bf cmb\+Band}, {\bf cmb\+D\+A\+C\+\_\+A}, {\bf cmb\+D\+A\+C\+\_\+B}, {\bf cmb\+L\+NA}, {\bf cmb\+P\+Adriver}, {\bf cmb\+S\+S\+C1}, {\bf cmb\+S\+S\+C2}, {\bf lime\+::\+L\+M\+S64\+C\+Protocol\+::\+Generic\+Packet\+::cmd}, {\bf lime\+::\+C\+M\+D\+\_\+\+M\+Y\+R\+I\+A\+D\+\_\+\+RD}, {\bf i}, {\bf lime\+::\+L\+M\+S64\+C\+Protocol\+::\+Generic\+Packet\+::in\+Buffer}, {\bf index}, {\bf lime\+::\+I\+Connection\+::\+Is\+Open()}, {\bf m\+\_\+ser\+Port}, {\bf lime\+::\+L\+M\+S64\+C\+Protocol\+::\+Generic\+Packet\+::out\+Buffer}, and {\bf lime\+::\+L\+M\+S64\+C\+Protocol\+::\+Transfer\+Packet()}.
+
+
+
+Referenced by {\bf H\+P\+M7\+\_\+wxgui()}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{de/dd7/classHPM7__wxgui_a84f041158261c06f51675ebcbec523cd_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{de/dd7/classHPM7__wxgui_a84f041158261c06f51675ebcbec523cd_icgraph}
+\end{center}
+\end{figure}
+
+
+\index{H\+P\+M7\+\_\+wxgui@{H\+P\+M7\+\_\+wxgui}!Initialize@{Initialize}}
+\index{Initialize@{Initialize}!H\+P\+M7\+\_\+wxgui@{H\+P\+M7\+\_\+wxgui}}
+\paragraph[{Initialize(lms\+\_\+device\+\_\+t $\ast$ser\+Port)}]{\setlength{\rightskip}{0pt plus 5cm}{\bf void} H\+P\+M7\+\_\+wxgui\+::\+Initialize (
+\begin{DoxyParamCaption}
+\item[{{\bf lms\+\_\+device\+\_\+t} $\ast$}]{ser\+Port}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [virtual]}}\label{classHPM7__wxgui_aff1d1eafd6420dccaac4a1e67b8ff688}
+
+
+Definition at line {\bf 153} of file {\bf H\+P\+M7\+\_\+wxgui.\+cpp}.
+
+
+
+References {\bf lime\+::\+L\+M\+S7\+\_\+\+Device\+::\+Get\+Connection()}, {\bf lms()}, and {\bf m\+\_\+ser\+Port}.
+
+
+
+Referenced by {\bf L\+M\+S7\+Suite\+App\+Frame\+::\+On\+Show\+H\+P\+M7()}, and {\bf L\+M\+S7\+Suite\+App\+Frame\+::\+Update\+Connections()}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{de/dd7/classHPM7__wxgui_aff1d1eafd6420dccaac4a1e67b8ff688_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{de/dd7/classHPM7__wxgui_aff1d1eafd6420dccaac4a1e67b8ff688_icgraph}
+\end{center}
+\end{figure}
+
+
+\index{H\+P\+M7\+\_\+wxgui@{H\+P\+M7\+\_\+wxgui}!On\+D\+A\+Cchange@{On\+D\+A\+Cchange}}
+\index{On\+D\+A\+Cchange@{On\+D\+A\+Cchange}!H\+P\+M7\+\_\+wxgui@{H\+P\+M7\+\_\+wxgui}}
+\paragraph[{On\+D\+A\+Cchange(wx\+Command\+Event \&event)}]{\setlength{\rightskip}{0pt plus 5cm}{\bf void} H\+P\+M7\+\_\+wxgui\+::\+On\+D\+A\+Cchange (
+\begin{DoxyParamCaption}
+\item[{wx\+Command\+Event \&}]{event}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [private]}}\label{classHPM7__wxgui_a0452c4a448d34c147ad31421e28af3a5}
+
+
+Definition at line {\bf 275} of file {\bf H\+P\+M7\+\_\+wxgui.\+cpp}.
+
+
+
+References {\bf cmb\+D\+A\+C\+\_\+A}, {\bf cmb\+D\+A\+C\+\_\+B}, {\bf lime\+::\+L\+M\+S64\+C\+Protocol\+::\+Generic\+Packet\+::cmd}, {\bf lime\+::\+C\+M\+D\+\_\+\+M\+Y\+R\+I\+A\+D\+\_\+\+WR}, {\bf lime\+::\+I\+Connection\+::\+Is\+Open()}, {\bf m\+\_\+ser\+Port}, {\bf lime\+::\+L\+M\+S64\+C\+Protocol\+::\+Generic\+Packet\+::out\+Buffer}, and {\bf lime\+::\+L\+M\+S64\+C\+Protocol\+::\+Transfer\+Packet()}.
+
+
+
+Referenced by {\bf H\+P\+M7\+\_\+wxgui()}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{de/dd7/classHPM7__wxgui_a0452c4a448d34c147ad31421e28af3a5_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{de/dd7/classHPM7__wxgui_a0452c4a448d34c147ad31421e28af3a5_icgraph}
+\end{center}
+\end{figure}
+
+
+\index{H\+P\+M7\+\_\+wxgui@{H\+P\+M7\+\_\+wxgui}!On\+G\+P\+I\+Ochange@{On\+G\+P\+I\+Ochange}}
+\index{On\+G\+P\+I\+Ochange@{On\+G\+P\+I\+Ochange}!H\+P\+M7\+\_\+wxgui@{H\+P\+M7\+\_\+wxgui}}
+\paragraph[{On\+G\+P\+I\+Ochange(wx\+Command\+Event \&event)}]{\setlength{\rightskip}{0pt plus 5cm}{\bf void} H\+P\+M7\+\_\+wxgui\+::\+On\+G\+P\+I\+Ochange (
+\begin{DoxyParamCaption}
+\item[{wx\+Command\+Event \&}]{event}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [private]}}\label{classHPM7__wxgui_a4da0ec5ceb0fa3e816b87bb1060f3239}
+
+
+Definition at line {\bf 211} of file {\bf H\+P\+M7\+\_\+wxgui.\+cpp}.
+
+
+
+References {\bf cmb\+Active\+Path}, {\bf cmb\+Band}, and {\bf Upload\+G\+P\+I\+O()}.
+
+
+
+Referenced by {\bf H\+P\+M7\+\_\+wxgui()}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{de/dd7/classHPM7__wxgui_a4da0ec5ceb0fa3e816b87bb1060f3239_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{de/dd7/classHPM7__wxgui_a4da0ec5ceb0fa3e816b87bb1060f3239_icgraph}
+\end{center}
+\end{figure}
+
+
+\index{H\+P\+M7\+\_\+wxgui@{H\+P\+M7\+\_\+wxgui}!On\+Tuner\+S\+S\+C1change@{On\+Tuner\+S\+S\+C1change}}
+\index{On\+Tuner\+S\+S\+C1change@{On\+Tuner\+S\+S\+C1change}!H\+P\+M7\+\_\+wxgui@{H\+P\+M7\+\_\+wxgui}}
+\paragraph[{On\+Tuner\+S\+S\+C1change(wx\+Command\+Event \&event)}]{\setlength{\rightskip}{0pt plus 5cm}{\bf void} H\+P\+M7\+\_\+wxgui\+::\+On\+Tuner\+S\+S\+C1change (
+\begin{DoxyParamCaption}
+\item[{wx\+Command\+Event \&}]{event}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [private]}}\label{classHPM7__wxgui_a69215882fb2f728eb6bd310418f1d296}
+
+
+Definition at line {\bf 164} of file {\bf H\+P\+M7\+\_\+wxgui.\+cpp}.
+
+
+
+References {\bf cmb\+S\+S\+C1}, {\bf lime\+::\+L\+M\+S64\+C\+Protocol\+::\+Generic\+Packet\+::cmd}, {\bf lime\+::\+C\+M\+D\+\_\+\+M\+Y\+R\+I\+A\+D\+\_\+\+WR}, {\bf lime\+::\+I\+Connection\+::\+Is\+Open()}, {\bf m\+\_\+ser\+Port}, {\bf lime\+::\+L\+M\+S64\+C\+Protocol\+::\+Generic\+Packet\+::out\+Buffer}, and {\bf lime\+::\+L\+M\+S64\+C\+Protocol\+::\+Transfer\+Packet()}.
+
+
+
+Referenced by {\bf H\+P\+M7\+\_\+wxgui()}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{de/dd7/classHPM7__wxgui_a69215882fb2f728eb6bd310418f1d296_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{de/dd7/classHPM7__wxgui_a69215882fb2f728eb6bd310418f1d296_icgraph}
+\end{center}
+\end{figure}
+
+
+\index{H\+P\+M7\+\_\+wxgui@{H\+P\+M7\+\_\+wxgui}!On\+Tuner\+S\+S\+C2change@{On\+Tuner\+S\+S\+C2change}}
+\index{On\+Tuner\+S\+S\+C2change@{On\+Tuner\+S\+S\+C2change}!H\+P\+M7\+\_\+wxgui@{H\+P\+M7\+\_\+wxgui}}
+\paragraph[{On\+Tuner\+S\+S\+C2change(wx\+Command\+Event \&event)}]{\setlength{\rightskip}{0pt plus 5cm}{\bf void} H\+P\+M7\+\_\+wxgui\+::\+On\+Tuner\+S\+S\+C2change (
+\begin{DoxyParamCaption}
+\item[{wx\+Command\+Event \&}]{event}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [private]}}\label{classHPM7__wxgui_aa27bf4c5922bb1a32daca43c3ceb1e88}
+
+
+Definition at line {\bf 186} of file {\bf H\+P\+M7\+\_\+wxgui.\+cpp}.
+
+
+
+References {\bf chk\+EB}, {\bf chk\+TP}, {\bf cmb\+S\+S\+C2}, {\bf lime\+::\+L\+M\+S64\+C\+Protocol\+::\+Generic\+Packet\+::cmd}, {\bf lime\+::\+C\+M\+D\+\_\+\+M\+Y\+R\+I\+A\+D\+\_\+\+WR}, {\bf lime\+::\+I\+Connection\+::\+Is\+Open()}, {\bf m\+\_\+ser\+Port}, {\bf lime\+::\+L\+M\+S64\+C\+Protocol\+::\+Generic\+Packet\+::out\+Buffer}, {\bf lime\+::\+L\+M\+S64\+C\+Protocol\+::\+Transfer\+Packet()}, and {\bf tuner\+Ids}.
+
+
+
+Referenced by {\bf H\+P\+M7\+\_\+wxgui()}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{de/dd7/classHPM7__wxgui_aa27bf4c5922bb1a32daca43c3ceb1e88_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{de/dd7/classHPM7__wxgui_aa27bf4c5922bb1a32daca43c3ceb1e88_icgraph}
+\end{center}
+\end{figure}
+
+
+\index{H\+P\+M7\+\_\+wxgui@{H\+P\+M7\+\_\+wxgui}!Select\+Band@{Select\+Band}}
+\index{Select\+Band@{Select\+Band}!H\+P\+M7\+\_\+wxgui@{H\+P\+M7\+\_\+wxgui}}
+\paragraph[{Select\+Band(unsigned int i)}]{\setlength{\rightskip}{0pt plus 5cm}{\bf void} H\+P\+M7\+\_\+wxgui\+::\+Select\+Band (
+\begin{DoxyParamCaption}
+\item[{unsigned {\bf int}}]{i}
+\end{DoxyParamCaption}
+)}\label{classHPM7__wxgui_a85cd606c4fc614e043a4eab74440d044}
+
+
+Definition at line {\bf 298} of file {\bf H\+P\+M7\+\_\+wxgui.\+cpp}.
+
+
+
+References {\bf cmb\+Band}, and {\bf Upload\+G\+P\+I\+O()}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{de/dd7/classHPM7__wxgui_a85cd606c4fc614e043a4eab74440d044_cgraph}
+\end{center}
+\end{figure}
+
+
+\index{H\+P\+M7\+\_\+wxgui@{H\+P\+M7\+\_\+wxgui}!Select\+Rx\+Path@{Select\+Rx\+Path}}
+\index{Select\+Rx\+Path@{Select\+Rx\+Path}!H\+P\+M7\+\_\+wxgui@{H\+P\+M7\+\_\+wxgui}}
+\paragraph[{Select\+Rx\+Path(unsigned int i)}]{\setlength{\rightskip}{0pt plus 5cm}{\bf void} H\+P\+M7\+\_\+wxgui\+::\+Select\+Rx\+Path (
+\begin{DoxyParamCaption}
+\item[{unsigned {\bf int}}]{i}
+\end{DoxyParamCaption}
+)}\label{classHPM7__wxgui_aa3d155e146513781ffe553d82582269e}
+
+
+Definition at line {\bf 305} of file {\bf H\+P\+M7\+\_\+wxgui.\+cpp}.
+
+
+
+References {\bf cmb\+Active\+Path}, and {\bf Upload\+G\+P\+I\+O()}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{de/dd7/classHPM7__wxgui_aa3d155e146513781ffe553d82582269e_cgraph}
+\end{center}
+\end{figure}
+
+
+\index{H\+P\+M7\+\_\+wxgui@{H\+P\+M7\+\_\+wxgui}!Upload\+G\+P\+IO@{Upload\+G\+P\+IO}}
+\index{Upload\+G\+P\+IO@{Upload\+G\+P\+IO}!H\+P\+M7\+\_\+wxgui@{H\+P\+M7\+\_\+wxgui}}
+\paragraph[{Upload\+G\+P\+I\+O()}]{\setlength{\rightskip}{0pt plus 5cm}bool H\+P\+M7\+\_\+wxgui\+::\+Upload\+G\+P\+IO (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}\label{classHPM7__wxgui_a4d71c05e7839a7006e397df82c4abfaa}
+
+
+Definition at line {\bf 312} of file {\bf H\+P\+M7\+\_\+wxgui.\+cpp}.
+
+
+
+References {\bf cmb\+Active\+Path}, {\bf cmb\+Band}, {\bf cmb\+L\+NA}, {\bf cmb\+P\+Adriver}, {\bf lime\+::\+L\+M\+S64\+C\+Protocol\+::\+Generic\+Packet\+::cmd}, {\bf lime\+::\+C\+M\+D\+\_\+\+M\+Y\+R\+I\+A\+D\+\_\+\+WR}, {\bf lime\+::\+I\+Connection\+::\+Is\+Open()}, {\bf m\+\_\+ser\+Port}, {\bf lime\+::\+L\+M\+S64\+C\+Protocol\+::\+Generic\+Packet\+::out\+Buffer}, and {\bf lime\+::\+L\+M\+S64\+C\+Protocol\+::\+Transfer\+Packet()}.
+
+
+
+Referenced by {\bf On\+G\+P\+I\+Ochange()}, {\bf Select\+Band()}, and {\bf Select\+Rx\+Path()}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{de/dd7/classHPM7__wxgui_a4d71c05e7839a7006e397df82c4abfaa_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{de/dd7/classHPM7__wxgui_a4d71c05e7839a7006e397df82c4abfaa_icgraph}
+\end{center}
+\end{figure}
+
+
+
+
+\subsubsection{Member Data Documentation}
+\index{H\+P\+M7\+\_\+wxgui@{H\+P\+M7\+\_\+wxgui}!btn\+Update\+All@{btn\+Update\+All}}
+\index{btn\+Update\+All@{btn\+Update\+All}!H\+P\+M7\+\_\+wxgui@{H\+P\+M7\+\_\+wxgui}}
+\paragraph[{btn\+Update\+All}]{\setlength{\rightskip}{0pt plus 5cm}wx\+Button$\ast$ H\+P\+M7\+\_\+wxgui\+::btn\+Update\+All\hspace{0.3cm}{\ttfamily [protected]}}\label{classHPM7__wxgui_a2a9c701a9ca70b6546018f334b9afea3}
+
+
+Definition at line {\bf 42} of file {\bf H\+P\+M7\+\_\+wxgui.\+h}.
+
+\index{H\+P\+M7\+\_\+wxgui@{H\+P\+M7\+\_\+wxgui}!ch\+E\+Bids@{ch\+E\+Bids}}
+\index{ch\+E\+Bids@{ch\+E\+Bids}!H\+P\+M7\+\_\+wxgui@{H\+P\+M7\+\_\+wxgui}}
+\paragraph[{ch\+E\+Bids}]{\setlength{\rightskip}{0pt plus 5cm}{\bf std\+::vector}$<$long$>$ H\+P\+M7\+\_\+wxgui\+::ch\+E\+Bids\hspace{0.3cm}{\ttfamily [private]}}\label{classHPM7__wxgui_a6b8a68c03118d1c72281506f6836ea07}
+
+
+Definition at line {\bf 52} of file {\bf H\+P\+M7\+\_\+wxgui.\+h}.
+
+\index{H\+P\+M7\+\_\+wxgui@{H\+P\+M7\+\_\+wxgui}!chk\+EB@{chk\+EB}}
+\index{chk\+EB@{chk\+EB}!H\+P\+M7\+\_\+wxgui@{H\+P\+M7\+\_\+wxgui}}
+\paragraph[{chk\+EB}]{\setlength{\rightskip}{0pt plus 5cm}{\bf std\+::vector}$<$wx\+Check\+Box$\ast$$>$ H\+P\+M7\+\_\+wxgui\+::chk\+EB\hspace{0.3cm}{\ttfamily [protected]}}\label{classHPM7__wxgui_af9f88392bf6058dd0ef1bde5c8cb7533}
+
+
+Definition at line {\bf 38} of file {\bf H\+P\+M7\+\_\+wxgui.\+h}.
+
+
+
+Referenced by {\bf Download\+All()}, and {\bf On\+Tuner\+S\+S\+C2change()}.
+
+\index{H\+P\+M7\+\_\+wxgui@{H\+P\+M7\+\_\+wxgui}!chk\+TP@{chk\+TP}}
+\index{chk\+TP@{chk\+TP}!H\+P\+M7\+\_\+wxgui@{H\+P\+M7\+\_\+wxgui}}
+\paragraph[{chk\+TP}]{\setlength{\rightskip}{0pt plus 5cm}{\bf std\+::vector}$<$wx\+Check\+Box$\ast$$>$ H\+P\+M7\+\_\+wxgui\+::chk\+TP\hspace{0.3cm}{\ttfamily [protected]}}\label{classHPM7__wxgui_ab8d3e6f9336a0606fcd9d244152eb0e6}
+
+
+Definition at line {\bf 39} of file {\bf H\+P\+M7\+\_\+wxgui.\+h}.
+
+
+
+Referenced by {\bf Download\+All()}, and {\bf On\+Tuner\+S\+S\+C2change()}.
+
+\index{H\+P\+M7\+\_\+wxgui@{H\+P\+M7\+\_\+wxgui}!ch\+T\+Pids@{ch\+T\+Pids}}
+\index{ch\+T\+Pids@{ch\+T\+Pids}!H\+P\+M7\+\_\+wxgui@{H\+P\+M7\+\_\+wxgui}}
+\paragraph[{ch\+T\+Pids}]{\setlength{\rightskip}{0pt plus 5cm}{\bf std\+::vector}$<$long$>$ H\+P\+M7\+\_\+wxgui\+::ch\+T\+Pids\hspace{0.3cm}{\ttfamily [private]}}\label{classHPM7__wxgui_a57f45798f9eccdcf350ac3a33d4c9d18}
+
+
+Definition at line {\bf 53} of file {\bf H\+P\+M7\+\_\+wxgui.\+h}.
+
+\index{H\+P\+M7\+\_\+wxgui@{H\+P\+M7\+\_\+wxgui}!cmb\+Active\+Path@{cmb\+Active\+Path}}
+\index{cmb\+Active\+Path@{cmb\+Active\+Path}!H\+P\+M7\+\_\+wxgui@{H\+P\+M7\+\_\+wxgui}}
+\paragraph[{cmb\+Active\+Path}]{\setlength{\rightskip}{0pt plus 5cm}wx\+Combo\+Box$\ast$ H\+P\+M7\+\_\+wxgui\+::cmb\+Active\+Path\hspace{0.3cm}{\ttfamily [protected]}}\label{classHPM7__wxgui_a52f6f7093bc42e0a0b5a1fc4e53b3d9b}
+
+
+Definition at line {\bf 33} of file {\bf H\+P\+M7\+\_\+wxgui.\+h}.
+
+
+
+Referenced by {\bf Download\+All()}, {\bf On\+G\+P\+I\+Ochange()}, {\bf Select\+Rx\+Path()}, and {\bf Upload\+G\+P\+I\+O()}.
+
+\index{H\+P\+M7\+\_\+wxgui@{H\+P\+M7\+\_\+wxgui}!cmb\+Band@{cmb\+Band}}
+\index{cmb\+Band@{cmb\+Band}!H\+P\+M7\+\_\+wxgui@{H\+P\+M7\+\_\+wxgui}}
+\paragraph[{cmb\+Band}]{\setlength{\rightskip}{0pt plus 5cm}wx\+Combo\+Box$\ast$ H\+P\+M7\+\_\+wxgui\+::cmb\+Band\hspace{0.3cm}{\ttfamily [protected]}}\label{classHPM7__wxgui_a7da8ed65a98b8a20fad1c2f17617eb9f}
+
+
+Definition at line {\bf 34} of file {\bf H\+P\+M7\+\_\+wxgui.\+h}.
+
+
+
+Referenced by {\bf Download\+All()}, {\bf On\+G\+P\+I\+Ochange()}, {\bf Select\+Band()}, and {\bf Upload\+G\+P\+I\+O()}.
+
+\index{H\+P\+M7\+\_\+wxgui@{H\+P\+M7\+\_\+wxgui}!cmb\+D\+A\+C\+\_\+A@{cmb\+D\+A\+C\+\_\+A}}
+\index{cmb\+D\+A\+C\+\_\+A@{cmb\+D\+A\+C\+\_\+A}!H\+P\+M7\+\_\+wxgui@{H\+P\+M7\+\_\+wxgui}}
+\paragraph[{cmb\+D\+A\+C\+\_\+A}]{\setlength{\rightskip}{0pt plus 5cm}wx\+Combo\+Box$\ast$ H\+P\+M7\+\_\+wxgui\+::cmb\+D\+A\+C\+\_\+A\hspace{0.3cm}{\ttfamily [protected]}}\label{classHPM7__wxgui_aca1552659b0f5552a1f877d709124243}
+
+
+Definition at line {\bf 43} of file {\bf H\+P\+M7\+\_\+wxgui.\+h}.
+
+
+
+Referenced by {\bf Download\+All()}, and {\bf On\+D\+A\+Cchange()}.
+
+\index{H\+P\+M7\+\_\+wxgui@{H\+P\+M7\+\_\+wxgui}!cmb\+D\+A\+C\+\_\+B@{cmb\+D\+A\+C\+\_\+B}}
+\index{cmb\+D\+A\+C\+\_\+B@{cmb\+D\+A\+C\+\_\+B}!H\+P\+M7\+\_\+wxgui@{H\+P\+M7\+\_\+wxgui}}
+\paragraph[{cmb\+D\+A\+C\+\_\+B}]{\setlength{\rightskip}{0pt plus 5cm}wx\+Combo\+Box$\ast$ H\+P\+M7\+\_\+wxgui\+::cmb\+D\+A\+C\+\_\+B\hspace{0.3cm}{\ttfamily [protected]}}\label{classHPM7__wxgui_ad5dbab74b5366cd45fbd5bf02502707b}
+
+
+Definition at line {\bf 44} of file {\bf H\+P\+M7\+\_\+wxgui.\+h}.
+
+
+
+Referenced by {\bf Download\+All()}, and {\bf On\+D\+A\+Cchange()}.
+
+\index{H\+P\+M7\+\_\+wxgui@{H\+P\+M7\+\_\+wxgui}!cmb\+L\+NA@{cmb\+L\+NA}}
+\index{cmb\+L\+NA@{cmb\+L\+NA}!H\+P\+M7\+\_\+wxgui@{H\+P\+M7\+\_\+wxgui}}
+\paragraph[{cmb\+L\+NA}]{\setlength{\rightskip}{0pt plus 5cm}wx\+Combo\+Box$\ast$ H\+P\+M7\+\_\+wxgui\+::cmb\+L\+NA\hspace{0.3cm}{\ttfamily [protected]}}\label{classHPM7__wxgui_a2fff149b18482f1f44e00f6c77dac942}
+
+
+Definition at line {\bf 35} of file {\bf H\+P\+M7\+\_\+wxgui.\+h}.
+
+
+
+Referenced by {\bf Download\+All()}, and {\bf Upload\+G\+P\+I\+O()}.
+
+\index{H\+P\+M7\+\_\+wxgui@{H\+P\+M7\+\_\+wxgui}!cmb\+P\+Adriver@{cmb\+P\+Adriver}}
+\index{cmb\+P\+Adriver@{cmb\+P\+Adriver}!H\+P\+M7\+\_\+wxgui@{H\+P\+M7\+\_\+wxgui}}
+\paragraph[{cmb\+P\+Adriver}]{\setlength{\rightskip}{0pt plus 5cm}wx\+Combo\+Box$\ast$ H\+P\+M7\+\_\+wxgui\+::cmb\+P\+Adriver\hspace{0.3cm}{\ttfamily [protected]}}\label{classHPM7__wxgui_a53977facbc74aca84423e3111b86ffee}
+
+
+Definition at line {\bf 36} of file {\bf H\+P\+M7\+\_\+wxgui.\+h}.
+
+
+
+Referenced by {\bf Download\+All()}, and {\bf Upload\+G\+P\+I\+O()}.
+
+\index{H\+P\+M7\+\_\+wxgui@{H\+P\+M7\+\_\+wxgui}!cmb\+S\+S\+C1@{cmb\+S\+S\+C1}}
+\index{cmb\+S\+S\+C1@{cmb\+S\+S\+C1}!H\+P\+M7\+\_\+wxgui@{H\+P\+M7\+\_\+wxgui}}
+\paragraph[{cmb\+S\+S\+C1}]{\setlength{\rightskip}{0pt plus 5cm}{\bf std\+::vector}$<$wx\+Combo\+Box$\ast$$>$ H\+P\+M7\+\_\+wxgui\+::cmb\+S\+S\+C1\hspace{0.3cm}{\ttfamily [protected]}}\label{classHPM7__wxgui_a8014cbda3e42a9497917ae6fd62eeea4}
+
+
+Definition at line {\bf 40} of file {\bf H\+P\+M7\+\_\+wxgui.\+h}.
+
+
+
+Referenced by {\bf Download\+All()}, and {\bf On\+Tuner\+S\+S\+C1change()}.
+
+\index{H\+P\+M7\+\_\+wxgui@{H\+P\+M7\+\_\+wxgui}!cmb\+S\+S\+C1ids@{cmb\+S\+S\+C1ids}}
+\index{cmb\+S\+S\+C1ids@{cmb\+S\+S\+C1ids}!H\+P\+M7\+\_\+wxgui@{H\+P\+M7\+\_\+wxgui}}
+\paragraph[{cmb\+S\+S\+C1ids}]{\setlength{\rightskip}{0pt plus 5cm}{\bf std\+::vector}$<$long$>$ H\+P\+M7\+\_\+wxgui\+::cmb\+S\+S\+C1ids\hspace{0.3cm}{\ttfamily [private]}}\label{classHPM7__wxgui_a70dd5c0332179137bd7f42dc99302d16}
+
+
+Definition at line {\bf 54} of file {\bf H\+P\+M7\+\_\+wxgui.\+h}.
+
+\index{H\+P\+M7\+\_\+wxgui@{H\+P\+M7\+\_\+wxgui}!cmb\+S\+S\+C2@{cmb\+S\+S\+C2}}
+\index{cmb\+S\+S\+C2@{cmb\+S\+S\+C2}!H\+P\+M7\+\_\+wxgui@{H\+P\+M7\+\_\+wxgui}}
+\paragraph[{cmb\+S\+S\+C2}]{\setlength{\rightskip}{0pt plus 5cm}{\bf std\+::vector}$<$wx\+Combo\+Box$\ast$$>$ H\+P\+M7\+\_\+wxgui\+::cmb\+S\+S\+C2\hspace{0.3cm}{\ttfamily [protected]}}\label{classHPM7__wxgui_aeee60dca2048d0c662ad4aa0475fe247}
+
+
+Definition at line {\bf 41} of file {\bf H\+P\+M7\+\_\+wxgui.\+h}.
+
+
+
+Referenced by {\bf Download\+All()}, and {\bf On\+Tuner\+S\+S\+C2change()}.
+
+\index{H\+P\+M7\+\_\+wxgui@{H\+P\+M7\+\_\+wxgui}!cmb\+S\+S\+C2ids@{cmb\+S\+S\+C2ids}}
+\index{cmb\+S\+S\+C2ids@{cmb\+S\+S\+C2ids}!H\+P\+M7\+\_\+wxgui@{H\+P\+M7\+\_\+wxgui}}
+\paragraph[{cmb\+S\+S\+C2ids}]{\setlength{\rightskip}{0pt plus 5cm}{\bf std\+::vector}$<$long$>$ H\+P\+M7\+\_\+wxgui\+::cmb\+S\+S\+C2ids\hspace{0.3cm}{\ttfamily [private]}}\label{classHPM7__wxgui_abf5ec15cbfbb0cf9b494de08e8c1ad26}
+
+
+Definition at line {\bf 55} of file {\bf H\+P\+M7\+\_\+wxgui.\+h}.
+
+\index{H\+P\+M7\+\_\+wxgui@{H\+P\+M7\+\_\+wxgui}!m\+\_\+ser\+Port@{m\+\_\+ser\+Port}}
+\index{m\+\_\+ser\+Port@{m\+\_\+ser\+Port}!H\+P\+M7\+\_\+wxgui@{H\+P\+M7\+\_\+wxgui}}
+\paragraph[{m\+\_\+ser\+Port}]{\setlength{\rightskip}{0pt plus 5cm}{\bf lime\+::\+L\+M\+S64\+C\+Protocol}$\ast$ H\+P\+M7\+\_\+wxgui\+::m\+\_\+ser\+Port\hspace{0.3cm}{\ttfamily [protected]}}\label{classHPM7__wxgui_ac1b331ebf5f8916357c5206d0f530ce4}
+
+
+Definition at line {\bf 58} of file {\bf H\+P\+M7\+\_\+wxgui.\+h}.
+
+
+
+Referenced by {\bf Download\+All()}, {\bf Initialize()}, {\bf On\+D\+A\+Cchange()}, {\bf On\+Tuner\+S\+S\+C1change()}, {\bf On\+Tuner\+S\+S\+C2change()}, and {\bf Upload\+G\+P\+I\+O()}.
+
+\index{H\+P\+M7\+\_\+wxgui@{H\+P\+M7\+\_\+wxgui}!tuner\+Ids@{tuner\+Ids}}
+\index{tuner\+Ids@{tuner\+Ids}!H\+P\+M7\+\_\+wxgui@{H\+P\+M7\+\_\+wxgui}}
+\paragraph[{tuner\+Ids}]{\setlength{\rightskip}{0pt plus 5cm}{\bf std\+::vector}$<$long$>$ H\+P\+M7\+\_\+wxgui\+::tuner\+Ids\hspace{0.3cm}{\ttfamily [protected]}}\label{classHPM7__wxgui_ae3484ef16a50c01527aed908b1ed8864}
+
+
+Definition at line {\bf 37} of file {\bf H\+P\+M7\+\_\+wxgui.\+h}.
+
+
+
+Referenced by {\bf On\+Tuner\+S\+S\+C2change()}.
+
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+/home/erik/prefix/default/src/limesuite-\/dev/src/\+H\+P\+M7/{\bf H\+P\+M7\+\_\+wxgui.\+h}\item 
+/home/erik/prefix/default/src/limesuite-\/dev/src/\+H\+P\+M7/{\bf H\+P\+M7\+\_\+wxgui.\+cpp}\end{DoxyCompactItemize}

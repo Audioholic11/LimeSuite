@@ -1,0 +1,497 @@
+\subsection{Lime\+Suite.\+cc}
+\label{LimeSuite_8cc_source}\index{/home/erik/prefix/default/src/limesuite-\/dev/octave/\+Lime\+Suite.\+cc@{/home/erik/prefix/default/src/limesuite-\/dev/octave/\+Lime\+Suite.\+cc}}
+
+\begin{DoxyCode}
+00001 \textcolor{preprocessor}{#include <octave/oct.h>}
+00002 \textcolor{preprocessor}{#include <octave/Cell.h>}
+00003 
+00004 \textcolor{preprocessor}{#include <vector>}
+00005 \textcolor{preprocessor}{#include <string>}
+00006 
+00007 \textcolor{preprocessor}{#include "LimeSuite.h"}
+00008 
+00009 \textcolor{keyword}{using namespace }std;
+00010 
+00011 \textcolor{keywordtype}{void} FreeResources();
+00012 
+00013 \textcolor{keyword}{const} \textcolor{keywordtype}{int} maxChCnt = 2;
+00014 \textcolor{keyword}{const} \textcolor{keywordtype}{float} scaleFactor = 32768.0f;
+00015 
+00016 lms_device_t* lmsDev = NULL;
+00017 lms_stream_t streamRx[maxChCnt];
+00018 lms_stream_t streamTx[maxChCnt];
+00019 
+00020 \textcolor{keyword}{struct }complex16_t
+00021 \{
+00022     int16\_t i;
+00023     int16\_t q;
+00024 \};
+00025 
+00026 \textcolor{keywordtype}{bool} WFMrunning = \textcolor{keyword}{false};
+00027 complex16_t* rxbuffers = NULL;
+00028 complex16_t* txbuffers = NULL;
+00029 
+00030 \textcolor{keywordtype}{void} StopStream()
+00031 \{
+00032     \textcolor{keywordflow}{if}(lmsDev == NULL)
+00033         \textcolor{keywordflow}{return};
+00034     \textcolor{keywordflow}{for} (\textcolor{keywordtype}{int} i = 0; i < maxChCnt; i++)
+00035     \{
+00036         LMS_StopStream(&streamRx[i]);
+00037         LMS_StopStream(&streamTx[i]);
+00038         \textcolor{keywordflow}{if} (streamRx[i].handle)
+00039             LMS_DestroyStream(lmsDev,&streamRx[i]);
+00040         \textcolor{keywordflow}{if} (streamTx[i].handle)
+00041             LMS_DestroyStream(lmsDev,&streamTx[i]);
+00042         streamRx[i].handle = 0;
+00043         streamTx[i].handle = 0;
+00044     \}
+00045 \}
+00046 
+00047 \textcolor{keywordtype}{void} PrintDeviceInfo(lms_device_t* port)
+00048 \{
+00049     \textcolor{keywordflow}{if}(port == NULL || lmsDev == NULL)
+00050         \textcolor{keywordflow}{return};
+00051     \textcolor{keyword}{const} lms_dev_info_t* info = LMS_GetDeviceInfo(lmsDev);
+00052     \textcolor{keywordflow}{if}(info == NULL)
+00053         octave\_stdout << \textcolor{stringliteral}{"Failed to get device info"} << endl;
+00054     \textcolor{keywordflow}{else}
+00055     \{
+00056         octave\_stdout << \textcolor{stringliteral}{"Connected to device: "} << info->deviceName
+00057                       << \textcolor{stringliteral}{" FW: "} << info->firmwareVersion << \textcolor{stringliteral}{" HW: "} << info->
+      hardwareVersion
+00058                       << \textcolor{stringliteral}{" Protocol: "} << info->protocolVersion << \textcolor{stringliteral}{" GW: "} << info->
+      gatewareVersion
+00059                       << \textcolor{stringliteral}{" GW\_rev: "} << info->gatewareRevision << endl;
+00060     \}
+00061 \}
+00062 
+00063 DEFUN_DLD (LimeGetDeviceList, args, nargout,
+00064 \textcolor{stringliteral}{"LIST = LimeGetDeviceList() - Returns available device list"})
+00065 \{
+00066     \textcolor{keywordflow}{if} (args.length ()!=0)
+00067     \{
+00068         print\_usage();
+00069         \textcolor{keywordflow}{return} octave\_value(-1);
+00070     \}
+00071     lms_info_str_t dev\_list[64];
+00072     \textcolor{keywordtype}{int} devCount = LMS_GetDeviceList((lms_info_str_t*)&dev\_list);
+00073     dim\_vector dim(devCount, 1);
+00074     Cell c;
+00075     octave\_value\_list retval;
+00076     \textcolor{comment}{//devNames.resize(devCount, 0, string(""));}
+00077     \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} i=0; i<devCount; ++i)
+00078     \{
+00079         c.insert(octave\_value (dev\_list[i], \textcolor{charliteral}{'"'}),i,0);
+00080         \textcolor{comment}{//retval(i) =  octave\_value (dev\_list[i], '"');}
+00081     \}
+00082     \textcolor{keywordflow}{return} octave\_value(c);\textcolor{comment}{//retval;}
+00083 \}
+00084 
+00085 DEFUN_DLD (LimeInitialize, args, nargout,
+00086 \textcolor{stringliteral}{"LimeInitialize(DEV) - connect to device and allocate buffer memory\(\backslash\)n\(\backslash\)}
+00087 \textcolor{stringliteral}{DEV [optional] - device name to connect, obtained via LimeGetDeviceList()"})
+00088 \{
+00089     FreeResources();
+00090     \textcolor{keywordtype}{int} status;
+00091     \textcolor{keywordtype}{int} nargin = args.length ();
+00092 
+00093     \textcolor{keywordflow}{if} (args.length ()>1)
+00094     \{
+00095         print\_usage();
+00096         \textcolor{keywordflow}{return} octave\_value(-1);
+00097     \}
+00098 
+00099     \textcolor{keywordflow}{if}(nargin > 0)
+00100     \{
+00101         \textcolor{keywordtype}{string} deviceName = args(0).string\_value();
+00102         status = LMS_Open(&lmsDev, (\textcolor{keywordtype}{char}*)deviceName.c\_str(), NULL);
+00103     \}
+00104     \textcolor{keywordflow}{else}
+00105         status = LMS_Open(&lmsDev, NULL, NULL);
+00106 
+00107     LMS_Synchronize(lmsDev,\textcolor{keyword}{false});
+00108     \textcolor{keywordflow}{if}(status != 0)
+00109     \{
+00110         octave\_stdout << LMS_GetLastErrorMessage() << endl;
+00111         \textcolor{keywordflow}{return} octave\_value(status);
+00112     \}
+00113     PrintDeviceInfo(lmsDev);
+00114 
+00115     \textcolor{keywordflow}{for} (\textcolor{keywordtype}{int} i = 0; i < maxChCnt; i++)
+00116     \{
+00117         streamRx[i].handle = 0;
+00118         streamTx[i].handle = 0;
+00119     \}
+00120 
+00121     \textcolor{keywordflow}{return} octave\_value(0);
+00122 \}
+00123 
+00124 
+00125 DEFUN_DLD (LimeDestroy, args, nargout,
+00126 \textcolor{stringliteral}{"LimeDestroy() - Stop all streams, deallocate memory and disconnect device"})
+00127 \{
+00128     FreeResources();
+00129     \textcolor{keywordflow}{return} octave\_value\_list();
+00130 \}
+00131 
+00132 DEFUN_DLD (LimeLoadConfig, args, nargout,
+00133 \textcolor{stringliteral}{"LimeLoadConfig(FILENAME) - Load configuration from file FILENAME"})
+00134 \{
+00135     \textcolor{keywordflow}{if}(lmsDev == NULL)
+00136     \{
+00137         octave\_stdout << \textcolor{stringliteral}{"LimeSuite not initialized"} << endl;
+00138         \textcolor{keywordflow}{return} octave\_value(-1);
+00139     \}
+00140 
+00141     \textcolor{keywordtype}{int} nargin = args.length();
+00142 
+00143     \textcolor{keywordflow}{if}(nargin != 1)
+00144     \{
+00145         print\_usage();
+00146         \textcolor{keywordflow}{return} octave\_value(-1);
+00147     \}
+00148 
+00149     \textcolor{keywordtype}{string} filename = args(0).string\_value();
+00150     octave\_stdout << \textcolor{stringliteral}{"LimeLoadConfig loading: "} << filename << endl;
+00151     \textcolor{keywordflow}{if} (LMS_LoadConfig(lmsDev, filename.c\_str())!=0)
+00152     \{
+00153          octave\_stdout << LMS_GetLastErrorMessage() << endl;
+00154          \textcolor{keywordflow}{return} octave\_value(-1);
+00155     \}
+00156     octave\_stdout << \textcolor{stringliteral}{"Config loaded successfully: "} << endl;
+00157 
+00158     \textcolor{keywordflow}{return} octave\_value(0);
+00159 \}
+00160 
+00161 DEFUN_DLD (LimeStartStreaming, args, nargout,
+00162 \textcolor{stringliteral}{"LimeStartStreaming(FIFOSIZE, CHANNELS) - starts sample streaming from selected channels\(\backslash\)n\(\backslash\)}
+00163 \textcolor{stringliteral}{ FIFOSIZE [optional] - buffer size in samples to be used by library (default: 4 MSamples)\(\backslash\)}
+00164 \textcolor{stringliteral}{ CHANNELS [optional] - array of channels to be used [rx0 ; rx1 ; tx0 ; tx1] (deafult: rx0)"})
+00165 \{
+00166     \textcolor{keywordtype}{int} nargin = args.length();
+00167     \textcolor{keywordflow}{if}(lmsDev == NULL)
+00168     \{
+00169         octave\_stdout << \textcolor{stringliteral}{"LimeSuite not initialized"} << endl;
+00170         \textcolor{keywordflow}{return} octave\_value(-1);
+00171     \}
+00172     \textcolor{keywordtype}{bool} tx[maxChCnt] = \{\textcolor{keyword}{false}\};
+00173     \textcolor{keywordtype}{bool} rx[maxChCnt] = \{\textcolor{keyword}{false}\};
+00174     \textcolor{keywordtype}{int} fifoSize = 4*1024*1024; \textcolor{comment}{//4MS}
+00175     \textcolor{keywordtype}{int} channels = 1;
+00176 
+00177     \textcolor{keywordflow}{if} ((nargin > 2))
+00178     \{
+00179         print\_usage();
+00180         \textcolor{keywordflow}{return} octave\_value(-1);
+00181     \}
+00182 
+00183     \textcolor{keywordflow}{if}(nargin > 0 && args(0).int\_value() > 0)
+00184         fifoSize = args(0).int\_value();
+00185 
+00186     \textcolor{keywordflow}{if} (nargin == 2)
+00187     \{
+00188         \textcolor{keywordtype}{int} rowCnt = args(1).char\_matrix\_value().rows();;
+00189         rowCnt = rowCnt < maxChCnt*2 ? rowCnt : maxChCnt*2;
+00190         \textcolor{keywordflow}{for} (\textcolor{keywordtype}{int} i = 0 ; i < rowCnt ; i++)
+00191         \{
+00192             std::string entry = args(1).char\_matrix\_value().row\_as\_string(i);
+00193             \textcolor{keywordflow}{if} (entry == \textcolor{stringliteral}{"rx0"} || entry == \textcolor{stringliteral}{"rx"})
+00194                 rx[0] = \textcolor{keyword}{true};
+00195             \textcolor{keywordflow}{else} \textcolor{keywordflow}{if} (entry == \textcolor{stringliteral}{"rx1"})
+00196                 rx[1] = \textcolor{keyword}{true};
+00197             \textcolor{keywordflow}{else} \textcolor{keywordflow}{if} (entry == \textcolor{stringliteral}{"tx0"} || entry == \textcolor{stringliteral}{"tx"})
+00198                 tx[0] = \textcolor{keyword}{true};
+00199             \textcolor{keywordflow}{else} \textcolor{keywordflow}{if} (entry == \textcolor{stringliteral}{"tx1"})
+00200                 tx[1] = \textcolor{keyword}{true};
+00201             \textcolor{keywordflow}{else}
+00202             \{
+00203                 octave\_stdout << \textcolor{stringliteral}{"Invalid channel parameter"} << endl;
+00204                 \textcolor{keywordflow}{return} octave\_value(-1);
+00205             \}
+00206         \}
+00207     \}
+00208     \textcolor{keywordflow}{else}
+00209         rx[0] = \textcolor{keyword}{true};
+00210 
+00211     \textcolor{keywordflow}{for} (\textcolor{keywordtype}{int} i = 0; i < maxChCnt; i++)
+00212     \{
+00213         \textcolor{keywordflow}{if} (rx[i])
+00214         \{
+00215             streamRx[i].channel = i;
+00216             streamRx[i].fifoSize = fifoSize;
+00217             streamRx[i].dataFmt = lms_stream_t::LMS_FMT_I16;
+00218             streamRx[i].isTx = \textcolor{keyword}{false};
+00219             streamRx[i].throughputVsLatency = 0.5;
+00220             \textcolor{keywordflow}{if}(LMS_SetupStream(lmsDev, &streamRx[i]) != 0)
+00221                 octave\_stdout << LMS_GetLastErrorMessage() << endl;
+00222         \}
+00223         \textcolor{keywordflow}{if} (tx[i])
+00224         \{
+00225             streamTx[i].channel = i;
+00226             streamTx[i].fifoSize = fifoSize;
+00227             streamTx[i].dataFmt = lms_stream_t::LMS_FMT_I16;
+00228             streamTx[i].isTx = \textcolor{keyword}{true};
+00229             streamTx[i].throughputVsLatency = 0.5;
+00230             \textcolor{keywordflow}{if}(LMS_SetupStream(lmsDev, &streamTx[i]) != 0)
+00231                 octave\_stdout << LMS_GetLastErrorMessage() << endl;
+00232         \}
+00233     \}
+00234 
+00235     \textcolor{keywordflow}{for} (\textcolor{keywordtype}{int} i = 0; i < maxChCnt; i++)
+00236     \{
+00237         \textcolor{keywordflow}{if} (rx[i])
+00238         \{
+00239             \textcolor{keywordflow}{if} (!rxbuffers)
+00240                 rxbuffers = \textcolor{keyword}{new} complex16_t[fifoSize/2];
+00241             \textcolor{keywordflow}{if}(LMS_StartStream(&streamRx[i]) != 0)
+00242                 octave\_stdout << LMS_GetLastErrorMessage() << endl;
+00243         \}
+00244         \textcolor{keywordflow}{if} (tx[i])
+00245         \{
+00246             \textcolor{keywordflow}{if} (!txbuffers)
+00247                 txbuffers = \textcolor{keyword}{new} complex16_t[fifoSize/2];
+00248             \textcolor{keywordflow}{if}(LMS_StartStream(&streamTx[i]) != 0)
+00249                 octave\_stdout << LMS_GetLastErrorMessage() << endl;
+00250         \}
+00251     \}
+00252 
+00253     \textcolor{keywordflow}{return} octave\_value\_list();
+00254 \}
+00255 
+00256 DEFUN_DLD (LimeStopStreaming, args, nargout,
+00257 \textcolor{stringliteral}{"LimeStopStreaming() - Stop Receiver and Transmitter threads"})
+00258 \{
+00259     \textcolor{keywordflow}{if}(lmsDev == NULL)
+00260     \{
+00261         octave\_stdout << \textcolor{stringliteral}{"LimeSuite not initialized"} << endl;
+00262         \textcolor{keywordflow}{return} octave\_value(-1);
+00263     \}
+00264     \textcolor{keywordtype}{int} nargin = args.length();
+00265     octave\_stdout << \textcolor{stringliteral}{"StopStreaming"} << endl;
+00266     StopStream();
+00267     \textcolor{keywordflow}{return} octave\_value\_list();
+00268 \}
+00269 
+00270 DEFUN_DLD (LimeReceiveSamples, args, ,
+00271 \textcolor{stringliteral}{"SIGNAL = LimeReceiveSamplesLarge( N, CH) - receive N samples from Rx channel CH.\(\backslash\)n\(\backslash\)}
+00272 \textcolor{stringliteral}{CH parameter is optional, valid values are 0 and 1"})
+00273 \{
+00274     \textcolor{keywordflow}{if} (!rxbuffers)
+00275     \{
+00276         octave\_stdout << \textcolor{stringliteral}{"Rx streaming not initialized"} << endl;
+00277         \textcolor{keywordflow}{return} octave\_value(-1);
+00278     \}
+00279 
+00280     \textcolor{keywordtype}{int} nargin = args.length ();
+00281     \textcolor{keywordflow}{if} (nargin != 2 && nargin != 1)
+00282     \{
+00283         print\_usage ();
+00284         \textcolor{keywordflow}{return} octave\_value\_list ();
+00285     \}
+00286     \textcolor{keyword}{const} \textcolor{keywordtype}{int} samplesToReceive = args(0).int\_value ();
+00287 
+00288     \textcolor{keywordtype}{unsigned} chIndex;
+00289     \textcolor{keywordflow}{if} (nargin == 2)
+00290     \{
+00291         chIndex = args(1).int\_value ();
+00292         \textcolor{keywordflow}{if} (chIndex >= maxChCnt)
+00293         \{
+00294             octave\_stdout << \textcolor{stringliteral}{"Invalid channel number"} << endl;
+00295             \textcolor{keywordflow}{return} octave\_value(-1);
+00296         \}
+00297     \}
+00298     \textcolor{keywordflow}{else}
+00299     \{
+00300         \textcolor{keywordflow}{for} (chIndex = 0; chIndex < maxChCnt; chIndex++)
+00301             \textcolor{keywordflow}{if} (streamRx[chIndex].handle != 0)
+00302                 \textcolor{keywordflow}{break};
+00303     \}
+00304 
+00305     Complex val=Complex(0.0,0.0);
+00306     ComplexRowVector iqdata( samplesToReceive, val ); \textcolor{comment}{// index 0 to N-1}
+00307 
+00308     \textcolor{keyword}{const} \textcolor{keywordtype}{int} timeout_ms = 1000;
+00309     lms_stream_meta_t meta;
+00310     \textcolor{keywordtype}{int} samplesCollected = 0;
+00311     \textcolor{keywordtype}{int} retries = 5;
+00312     \textcolor{keywordflow}{while}(samplesCollected < samplesToReceive && retries--)
+00313     \{
+00314         \textcolor{keywordtype}{int} samplesToRead = 0;
+00315         \textcolor{keywordflow}{if}(samplesToReceive-samplesCollected > streamRx[chIndex].fifoSize/2)
+00316             samplesToRead = streamRx[chIndex].fifoSize/2;
+00317         \textcolor{keywordflow}{else}
+00318             samplesToRead = samplesToReceive-samplesCollected;
+00319         \textcolor{keywordtype}{int} samplesRead = LMS_RecvStream(&streamRx[chIndex], (\textcolor{keywordtype}{void}*)rxbuffers, samplesToRead, &meta, 
+      timeout\_ms);
+00320         \textcolor{keywordflow}{if} (samplesRead < 0)
+00321         \{
+00322             octave\_stdout << \textcolor{stringliteral}{"Error reading samples"} << endl;
+00323             \textcolor{keywordflow}{return} octave\_value(-1);
+00324         \}
+00325         \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} i=0; i<samplesRead; ++i)
+00326         \{
+00327             iqdata(samplesCollected+i)=Complex(rxbuffers[i].i/scaleFactor,rxbuffers[
+      i].q/scaleFactor);
+00328         \}
+00329         samplesCollected += samplesRead;
+00330     \}
+00331     \textcolor{keywordflow}{return} octave\_value(iqdata);
+00332 \}
+00333 
+00334 DEFUN_DLD (LimeTransmitSamples, args, ,
+00335 \textcolor{stringliteral}{"LimeTransmitSamples( SIGNAL, CH) - sends normalized complex SIGNAL to Tx cahnnel CH\(\backslash\)n\(\backslash\)}
+00336 \textcolor{stringliteral}{CH parameter is optional, valid values are 0 and 1"})
+00337 \{
+00338     \textcolor{keywordflow}{if} (!txbuffers)
+00339     \{
+00340         octave\_stdout << \textcolor{stringliteral}{"Tx streaming not initialized"} << endl;
+00341         \textcolor{keywordflow}{return} octave\_value(-1);
+00342     \}
+00343 
+00344     \textcolor{keywordtype}{int} nargin = args.length ();
+00345     \textcolor{keywordtype}{int} check=0;
+00346     \textcolor{keywordflow}{if} (nargin != 2 && nargin != 1)
+00347     \{
+00348         print\_usage ();
+00349         \textcolor{keywordflow}{return} octave\_value\_list ();
+00350     \}
+00351 
+00352     \textcolor{keywordtype}{int} chIndex = 0;
+00353     \textcolor{keywordflow}{if} (nargin == 2)
+00354     \{
+00355         chIndex = args(1).int\_value ();
+00356         \textcolor{keywordflow}{if} (chIndex >= maxChCnt)
+00357         \{
+00358             octave\_stdout << \textcolor{stringliteral}{"Invalid channel number"} << endl;
+00359             \textcolor{keywordflow}{return} octave\_value(-1);
+00360         \}
+00361     \}
+00362     \textcolor{keywordflow}{else}
+00363     \{
+00364         \textcolor{keywordflow}{for} (chIndex = 0; chIndex < maxChCnt; chIndex++)
+00365             \textcolor{keywordflow}{if} (streamTx[chIndex].handle != 0)
+00366                 \textcolor{keywordflow}{break};
+00367     \}
+00368 
+00369     ComplexRowVector    iqdata=args(0).complex\_row\_vector\_value();
+00370     dim\_vector          iqdataSize=iqdata.dims();
+00371     \textcolor{keywordtype}{int} samplesCount = iqdataSize(0) > iqdataSize(1) ? iqdataSize(0) : iqdataSize(1);
+00372 
+00373     \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} i=0; i < samplesCount; ++i)
+00374     \{
+00375         octave\_value    iqdatum = scaleFactor*iqdata(i);
+00376         Complex iqdatum2 = iqdatum.complex\_value();
+00377         \textcolor{keywordtype}{short} i\_sample = iqdatum2.real(); \textcolor{comment}{//}
+00378         \textcolor{keywordtype}{short} q\_sample = iqdatum2.imag(); \textcolor{comment}{//}
+00379         txbuffers[i].i = i\_sample;
+00380         txbuffers[i].q = q\_sample;
+00381     \}
+00382 
+00383     \textcolor{keyword}{const} \textcolor{keywordtype}{int} timeout_ms = 1000;
+00384     lms_stream_meta_t meta;
+00385     meta.waitForTimestamp = \textcolor{keyword}{false};
+00386     meta.timestamp = 0;
+00387     \textcolor{keywordtype}{int} samplesWrite = samplesCount;
+00388     samplesWrite = LMS_SendStream(&streamTx[chIndex], (\textcolor{keyword}{const} \textcolor{keywordtype}{void}*)txbuffers, samplesCount, &meta, 
+      timeout\_ms);
+00389 
+00390     \textcolor{keywordflow}{return} octave\_value (samplesWrite);
+00391 \}
+00392 
+00393 DEFUN_DLD (LimeLoopWFMStart, args, ,
+00394 \textcolor{stringliteral}{"LimeLoopWFMStart(SIGNAL) - upload SIGNAL to device RAM for repeated transmitting"})
+00395 \{
+00396     \textcolor{keywordflow}{if}(lmsDev == NULL)
+00397     \{
+00398         octave\_stdout << \textcolor{stringliteral}{"LimeSuite not initialized"} << endl;
+00399         \textcolor{keywordflow}{return} octave\_value(-1);
+00400     \}
+00401     \textcolor{keywordtype}{int} nargin = args.length ();
+00402     \textcolor{keywordtype}{int} check=0;
+00403     \textcolor{keywordflow}{if} (nargin != 2 && nargin != 1)
+00404     \{
+00405         print\_usage ();
+00406         \textcolor{keywordflow}{return} octave\_value\_list ();
+00407     \}
+00408 
+00409     \textcolor{keyword}{const} \textcolor{keywordtype}{int} chCount = nargin;
+00410     \textcolor{keyword}{const} \textcolor{keywordtype}{int} timeout_ms = 1000;
+00411 
+00412     ComplexRowVector    iqdata=args(0).complex\_row\_vector\_value();
+00413     dim\_vector          iqdataSize=iqdata.dims();
+00414     \textcolor{keywordtype}{int} samplesCount = iqdataSize(0) > iqdataSize(1) ? iqdataSize(0) : iqdataSize(1);
+00415     \textcolor{keywordtype}{int} wfmLength = samplesCount;
+00416 
+00417     complex16_t **wfmBuffers = \textcolor{keyword}{new} complex16_t*[chCount];
+00418     \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} i=0; i<chCount; ++i)
+00419         wfmBuffers[i] = \textcolor{keyword}{new} complex16_t[samplesCount];
+00420 
+00421     \textcolor{keywordflow}{for} (\textcolor{keywordtype}{int} ch = 0; ch < chCount; ch++)
+00422         \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} i=0; i < samplesCount; ++i)
+00423         \{
+00424             octave\_value    iqdatum = 2047*iqdata(i);
+00425             Complex iqdatum2 = iqdatum.complex\_value();
+00426             \textcolor{keywordtype}{float} i\_sample = iqdatum2.real(); \textcolor{comment}{//}
+00427             \textcolor{keywordtype}{float} q\_sample = iqdatum2.imag(); \textcolor{comment}{//}
+00428             wfmBuffers[ch][i].i = i\_sample;
+00429             wfmBuffers[ch][i].q = q\_sample;
+00430         \}
+00431 
+00432     LMS_UploadWFM(lmsDev, (\textcolor{keyword}{const} \textcolor{keywordtype}{void}**)wfmBuffers, chCount, samplesCount, 0);
+00433     LMS_EnableTxWFM(lmsDev, 0, \textcolor{keyword}{true});
+00434     \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} i=0; i<chCount; ++i)
+00435         \textcolor{keyword}{delete} wfmBuffers[i];
+00436     \textcolor{keyword}{delete} wfmBuffers;
+00437     WFMrunning = \textcolor{keyword}{true};
+00438     \textcolor{keywordflow}{return} octave\_value\_list();
+00439 \}
+00440 
+00441 DEFUN_DLD (LimeLoopWFMStop, args, ,
+00442 \textcolor{stringliteral}{"LimeTxLoopWFMStop() - stop transmitting samples from device RAM"})
+00443 \{
+00444     \textcolor{keywordflow}{if}(lmsDev == NULL)
+00445     \{
+00446         octave\_stdout << \textcolor{stringliteral}{"LimeSuite not initialized"} << endl;
+00447         \textcolor{keywordflow}{return} octave\_value(-1);
+00448     \}
+00449     \textcolor{keywordflow}{if}(WFMrunning)
+00450         LMS_EnableTxWFM(lmsDev, 0, \textcolor{keyword}{false});
+00451     WFMrunning = \textcolor{keyword}{false};
+00452     \textcolor{keywordflow}{return} octave\_value ();
+00453 \}
+00454 
+00455 \textcolor{keywordtype}{void} FreeResources()
+00456 \{
+00457     \textcolor{keywordflow}{if}(lmsDev)
+00458     \{
+00459         \textcolor{keywordflow}{if}(WFMrunning)
+00460             LMS_EnableTxWFM(lmsDev, 0, \textcolor{keyword}{false});
+00461         StopStream();
+00462         LMS_Close(lmsDev);
+00463         lmsDev = NULL;
+00464     \}
+00465     \textcolor{keywordflow}{if}(rxbuffers)
+00466     \{
+00467         \textcolor{keyword}{delete} rxbuffers;
+00468         rxbuffers = NULL;
+00469     \}
+00470     \textcolor{keywordflow}{if}(txbuffers)
+00471     \{
+00472         \textcolor{keyword}{delete} txbuffers;
+00473         txbuffers = NULL;
+00474     \}
+00475 \}
+00476 
+00477 \textcolor{keyword}{class }ResourceDeallocator
+00478 \{
+00479 \textcolor{keyword}{public}:
+00480     ResourceDeallocator() \{\};
+00481     ~ResourceDeallocator()
+00482     \{
+00483         FreeResources();
+00484     \};
+00485 \};
+00486 
+00487 ResourceDeallocator gResources;
+\end{DoxyCode}

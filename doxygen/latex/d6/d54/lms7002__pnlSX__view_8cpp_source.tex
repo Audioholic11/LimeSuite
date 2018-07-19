@@ -1,0 +1,649 @@
+\subsection{lms7002\+\_\+pnl\+S\+X\+\_\+view.\+cpp}
+\label{lms7002__pnlSX__view_8cpp_source}\index{/home/erik/prefix/default/src/limesuite-\/dev/src/lms7002\+\_\+wxgui/lms7002\+\_\+pnl\+S\+X\+\_\+view.\+cpp@{/home/erik/prefix/default/src/limesuite-\/dev/src/lms7002\+\_\+wxgui/lms7002\+\_\+pnl\+S\+X\+\_\+view.\+cpp}}
+
+\begin{DoxyCode}
+00001 \textcolor{preprocessor}{#include "lms7002_pnlSX_view.h"}
+00002 
+00003 \textcolor{preprocessor}{#include <wx/textdlg.h>}
+00004 \textcolor{preprocessor}{#include <wx/valnum.h>}
+00005 \textcolor{preprocessor}{#include <wx/msgdlg.h>}
+00006 \textcolor{preprocessor}{#include <map>}
+00007 \textcolor{preprocessor}{#include <assert.h>}
+00008 \textcolor{preprocessor}{#include "numericSlider.h"}
+00009 \textcolor{preprocessor}{#include "lms7002_gui_utilities.h"}
+00010 \textcolor{preprocessor}{#include "lms7suiteEvents.h"}
+00011 \textcolor{preprocessor}{#include "lms7002_dlgVCOfrequencies.h"}
+00012 \textcolor{preprocessor}{#include <string>}
+00013 \textcolor{preprocessor}{#include "lms7_device.h"}
+00014 \textcolor{preprocessor}{#include "Logger.h"}
+00015 \textcolor{keyword}{using namespace }std;
+00016 \textcolor{keyword}{using namespace }lime;
+00017 
+00018 \textcolor{keyword}{static} \textcolor{keywordtype}{bool} showRefClkSpurCancelation = \textcolor{keyword}{true};
+00019 
+00020 lms7002_pnlSX_view::lms7002_pnlSX_view( wxWindow* parent, wxWindowID \textcolor{keywordtype}{id}, \textcolor{keyword}{const} wxPoint& pos, \textcolor{keyword}{const} wxSize& 
+      size, \textcolor{keywordtype}{long} style )
+00021     : pnlSX_view(parent, id, pos, size, style), lmsControl(nullptr)
+00022 \{
+00023     sizerR3->Add(\textcolor{keyword}{new} wxStaticText(\textcolor{keyword}{this}, wxID\_ANY, \_(\textcolor{stringliteral}{"PLL LPF zero resistor:"})), 1, wxEXPAND, 0);
+00024     cmbRZ_CTRL = \textcolor{keyword}{new} wxComboBox(\textcolor{keyword}{this}, wxID\_ANY);
+00025     cmbRZ_CTRL->Append(\_(\textcolor{stringliteral}{"Rzero = 20 kOhm"}));
+00026     cmbRZ_CTRL->Append(\_(\textcolor{stringliteral}{"Rzero = 8 kOhm"}));
+00027     cmbRZ_CTRL->Append(\_(\textcolor{stringliteral}{"Rzero = 4 kOhm"}));
+00028     cmbRZ_CTRL->Append(\_(\textcolor{stringliteral}{"LPF resistors are in bypass mode (<100 Ohm)"}));
+00029     cmbRZ_CTRL->Connect(wxEVT\_COMMAND\_COMBOBOX\_SELECTED, wxCommandEventHandler(
+      lms7002_pnlSX_view::ParameterChangeHandler), NULL, \textcolor{keyword}{this});
+00030     wndId2Enum[cmbRZ_CTRL] = LMS7_RZ_CTRL;
+00031     sizerR3->Add(cmbRZ_CTRL);
+00032 
+00033     sizerR3->Add(\textcolor{keyword}{new} wxStaticText(\textcolor{keyword}{this}, wxID\_ANY, \_(\textcolor{stringliteral}{"CMPLO\_CTRL:"})), 1, wxEXPAND, 0);
+00034     cmbCMPLO_CTRL = \textcolor{keyword}{new} wxComboBox(\textcolor{keyword}{this}, wxID\_ANY);
+00035     cmbCMPLO_CTRL->Append(\_(\textcolor{stringliteral}{"Low threshold is set to 0.18V"}));
+00036     cmbCMPLO_CTRL->Append(\_(\textcolor{stringliteral}{"Low threshold is set to 0.1V"}));
+00037     cmbCMPLO_CTRL->Connect(wxEVT\_COMMAND\_COMBOBOX\_SELECTED, wxCommandEventHandler(
+      lms7002_pnlSX_view::ParameterChangeHandler), NULL, \textcolor{keyword}{this});
+00038     sizerR3->Add(cmbCMPLO_CTRL, 0, 0, 5);
+00039     wndId2Enum[cmbCMPLO_CTRL] = LMS7_CMPLO_CTRL_SX;
+00040 
+00041     \textcolor{comment}{//ids for updating from chip}
+00042     wndId2Enum[chkBYPLDO_VCO] = LMS7param(BYPLDO_VCO);
+00043     wndId2Enum[cmbCP2_PLL] = LMS7param(CP2_PLL);
+00044     wndId2Enum[cmbCP3_PLL] = LMS7param(CP3_PLL);
+00045     wndId2Enum[ctrCSW_VCO] = LMS7param(CSW_VCO);
+00046     wndId2Enum[chkCURLIM_VCO] = LMS7param(CURLIM_VCO);
+00047     wndId2Enum[cmbCZ] = LMS7param(CZ);
+00048     wndId2Enum[ctrDIV_LOCH] = LMS7param(DIV_LOCH);
+00049     wndId2Enum[chkEN_COARSEPLL] = LMS7param(EN_COARSEPLL);
+00050     wndId2Enum[chkEN_DIV2_DIVPROGenabled] = LMS7param(EN_DIV2_DIVPROG);
+00051     wndId2Enum[chkEN_G] = LMS7param(EN_G);
+00052     wndId2Enum[chkEN_INTONLY_SDM] = LMS7param(EN_INTONLY_SDM);
+00053     wndId2Enum[chkEN_SDM_CLK] = LMS7param(EN_SDM_CLK);
+00054     wndId2Enum[cmbICT_VCO] = LMS7param(ICT_VCO);
+00055     wndId2Enum[cmbIOFFSET_CP] = LMS7param(IOFFSET_CP);
+00056     wndId2Enum[cmbIPULSE_CP] = LMS7param(IPULSE_CP);
+00057     wndId2Enum[chkPD_CP] = LMS7param(PD_CP);
+00058     wndId2Enum[chkPD_FDIV] = LMS7param(PD_FDIV);
+00059     wndId2Enum[chkPD_LOCH_T2RBUF] = LMS7param(PD_LOCH_T2RBUF);
+00060     wndId2Enum[chkPD_SDM] = LMS7param(PD_SDM);
+00061     wndId2Enum[chkPD_VCO] = LMS7param(PD_VCO);
+00062     wndId2Enum[chkPD_VCO_COMP] = LMS7param(PD_VCO_COMP);
+00063     wndId2Enum[ctrPW_DIV2_LOCH] = LMS7param(PW_DIV2_LOCH);
+00064     wndId2Enum[ctrPW_DIV4_LOCH] = LMS7param(PW_DIV4_LOCH);
+00065     wndId2Enum[chkRESET_N] = LMS7param(RESET_N);
+00066     wndId2Enum[chkREVPH_PFD] = LMS7param(REVPH_PFD);
+00067     wndId2Enum[chkREV_SDMCLK] = LMS7param(REV_SDMCLK);
+00068     wndId2Enum[cmbRSEL_LDO_VCO] = LMS7param(RSEL_LDO_VCO);
+00069     wndId2Enum[cmbSEL_SDMCLK] = LMS7param(SEL_SDMCLK);
+00070     wndId2Enum[rgrSEL_VCO] = LMS7param(SEL_VCO);
+00071     wndId2Enum[chkSPDUP_VCO] = LMS7param(SPDUP_VCO);
+00072     wndId2Enum[chkSX_DITHER_EN] = LMS7param(SX_DITHER_EN);
+00073     wndId2Enum[cmbTST_SX] = LMS7param(TST_SX);
+00074     wndId2Enum[cmbVDIV_VCO] = LMS7param(VDIV_VCO);
+00075     wndId2Enum[chkPD_FBDIV] = LMS7param(PD_FBDIV);
+00076     wndId2Enum[chkEN_DIR_SXRSXT] = LMS7param(EN_DIR_SXRSXT);
+00077     wndId2Enum[lblINT_SDM] = LMS7param(INT_SDM);
+00078     wndId2Enum[lblEN_DIV2_DIVPROG] = LMS7param(EN_DIV2_DIVPROG);
+00079 
+00080     \textcolor{keywordtype}{char} ctemp[80];
+00081     wxArrayString temp;
+00082 
+00083     temp.clear();
+00084     \textcolor{keywordflow}{for} (\textcolor{keywordtype}{int} i = 0; i<16; ++i)
+00085     \{
+00086         sprintf(ctemp, \textcolor{stringliteral}{"%.3f pF"}, (i * 6 * 387.0) / 1000.0); temp.push\_back(ctemp);
+00087     \}
+00088     cmbCP2_PLL->Set(temp);
+00089 
+00090     temp.clear();
+00091     \textcolor{keywordflow}{for} (\textcolor{keywordtype}{int} i = 0; i<16; ++i)
+00092     \{
+00093         sprintf(ctemp, \textcolor{stringliteral}{"%.3f pF"}, (i * 6 * 980.0) / 1000.0); temp.push\_back(ctemp);
+00094     \}
+00095     cmbCP3_PLL->Set(temp);
+00096 
+00097     temp.clear();
+00098     \textcolor{keywordflow}{for} (\textcolor{keywordtype}{int} i = 0; i<16; ++i)
+00099     \{
+00100         sprintf(ctemp, \textcolor{stringliteral}{"%.3f pF"}, i * 8 * 5.88); temp.push\_back(ctemp);
+00101     \}
+00102     cmbCZ->Set(temp);
+00103 
+00104     temp.clear();
+00105     \textcolor{keywordflow}{for} (\textcolor{keywordtype}{int} i = 0; i<64; ++i)
+00106     \{
+00107         sprintf(ctemp, \textcolor{stringliteral}{"%.3f uA"}, 0.243*i); temp.push\_back(ctemp);
+00108     \}
+00109     cmbIOFFSET_CP->Set(temp);
+00110 
+00111     temp.clear();
+00112     \textcolor{keywordflow}{for} (\textcolor{keywordtype}{int} i = 0; i<64; ++i)
+00113     \{
+00114         sprintf(ctemp, \textcolor{stringliteral}{"%.3f uA"}, 2.312*i); temp.push\_back(ctemp);
+00115     \}
+00116     cmbIPULSE_CP->Set(temp);
+00117 
+00118     temp.clear();
+00119     \textcolor{keywordflow}{for} (\textcolor{keywordtype}{int} i = 0; i <= 6; ++i)
+00120     \{
+00121         sprintf(ctemp, \textcolor{stringliteral}{"1.6 V"}); temp.push\_back(ctemp);
+00122     \}
+00123     \textcolor{keywordflow}{for} (\textcolor{keywordtype}{int} i = 7; i<32; ++i)
+00124     \{
+00125         sprintf(ctemp, \textcolor{stringliteral}{"%.3f V"}, (0.000060*180000.0 / i)); temp.push\_back(ctemp);
+00126     \}
+00127     cmbRSEL_LDO_VCO->Set(temp);
+00128 
+00129     temp.clear();
+00130     temp.push\_back(\textcolor{stringliteral}{"CLK\_DIV"});
+00131     temp.push\_back(\textcolor{stringliteral}{"CLK\_REF"});
+00132     cmbSEL_SDMCLK->Set(temp);
+00133 
+00134     temp.clear();
+00135     temp.push\_back(\textcolor{stringliteral}{"TST disabled"});
+00136     temp.push\_back(\textcolor{stringliteral}{"TST[0]=VCO/20 clk*; TST[1]=VCO/40 clk*; TSTA=Hi Z"});
+00137     temp.push\_back(\textcolor{stringliteral}{"TST[0]=SDM clk; TST[1]=FBD output; TSTA=Vtune@60kOhm"});
+00138     temp.push\_back(\textcolor{stringliteral}{"TST[0]=Ref clk; TST[1]=FBD output; TSTA=Vtune@10kOhm"});
+00139     temp.push\_back(\textcolor{stringliteral}{"TST[0]=Hi Z; TST[1]=Hi Z; TSTA=Hi Z"});
+00140     temp.push\_back(\textcolor{stringliteral}{"TST[0]=CP Down offset; TST[1]=CP Up offset; TSTA=Hi Z"});
+00141     temp.push\_back(\textcolor{stringliteral}{"TST[0]=Hi Z; TST[1]=Hi Z; TSTA=Vtune@60kOhm"});
+00142     temp.push\_back(\textcolor{stringliteral}{"TST[0]=Hi Z; TST[1]=Hi Z; TSTA=Vtune@10kOhm"});
+00143     cmbTST_SX->Set(temp);
+00144 
+00145     temp.clear();
+00146     sprintf(ctemp, \textcolor{stringliteral}{"%.4f V"}, 1.6628); temp.push\_back(ctemp);
+00147     sprintf(ctemp, \textcolor{stringliteral}{"%.4f V"}, 1.6626); temp.push\_back(ctemp);
+00148     sprintf(ctemp, \textcolor{stringliteral}{"%.4f V"}, 1.6623); temp.push\_back(ctemp);
+00149     sprintf(ctemp, \textcolor{stringliteral}{"%.4f V"}, 1.6621); temp.push\_back(ctemp);
+00150     sprintf(ctemp, \textcolor{stringliteral}{"%.4f V"}, 1.6618); temp.push\_back(ctemp);
+00151     sprintf(ctemp, \textcolor{stringliteral}{"%.4f V"}, 1.6616); temp.push\_back(ctemp);
+00152     sprintf(ctemp, \textcolor{stringliteral}{"%.4f V"}, 1.6614); temp.push\_back(ctemp);
+00153     sprintf(ctemp, \textcolor{stringliteral}{"%.4f V"}, 1.6611); temp.push\_back(ctemp);
+00154     sprintf(ctemp, \textcolor{stringliteral}{"%.4f V"}, 1.6608); temp.push\_back(ctemp);
+00155     sprintf(ctemp, \textcolor{stringliteral}{"%.4f V"}, 1.6606); temp.push\_back(ctemp);
+00156     sprintf(ctemp, \textcolor{stringliteral}{"%.4f V"}, 1.6603); temp.push\_back(ctemp);
+00157     sprintf(ctemp, \textcolor{stringliteral}{"%.4f V"}, 1.6601); temp.push\_back(ctemp);
+00158     sprintf(ctemp, \textcolor{stringliteral}{"%.4f V"}, 1.6598); temp.push\_back(ctemp);
+00159     sprintf(ctemp, \textcolor{stringliteral}{"%.4f V"}, 1.6596); temp.push\_back(ctemp);
+00160     sprintf(ctemp, \textcolor{stringliteral}{"%.4f V"}, 1.6593); temp.push\_back(ctemp);
+00161     sprintf(ctemp, \textcolor{stringliteral}{"%.4f V"}, 1.659); temp.push\_back(ctemp);
+00162     sprintf(ctemp, \textcolor{stringliteral}{"%.4f V"}, 1.6608); temp.push\_back(ctemp);
+00163     sprintf(ctemp, \textcolor{stringliteral}{"%.4f V"}, 1.6606); temp.push\_back(ctemp);
+00164     sprintf(ctemp, \textcolor{stringliteral}{"%.4f V"}, 1.6603); temp.push\_back(ctemp);
+00165     sprintf(ctemp, \textcolor{stringliteral}{"%.4f V"}, 1.6601); temp.push\_back(ctemp);
+00166     sprintf(ctemp, \textcolor{stringliteral}{"%.4f V"}, 1.6598); temp.push\_back(ctemp);
+00167     sprintf(ctemp, \textcolor{stringliteral}{"%.4f V"}, 1.6596); temp.push\_back(ctemp);
+00168     sprintf(ctemp, \textcolor{stringliteral}{"%.4f V"}, 1.6593); temp.push\_back(ctemp);
+00169     sprintf(ctemp, \textcolor{stringliteral}{"%.4f V"}, 1.659); temp.push\_back(ctemp);
+00170     sprintf(ctemp, \textcolor{stringliteral}{"%.4f V"}, 1.6587); temp.push\_back(ctemp);
+00171     sprintf(ctemp, \textcolor{stringliteral}{"%.4f V"}, 1.6585); temp.push\_back(ctemp);
+00172     sprintf(ctemp, \textcolor{stringliteral}{"%.4f V"}, 1.6582); temp.push\_back(ctemp);
+00173     sprintf(ctemp, \textcolor{stringliteral}{"%.4f V"}, 1.6579); temp.push\_back(ctemp);
+00174     sprintf(ctemp, \textcolor{stringliteral}{"%.4f V"}, 1.6576); temp.push\_back(ctemp);
+00175     sprintf(ctemp, \textcolor{stringliteral}{"%.4f V"}, 1.6574); temp.push\_back(ctemp);
+00176     sprintf(ctemp, \textcolor{stringliteral}{"%.4f V"}, 1.6571); temp.push\_back(ctemp);
+00177     sprintf(ctemp, \textcolor{stringliteral}{"%.4f V"}, 1.6568); temp.push\_back(ctemp);
+00178     sprintf(ctemp, \textcolor{stringliteral}{"%.4f V"}, 1.6587); temp.push\_back(ctemp);
+00179     sprintf(ctemp, \textcolor{stringliteral}{"%.4f V"}, 1.6585); temp.push\_back(ctemp);
+00180     sprintf(ctemp, \textcolor{stringliteral}{"%.4f V"}, 1.6582); temp.push\_back(ctemp);
+00181     sprintf(ctemp, \textcolor{stringliteral}{"%.4f V"}, 1.6579); temp.push\_back(ctemp);
+00182     sprintf(ctemp, \textcolor{stringliteral}{"%.4f V"}, 1.6576); temp.push\_back(ctemp);
+00183     sprintf(ctemp, \textcolor{stringliteral}{"%.4f V"}, 1.6574); temp.push\_back(ctemp);
+00184     sprintf(ctemp, \textcolor{stringliteral}{"%.4f V"}, 1.6571); temp.push\_back(ctemp);
+00185     sprintf(ctemp, \textcolor{stringliteral}{"%.4f V"}, 1.6568); temp.push\_back(ctemp);
+00186     sprintf(ctemp, \textcolor{stringliteral}{"%.4f V"}, 1.6565); temp.push\_back(ctemp);
+00187     sprintf(ctemp, \textcolor{stringliteral}{"%.4f V"}, 1.6562); temp.push\_back(ctemp);
+00188     sprintf(ctemp, \textcolor{stringliteral}{"%.4f V"}, 1.6559); temp.push\_back(ctemp);
+00189     sprintf(ctemp, \textcolor{stringliteral}{"%.4f V"}, 1.6556); temp.push\_back(ctemp);
+00190     sprintf(ctemp, \textcolor{stringliteral}{"%.4f V"}, 1.6553); temp.push\_back(ctemp);
+00191     sprintf(ctemp, \textcolor{stringliteral}{"%.4f V"}, 1.655); temp.push\_back(ctemp);
+00192     sprintf(ctemp, \textcolor{stringliteral}{"%.4f V"}, 1.6547); temp.push\_back(ctemp);
+00193     sprintf(ctemp, \textcolor{stringliteral}{"%.4f V"}, 1.6544); temp.push\_back(ctemp);
+00194     sprintf(ctemp, \textcolor{stringliteral}{"%.4f V"}, 1.6565); temp.push\_back(ctemp);
+00195     sprintf(ctemp, \textcolor{stringliteral}{"%.4f V"}, 1.6562); temp.push\_back(ctemp);
+00196     sprintf(ctemp, \textcolor{stringliteral}{"%.4f V"}, 1.6559); temp.push\_back(ctemp);
+00197     sprintf(ctemp, \textcolor{stringliteral}{"%.4f V"}, 1.6556); temp.push\_back(ctemp);
+00198     sprintf(ctemp, \textcolor{stringliteral}{"%.4f V"}, 1.6553); temp.push\_back(ctemp);
+00199     sprintf(ctemp, \textcolor{stringliteral}{"%.4f V"}, 1.655); temp.push\_back(ctemp);
+00200     sprintf(ctemp, \textcolor{stringliteral}{"%.4f V"}, 1.6547); temp.push\_back(ctemp);
+00201     sprintf(ctemp, \textcolor{stringliteral}{"%.4f V"}, 1.6544); temp.push\_back(ctemp);
+00202     sprintf(ctemp, \textcolor{stringliteral}{"%.4f V"}, 1.6541); temp.push\_back(ctemp);
+00203     sprintf(ctemp, \textcolor{stringliteral}{"%.4f V"}, 1.6537); temp.push\_back(ctemp);
+00204     sprintf(ctemp, \textcolor{stringliteral}{"%.4f V"}, 1.6534); temp.push\_back(ctemp);
+00205     sprintf(ctemp, \textcolor{stringliteral}{"%.4f V"}, 1.6531); temp.push\_back(ctemp);
+00206     sprintf(ctemp, \textcolor{stringliteral}{"%.4f V"}, 1.6528); temp.push\_back(ctemp);
+00207     sprintf(ctemp, \textcolor{stringliteral}{"%.4f V"}, 1.6524); temp.push\_back(ctemp);
+00208     sprintf(ctemp, \textcolor{stringliteral}{"%.4f V"}, 1.6521); temp.push\_back(ctemp);
+00209     sprintf(ctemp, \textcolor{stringliteral}{"%.4f V"}, 1.6518); temp.push\_back(ctemp);
+00210     sprintf(ctemp, \textcolor{stringliteral}{"%.4f V"}, 1.6421); temp.push\_back(ctemp);
+00211     sprintf(ctemp, \textcolor{stringliteral}{"%.4f V"}, 1.6417); temp.push\_back(ctemp);
+00212     sprintf(ctemp, \textcolor{stringliteral}{"%.4f V"}, 1.6412); temp.push\_back(ctemp);
+00213     sprintf(ctemp, \textcolor{stringliteral}{"%.4f V"}, 1.6408); temp.push\_back(ctemp);
+00214     sprintf(ctemp, \textcolor{stringliteral}{"%.4f V"}, 1.6403); temp.push\_back(ctemp);
+00215     sprintf(ctemp, \textcolor{stringliteral}{"%.4f V"}, 1.6399); temp.push\_back(ctemp);
+00216     sprintf(ctemp, \textcolor{stringliteral}{"%.4f V"}, 1.6394); temp.push\_back(ctemp);
+00217     sprintf(ctemp, \textcolor{stringliteral}{"%.4f V"}, 1.6389); temp.push\_back(ctemp);
+00218     sprintf(ctemp, \textcolor{stringliteral}{"%.4f V"}, 1.6384); temp.push\_back(ctemp);
+00219     sprintf(ctemp, \textcolor{stringliteral}{"%.4f V"}, 1.638); temp.push\_back(ctemp);
+00220     sprintf(ctemp, \textcolor{stringliteral}{"%.4f V"}, 1.6375); temp.push\_back(ctemp);
+00221     sprintf(ctemp, \textcolor{stringliteral}{"%.4f V"}, 1.637); temp.push\_back(ctemp);
+00222     sprintf(ctemp, \textcolor{stringliteral}{"%.4f V"}, 1.6365); temp.push\_back(ctemp);
+00223     sprintf(ctemp, \textcolor{stringliteral}{"%.4f V"}, 1.636); temp.push\_back(ctemp);
+00224     sprintf(ctemp, \textcolor{stringliteral}{"%.4f V"}, 1.6354); temp.push\_back(ctemp);
+00225     sprintf(ctemp, \textcolor{stringliteral}{"%.4f V"}, 1.6349); temp.push\_back(ctemp);
+00226     sprintf(ctemp, \textcolor{stringliteral}{"%.4f V"}, 1.6384); temp.push\_back(ctemp);
+00227     sprintf(ctemp, \textcolor{stringliteral}{"%.4f V"}, 1.638); temp.push\_back(ctemp);
+00228     sprintf(ctemp, \textcolor{stringliteral}{"%.4f V"}, 1.6375); temp.push\_back(ctemp);
+00229     sprintf(ctemp, \textcolor{stringliteral}{"%.4f V"}, 1.637); temp.push\_back(ctemp);
+00230     sprintf(ctemp, \textcolor{stringliteral}{"%.4f V"}, 1.6365); temp.push\_back(ctemp);
+00231     sprintf(ctemp, \textcolor{stringliteral}{"%.4f V"}, 1.636); temp.push\_back(ctemp);
+00232     sprintf(ctemp, \textcolor{stringliteral}{"%.4f V"}, 1.6354); temp.push\_back(ctemp);
+00233     sprintf(ctemp, \textcolor{stringliteral}{"%.4f V"}, 1.6349); temp.push\_back(ctemp);
+00234     sprintf(ctemp, \textcolor{stringliteral}{"%.4f V"}, 1.6344); temp.push\_back(ctemp);
+00235     sprintf(ctemp, \textcolor{stringliteral}{"%.4f V"}, 1.6339); temp.push\_back(ctemp);
+00236     sprintf(ctemp, \textcolor{stringliteral}{"%.4f V"}, 1.6333); temp.push\_back(ctemp);
+00237     sprintf(ctemp, \textcolor{stringliteral}{"%.4f V"}, 1.6328); temp.push\_back(ctemp);
+00238     sprintf(ctemp, \textcolor{stringliteral}{"%.4f V"}, 1.6322); temp.push\_back(ctemp);
+00239     sprintf(ctemp, \textcolor{stringliteral}{"%.4f V"}, 1.6316); temp.push\_back(ctemp);
+00240     sprintf(ctemp, \textcolor{stringliteral}{"%.4f V"}, 1.6311); temp.push\_back(ctemp);
+00241     sprintf(ctemp, \textcolor{stringliteral}{"%.4f V"}, 1.6305); temp.push\_back(ctemp);
+00242     sprintf(ctemp, \textcolor{stringliteral}{"%.4f V"}, 1.6344); temp.push\_back(ctemp);
+00243     sprintf(ctemp, \textcolor{stringliteral}{"%.4f V"}, 1.6339); temp.push\_back(ctemp);
+00244     sprintf(ctemp, \textcolor{stringliteral}{"%.4f V"}, 1.6333); temp.push\_back(ctemp);
+00245     sprintf(ctemp, \textcolor{stringliteral}{"%.4f V"}, 1.6328); temp.push\_back(ctemp);
+00246     sprintf(ctemp, \textcolor{stringliteral}{"%.4f V"}, 1.6322); temp.push\_back(ctemp);
+00247     sprintf(ctemp, \textcolor{stringliteral}{"%.4f V"}, 1.6316); temp.push\_back(ctemp);
+00248     sprintf(ctemp, \textcolor{stringliteral}{"%.4f V"}, 1.6311); temp.push\_back(ctemp);
+00249     sprintf(ctemp, \textcolor{stringliteral}{"%.4f V"}, 1.6305); temp.push\_back(ctemp);
+00250     sprintf(ctemp, \textcolor{stringliteral}{"%.4f V"}, 1.6299); temp.push\_back(ctemp);
+00251     sprintf(ctemp, \textcolor{stringliteral}{"%.4f V"}, 1.6293); temp.push\_back(ctemp);
+00252     sprintf(ctemp, \textcolor{stringliteral}{"%.4f V"}, 1.6287); temp.push\_back(ctemp);
+00253     sprintf(ctemp, \textcolor{stringliteral}{"%.4f V"}, 1.6281); temp.push\_back(ctemp);
+00254     sprintf(ctemp, \textcolor{stringliteral}{"%.4f V"}, 1.6275); temp.push\_back(ctemp);
+00255     sprintf(ctemp, \textcolor{stringliteral}{"%.4f V"}, 1.6269); temp.push\_back(ctemp);
+00256     sprintf(ctemp, \textcolor{stringliteral}{"%.4f V"}, 1.6262); temp.push\_back(ctemp);
+00257     sprintf(ctemp, \textcolor{stringliteral}{"%.4f V"}, 1.6256); temp.push\_back(ctemp);
+00258     sprintf(ctemp, \textcolor{stringliteral}{"%.4f V"}, 1.6299); temp.push\_back(ctemp);
+00259     sprintf(ctemp, \textcolor{stringliteral}{"%.4f V"}, 1.6293); temp.push\_back(ctemp);
+00260     sprintf(ctemp, \textcolor{stringliteral}{"%.4f V"}, 1.6287); temp.push\_back(ctemp);
+00261     sprintf(ctemp, \textcolor{stringliteral}{"%.4f V"}, 1.6281); temp.push\_back(ctemp);
+00262     sprintf(ctemp, \textcolor{stringliteral}{"%.4f V"}, 1.6275); temp.push\_back(ctemp);
+00263     sprintf(ctemp, \textcolor{stringliteral}{"%.4f V"}, 1.6269); temp.push\_back(ctemp);
+00264     sprintf(ctemp, \textcolor{stringliteral}{"%.4f V"}, 1.6262); temp.push\_back(ctemp);
+00265     sprintf(ctemp, \textcolor{stringliteral}{"%.4f V"}, 1.6256); temp.push\_back(ctemp);
+00266     sprintf(ctemp, \textcolor{stringliteral}{"%.4f V"}, 1.6249); temp.push\_back(ctemp);
+00267     sprintf(ctemp, \textcolor{stringliteral}{"%.4f V"}, 1.6243); temp.push\_back(ctemp);
+00268     sprintf(ctemp, \textcolor{stringliteral}{"%.4f V"}, 1.6236); temp.push\_back(ctemp);
+00269     sprintf(ctemp, \textcolor{stringliteral}{"%.4f V"}, 1.6229); temp.push\_back(ctemp);
+00270     sprintf(ctemp, \textcolor{stringliteral}{"%.4f V"}, 1.6222); temp.push\_back(ctemp);
+00271     sprintf(ctemp, \textcolor{stringliteral}{"%.4f V"}, 1.6215); temp.push\_back(ctemp);
+00272     sprintf(ctemp, \textcolor{stringliteral}{"%.4f V"}, 1.6208); temp.push\_back(ctemp);
+00273     sprintf(ctemp, \textcolor{stringliteral}{"%.4f V"}, 1.6201); temp.push\_back(ctemp);
+00274     sprintf(ctemp, \textcolor{stringliteral}{"%.4f V"}, 1.5981); temp.push\_back(ctemp);
+00275     sprintf(ctemp, \textcolor{stringliteral}{"%.4f V"}, 1.597); temp.push\_back(ctemp);
+00276     sprintf(ctemp, \textcolor{stringliteral}{"%.4f V"}, 1.5959); temp.push\_back(ctemp);
+00277     sprintf(ctemp, \textcolor{stringliteral}{"%.4f V"}, 1.5947); temp.push\_back(ctemp);
+00278     sprintf(ctemp, \textcolor{stringliteral}{"%.4f V"}, 1.5936); temp.push\_back(ctemp);
+00279     sprintf(ctemp, \textcolor{stringliteral}{"%.4f V"}, 1.5924); temp.push\_back(ctemp);
+00280     sprintf(ctemp, \textcolor{stringliteral}{"%.4f V"}, 1.5912); temp.push\_back(ctemp);
+00281     sprintf(ctemp, \textcolor{stringliteral}{"%.4f V"}, 1.59); temp.push\_back(ctemp);
+00282     sprintf(ctemp, \textcolor{stringliteral}{"%.4f V"}, 1.5888); temp.push\_back(ctemp);
+00283     sprintf(ctemp, \textcolor{stringliteral}{"%.4f V"}, 1.5875); temp.push\_back(ctemp);
+00284     sprintf(ctemp, \textcolor{stringliteral}{"%.4f V"}, 1.5862); temp.push\_back(ctemp);
+00285     sprintf(ctemp, \textcolor{stringliteral}{"%.4f V"}, 1.5849); temp.push\_back(ctemp);
+00286     sprintf(ctemp, \textcolor{stringliteral}{"%.4f V"}, 1.5836); temp.push\_back(ctemp);
+00287     sprintf(ctemp, \textcolor{stringliteral}{"%.4f V"}, 1.5822); temp.push\_back(ctemp);
+00288     sprintf(ctemp, \textcolor{stringliteral}{"%.4f V"}, 1.5808); temp.push\_back(ctemp);
+00289     sprintf(ctemp, \textcolor{stringliteral}{"%.4f V"}, 1.5794); temp.push\_back(ctemp);
+00290     sprintf(ctemp, \textcolor{stringliteral}{"%.4f V"}, 1.5888); temp.push\_back(ctemp);
+00291     sprintf(ctemp, \textcolor{stringliteral}{"%.4f V"}, 1.5875); temp.push\_back(ctemp);
+00292     sprintf(ctemp, \textcolor{stringliteral}{"%.4f V"}, 1.5862); temp.push\_back(ctemp);
+00293     sprintf(ctemp, \textcolor{stringliteral}{"%.4f V"}, 1.5849); temp.push\_back(ctemp);
+00294     sprintf(ctemp, \textcolor{stringliteral}{"%.4f V"}, 1.5836); temp.push\_back(ctemp);
+00295     sprintf(ctemp, \textcolor{stringliteral}{"%.4f V"}, 1.5822); temp.push\_back(ctemp);
+00296     sprintf(ctemp, \textcolor{stringliteral}{"%.4f V"}, 1.5808); temp.push\_back(ctemp);
+00297     sprintf(ctemp, \textcolor{stringliteral}{"%.4f V"}, 1.5794); temp.push\_back(ctemp);
+00298     sprintf(ctemp, \textcolor{stringliteral}{"%.4f V"}, 1.5779); temp.push\_back(ctemp);
+00299     sprintf(ctemp, \textcolor{stringliteral}{"%.4f V"}, 1.5765); temp.push\_back(ctemp);
+00300     sprintf(ctemp, \textcolor{stringliteral}{"%.4f V"}, 1.575); temp.push\_back(ctemp);
+00301     sprintf(ctemp, \textcolor{stringliteral}{"%.4f V"}, 1.5734); temp.push\_back(ctemp);
+00302     sprintf(ctemp, \textcolor{stringliteral}{"%.4f V"}, 1.5718); temp.push\_back(ctemp);
+00303     sprintf(ctemp, \textcolor{stringliteral}{"%.4f V"}, 1.5702); temp.push\_back(ctemp);
+00304     sprintf(ctemp, \textcolor{stringliteral}{"%.4f V"}, 1.5686); temp.push\_back(ctemp);
+00305     sprintf(ctemp, \textcolor{stringliteral}{"%.4f V"}, 1.5669); temp.push\_back(ctemp);
+00306     sprintf(ctemp, \textcolor{stringliteral}{"%.4f V"}, 1.5779); temp.push\_back(ctemp);
+00307     sprintf(ctemp, \textcolor{stringliteral}{"%.4f V"}, 1.5765); temp.push\_back(ctemp);
+00308     sprintf(ctemp, \textcolor{stringliteral}{"%.4f V"}, 1.575); temp.push\_back(ctemp);
+00309     sprintf(ctemp, \textcolor{stringliteral}{"%.4f V"}, 1.5734); temp.push\_back(ctemp);
+00310     sprintf(ctemp, \textcolor{stringliteral}{"%.4f V"}, 1.5718); temp.push\_back(ctemp);
+00311     sprintf(ctemp, \textcolor{stringliteral}{"%.4f V"}, 1.5702); temp.push\_back(ctemp);
+00312     sprintf(ctemp, \textcolor{stringliteral}{"%.4f V"}, 1.5686); temp.push\_back(ctemp);
+00313     sprintf(ctemp, \textcolor{stringliteral}{"%.4f V"}, 1.5669); temp.push\_back(ctemp);
+00314     sprintf(ctemp, \textcolor{stringliteral}{"%.4f V"}, 1.5652); temp.push\_back(ctemp);
+00315     sprintf(ctemp, \textcolor{stringliteral}{"%.4f V"}, 1.5634); temp.push\_back(ctemp);
+00316     sprintf(ctemp, \textcolor{stringliteral}{"%.4f V"}, 1.5616); temp.push\_back(ctemp);
+00317     sprintf(ctemp, \textcolor{stringliteral}{"%.4f V"}, 1.5598); temp.push\_back(ctemp);
+00318     sprintf(ctemp, \textcolor{stringliteral}{"%.4f V"}, 1.5579); temp.push\_back(ctemp);
+00319     sprintf(ctemp, \textcolor{stringliteral}{"%.4f V"}, 1.556); temp.push\_back(ctemp);
+00320     sprintf(ctemp, \textcolor{stringliteral}{"%.4f V"}, 1.554); temp.push\_back(ctemp);
+00321     sprintf(ctemp, \textcolor{stringliteral}{"%.4f V"}, 1.552); temp.push\_back(ctemp);
+00322     sprintf(ctemp, \textcolor{stringliteral}{"%.4f V"}, 1.5652); temp.push\_back(ctemp);
+00323     sprintf(ctemp, \textcolor{stringliteral}{"%.4f V"}, 1.5634); temp.push\_back(ctemp);
+00324     sprintf(ctemp, \textcolor{stringliteral}{"%.4f V"}, 1.5616); temp.push\_back(ctemp);
+00325     sprintf(ctemp, \textcolor{stringliteral}{"%.4f V"}, 1.5598); temp.push\_back(ctemp);
+00326     sprintf(ctemp, \textcolor{stringliteral}{"%.4f V"}, 1.5579); temp.push\_back(ctemp);
+00327     sprintf(ctemp, \textcolor{stringliteral}{"%.4f V"}, 1.556); temp.push\_back(ctemp);
+00328     sprintf(ctemp, \textcolor{stringliteral}{"%.4f V"}, 1.554); temp.push\_back(ctemp);
+00329     sprintf(ctemp, \textcolor{stringliteral}{"%.4f V"}, 1.552); temp.push\_back(ctemp);
+00330     sprintf(ctemp, \textcolor{stringliteral}{"%.4f V"}, 1.5499); temp.push\_back(ctemp);
+00331     sprintf(ctemp, \textcolor{stringliteral}{"%.4f V"}, 1.5478); temp.push\_back(ctemp);
+00332     sprintf(ctemp, \textcolor{stringliteral}{"%.4f V"}, 1.5456); temp.push\_back(ctemp);
+00333     sprintf(ctemp, \textcolor{stringliteral}{"%.4f V"}, 1.5433); temp.push\_back(ctemp);
+00334     sprintf(ctemp, \textcolor{stringliteral}{"%.4f V"}, 1.5411); temp.push\_back(ctemp);
+00335     sprintf(ctemp, \textcolor{stringliteral}{"%.4f V"}, 1.5387); temp.push\_back(ctemp);
+00336     sprintf(ctemp, \textcolor{stringliteral}{"%.4f V"}, 1.5363); temp.push\_back(ctemp);
+00337     sprintf(ctemp, \textcolor{stringliteral}{"%.4f V"}, 1.5338); temp.push\_back(ctemp);
+00338     sprintf(ctemp, \textcolor{stringliteral}{"%.4f V"}, 1.4388); temp.push\_back(ctemp);
+00339     sprintf(ctemp, \textcolor{stringliteral}{"%.4f V"}, 1.433); temp.push\_back(ctemp);
+00340     sprintf(ctemp, \textcolor{stringliteral}{"%.4f V"}, 1.4268); temp.push\_back(ctemp);
+00341     sprintf(ctemp, \textcolor{stringliteral}{"%.4f V"}, 1.4205); temp.push\_back(ctemp);
+00342     sprintf(ctemp, \textcolor{stringliteral}{"%.4f V"}, 1.4138); temp.push\_back(ctemp);
+00343     sprintf(ctemp, \textcolor{stringliteral}{"%.4f V"}, 1.4069); temp.push\_back(ctemp);
+00344     sprintf(ctemp, \textcolor{stringliteral}{"%.4f V"}, 1.3996); temp.push\_back(ctemp);
+00345     sprintf(ctemp, \textcolor{stringliteral}{"%.4f V"}, 1.392); temp.push\_back(ctemp);
+00346     sprintf(ctemp, \textcolor{stringliteral}{"%.4f V"}, 1.384); temp.push\_back(ctemp);
+00347     sprintf(ctemp, \textcolor{stringliteral}{"%.4f V"}, 1.3756); temp.push\_back(ctemp);
+00348     sprintf(ctemp, \textcolor{stringliteral}{"%.4f V"}, 1.3667); temp.push\_back(ctemp);
+00349     sprintf(ctemp, \textcolor{stringliteral}{"%.4f V"}, 1.3574); temp.push\_back(ctemp);
+00350     sprintf(ctemp, \textcolor{stringliteral}{"%.4f V"}, 1.3476); temp.push\_back(ctemp);
+00351     sprintf(ctemp, \textcolor{stringliteral}{"%.4f V"}, 1.3373); temp.push\_back(ctemp);
+00352     sprintf(ctemp, \textcolor{stringliteral}{"%.4f V"}, 1.3264); temp.push\_back(ctemp);
+00353     sprintf(ctemp, \textcolor{stringliteral}{"%.4f V"}, 1.3148); temp.push\_back(ctemp);
+00354     sprintf(ctemp, \textcolor{stringliteral}{"%.4f V"}, 1.384); temp.push\_back(ctemp);
+00355     sprintf(ctemp, \textcolor{stringliteral}{"%.4f V"}, 1.3756); temp.push\_back(ctemp);
+00356     sprintf(ctemp, \textcolor{stringliteral}{"%.4f V"}, 1.3667); temp.push\_back(ctemp);
+00357     sprintf(ctemp, \textcolor{stringliteral}{"%.4f V"}, 1.3574); temp.push\_back(ctemp);
+00358     sprintf(ctemp, \textcolor{stringliteral}{"%.4f V"}, 1.3476); temp.push\_back(ctemp);
+00359     sprintf(ctemp, \textcolor{stringliteral}{"%.4f V"}, 1.3373); temp.push\_back(ctemp);
+00360     sprintf(ctemp, \textcolor{stringliteral}{"%.4f V"}, 1.3264); temp.push\_back(ctemp);
+00361     sprintf(ctemp, \textcolor{stringliteral}{"%.4f V"}, 1.3148); temp.push\_back(ctemp);
+00362     sprintf(ctemp, \textcolor{stringliteral}{"%.4f V"}, 1.3025); temp.push\_back(ctemp);
+00363     sprintf(ctemp, \textcolor{stringliteral}{"%.4f V"}, 1.2895); temp.push\_back(ctemp);
+00364     sprintf(ctemp, \textcolor{stringliteral}{"%.4f V"}, 1.2756); temp.push\_back(ctemp);
+00365     sprintf(ctemp, \textcolor{stringliteral}{"%.4f V"}, 1.2608); temp.push\_back(ctemp);
+00366     sprintf(ctemp, \textcolor{stringliteral}{"%.4f V"}, 1.245); temp.push\_back(ctemp);
+00367     sprintf(ctemp, \textcolor{stringliteral}{"%.4f V"}, 1.228); temp.push\_back(ctemp);
+00368     sprintf(ctemp, \textcolor{stringliteral}{"%.4f V"}, 1.2098); temp.push\_back(ctemp);
+00369     sprintf(ctemp, \textcolor{stringliteral}{"%.4f V"}, 1.1902); temp.push\_back(ctemp);
+00370     sprintf(ctemp, \textcolor{stringliteral}{"%.4f V"}, 1.3025); temp.push\_back(ctemp);
+00371     sprintf(ctemp, \textcolor{stringliteral}{"%.4f V"}, 1.2895); temp.push\_back(ctemp);
+00372     sprintf(ctemp, \textcolor{stringliteral}{"%.4f V"}, 1.2756); temp.push\_back(ctemp);
+00373     sprintf(ctemp, \textcolor{stringliteral}{"%.4f V"}, 1.2608); temp.push\_back(ctemp);
+00374     sprintf(ctemp, \textcolor{stringliteral}{"%.4f V"}, 1.245); temp.push\_back(ctemp);
+00375     sprintf(ctemp, \textcolor{stringliteral}{"%.4f V"}, 1.228); temp.push\_back(ctemp);
+00376     sprintf(ctemp, \textcolor{stringliteral}{"%.4f V"}, 1.2098); temp.push\_back(ctemp);
+00377     sprintf(ctemp, \textcolor{stringliteral}{"%.4f V"}, 1.1902); temp.push\_back(ctemp);
+00378     sprintf(ctemp, \textcolor{stringliteral}{"%.4f V"}, 1.169); temp.push\_back(ctemp);
+00379     sprintf(ctemp, \textcolor{stringliteral}{"%.4f V"}, 1.1461); temp.push\_back(ctemp);
+00380     sprintf(ctemp, \textcolor{stringliteral}{"%.4f V"}, 1.1211); temp.push\_back(ctemp);
+00381     sprintf(ctemp, \textcolor{stringliteral}{"%.4f V"}, 1.0939); temp.push\_back(ctemp);
+00382     sprintf(ctemp, \textcolor{stringliteral}{"%.4f V"}, 1.0641); temp.push\_back(ctemp);
+00383     sprintf(ctemp, \textcolor{stringliteral}{"%.4f V"}, 1.0313); temp.push\_back(ctemp);
+00384     sprintf(ctemp, \textcolor{stringliteral}{"%.4f V"}, 0.9951); temp.push\_back(ctemp);
+00385     sprintf(ctemp, \textcolor{stringliteral}{"%.4f V"}, 0.9549); temp.push\_back(ctemp);
+00386     sprintf(ctemp, \textcolor{stringliteral}{"%.4f V"}, 1.169); temp.push\_back(ctemp);
+00387     sprintf(ctemp, \textcolor{stringliteral}{"%.4f V"}, 1.1461); temp.push\_back(ctemp);
+00388     sprintf(ctemp, \textcolor{stringliteral}{"%.4f V"}, 1.1211); temp.push\_back(ctemp);
+00389     sprintf(ctemp, \textcolor{stringliteral}{"%.4f V"}, 1.0939); temp.push\_back(ctemp);
+00390     sprintf(ctemp, \textcolor{stringliteral}{"%.4f V"}, 1.0641); temp.push\_back(ctemp);
+00391     sprintf(ctemp, \textcolor{stringliteral}{"%.4f V"}, 1.0313); temp.push\_back(ctemp);
+00392     sprintf(ctemp, \textcolor{stringliteral}{"%.4f V"}, 0.9951); temp.push\_back(ctemp);
+00393     sprintf(ctemp, \textcolor{stringliteral}{"%.4f V"}, 0.9549); temp.push\_back(ctemp);
+00394     sprintf(ctemp, \textcolor{stringliteral}{"%.4f V"}, 0.9099); temp.push\_back(ctemp);
+00395     sprintf(ctemp, \textcolor{stringliteral}{"%.4f V"}, 0.8593); temp.push\_back(ctemp);
+00396     sprintf(ctemp, \textcolor{stringliteral}{"%.4f V"}, 0.802); temp.push\_back(ctemp);
+00397     sprintf(ctemp, \textcolor{stringliteral}{"%.4f V"}, 0.7365); temp.push\_back(ctemp);
+00398     sprintf(ctemp, \textcolor{stringliteral}{"%.4f V"}, 0.6609); temp.push\_back(ctemp);
+00399     sprintf(ctemp, \textcolor{stringliteral}{"%.4f V"}, 0.5727); temp.push\_back(ctemp);
+00400     sprintf(ctemp, \textcolor{stringliteral}{"%.4f V"}, 0.4685); temp.push\_back(ctemp);
+00401     sprintf(ctemp, \textcolor{stringliteral}{"%.4f V"}, 0.3436); temp.push\_back(ctemp);
+00402     cmbVDIV_VCO->Set(temp);
+00403 
+00404     txtRefSpurBW->SetValue(\_(\textcolor{stringliteral}{"5"}));
+00405 
+00406     LMS7002_WXGUI::UpdateTooltips(wndId2Enum, \textcolor{keyword}{true});
+00407     \textcolor{keywordflow}{if}(showRefClkSpurCancelation)
+00408     \{
+00409         pnlRefClkSpur->Show();
+00410         showRefClkSpurCancelation = \textcolor{keyword}{false};
+00411     \}
+00412 \}
+00413 
+00414 \textcolor{keywordtype}{void} lms7002_pnlSX_view::Initialize(lms_device_t* pControl)
+00415 \{
+00416     lmsControl = pControl;
+00417     assert(lmsControl != \textcolor{keyword}{nullptr});
+00418 \}
+00419 
+00420 \textcolor{keywordtype}{void} lms7002_pnlSX_view::ParameterChangeHandler(wxSpinEvent& event)
+00421 \{
+00422     wxCommandEvent evt;
+00423     evt.SetInt(event.GetInt());
+00424     evt.SetId(event.GetId());
+00425     evt.SetEventObject(event.GetEventObject());
+00426     ParameterChangeHandler(evt);
+00427 \}
+00428 
+00429 \textcolor{keywordtype}{void} lms7002_pnlSX_view::ParameterChangeHandler(wxCommandEvent& event)
+00430 \{
+00431     assert(lmsControl != \textcolor{keyword}{nullptr});
+00432     LMS7Parameter parameter;
+00433     \textcolor{keywordflow}{try}
+00434     \{
+00435         parameter = wndId2Enum.at(reinterpret\_cast<wxWindow*>(event.GetEventObject()));
+00436     \}
+00437     \textcolor{keywordflow}{catch} (std::exception & e)
+00438     \{
+00439         std::cout << \textcolor{stringliteral}{"Control element(ID = "} << \textcolor{keyword}{event}.GetId() << \textcolor{stringliteral}{") don't have assigned LMS parameter."} << 
+      std::endl;
+00440         \textcolor{keywordflow}{return};
+00441     \}
+00442     LMS_WriteParam(lmsControl,parameter,event.GetInt());
+00443 
+00444     \textcolor{keywordflow}{if}(event.GetEventObject() == ctrCSW_VCO) \textcolor{comment}{//for convenience refresh comparator values}
+00445     \{
+00446         wxCommandEvent evt;
+00447         OnbtnReadComparators(evt);
+00448     \}
+00449 \}
+00450 
+00451 \textcolor{keywordtype}{void} lms7002_pnlSX_view::OnbtnReadComparators(wxCommandEvent& event)
+00452 \{
+00453     assert(lmsControl != \textcolor{keyword}{nullptr});
+00454     uint16\_t value;
+00455     LMS_ReadParam(lmsControl,LMS7param(VCO_CMPHO),&value);
+00456 
+00457     lblVCO_CMPHO->SetLabel(wxString::Format(\_(\textcolor{stringliteral}{"%i"}), value));
+00458     \textcolor{keywordflow}{if} (value == 1)
+00459         lblVCO_CMPHO->SetBackgroundColour(*wxGREEN);
+00460     \textcolor{keywordflow}{else}
+00461         lblVCO_CMPHO->SetBackgroundColour(*wxRED);
+00462 
+00463     LMS_ReadParam(lmsControl,LMS7param(VCO_CMPLO),&value);
+00464     lblVCO_CMPLO->SetLabel(wxString::Format(\_(\textcolor{stringliteral}{"%i"}), value));
+00465     \textcolor{keywordflow}{if} (value == 0)
+00466         lblVCO_CMPLO->SetBackgroundColour(*wxGREEN);
+00467     \textcolor{keywordflow}{else}
+00468         lblVCO_CMPLO->SetBackgroundColour(*wxRED);
+00469 \}
+00470 
+00471 \textcolor{keywordtype}{void} lms7002_pnlSX_view::OnbtnChangeRefClkClick( wxCommandEvent& event )
+00472 \{
+00473     assert(lmsControl != \textcolor{keyword}{nullptr});
+00474     wxTextEntryDialog *dlg = \textcolor{keyword}{new} wxTextEntryDialog(\textcolor{keyword}{this}, \_(\textcolor{stringliteral}{"Enter reference clock, MHz"}), \_(\textcolor{stringliteral}{"Reference
+       clock"}));
+00475     \textcolor{keywordtype}{double} refClkMHz;
+00476     dlg->SetTextValidator(wxFILTER\_NUMERIC);
+00477     uint16\_t ch;
+00478     LMS_ReadParam(lmsControl,LMS7param(MAC),&ch);
+00479     \textcolor{keyword}{const} \textcolor{keyword}{auto} isTx = (ch == 2)? \textcolor{keyword}{true} : \textcolor{keyword}{false};
+00480     \textcolor{keywordtype}{double} freq;
+00481     LMS_GetClockFreq(lmsControl,LMS_CLOCK_REF,&freq);
+00482     dlg->SetValue(wxString::Format(\_(\textcolor{stringliteral}{"%f"}), freq/1e6));
+00483     \textcolor{keywordflow}{if} (dlg->ShowModal() == wxID\_OK)
+00484     \{
+00485         dlg->GetValue().ToDouble(&refClkMHz);
+00486         \textcolor{keywordflow}{if} (refClkMHz != 0)
+00487         \{
+00488             \textcolor{keywordtype}{double} currentFreq\_MHz;
+00489             txtFrequency->GetValue().ToDouble(&currentFreq\_MHz);
+00490             LMS_SetClockFreq(lmsControl,LMS_CLOCK_REF,refClkMHz * 1e6);
+00491             \textcolor{keywordtype}{int} status = LMS_SetClockFreq(lmsControl, isTx ? LMS_CLOCK_SXT : 
+      LMS_CLOCK_SXR,currentFreq\_MHz * 1e6);
+00492             \textcolor{keywordflow}{if} (status != 0)
+00493                 wxMessageBox(\_(\textcolor{stringliteral}{"Set SX frequency failed"}));
+00494             UpdateGUI();
+00495         \}
+00496     \}
+00497 \}
+00498 
+00499 \textcolor{keywordtype}{void} lms7002_pnlSX_view::OnbtnCalculateClick( wxCommandEvent& event )
+00500 \{
+00501     assert(lmsControl != \textcolor{keyword}{nullptr});
+00502     \textcolor{keywordtype}{double} freqMHz;
+00503     txtFrequency->GetValue().ToDouble(&freqMHz);
+00504     uint16\_t ch;
+00505     LMS_ReadParam(lmsControl,LMS7param(MAC),&ch);
+00506     \textcolor{keyword}{const} \textcolor{keyword}{auto} isTx = (ch == 2)? \textcolor{keyword}{true} : \textcolor{keyword}{false};
+00507     \textcolor{keywordtype}{double} RefClkMHz;
+00508     lblRefClk_MHz->GetLabel().ToDouble(&RefClkMHz);
+00509     LMS_SetClockFreq(lmsControl,LMS_CLOCK_REF,RefClkMHz * 1e6);
+00510 
+00511     \textcolor{keywordtype}{double} BWMHz;
+00512     txtRefSpurBW->GetValue().ToDouble(&BWMHz);
+00513     \textcolor{keywordtype}{int} status;
+00514     LMS7002M* lms = ((LMS7_Device*)lmsControl)->GetLMS();
+00515     \textcolor{keywordflow}{if}(chkEnableRefSpurCancelation->IsChecked())
+00516         status = lms->SetFrequencySXWithSpurCancelation(isTx,freqMHz * 1e6, BWMHz*1e6);
+00517     \textcolor{keywordflow}{else}
+00518         status = lms->SetFrequencySX(isTx,freqMHz * 1e6);
+00519 
+00520     \textcolor{keywordflow}{if} (status != 0)
+00521         wxMessageBox(\_(\textcolor{stringliteral}{"Set SX frequency failed"}));
+00522     \textcolor{keywordflow}{else}
+00523     \{
+00524         wxCommandEvent evt;
+00525         evt.SetEventType(LOG\_MESSAGE);
+00526         evt.SetInt(lime::LOG_LEVEL_INFO);
+00527         wxString msg;
+00528         \textcolor{keywordflow}{if} (ch == 1)
+00529             msg = \_(\textcolor{stringliteral}{"SXR"});
+00530         \textcolor{keywordflow}{else}
+00531             msg = \_(\textcolor{stringliteral}{"SXT"});
+00532         msg += wxString::Format(\_(\textcolor{stringliteral}{" frequency set to %f MHz"}), freqMHz);
+00533         evt.SetString(msg);
+00534         wxPostEvent(\textcolor{keyword}{this}, evt);
+00535     \}
+00536     UpdateGUI();
+00537 \}
+00538 
+00539 \textcolor{keywordtype}{void} lms7002_pnlSX_view::OnbtnTuneClick( wxCommandEvent& event )
+00540 \{
+00541     assert(lmsControl != \textcolor{keyword}{nullptr});
+00542     uint16\_t ch;
+00543     LMS_ReadParam(lmsControl,LMS7param(MAC),&ch);
+00544     \textcolor{keywordtype}{int} status = LMS_SetClockFreq(lmsControl,ch == 2 ? LMS_CLOCK_SXT : 
+      LMS_CLOCK_SXR,-1); \textcolor{comment}{//Tune}
+00545     \textcolor{keywordflow}{if} (status != 0)
+00546         wxMessageBox(wxString::Format(\_(\textcolor{stringliteral}{"SX VCO Tune Failed"})));
+00547     UpdateGUI();
+00548 \}
+00549 
+00550 \textcolor{keywordtype}{void} lms7002_pnlSX_view::UpdateGUI()
+00551 \{
+00552     assert(lmsControl != \textcolor{keyword}{nullptr});
+00553 
+00554     LMS7002_WXGUI::UpdateControlsByMap(\textcolor{keyword}{this}, lmsControl, wndId2Enum);
+00555     uint16\_t ch;
+00556     LMS_ReadParam(lmsControl,LMS7param(MAC),&ch);
+00557     \textcolor{keyword}{const} \textcolor{keyword}{auto} isTx = (ch == 2)? \textcolor{keyword}{true} : \textcolor{keyword}{false};
+00558     \textcolor{keywordtype}{double} freq;
+00559     LMS_GetClockFreq(lmsControl,LMS_CLOCK_REF,&freq);
+00560     lblRefClk_MHz->SetLabel(wxString::Format(\_(\textcolor{stringliteral}{"%.3f"}), freq / 1e6));
+00561     LMS_GetClockFreq(lmsControl,isTx ? LMS_CLOCK_SXT: LMS_CLOCK_SXR,&freq);
+00562     lblRealOutFrequency->SetLabel(wxString::Format(\_(\textcolor{stringliteral}{"%.3f"}), freq / 1e6));
+00563     \textcolor{keywordflow}{if}(chkEnableRefSpurCancelation->IsChecked())
+00564     \{
+00565         uint16\_t downconvert = 0;
+00566         LMS_ReadParam(lmsControl, LMS7param(CMIX_SC_RXTSP), &downconvert);
+00567         \textcolor{keywordtype}{double}* freqNCO = \textcolor{keyword}{new} \textcolor{keywordtype}{double}[16];
+00568         \textcolor{keywordtype}{double} PHO;
+00569         LMS_GetNCOFrequency(lmsControl, \textcolor{keyword}{false}, 0, freqNCO, &PHO);
+00570         \textcolor{keywordflow}{if}(downconvert)
+00571             freq += freqNCO[15];
+00572         \textcolor{keywordflow}{else}
+00573             freq -= freqNCO[15];
+00574         \textcolor{keyword}{delete}[] freqNCO;
+00575     \}
+00576     txtFrequency->SetValue(wxString::Format(\_(\textcolor{stringliteral}{"%.3f"}), freq / 1e6));
+00577     uint16\_t div;
+00578     LMS_ReadParam(lmsControl,LMS7param(DIV_LOCH),&div);
+00579     lblDivider->SetLabel(wxString::Format(\textcolor{stringliteral}{"2^%i"}, div));
+00580 
+00581     uint16\_t value;
+00582     LMS_ReadParam(lmsControl,LMS7param(FRAC\_SDM\_MSB),&value);
+00583     \textcolor{keywordtype}{int} fracValue = value << 16;
+00584     LMS_ReadParam(lmsControl,LMS7param(FRAC\_SDM\_LSB),&value);
+00585     fracValue |= value;
+00586     lblFRAC_SDM->SetLabel(wxString::Format(\textcolor{stringliteral}{"%i"}, fracValue));
+00587 
+00588     \textcolor{comment}{//check if B channel is enabled}
+00589     LMS_ReadParam(lmsControl,LMS7param(MAC),&ch);
+00590     \textcolor{keywordflow}{if} (ch >= 2)
+00591     \{
+00592         LMS_ReadParam(lmsControl,LMS7param(MIMO_SISO),&ch);
+00593         \textcolor{keywordflow}{if} (ch != 0)
+00594         \{
+00595             wxMessageBox(\_(\textcolor{stringliteral}{"MIMO channel B is disabled"}), \_(\textcolor{stringliteral}{"Warning"}));
+00596             \textcolor{keywordflow}{return};
+00597         \}
+00598     \}
+00599     \textcolor{keywordflow}{if}(ch == 1)
+00600         chkPD_LOCH_T2RBUF->Hide();
+00601     \textcolor{keywordflow}{else}
+00602         chkPD_LOCH_T2RBUF->Show();
+00603 
+00604     wxCommandEvent evt;
+00605     OnbtnReadComparators(evt);
+00606 \}
+00607 
+00608 \textcolor{keywordtype}{void} lms7002_pnlSX_view::OnShowVCOclicked(wxCommandEvent& event)
+00609 \{
+00610     lms7002_dlgVCOfrequencies* dlg = \textcolor{keyword}{new} lms7002_dlgVCOfrequencies(\textcolor{keyword}{this}, 
+      lmsControl);
+00611     dlg->ShowModal();
+00612     dlg->Destroy();
+00613 \}
+00614 
+00615 \textcolor{keywordtype}{void} lms7002_pnlSX_view::OnEnableRefSpurCancelation(wxCommandEvent& event)
+00616 \{
+00617     txtRefSpurBW->Enable(chkEnableRefSpurCancelation->IsChecked());
+00618     uint16\_t ch = 0;
+00619     LMS_ReadParam(lmsControl, LMS7param(MAC), &ch);
+00620     \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} i=0; i<2; ++i)
+00621     \{
+00622         LMS_WriteParam(lmsControl, LMS7param(MAC), i+1);
+00623         LMS_WriteParam(lmsControl, LMS7param(CMIX_GAIN_RXTSP), 1);
+00624         LMS_WriteParam(lmsControl, LMS7param(CMIX_BYP_RXTSP), 0);
+00625         \textcolor{keywordflow}{if}(chkEnableRefSpurCancelation->IsChecked())
+00626         \{
+00627             LMS_WriteParam(lmsControl, LMS7param(SEL_RX), 15);
+00628         \}
+00629         \textcolor{keywordflow}{else}
+00630         \{
+00631             LMS_WriteParam(lmsControl, LMS7param(SEL_RX), 14);
+00632         \}
+00633     \}
+00634     LMS_WriteParam(lmsControl, LMS7param(MAC), ch);
+00635     UpdateGUI();
+00636 \}
+\end{DoxyCode}

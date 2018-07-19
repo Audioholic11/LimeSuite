@@ -1,0 +1,425 @@
+\subsection{L\+M\+S7002\+M\+\_\+\+Rx\+Tx\+Calibrations.\+cpp}
+\label{LMS7002M__RxTxCalibrations_8cpp_source}\index{/home/erik/prefix/default/src/limesuite-\/dev/src/lms7002m/\+L\+M\+S7002\+M\+\_\+\+Rx\+Tx\+Calibrations.\+cpp@{/home/erik/prefix/default/src/limesuite-\/dev/src/lms7002m/\+L\+M\+S7002\+M\+\_\+\+Rx\+Tx\+Calibrations.\+cpp}}
+
+\begin{DoxyCode}
+00001 \textcolor{preprocessor}{#include "LMS7002M.h"}
+00002 \textcolor{preprocessor}{#include <assert.h>}
+00003 \textcolor{preprocessor}{#include "MCU_BD.h"}
+00004 \textcolor{preprocessor}{#include "IConnection.h"}
+00005 \textcolor{preprocessor}{#include "mcu_programs.h"}
+00006 \textcolor{preprocessor}{#include <chrono>}
+00007 \textcolor{preprocessor}{#include <thread>}
+00008 \textcolor{preprocessor}{#include "Logger.h"}
+00009 \textcolor{preprocessor}{#include "LMSBoards.h"}
+00010 
+00011 \textcolor{preprocessor}{#ifndef NDEBUG}
+00012 \textcolor{preprocessor}{#define LMS\_VERBOSE\_OUTPUT}
+00013 \textcolor{preprocessor}{#endif}
+00014 
+00015 \textcolor{preprocessor}{#ifdef LMS\_VERBOSE\_OUTPUT}
+00016 \textcolor{keyword}{static} \textcolor{keyword}{const} \textcolor{keywordtype}{bool} verboseEnabled = \textcolor{keyword}{true};
+00017 \textcolor{preprocessor}{#else}
+00018 \textcolor{keyword}{static} \textcolor{keyword}{const} \textcolor{keywordtype}{bool} verboseEnabled = \textcolor{keyword}{false};
+00019 \textcolor{preprocessor}{#endif}
+00020 
+00021 \textcolor{keyword}{using namespace }std;
+00022 \textcolor{keyword}{using namespace }lime;
+00023 
+00024 \textcolor{keyword}{class }BoardLoopbackStore
+00025 \{
+00026 \textcolor{keyword}{public}:
+00027     BoardLoopbackStore(lime::IConnection* port) : port(port)
+00028     \{
+00029         \textcolor{keywordflow}{if}(port && port->ReadRegister(LoopbackCtrAddr, mLoopbackState) != 0)
+00030             lime::ReportError(-1, \textcolor{stringliteral}{"Failed to read Loopback controls"});
+00031     \}
+00032     ~BoardLoopbackStore()
+00033     \{
+00034         \textcolor{keywordflow}{if}(port && port->WriteRegister(LoopbackCtrAddr, mLoopbackState) != 0)
+00035             lime::ReportError(-1, \textcolor{stringliteral}{"Failed to restore Loopback controls"});
+00036     \}
+00037 \textcolor{keyword}{private}:
+00038     lime::IConnection* port;
+00039     \textcolor{keyword}{static} \textcolor{keyword}{const} uint32\_t LoopbackCtrAddr = 0x0017;
+00040     \textcolor{keywordtype}{int} mLoopbackState;
+00041 \};
+00042 
+00043 \textcolor{keyword}{static} uint8\_t GetExtLoopPair(lime::LMS7002M &ctr, \textcolor{keywordtype}{bool} calibratingTx)
+00044 \{
+00045     uint8\_t loopPair = 0;
+00046     lime::IConnection* port = ctr.GetConnection();
+00047     \textcolor{keywordflow}{if}(!port)
+00048         \textcolor{keywordflow}{return} 0;
+00049 
+00050     \textcolor{keyword}{auto} devName = port->GetDeviceInfo().deviceName;
+00051     uint8\_t activeLNA = ctr.Get_SPI_Reg_bits(LMS7_SEL_PATH_RFE);
+00052     uint8\_t activeBand = (ctr.Get_SPI_Reg_bits(LMS7_SEL_BAND2_TRF) << 1 | ctr.
+      Get_SPI_Reg_bits(LMS7_SEL_BAND1_TRF))-1;
+00053 
+00054     \textcolor{keywordflow}{if}(devName == lime::GetDeviceName(lime::LMS_DEV_LIMESDR))
+00055         loopPair = 1 << 2 | 0x1; \textcolor{comment}{// band2 -> LNAH}
+00056     \textcolor{keywordflow}{else} \textcolor{keywordflow}{if}(devName == lime::GetDeviceName(lime::LMS_DEV_LIMESDRMINI))
+00057         loopPair = activeBand << 2 | activeLNA;
+00058     \textcolor{keywordflow}{return} loopPair;
+00059 \}
+00060 
+00064 \textcolor{keyword}{static} \textcolor{keyword}{inline} int16\_t signextIqCorr(\textcolor{keyword}{const} uint16\_t regVal)
+00065 \{
+00066     int16\_t signedPhase = int16\_t(regVal << 4);
+00067     \textcolor{keywordflow}{return} int16\_t(signedPhase) >> 4;
+00068 \}
+00069 
+00070 \textcolor{keyword}{const} \textcolor{keywordtype}{double} TrxCalib_RF_LimitLow = 2.5e6;
+00071 \textcolor{keyword}{const} \textcolor{keywordtype}{double} TrxCalib_RF_LimitHigh = 120e6;
+00072 
+00073 \textcolor{keyword}{static} \textcolor{keyword}{const} \textcolor{keywordtype}{char} cSquaresLine[] =
+00074     \textcolor{stringliteral}{"############################################################\(\backslash\)n"};
+00075 \textcolor{keyword}{static} \textcolor{keyword}{const} \textcolor{keywordtype}{char} cDashLine[] =
+00076     \textcolor{stringliteral}{"------------------------------------------------------------\(\backslash\)n"};
+00077 
+00078 \textcolor{preprocessor}{#define verbose\_printf(...) \(\backslash\)}
+00079 \textcolor{preprocessor}{    do \{ if (verboseEnabled) \{\(\backslash\)}
+00080 \textcolor{preprocessor}{        fprintf(stderr, \_\_VA\_ARGS\_\_);\(\backslash\)}
+00081 \textcolor{preprocessor}{    \}\} while (0)}
+00082 
+00083 \textcolor{keyword}{static} \textcolor{keywordtype}{void} WriteAnalogDC(lime::LMS7002M* lmsControl, \textcolor{keyword}{const} LMS7Parameter& param, \textcolor{keywordtype}{int} value)
+00084 \{
+00085     uint16\_t mask = param.address < 0x05C7 ? 0x03FF : 0x003F;
+00086     int16\_t regValue = 0;
+00087     \textcolor{keywordflow}{if}(value < 0)
+00088     \{
+00089         regValue |= (mask+1);
+00090         regValue |= (abs(value+mask) & mask);
+00091     \}
+00092     \textcolor{keywordflow}{else}
+00093         regValue |= (abs(value+mask+1) & mask);
+00094     lmsControl->SPI_write(param.address, regValue);
+00095     lmsControl->SPI_write(param.address, regValue | 0x8000);
+00096 \}
+00097 
+00098 \textcolor{keyword}{static} int16\_t ReadAnalogDC(lime::LMS7002M* lmsControl, \textcolor{keyword}{const} LMS7Parameter& param)
+00099 \{
+00100     uint16\_t mask = param.address < 0x05C7 ? 0x03FF : 0x003F;
+00101 
+00102     lmsControl->SPI_write(param.address, 0);
+00103     lmsControl->SPI_write(param.address, 0x4000);
+00104     uint16\_t value = lmsControl->SPI_read(param.address, \textcolor{keyword}{true});
+00105     lmsControl->SPI_write(param.address, value & ~0xC000);
+00106     int16\_t result = (value & mask);
+00107     \textcolor{keywordflow}{if}(value& (mask+1))
+00108         result *= -1;
+00109     \textcolor{keywordflow}{return} result;
+00110 \}
+00111 
+00112 \textcolor{keyword}{static} \textcolor{keywordtype}{int} SetExtLoopback(IConnection* port, uint8\_t ch, \textcolor{keywordtype}{bool} enable, \textcolor{keywordtype}{bool} tx)
+00113 \{
+00114     \textcolor{comment}{//enable external loopback switches}
+00115     \textcolor{keyword}{const} uint32\_t LoopbackCtrAddr = 0x0017;
+00116     uint32\_t value = 0;
+00117     \textcolor{keywordtype}{int} status;
+00118     status = port->ReadRegister(LoopbackCtrAddr, value);
+00119     \textcolor{keywordflow}{if}(status != 0)
+00120         \textcolor{keywordflow}{return} -1;
+00121     \textcolor{keyword}{auto} devName = port->GetDeviceInfo().deviceName;
+00122 
+00123     \textcolor{keywordflow}{if}(devName == lime::GetDeviceName(lime::LMS_DEV_LIMESDR))
+00124     \{
+00125         \textcolor{keyword}{const} uint16\_t mask = 0x7;
+00126         \textcolor{keyword}{const} uint8\_t shiftCount = (ch==2 ? 4 : 0);
+00127         value &= ~(mask << shiftCount);
+00128         value |= enable << shiftCount;   \textcolor{comment}{//EN\_Loopback}
+00129         value |= enable << (shiftCount+1); \textcolor{comment}{//EN\_Attenuator}
+00130         value |= !enable << (shiftCount+2); \textcolor{comment}{//EN\_Shunt}
+00131     \}
+00132     \textcolor{keywordflow}{else} \textcolor{keywordflow}{if} (devName == lime::GetDeviceName(lime::LMS_DEV_LIMESDRMINI))
+00133     \{
+00134         \textcolor{comment}{//EN\_Shunt}
+00135         value &= ~(1 << 2);
+00136         value |= !enable << 2;
+00137 
+00138         \textcolor{keywordflow}{if}(tx)
+00139         \{
+00140             uint32\_t wr = 0x0103 << 16;
+00141             uint32\_t path;
+00142             port->ReadLMS7002MSPI(&wr, &path, 1);
+00143             path >>= 10;
+00144             path &= 0x3;
+00145             \textcolor{keywordflow}{if} (path==1)
+00146             \{
+00147                 value &= ~(1<<13);
+00148                 value |= 1<<12;
+00149 
+00150                 value &= ~(1<<8); \textcolor{comment}{//LNA\_H}
+00151                 value |= 1<<9;
+00152             \}
+00153             \textcolor{keywordflow}{else} \textcolor{keywordflow}{if} (path==2)
+00154             \{
+00155                 value &= ~(1<<12);
+00156                 value |= 1<<13;
+00157 
+00158                 value &= ~(1<<9); \textcolor{comment}{//LNA\_W}
+00159                 value |= 1<<8;
+00160             \}
+00161             \textcolor{comment}{//value |= enable << 1; //EN\_Attenuator}
+00162         \}
+00163         \textcolor{keywordflow}{else}
+00164         \{
+00165             uint32\_t wr = 0x010D << 16;
+00166             uint32\_t path;
+00167             port->ReadLMS7002MSPI(&wr, &path, 1);
+00168             path &= ~0x0180;
+00169             path >>= 7;
+00170             \textcolor{keywordflow}{if} (path==1)
+00171             \{
+00172                 value &= ~(1<<8);
+00173                 value |= 1<<9;
+00174             \}
+00175             \textcolor{keywordflow}{else} \textcolor{keywordflow}{if} (path==3)
+00176             \{
+00177                 value &= ~(1<<9);
+00178                 value |= 1<<8;
+00179             \}
+00180         \}
+00181     \}
+00182     status = port->WriteRegister(LoopbackCtrAddr, value);
+00183     \textcolor{keywordflow}{if}(status != 0)
+00184         \textcolor{keywordflow}{return} ReportError(status, \textcolor{stringliteral}{"Failed to enable external loopback"});
+00185     \textcolor{keywordflow}{return} status;
+00186 \}
+00187 
+00190 uint32\_t LMS7002M::GetRSSI(RSSI_measurements *measurements)
+00191 \{
+00192     \textcolor{comment}{//delay to make sure RSSI gets enough samples to refresh before reading it}
+00193     this\_thread::sleep\_for(chrono::microseconds(50));
+00194     Modify_SPI_Reg_bits(LMS7_CAPTURE, 0);
+00195     Modify_SPI_Reg_bits(LMS7_CAPTURE, 1);
+00196     uint32\_t rssi = (Get_SPI_Reg_bits(0x040F, 15, 0, \textcolor{keyword}{true}) << 2) | 
+      Get_SPI_Reg_bits(0x040E, 1, 0, \textcolor{keyword}{true});
+00197     \textcolor{keywordflow}{return} rssi;
+00198 \}
+00199 
+00203 \textcolor{keywordtype}{int} LMS7002M::CalibrateTx(float_type bandwidth\_Hz, \textcolor{keywordtype}{bool} useExtLoopback)
+00204 \{
+00205     \textcolor{keywordflow}{if} (TrxCalib_RF_LimitLow > bandwidth\_Hz || bandwidth\_Hz > 
+      TrxCalib_RF_LimitHigh)
+00206         \textcolor{keywordflow}{return} ReportError(ERANGE, \textcolor{stringliteral}{"Tx Calibration: Frequency out of range, available range: %g-%g MHz"}, 
+      TrxCalib_RF_LimitLow / 1e6, TrxCalib_RF_LimitHigh / 1e6);
+00207     \textcolor{keywordflow}{if}(controlPort == \textcolor{keyword}{nullptr})
+00208         \textcolor{keywordflow}{return} ReportError(EINVAL, \textcolor{stringliteral}{"Tx Calibration: Device not connected"});
+00209 \textcolor{preprocessor}{#ifdef LMS\_VERBOSE\_OUTPUT}
+00210     \textcolor{keyword}{auto} beginTime = std::chrono::high\_resolution\_clock::now();
+00211 \textcolor{preprocessor}{#endif}
+00212     \textcolor{keywordtype}{int} status;
+00213     uint8\_t ch = (uint8\_t)Get_SPI_Reg_bits(LMS7_MAC);
+00214     \textcolor{keywordflow}{if}(ch == 0 || ch == 3)
+00215         \textcolor{keywordflow}{return} ReportError(EINVAL, \textcolor{stringliteral}{"Tx Calibration: Incorrect channel selection MAC %i"}, ch);
+00216 
+00217     \textcolor{comment}{//caching variables}
+00218     DeviceInfo info = controlPort->GetDeviceInfo();
+00219     \textcolor{keywordtype}{double} txFreq = GetFrequencySX(LMS7002M::Tx);
+00220     uint8\_t channel = ch == 1 ? 0 : 1;
+00221     \textcolor{keywordtype}{int} band = Get_SPI_Reg_bits(LMS7_SEL_BAND1_TRF) ? 0 : 1;
+00222 
+00223     \textcolor{keywordtype}{int} dccorri(0), dccorrq(0), gcorri(0), gcorrq(0),phaseOffset(0);
+00224     verbose_printf(\textcolor{stringliteral}{"Tx calibration using MCU %s loopback\(\backslash\)n"},
+00225                     useExtLoopback ? \textcolor{stringliteral}{"EXTERNAL"} : \textcolor{stringliteral}{"INTERNAL"});
+00226     verbose_printf(\textcolor{stringliteral}{"Tx ch.%s @ %4g MHz, BW: %g MHz, RF output: %s, Gain: %i\(\backslash\)n"},
+00227                     channel ? \textcolor{stringliteral}{"B"} : \textcolor{stringliteral}{"A"},
+00228                     txFreq/1e6,
+00229                     bandwidth\_Hz/1e6,
+00230                     band ? \textcolor{stringliteral}{"BAND2"} : \textcolor{stringliteral}{"BAND1"},
+00231                     Get_SPI_Reg_bits(LMS7_CG_IAMP_TBB));
+00232 
+00233     uint8\_t mcuID = mcuControl->ReadMCUProgramID();
+00234     verbose_printf(\textcolor{stringliteral}{"Current MCU firmware: %i, %s\(\backslash\)n"}, mcuID,
+00235         mcuID == MCU_ID_CALIBRATIONS_SINGLE_IMAGE ? \textcolor{stringliteral}{"DC/IQ calibration full"}:\textcolor{stringliteral}{"unknown"});
+00236     \textcolor{keywordflow}{if}(mcuID != MCU_ID_CALIBRATIONS_SINGLE_IMAGE)
+00237     \{
+00238         verbose_printf(\textcolor{stringliteral}{"Uploading DC/IQ calibration firmware\(\backslash\)n"});
+00239         status = mcuControl->Program\_MCU(mcu_program_lms7_dc_iq_calibration_bin, 
+      IConnection::MCU\_PROG\_MODE::SRAM);
+00240         \textcolor{keywordflow}{if}(status != 0)
+00241             \textcolor{keywordflow}{return} status;
+00242     \}
+00243 
+00244     \textcolor{comment}{//set reference clock parameter inside MCU}
+00245     \textcolor{keywordtype}{long} refClk = GetReferenceClk\_SX(\textcolor{keyword}{false});
+00246     mcuControl->SetParameter(MCU_BD::MCU_REF_CLK, refClk);
+00247     verbose_printf(\textcolor{stringliteral}{"MCU Ref. clock: %g MHz\(\backslash\)n"}, refClk / 1e6);
+00248     \textcolor{comment}{//Tx Rx separation bandwidth while calibrating}
+00249     mcuControl->SetParameter(MCU_BD::MCU_BW, bandwidth\_Hz);
+00250 
+00251     \{
+00252         BoardLoopbackStore onBoardLoopbackRestoration(GetConnection());
+00253         \textcolor{keywordflow}{if}(useExtLoopback)
+00254         \{
+00255             status = SetExtLoopback(controlPort, ch, \textcolor{keyword}{true}, \textcolor{keyword}{true});
+00256             \textcolor{keywordflow}{if}(status != 0)
+00257                 \textcolor{keywordflow}{return} ReportError(EINVAL, \textcolor{stringliteral}{"Tx Calibration: Failed to enable external loopback"});
+00258             uint8\_t loopPair = GetExtLoopPair(*\textcolor{keyword}{this}, \textcolor{keyword}{true});
+00259             mcuControl->SetParameter(MCU_BD::MCU_EXT_LOOPBACK_PAIR, loopPair);
+00260         \}
+00261         mcuControl->RunProcedure(useExtLoopback ? 
+      MCU_FUNCTION_CALIBRATE_TX_EXTLOOPB : MCU_FUNCTION_CALIBRATE_TX);
+00262         status = mcuControl->WaitForMCU(1000);
+00263         \textcolor{keywordflow}{if}(status != MCU_BD::MCU_NO_ERROR)
+00264             \textcolor{keywordflow}{return} ReportError(EINVAL, \textcolor{stringliteral}{"Tx Calibration: MCU error %i (%s)"}, status, 
+      MCU\_BD::MCUStatusMessage(status));
+00265     \}
+00266 
+00267     \textcolor{comment}{//sync registers to cache}
+00268     \textcolor{keyword}{const} std::vector<uint16\_t> regsToSync = \{0x0208, 0x05C0\};
+00269     \textcolor{keywordflow}{for}(\textcolor{keyword}{const} \textcolor{keyword}{auto} addr : regsToSync)
+00270         this->SPI_read(addr, \textcolor{keyword}{true});
+00271 
+00272     \textcolor{comment}{//need to read back calibration results}
+00273     dccorri = ReadAnalogDC(\textcolor{keyword}{this}, channel ? LMS7_DC_TXBI : LMS7_DC_TXAI);
+00274     dccorrq = ReadAnalogDC(\textcolor{keyword}{this}, channel ? LMS7_DC_TXBQ : LMS7_DC_TXAQ);
+00275     gcorri = Get_SPI_Reg_bits(LMS7_GCORRI_TXTSP, \textcolor{keyword}{true});
+00276     gcorrq = Get_SPI_Reg_bits(LMS7_GCORRQ_TXTSP, \textcolor{keyword}{true});
+00277     phaseOffset = signextIqCorr(Get_SPI_Reg_bits(LMS7_IQCORR_TXTSP, \textcolor{keyword}{true}));
+00278 
+00279     Log(\textcolor{stringliteral}{"Tx calibration finished"}, LOG\_INFO);
+00280 \textcolor{preprocessor}{#ifdef LMS\_VERBOSE\_OUTPUT}
+00281     verbose_printf(\textcolor{stringliteral}{"Tx | DC  | GAIN | PHASE\(\backslash\)n"});
+00282     verbose_printf(\textcolor{stringliteral}{"---+-----+------+------\(\backslash\)n"});
+00283     verbose_printf(\textcolor{stringliteral}{"I: | %3i | %4i | %i\(\backslash\)n"}, dccorri, gcorri, phaseOffset);
+00284     verbose_printf(\textcolor{stringliteral}{"Q: | %3i | %4i |\(\backslash\)n"}, dccorrq, gcorrq);
+00285     int32\_t duration = std::chrono::duration\_cast<std::chrono::milliseconds>
+00286         (std::chrono::high\_resolution\_clock::now()-beginTime).count();
+00287     verbose_printf(\textcolor{stringliteral}{"Duration: %i ms\(\backslash\)n"}, duration);
+00288 \textcolor{preprocessor}{#endif //LMS\_VERBOSE\_OUTPUT}
+00289     \textcolor{keywordflow}{return} 0;
+00290 \}
+00291 
+00295 \textcolor{keywordtype}{int} LMS7002M::CalibrateRx(float_type bandwidth\_Hz, \textcolor{keywordtype}{bool} useExtLoopback)
+00296 \{
+00297     \textcolor{keywordflow}{if} (TrxCalib_RF_LimitLow > bandwidth\_Hz || bandwidth\_Hz > 
+      TrxCalib_RF_LimitHigh)
+00298         \textcolor{keywordflow}{return} ReportError(ERANGE, \textcolor{stringliteral}{"Rx Calibration: Frequency out of range, available range: from %g to %g
+       MHz"}, TrxCalib_RF_LimitLow / 1e6, TrxCalib_RF_LimitHigh / 1e6);
+00299     \textcolor{keywordflow}{if}(controlPort == \textcolor{keyword}{nullptr})
+00300         \textcolor{keywordflow}{return} ReportError(ENODEV, \textcolor{stringliteral}{"Rx Calibration: Device not connected"});
+00301 \textcolor{preprocessor}{#ifdef LMS\_VERBOSE\_OUTPUT}
+00302     \textcolor{keyword}{auto} beginTime = std::chrono::high\_resolution\_clock::now();
+00303 \textcolor{preprocessor}{#endif}
+00304 
+00305     DeviceInfo info = controlPort->GetDeviceInfo();
+00306     \textcolor{keywordtype}{int} status;
+00307     uint8\_t ch = (uint8\_t)Get_SPI_Reg_bits(LMS7_MAC);
+00308     \textcolor{keywordflow}{if}(ch == 0 || ch == 3)
+00309         \textcolor{keywordflow}{return} ReportError(EINVAL, \textcolor{stringliteral}{"Rx Calibration: Incorrect channel selection MAC %i"}, ch);
+00310     uint8\_t channel = ch == 1 ? 0 : 1;
+00311     uint8\_t lna = (uint8\_t)Get_SPI_Reg_bits(LMS7_SEL_PATH_RFE);
+00312     \textcolor{keywordtype}{double} rxFreq = GetFrequencySX(LMS7002M::Rx);
+00313 
+00314     \textcolor{keyword}{const} \textcolor{keywordtype}{char}* lnaName;
+00315     \textcolor{keywordflow}{switch}(lna)
+00316     \{
+00317         \textcolor{keywordflow}{case} 0: lnaName = \textcolor{stringliteral}{"none"}; \textcolor{keywordflow}{break};
+00318         \textcolor{keywordflow}{case} 1: lnaName = \textcolor{stringliteral}{"LNAH"}; \textcolor{keywordflow}{break};
+00319         \textcolor{keywordflow}{case} 2: lnaName = \textcolor{stringliteral}{"LNAL"}; \textcolor{keywordflow}{break};
+00320         \textcolor{keywordflow}{case} 3: lnaName = \textcolor{stringliteral}{"LNAW"}; \textcolor{keywordflow}{break};
+00321         \textcolor{keywordflow}{default}: lnaName = \textcolor{stringliteral}{"none"}; \textcolor{keywordflow}{break};
+00322     \}
+00323     verbose_printf(\textcolor{stringliteral}{"Rx calibration using %s loopback\(\backslash\)n"},
+00324         (useExtLoopback ? \textcolor{stringliteral}{"EXTERNAL"} : \textcolor{stringliteral}{"INTERNAL"}));
+00325     verbose_printf(\textcolor{stringliteral}{"Rx ch.%s @ %4g MHz, BW: %g MHz, RF input: %s, PGA: %i, LNA: %i, TIA: %i\(\backslash\)n"},
+00326                 ch == Channel::ChA ? \textcolor{stringliteral}{"A"} : \textcolor{stringliteral}{"B"}, rxFreq/1e6,
+00327                 bandwidth\_Hz/1e6, lnaName,
+00328                 Get_SPI_Reg_bits(LMS7_G_PGA_RBB),
+00329                 Get_SPI_Reg_bits(LMS7_G_LNA_RFE),
+00330                 Get_SPI_Reg_bits(LMS7_G_TIA_RFE));
+00331 
+00332     \textcolor{keywordtype}{int} dcoffi(0), dcoffq(0), gcorri(0), gcorrq(0), phaseOffset(0);
+00333     \textcolor{comment}{//check if MCU has correct firmware}
+00334     uint8\_t mcuID = mcuControl->ReadMCUProgramID();
+00335     verbose_printf(\textcolor{stringliteral}{"Current MCU firmware: %i, %s\(\backslash\)n"}, mcuID,
+00336         mcuID == MCU_ID_CALIBRATIONS_SINGLE_IMAGE ? \textcolor{stringliteral}{"DC/IQ calibration full"} : \textcolor{stringliteral}{"unknown"});
+00337     \textcolor{keywordflow}{if}(mcuID != MCU_ID_CALIBRATIONS_SINGLE_IMAGE)
+00338     \{
+00339         verbose_printf(\textcolor{stringliteral}{"Uploading DC/IQ calibration firmware\(\backslash\)n"});
+00340         status = mcuControl->Program\_MCU(mcu_program_lms7_dc_iq_calibration_bin, 
+      IConnection::MCU\_PROG\_MODE::SRAM);
+00341         \textcolor{keywordflow}{if}(status != 0)
+00342             \textcolor{keywordflow}{return} status;
+00343     \}
+00344 
+00345     \textcolor{comment}{//set reference clock parameter inside MCU}
+00346     \textcolor{keywordtype}{long} refClk = GetReferenceClk\_SX(\textcolor{keyword}{false});
+00347     mcuControl->SetParameter(MCU_BD::MCU_REF_CLK, refClk);
+00348     verbose_printf(\textcolor{stringliteral}{"MCU Ref. clock: %g MHz\(\backslash\)n"}, refClk / 1e6);
+00349     \textcolor{comment}{//Tx Rx separation bandwidth while calibrating}
+00350     mcuControl->SetParameter(MCU_BD::MCU_BW, bandwidth\_Hz);
+00351 
+00352     \{
+00353         BoardLoopbackStore onBoardLoopbackRestoration(GetConnection());
+00354         \textcolor{keywordflow}{if}(useExtLoopback)
+00355         \{
+00356             status = SetExtLoopback(controlPort, ch, \textcolor{keyword}{true}, \textcolor{keyword}{false});
+00357             \textcolor{keywordflow}{if}(status != 0)
+00358                 \textcolor{keywordflow}{return} ReportError(EINVAL, \textcolor{stringliteral}{"Rx Calibration: Failed to enable external loopback"});
+00359             uint8\_t loopPair = GetExtLoopPair(*\textcolor{keyword}{this}, \textcolor{keyword}{false});
+00360             mcuControl->SetParameter(MCU_BD::MCU_EXT_LOOPBACK_PAIR, loopPair);
+00361         \}
+00362 
+00363         mcuControl->RunProcedure(useExtLoopback ? 
+      MCU_FUNCTION_CALIBRATE_RX_EXTLOOPB : MCU_FUNCTION_CALIBRATE_RX);
+00364         status = mcuControl->WaitForMCU(1000);
+00365         \textcolor{keywordflow}{if}(status != MCU_BD::MCU_NO_ERROR)
+00366             \textcolor{keywordflow}{return} ReportError(EINVAL, \textcolor{stringliteral}{"Rx calibration: MCU error %i (%s)"}, status, 
+      MCU\_BD::MCUStatusMessage(status));
+00367     \}
+00368 
+00369     \textcolor{comment}{//sync registers to cache}
+00370     \textcolor{keyword}{const} std::vector<uint16\_t> regsToSync = \{0x040C, 0x05C0\};
+00371     \textcolor{keywordflow}{for}(\textcolor{keyword}{const} \textcolor{keyword}{auto} addr : regsToSync)
+00372         this->SPI_read(addr, \textcolor{keyword}{true});
+00373 
+00374     \textcolor{comment}{//read back for cache input and print}
+00375     dcoffi = ReadAnalogDC(\textcolor{keyword}{this}, channel ? LMS7_DC_RXBI : LMS7_DC_RXAI);
+00376     dcoffq = ReadAnalogDC(\textcolor{keyword}{this}, channel ? LMS7_DC_RXBQ : LMS7_DC_RXAQ);
+00377     gcorri = Get_SPI_Reg_bits(LMS7_GCORRI_RXTSP, \textcolor{keyword}{true});
+00378     gcorrq = Get_SPI_Reg_bits(LMS7_GCORRQ_RXTSP, \textcolor{keyword}{true});
+00379     phaseOffset = signextIqCorr(Get_SPI_Reg_bits(LMS7_IQCORR_RXTSP, \textcolor{keyword}{true}));
+00380 
+00381     Log(\textcolor{stringliteral}{"Rx calibration finished"}, LOG\_INFO);
+00382 \textcolor{preprocessor}{#ifdef LMS\_VERBOSE\_OUTPUT}
+00383     verbose_printf(\textcolor{stringliteral}{"RX | DC  | GAIN | PHASE\(\backslash\)n"});
+00384     verbose_printf(\textcolor{stringliteral}{"---+-----+------+------\(\backslash\)n"});
+00385     verbose_printf(\textcolor{stringliteral}{"I: | %3i | %4i | %i\(\backslash\)n"}, dcoffi, gcorri, phaseOffset);
+00386     verbose_printf(\textcolor{stringliteral}{"Q: | %3i | %4i |\(\backslash\)n"}, dcoffq, gcorrq);
+00387     int32\_t duration = std::chrono::duration\_cast<std::chrono::milliseconds>
+00388         (std::chrono::high\_resolution\_clock::now()-beginTime).count();
+00389     verbose_printf(\textcolor{stringliteral}{"Duration: %i ms\(\backslash\)n"}, duration);
+00390 \textcolor{preprocessor}{#endif //LMS\_VERBOSE\_OUTPUT}
+00391     \textcolor{keywordflow}{return} 0;
+00392 \}
+00393 
+00399 \textcolor{keywordtype}{int} LMS7002M::LoadDC\_REG\_IQ(\textcolor{keywordtype}{bool} tx, int16\_t I, int16\_t Q)
+00400 \{
+00401     \textcolor{keywordflow}{if}(tx)
+00402     \{
+00403         Modify_SPI_Reg_bits(LMS7_DC_REG_TXTSP, I);
+00404         Modify_SPI_Reg_bits(LMS7_TSGDCLDI_TXTSP, 0);
+00405         Modify_SPI_Reg_bits(LMS7_TSGDCLDI_TXTSP, 1);
+00406         Modify_SPI_Reg_bits(LMS7_TSGDCLDI_TXTSP, 0);
+00407         Modify_SPI_Reg_bits(LMS7_DC_REG_TXTSP, Q);
+00408         Modify_SPI_Reg_bits(LMS7_TSGDCLDQ_TXTSP, 0);
+00409         Modify_SPI_Reg_bits(LMS7_TSGDCLDQ_TXTSP, 1);
+00410         Modify_SPI_Reg_bits(LMS7_TSGDCLDQ_TXTSP, 0);
+00411     \}
+00412     \textcolor{keywordflow}{else}
+00413     \{
+00414         Modify_SPI_Reg_bits(LMS7_DC_REG_RXTSP, I);
+00415         Modify_SPI_Reg_bits(LMS7_TSGDCLDI_RXTSP, 0);
+00416         Modify_SPI_Reg_bits(LMS7_TSGDCLDI_RXTSP, 1);
+00417         Modify_SPI_Reg_bits(LMS7_TSGDCLDI_RXTSP, 0);
+00418         Modify_SPI_Reg_bits(LMS7_DC_REG_RXTSP, Q);
+00419         Modify_SPI_Reg_bits(LMS7_TSGDCLDQ_RXTSP, 0);
+00420         Modify_SPI_Reg_bits(LMS7_TSGDCLDQ_RXTSP, 1);
+00421         Modify_SPI_Reg_bits(LMS7_TSGDCLDQ_RXTSP, 0);
+00422     \}
+00423     \textcolor{keywordflow}{return} 0;
+00424 \}
+\end{DoxyCode}

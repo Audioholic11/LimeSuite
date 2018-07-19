@@ -1,0 +1,109 @@
+\subsection{pnl\+Q\+Spark.\+h}
+\label{pnlQSpark_8h_source}\index{/home/erik/prefix/default/src/limesuite-\/dev/src/boards\+\_\+wxgui/pnl\+Q\+Spark.\+h@{/home/erik/prefix/default/src/limesuite-\/dev/src/boards\+\_\+wxgui/pnl\+Q\+Spark.\+h}}
+
+\begin{DoxyCode}
+00001 \textcolor{preprocessor}{#ifndef PNL\_QSPARK\_H}
+00002 \textcolor{preprocessor}{#define PNL\_QSPARK\_H}
+00003 
+00004 \textcolor{preprocessor}{#include <map>}
+00005 \textcolor{preprocessor}{#include <wx/frame.h>}
+00006 \textcolor{preprocessor}{#include <wx/panel.h>}
+00007 \textcolor{preprocessor}{#include "lime/LimeSuite.h"}
+00008 \textcolor{keyword}{class }wxStaticText;
+00009 \textcolor{keyword}{class }wxFlexGridSizer;
+00010 \textcolor{keyword}{class }wxButton;
+00011 \textcolor{keyword}{class }wxSpinCtrl;
+00012 \textcolor{keyword}{class }wxComboBox;
+00013 \textcolor{keyword}{class }wxCheckBox;
+00014 \textcolor{keyword}{class }wxTextCtrl;
+00015 \textcolor{keyword}{class }wxChoice;
+00016 \textcolor{keyword}{class }wxRadioButton;
+00017 
+00018 
+00019 
+00020 \textcolor{keyword}{class }pnlQSpark : \textcolor{keyword}{public} wxPanel
+00021 \{
+00022 \textcolor{keyword}{public}:
+00023     pnlQSpark(wxWindow* parent, wxWindowID \textcolor{keywordtype}{id} = wxID\_ANY, \textcolor{keyword}{const} wxString &title = wxEmptyString, \textcolor{keyword}{const} 
+      wxPoint& pos = wxDefaultPosition, \textcolor{keyword}{const} wxSize& size = wxDefaultSize, \textcolor{keywordtype}{int} style = 0, wxString 
+      name = \textcolor{stringliteral}{""});
+00024     \textcolor{keywordtype}{void} Initialize(lms_device_t *pControl);
+00025     \textcolor{keyword}{virtual} ~pnlQSpark();
+00026 
+00027     wxComboBox* cmbVCXOcontrolVoltage;
+00028     
+00029     wxCheckBox* chkLB_1A;
+00030     wxCheckBox* chkLB_1B;
+00031     wxCheckBox* chkLB_2A;
+00032     wxCheckBox* chkLB_2B;
+00033     wxCheckBox* chkSH_1A;
+00034     wxCheckBox* chkSH_1B;
+00035     wxCheckBox* chkSH_2A;
+00036     wxCheckBox* chkSH_2B;
+00037     wxCheckBox* chkAT_1A;
+00038     wxCheckBox* chkAT_1B;
+00039     wxCheckBox* chkAT_2A;
+00040     wxCheckBox* chkAT_2B;
+00041 
+00042     wxPanel* mPanelStreamPLL;
+00043     wxTextCtrl* txtPllFreqRxMHz;
+00044     wxStaticText* lblRealFreqTx;
+00045     wxStaticText* lblRealFreqRx;
+00046     wxTextCtrl* txtPllFreqTxMHz;
+00047     wxTextCtrl* txtPhaseOffsetDeg;
+00048     wxButton* btnConfigurePLL;
+00049 
+00050     wxCheckBox* chkEN_TXTSP;
+00051     wxCheckBox* chkEN_RXTSP;
+00052     wxCheckBox* chkRX_DCCORR_BYP;
+00053     wxCheckBox* chkRX_PHCORR_BYP;
+00054     wxCheckBox* chkRX_GCORR_BYP;
+00055     wxCheckBox* chkTX_DCCORR_BYP;
+00056     wxCheckBox* chkTX_PHCORR_BYP;
+00057     wxCheckBox* chkTX_GCORR_BYP;
+00058     wxSpinCtrl* spinTX_DCCORRI;
+00059     wxSpinCtrl* spinTX_DCCORRQ;
+00060     wxSpinCtrl* spinTX_GCORRQ;
+00061     wxSpinCtrl* spinTX_GCORRI;
+00062     wxSpinCtrl* spinTX_PHCORR;
+00063     wxSpinCtrl* spinRX_GCORRQ;
+00064     wxSpinCtrl* spinRX_GCORRI;
+00065     wxSpinCtrl* spinRX_PHCORR;
+00066     wxChoice* cmbInsel;
+00067     wxRadioButton* rbChannelA;
+00068     wxRadioButton* rbChannelB;
+00069 
+00070     wxTextCtrl* txtNcoFreq;
+00071 
+00072     \textcolor{keyword}{static} \textcolor{keyword}{const} \textcolor{keywordtype}{long} ID_BUTTON_UPDATEALL;
+00073     \textcolor{keyword}{static} \textcolor{keyword}{const} \textcolor{keywordtype}{long} ID_VCXOCV;
+00074 
+00075     \textcolor{keywordtype}{void} OnbtnUpdateAll(wxCommandEvent& event);
+00076     \textcolor{keywordtype}{void} OnNcoFrequencyChanged(wxCommandEvent& event);
+00077 \textcolor{keyword}{protected}:
+00078     \textcolor{keywordtype}{void} OnConfigurePLL(wxCommandEvent &event);
+00079     \textcolor{keywordtype}{void} OnReadAll(wxCommandEvent &event);
+00080     \textcolor{keywordtype}{void} OnWriteAll(wxCommandEvent &event);
+00081     \textcolor{keywordtype}{void} OnSwitchToChannelA(wxCommandEvent& event);
+00082     \textcolor{keywordtype}{void} OnSwitchToChannelB(wxCommandEvent& event);
+00083 
+00084     \textcolor{keyword}{struct }Register
+00085     \{
+00086         Register();
+00087         Register(\textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{short} address, \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{char} msb, \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{char} lsb, \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{short} 
+      defaultValue);
+00088         \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{short} address;
+00089         \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{char} msb;
+00090         \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{char} lsb;
+00091         \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{short} defaultValue;
+00092     \};
+00093     std::map<wxObject*, Register> controlsPtr2Registers;
+00094     \textcolor{keywordtype}{void} RegisterParameterChangeHandler(wxCommandEvent& event);
+00095 
+00096 \textcolor{keyword}{protected}:
+00097     lms_device_t *lmsControl;
+00098     DECLARE\_EVENT\_TABLE()
+00099 \};
+00100 
+00101 \textcolor{preprocessor}{#endif}
+\end{DoxyCode}

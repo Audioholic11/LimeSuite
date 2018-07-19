@@ -1,0 +1,90 @@
+\subsection{gpio\+\_\+example.\+cpp}
+\label{gpio__example_8cpp_source}\index{/home/erik/prefix/default/src/limesuite-\/dev/src/examples/gpio\+\_\+example.\+cpp@{/home/erik/prefix/default/src/limesuite-\/dev/src/examples/gpio\+\_\+example.\+cpp}}
+
+\begin{DoxyCode}
+00001 
+00006 \textcolor{preprocessor}{#include <lime/LimeSuite.h>}
+00007 \textcolor{preprocessor}{#include <iostream>}
+00008 \textcolor{preprocessor}{#include <chrono>}
+00009 \textcolor{preprocessor}{#include <thread>}
+00010 
+00011 \textcolor{comment}{//Device structure, should be initialize to NULL}
+00012 lms_device_t* device = NULL;
+00013 
+00014 \textcolor{keywordtype}{int} error()
+00015 \{
+00016     \textcolor{keywordflow}{if} (device != NULL)
+00017         LMS_Close(device);
+00018     exit(-1);
+00019 \}
+00020 
+00021 \textcolor{keywordtype}{void} print_gpio(\textcolor{keywordtype}{int} gpio\_val)
+00022 \{
+00023     \textcolor{keywordflow}{for} (\textcolor{keywordtype}{int} i = 0; i < 8; i++)
+00024     \{
+00025         \textcolor{keywordtype}{bool} \textcolor{keyword}{set} = gpio\_val&(1<<i); 
+00026         std::cout << \textcolor{stringliteral}{"GPIO"} << i <<\textcolor{stringliteral}{": "} << (\textcolor{keyword}{set} ? \textcolor{stringliteral}{"High"} : \textcolor{stringliteral}{"Low"}) << std::endl;
+00027     \}
+00028 \}
+00029 
+00030 \textcolor{keywordtype}{int} main(\textcolor{keywordtype}{int} argc, \textcolor{keywordtype}{char}** argv)
+00031 \{
+00032     \textcolor{comment}{//Find devices}
+00033     \textcolor{keywordtype}{int} n;
+00034     lms_info_str_t list[8]; \textcolor{comment}{//should be large enough to hold all detected devices}
+00035     \textcolor{keywordflow}{if} ((n = LMS_GetDeviceList(list)) < 0) \textcolor{comment}{//NULL can be passed to only get number of devices}
+00036         error();
+00037 
+00038     std::cout << \textcolor{stringliteral}{"Devices found: "} << n << std::endl; \textcolor{comment}{//print number of devices}
+00039     \textcolor{keywordflow}{if} (n < 1)
+00040         \textcolor{keywordflow}{return} -1;
+00041 
+00042     \textcolor{comment}{//open the first device}
+00043     \textcolor{keywordflow}{if} (LMS_Open(&device, list[0], NULL))
+00044         error();
+00045 
+00046     \textcolor{comment}{//Read current GPIO pins state using LMS\_GPIORead()}
+00047     std::cout << \textcolor{stringliteral}{"Read current GPIO state:"} << std::endl;
+00048     uint8\_t gpio\_val = 0;
+00049     \textcolor{keywordflow}{if} (LMS_GPIORead(device, &gpio\_val, 1)!=0) \textcolor{comment}{//1 byte buffer is enough to read 8 GPIO pins on LimeSDR-USB}
+00050         error();
+00051     print_gpio(gpio\_val);
+00052 
+00053     \textcolor{comment}{//change GPIO pins direction using LMS\_GPIODirWrite()}
+00054     std::cout << std::endl << \textcolor{stringliteral}{"Set GPIO0, GPIO1, GPIO2 GPIO3 and GPIO7 to output:"} << std::endl;
+00055     uint8\_t gpio\_dir = 0x8F; \textcolor{comment}{//set bits 0,1,2,3 and 7}
+00056     \textcolor{keywordflow}{if} (LMS_GPIODirWrite(device, &gpio\_dir, 1)!=0) \textcolor{comment}{//1 byte buffer is enough to configure 8 GPIO pins on
+       LimeSDR-USB}
+00057         error();
+00058     std::cout << \textcolor{stringliteral}{"Read GPIO:"} << std::endl;
+00059     \textcolor{keywordflow}{if} (LMS_GPIORead(device, &gpio\_val, 1)!=0)
+00060         error();
+00061     print_gpio(gpio\_val);
+00062   
+00063     \textcolor{comment}{//set GPIO pins output level using LMS\_GPIOWrite(). Only affect GPIO that configured as output}
+00064     std::cout << std::endl << \textcolor{stringliteral}{"Set GPIO0, GPIO7 output to High level:"} << std::endl;
+00065     gpio\_val = 0x81;
+00066     \textcolor{keywordflow}{if} (LMS_GPIOWrite(device, &gpio\_val, 1)!=0) \textcolor{comment}{//1 byte buffer is enough to set 8 GPIO pins on LimeSDR-USB}
+00067         error();
+00068     std::cout << \textcolor{stringliteral}{"Read GPIO:"} << std::endl;
+00069     \textcolor{keywordflow}{if} (LMS_GPIORead(device, &gpio\_val, 1)!=0)
+00070         error();
+00071     print_gpio(gpio\_val);
+00072     
+00073     \textcolor{comment}{//togle single GPIO for some time (~16s)}
+00074     std::cout << std::endl << \textcolor{stringliteral}{"Toggle GPIO0"} << std::endl;
+00075     \textcolor{keywordflow}{for} (\textcolor{keywordtype}{int} i = 0; i < 16; i++)
+00076     \{
+00077         gpio\_val = 0x81;
+00078         \textcolor{keywordflow}{if} (LMS_GPIOWrite(device, &gpio\_val, 1)!=0)
+00079             error();
+00080         gpio\_val = 0x80;
+00081         std::this\_thread::sleep\_for(std::chrono::milliseconds(500));
+00082         \textcolor{keywordflow}{if} (LMS_GPIOWrite(device, &gpio\_val, 1)!=0)
+00083             error();  
+00084         std::this\_thread::sleep\_for(std::chrono::milliseconds(500));      
+00085     \}
+00086        
+00087     \textcolor{keywordflow}{return} 0;
+00088 \}
+\end{DoxyCode}

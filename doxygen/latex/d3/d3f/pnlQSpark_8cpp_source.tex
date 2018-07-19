@@ -1,0 +1,589 @@
+\subsection{pnl\+Q\+Spark.\+cpp}
+\label{pnlQSpark_8cpp_source}\index{/home/erik/prefix/default/src/limesuite-\/dev/src/boards\+\_\+wxgui/pnl\+Q\+Spark.\+cpp@{/home/erik/prefix/default/src/limesuite-\/dev/src/boards\+\_\+wxgui/pnl\+Q\+Spark.\+cpp}}
+
+\begin{DoxyCode}
+00001 \textcolor{preprocessor}{#include <wx/sizer.h>}
+00002 \textcolor{preprocessor}{#include <wx/stattext.h>}
+00003 \textcolor{preprocessor}{#include <wx/button.h>}
+00004 \textcolor{preprocessor}{#include <wx/string.h>}
+00005 \textcolor{preprocessor}{#include <wx/spinctrl.h>}
+00006 \textcolor{preprocessor}{#include <wx/combobox.h>}
+00007 \textcolor{preprocessor}{#include <wx/checkbox.h>}
+00008 \textcolor{preprocessor}{#include <wx/msgdlg.h>}
+00009 \textcolor{preprocessor}{#include <wx/radiobox.h>}
+00010 \textcolor{preprocessor}{#include <wx/radiobut.h>}
+00011 
+00012 \textcolor{preprocessor}{#include "pnlQSpark.h"}
+00013 \textcolor{preprocessor}{#include <ciso646>}
+00014 \textcolor{preprocessor}{#include <map>}
+00015 
+00016 \textcolor{preprocessor}{#include <FPGA_common.h>}
+00017 \textcolor{preprocessor}{#include <lms7_device.h>}
+00018 \textcolor{preprocessor}{#include "lms7suiteEvents.h"}
+00019 
+00020 \textcolor{keyword}{using namespace }lime;
+00021 \textcolor{keyword}{using namespace }std;
+00022 
+00023 BEGIN\_EVENT\_TABLE(pnlQSpark,wxPanel)
+00024 END\_EVENT\_TABLE()
+00025 
+00026 pnlQSpark::Register::Register()
+00027     : address(0), msb(0), lsb(0), defaultValue(0)
+00028 \{
+00029 \}
+00030 
+00031 
+00032 pnlQSpark::Register::Register(\textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{short} address, \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{char} msb, \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{char} lsb, \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{short} 
+      defaultValue)
+00033     : address(address), msb(msb), lsb(lsb), defaultValue(defaultValue)
+00034 \{
+00035 \}
+00036 
+00037 pnlQSpark::pnlQSpark(wxWindow* parent,wxWindowID \textcolor{keywordtype}{id}, \textcolor{keyword}{const} wxString &title, \textcolor{keyword}{const} wxPoint& pos,\textcolor{keyword}{const} wxSize
+      & size, \textcolor{keywordtype}{int} style, wxString name)
+00038 \{
+00039     lmsControl = \textcolor{keyword}{nullptr};
+00040 
+00041     wxFlexGridSizer* FlexGridSizer1;
+00042 
+00043     Create(parent, \textcolor{keywordtype}{id}, wxDefaultPosition, wxDefaultSize, style, \_T(\textcolor{stringliteral}{"id"}));
+00044 \textcolor{preprocessor}{#ifdef WIN32}
+00045     SetBackgroundColour(wxSystemSettings::GetColour(wxSYS\_COLOUR\_BTNFACE));
+00046 \textcolor{preprocessor}{#endif}
+00047     wxFlexGridSizer* mainSizer = \textcolor{keyword}{new} wxFlexGridSizer(0, 2, 5, 5);
+00048     FlexGridSizer1 = \textcolor{keyword}{new} wxFlexGridSizer(0, 1, 5, 5);
+00049 
+00050     SetSizer(mainSizer);
+00051     \{
+00052         \textcolor{keyword}{auto} groupSizer = \textcolor{keyword}{new} wxStaticBoxSizer( \textcolor{keyword}{new} wxStaticBox( \textcolor{keyword}{this}, wxID\_ANY, wxT(\textcolor{stringliteral}{"External loopback
+       controls"}) ), wxVERTICAL );
+00053         \{
+00054             \textcolor{keyword}{auto} controlsSizer = \textcolor{keyword}{new} wxFlexGridSizer(0, 1, 5, 5);
+00055             chkLB_1A = \textcolor{keyword}{new} wxCheckBox(\textcolor{keyword}{this}, wxNewId(), \_(\textcolor{stringliteral}{"RF loopback ch.A"}));
+00056             chkLB_1A->SetToolTip(\_(\textcolor{stringliteral}{"[RFLB\_A\_EN] External RF loopback TxBAND2->RxLNAH channel A"}));
+00057             Connect(chkLB_1A->GetId(), wxEVT\_CHECKBOX, wxCommandEventHandler(
+      pnlQSpark::RegisterParameterChangeHandler), NULL, \textcolor{keyword}{this});
+00058             controlsSizer->Add(chkLB_1A, 1, wxEXPAND | wxALIGN\_LEFT | wxALIGN\_TOP, 5);
+00059             chkLB_1B = \textcolor{keyword}{new} wxCheckBox(\textcolor{keyword}{this}, wxNewId(), \_(\textcolor{stringliteral}{"RF loopback ch.B"}));
+00060             chkLB_1B->SetToolTip(\_(\textcolor{stringliteral}{"[RFLB\_B\_EN] External RF loopback TxBAND2->RxLNAH channel B"}));
+00061             Connect(chkLB_1B->GetId(), wxEVT\_CHECKBOX, wxCommandEventHandler(
+      pnlQSpark::RegisterParameterChangeHandler), NULL, \textcolor{keyword}{this});
+00062             controlsSizer->Add(chkLB_1B, 1, wxEXPAND | wxALIGN\_LEFT | wxALIGN\_TOP, 5);
+00063 
+00064             chkSH_1A = \textcolor{keyword}{new} wxCheckBox(\textcolor{keyword}{this}, wxNewId(), \_(\textcolor{stringliteral}{"Ch.A shunt"}));
+00065             chkSH_1A->SetToolTip(\_(\textcolor{stringliteral}{"[TX1\_2\_LB\_SH]"}));
+00066             Connect(chkSH_1A->GetId(), wxEVT\_CHECKBOX, wxCommandEventHandler(
+      pnlQSpark::RegisterParameterChangeHandler), NULL, \textcolor{keyword}{this});
+00067             controlsSizer->Add(chkSH_1A, 1, wxEXPAND | wxALIGN\_LEFT | wxALIGN\_TOP, 5);
+00068             chkSH_1B = \textcolor{keyword}{new} wxCheckBox(\textcolor{keyword}{this}, wxNewId(), \_(\textcolor{stringliteral}{"Ch.B shunt"}));
+00069             chkSH_1B->SetToolTip(\_(\textcolor{stringliteral}{"[TX2\_2\_LB\_SH]"}));
+00070             Connect(chkSH_1B->GetId(), wxEVT\_CHECKBOX, wxCommandEventHandler(
+      pnlQSpark::RegisterParameterChangeHandler), NULL, \textcolor{keyword}{this});
+00071             controlsSizer->Add(chkSH_1B, 1, wxEXPAND | wxALIGN\_LEFT | wxALIGN\_TOP, 5);
+00072             chkAT_1A = \textcolor{keyword}{new} wxCheckBox(\textcolor{keyword}{this}, wxNewId(), \_(\textcolor{stringliteral}{"Ch.A attenuator"}));
+00073             chkAT_1A->SetToolTip(\_(\textcolor{stringliteral}{"[TX1\_2\_LB\_AT]"}));
+00074             Connect(chkAT_1A->GetId(), wxEVT\_CHECKBOX, wxCommandEventHandler(
+      pnlQSpark::RegisterParameterChangeHandler), NULL, \textcolor{keyword}{this});
+00075             controlsSizer->Add(chkAT_1A, 1, wxEXPAND | wxALIGN\_LEFT | wxALIGN\_TOP, 5);
+00076             chkAT_1B = \textcolor{keyword}{new} wxCheckBox(\textcolor{keyword}{this}, wxNewId(), \_(\textcolor{stringliteral}{"Ch.B attenuator"}));
+00077             chkAT_1B->SetToolTip(\_(\textcolor{stringliteral}{"[TX2\_2\_LB\_AT]"}));
+00078             Connect(chkAT_1B->GetId(), wxEVT\_CHECKBOX, wxCommandEventHandler(
+      pnlQSpark::RegisterParameterChangeHandler), NULL, \textcolor{keyword}{this});
+00079             controlsSizer->Add(chkAT_1B, 1, wxEXPAND | wxALIGN\_LEFT | wxALIGN\_TOP, 5);
+00080             \textcolor{keyword}{auto} lms1sizer = \textcolor{keyword}{new} wxStaticBoxSizer( \textcolor{keyword}{new} wxStaticBox( \textcolor{keyword}{this}, wxID\_ANY, wxT(\textcolor{stringliteral}{"LMS#1"}) ), 
+      wxVERTICAL );
+00081             lms1sizer->Add(controlsSizer, 1, wxEXPAND | wxALIGN\_LEFT | wxALIGN\_TOP | wxALL, 5);
+00082             groupSizer->Add(lms1sizer, 1, wxEXPAND | wxALIGN\_LEFT | wxALIGN\_TOP | wxALL, 5);
+00083         \}
+00084         \{
+00085             \textcolor{keyword}{auto} controlsSizer = \textcolor{keyword}{new} wxFlexGridSizer(0, 1, 5, 5);
+00086             chkLB_2A = \textcolor{keyword}{new} wxCheckBox(\textcolor{keyword}{this}, wxNewId(), \_(\textcolor{stringliteral}{"RF loopback ch.A"}));
+00087             chkLB_2A->SetToolTip(\_(\textcolor{stringliteral}{"[RFLB\_A\_EN] External RF loopback TxBAND2->RxLNAH channel A"}));
+00088             Connect(chkLB_2A->GetId(), wxEVT\_CHECKBOX, wxCommandEventHandler(
+      pnlQSpark::RegisterParameterChangeHandler), NULL, \textcolor{keyword}{this});
+00089             controlsSizer->Add(chkLB_2A, 1, wxEXPAND | wxALIGN\_LEFT | wxALIGN\_TOP, 5);
+00090             chkLB_2B = \textcolor{keyword}{new} wxCheckBox(\textcolor{keyword}{this}, wxNewId(), \_(\textcolor{stringliteral}{"RF loopback ch.B"}));
+00091             chkLB_2B->SetToolTip(\_(\textcolor{stringliteral}{"[RFLB\_B\_EN] External RF loopback TxBAND2->RxLNAH channel B"}));
+00092             Connect(chkLB_2B->GetId(), wxEVT\_CHECKBOX, wxCommandEventHandler(
+      pnlQSpark::RegisterParameterChangeHandler), NULL, \textcolor{keyword}{this});
+00093             controlsSizer->Add(chkLB_2B, 1, wxEXPAND | wxALIGN\_LEFT | wxALIGN\_TOP, 5);
+00094 
+00095             chkSH_2A = \textcolor{keyword}{new} wxCheckBox(\textcolor{keyword}{this}, wxNewId(), \_(\textcolor{stringliteral}{"Ch.A shunt"}));
+00096             chkSH_2A->SetToolTip(\_(\textcolor{stringliteral}{"[TX1\_2\_LB\_SH]"}));
+00097             Connect(chkSH_2A->GetId(), wxEVT\_CHECKBOX, wxCommandEventHandler(
+      pnlQSpark::RegisterParameterChangeHandler), NULL, \textcolor{keyword}{this});
+00098             controlsSizer->Add(chkSH_2A, 1, wxEXPAND | wxALIGN\_LEFT | wxALIGN\_TOP, 5);
+00099             chkSH_2B = \textcolor{keyword}{new} wxCheckBox(\textcolor{keyword}{this}, wxNewId(), \_(\textcolor{stringliteral}{"Ch.B shunt"}));
+00100             chkSH_2B->SetToolTip(\_(\textcolor{stringliteral}{"[TX2\_2\_LB\_SH]"}));
+00101             Connect(chkSH_2B->GetId(), wxEVT\_CHECKBOX, wxCommandEventHandler(
+      pnlQSpark::RegisterParameterChangeHandler), NULL, \textcolor{keyword}{this});
+00102             controlsSizer->Add(chkSH_2B, 1, wxEXPAND | wxALIGN\_LEFT | wxALIGN\_TOP, 5);
+00103             chkAT_2A = \textcolor{keyword}{new} wxCheckBox(\textcolor{keyword}{this}, wxNewId(), \_(\textcolor{stringliteral}{"Ch.A attenuator"}));
+00104             chkAT_2A->SetToolTip(\_(\textcolor{stringliteral}{"[TX1\_2\_LB\_AT]"}));
+00105             Connect(chkAT_2A->GetId(), wxEVT\_CHECKBOX, wxCommandEventHandler(
+      pnlQSpark::RegisterParameterChangeHandler), NULL, \textcolor{keyword}{this});
+00106             controlsSizer->Add(chkAT_2A, 1, wxEXPAND | wxALIGN\_LEFT | wxALIGN\_TOP, 5);
+00107             chkAT_2B = \textcolor{keyword}{new} wxCheckBox(\textcolor{keyword}{this}, wxNewId(), \_(\textcolor{stringliteral}{"Ch.B attenuator"}));
+00108             chkAT_2B->SetToolTip(\_(\textcolor{stringliteral}{"[TX2\_2\_LB\_AT]"}));
+00109             Connect(chkAT_2B->GetId(), wxEVT\_CHECKBOX, wxCommandEventHandler(
+      pnlQSpark::RegisterParameterChangeHandler), NULL, \textcolor{keyword}{this});
+00110             controlsSizer->Add(chkAT_2B, 1, wxEXPAND | wxALIGN\_LEFT | wxALIGN\_TOP, 5);
+00111             \textcolor{keyword}{auto} lms1sizer = \textcolor{keyword}{new} wxStaticBoxSizer( \textcolor{keyword}{new} wxStaticBox( \textcolor{keyword}{this}, wxID\_ANY, wxT(\textcolor{stringliteral}{"LMS#2"}) ), 
+      wxVERTICAL );
+00112             lms1sizer->Add(controlsSizer, 1, wxEXPAND | wxALIGN\_LEFT | wxALIGN\_TOP | wxALL, 5);
+00113             groupSizer->Add(lms1sizer, 1, wxEXPAND | wxALIGN\_LEFT | wxALIGN\_TOP |  wxALL, 5);
+00114         \}
+00115         mainSizer->Add(groupSizer, 1, wxEXPAND | wxALIGN\_LEFT | wxALIGN\_TOP | wxALL, 5);
+00116     \}
+00117 
+00118 
+00119 
+00120     wxSize freqTextfieldSize(64, -1);
+00121     mPanelStreamPLL = \textcolor{keyword}{new} wxPanel(\textcolor{keyword}{this}, wxNewId());
+00122     wxFlexGridSizer* sizerPllControls = \textcolor{keyword}{new} wxFlexGridSizer(0, 3, 5, 5);
+00123     sizerPllControls->Add(\textcolor{keyword}{new} wxStaticText(mPanelStreamPLL, wxID\_ANY, \_(\textcolor{stringliteral}{"DAC :"})), 1, wxALIGN\_LEFT | 
+      wxALIGN\_CENTER\_VERTICAL, 5);
+00124     txtPllFreqTxMHz = \textcolor{keyword}{new} wxTextCtrl(mPanelStreamPLL, wxNewId(), \_(\textcolor{stringliteral}{"160"}), wxDefaultPosition, 
+      freqTextfieldSize);
+00125     sizerPllControls->Add(txtPllFreqTxMHz, 1, wxALIGN\_LEFT | wxALIGN\_CENTER\_VERTICAL, 5);
+00126     lblRealFreqTx = \textcolor{keyword}{new} wxStaticText(mPanelStreamPLL, wxID\_ANY, \_(\textcolor{stringliteral}{"MHz"}));
+00127     sizerPllControls->Add(lblRealFreqTx, 1, wxALIGN\_LEFT | wxALIGN\_CENTER\_VERTICAL, 5);
+00128 
+00129     sizerPllControls->Add(\textcolor{keyword}{new} wxStaticText(mPanelStreamPLL, wxID\_ANY, \_(\textcolor{stringliteral}{"ADC :"})), 1, wxALIGN\_LEFT | 
+      wxALIGN\_CENTER\_VERTICAL, 5);
+00130     txtPllFreqRxMHz = \textcolor{keyword}{new} wxTextCtrl(mPanelStreamPLL, wxNewId(), \_(\textcolor{stringliteral}{"160"}), wxDefaultPosition, 
+      freqTextfieldSize);
+00131     sizerPllControls->Add(txtPllFreqRxMHz, 1, wxALIGN\_LEFT | wxALIGN\_CENTER\_VERTICAL, 5);
+00132     lblRealFreqRx = \textcolor{keyword}{new} wxStaticText(mPanelStreamPLL, wxID\_ANY, \_(\textcolor{stringliteral}{"MHz"}));
+00133     sizerPllControls->Add(lblRealFreqRx, 1, wxALIGN\_LEFT | wxALIGN\_CENTER\_VERTICAL, 5);
+00134 
+00135     btnConfigurePLL = \textcolor{keyword}{new} wxButton(mPanelStreamPLL, wxNewId(), \_(\textcolor{stringliteral}{"Configure"}));
+00136     sizerPllControls->Add(btnConfigurePLL, 1, wxALIGN\_LEFT | wxALIGN\_CENTER\_VERTICAL, 5);
+00137     Connect(btnConfigurePLL->GetId(), wxEVT\_COMMAND\_BUTTON\_CLICKED, wxCommandEventHandler(
+      pnlQSpark::OnConfigurePLL), NULL, \textcolor{keyword}{this});
+00138 
+00139     wxStaticBoxSizer* streamPllGroup = \textcolor{keyword}{new} wxStaticBoxSizer(wxHORIZONTAL, 
+      mPanelStreamPLL, \_T(\textcolor{stringliteral}{"Digital Interface Clock"}));
+00140     mPanelStreamPLL->SetSizer(streamPllGroup);
+00141     streamPllGroup->Add(sizerPllControls, 1, wxALIGN\_LEFT | wxALIGN\_TOP, 5);
+00142     streamPllGroup->Fit(mPanelStreamPLL);
+00143     FlexGridSizer1->Add(mPanelStreamPLL, 1, wxEXPAND | wxALIGN\_LEFT | wxALIGN\_TOP, 5);
+00144 
+00145     wxStaticBoxSizer* chBox = \textcolor{keyword}{new} wxStaticBoxSizer(wxVERTICAL, \textcolor{keyword}{this}, \_T(\textcolor{stringliteral}{"ADC/DAC channel controls"}));
+00146     wxFlexGridSizer* chSizer = \textcolor{keyword}{new} wxFlexGridSizer(6, 0, 0, 0);
+00147     wxFlexGridSizer* chSelect = \textcolor{keyword}{new} wxFlexGridSizer(0, 2, 0, 0);
+00148     rbChannelA = \textcolor{keyword}{new} wxRadioButton(\textcolor{keyword}{this}, wxNewId(), wxT(\textcolor{stringliteral}{"A CHANNEL"}), wxDefaultPosition, wxDefaultSize, 0);
+00149     rbChannelA->SetValue(\textcolor{keyword}{true});
+00150     rbChannelA->Connect(wxEVT\_COMMAND\_RADIOBUTTON\_SELECTED, wxCommandEventHandler(
+      pnlQSpark::OnSwitchToChannelA), NULL, \textcolor{keyword}{this});
+00151     chSelect->Add(rbChannelA, 0, wxEXPAND, 5);
+00152 
+00153     rbChannelB = \textcolor{keyword}{new} wxRadioButton(\textcolor{keyword}{this}, wxNewId(), wxT(\textcolor{stringliteral}{"B CHANNEL"}), wxDefaultPosition, wxDefaultSize, 0);
+00154     chSelect->Add(rbChannelB, 0, wxEXPAND, 5);
+00155     rbChannelB->Connect(wxEVT\_COMMAND\_RADIOBUTTON\_SELECTED, wxCommandEventHandler(
+      pnlQSpark::OnSwitchToChannelB), NULL, \textcolor{keyword}{this});
+00156     chSizer->Add(chSelect, 1, wxEXPAND | wxALIGN\_LEFT | wxALIGN\_TOP | wxALL, 5);
+00157     chBox->Add(chSizer, 1, wxEXPAND | wxALIGN\_LEFT | wxALIGN\_TOP | wxALL, 5);
+00158     FlexGridSizer1->Add(chBox, 1, wxEXPAND | wxALIGN\_LEFT | wxALIGN\_TOP, 5);
+00159 
+00160     wxStaticBoxSizer* moduleEnables = \textcolor{keyword}{new} wxStaticBoxSizer(wxHORIZONTAL, \textcolor{keyword}{this}, \_T(\textcolor{stringliteral}{""}));
+00161     chkEN_RXTSP = \textcolor{keyword}{new} wxCheckBox(\textcolor{keyword}{this}, wxNewId(), \_(\textcolor{stringliteral}{"Enable RxTSP"}));
+00162     moduleEnables->Add(chkEN_RXTSP, 1, wxALIGN\_LEFT | wxALIGN\_TOP, 5);
+00163     Connect(chkEN_RXTSP->GetId(), wxEVT\_CHECKBOX, wxCommandEventHandler(
+      pnlQSpark::RegisterParameterChangeHandler), NULL, \textcolor{keyword}{this});
+00164     chkEN_TXTSP = \textcolor{keyword}{new} wxCheckBox(\textcolor{keyword}{this}, wxNewId(), \_(\textcolor{stringliteral}{"Enable TxTSP"}));
+00165     moduleEnables->Add(chkEN\_TXTSP, 1, wxALIGN\_LEFT | wxALIGN\_TOP, 5);
+00166     Connect(chkEN\_TXTSP->GetId(), wxEVT\_CHECKBOX, wxCommandEventHandler(
+      pnlQSpark::RegisterParameterChangeHandler), NULL, \textcolor{keyword}{this});
+00167     chSizer->Add(moduleEnables, 1, wxEXPAND | wxALIGN\_LEFT | wxALIGN\_TOP | wxALL, 5);
+00168 
+00169     wxStaticBoxSizer* bypassesGroup = \textcolor{keyword}{new} wxStaticBoxSizer(wxVERTICAL, \textcolor{keyword}{this}, \_T(\textcolor{stringliteral}{"Bypass"}));
+00170     wxFlexGridSizer* bypasses = \textcolor{keyword}{new} wxFlexGridSizer(0, 2, 0, 0);
+00171     chkRX_GCORR_BYP = \textcolor{keyword}{new} wxCheckBox(\textcolor{keyword}{this}, wxNewId(), \_(\textcolor{stringliteral}{"Rx Gain corrector"}));
+00172     bypasses->Add(chkRX_GCORR_BYP, 1, wxALIGN\_LEFT | wxALIGN\_TOP, 5);
+00173     Connect(chkRX_GCORR_BYP->GetId(), wxEVT\_CHECKBOX, wxCommandEventHandler(
+      pnlQSpark::RegisterParameterChangeHandler), NULL, \textcolor{keyword}{this});
+00174 
+00175     chkTX_GCORR_BYP = \textcolor{keyword}{new} wxCheckBox(\textcolor{keyword}{this}, wxNewId(), \_(\textcolor{stringliteral}{"Tx Gain corrector"}));
+00176     bypasses->Add(chkTX\_GCORR\_BYP, 1, wxALIGN\_LEFT | wxALIGN\_TOP, 5);
+00177     Connect(chkTX\_GCORR\_BYP->GetId(), wxEVT\_CHECKBOX, wxCommandEventHandler(
+      pnlQSpark::RegisterParameterChangeHandler), NULL, \textcolor{keyword}{this});
+00178 
+00179     chkRX_PHCORR_BYP = \textcolor{keyword}{new} wxCheckBox(\textcolor{keyword}{this}, wxNewId(), \_(\textcolor{stringliteral}{"Rx Phase corrector"}));
+00180     bypasses->Add(chkRX\_PHCORR\_BYP, 1, wxALIGN\_LEFT | wxALIGN\_TOP, 5);
+00181     Connect(chkRX\_PHCORR\_BYP->GetId(), wxEVT\_CHECKBOX, wxCommandEventHandler(
+      pnlQSpark::RegisterParameterChangeHandler), NULL, \textcolor{keyword}{this});
+00182 
+00183     chkTX_PHCORR_BYP = \textcolor{keyword}{new} wxCheckBox(\textcolor{keyword}{this}, wxNewId(), \_(\textcolor{stringliteral}{"Tx Phase corrector"}));
+00184     bypasses->Add(chkTX\_PHCORR\_BYP, 1, wxALIGN\_LEFT | wxALIGN\_TOP, 5);
+00185     Connect(chkTX\_PHCORR\_BYP->GetId(), wxEVT\_CHECKBOX, wxCommandEventHandler(
+      pnlQSpark::RegisterParameterChangeHandler), NULL, \textcolor{keyword}{this});
+00186 
+00187     chkRX_DCCORR_BYP = \textcolor{keyword}{new} wxCheckBox(\textcolor{keyword}{this}, wxNewId(), \_(\textcolor{stringliteral}{"Rx DC corrector"}));
+00188     bypasses->Add(chkRX\_DCCORR\_BYP, 1, wxALIGN\_LEFT | wxALIGN\_TOP, 5);
+00189     Connect(chkRX\_DCCORR\_BYP->GetId(), wxEVT\_CHECKBOX, wxCommandEventHandler(
+      pnlQSpark::RegisterParameterChangeHandler), NULL, \textcolor{keyword}{this});
+00190 
+00191     chkTX_DCCORR_BYP = \textcolor{keyword}{new} wxCheckBox(\textcolor{keyword}{this}, wxNewId(), \_(\textcolor{stringliteral}{"Tx DC corrector"}));
+00192     bypasses->Add(chkTX\_DCCORR\_BYP, 1, wxALIGN\_LEFT | wxALIGN\_TOP, 5);
+00193     Connect(chkTX\_DCCORR\_BYP->GetId(), wxEVT\_CHECKBOX, wxCommandEventHandler(
+      pnlQSpark::RegisterParameterChangeHandler), NULL, \textcolor{keyword}{this});
+00194 
+00195     bypassesGroup->Add(bypasses , 1, wxALIGN\_LEFT | wxALIGN\_TOP, 5);
+00196     chSizer->Add(bypassesGroup, 1, wxEXPAND | wxALIGN\_LEFT | wxALIGN\_TOP, 5);
+00197 
+00198     wxFlexGridSizer* tx\_correctorsSizer = \textcolor{keyword}{new} wxFlexGridSizer(0, 2, 0, 5);
+00199     wxSize spinBoxSize(64, -1);
+00200     \textcolor{keywordtype}{long} spinBoxStyle = wxSP\_ARROW\_KEYS | wxTE\_PROCESS\_ENTER;
+00201     tx\_correctorsSizer->Add(\textcolor{keyword}{new} wxStaticText(\textcolor{keyword}{this}, wxID\_ANY, \_(\textcolor{stringliteral}{"Tx GCORRQ"})), 1, wxALIGN\_LEFT | 
+      wxALIGN\_CENTER\_VERTICAL, 5);
+00202     spinTX_GCORRQ = \textcolor{keyword}{new} wxSpinCtrl(\textcolor{keyword}{this}, wxNewId(), wxEmptyString, wxDefaultPosition, spinBoxSize, 
+      spinBoxStyle, 0, 2047, 2047);
+00203     tx\_correctorsSizer->Add(spinTX_GCORRQ, 1, wxALIGN\_LEFT | wxALIGN\_TOP, 5);
+00204     Connect(spinTX_GCORRQ->GetId(), wxEVT\_TEXT\_ENTER, wxCommandEventHandler(
+      pnlQSpark::RegisterParameterChangeHandler), NULL, \textcolor{keyword}{this});
+00205     Connect(spinTX_GCORRQ->GetId(), wxEVT\_SPINCTRL, wxCommandEventHandler(
+      pnlQSpark::RegisterParameterChangeHandler), NULL, \textcolor{keyword}{this});
+00206     Connect(spinTX_GCORRQ->GetId(), wxEVT\_SPIN, wxCommandEventHandler(
+      pnlQSpark::RegisterParameterChangeHandler), NULL, \textcolor{keyword}{this});
+00207 
+00208     tx\_correctorsSizer->Add(\textcolor{keyword}{new} wxStaticText(\textcolor{keyword}{this}, wxID\_ANY, \_(\textcolor{stringliteral}{"Tx GCORRI"})), 1, wxALIGN\_LEFT | 
+      wxALIGN\_CENTER\_VERTICAL, 5);
+00209     spinTX_GCORRI = \textcolor{keyword}{new} wxSpinCtrl(\textcolor{keyword}{this}, wxNewId(), wxEmptyString, wxDefaultPosition, spinBoxSize, 
+      spinBoxStyle, 0, 2047, 2047);
+00210     tx\_correctorsSizer->Add(spinTX_GCORRI, 1, wxALIGN\_LEFT | wxALIGN\_TOP, 5);
+00211     Connect(spinTX_GCORRI->GetId(), wxEVT\_TEXT\_ENTER, wxCommandEventHandler(
+      pnlQSpark::RegisterParameterChangeHandler), NULL, \textcolor{keyword}{this});
+00212     Connect(spinTX_GCORRI->GetId(), wxEVT\_SPINCTRL, wxCommandEventHandler(
+      pnlQSpark::RegisterParameterChangeHandler), NULL, \textcolor{keyword}{this});
+00213     Connect(spinTX_GCORRI->GetId(), wxEVT\_SPIN, wxCommandEventHandler(
+      pnlQSpark::RegisterParameterChangeHandler), NULL, \textcolor{keyword}{this});
+00214 
+00215     tx\_correctorsSizer->Add(\textcolor{keyword}{new} wxStaticText(\textcolor{keyword}{this}, wxID\_ANY, \_(\textcolor{stringliteral}{"Tx PHCORR"})), 1, wxALIGN\_LEFT | 
+      wxALIGN\_CENTER\_VERTICAL, 5);
+00216     spinTX_PHCORR = \textcolor{keyword}{new} wxSpinCtrl(\textcolor{keyword}{this}, wxNewId(), wxEmptyString, wxDefaultPosition, spinBoxSize, 
+      spinBoxStyle, -2048, 2047, 0);
+00217     tx\_correctorsSizer->Add(spinTX_PHCORR, 1, wxALIGN\_LEFT | wxALIGN\_TOP, 5);
+00218     Connect(spinTX_PHCORR->GetId(), wxEVT\_TEXT\_ENTER, wxCommandEventHandler(
+      pnlQSpark::RegisterParameterChangeHandler), NULL, \textcolor{keyword}{this});
+00219     Connect(spinTX_PHCORR->GetId(), wxEVT\_SPINCTRL, wxCommandEventHandler(
+      pnlQSpark::RegisterParameterChangeHandler), NULL, \textcolor{keyword}{this});
+00220     Connect(spinTX_PHCORR->GetId(), wxEVT\_SPIN, wxCommandEventHandler(
+      pnlQSpark::RegisterParameterChangeHandler), NULL, \textcolor{keyword}{this});
+00221 
+00222     tx\_correctorsSizer->Add(\textcolor{keyword}{new} wxStaticText(\textcolor{keyword}{this}, wxID\_ANY, \_(\textcolor{stringliteral}{"Tx DCCORRI"})), 1, wxALIGN\_LEFT | 
+      wxALIGN\_CENTER\_VERTICAL, 5);
+00223     spinTX_DCCORRI = \textcolor{keyword}{new} wxSpinCtrl(\textcolor{keyword}{this}, wxNewId(), wxEmptyString, wxDefaultPosition, spinBoxSize, 
+      spinBoxStyle, -128, 127, 0);
+00224     tx\_correctorsSizer->Add(spinTX_DCCORRI, 1, wxALIGN\_LEFT | wxALIGN\_TOP, 5);
+00225     Connect(spinTX_DCCORRI->GetId(), wxEVT\_TEXT\_ENTER, wxCommandEventHandler(
+      pnlQSpark::RegisterParameterChangeHandler), NULL, \textcolor{keyword}{this});
+00226     Connect(spinTX_DCCORRI->GetId(), wxEVT\_SPINCTRL, wxCommandEventHandler(
+      pnlQSpark::RegisterParameterChangeHandler), NULL, \textcolor{keyword}{this});
+00227     Connect(spinTX_DCCORRI->GetId(), wxEVT\_SPIN, wxCommandEventHandler(
+      pnlQSpark::RegisterParameterChangeHandler), NULL, \textcolor{keyword}{this});
+00228 
+00229     tx\_correctorsSizer->Add(\textcolor{keyword}{new} wxStaticText(\textcolor{keyword}{this}, wxID\_ANY, \_(\textcolor{stringliteral}{"Tx DCCORRQ"})), 1, wxALIGN\_LEFT | 
+      wxALIGN\_CENTER\_VERTICAL, 5);
+00230     spinTX_DCCORRQ = \textcolor{keyword}{new} wxSpinCtrl(\textcolor{keyword}{this}, wxNewId(), wxEmptyString, wxDefaultPosition, spinBoxSize, 
+      spinBoxStyle, -128, 127, 0);
+00231     tx\_correctorsSizer->Add(spinTX_DCCORRQ, 1, wxALIGN\_LEFT | wxALIGN\_TOP, 5);
+00232     Connect(spinTX_DCCORRQ->GetId(), wxEVT\_TEXT\_ENTER, wxCommandEventHandler(
+      pnlQSpark::RegisterParameterChangeHandler), NULL, \textcolor{keyword}{this});
+00233     Connect(spinTX_DCCORRQ->GetId(), wxEVT\_SPINCTRL, wxCommandEventHandler(
+      pnlQSpark::RegisterParameterChangeHandler), NULL, \textcolor{keyword}{this});
+00234     Connect(spinTX_DCCORRQ->GetId(), wxEVT\_SPIN, wxCommandEventHandler(
+      pnlQSpark::RegisterParameterChangeHandler), NULL, \textcolor{keyword}{this});
+00235 
+00236 
+00237     wxFlexGridSizer* rx\_correctorsSizer = \textcolor{keyword}{new} wxFlexGridSizer(0, 2, 0, 5);
+00238     rx\_correctorsSizer->Add(\textcolor{keyword}{new} wxStaticText(\textcolor{keyword}{this}, wxID\_ANY, \_(\textcolor{stringliteral}{"Rx GCORRQ"})), 1, wxALIGN\_LEFT | 
+      wxALIGN\_CENTER\_VERTICAL, 5);
+00239     spinRX_GCORRQ = \textcolor{keyword}{new} wxSpinCtrl(\textcolor{keyword}{this}, wxNewId(), wxEmptyString, wxDefaultPosition, spinBoxSize, 
+      spinBoxStyle, 0, 2047, 2047);
+00240     rx\_correctorsSizer->Add(spinRX_GCORRQ, 1, wxALIGN\_LEFT | wxALIGN\_TOP, 5);
+00241     Connect(spinRX_GCORRQ->GetId(), wxEVT\_TEXT\_ENTER, wxCommandEventHandler(
+      pnlQSpark::RegisterParameterChangeHandler), NULL, \textcolor{keyword}{this});
+00242     Connect(spinRX_GCORRQ->GetId(), wxEVT\_SPINCTRL, wxCommandEventHandler(
+      pnlQSpark::RegisterParameterChangeHandler), NULL, \textcolor{keyword}{this});
+00243     Connect(spinRX_GCORRQ->GetId(), wxEVT\_SPIN, wxCommandEventHandler(
+      pnlQSpark::RegisterParameterChangeHandler), NULL, \textcolor{keyword}{this});
+00244 
+00245     rx\_correctorsSizer->Add(\textcolor{keyword}{new} wxStaticText(\textcolor{keyword}{this}, wxID\_ANY, \_(\textcolor{stringliteral}{"Rx GCORRI"})), 1, wxALIGN\_LEFT | 
+      wxALIGN\_CENTER\_VERTICAL, 5);
+00246     spinRX_GCORRI = \textcolor{keyword}{new} wxSpinCtrl(\textcolor{keyword}{this}, wxNewId(), wxEmptyString, wxDefaultPosition, spinBoxSize, 
+      spinBoxStyle, 0, 2047, 2047);
+00247     rx\_correctorsSizer->Add(spinRX_GCORRI, 1, wxALIGN\_LEFT | wxALIGN\_TOP, 5);
+00248     Connect(spinRX_GCORRI->GetId(), wxEVT\_TEXT\_ENTER, wxCommandEventHandler(
+      pnlQSpark::RegisterParameterChangeHandler), NULL, \textcolor{keyword}{this});
+00249     Connect(spinRX_GCORRI->GetId(), wxEVT\_SPINCTRL, wxCommandEventHandler(
+      pnlQSpark::RegisterParameterChangeHandler), NULL, \textcolor{keyword}{this});
+00250     Connect(spinRX_GCORRI->GetId(), wxEVT\_SPIN, wxCommandEventHandler(
+      pnlQSpark::RegisterParameterChangeHandler), NULL, \textcolor{keyword}{this});
+00251 
+00252     rx\_correctorsSizer->Add(\textcolor{keyword}{new} wxStaticText(\textcolor{keyword}{this}, wxID\_ANY, \_(\textcolor{stringliteral}{"Rx PHCORR"})), 1, wxALIGN\_LEFT | 
+      wxALIGN\_CENTER\_VERTICAL, 5);
+00253     spinRX_PHCORR = \textcolor{keyword}{new} wxSpinCtrl(\textcolor{keyword}{this}, wxNewId(), wxEmptyString, wxDefaultPosition, spinBoxSize, 
+      spinBoxStyle, -2048, 2047, 0);
+00254     rx\_correctorsSizer->Add(spinRX_PHCORR, 1, wxALIGN\_LEFT | wxALIGN\_TOP, 5);
+00255     Connect(spinRX_PHCORR->GetId(), wxEVT\_TEXT\_ENTER, wxCommandEventHandler(
+      pnlQSpark::RegisterParameterChangeHandler), NULL, \textcolor{keyword}{this});
+00256     Connect(spinRX_PHCORR->GetId(), wxEVT\_SPINCTRL, wxCommandEventHandler(
+      pnlQSpark::RegisterParameterChangeHandler), NULL, \textcolor{keyword}{this});
+00257     Connect(spinRX_PHCORR->GetId(), wxEVT\_SPIN, wxCommandEventHandler(
+      pnlQSpark::RegisterParameterChangeHandler), NULL, \textcolor{keyword}{this});
+00258 
+00259     wxFlexGridSizer* correctorsSizer = \textcolor{keyword}{new} wxFlexGridSizer(0, 2, 0, 5);
+00260     correctorsSizer->Add(rx\_correctorsSizer, 1, wxALIGN\_LEFT | wxALIGN\_TOP, 5);
+00261     correctorsSizer->Add(tx\_correctorsSizer, 1, wxALIGN\_LEFT | wxALIGN\_TOP, 5);
+00262 
+00263     wxStaticBoxSizer* correctorsGroup = \textcolor{keyword}{new} wxStaticBoxSizer(wxVERTICAL, \textcolor{keyword}{this}, \_T(\textcolor{stringliteral}{"Correctors"}));
+00264     correctorsGroup->Add(correctorsSizer, 1, wxEXPAND | wxALIGN\_LEFT | wxALIGN\_TOP, 5);
+00265     chSizer->Add(correctorsGroup, 1, wxEXPAND | wxALIGN\_LEFT | wxALIGN\_TOP, 5);
+00266 
+00267     txtNcoFreq = \textcolor{keyword}{new} wxTextCtrl(\textcolor{keyword}{this}, wxNewId(), \_(\textcolor{stringliteral}{"1.0"}), wxDefaultPosition, freqTextfieldSize);
+00268     wxArrayString insel\_choices;
+00269     insel\_choices.push\_back(\_(\textcolor{stringliteral}{"Rx chain"}));
+00270     insel\_choices.push\_back(\_(\textcolor{stringliteral}{"FPGA NCO"}));
+00271     cmbInsel = \textcolor{keyword}{new} wxChoice(\textcolor{keyword}{this}, wxNewId(), wxDefaultPosition, wxDefaultSize, insel\_choices, 1);
+00272     cmbInsel->SetSelection(0);
+00273     Connect(cmbInsel->GetId(), wxEVT\_CHOICE, wxCommandEventHandler(
+      pnlQSpark::RegisterParameterChangeHandler), NULL, \textcolor{keyword}{this});
+00274 
+00275     wxStaticBoxSizer* loopbackGroup = \textcolor{keyword}{new} wxStaticBoxSizer(wxHORIZONTAL, \textcolor{keyword}{this}, \_T(\textcolor{stringliteral}{"Loopback controls"}));
+00276     wxFlexGridSizer* loopbackSizer = \textcolor{keyword}{new} wxFlexGridSizer(0, 2, 0, 0);
+00277     loopbackSizer->Add(\textcolor{keyword}{new} wxStaticText(\textcolor{keyword}{this}, wxID\_ANY, \_(\textcolor{stringliteral}{"Tx chain input source:"})), 1, wxALL | 
+      wxALIGN\_RIGHT | wxALIGN\_CENTER\_VERTICAL, 5);
+00278     loopbackSizer->Add(cmbInsel, 1, wxALIGN\_LEFT | wxEXPAND, 5);
+00279     loopbackSizer->Add(\textcolor{keyword}{new} wxStaticText(\textcolor{keyword}{this}, wxID\_ANY, \_(\textcolor{stringliteral}{"NCO (MHz):"})), 1, wxALL | wxALIGN\_RIGHT | 
+      wxALIGN\_CENTER\_VERTICAL, 5);
+00280     loopbackSizer->Add(txtNcoFreq, 1, wxALIGN\_LEFT | wxEXPAND, 5);
+00281     Connect(txtNcoFreq->GetId(), wxEVT\_TEXT, wxCommandEventHandler(
+      pnlQSpark::OnNcoFrequencyChanged), NULL, \textcolor{keyword}{this});
+00282     Connect(txtNcoFreq->GetId(), wxEVT\_TEXT\_ENTER, wxCommandEventHandler(
+      pnlQSpark::OnNcoFrequencyChanged), NULL, \textcolor{keyword}{this});
+00283 
+00284     loopbackGroup->Add(loopbackSizer, 1, wxALIGN\_LEFT | wxALIGN\_TOP | wxEXPAND, 5);
+00285     chSizer->Add(loopbackGroup, 1, wxALIGN\_LEFT | wxALIGN\_TOP | wxEXPAND, 5);
+00286 
+00287     mainSizer->Add(FlexGridSizer1, 1, wxEXPAND | wxALIGN\_LEFT | wxALIGN\_TOP | wxALL, 5);
+00288 
+00289     mainSizer->Fit(\textcolor{keyword}{this});
+00290     mainSizer->SetSizeHints(\textcolor{keyword}{this});
+00291     Layout();
+00292 
+00293     controlsPtr2Registers.clear();
+00294     controlsPtr2Registers[chkEN_RXTSP] = Register(0x00A0, 0, 0, 0);
+00295     controlsPtr2Registers[chkEN_TXTSP] = Register(0x0080, 0, 0, 0);
+00296 
+00297     controlsPtr2Registers[chkRX_DCCORR_BYP] = Register(0x00AC, 2, 2, 0);
+00298     controlsPtr2Registers[chkRX_PHCORR_BYP] = Register(0x00AC, 0, 0, 0);
+00299     controlsPtr2Registers[chkRX_GCORR_BYP] = Register(0x00AC, 1, 1, 0);
+00300     controlsPtr2Registers[chkTX_PHCORR_BYP] = Register(0x0088, 0, 0, 0);
+00301     controlsPtr2Registers[chkTX_GCORR_BYP] = Register(0x0088, 1, 1, 0);
+00302     controlsPtr2Registers[chkTX_DCCORR_BYP] = Register(0x0088, 3, 3, 0);
+00303 
+00304     controlsPtr2Registers[spinTX_GCORRQ] = Register(0x0081, 10, 0, 2047);
+00305     controlsPtr2Registers[spinTX_GCORRI] = Register(0x0082, 10, 0, 2047);
+00306     controlsPtr2Registers[spinTX_PHCORR] = Register(0x0083, 11, 0, 0);
+00307     controlsPtr2Registers[spinTX_DCCORRI] = Register(0x0084, 15, 8, 0);
+00308     controlsPtr2Registers[spinTX_DCCORRQ] = Register(0x0084, 7, 0, 0);
+00309 
+00310     controlsPtr2Registers[spinRX_GCORRQ] = Register(0x00A1, 10, 0, 2047);
+00311     controlsPtr2Registers[spinRX_GCORRI] = Register(0x00A2, 10, 0, 2047);
+00312     controlsPtr2Registers[spinRX_PHCORR] = Register(0x00A3, 11, 0, 0);
+00313       
+00314     controlsPtr2Registers[chkLB_1A] = Register(0x0017, 1, 0, 2);
+00315     controlsPtr2Registers[chkLB_1B] = Register(0x0017, 5, 4, 2);
+00316     controlsPtr2Registers[chkLB_2A] = Register(0x0017, 9, 8, 2);
+00317     controlsPtr2Registers[chkLB_2B] = Register(0x0017, 13, 12, 2);
+00318     controlsPtr2Registers[chkSH_1A] = Register(0x0017, 3, 3, 1);
+00319     controlsPtr2Registers[chkSH_1B] = Register(0x0017, 7, 7, 1);
+00320     controlsPtr2Registers[chkSH_2A] = Register(0x0017, 11, 11, 1);
+00321     controlsPtr2Registers[chkSH_2B] = Register(0x0017, 15, 15, 1);
+00322     controlsPtr2Registers[chkAT_1A] = Register(0x0017, 2, 2, 0);
+00323     controlsPtr2Registers[chkAT_1B] = Register(0x0017, 6, 6, 0);
+00324     controlsPtr2Registers[chkAT_2A] = Register(0x0017, 10, 10, 0);
+00325     controlsPtr2Registers[chkAT_2B] = Register(0x0017, 14, 14, 0);
+00326 
+00327 
+00328     controlsPtr2Registers[cmbInsel] = Register(0x0080, 2, 2, 0);
+00329     
+00330     Bind(READ\_ALL\_VALUES, &pnlQSpark::OnReadAll, \textcolor{keyword}{this}, this->GetId());
+00331     Bind(WRITE\_ALL\_VALUES, &pnlQSpark::OnWriteAll, \textcolor{keyword}{this}, this->GetId());
+00332 \}
+00333 
+00334 \textcolor{keywordtype}{void} pnlQSpark::Initialize(lms_device_t* pControl)
+00335 \{
+00336     lmsControl = pControl;
+00337     LMS_WriteFPGAReg(lmsControl, 0xFFFF, rbChannelB->GetValue() ? 0x2 : 0x1);
+00338     \textcolor{keywordtype}{double} freqHz;
+00339     LMS_GetSampleRate(lmsControl, LMS_CH_RX, 4, &freqHz,\textcolor{keyword}{nullptr});
+00340     txtPllFreqRxMHz->SetValue(wxString::Format(\textcolor{stringliteral}{"%1.3f"}, freqHz/1e6));
+00341     LMS_GetSampleRate(lmsControl, LMS_CH_TX, 4, &freqHz,\textcolor{keyword}{nullptr});
+00342     txtPllFreqTxMHz->SetValue(wxString::Format(\textcolor{stringliteral}{"%1.3f"}, freqHz/1e6));
+00343     
+00344 \}
+00345 
+00346 \textcolor{keywordtype}{void} pnlQSpark::RegisterParameterChangeHandler(wxCommandEvent& event)
+00347 \{
+00348     \textcolor{keywordflow}{if} (controlsPtr2Registers.find(event.GetEventObject()) == 
+      controlsPtr2Registers.end())
+00349         \textcolor{keywordflow}{return}; \textcolor{comment}{//control not found in the table}
+00350 
+00351     Register reg = controlsPtr2Registers[\textcolor{keyword}{event}.GetEventObject()];
+00352     \textcolor{keywordtype}{int} mac = (reg.address!=0x17) && (rbChannelB->GetValue()) ? 0x2 : 0x1;
+00353     \textcolor{keywordflow}{if} (LMS_WriteFPGAReg(lmsControl, 0xFFFF,  mac)!=0)
+00354     \{
+00355         wxMessageBox(\_(\textcolor{stringliteral}{"Write FPGA register failed"}), \_(\textcolor{stringliteral}{"Error"}), wxICON\_ERROR | wxOK); 
+00356         \textcolor{keywordflow}{return};
+00357     \}
+00358 
+00359     \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{short} mask = (~(~0 << (reg.msb - reg.lsb + 1))) << reg.lsb; \textcolor{comment}{// creates bit mask}
+00360 
+00361     uint16\_t regValue;
+00362     LMS_ReadFPGAReg(lmsControl,reg.address,&regValue);
+00363 
+00364     regValue &= ~mask;
+00365     \textcolor{keywordtype}{int} evtVal = \textcolor{keyword}{event}.GetInt();
+00366     \textcolor{keywordflow}{if} (event.GetEventObject() == chkLB_1A || \textcolor{keyword}{event}.GetEventObject() == chkLB_1B || \textcolor{keyword}{event}.GetEventObject() 
+      == chkLB_2A || \textcolor{keyword}{event}.GetEventObject() == chkLB_2B)
+00367         evtVal++;
+00368     regValue |= ( evtVal << reg.lsb) & mask;
+00369 
+00370     \textcolor{keywordflow}{if}(LMS_WriteFPGAReg(lmsControl, reg.address, regValue) != 0)
+00371         wxMessageBox(\_(\textcolor{stringliteral}{"Write FPGA register failed"}), \_(\textcolor{stringliteral}{"Error"}), wxICON\_ERROR | wxOK);
+00372 \}
+00373 
+00374 pnlQSpark::~pnlQSpark()
+00375 \{
+00376     mPanelStreamPLL->Disconnect(wxEVT\_BUTTON, btnConfigurePLL->GetId(), wxCommandEventHandler(
+      pnlQSpark::OnConfigurePLL), 0, \textcolor{keyword}{this});
+00377 \}
+00378 
+00379 \textcolor{keywordtype}{void} pnlQSpark::OnbtnUpdateAll(wxCommandEvent& event)
+00380 \{
+00381     map<wxObject*, Register>::iterator iter;
+00382     wxClassInfo* spinctr = wxClassInfo::FindClass(\textcolor{stringliteral}{"wxSpinCtrl"});
+00383     wxClassInfo* checkboxctr = wxClassInfo::FindClass(\textcolor{stringliteral}{"wxCheckBox"});
+00384     wxClassInfo* choicectr = wxClassInfo::FindClass(\textcolor{stringliteral}{"wxChoice"});
+00385     \textcolor{keywordflow}{if} (LMS_WriteFPGAReg(lmsControl, 0xFFFF, rbChannelB->GetValue() ? 0x2 : 0x1)!= 0)
+00386     \{
+00387         wxMessageBox(\_(\textcolor{stringliteral}{"Write FPGA register failed"}), \_(\textcolor{stringliteral}{"Error"}), wxICON\_ERROR | wxOK); 
+00388         \textcolor{keywordflow}{return}; 
+00389     \}
+00390     \textcolor{keywordflow}{for} (iter = controlsPtr2Registers.begin(); iter != controlsPtr2Registers.end(); ++iter)
+00391     \{
+00392         Register reg = iter->second;
+00393         \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{short} mask = (~(~0 << (reg.msb - reg.lsb + 1))) << reg.lsb; \textcolor{comment}{// creates bit mask}
+00394         uint16\_t value;
+00395 
+00396         LMS_ReadFPGAReg(lmsControl,reg.address,&value);
+00397 
+00398         value = value & mask;
+00399         value = value >> reg.lsb;
+00400         
+00401         \textcolor{keywordflow}{if} (iter->first == chkLB_1A || iter->first == chkLB_1B || iter->first == 
+      chkLB_2A || iter->first == chkLB_2B)
+00402             value = value == 2 ? 1 : 0;
+00403         \textcolor{keywordflow}{if} (iter->first->IsKindOf(spinctr))
+00404             reinterpret\_cast<wxSpinCtrl*>(iter->first)->SetValue(value);
+00405         \textcolor{keywordflow}{else} \textcolor{keywordflow}{if}(iter->first->IsKindOf(checkboxctr))
+00406             reinterpret\_cast<wxCheckBox*>(iter->first)->SetValue(value);
+00407         \textcolor{keywordflow}{else} \textcolor{keywordflow}{if}(iter->first->IsKindOf(choicectr))
+00408             reinterpret\_cast<wxComboBox*>(iter->first)->SetSelection(value);
+00409     \}
+00410 
+00411     \textcolor{keywordtype}{double} refClk\_MHz, ncoFreq\_MHz;
+00412     txtPllFreqTxMHz->GetValue().ToDouble(&refClk\_MHz);
+00413     uint32\_t fcw = 0;
+00414     vector<uint32\_t> addrs = \{ 0x008E, 0x008F \};
+00415 
+00416     \textcolor{keywordflow}{for} (\textcolor{keywordtype}{size\_t} i = 0; i <addrs.size(); i++)
+00417     \{
+00418         uint16\_t value;
+00419         \textcolor{keywordflow}{if} (LMS_ReadFPGAReg(lmsControl, addrs[i], &value) != 0)
+00420         \{
+00421             wxMessageBox(\_(\textcolor{stringliteral}{"Read FPGA register failed"}), \_(\textcolor{stringliteral}{"Error"}), wxICON\_ERROR | wxOK);
+00422             \textcolor{keywordflow}{return};
+00423         \}
+00424         fcw <<= 16;
+00425         fcw += value;
+00426     \}
+00427     ncoFreq\_MHz = fcw * refClk\_MHz / 4294967296;
+00428     txtNcoFreq->SetValue(wxString::Format(\textcolor{stringliteral}{"%1.3f"}, ncoFreq\_MHz));
+00429 \}
+00430 
+00431 \textcolor{keywordtype}{void} pnlQSpark::OnConfigurePLL(wxCommandEvent &event)
+00432 \{
+00433 
+00434     \textcolor{keyword}{auto} conn = ((LMS7_Device*)lmsControl)->GetConnection();
+00435     \textcolor{keywordflow}{if} (!conn || !conn->IsOpen())
+00436     \{
+00437         wxMessageBox(\_(\textcolor{stringliteral}{"device not connected"}), \_(\textcolor{stringliteral}{"Error"}), wxICON\_ERROR | wxOK);
+00438         \textcolor{keywordflow}{return};
+00439     \}
+00440 
+00441     \textcolor{keywordtype}{double} FreqTxMHz, FreqRxMHz;
+00442     txtPllFreqTxMHz->GetValue().ToDouble(&FreqTxMHz);
+00443     txtPllFreqRxMHz->GetValue().ToDouble(&FreqRxMHz);
+00444 
+00445     \textcolor{keywordflow}{if} (((LMS7_Device*)lmsControl)->SetRate(4, FreqRxMHz*1e6, FreqTxMHz*1e6)!=0)
+00446         wxMessageBox(\_(\textcolor{stringliteral}{"PLL configuration failed"}), \_(\textcolor{stringliteral}{"Error"}), wxICON\_ERROR | wxOK);
+00447     \textcolor{keywordflow}{else}
+00448         OnNcoFrequencyChanged(event);
+00449 \}
+00450 
+00451 \textcolor{keywordtype}{void} pnlQSpark::OnNcoFrequencyChanged(wxCommandEvent& event)
+00452 \{
+00453     LMS_WriteFPGAReg(lmsControl, 0xFFFF, rbChannelB->GetValue() ? 0x2 : 0x1);
+00454     \textcolor{keywordtype}{double} refClk\_MHz, ncoFreq\_MHz;
+00455     txtPllFreqTxMHz->GetValue().ToDouble(&refClk\_MHz);
+00456     txtNcoFreq->GetValue().ToDouble(&ncoFreq\_MHz);
+00457     uint32\_t fcw = (uint32\_t)((ncoFreq\_MHz / refClk\_MHz) * 4294967296);
+00458     vector<uint32\_t> addrs = \{ 0x008E, 0x008F \};
+00459     vector<uint32\_t> values = \{ (fcw >> 16) & 0xFFFF, fcw & 0xFFFF \};
+00460 
+00461     \textcolor{keywordflow}{for} (\textcolor{keywordtype}{size\_t} i = 0; i <values.size();i++)
+00462     \{
+00463         \textcolor{keywordflow}{if} (LMS_WriteFPGAReg(lmsControl,addrs[i],values[i]) !=0)
+00464         \{
+00465             wxMessageBox(\_(\textcolor{stringliteral}{"Write FPGA register failed"}), \_(\textcolor{stringliteral}{"Error"}), wxICON\_ERROR | wxOK);
+00466             \textcolor{keywordflow}{return};
+00467         \}
+00468     \}
+00469 \}
+00470 
+00471 \textcolor{keywordtype}{void} pnlQSpark::OnReadAll(wxCommandEvent &event)
+00472 \{
+00473      OnbtnUpdateAll(event);
+00474 \}
+00475 
+00476 \textcolor{keywordtype}{void} pnlQSpark::OnWriteAll(wxCommandEvent &event)
+00477 \{
+00478     OnNcoFrequencyChanged(event);
+00479     OnConfigurePLL(event);
+00480 \}
+00481 
+00482 \textcolor{keywordtype}{void} pnlQSpark::OnSwitchToChannelA(wxCommandEvent& event)
+00483 \{
+00484     \textcolor{keywordflow}{if} (LMS_WriteFPGAReg(lmsControl, 0xFFFF, 0x1) != 0)
+00485     \{
+00486         wxMessageBox(\_(\textcolor{stringliteral}{"Write FPGA register failed"}), \_(\textcolor{stringliteral}{"Error"}), wxICON\_ERROR | wxOK);
+00487         \textcolor{keywordflow}{return};
+00488     \}
+00489     wxCommandEvent evt;
+00490     OnbtnUpdateAll(evt);
+00491 \}
+00492 
+00493 \textcolor{keywordtype}{void} pnlQSpark::OnSwitchToChannelB(wxCommandEvent& event)
+00494 \{
+00495     \textcolor{keywordflow}{if} (LMS_WriteFPGAReg(lmsControl, 0xFFFF, 0x2) != 0)
+00496     \{
+00497         wxMessageBox(\_(\textcolor{stringliteral}{"Write FPGA register failed"}), \_(\textcolor{stringliteral}{"Error"}), wxICON\_ERROR | wxOK);
+00498         \textcolor{keywordflow}{return};
+00499     \}
+00500     wxCommandEvent evt;
+00501     OnbtnUpdateAll(evt);
+00502 \}
+\end{DoxyCode}

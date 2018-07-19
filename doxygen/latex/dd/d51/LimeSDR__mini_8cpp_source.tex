@@ -1,0 +1,296 @@
+\subsection{Lime\+S\+D\+R\+\_\+mini.\+cpp}
+\label{LimeSDR__mini_8cpp_source}\index{/home/erik/prefix/default/src/limesuite-\/dev/src/\+A\+P\+I/\+Lime\+S\+D\+R\+\_\+mini.\+cpp@{/home/erik/prefix/default/src/limesuite-\/dev/src/\+A\+P\+I/\+Lime\+S\+D\+R\+\_\+mini.\+cpp}}
+
+\begin{DoxyCode}
+00001 \textcolor{comment}{/*}
+00002 \textcolor{comment}{ * File:   LimeSDR\_mini.cpp}
+00003 \textcolor{comment}{ * Author: Ignas J}
+00004 \textcolor{comment}{ *}
+00005 \textcolor{comment}{ * Created on September 18, 2016}
+00006 \textcolor{comment}{ */}
+00007 \textcolor{preprocessor}{#include "LimeSDR_mini.h"}
+00008 \textcolor{preprocessor}{#include "lime/LimeSuite.h"}
+00009 \textcolor{preprocessor}{#include "Logger.h"}
+00010 \textcolor{preprocessor}{#include "FPGA_Mini.h"}
+00011 \textcolor{preprocessor}{#include "device_constants.h"}
+00012 
+00013 \textcolor{keyword}{namespace }lime
+00014 \{
+00015 
+00016 LMS7_LimeSDR_mini::LMS7_LimeSDR_mini(lime::IConnection* conn, lime::LMS7_Device *obj) : 
+      lime::LMS7_Device(obj)
+00017 \{
+00018     fpga = \textcolor{keyword}{new} lime::FPGA_Mini();
+00019     \textcolor{keywordflow}{while} (obj && lms_list.size() > 1)
+00020     \{
+00021         \textcolor{keyword}{delete} lms_list.back();
+00022         lms_list.pop\_back();
+00023     \}
+00024     fpga->SetConnection(conn);
+00025     \textcolor{keywordtype}{double} refClk = fpga->DetectRefClk();
+00026     this->lms_list[0]->SetConnection(conn);
+00027     mStreamers.push\_back(\textcolor{keyword}{new} lime::Streamer(fpga,lms_list[0],0));
+00028     lms_list[0]->SetReferenceClk\_SX(\textcolor{keyword}{false}, refClk);
+00029     connection = conn;
+00030 \}
+00031 
+00032 \textcolor{keywordtype}{int} LMS7_LimeSDR_mini::Init()
+00033 \{
+00034     \textcolor{keyword}{struct }regVal
+00035     \{
+00036         uint16\_t adr;
+00037         uint16\_t val;
+00038     \};
+00039 
+00040     \textcolor{keyword}{const} std::vector<regVal> initVals\_1v0 = \{
+00041         \{0x0022, 0x0FFF\}, \{0x0023, 0x5550\}, \{0x002B, 0x0038\}, \{0x002C, 0x0000\},
+00042         \{0x002D, 0x0641\}, \{0x0086, 0x4101\}, \{0x0087, 0x5555\}, \{0x0088, 0x03F0\},
+00043         \{0x0089, 0x1078\}, \{0x008B, 0x2100\}, \{0x008C, 0x267B\}, \{0x0092, 0xFFFF\},
+00044     \{0x0093, 0x03FF\}, \{0x00A1, 0x656A\}, \{0x00A6, 0x0001\}, \{0x00A9, 0x8000\},
+00045         \{0x00AC, 0x2000\}, \{0x0105, 0x0011\}, \{0x0108, 0x118C\}, \{0x0109, 0x6100\},
+00046         \{0x010A, 0x1F4C\}, \{0x010B, 0x0001\}, \{0x010C, 0x8865\}, \{0x010E, 0x0000\},
+00047         \{0x010F, 0x3142\}, \{0x0110, 0x2B14\}, \{0x0111, 0x0000\}, \{0x0112, 0x942E\},
+00048         \{0x0113, 0x03C2\}, \{0x0114, 0x00D0\}, \{0x0117, 0x1230\}, \{0x0119, 0x18D2\},
+00049         \{0x011C, 0x8941\}, \{0x011D, 0x0000\}, \{0x011E, 0x0740\}, \{0x0120, 0xE6B4\},
+00050         \{0x0121, 0x3650\}, \{0x0123, 0x000F\}, \{0x0200, 0x00E1\}, \{0x0208, 0x017B\},
+00051         \{0x020B, 0x4000\}, \{0x020C, 0x8000\}, \{0x0400, 0x8081\}, \{0x0404, 0x0006\},
+00052         \{0x040B, 0x1020\}, \{0x040C, 0x00FB\}
+00053     \};
+00054 
+00055     \textcolor{keyword}{const} std::vector<regVal> initVals\_1v2 = \{
+00056         \{0x0022, 0x0FFF\}, \{0x0023, 0x5550\}, \{0x002B, 0x0038\}, \{0x002C, 0x0000\},
+00057         \{0x002D, 0x0641\}, \{0x0086, 0x4101\}, \{0x0087, 0x5555\}, \{0x0088, 0x03F0\},
+00058         \{0x0089, 0x1078\}, \{0x008B, 0x2100\}, \{0x008C, 0x267B\}, \{0x00A1, 0x656A\},
+00059         \{0x00A6, 0x0009\}, \{0x00A7, 0x8A8A\}, \{0x00A9, 0x8000\}, \{0x00AC, 0x2000\},
+00060         \{0x0105, 0x0011\}, \{0x0108, 0x118C\}, \{0x0109, 0x6100\}, \{0x010A, 0x1F4C\},
+00061         \{0x010B, 0x0001\}, \{0x010C, 0x8865\}, \{0x010E, 0x0000\}, \{0x010F, 0x3142\},
+00062         \{0x0110, 0x2B14\}, \{0x0111, 0x0000\}, \{0x0112, 0x942E\}, \{0x0113, 0x03C2\},
+00063         \{0x0114, 0x00D0\}, \{0x0117, 0x1230\}, \{0x0119, 0x18D2\}, \{0x011C, 0x8941\},
+00064         \{0x011D, 0x0000\}, \{0x011E, 0x0740\}, \{0x0120, 0xE6B4\}, \{0x0121, 0x3650\},
+00065         \{0x0123, 0x000F\}, \{0x0200, 0x00E1\}, \{0x0208, 0x017B\}, \{0x020B, 0x4000\},
+00066         \{0x020C, 0x8000\}, \{0x0400, 0x8081\}, \{0x0404, 0x0006\}, \{0x040B, 0x1020\},
+00067         \{0x040C, 0x00FB\}
+00068     \};
+00069 
+00070     \textcolor{keywordtype}{int} hw\_version = 0;
+00071     connection->ReadRegister(3, hw\_version);
+00072     \textcolor{keyword}{auto} &initVals = hw\_version >= 2 ? initVals\_1v2 : initVals\_1v0;
+00073 
+00074     lime::LMS7002M* lms = lms_list[0];
+00075     \textcolor{keywordflow}{if} (lms->ResetChip() != 0)
+00076         \textcolor{keywordflow}{return} -1;
+00077 
+00078     lms->Modify_SPI_Reg_bits(LMS7param(MAC), 1);
+00079     \textcolor{keywordflow}{for} (\textcolor{keyword}{auto} i : initVals)
+00080         lms->SPI_write(i.adr, i.val, \textcolor{keyword}{true});
+00081 
+00082     lms->Modify_SPI_Reg_bits(LMS7param(MAC), 2);
+00083     lms->SPI_write(0x0123, 0x000F);  \textcolor{comment}{//SXT}
+00084     lms->SPI_write(0x0120, 0xE6B4);  \textcolor{comment}{//SXT}
+00085     lms->SPI_write(0x011C, 0x8941);  \textcolor{comment}{//SXT}
+00086     lms->EnableChannel(\textcolor{keyword}{false}, \textcolor{keyword}{false});
+00087     lms->EnableChannel(\textcolor{keyword}{true}, \textcolor{keyword}{false});
+00088 
+00089     lms->Modify_SPI_Reg_bits(LMS7param(MAC), 1);
+00090 
+00091     \textcolor{keywordflow}{if} (SetFrequency(\textcolor{keyword}{true},0,1250e6)!=0)
+00092         \textcolor{keywordflow}{return} -1;
+00093     \textcolor{keywordflow}{if} (SetFrequency(\textcolor{keyword}{false},0,1200e6)!=0)
+00094         \textcolor{keywordflow}{return} -1;
+00095     \textcolor{keywordflow}{if} (SetRate(15.36e6, 1)!=0)
+00096         \textcolor{keywordflow}{return} -1;
+00097 
+00098     \textcolor{keywordflow}{return} 0;
+00099 \}
+00100 
+00101 \textcolor{keywordtype}{unsigned} LMS7_LimeSDR_mini::GetNumChannels(\textcolor{keyword}{const} \textcolor{keywordtype}{bool} tx)\textcolor{keyword}{ const}
+00102 \textcolor{keyword}{}\{
+00103     \textcolor{keywordflow}{return} 1;
+00104 \}
+00105 
+00106 \textcolor{keywordtype}{int} LMS7_LimeSDR_mini::SetFrequency(\textcolor{keywordtype}{bool} isTx, \textcolor{keywordtype}{unsigned} chan, \textcolor{keywordtype}{double} f\_Hz)
+00107 \{
+00108     lime::LMS7002M* lms = lms_list[0];
+00109 
+00110     ChannelInfo& channel = isTx ? tx_channels[0] : rx_channels[0];
+00111     channel.freq = f\_Hz;
+00112 
+00113     \textcolor{keyword}{auto} setTDD = [=](\textcolor{keywordtype}{double} center)->\textcolor{keywordtype}{int}
+00114     \{
+00115         ChannelInfo& other = isTx ? rx_channels[0] : tx_channels[0];
+00116         \textcolor{keywordtype}{bool} tdd =  fabs(other.freq+other.cF_offset_nco-center) > 0.1 ? \textcolor{keyword}{false} : \textcolor{keyword}{true};
+00117         lms->EnableSXTDD(tdd);
+00118         \textcolor{keywordflow}{if} (isTx || (!tdd))
+00119             \textcolor{keywordflow}{if} (lms->SetFrequencySX(isTx, center) != 0)
+00120                 \textcolor{keywordflow}{return} -1;
+00121         \textcolor{keywordflow}{return} 0;
+00122     \};
+00123 
+00124     \textcolor{keywordflow}{if} (f\_Hz < 30e6)
+00125     \{
+00126         \textcolor{keywordflow}{if} (setTDD(30e6) != 0)
+00127             \textcolor{keywordflow}{return} -1;
+00128         channel.cF_offset_nco = 30e6-f\_Hz;
+00129         \textcolor{keywordflow}{if} (SetRate(isTx,GetRate(isTx,0),2)!=0)
+00130             \textcolor{keywordflow}{return} -1;
+00131         \textcolor{keywordflow}{return} 0;
+00132     \}
+00133 
+00134     \textcolor{keywordflow}{if} (channel.cF_offset_nco != 0)
+00135         SetNCOFreq(isTx, 0, -1, 0.0);
+00136     channel.cF_offset_nco = 0;
+00137     \textcolor{keywordflow}{if} (setTDD(f\_Hz) != 0)
+00138         \textcolor{keywordflow}{return} -1;
+00139     \textcolor{keywordflow}{return} 0;
+00140 \}
+00141 
+00142 std::vector<std::string> LMS7_LimeSDR_mini::GetPathNames(\textcolor{keywordtype}{bool} dir_tx, \textcolor{keywordtype}{unsigned} 
+      chan)\textcolor{keyword}{ const}
+00143 \textcolor{keyword}{}\{
+00144     \textcolor{keywordflow}{if} (dir\_tx)
+00145         \textcolor{keywordflow}{return} \{\textcolor{stringliteral}{"NONE"}, \textcolor{stringliteral}{"BAND1"}, \textcolor{stringliteral}{"BAND2"}\};
+00146     \textcolor{keywordflow}{else}
+00147     \textcolor{keywordflow}{return} \{\textcolor{stringliteral}{"NONE"}, \textcolor{stringliteral}{"LNAH"}, \textcolor{stringliteral}{"LNAL\_NC"}, \textcolor{stringliteral}{"LNAW"}\};
+00148 \}
+00149 
+00150 \textcolor{keywordtype}{int} LMS7_LimeSDR_mini::SetPath(\textcolor{keywordtype}{bool} tx, \textcolor{keywordtype}{unsigned} chan, \textcolor{keywordtype}{unsigned} path)
+00151 \{
+00152     lime::LMS7002M* lms = lms_list[0];
+00153     \textcolor{keywordflow}{if} (lms->Modify_SPI_Reg_bits(LMS7param(MAC), (chan%2) + 1) != 0)
+00154         \textcolor{keywordflow}{return} -1;
+00155     \textcolor{keywordflow}{if} (tx==\textcolor{keyword}{false})
+00156     \{
+00157         \textcolor{keywordflow}{if} ((lms->Modify_SPI_Reg_bits(LMS7param(SEL_PATH_RFE),path)!=0)
+00158         || (lms->Modify_SPI_Reg_bits(LMS7param(EN_INSHSW_L_RFE), path != 2) != 0)
+00159         || (lms->Modify_SPI_Reg_bits(LMS7param(EN_INSHSW_W_RFE), path != 3) != 0))
+00160             \textcolor{keywordflow}{return} -1;
+00161         \textcolor{keywordflow}{if} (path==LMS_PATH_LNAW)
+00162         \{
+00163             uint16\_t value;
+00164             connection->ReadRegister(0x17,value);
+00165             value &= ~(1<<8);
+00166             value |= 1<<9;
+00167             connection->WriteRegister(0x17, value);
+00168         \}
+00169         \textcolor{keywordflow}{else} \textcolor{keywordflow}{if} (path==LMS_PATH_LNAH)
+00170         \{
+00171             uint16\_t value;
+00172             connection->ReadRegister(0x17,value);
+00173             value &= ~(1<<9);
+00174             value |= 1<<8;
+00175             connection->WriteRegister(0x17, value);
+00176         \}
+00177         \textcolor{keywordflow}{else} \textcolor{keywordflow}{if} (LMS_PATH_LNAL)
+00178             lime::warning(\textcolor{stringliteral}{"LNAL has no connection to RF ports"});
+00179     \}
+00180     \textcolor{keywordflow}{else}
+00181     \{
+00182         \textcolor{keywordflow}{if} ((lms->Modify_SPI_Reg_bits(LMS7param(SEL_BAND1_TRF), path == 
+      LMS_PATH_TX1) != 0)
+00183         || (lms->Modify_SPI_Reg_bits(LMS7param(SEL_BAND2_TRF), path == 
+      LMS_PATH_TX2) != 0))
+00184             \textcolor{keywordflow}{return} -1;
+00185         \textcolor{keywordflow}{if} (path==LMS_PATH_TX1)
+00186         \{
+00187             uint16\_t value;
+00188             connection->ReadRegister(0x17,value);
+00189             value &= ~(1<<13);
+00190             value |= 1<<12;
+00191             connection->WriteRegister(0x17, value);
+00192         \}
+00193         \textcolor{keywordflow}{else} \textcolor{keywordflow}{if} (path==LMS_PATH_TX2)
+00194         \{
+00195             uint16\_t value;
+00196             connection->ReadRegister(0x17,value);
+00197             value &= ~(1<<12);
+00198             value |= 1<<13;
+00199             connection->WriteRegister(0x17, value);
+00200         \}
+00201     \}
+00202     \textcolor{keywordflow}{return} 0;
+00203 \}
+00204 
+00205 \textcolor{keywordtype}{int} LMS7_LimeSDR_mini::SetRate(\textcolor{keywordtype}{double} f\_Hz, \textcolor{keywordtype}{int} oversample)
+00206 \{
+00207     lime::LMS7002M* lms = lms_list[0];
+00208 
+00209     \textcolor{keywordflow}{if} (oversample == 0)
+00210         oversample = lime::cgenMax/(16*f\_Hz);
+00211     \textcolor{keywordtype}{bool} bypass = (oversample <= 1 && tx_channels[0].cF\_offset\_nco == 0.0 && 
+      rx_channels[0].cF\_offset\_nco == 0.0);
+00212 
+00213     \textcolor{keywordflow}{if} ((lms->Modify_SPI_Reg_bits(LMS7_LML1_SISODDR, 1)!=0)
+00214         || (lms->Modify_SPI_Reg_bits(LMS7_LML2_SISODDR, 1)!=0)
+00215         || (lms->Modify_SPI_Reg_bits(LMS7_CDSN_RXALML, !bypass)!=0))
+00216             \textcolor{keywordflow}{return} -1;
+00217 
+00218     \textcolor{keywordflow}{if} (!bypass)
+00219         \textcolor{keywordflow}{return} LMS7_Device::SetRate(f\_Hz, oversample);
+00220 
+00221     tx_channels[0].sample\_rate = f\_Hz;
+00222     rx_channels[0].sample\_rate = f\_Hz;
+00223 
+00224     \textcolor{keywordflow}{if} ((lms->SetFrequencyCGEN(f\_Hz*4) != 0)
+00225         || (lms->Modify_SPI_Reg_bits(LMS7param(EN_ADCCLKH_CLKGN), 0) != 0)
+00226         || (lms->Modify_SPI_Reg_bits(LMS7param(CLKH_OV_CLKL_CGEN), 2) != 0)
+00227         || (lms->Modify_SPI_Reg_bits(LMS7param(MAC), 1) != 0)
+00228         || (lms->SetInterfaceFrequency(lms->GetFrequencyCGEN(), 7, 7) != 0))
+00229         \textcolor{keywordflow}{return} -1;
+00230 
+00231      \textcolor{keywordtype}{double} fpgaTxPLL = lms->GetReferenceClk_TSP(lime::LMS7002M::Tx);
+00232      \textcolor{keywordtype}{double} fpgaRxPLL = lms->GetReferenceClk_TSP(lime::LMS7002M::Rx);
+00233      \textcolor{keywordflow}{if} (fpga->SetInterfaceFreq(fpgaTxPLL, fpgaRxPLL, 0) != 0)
+00234         \textcolor{keywordflow}{return} -1;
+00235      \textcolor{keywordflow}{return} 0;
+00236 \}
+00237 
+00238 
+00239 \textcolor{keywordtype}{int} LMS7_LimeSDR_mini::SetRate(\textcolor{keywordtype}{bool} tx, \textcolor{keywordtype}{double} f\_Hz, \textcolor{keywordtype}{unsigned} oversample)
+00240 \{
+00241     \textcolor{keywordflow}{return} SetRate(f\_Hz, oversample); \textcolor{comment}{//different rates for TX and Rx are not supported}
+00242 \}
+00243 
+00244 LMS7_Device::Range LMS7_LimeSDR_mini::GetRxPathBand(\textcolor{keywordtype}{unsigned} path, \textcolor{keywordtype}{unsigned} chan)\textcolor{keyword}{ const}
+00245 \textcolor{keyword}{}\{
+00246   \textcolor{keywordflow}{switch} (path)
+00247   \{
+00248       \textcolor{keywordflow}{case} LMS_PATH_LNAH: \textcolor{keywordflow}{return} Range(2e9, 2.6e9);
+00249       \textcolor{keywordflow}{case} LMS_PATH_LNAW: \textcolor{keywordflow}{return} Range(700e6, 900e6);
+00250       \textcolor{keywordflow}{default}: \textcolor{keywordflow}{return} Range();
+00251   \}
+00252 \}
+00253 
+00254 LMS7_Device::Range LMS7_LimeSDR_mini::GetTxPathBand(\textcolor{keywordtype}{unsigned} path, \textcolor{keywordtype}{unsigned} chan)\textcolor{keyword}{ const}
+00255 \textcolor{keyword}{}\{
+00256   \textcolor{keywordflow}{switch} (path)
+00257   \{
+00258       \textcolor{keywordflow}{case} LMS_PATH_TX1: \textcolor{keywordflow}{return} Range(2e9, 2.6e9);
+00259       \textcolor{keywordflow}{case} LMS_PATH_TX2: \textcolor{keywordflow}{return} Range(30e6, 1.9e9);
+00260       \textcolor{keywordflow}{default}: \textcolor{keywordflow}{return} Range();
+00261   \}
+00262 \}
+00263 
+00264 
+00265 std::vector<std::string> LMS7_LimeSDR_mini::GetProgramModes()\textcolor{keyword}{ const}
+00266 \textcolor{keyword}{}\{
+00267     \textcolor{keywordflow}{return} \{program_mode::autoUpdate,
+00268             program_mode::fpgaFlash, program_mode::fpgaReset,
+00269             program_mode::mcuRAM, program_mode::mcuEEPROM, 
+      program_mode::mcuReset\};
+00270 \}
+00271 
+00272 LMS7_Device::Range LMS7_LimeSDR_mini::GetRateRange(\textcolor{keywordtype}{bool} \textcolor{comment}{/*dir*/}, \textcolor{keywordtype}{unsigned} \textcolor{comment}{/*chan*/})\textcolor{keyword}{ const}
+00273 \textcolor{keyword}{}\{
+00274     \textcolor{keywordflow}{return} Range(100e3, 30.72e6);
+00275 \}
+00276 
+00277 LMS7_Device::Range LMS7_LimeSDR_mini::GetFrequencyRange(\textcolor{keywordtype}{bool} tx)\textcolor{keyword}{ const}
+00278 \textcolor{keyword}{}\{
+00279     \textcolor{keywordflow}{return} Range(10e6, 3.5e9);
+00280 \}
+00281 
+00282 
+00283 \}\textcolor{comment}{//namespace lime}
+00284 
+00285 
+\end{DoxyCode}

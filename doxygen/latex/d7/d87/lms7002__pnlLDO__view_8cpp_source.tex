@@ -1,0 +1,233 @@
+\subsection{lms7002\+\_\+pnl\+L\+D\+O\+\_\+view.\+cpp}
+\label{lms7002__pnlLDO__view_8cpp_source}\index{/home/erik/prefix/default/src/limesuite-\/dev/src/lms7002\+\_\+wxgui/lms7002\+\_\+pnl\+L\+D\+O\+\_\+view.\+cpp@{/home/erik/prefix/default/src/limesuite-\/dev/src/lms7002\+\_\+wxgui/lms7002\+\_\+pnl\+L\+D\+O\+\_\+view.\+cpp}}
+
+\begin{DoxyCode}
+00001 \textcolor{preprocessor}{#include "lms7002_pnlLDO_view.h"}
+00002 \textcolor{preprocessor}{#include <map>}
+00003 \textcolor{preprocessor}{#include "lms7002_gui_utilities.h"}
+00004 \textcolor{keyword}{using namespace }lime;
+00005 
+00006 lms7002_pnlLDO_view::lms7002_pnlLDO_view( wxWindow* parent )
+00007 :
+00008 pnlLDO_view( parent )
+00009 \{
+00010 
+00011 \}
+00012 
+00013 lms7002_pnlLDO_view::lms7002_pnlLDO_view( wxWindow* parent, wxWindowID \textcolor{keywordtype}{id}, \textcolor{keyword}{const} wxPoint& pos, \textcolor{keyword}{const} wxSize
+      & size, \textcolor{keywordtype}{long} style )
+00014     : pnlLDO_view(parent, id, pos, size, style), lmsControl(nullptr)
+00015 \{
+00016     \textcolor{comment}{/*wndId2Enum[chkBYP\_LDO\_AFE] = BYP\_LDO\_AFE;}
+00017 \textcolor{comment}{    wndId2Enum[chkBYP\_LDO\_CPGN] = BYP\_LDO\_CPGN;}
+00018 \textcolor{comment}{    wndId2Enum[chkBYP\_LDO\_CPSXR] = BYP\_LDO\_CPSXR;}
+00019 \textcolor{comment}{    wndId2Enum[chkBYP\_LDO\_CPSXT] = BYP\_LDO\_CPSXT;}
+00020 \textcolor{comment}{    wndId2Enum[chkBYP\_LDO\_DIG] = BYP\_LDO\_DIG;}
+00021 \textcolor{comment}{    wndId2Enum[chkBYP\_LDO\_DIGGN] = BYP\_LDO\_DIGGN;}
+00022 \textcolor{comment}{    wndId2Enum[chkBYP\_LDO\_DIGIp1] = BYP\_LDO\_DIGIp1;}
+00023 \textcolor{comment}{    wndId2Enum[chkBYP\_LDO\_DIGIp2] = BYP\_LDO\_DIGIp2;}
+00024 \textcolor{comment}{    wndId2Enum[chkBYP\_LDO\_DIGSXR] = BYP\_LDO\_DIGSXR;}
+00025 \textcolor{comment}{    wndId2Enum[chkBYP\_LDO\_DIGSXT] = BYP\_LDO\_DIGSXT;}
+00026 \textcolor{comment}{    wndId2Enum[chkBYP\_LDO\_DIVGN] = BYP\_LDO\_DIVGN;}
+00027 \textcolor{comment}{    wndId2Enum[chkBYP\_LDO\_DIVSXR] = BYP\_LDO\_DIVSXR;}
+00028 \textcolor{comment}{    wndId2Enum[chkBYP\_LDO\_DIVSXT] = BYP\_LDO\_DIVSXT;}
+00029 \textcolor{comment}{    wndId2Enum[chkBYP\_LDO\_LNA12] = BYP\_LDO\_LNA12;}
+00030 \textcolor{comment}{    wndId2Enum[chkBYP\_LDO\_LNA14] = BYP\_LDO\_LNA14;}
+00031 \textcolor{comment}{    wndId2Enum[chkBYP\_LDO\_MXRFE] = BYP\_LDO\_MXRFE;}
+00032 \textcolor{comment}{    wndId2Enum[chkBYP\_LDO\_RBB] = BYP\_LDO\_RBB;}
+00033 \textcolor{comment}{    wndId2Enum[chkBYP\_LDO\_RXBUF] = BYP\_LDO\_RXBUF;}
+00034 \textcolor{comment}{    wndId2Enum[chkBYP\_LDO\_SPIBUF] = BYP\_LDO\_SPIBUF;}
+00035 \textcolor{comment}{    wndId2Enum[chkBYP\_LDO\_TBB] = BYP\_LDO\_TBB;}
+00036 \textcolor{comment}{    wndId2Enum[chkBYP\_LDO\_TIA12] = BYP\_LDO\_TIA12;}
+00037 \textcolor{comment}{    wndId2Enum[chkBYP\_LDO\_TIA14] = BYP\_LDO\_TIA14;}
+00038 \textcolor{comment}{    wndId2Enum[chkBYP\_LDO\_TLOB] = BYP\_LDO\_TLOB;}
+00039 \textcolor{comment}{    wndId2Enum[chkBYP\_LDO\_TPAD] = BYP\_LDO\_TPAD;}
+00040 \textcolor{comment}{    wndId2Enum[chkBYP\_LDO\_TXBUF] = BYP\_LDO\_TXBUF;}
+00041 \textcolor{comment}{    wndId2Enum[chkBYP\_LDO\_VCOGN] = BYP\_LDO\_VCOGN;}
+00042 \textcolor{comment}{    wndId2Enum[chkBYP\_LDO\_VCOSXR] = BYP\_LDO\_VCOSXR;}
+00043 \textcolor{comment}{    wndId2Enum[chkBYP\_LDO\_VCOSXT] = BYP\_LDO\_VCOSXT;*/}
+00044     wndId2Enum[chkEN_G_LDO] = LMS7param(EN_G_LDO);
+00045     wndId2Enum[chkEN_G_LDOP] = LMS7param(EN_G_LDOP);
+00046     wndId2Enum[chkEN_LDO_AFE] = LMS7param(EN_LDO_AFE);
+00047     wndId2Enum[chkEN_LDO_CPGN] = LMS7param(EN_LDO_CPGN);
+00048     wndId2Enum[chkEN_LDO_CPSXR] = LMS7param(EN_LDO_CPSXR);
+00049     wndId2Enum[chkEN_LDO_CPSXT] = LMS7param(EN_LDO_CPSXT);
+00050     wndId2Enum[chkEN_LDO_DIG] = LMS7param(EN_LDO_DIG);
+00051     wndId2Enum[chkEN_LDO_DIGGN] = LMS7param(EN_LDO_DIGGN);
+00052     wndId2Enum[chkPD_LDO_DIGIp1] = LMS7param(PD_LDO_DIGIp1);
+00053     wndId2Enum[chkPD_LDO_DIGIp2] = LMS7param(PD_LDO_DIGIp2);
+00054     wndId2Enum[chkEN_LDO_DIGSXR] = LMS7param(EN_LDO_DIGSXR);
+00055     wndId2Enum[chkEN_LDO_DIGSXT] = LMS7param(EN_LDO_DIGSXT);
+00056     wndId2Enum[chkEN_LDO_DIVGN] = LMS7param(EN_LDO_DIVGN);
+00057     wndId2Enum[chkEN_LDO_DIVSXR] = LMS7param(EN_LDO_DIVSXR);
+00058     wndId2Enum[chkEN_LDO_DIVSXT] = LMS7param(EN_LDO_DIVSXT);
+00059     wndId2Enum[chkEN_LDO_LNA12] = LMS7param(EN_LDO_LNA12);
+00060     wndId2Enum[chkEN_LDO_LNA14] = LMS7param(EN_LDO_LNA14);
+00061     wndId2Enum[chkEN_LDO_MXRFE] = LMS7param(EN_LDO_MXRFE);
+00062     wndId2Enum[chkEN_LDO_RBB] = LMS7param(EN_LDO_RBB);
+00063     wndId2Enum[chkEN_LDO_RXBUF] = LMS7param(EN_LDO_RXBUF);
+00064     wndId2Enum[chkPD_LDO_SPIBUF] = LMS7param(PD_LDO_SPIBUF);
+00065     wndId2Enum[chkEN_LDO_TBB] = LMS7param(EN_LDO_TBB);
+00066     wndId2Enum[chkEN_LDO_TIA12] = LMS7param(EN_LDO_TIA12);
+00067     wndId2Enum[chkEN_LDO_TIA14] = LMS7param(EN_LDO_TIA14);
+00068     wndId2Enum[chkEN_LDO_TLOB] = LMS7param(EN_LDO_TLOB);
+00069     wndId2Enum[chkEN_LDO_TPAD] = LMS7param(EN_LDO_TPAD);
+00070     wndId2Enum[chkEN_LDO_TXBUF] = LMS7param(EN_LDO_TXBUF);
+00071     wndId2Enum[chkEN_LDO_VCOGN] = LMS7param(EN_LDO_VCOGN);
+00072     wndId2Enum[chkEN_LDO_VCOSXR] = LMS7param(EN_LDO_VCOSXR);
+00073     wndId2Enum[chkEN_LDO_VCOSXT] = LMS7param(EN_LDO_VCOSXT);
+00074     wndId2Enum[chkEN_LOADIMP_LDO_AFE] = LMS7param(EN_LOADIMP_LDO_AFE);
+00075     wndId2Enum[chkEN_LOADIMP_LDO_CPGN] = LMS7param(EN_LOADIMP_LDO_CPGN);
+00076     wndId2Enum[chkEN_LOADIMP_LDO_CPSXR] = LMS7param(EN_LOADIMP_LDO_CPSXR);
+00077     wndId2Enum[chkEN_LOADIMP_LDO_CPSXT] = LMS7param(EN_LOADIMP_LDO_CPSXT);
+00078     wndId2Enum[chkEN_LOADIMP_LDO_DIG] = LMS7param(EN_LOADIMP_LDO_DIG);
+00079     wndId2Enum[chkEN_LOADIMP_LDO_DIGGN] = LMS7param(EN_LOADIMP_LDO_DIGGN);
+00080     wndId2Enum[chkEN_LOADIMP_LDO_DIGIp1] = LMS7param(EN_LOADIMP_LDO_DIGIp1);
+00081     wndId2Enum[chkEN_LOADIMP_LDO_DIGIp2] = LMS7param(EN_LOADIMP_LDO_DIGIp2);
+00082     wndId2Enum[chkEN_LOADIMP_LDO_DIGSXR] = LMS7param(EN_LOADIMP_LDO_DIGSXR);
+00083     wndId2Enum[chkEN_LOADIMP_LDO_DIGSXT] = LMS7param(EN_LOADIMP_LDO_DIGSXT);
+00084     wndId2Enum[chkEN_LOADIMP_LDO_DIVGN] = LMS7param(EN_LOADIMP_LDO_DIVGN);
+00085     wndId2Enum[chkEN_LOADIMP_LDO_DIVSXR] = LMS7param(EN_LOADIMP_LDO_DIVSXR);
+00086     wndId2Enum[chkEN_LOADIMP_LDO_DIVSXT] = LMS7param(EN_LOADIMP_LDO_DIVSXT);
+00087     wndId2Enum[chkEN_LOADIMP_LDO_LNA12] = LMS7param(EN_LOADIMP_LDO_LNA12);
+00088     wndId2Enum[chkEN_LOADIMP_LDO_LNA14] = LMS7param(EN_LOADIMP_LDO_LNA14);
+00089     wndId2Enum[chkEN_LOADIMP_LDO_MXRFE] = LMS7param(EN_LOADIMP_LDO_MXRFE);
+00090     wndId2Enum[chkEN_LOADIMP_LDO_RBB] = LMS7param(EN_LOADIMP_LDO_RBB);
+00091     wndId2Enum[chkEN_LOADIMP_LDO_RXBUF] = LMS7param(EN_LOADIMP_LDO_RXBUF);
+00092     wndId2Enum[chkEN_LOADIMP_LDO_SPIBUF] = LMS7param(EN_LOADIMP_LDO_SPIBUF);
+00093     wndId2Enum[chkEN_LOADIMP_LDO_TBB] = LMS7param(EN_LOADIMP_LDO_TBB);
+00094     wndId2Enum[chkEN_LOADIMP_LDO_TIA12] = LMS7param(EN_LOADIMP_LDO_TIA12);
+00095     wndId2Enum[chkEN_LOADIMP_LDO_TIA14] = LMS7param(EN_LOADIMP_LDO_TIA14);
+00096     wndId2Enum[chkEN_LOADIMP_LDO_TLOB] = LMS7param(EN_LOADIMP_LDO_TLOB);
+00097     wndId2Enum[chkEN_LOADIMP_LDO_TPAD] = LMS7param(EN_LOADIMP_LDO_TPAD);
+00098     wndId2Enum[chkEN_LOADIMP_LDO_TXBUF] = LMS7param(EN_LOADIMP_LDO_TXBUF);
+00099     wndId2Enum[chkEN_LOADIMP_LDO_VCOGN] = LMS7param(EN_LOADIMP_LDO_VCOGN);
+00100     wndId2Enum[chkEN_LOADIMP_LDO_VCOSXR] = LMS7param(EN_LOADIMP_LDO_VCOSXR);
+00101     wndId2Enum[chkEN_LOADIMP_LDO_VCOSXT] = LMS7param(EN_LOADIMP_LDO_VCOSXT);
+00102     wndId2Enum[cmbRDIV_AFE] = LMS7param(RDIV_AFE);
+00103     wndId2Enum[cmbRDIV_CPGN] = LMS7param(RDIV_CPGN);
+00104     wndId2Enum[cmbRDIV_CPSXR] = LMS7param(RDIV_CPSXR);
+00105     wndId2Enum[cmbRDIV_CPSXT] = LMS7param(RDIV_CPSXT);
+00106     wndId2Enum[cmbRDIV_DIG] = LMS7param(RDIV_DIG);
+00107     wndId2Enum[cmbRDIV_DIGGN] = LMS7param(RDIV_DIGGN);
+00108     wndId2Enum[cmbRDIV_DIGIp1] = LMS7param(RDIV_DIGIp1);
+00109     wndId2Enum[cmbRDIV_DIGIp2] = LMS7param(RDIV_DIGIp2);
+00110     wndId2Enum[cmbRDIV_DIGSXR] = LMS7param(RDIV_DIGSXR);
+00111     wndId2Enum[cmbRDIV_DIGSXT] = LMS7param(RDIV_DIGSXT);
+00112     wndId2Enum[cmbRDIV_DIVGN] = LMS7param(RDIV_DIVGN);
+00113     wndId2Enum[cmbRDIV_DIVSXR] = LMS7param(RDIV_DIVSXR);
+00114     wndId2Enum[cmbRDIV_DIVSXT] = LMS7param(RDIV_DIVSXT);
+00115     wndId2Enum[cmbRDIV_LNA12] = LMS7param(RDIV_LNA12);
+00116     wndId2Enum[cmbRDIV_LNA14] = LMS7param(RDIV_LNA14);
+00117     wndId2Enum[cmbRDIV_MXRFE] = LMS7param(RDIV_MXRFE);
+00118     wndId2Enum[cmbRDIV_RBB] = LMS7param(RDIV_RBB);
+00119     wndId2Enum[cmbRDIV_RXBUF] = LMS7param(RDIV_RXBUF);
+00120     wndId2Enum[cmbRDIV_SPIBUF] = LMS7param(RDIV_SPIBUF);
+00121     wndId2Enum[cmbRDIV_TBB] = LMS7param(RDIV_TBB);
+00122     wndId2Enum[cmbRDIV_TIA12] = LMS7param(RDIV_TIA12);
+00123     wndId2Enum[cmbRDIV_TIA14] = LMS7param(RDIV_TIA14);
+00124     wndId2Enum[cmbRDIV_TLOB] = LMS7param(RDIV_TLOB);
+00125     wndId2Enum[cmbRDIV_TPAD] = LMS7param(RDIV_TPAD);
+00126     wndId2Enum[cmbRDIV_TXBUF] = LMS7param(RDIV_TXBUF);
+00127     wndId2Enum[cmbRDIV_VCOGN] = LMS7param(RDIV_VCOGN);
+00128     wndId2Enum[cmbRDIV_VCOSXR] = LMS7param(RDIV_VCOSXR);
+00129     wndId2Enum[cmbRDIV_VCOSXT] = LMS7param(RDIV_VCOSXT);
+00130     wndId2Enum[chkSPDUP_LDO_AFE] = LMS7param(SPDUP_LDO_AFE);
+00131     wndId2Enum[chkSPDUP_LDO_CPGN] = LMS7param(SPDUP_LDO_CPGN);
+00132     wndId2Enum[chkSPDUP_LDO_CPSXR] = LMS7param(SPDUP_LDO_CPSXR);
+00133     wndId2Enum[chkSPDUP_LDO_CPSXT] = LMS7param(SPDUP_LDO_CPSXT);
+00134     wndId2Enum[chkSPDUP_LDO_DIG] = LMS7param(SPDUP_LDO_DIG);
+00135     wndId2Enum[chkSPDUP_LDO_DIGGN] = LMS7param(SPDUP_LDO_DIGGN);
+00136     wndId2Enum[chkSPDUP_LDO_DIGIp1] = LMS7param(SPDUP_LDO_DIGIp1);
+00137     wndId2Enum[chkSPDUP_LDO_DIGIp2] = LMS7param(SPDUP_LDO_DIGIp2);
+00138     wndId2Enum[chkSPDUP_LDO_DIGSXR] = LMS7param(SPDUP_LDO_DIGSXR);
+00139     wndId2Enum[chkSPDUP_LDO_DIGSXT] = LMS7param(SPDUP_LDO_DIGSXT);
+00140     wndId2Enum[chkSPDUP_LDO_DIVGN] = LMS7param(SPDUP_LDO_DIVGN);
+00141     wndId2Enum[chkSPDUP_LDO_DIVSXR] = LMS7param(SPDUP_LDO_DIVSXR);
+00142     wndId2Enum[chkSPDUP_LDO_DIVSXT] = LMS7param(SPDUP_LDO_DIVSXT);
+00143     wndId2Enum[chkSPDUP_LDO_LNA12] = LMS7param(SPDUP_LDO_LNA12);
+00144     wndId2Enum[chkSPDUP_LDO_LNA14] = LMS7param(SPDUP_LDO_LNA14);
+00145     wndId2Enum[chkSPDUP_LDO_MXRFE] = LMS7param(SPDUP_LDO_MXRFE);
+00146     wndId2Enum[chkSPDUP_LDO_RBB] = LMS7param(SPDUP_LDO_RBB);
+00147     wndId2Enum[chkSPDUP_LDO_RXBUF] = LMS7param(SPDUP_LDO_RXBUF);
+00148     wndId2Enum[chkSPDUP_LDO_SPIBUF] = LMS7param(SPDUP_LDO_SPIBUF);
+00149     wndId2Enum[chkSPDUP_LDO_TBB] = LMS7param(SPDUP_LDO_TBB);
+00150     wndId2Enum[chkSPDUP_LDO_TIA12] = LMS7param(SPDUP_LDO_TIA12);
+00151     wndId2Enum[chkSPDUP_LDO_TIA14] = LMS7param(SPDUP_LDO_TIA14);
+00152     wndId2Enum[chkSPDUP_LDO_TLOB] = LMS7param(SPDUP_LDO_TLOB);
+00153     wndId2Enum[chkSPDUP_LDO_TPAD] = LMS7param(SPDUP_LDO_TPAD);
+00154     wndId2Enum[chkSPDUP_LDO_TXBUF] = LMS7param(SPDUP_LDO_TXBUF);
+00155     wndId2Enum[chkSPDUP_LDO_VCOGN] = LMS7param(SPDUP_LDO_VCOGN);
+00156     wndId2Enum[chkSPDUP_LDO_VCOSXR] = LMS7param(SPDUP_LDO_VCOSXR);
+00157     wndId2Enum[chkSPDUP_LDO_VCOSXT] = LMS7param(SPDUP_LDO_VCOSXT);
+00158     wndId2Enum[cmbISINK_SPIBUFF] = LMS7param(ISINK\_SPIBUFF);
+00159     wxArrayString temp;
+00160     temp.clear();
+00161     \textcolor{keywordflow}{for} (\textcolor{keywordtype}{int} i = 0; i<256; ++i)
+00162     \{
+00163         temp.push\_back(wxString::Format(\_(\textcolor{stringliteral}{"%.3f V"}), (860.0 + 3.92*i) / 1000.0));
+00164     \}
+00165     cmbRDIV_AFE->Append(temp);
+00166     cmbRDIV_CPGN->Append(temp);
+00167     cmbRDIV_CPSXR->Append(temp);
+00168     cmbRDIV_CPSXT->Append(temp);
+00169     cmbRDIV_DIG->Append(temp);
+00170     cmbRDIV_DIGGN->Append(temp);
+00171     cmbRDIV_DIGIp1->Append(temp);
+00172     cmbRDIV_DIGIp2->Append(temp);
+00173     cmbRDIV_DIGSXR->Append(temp);
+00174     cmbRDIV_DIGSXT->Append(temp);
+00175     cmbRDIV_DIVGN->Append(temp);
+00176     cmbRDIV_DIVSXR->Append(temp);
+00177     cmbRDIV_DIVSXT->Append(temp);
+00178     cmbRDIV_LNA12->Append(temp);
+00179     cmbRDIV_LNA14->Append(temp);
+00180     cmbRDIV_MXRFE->Append(temp);
+00181     cmbRDIV_RBB->Append(temp);
+00182     cmbRDIV_RXBUF->Append(temp);
+00183     cmbRDIV_SPIBUF->Append(temp);
+00184     cmbRDIV_TBB->Append(temp);
+00185     cmbRDIV_TIA12->Append(temp);
+00186     cmbRDIV_TIA14->Append(temp);
+00187     cmbRDIV_TLOB->Append(temp);
+00188     cmbRDIV_TPAD->Append(temp);
+00189     cmbRDIV_TXBUF->Append(temp);
+00190     cmbRDIV_VCOGN->Append(temp);
+00191     cmbRDIV_VCOSXR->Append(temp);
+00192     cmbRDIV_VCOSXT->Append(temp);
+00193 
+00194     LMS7002_WXGUI::UpdateTooltips(wndId2Enum, \textcolor{keyword}{true});
+00195 \}
+00196 
+00197 \textcolor{keywordtype}{void} lms7002_pnlLDO_view::Initialize(lms_device_t* pControl)
+00198 \{
+00199     lmsControl = pControl;
+00200     assert(lmsControl != \textcolor{keyword}{nullptr});
+00201     uint16\_t value;
+00202     \textcolor{keywordflow}{if} (LMS_ReadParam(lmsControl,LMS7param(MASK),&value)!=0  || value != 0)
+00203          value = 1;
+00204     cmbISINK_SPIBUFF->Enable(value);
+00205 \}
+00206 
+00207 \textcolor{keywordtype}{void} lms7002_pnlLDO_view::ParameterChangeHandler(wxCommandEvent& event)
+00208 \{
+00209     assert(lmsControl != \textcolor{keyword}{nullptr});
+00210     LMS7Parameter parameter;
+00211     \textcolor{keywordflow}{try}
+00212     \{
+00213         parameter = wndId2Enum.at(reinterpret\_cast<wxWindow*>(event.GetEventObject()));
+00214     \}
+00215     \textcolor{keywordflow}{catch} (std::exception & e)
+00216     \{
+00217         std::cout << \textcolor{stringliteral}{"Control element(ID = "} << \textcolor{keyword}{event}.GetId() << \textcolor{stringliteral}{") don't have assigned LMS parameter."} << 
+      std::endl;
+00218         \textcolor{keywordflow}{return};
+00219     \}
+00220     LMS_WriteParam(lmsControl,parameter,event.GetInt());
+00221 \}
+00222 
+00223 \textcolor{keywordtype}{void} lms7002_pnlLDO_view::UpdateGUI()
+00224 \{
+00225     LMS7002_WXGUI::UpdateControlsByMap(\textcolor{keyword}{this}, lmsControl, wndId2Enum);
+00226 \}
+\end{DoxyCode}

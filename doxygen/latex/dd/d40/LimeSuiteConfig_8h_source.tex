@@ -1,0 +1,38 @@
+\subsection{Lime\+Suite\+Config.\+h}
+\label{LimeSuiteConfig_8h_source}\index{/home/erik/prefix/default/src/limesuite-\/dev/src/\+Lime\+Suite\+Config.\+h@{/home/erik/prefix/default/src/limesuite-\/dev/src/\+Lime\+Suite\+Config.\+h}}
+
+\begin{DoxyCode}
+00001 
+00007 \textcolor{comment}{// Generic helper definitions for shared library support}
+00008 \textcolor{preprocessor}{#if defined \_WIN32 || defined \_\_CYGWIN\_\_}
+00009 \textcolor{preprocessor}{  #define LIME\_HELPER\_DLL\_IMPORT \_\_declspec(dllimport)}
+00010 \textcolor{preprocessor}{  #define LIME\_HELPER\_DLL\_EXPORT \_\_declspec(dllexport)}
+00011 \textcolor{preprocessor}{  #define LIME\_HELPER\_DLL\_LOCAL}
+00012 \textcolor{preprocessor}{#else}
+00013 \textcolor{preprocessor}{  #if \_\_GNUC\_\_ >= 4}
+00014 \textcolor{preprocessor}{    #define LIME\_HELPER\_DLL\_IMPORT \_\_attribute\_\_ ((visibility ("default")))}
+00015 \textcolor{preprocessor}{    #define LIME\_HELPER\_DLL\_EXPORT \_\_attribute\_\_ ((visibility ("default")))}
+00016 \textcolor{preprocessor}{    #define LIME\_HELPER\_DLL\_LOCAL  \_\_attribute\_\_ ((visibility ("hidden")))}
+00017 \textcolor{preprocessor}{  #else}
+00018 \textcolor{preprocessor}{    #define LIME\_HELPER\_DLL\_IMPORT}
+00019 \textcolor{preprocessor}{    #define LIME\_HELPER\_DLL\_EXPORT}
+00020 \textcolor{preprocessor}{    #define LIME\_HELPER\_DLL\_LOCAL}
+00021 \textcolor{preprocessor}{  #endif}
+00022 \textcolor{preprocessor}{#endif}
+00023 
+00024 \textcolor{comment}{// Now we use the generic helper definitions above to define LIME\_API and LIME\_LOCAL.}
+00025 \textcolor{comment}{// LIME\_API is used for the public API symbols. It either DLL imports or DLL exports (or does nothing for
+       static build)}
+00026 \textcolor{comment}{// LIME\_LOCAL is used for non-api symbols.}
+00027 \textcolor{preprocessor}{#ifdef LIME\_DLL // defined if LIME is compiled as a DLL}
+00028 \textcolor{preprocessor}{  #ifdef LIME\_DLL\_EXPORTS // defined if we are building the LIME DLL (instead of using it)}
+00029 \textcolor{preprocessor}{    #define LIME\_API LIME\_HELPER\_DLL\_EXPORT}
+00030 \textcolor{preprocessor}{  #else}
+00031 \textcolor{preprocessor}{    #define LIME\_API LIME\_HELPER\_DLL\_IMPORT}
+00032 \textcolor{preprocessor}{  #endif // LIME\_DLL\_EXPORTS}
+00033 \textcolor{preprocessor}{  #define LIME\_LOCAL LIME\_HELPER\_DLL\_LOCAL}
+00034 \textcolor{preprocessor}{#else // LIME\_DLL is not defined: this means LIME is a static lib.}
+00035 \textcolor{preprocessor}{  #define LIME\_API}
+00036 \textcolor{preprocessor}{  #define LIME\_LOCAL}
+00037 \textcolor{preprocessor}{#endif // LIME\_DLL}
+\end{DoxyCode}

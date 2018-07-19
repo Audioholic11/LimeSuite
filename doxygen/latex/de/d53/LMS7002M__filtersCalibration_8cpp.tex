@@ -1,0 +1,120 @@
+\subsection{/home/erik/prefix/default/src/limesuite-\/dev/src/lms7002m/\+L\+M\+S7002\+M\+\_\+filters\+Calibration.cpp File Reference}
+\label{LMS7002M__filtersCalibration_8cpp}\index{/home/erik/prefix/default/src/limesuite-\/dev/src/lms7002m/\+L\+M\+S7002\+M\+\_\+filters\+Calibration.\+cpp@{/home/erik/prefix/default/src/limesuite-\/dev/src/lms7002m/\+L\+M\+S7002\+M\+\_\+filters\+Calibration.\+cpp}}
+
+
+Implementation of L\+M\+S7002M transceiver filters calibration algorithms.  
+
+
+{\ttfamily \#include \char`\"{}L\+M\+S7002\+M.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}I\+Connection.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}Logger.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}L\+M\+S7002\+M\+\_\+\+Registers\+Map.\+h\char`\"{}}\\*
+{\ttfamily \#include $<$cmath$>$}\\*
+{\ttfamily \#include $<$iostream$>$}\\*
+{\ttfamily \#include $<$assert.\+h$>$}\\*
+{\ttfamily \#include \char`\"{}M\+C\+U\+\_\+\+B\+D.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}mcu\+\_\+programs.\+h\char`\"{}}\\*
+Include dependency graph for L\+M\+S7002\+M\+\_\+filters\+Calibration.\+cpp\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{d2/dda/LMS7002M__filtersCalibration_8cpp__incl}
+\end{center}
+\end{figure}
+\subsubsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+static const {\bf float\+\_\+type} {\bf Rx\+L\+P\+F\+\_\+\+R\+F\+\_\+\+Limit\+Low} = 1.\+4e6
+\item 
+static const {\bf float\+\_\+type} {\bf Rx\+L\+P\+F\+\_\+\+R\+F\+\_\+\+Limit\+High} = 130e6
+\item 
+const {\bf float\+\_\+type} {\bf Tx\+L\+P\+F\+\_\+\+R\+F\+\_\+\+Limit\+Low} = 5e6
+\item 
+const {\bf float\+\_\+type} {\bf Tx\+L\+P\+F\+\_\+\+R\+F\+\_\+\+Limit\+Low\+Mid} = 40e6
+\item 
+const {\bf float\+\_\+type} {\bf Tx\+L\+P\+F\+\_\+\+R\+F\+\_\+\+Limit\+Mid\+High} = 50e6
+\item 
+const {\bf float\+\_\+type} {\bf Tx\+L\+P\+F\+\_\+\+R\+F\+\_\+\+Limit\+High} = 130e6
+\end{DoxyCompactItemize}
+
+
+\subsubsection{Detailed Description}
+Implementation of L\+M\+S7002M transceiver filters calibration algorithms. 
+
+\begin{DoxyAuthor}{Author}
+Lime Microsystems (www.\+limemicro.\+com) 
+\end{DoxyAuthor}
+
+
+Definition in file {\bf L\+M\+S7002\+M\+\_\+filters\+Calibration.\+cpp}.
+
+
+
+\subsubsection{Variable Documentation}
+\index{L\+M\+S7002\+M\+\_\+filters\+Calibration.\+cpp@{L\+M\+S7002\+M\+\_\+filters\+Calibration.\+cpp}!Rx\+L\+P\+F\+\_\+\+R\+F\+\_\+\+Limit\+High@{Rx\+L\+P\+F\+\_\+\+R\+F\+\_\+\+Limit\+High}}
+\index{Rx\+L\+P\+F\+\_\+\+R\+F\+\_\+\+Limit\+High@{Rx\+L\+P\+F\+\_\+\+R\+F\+\_\+\+Limit\+High}!L\+M\+S7002\+M\+\_\+filters\+Calibration.\+cpp@{L\+M\+S7002\+M\+\_\+filters\+Calibration.\+cpp}}
+\paragraph[{Rx\+L\+P\+F\+\_\+\+R\+F\+\_\+\+Limit\+High}]{\setlength{\rightskip}{0pt plus 5cm}const {\bf float\+\_\+type} Rx\+L\+P\+F\+\_\+\+R\+F\+\_\+\+Limit\+High = 130e6\hspace{0.3cm}{\ttfamily [static]}}\label{LMS7002M__filtersCalibration_8cpp_a05c91ce39e2a5164631243875e3dd63c}
+
+
+Definition at line {\bf 25} of file {\bf L\+M\+S7002\+M\+\_\+filters\+Calibration.\+cpp}.
+
+
+
+Referenced by {\bf lime\+::\+L\+M\+S7002\+M\+::\+Tune\+Rx\+Filter()}.
+
+\index{L\+M\+S7002\+M\+\_\+filters\+Calibration.\+cpp@{L\+M\+S7002\+M\+\_\+filters\+Calibration.\+cpp}!Rx\+L\+P\+F\+\_\+\+R\+F\+\_\+\+Limit\+Low@{Rx\+L\+P\+F\+\_\+\+R\+F\+\_\+\+Limit\+Low}}
+\index{Rx\+L\+P\+F\+\_\+\+R\+F\+\_\+\+Limit\+Low@{Rx\+L\+P\+F\+\_\+\+R\+F\+\_\+\+Limit\+Low}!L\+M\+S7002\+M\+\_\+filters\+Calibration.\+cpp@{L\+M\+S7002\+M\+\_\+filters\+Calibration.\+cpp}}
+\paragraph[{Rx\+L\+P\+F\+\_\+\+R\+F\+\_\+\+Limit\+Low}]{\setlength{\rightskip}{0pt plus 5cm}const {\bf float\+\_\+type} Rx\+L\+P\+F\+\_\+\+R\+F\+\_\+\+Limit\+Low = 1.\+4e6\hspace{0.3cm}{\ttfamily [static]}}\label{LMS7002M__filtersCalibration_8cpp_a42d996f914d0818182ff2b90d24c7ca5}
+
+
+Definition at line {\bf 24} of file {\bf L\+M\+S7002\+M\+\_\+filters\+Calibration.\+cpp}.
+
+
+
+Referenced by {\bf lime\+::\+L\+M\+S7002\+M\+::\+Tune\+Rx\+Filter()}.
+
+\index{L\+M\+S7002\+M\+\_\+filters\+Calibration.\+cpp@{L\+M\+S7002\+M\+\_\+filters\+Calibration.\+cpp}!Tx\+L\+P\+F\+\_\+\+R\+F\+\_\+\+Limit\+High@{Tx\+L\+P\+F\+\_\+\+R\+F\+\_\+\+Limit\+High}}
+\index{Tx\+L\+P\+F\+\_\+\+R\+F\+\_\+\+Limit\+High@{Tx\+L\+P\+F\+\_\+\+R\+F\+\_\+\+Limit\+High}!L\+M\+S7002\+M\+\_\+filters\+Calibration.\+cpp@{L\+M\+S7002\+M\+\_\+filters\+Calibration.\+cpp}}
+\paragraph[{Tx\+L\+P\+F\+\_\+\+R\+F\+\_\+\+Limit\+High}]{\setlength{\rightskip}{0pt plus 5cm}const {\bf float\+\_\+type} Tx\+L\+P\+F\+\_\+\+R\+F\+\_\+\+Limit\+High = 130e6}\label{LMS7002M__filtersCalibration_8cpp_ad4eecea5513ad251abd368c1f07d121f}
+
+
+Definition at line {\bf 31} of file {\bf L\+M\+S7002\+M\+\_\+filters\+Calibration.\+cpp}.
+
+
+
+Referenced by {\bf lime\+::\+L\+M\+S7002\+M\+::\+Tune\+Tx\+Filter()}.
+
+\index{L\+M\+S7002\+M\+\_\+filters\+Calibration.\+cpp@{L\+M\+S7002\+M\+\_\+filters\+Calibration.\+cpp}!Tx\+L\+P\+F\+\_\+\+R\+F\+\_\+\+Limit\+Low@{Tx\+L\+P\+F\+\_\+\+R\+F\+\_\+\+Limit\+Low}}
+\index{Tx\+L\+P\+F\+\_\+\+R\+F\+\_\+\+Limit\+Low@{Tx\+L\+P\+F\+\_\+\+R\+F\+\_\+\+Limit\+Low}!L\+M\+S7002\+M\+\_\+filters\+Calibration.\+cpp@{L\+M\+S7002\+M\+\_\+filters\+Calibration.\+cpp}}
+\paragraph[{Tx\+L\+P\+F\+\_\+\+R\+F\+\_\+\+Limit\+Low}]{\setlength{\rightskip}{0pt plus 5cm}const {\bf float\+\_\+type} Tx\+L\+P\+F\+\_\+\+R\+F\+\_\+\+Limit\+Low = 5e6}\label{LMS7002M__filtersCalibration_8cpp_a41b5f1e72a489822ffaf4e499c7b9154}
+
+
+Definition at line {\bf 28} of file {\bf L\+M\+S7002\+M\+\_\+filters\+Calibration.\+cpp}.
+
+
+
+Referenced by {\bf lime\+::\+L\+M\+S7002\+M\+::\+Tune\+Tx\+Filter()}.
+
+\index{L\+M\+S7002\+M\+\_\+filters\+Calibration.\+cpp@{L\+M\+S7002\+M\+\_\+filters\+Calibration.\+cpp}!Tx\+L\+P\+F\+\_\+\+R\+F\+\_\+\+Limit\+Low\+Mid@{Tx\+L\+P\+F\+\_\+\+R\+F\+\_\+\+Limit\+Low\+Mid}}
+\index{Tx\+L\+P\+F\+\_\+\+R\+F\+\_\+\+Limit\+Low\+Mid@{Tx\+L\+P\+F\+\_\+\+R\+F\+\_\+\+Limit\+Low\+Mid}!L\+M\+S7002\+M\+\_\+filters\+Calibration.\+cpp@{L\+M\+S7002\+M\+\_\+filters\+Calibration.\+cpp}}
+\paragraph[{Tx\+L\+P\+F\+\_\+\+R\+F\+\_\+\+Limit\+Low\+Mid}]{\setlength{\rightskip}{0pt plus 5cm}const {\bf float\+\_\+type} Tx\+L\+P\+F\+\_\+\+R\+F\+\_\+\+Limit\+Low\+Mid = 40e6}\label{LMS7002M__filtersCalibration_8cpp_ad60dd3989e72e40be2270ae4be4f277d}
+
+
+Definition at line {\bf 29} of file {\bf L\+M\+S7002\+M\+\_\+filters\+Calibration.\+cpp}.
+
+
+
+Referenced by {\bf lime\+::\+L\+M\+S7002\+M\+::\+Tune\+Tx\+Filter()}.
+
+\index{L\+M\+S7002\+M\+\_\+filters\+Calibration.\+cpp@{L\+M\+S7002\+M\+\_\+filters\+Calibration.\+cpp}!Tx\+L\+P\+F\+\_\+\+R\+F\+\_\+\+Limit\+Mid\+High@{Tx\+L\+P\+F\+\_\+\+R\+F\+\_\+\+Limit\+Mid\+High}}
+\index{Tx\+L\+P\+F\+\_\+\+R\+F\+\_\+\+Limit\+Mid\+High@{Tx\+L\+P\+F\+\_\+\+R\+F\+\_\+\+Limit\+Mid\+High}!L\+M\+S7002\+M\+\_\+filters\+Calibration.\+cpp@{L\+M\+S7002\+M\+\_\+filters\+Calibration.\+cpp}}
+\paragraph[{Tx\+L\+P\+F\+\_\+\+R\+F\+\_\+\+Limit\+Mid\+High}]{\setlength{\rightskip}{0pt plus 5cm}const {\bf float\+\_\+type} Tx\+L\+P\+F\+\_\+\+R\+F\+\_\+\+Limit\+Mid\+High = 50e6}\label{LMS7002M__filtersCalibration_8cpp_a8b82d455baafae9bb1da212cae9cff71}
+
+
+Definition at line {\bf 30} of file {\bf L\+M\+S7002\+M\+\_\+filters\+Calibration.\+cpp}.
+
+
+
+Referenced by {\bf lime\+::\+L\+M\+S7002\+M\+::\+Tune\+Tx\+Filter()}.
+

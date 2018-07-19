@@ -1,0 +1,74 @@
+\subsection{L\+M\+S\+\_\+\+Programing\+\_\+wxgui.\+h}
+\label{LMS__Programing__wxgui_8h_source}\index{/home/erik/prefix/default/src/limesuite-\/dev/src/\+L\+M\+S\+\_\+\+Programing/\+L\+M\+S\+\_\+\+Programing\+\_\+wxgui.\+h@{/home/erik/prefix/default/src/limesuite-\/dev/src/\+L\+M\+S\+\_\+\+Programing/\+L\+M\+S\+\_\+\+Programing\+\_\+wxgui.\+h}}
+
+\begin{DoxyCode}
+00001 
+00005 \textcolor{preprocessor}{#ifndef LMS\_Programing\_wxgui\_H}
+00006 \textcolor{preprocessor}{#define LMS\_Programing\_wxgui\_H}
+00007 
+00008 \textcolor{preprocessor}{#include <wx/frame.h>}
+00009 \textcolor{preprocessor}{#include <wx/wx.h>}
+00010 \textcolor{keyword}{class }wxGauge;
+00011 \textcolor{keyword}{class }wxStaticText;
+00012 \textcolor{keyword}{class }wxFlexGridSizer;
+00013 \textcolor{keyword}{class }wxButton;
+00014 \textcolor{keyword}{class }wxChoice;
+00015 
+00016 \textcolor{preprocessor}{#include <thread>}
+00017 \textcolor{preprocessor}{#include <atomic>}
+00018 \textcolor{preprocessor}{#include <vector>}
+00019 \textcolor{preprocessor}{#include "lime/LimeSuite.h"}
+00020 
+00021 \textcolor{keyword}{class }LMS_Programing_wxgui : \textcolor{keyword}{public} wxFrame
+00022 \{
+00023 \textcolor{keyword}{public}:
+00024     LMS_Programing_wxgui(wxWindow* parent,wxWindowID \textcolor{keywordtype}{id}=wxID\_ANY,\textcolor{keyword}{const} wxString& title =\_(\textcolor{stringliteral}{""}), \textcolor{keyword}{const} 
+      wxPoint& pos=wxDefaultPosition,\textcolor{keyword}{const} wxSize& size=wxDefaultSize, \textcolor{keywordtype}{int} style=0, wxString 
+      name = wxEmptyString);
+00025     \textcolor{keyword}{virtual} \textcolor{keywordtype}{void} SetConnection(lms_device_t* port);
+00026     \textcolor{keyword}{virtual} ~LMS_Programing_wxgui();
+00027 
+00028 \textcolor{keyword}{protected}:
+00029     wxChoice* cmbDevice;
+00030     wxStaticText* lblProgressPercent;
+00031     wxStaticText* StaticText2;
+00032     wxGauge* progressBar;
+00033     wxStaticText* lblFilename;
+00034     wxStaticText* StaticText1;
+00035     wxStaticText* StaticText3;
+00036     wxButton* btnStartStop;
+00037     wxButton* btnOpen;
+00038     \textcolor{keywordtype}{bool} btnOpenEnb;
+00039 
+00040     \textcolor{keywordtype}{void} DoProgramming();
+00041     \textcolor{keyword}{static} \textcolor{keywordtype}{bool} OnProgrammingCallback(\textcolor{keywordtype}{int} bsent, \textcolor{keywordtype}{int} btotal, \textcolor{keyword}{const} \textcolor{keywordtype}{char}* progressMsg);
+00042     \textcolor{keyword}{static} \textcolor{keywordtype}{bool} test(\textcolor{keywordtype}{int} bsent, \textcolor{keywordtype}{int} btotal, \textcolor{keyword}{const} \textcolor{keywordtype}{char}* progressMsg);
+00043     std::vector<char> mProgramData;
+00044     lms_device_t* lmsControl;
+00045     std::atomic<bool> mProgrammingInProgress;
+00046     std::atomic<bool> mAbortProgramming;
+00047     std::thread mWorkerThread;
+00048     \textcolor{keyword}{static} LMS_Programing_wxgui* obj_ptr;
+00049     \textcolor{keyword}{static} \textcolor{keyword}{const} \textcolor{keywordtype}{long} ID_PROGRAMING_FINISHED_EVENT;
+00050     \textcolor{keyword}{static} \textcolor{keyword}{const} \textcolor{keywordtype}{long} ID_PROGRAMING_STATUS_EVENT;
+00051     \textcolor{keyword}{static} \textcolor{keyword}{const} \textcolor{keywordtype}{long} ID_BUTTON1;
+00052     \textcolor{keyword}{static} \textcolor{keyword}{const} \textcolor{keywordtype}{long} ID_BUTTON2;
+00053     \textcolor{keyword}{static} \textcolor{keyword}{const} \textcolor{keywordtype}{long} ID_GAUGE1;
+00054     \textcolor{keyword}{static} \textcolor{keyword}{const} \textcolor{keywordtype}{long} ID_CHOICE2;
+00055     \textcolor{keyword}{static} \textcolor{keyword}{const} \textcolor{keywordtype}{long} ID_CHOICE1;
+00056 
+00057 \textcolor{keyword}{private}:
+00058     \textcolor{keywordtype}{void} OnbtnOpenClick(wxCommandEvent& event);
+00059     \textcolor{keywordtype}{void} OnbtnStartProgrammingClick(wxCommandEvent& event);
+00060     \textcolor{keywordtype}{void} OnAbortProgramming(wxCommandEvent& event);
+00061     \textcolor{keywordtype}{void} OnbtnProgFPGAClick(wxCommandEvent& event);
+00062     \textcolor{keywordtype}{void} OncmbDeviceSelect(wxCommandEvent& event);
+00063     \textcolor{keywordtype}{void} OnProgramingStatusUpdate(wxCommandEvent& event);
+00064     \textcolor{keywordtype}{void} OnProgramingFinished(wxCommandEvent& event);
+00065 
+00066 \textcolor{keyword}{protected}:
+00067     DECLARE\_EVENT\_TABLE()
+00068 \};
+00069 
+00070 \textcolor{preprocessor}{#endif}
+\end{DoxyCode}

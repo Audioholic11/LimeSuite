@@ -1,0 +1,172 @@
+\subsection{Connection\+F\+X3\+Entry.\+cpp}
+\label{ConnectionFX3Entry_8cpp_source}\index{/home/erik/prefix/default/src/limesuite-\/dev/src/\+Connection\+F\+X3/\+Connection\+F\+X3\+Entry.\+cpp@{/home/erik/prefix/default/src/limesuite-\/dev/src/\+Connection\+F\+X3/\+Connection\+F\+X3\+Entry.\+cpp}}
+
+\begin{DoxyCode}
+00001 
+00007 \textcolor{preprocessor}{#include "ConnectionFX3.h"}
+00008 \textcolor{preprocessor}{#include "Logger.h"}
+00009 
+00010 \textcolor{keyword}{using namespace }lime;
+00011 
+00012 \textcolor{preprocessor}{#ifdef \_\_unix\_\_}
+00013 \textcolor{keywordtype}{void} ConnectionFX3Entry::handle\_libusb\_events()
+00014 \{
+00015     \textcolor{keyword}{struct }timeval tv;
+00016     tv.tv\_sec = 0;
+00017     tv.tv\_usec = 250000;
+00018     \textcolor{keywordflow}{while}(mProcessUSBEvents.load() == \textcolor{keyword}{true})
+00019     \{
+00020         \textcolor{keywordtype}{int} r = libusb\_handle\_events\_timeout\_completed(ctx, &tv, NULL);
+00021         \textcolor{keywordflow}{if}(r != 0) lime::error(\textcolor{stringliteral}{"error libusb\_handle\_events %s"}, libusb\_strerror(libusb\_error(r)));
+00022     \}
+00023 \}
+00024 \textcolor{preprocessor}{#endif // \_\_UNIX\_\_}
+00025 
+00027 \textcolor{keywordtype}{void} __loadConnectionFX3Entry(\textcolor{keywordtype}{void}) \textcolor{comment}{//TODO fixme replace with LoadLibrary/dlopen}
+00028 \{
+00029 \textcolor{keyword}{static} ConnectionFX3Entry FX3Entry;
+00030 \}
+00031 
+00032 ConnectionFX3Entry::ConnectionFX3Entry(\textcolor{keywordtype}{void}):
+00033     ConnectionRegistryEntry(\textcolor{stringliteral}{"FX3"})
+00034 \{
+00035 \textcolor{preprocessor}{#ifdef \_\_unix\_\_}
+00036     \textcolor{keywordtype}{int} r = libusb\_init(&ctx); \textcolor{comment}{//initialize the library for the session we just declared}
+00037     \textcolor{keywordflow}{if}(r < 0)
+00038         lime::error(\textcolor{stringliteral}{"Init Error %i"}, r); \textcolor{comment}{//there was an error}
+00039 \textcolor{preprocessor}{#if LIBUSBX\_API\_VERSION < 0x01000106}
+00040     libusb\_set\_debug(ctx, 3); \textcolor{comment}{//set verbosity level to 3, as suggested in the documentation}
+00041 \textcolor{preprocessor}{#else}
+00042     libusb\_set\_option(ctx, LIBUSB\_OPTION\_LOG\_LEVEL, 3); \textcolor{comment}{//set verbosity level to 3, as suggested in the
+       documentation}
+00043 \textcolor{preprocessor}{#endif}
+00044     mProcessUSBEvents.store(\textcolor{keyword}{true});
+00045     mUSBProcessingThread = std::thread(&ConnectionFX3Entry::handle\_libusb\_events, \textcolor{keyword}{this});
+00046 \textcolor{preprocessor}{#endif}
+00047 \}
+00048 
+00049 ConnectionFX3Entry::~ConnectionFX3Entry(\textcolor{keywordtype}{void})
+00050 \{
+00051 \textcolor{preprocessor}{#ifdef \_\_unix\_\_}
+00052     mProcessUSBEvents.store(\textcolor{keyword}{false});
+00053     mUSBProcessingThread.join();
+00054     libusb\_exit(ctx);
+00055 \textcolor{preprocessor}{#endif}
+00056 \}
+00057 
+00058 std::vector<ConnectionHandle> ConnectionFX3Entry::enumerate(\textcolor{keyword}{const} 
+      ConnectionHandle &hint)
+00059 \{
+00060     std::vector<ConnectionHandle> handles;
+00061 
+00062 \textcolor{preprocessor}{#ifndef \_\_unix\_\_}
+00063     CCyUSBDevice device;
+00064     \textcolor{keywordflow}{if} (device.DeviceCount())
+00065     \{
+00066         \textcolor{keywordflow}{for} (\textcolor{keywordtype}{int} i = 0; i<device.DeviceCount(); ++i)
+00067         \{
+00068             \textcolor{keywordflow}{if} (hint.index >= 0 && hint.index != i)
+00069                 \textcolor{keywordflow}{continue};
+00070             \textcolor{keywordflow}{if} (device.IsOpen())
+00071                 device.Close();
+00072             device.Open(i);
+00073             ConnectionHandle handle;
+00074             \textcolor{keywordflow}{if} (device.bSuperSpeed == \textcolor{keyword}{true})
+00075                 handle.media = \textcolor{stringliteral}{"USB 3.0"};
+00076             \textcolor{keywordflow}{else} \textcolor{keywordflow}{if} (device.bHighSpeed == \textcolor{keyword}{true})
+00077                 handle.media = \textcolor{stringliteral}{"USB 2.0"};
+00078             \textcolor{keywordflow}{else}
+00079                 handle.media = \textcolor{stringliteral}{"USB"};
+00080             handle.name = device.DeviceName;
+00081             handle.index = i;
+00082             std::wstring ws(device.SerialNumber);
+00083             handle.serial = std::string(ws.begin(),ws.end());
+00084             \textcolor{keywordflow}{if} (hint.serial.empty() or hint.serial == handle.serial)
+00085             \{
+00086                 handles.push\_back(handle); \textcolor{comment}{//filter on serial}
+00087             \}
+00088             device.Close();
+00089         \}
+00090     \}
+00091 \textcolor{preprocessor}{#else}
+00092     libusb\_device **devs; \textcolor{comment}{//pointer to pointer of device, used to retrieve a list of devices}
+00093     \textcolor{keywordtype}{int} usbDeviceCount = libusb\_get\_device\_list(ctx, &devs);
+00094 
+00095     \textcolor{keywordflow}{if} (usbDeviceCount < 0) \{
+00096         lime::error(\textcolor{stringliteral}{"failed to get libusb device list: %s"}, libusb\_strerror(libusb\_error(usbDeviceCount)));
+00097         \textcolor{keywordflow}{return} handles;
+00098     \}
+00099 
+00100     \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} i=0; i<usbDeviceCount; ++i)
+00101     \{
+00102         libusb\_device\_descriptor desc;
+00103         \textcolor{keywordtype}{int} r = libusb\_get\_device\_descriptor(devs[i], &desc);
+00104         \textcolor{keywordflow}{if}(r<0)
+00105             lime::error(\textcolor{stringliteral}{"failed to get device description"});
+00106         \textcolor{keywordtype}{int} pid = desc.idProduct;
+00107         \textcolor{keywordtype}{int} vid = desc.idVendor;
+00108 
+00109         \textcolor{keywordflow}{if}(vid == 1204 && pid == 34323)
+00110         \{
+00111             ConnectionHandle handle;
+00112             handle.media = \textcolor{stringliteral}{"USB"};
+00113             handle.name = \textcolor{stringliteral}{"DigiGreen"};
+00114             handle.addr = std::to\_string(\textcolor{keywordtype}{int}(pid))+\textcolor{stringliteral}{":"}+std::to\_string(\textcolor{keywordtype}{int}(vid));
+00115             handles.push\_back(handle);
+00116         \}
+00117         \textcolor{keywordflow}{else} \textcolor{keywordflow}{if}((vid == 1204 && pid == 241) || (vid == 1204 && pid == 243) || (vid == 7504 && pid == 24840)
+      )
+00118         \{
+00119             libusb\_device\_handle *tempDev\_handle(\textcolor{keyword}{nullptr});
+00120             \textcolor{keywordflow}{if}(libusb\_open(devs[i], &tempDev\_handle) != 0 || tempDev\_handle == \textcolor{keyword}{nullptr})
+00121                 \textcolor{keywordflow}{continue};
+00122 
+00123             ConnectionHandle handle;
+00124 
+00125             \textcolor{comment}{//check operating speed}
+00126             \textcolor{keywordtype}{int} speed = libusb\_get\_device\_speed(devs[i]);
+00127             \textcolor{keywordflow}{if}(speed == LIBUSB\_SPEED\_HIGH)
+00128                 handle.media = \textcolor{stringliteral}{"USB 2.0"};
+00129             \textcolor{keywordflow}{else} \textcolor{keywordflow}{if}(speed == LIBUSB\_SPEED\_SUPER)
+00130                 handle.media = \textcolor{stringliteral}{"USB 3.0"};
+00131             \textcolor{keywordflow}{else}
+00132                 handle.media = \textcolor{stringliteral}{"USB"};
+00133 
+00134             \textcolor{comment}{//read device name}
+00135             \textcolor{keywordtype}{char} data[255];
+00136             r = libusb\_get\_string\_descriptor\_ascii(tempDev\_handle,  LIBUSB\_CLASS\_COMM, (\textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{char}*)data
+      , \textcolor{keyword}{sizeof}(data));
+00137             \textcolor{keywordflow}{if}(r > 0) handle.name = std::string(data, \textcolor{keywordtype}{size\_t}(r));
+00138 
+00139             r = std::sprintf(data, \textcolor{stringliteral}{"%.4x:%.4x"}, \textcolor{keywordtype}{int}(vid), \textcolor{keywordtype}{int}(pid));
+00140             \textcolor{keywordflow}{if} (r > 0) handle.addr = std::string(data, \textcolor{keywordtype}{size\_t}(r));
+00141 
+00142             \textcolor{keywordflow}{if} (desc.iSerialNumber > 0)
+00143             \{
+00144                 r = libusb\_get\_string\_descriptor\_ascii(tempDev\_handle,desc.iSerialNumber,(\textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{char}*)
+      data, \textcolor{keyword}{sizeof}(data));
+00145                 \textcolor{keywordflow}{if}(r<0)
+00146                     lime::error(\textcolor{stringliteral}{"failed to get serial number"});
+00147                 \textcolor{keywordflow}{else}
+00148                     handle.serial = std::string(data, \textcolor{keywordtype}{size\_t}(r));
+00149             \}
+00150             libusb\_close(tempDev\_handle);
+00151 
+00152             \textcolor{comment}{//add handle conditionally, filter by serial number}
+00153             \textcolor{keywordflow}{if} (hint.serial.empty() or hint.serial == handle.serial)
+00154             \{
+00155                 handles.push\_back(handle);
+00156             \}
+00157         \}
+00158     \}
+00159 
+00160     libusb\_free\_device\_list(devs, 1);
+00161 \textcolor{preprocessor}{#endif}
+00162     \textcolor{keywordflow}{return} handles;
+00163 \}
+00164 
+00165 IConnection *ConnectionFX3Entry::make(\textcolor{keyword}{const} ConnectionHandle &handle)
+00166 \{
+00167     \textcolor{keywordflow}{return} \textcolor{keyword}{new} ConnectionFX3(ctx, handle.addr, handle.serial, handle.index);
+00168 \}
+\end{DoxyCode}

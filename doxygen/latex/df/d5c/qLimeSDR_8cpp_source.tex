@@ -1,0 +1,70 @@
+\subsection{q\+Lime\+S\+D\+R.\+cpp}
+\label{qLimeSDR_8cpp_source}\index{/home/erik/prefix/default/src/limesuite-\/dev/src/\+A\+P\+I/q\+Lime\+S\+D\+R.\+cpp@{/home/erik/prefix/default/src/limesuite-\/dev/src/\+A\+P\+I/q\+Lime\+S\+D\+R.\+cpp}}
+
+\begin{DoxyCode}
+00001 \textcolor{comment}{/*}
+00002 \textcolor{comment}{ * File:   qLimeSDR.cpp}
+00003 \textcolor{comment}{ * Author: Ignas J}
+00004 \textcolor{comment}{ *}
+00005 \textcolor{comment}{ * Created on April 27, 2018}
+00006 \textcolor{comment}{ */}
+00007 \textcolor{preprocessor}{#include "qLimeSDR.h"}
+00008 \textcolor{preprocessor}{#include "FPGA_Q.h"}
+00009 
+00010 \textcolor{keyword}{namespace }lime
+00011 \{
+00012 
+00013 LMS7_qLimeSDR::LMS7_qLimeSDR(lime::IConnection* conn, LMS7_Device *obj) : 
+      LMS7_Device(obj), dacRate(20e6), adcRate(20e6)
+00014 \{
+00015     fpga = \textcolor{keyword}{new} lime::FPGA_Q();
+00016     tx_channels.resize(GetNumChannels());
+00017     rx_channels.resize(GetNumChannels());
+00018   
+00019     \textcolor{keywordflow}{while} (lms_list.size() < 2)
+00020         lms_list.push\_back(\textcolor{keyword}{new} lime::LMS7002M());
+00021 
+00022     fpga->SetConnection(conn);
+00023     \textcolor{keywordflow}{for} (\textcolor{keywordtype}{unsigned} i = 0; i < 2; i++)
+00024     \{
+00025         this->lms_list[i]->SetConnection(conn, i);
+00026         lms_list[i]->SetReferenceClk\_SX(\textcolor{keyword}{false}, 30.72e6);
+00027         mStreamers.push\_back(\textcolor{keyword}{new} lime::Streamer(fpga,lms_list[i],i));
+00028     \}       
+00029     mStreamers.push\_back(\textcolor{keyword}{new} lime::Streamer(fpga,lms_list[0],2)); \textcolor{comment}{//adc/dac streamer}
+00030     connection = conn;
+00031 \}
+00032 
+00033 \textcolor{keywordtype}{unsigned} LMS7_qLimeSDR::GetNumChannels(\textcolor{keyword}{const} \textcolor{keywordtype}{bool} tx)\textcolor{keyword}{ const}
+00034 \textcolor{keyword}{}\{
+00035     \textcolor{keywordflow}{return} 5;
+00036 \};
+00037 
+00038 \textcolor{keywordtype}{int} LMS7_qLimeSDR::EnableChannel(\textcolor{keywordtype}{bool} dir_tx, \textcolor{keywordtype}{unsigned} chan, \textcolor{keywordtype}{bool} enabled)
+00039 \{
+00040     \textcolor{keywordflow}{if} (chan == 4)
+00041         \textcolor{keywordflow}{return} 0;
+00042     \textcolor{keywordflow}{return} LMS7_Device::EnableChannel(dir\_tx,chan,enabled);
+00043 \}
+00044 
+00045 \textcolor{keywordtype}{int} LMS7_qLimeSDR::SetRate(\textcolor{keywordtype}{unsigned} ch, \textcolor{keywordtype}{double} rxRate, \textcolor{keywordtype}{double} txRate, \textcolor{keywordtype}{unsigned} 
+      oversample)
+00046 \{
+00047     \textcolor{keywordflow}{if} (ch == 4)
+00048     \{
+00049         adcRate = rxRate;
+00050         dacRate = txRate;
+00051         \textcolor{keywordflow}{return} fpga->SetInterfaceFreq(txRate,rxRate,0,0,2);
+00052     \}
+00053     \textcolor{keywordflow}{return} LMS7_Device::SetRate(ch,rxRate,txRate,oversample);      
+00054 \}
+00055 
+00056 \textcolor{keywordtype}{double} LMS7_qLimeSDR::GetRate(\textcolor{keywordtype}{bool} tx, \textcolor{keywordtype}{unsigned} chan, \textcolor{keywordtype}{double} *rf\_rate\_Hz)\textcolor{keyword}{ const}
+00057 \textcolor{keyword}{}\{
+00058     \textcolor{keywordflow}{if} (chan == 4)
+00059         \textcolor{keywordflow}{return} tx ? dacRate : adcRate;
+00060     \textcolor{keywordflow}{return} LMS7_Device::GetRate(tx, chan, rf\_rate\_Hz);
+00061 \}
+00062 
+00063 \} \textcolor{comment}{//namespace lime}
+\end{DoxyCode}

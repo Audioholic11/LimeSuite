@@ -1,0 +1,188 @@
+\subsection{Connection\+Images.\+cpp}
+\label{ConnectionImages_8cpp_source}\index{/home/erik/prefix/default/src/limesuite-\/dev/src/protocols/\+Connection\+Images.\+cpp@{/home/erik/prefix/default/src/limesuite-\/dev/src/protocols/\+Connection\+Images.\+cpp}}
+
+\begin{DoxyCode}
+00001 
+00007 \textcolor{preprocessor}{#include "SystemResources.h"}
+00008 \textcolor{preprocessor}{#include "LMS64CProtocol.h"}
+00009 \textcolor{preprocessor}{#include "LMSBoards.h"}
+00010 \textcolor{preprocessor}{#include "Logger.h"}
+00011 \textcolor{preprocessor}{#include <fstream>}
+00012 \textcolor{preprocessor}{#include <ciso646>}
+00013 
+00014 \textcolor{keyword}{using namespace }lime;
+00015 
+00019 \textcolor{keyword}{struct }ConnectionImageEntry
+00020 \{
+00021     eLMS_DEV dev;
+00022     \textcolor{keywordtype}{int} hw_rev;
+00023 
+00024     \textcolor{keywordtype}{int} fw_ver;
+00025     \textcolor{keyword}{const} \textcolor{keywordtype}{char} *fw_img;
+00026 
+00027     \textcolor{keywordtype}{int} gw_ver;
+00028     \textcolor{keywordtype}{int} gw_rev;
+00029     \textcolor{keyword}{const} \textcolor{keywordtype}{char} *gw_img;
+00030 \};
+00031 
+00036 \textcolor{keyword}{static} \textcolor{keyword}{const} ConnectionImageEntry &lookupImageEntry(\textcolor{keyword}{const} 
+      LMS64CProtocol::LMSinfo &info)
+00037 \{
+00038     \textcolor{keyword}{static} \textcolor{keyword}{const} std::vector<ConnectionImageEntry> imageEntries = \{
+00039         ConnectionImageEntry(\{LMS_DEV_UNKNOWN, -1, -1, \textcolor{keyword}{nullptr}, -1, -1, \textcolor{keyword}{nullptr}\}),
+00040         ConnectionImageEntry(\{LMS_DEV_LIMESDR, 4, 4, \textcolor{stringliteral}{"LimeSDR-USB\_HW\_1.4\_r4.0.img"}, 2, 17,  \textcolor{stringliteral}{"
+      LimeSDR-USB\_HW\_1.4\_r2.17.rbf"}\}),
+00041         ConnectionImageEntry(\{LMS_DEV_LIMESDR, 3, 3, \textcolor{stringliteral}{"LimeSDR-USB\_HW\_1.3\_r3.0.img"}, 1, 20, \textcolor{stringliteral}{"
+      LimeSDR-USB\_HW\_1.1\_r1.20.rbf"}\}),
+00042         ConnectionImageEntry(\{LMS_DEV_LIMESDR, 2, 3, \textcolor{stringliteral}{"LimeSDR-USB\_HW\_1.2\_r3.0.img"}, 1, 20, \textcolor{stringliteral}{"
+      LimeSDR-USB\_HW\_1.1\_r1.20.rbf"}\}),
+00043         ConnectionImageEntry(\{LMS_DEV_LIMESDR, 1, 7, \textcolor{stringliteral}{"LimeSDR-USB\_HW\_1.1\_r7.0.img"}, 1, 20, \textcolor{stringliteral}{"
+      LimeSDR-USB\_HW\_1.1\_r1.20.rbf"}\}),
+00044         ConnectionImageEntry(\{LMS_DEV_STREAM,  3, 8, \textcolor{stringliteral}{"STREAM-USB\_HW\_1.1\_r8.0.img"},  1, 2,  \textcolor{stringliteral}{"
+      STREAM-USB\_HW\_1.3\_r1.2.rbf"}\}),
+00045         ConnectionImageEntry(\{LMS_DEV_LIMESDRMINI,  0, 0, \textcolor{keyword}{nullptr},  1, 26,  \textcolor{stringliteral}{"LimeSDR-Mini\_HW\_1.1\_r1.26.rpd"}
+      \}),
+00046     \};
+00047 
+00048     \textcolor{keywordflow}{for}(\textcolor{keyword}{const} \textcolor{keyword}{auto} &iter : imageEntries)
+00049     \{
+00050         \textcolor{keywordflow}{if} (info.device == iter.dev && info.hardware == iter.hw\_rev)
+00051         \{
+00052             \textcolor{keywordflow}{return} iter;
+00053         \}
+00054     \}
+00055 
+00056     \textcolor{keywordflow}{return} imageEntries.front(); \textcolor{comment}{//the -1 unknown entry}
+00057 \}
+00058 
+00059 \textcolor{keywordtype}{void} LMS64CProtocol::VersionCheck(\textcolor{keywordtype}{void})
+00060 \{
+00061     \textcolor{keyword}{const} \textcolor{keyword}{auto} info = this->GetInfo();
+00062     \textcolor{keyword}{const} \textcolor{keyword}{auto} &entry = lookupImageEntry(info);
+00063 
+00064     \textcolor{comment}{//an entry match was not found}
+00065     \textcolor{keywordflow}{if} (entry.dev == LMS_DEV_UNKNOWN)
+00066     \{
+00067         \textcolor{keywordflow}{return};
+00068     \}
+00069 
+00070     \textcolor{comment}{//check and warn about firmware mismatch problems}
+00071     \textcolor{keywordflow}{if} (info.firmware != entry.fw\_ver && entry.fw\_img != \textcolor{keyword}{nullptr}) lime::warning(
+00072         \textcolor{stringliteral}{"Firmware version mismatch!\(\backslash\)n"}
+00073         \textcolor{stringliteral}{"  Expected firmware version %d, but found version %d\(\backslash\)n"}
+00074         \textcolor{stringliteral}{"  Follow the FW and FPGA upgrade instructions:\(\backslash\)n"}
+00075         \textcolor{stringliteral}{"  http://wiki.myriadrf.org/Lime\_Suite#Flashing\_images\(\backslash\)n"}
+00076         \textcolor{stringliteral}{"  Or run update on the command line: LimeUtil --update\(\backslash\)n"},
+00077         entry.fw\_ver, info.firmware);
+00078 
+00079     \textcolor{comment}{//check and warn about gateware mismatch problems}
+00080     \textcolor{keywordflow}{if} ( entry.gw\_img != \textcolor{keyword}{nullptr})
+00081     \{
+00082         \textcolor{keyword}{const} \textcolor{keyword}{auto} fpgaInfo = this->GetFPGAInfo();
+00083         \textcolor{keywordflow}{if} (fpgaInfo.gatewareVersion != entry.gw\_ver
+00084             || fpgaInfo.gatewareRevision != entry.gw\_rev) lime::warning(
+00085             \textcolor{stringliteral}{"Gateware version mismatch!\(\backslash\)n"}
+00086             \textcolor{stringliteral}{"  Expected gateware version %d, revision %d\(\backslash\)n"}
+00087             \textcolor{stringliteral}{"  But found version %d, revision %d\(\backslash\)n"}
+00088             \textcolor{stringliteral}{"  Follow the FW and FPGA upgrade instructions:\(\backslash\)n"}
+00089             \textcolor{stringliteral}{"  http://wiki.myriadrf.org/Lime\_Suite#Flashing\_images\(\backslash\)n"}
+00090             \textcolor{stringliteral}{"  Or run update on the command line: LimeUtil --update\(\backslash\)n"},
+00091             entry.gw\_ver, entry.gw\_rev, fpgaInfo.gatewareVersion, fpgaInfo.gatewareRevision);
+00092     \}
+00093 \}
+00094 
+00095 \textcolor{keyword}{static} \textcolor{keywordtype}{bool} programmingCallbackStream(
+00096     \textcolor{keywordtype}{int} bsent, \textcolor{keywordtype}{int} btotal, \textcolor{keyword}{const} \textcolor{keywordtype}{char}* progressMsg,
+00097     \textcolor{keyword}{const} std::string &image,
+00098     IConnection::ProgrammingCallback callback)
+00099 \{
+00100     \textcolor{keyword}{const} \textcolor{keyword}{auto} msg = std::string(progressMsg) + \textcolor{stringliteral}{" ("} + image + \textcolor{stringliteral}{")"};
+00101     \textcolor{keywordflow}{return} callback(bsent, btotal, msg.c\_str());
+00102 \}
+00103 
+00104 \textcolor{keywordtype}{int} LMS64CProtocol::ProgramUpdate(\textcolor{keyword}{const} \textcolor{keywordtype}{bool} download, 
+      IConnection::ProgrammingCallback callback)
+00105 \{
+00106     \textcolor{keyword}{const} \textcolor{keyword}{auto} info = this->GetInfo();
+00107     \textcolor{keyword}{const} \textcolor{keyword}{auto} &entry = lookupImageEntry(info);
+00108 
+00109     \textcolor{comment}{//an entry match was not found}
+00110     \textcolor{keywordflow}{if} (entry.dev == LMS_DEV_UNKNOWN)\{
+00111         \textcolor{keywordflow}{return} lime::ReportError(\textcolor{stringliteral}{"Update not supported: %s[HW=%d]"}, 
+      GetDeviceName(info.device), info.hardware);
+00112     \}
+00113 
+00114     \textcolor{comment}{//download images when missing}
+00115     \textcolor{keywordflow}{if} (download)\{
+00116         std::vector<std::string> images = \{entry.gw\_img\};
+00117         \textcolor{keywordflow}{if} (entry.fw\_img) images.push\_back(std::string(entry.fw\_img));
+00118         \textcolor{keywordflow}{for} (\textcolor{keyword}{const} \textcolor{keyword}{auto} &image : images)
+00119         \{
+00120             \textcolor{keywordflow}{if} (not lime::locateImageResource(image).empty()) \textcolor{keywordflow}{continue};
+00121             \textcolor{keyword}{const} std::string msg(\textcolor{stringliteral}{"Downloading: "} + image);
+00122             \textcolor{keywordflow}{if} (callback) callback(0, 1, msg.c\_str());
+00123             \textcolor{keywordtype}{int} ret = lime::downloadImageResource(image);
+00124             \textcolor{keywordflow}{if} (ret != 0) \textcolor{keywordflow}{return} ret; \textcolor{comment}{//error set by download call}
+00125             \textcolor{keywordflow}{if} (callback) callback(1, 1, \textcolor{stringliteral}{"Done!"});
+00126         \}
+00127     \}
+00128 
+00129     \textcolor{comment}{//load firmware into flash}
+00130     \textcolor{keywordflow}{if} (entry.fw\_img)\{
+00131         \textcolor{comment}{//open file}
+00132         std::ifstream file;
+00133         \textcolor{keyword}{const} \textcolor{keyword}{auto} path = lime::locateImageResource(entry.fw\_img);
+00134         file.open(path.c\_str(), std::ios::in | std::ios::binary);
+00135         \textcolor{keywordflow}{if} (not file.good()) \textcolor{keywordflow}{return} lime::ReportError(\textcolor{stringliteral}{"Error opening %s"}, path.c\_str());
+00136 
+00137         \textcolor{comment}{//read file}
+00138         std::streampos fileSize;
+00139         file.seekg(0, std::ios::end);
+00140         fileSize = file.tellg();
+00141         file.seekg(0, std::ios::beg);
+00142         std::vector<char> progData(fileSize, 0);
+00143         file.read(progData.data(), fileSize);
+00144 
+00145         \textcolor{keywordtype}{int} device = LMS64CProtocol::FX3; \textcolor{comment}{//FX3}
+00146         \textcolor{keywordtype}{int} progMode = 2; \textcolor{comment}{//Firmware to FLASH}
+00147         \textcolor{keyword}{using namespace }std::placeholders;
+00148         \textcolor{keyword}{const} \textcolor{keyword}{auto} cb = std::bind(&programmingCallbackStream, \_1, \_2, \_3, path, callback);
+00149         \textcolor{keyword}{auto} status = this->ProgramWrite(progData.data(), progData.size(), progMode, 
+      device, cb);
+00150         \textcolor{keywordflow}{if} (status != 0) \textcolor{keywordflow}{return} status;
+00151     \}
+00152 
+00153     \textcolor{comment}{//load gateware into flash}
+00154     \{
+00155         \textcolor{comment}{//open file}
+00156         std::ifstream file;
+00157         \textcolor{keyword}{const} \textcolor{keyword}{auto} path = lime::locateImageResource(entry.gw\_img);
+00158         file.open(path.c\_str(), std::ios::in | std::ios::binary);
+00159         \textcolor{keywordflow}{if} (not file.good()) \textcolor{keywordflow}{return} lime::ReportError(\textcolor{stringliteral}{"Error opening %s"}, path.c\_str());
+00160 
+00161         \textcolor{comment}{//read file}
+00162         std::streampos fileSize;
+00163         file.seekg(0, std::ios::end);
+00164         fileSize = file.tellg();
+00165         file.seekg(0, std::ios::beg);
+00166         std::vector<char> progData(fileSize, 0);
+00167         file.read(progData.data(), fileSize);
+00168 
+00169         \textcolor{keywordtype}{int} device = LMS64CProtocol::FPGA; \textcolor{comment}{//Altera FPGA}
+00170         \textcolor{keywordtype}{int} progMode = 1; \textcolor{comment}{//Bitstream to FLASH}
+00171         \textcolor{keyword}{using namespace }std::placeholders;
+00172         \textcolor{keyword}{const} \textcolor{keyword}{auto} cb = std::bind(&programmingCallbackStream, \_1, \_2, \_3, path, callback);
+00173         \textcolor{keyword}{auto} status = this->ProgramWrite(progData.data(), progData.size(), progMode, 
+      device, cb);
+00174         \textcolor{keywordflow}{if} (status != 0) \textcolor{keywordflow}{return} status;
+00175     \}
+00176 
+00177     \textcolor{comment}{//Reset FX3, FPGA should be reloaded on boot}
+00178     \textcolor{keywordflow}{if} (entry.fw\_img)\{
+00179         \textcolor{keywordtype}{int} device = LMS64CProtocol::FX3; \textcolor{comment}{//FX3}
+00180         \textcolor{keyword}{auto} status = this->ProgramWrite(\textcolor{keyword}{nullptr}, 0, 0, device, \textcolor{keyword}{nullptr});
+00181         \textcolor{keywordflow}{if} (status != 0) \textcolor{keywordflow}{return} status;
+00182     \}
+00183     \textcolor{keywordflow}{return} 0;
+00184 \}
+\end{DoxyCode}

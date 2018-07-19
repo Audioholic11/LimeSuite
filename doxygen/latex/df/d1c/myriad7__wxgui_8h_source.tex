@@ -1,0 +1,42 @@
+\subsection{myriad7\+\_\+wxgui.\+h}
+\label{myriad7__wxgui_8h_source}\index{/home/erik/prefix/default/src/limesuite-\/dev/src/myriad7/myriad7\+\_\+wxgui.\+h@{/home/erik/prefix/default/src/limesuite-\/dev/src/myriad7/myriad7\+\_\+wxgui.\+h}}
+
+\begin{DoxyCode}
+00001 
+00005 \textcolor{preprocessor}{#ifndef MYRIAD7\_WXGUI\_H}
+00006 \textcolor{preprocessor}{#define MYRIAD7\_WXGUI\_H}
+00007 
+00008 \textcolor{preprocessor}{#include <wx/frame.h>}
+00009 \textcolor{preprocessor}{#include "lime/LimeSuite.h"}
+00010 \textcolor{keyword}{class }wxComboBox;
+00011 \textcolor{keyword}{class }wxStaticText;
+00012 \textcolor{keyword}{class }wxFlexGridSizer;
+00013 
+00014 \textcolor{keyword}{class }Myriad7_wxgui: \textcolor{keyword}{public} wxFrame
+00015 \{
+00016     \textcolor{keyword}{public}:
+00017 
+00018         Myriad7_wxgui(wxWindow* parent,wxWindowID \textcolor{keywordtype}{id}=wxID\_ANY, \textcolor{keyword}{const} wxString &title = wxEmptyString, \textcolor{keyword}{const}
+       wxPoint& pos=wxDefaultPosition,\textcolor{keyword}{const} wxSize& size=wxDefaultSize, \textcolor{keywordtype}{long} styles = 0);
+00019         \textcolor{keywordtype}{void} Initialize(lms_device_t* serPort);
+00020         \textcolor{keyword}{virtual} ~Myriad7_wxgui();
+00021         \textcolor{keyword}{virtual} \textcolor{keywordtype}{void} UpdatePanel();
+00022 
+00023         wxStaticText* StaticText2;
+00024         wxComboBox* cmbGPIO2;
+00025         wxStaticText* StaticText1;
+00026         wxComboBox* cmbGPIO_1_0;
+00027 
+00028         \textcolor{keyword}{static} \textcolor{keyword}{const} \textcolor{keywordtype}{long} ID_STATICTEXT1;
+00029         \textcolor{keyword}{static} \textcolor{keyword}{const} \textcolor{keywordtype}{long} ID_COMBOBOX1;
+00030         \textcolor{keyword}{static} \textcolor{keyword}{const} \textcolor{keywordtype}{long} ID_STATICTEXT2;
+00031         \textcolor{keyword}{static} \textcolor{keyword}{const} \textcolor{keywordtype}{long} ID_COMBOBOX2;
+00032 
+00033         \textcolor{keywordtype}{void} ParameterChangeHandler(wxCommandEvent& event);
+00034     \textcolor{keyword}{protected}:
+00035         lms_device_t* lmsControl;
+00036         DECLARE\_EVENT\_TABLE()
+00037 \};
+00038 
+00039 \textcolor{preprocessor}{#endif}
+\end{DoxyCode}

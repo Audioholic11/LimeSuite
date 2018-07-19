@@ -1,0 +1,63 @@
+\subsection{lms7002m\+\_\+controls.\+h}
+\label{lms7002m__controls_8h_source}\index{/home/erik/prefix/default/src/limesuite-\/dev/mcu\+\_\+program/common\+\_\+src/lms7002m\+\_\+controls.\+h@{/home/erik/prefix/default/src/limesuite-\/dev/mcu\+\_\+program/common\+\_\+src/lms7002m\+\_\+controls.\+h}}
+
+\begin{DoxyCode}
+00001 \textcolor{preprocessor}{#ifndef LMS7002M\_CONTROLS\_MCU\_H}
+00002 \textcolor{preprocessor}{#define LMS7002M\_CONTROLS\_MCU\_H}
+00003 
+00004 \textcolor{preprocessor}{#define LMS7002M\_Rx 0}
+00005 \textcolor{preprocessor}{#define LMS7002M\_Tx 1}
+00006 
+00007 \textcolor{preprocessor}{#include "typedefs.h"}
+00008 
+00009 \textcolor{preprocessor}{#ifdef \_\_cplusplus}
+00010 \textcolor{keyword}{extern} \textcolor{stringliteral}{"C"}
+00011 \{
+00012 \textcolor{preprocessor}{#endif}
+00013 
+00014 \textcolor{keyword}{extern} \textcolor{keywordtype}{void} SaveChipState(\textcolor{keywordtype}{bool} wr);
+00015 \textcolor{keyword}{extern} \textcolor{keywordtype}{void} SetDefaults(uint16\_t start, uint16\_t end);
+00016 \textcolor{keyword}{extern} \textcolor{keywordtype}{void} SetDefaultsSX();
+00017 \textcolor{keyword}{extern} \textcolor{keywordtype}{void} ClockLogicResets();
+00018 
+00019 \textcolor{keyword}{extern} \textcolor{keywordtype}{void} SetNCOFrequency(\textcolor{keyword}{const} \textcolor{keywordtype}{bool} tx, \textcolor{keyword}{const} \textcolor{keywordtype}{float} freq\_Hz, uint8\_t index);
+00020 
+00021 \textcolor{keyword}{extern} float_type GetReferenceClk_TSP_MHz(\textcolor{keywordtype}{bool} tx);
+00022 \textcolor{keyword}{extern} float_type GetFrequencyCGEN();
+00023 \textcolor{keyword}{extern} uint8\_t SetFrequencyCGEN(\textcolor{keyword}{const} float_type freq);
+00024 \textcolor{keyword}{extern} float_type GetFrequencySX(\textcolor{keyword}{const} \textcolor{keywordtype}{bool} Tx);
+00025 \textcolor{keyword}{extern} uint8\_t SetFrequencySX(\textcolor{keyword}{const} \textcolor{keywordtype}{bool} Tx, \textcolor{keyword}{const} float_type freq);
+00026 \textcolor{keyword}{extern} \textcolor{keywordtype}{void} EnableChannelPowerControls();
+00027 \textcolor{keyword}{extern} \textcolor{keywordtype}{void} EnableMIMOBuffersIfNecessary();
+00028 
+00029 \textcolor{keyword}{enum} VCO_ID
+00030 \{
+00031     VCO_CGEN = 0,
+00032     VCO_SXR,
+00033     VCO_SXT
+00034 \};
+00035 
+00036 \textcolor{keyword}{extern} uint8\_t TuneVCO(\textcolor{keywordtype}{bool} SX); \textcolor{comment}{// 0-cgen, 1-SXR, 2-SXT}
+00037 \textcolor{keyword}{extern} uint16\_t pow2(\textcolor{keyword}{const} uint8\_t power);
+00038 
+00039 \textcolor{keyword}{typedef} \textcolor{keyword}{struct}
+00040 \{
+00041     \textcolor{keyword}{const} uint16\_t* addr;
+00042     \textcolor{keyword}{const} uint16\_t* val;
+00043     \textcolor{keyword}{const} uint16\_t* mask;
+00044     \textcolor{keyword}{const} uint8\_t cnt;
+00045     \textcolor{keyword}{const} uint16\_t* wrOnlyAddr;
+00046     \textcolor{keyword}{const} uint16\_t* wrOnlyData;
+00047     \textcolor{keyword}{const} uint8\_t wrOnlyAddrCnt;
+00048     \textcolor{keyword}{const} uint8\_t wrOnlyDataCnt;
+00049 \} RegisterBatch;
+00050 
+00051 \textcolor{keyword}{extern} \textcolor{keywordtype}{void} WriteMaskedRegs(\textcolor{keyword}{const} RegisterBatch ROM* regs);
+00052 \textcolor{keyword}{extern} uint8\_t GetValueOf_c_ctl_pga_rbb(uint8\_t g\_pga\_rbb);
+00053 
+00054 \textcolor{preprocessor}{#ifdef \_\_cplusplus}
+00055 \}
+00056 \textcolor{preprocessor}{#endif}
+00057 
+00058 \textcolor{preprocessor}{#endif //LMS7002M\_CONTROLS\_MCU\_H}
+\end{DoxyCode}

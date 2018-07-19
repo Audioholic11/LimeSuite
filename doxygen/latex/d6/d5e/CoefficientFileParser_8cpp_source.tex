@@ -1,0 +1,203 @@
+\subsection{Coefficient\+File\+Parser.\+cpp}
+\label{CoefficientFileParser_8cpp_source}\index{/home/erik/prefix/default/src/limesuite-\/dev/src/lms7002\+\_\+wxgui/\+Coefficient\+File\+Parser.\+cpp@{/home/erik/prefix/default/src/limesuite-\/dev/src/lms7002\+\_\+wxgui/\+Coefficient\+File\+Parser.\+cpp}}
+
+\begin{DoxyCode}
+00001 
+00007 \textcolor{preprocessor}{#include <string.h>}
+00008 \textcolor{preprocessor}{#include <stdlib.h>}
+00009 \textcolor{preprocessor}{#include <stdio.h>}
+00010 \textcolor{preprocessor}{#include "CoefficientFileParser.h"}
+00011 \textcolor{preprocessor}{#include <fstream>}
+00012 \textcolor{keyword}{using namespace }std;
+00013 
+00014 \textcolor{comment}{// ***************************************************************}
+00015 \textcolor{comment}{// Check if 'c' is blank character.}
+00016 \textcolor{comment}{// ***************************************************************}
+00017 \textcolor{keywordtype}{bool} Parser::IsBlank(\textcolor{keywordtype}{char} c)
+00018 \{
+00019     \textcolor{keywordtype}{char} blankchar[] = \textcolor{stringliteral}{", \(\backslash\)t\(\backslash\)n\(\backslash\)r"};
+00020     \textcolor{keywordflow}{for}(\textcolor{keywordtype}{unsigned} i=0; i<strlen(blankchar); i++)
+00021             \textcolor{keywordflow}{if}(c == blankchar[i] ) \textcolor{keywordflow}{return}(\textcolor{keyword}{true});
+00022 
+00023     \textcolor{keywordflow}{return}(\textcolor{keyword}{false});
+00024 \}
+00025 
+00026 \textcolor{comment}{// ***************************************************************}
+00027 \textcolor{comment}{// Check if 'c' is a digit.}
+00028 \textcolor{comment}{// ***************************************************************}
+00029 \textcolor{keywordtype}{bool} Parser::IsDigit(\textcolor{keywordtype}{char} c)
+00030 \{
+00031     \textcolor{keywordtype}{char} digit[] = \textcolor{stringliteral}{".0123456789+-"};
+00032     \textcolor{keywordflow}{for}(\textcolor{keywordtype}{unsigned} i=0; i<strlen(digit); i++)
+00033             \textcolor{keywordflow}{if}(c == digit[i] ) \textcolor{keywordflow}{return}(\textcolor{keyword}{true});
+00034     \textcolor{keywordflow}{return}(\textcolor{keyword}{false});
+00035 \}
+00036 
+00037 \textcolor{comment}{// ***************************************************************}
+00038 \textcolor{comment}{//  Get integer value from the file}
+00039 \textcolor{comment}{//  Returns:}
+00040 \textcolor{comment}{//      0 upon success,}
+00041 \textcolor{comment}{//      -1 if EOF or}
+00042 \textcolor{comment}{//      -2 if syntax error}
+00043 \textcolor{comment}{// ***************************************************************}
+00044 \textcolor{keywordtype}{int} Parser::getValue(FILE *fp, \textcolor{keywordtype}{float} *v)
+00045 \{
+00046     \textcolor{keywordtype}{char} c, c1, str[256];
+00047     \textcolor{keywordtype}{int} i, opencomments;
+00048 
+00049     \textcolor{comment}{/* Skip blanks, tabs and new lines */}
+00050     \textcolor{keywordflow}{while}( IsBlank( c = fgetc(fp) ) );
+00051 
+00052     \textcolor{comment}{/* Its end of file, nothing to read */}
+00053     \textcolor{keywordflow}{if}( c == EOF ) \textcolor{keywordflow}{return}(EOF);
+00054 
+00055     \textcolor{keywordflow}{if}( c == \textcolor{charliteral}{'/'}) \{         \textcolor{comment}{/* check for comments */}
+00056         c1 = fgetc(fp);
+00057         \textcolor{keywordflow}{if}( c1 == \textcolor{charliteral}{'/'}) \{    \textcolor{comment}{/* C++ one line comment */}
+00058             \textcolor{keywordflow}{while}( (c = fgetc(fp)) != \textcolor{charliteral}{'\(\backslash\)n'} && c != EOF) ;
+00059             \textcolor{keywordflow}{if}(c == EOF) \textcolor{keywordflow}{return}(EOF);
+00060             \textcolor{keywordflow}{else} \textcolor{keywordflow}{return}(getValue(fp, v));
+00061         \} \textcolor{keywordflow}{else} \textcolor{keywordflow}{if}( c1 == \textcolor{charliteral}{'*'}) \{     \textcolor{comment}{/* C like comment */}
+00062             opencomments = 1;
+00063             c = fgetc(fp);
+00064             \textcolor{keywordflow}{if}(c == EOF) \textcolor{keywordflow}{return}(EOF);
+00065             \textcolor{keywordflow}{while}( (c1 = fgetc(fp)) != EOF ) \{
+00066                 \textcolor{keywordflow}{if}( c == \textcolor{charliteral}{'/'} && c1 == \textcolor{charliteral}{'*'} ) opencomments++;
+00067                 \textcolor{keywordflow}{if}( c == \textcolor{charliteral}{'*'} && c1 == \textcolor{charliteral}{'/'} ) opencomments--;
+00068                 c = c1;
+00069                 \textcolor{keywordflow}{if}(opencomments == 0) \textcolor{keywordflow}{break};
+00070             \}
+00071             \textcolor{keywordflow}{if}(c1 == EOF) \textcolor{keywordflow}{return}(EOF);
+00072             \textcolor{keywordflow}{else} \textcolor{keywordflow}{return}(getValue(fp, v));
+00073         \} \textcolor{keywordflow}{else} \{
+00074             ungetc(c1, fp);
+00075         \}
+00076     \}
+00077 
+00078     \textcolor{keywordflow}{if}( IsDigit(c) ) \{
+00079         i=0; str[i]=c; i++;
+00080         \textcolor{keywordflow}{while}( IsDigit(c=fgetc(fp)) ) \{
+00081             str[i]=c; i++;
+00082         \}
+00083         ungetc(c, fp);
+00084         str[i]=\textcolor{charliteral}{'\(\backslash\)0'};
+00085         *v = atof(str);
+00086         \textcolor{keywordflow}{return}(0);
+00087     \} \textcolor{keywordflow}{else} \textcolor{keywordflow}{return}(-2);
+00088 \}
+00089 
+00090 \textcolor{comment}{// ***************************************************************}
+00091 \textcolor{comment}{// Get the coefficients from a file. Return values:}
+00092 \textcolor{comment}{//  -2  syntax error within the file}
+00093 \textcolor{comment}{//  -3  filename is empty string}
+00094 \textcolor{comment}{//  -4  can not open the file}
+00095 \textcolor{comment}{//  -5  too many coefficients in the file}
+00096 \textcolor{comment}{//  >=0     number of the coefficients read}
+00097 \textcolor{comment}{// ***************************************************************}
+00098 \textcolor{keywordtype}{int} Parser::getcoeffs(\textcolor{keyword}{const} \textcolor{keywordtype}{char} *filename, \textcolor{keywordtype}{float} *v, \textcolor{keywordtype}{int} max)
+00099 \{
+00100     \textcolor{keywordtype}{int} i, n;
+00101     FILE *fp;
+00102 
+00103     \textcolor{keywordflow}{if}( strlen(filename) == 0) \textcolor{keywordflow}{return}(-3);
+00104     \textcolor{keywordflow}{if}( (fp = fopen(filename, \textcolor{stringliteral}{"r"})) == NULL) \textcolor{keywordflow}{return}(-4);
+00105 
+00106     \textcolor{keywordflow}{for}(n=0; n < max; ) \{
+00107         i = getValue(fp, v);
+00108         \textcolor{keywordflow}{if}( i == EOF ) \{
+00109             fclose(fp);
+00110             \textcolor{keywordflow}{return}(n);
+00111         \} \textcolor{keywordflow}{else} \textcolor{keywordflow}{if}( i ==  -2 ) \{
+00112             fclose(fp);
+00113             \textcolor{keywordflow}{return}(-2);
+00114         \} \textcolor{keywordflow}{else} \textcolor{keywordflow}{if}( i == 0 ) \{
+00115             n++; v++;
+00116         \}
+00117     \}
+00118     fclose(fp);
+00119     \textcolor{keywordflow}{return}(-5);
+00120 \}
+00121 
+00122 \textcolor{comment}{// ***************************************************************}
+00123 \textcolor{comment}{// Get pair of the coefficients from a file. Return values:}
+00124 \textcolor{comment}{//  -1  odd number of the coefficients found in the file}
+00125 \textcolor{comment}{//  -2  syntax error within the file}
+00126 \textcolor{comment}{//  -3  filename is empty string}
+00127 \textcolor{comment}{//  -4  can not open the file}
+00128 \textcolor{comment}{//  -5  too many coefficients in the file}
+00129 \textcolor{comment}{//  >=0     number of the coefficients read}
+00130 \textcolor{comment}{// ***************************************************************}
+00131 \textcolor{keywordtype}{int} Parser::getcoeffs2(\textcolor{keyword}{const} \textcolor{keywordtype}{char} *filename, \textcolor{keywordtype}{float} *v1, \textcolor{keywordtype}{float} *v2, \textcolor{keywordtype}{int} max)
+00132 \{
+00133     \textcolor{keywordtype}{int} i, n;
+00134     FILE *fp;
+00135 
+00136     \textcolor{keywordflow}{if}( strlen(filename) == 0) \textcolor{keywordflow}{return}(-3);
+00137     \textcolor{keywordflow}{if}( (fp = fopen(filename, \textcolor{stringliteral}{"r"})) == NULL) \textcolor{keywordflow}{return}(-4);
+00138 
+00139     \textcolor{keywordflow}{for}(n=0; n < max+1; ) \{
+00140         i = getValue(fp, v1);
+00141         \textcolor{keywordflow}{if}( i == EOF ) \{
+00142             fclose(fp);
+00143             \textcolor{keywordflow}{return}(n);
+00144         \} \textcolor{keywordflow}{else} \textcolor{keywordflow}{if}( i ==  -2 ) \{
+00145             fclose(fp);
+00146             \textcolor{keywordflow}{return}(-2);
+00147         \} \textcolor{keywordflow}{else} \textcolor{keywordflow}{if}( i == 0 ) \{
+00148             v1++;
+00149         \}
+00150 
+00151         i = getValue(fp, v2);
+00152         \textcolor{keywordflow}{if}( i == EOF ) \{
+00153             fclose(fp);
+00154             \textcolor{keywordflow}{return}(-2);
+00155         \} \textcolor{keywordflow}{else} \textcolor{keywordflow}{if}( i ==  -2 ) \{
+00156             fclose(fp);
+00157             \textcolor{keywordflow}{return}(-2);
+00158         \} \textcolor{keywordflow}{else} \textcolor{keywordflow}{if}( i == 0 ) \{
+00159             v2++; n++;
+00160         \}
+00161     \}
+00162 
+00163     fclose(fp);
+00164     \textcolor{keywordflow}{return}(-5);
+00165 \}
+00166 
+00167 \textcolor{comment}{// ***************************************************************}
+00168 \textcolor{comment}{// Saves given coefficients to fir file}
+00169 \textcolor{comment}{// ***************************************************************}
+00170 \textcolor{keywordtype}{void} Parser::saveToFile(\textcolor{keyword}{const} \textcolor{keywordtype}{char} * filename, \textcolor{keyword}{const} \textcolor{keywordtype}{float} *coefficients, \textcolor{keywordtype}{int} cCount)
+00171 \{
+00172     fstream fout;
+00173     fout.open(filename, ios::out);
+00174 
+00175     \textcolor{keywordtype}{char} fname[80];
+00176     \textcolor{keywordtype}{char} *name\_pos = 0;
+00177 
+00178     name\_pos = strrchr((\textcolor{keywordtype}{char}*)filename, \textcolor{charliteral}{'\(\backslash\)\(\backslash\)'});
+00179     \textcolor{keywordflow}{if}(name\_pos == NULL)
+00180         name\_pos = strrchr((\textcolor{keywordtype}{char}*)filename, \textcolor{charliteral}{'/'});
+00181 
+00182     fout << \textcolor{stringliteral}{"/* ******************************************************************"} << endl;
+00183     fout << \textcolor{stringliteral}{"   FILE:\(\backslash\)t"};
+00184     \textcolor{keywordflow}{if}(name\_pos != NULL)
+00185     \{
+00186         strncpy(fname, name\_pos+1, 80);
+00187         fout << fname << endl;
+00188     \}
+00189     \textcolor{keywordflow}{else}
+00190         fout << \textcolor{stringliteral}{"???"} << endl;
+00191     fout << \textcolor{stringliteral}{"   DESCRIPTION:\(\backslash\)t"} << endl;
+00192     fout << \textcolor{stringliteral}{"   DATE:\(\backslash\)t"} << endl;
+00193     fout << \textcolor{stringliteral}{"   REVISIONS:\(\backslash\)t"} << endl;
+00194     fout << \textcolor{stringliteral}{"   ****************************************************************** */"} << endl << endl;
+00195 
+00196     \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} i=0; i<cCount; ++i)
+00197     \{
+00198         fout << \textcolor{stringliteral}{"\(\backslash\)t"} << std::fixed << coefficients[i];
+00199         \textcolor{keywordflow}{if}(i<cCount-1)
+00200             fout << \textcolor{charliteral}{','} << endl;
+00201     \}
+00202     fout.close();
+00203 \}
+\end{DoxyCode}

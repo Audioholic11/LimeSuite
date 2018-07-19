@@ -1,0 +1,251 @@
+\subsection{lms7002\+\_\+pnl\+R\+F\+E\+\_\+view.\+cpp}
+\label{lms7002__pnlRFE__view_8cpp_source}\index{/home/erik/prefix/default/src/limesuite-\/dev/src/lms7002\+\_\+wxgui/lms7002\+\_\+pnl\+R\+F\+E\+\_\+view.\+cpp@{/home/erik/prefix/default/src/limesuite-\/dev/src/lms7002\+\_\+wxgui/lms7002\+\_\+pnl\+R\+F\+E\+\_\+view.\+cpp}}
+
+\begin{DoxyCode}
+00001 \textcolor{preprocessor}{#include "lms7002_pnlRFE_view.h"}
+00002 \textcolor{preprocessor}{#include <wx/msgdlg.h>}
+00003 \textcolor{preprocessor}{#include <map>}
+00004 \textcolor{preprocessor}{#include <vector>}
+00005 \textcolor{preprocessor}{#include <assert.h>}
+00006 \textcolor{preprocessor}{#include "lms7002_gui_utilities.h"}
+00007 \textcolor{preprocessor}{#include "numericSlider.h"}
+00008 \textcolor{preprocessor}{#include "lms7suiteEvents.h"}
+00009 \textcolor{preprocessor}{#include "LMS7002M_parameters.h"}
+00010 
+00011 \textcolor{keyword}{using namespace }lime;
+00012 \textcolor{keyword}{using namespace }LMS7002_WXGUI;
+00013 
+00014 \textcolor{keyword}{static} indexValueMap g_lna_rfe_IndexValuePairs;
+00015 \textcolor{keyword}{static} indexValueMap g_tia_rfe_IndexValuePairs;
+00016 
+00017 lms7002_pnlRFE_view::lms7002_pnlRFE_view( wxWindow* parent )
+00018     : pnlRFE_view(parent), lmsControl(nullptr)
+00019 \{
+00020 
+00021 \}
+00022 
+00023 lms7002_pnlRFE_view::lms7002_pnlRFE_view(wxWindow* parent, wxWindowID \textcolor{keywordtype}{id}, \textcolor{keyword}{const} wxPoint& pos, \textcolor{keyword}{const} wxSize&
+       size, \textcolor{keywordtype}{long} style)
+00024     : pnlRFE_view(parent, id, pos, size, style), lmsControl(nullptr)
+00025 \{
+00026     \textcolor{comment}{//ids for updating from chip}
+00027     wndId2Enum[cmbCAP_RXMXO_RFE] = LMS7param(CAP_RXMXO_RFE);
+00028     wndId2Enum[cmbCCOMP_TIA_RFE] = LMS7param(CCOMP_TIA_RFE);
+00029     wndId2Enum[cmbCFB_TIA_RFE] = LMS7param(CFB_TIA_RFE);
+00030     wndId2Enum[cmbCGSIN_LNA_RFE] = LMS7param(CGSIN_LNA_RFE);
+00031     wndId2Enum[cmbDCOFFI_RFE] = LMS7param(DCOFFI_RFE);
+00032     wndId2Enum[cmbDCOFFQ_RFE] = LMS7param(DCOFFQ_RFE);
+00033     wndId2Enum[chkEN_DCOFF_RXFE_RFE] = LMS7param(EN_DCOFF_RXFE_RFE);
+00034     wndId2Enum[chkEN_G_RFE] = LMS7param(EN_G_RFE);
+00035     wndId2Enum[chkEN_INSHSW_LB1_RFE] = LMS7param(EN_INSHSW_LB1_RFE);
+00036     wndId2Enum[chkEN_INSHSW_LB2_RFE] = LMS7param(EN_INSHSW_LB2_RFE);
+00037     wndId2Enum[chkEN_INSHSW_L_RFE] = LMS7param(EN_INSHSW_L_RFE);
+00038     wndId2Enum[chkEN_INSHSW_W_RFE] = LMS7param(EN_INSHSW_W_RFE);
+00039     wndId2Enum[chkEN_NEXTRX_RFE] = LMS7param(EN_NEXTRX_RFE);
+00040     wndId2Enum[cmbG_LNA_RFE] = LMS7param(G_LNA_RFE);
+00041     wndId2Enum[cmbG_RXLOOPB_RFE] = LMS7param(G_RXLOOPB_RFE);
+00042     wndId2Enum[cmbG_TIA_RFE] = LMS7param(G_TIA_RFE);
+00043     wndId2Enum[cmbICT_LNACMO_RFE] = LMS7param(ICT_LNACMO_RFE);
+00044     wndId2Enum[cmbICT_LNA_RFE] = LMS7param(ICT_LNA_RFE);
+00045     wndId2Enum[cmbICT_LODC_RFE] = LMS7param(ICT_LODC_RFE);
+00046     wndId2Enum[cmbICT_LOOPB_RFE] = LMS7param(ICT_LOOPB_RFE);
+00047     wndId2Enum[cmbICT_TIAMAIN_RFE] = LMS7param(ICT_TIAMAIN_RFE);
+00048     wndId2Enum[cmbICT_TIAOUT_RFE] = LMS7param(ICT_TIAOUT_RFE);
+00049     wndId2Enum[chkPD_LNA_RFE] = LMS7param(PD_LNA_RFE);
+00050     wndId2Enum[chkPD_MXLOBUF_RFE] = LMS7param(PD_MXLOBUF_RFE);
+00051     wndId2Enum[chkPD_QGEN_RFE] = LMS7param(PD_QGEN_RFE);
+00052     wndId2Enum[chkPD_RLOOPB_1_RFE] = LMS7param(PD_RLOOPB_1_RFE);
+00053     wndId2Enum[chkPD_RLOOPB_2_RFE] = LMS7param(PD_RLOOPB_2_RFE);
+00054     wndId2Enum[chkPD_RSSI_RFE] = LMS7param(PD_RSSI_RFE);
+00055     wndId2Enum[chkPD_TIA_RFE] = LMS7param(PD_TIA_RFE);
+00056     wndId2Enum[cmbRCOMP_TIA_RFE] = LMS7param(RCOMP_TIA_RFE);
+00057     wndId2Enum[cmbRFB_TIA_RFE] = LMS7param(RFB_TIA_RFE);
+00058     wndId2Enum[cmbSEL_PATH_RFE] = LMS7param(SEL_PATH_RFE);
+00059     wndId2Enum[cmbCDC_I_RFE] = LMS7param(CDC_I_RFE);
+00060     wndId2Enum[cmbCDC_Q_RFE] = LMS7param(CDC_Q_RFE);
+00061     wndId2Enum[chkEN_DIR_RFE] = LMS7param(EN_DIR_RFE);
+00062 
+00063     wxArrayString temp;
+00064     temp.clear();
+00065     \textcolor{keywordflow}{for} (\textcolor{keywordtype}{int} i = 0; i<32; ++i)
+00066         temp.push\_back(wxString::Format(\_(\textcolor{stringliteral}{"%i fF"}), (i + 1) * 80));
+00067     cmbCAP_RXMXO_RFE->Set(temp);
+00068 
+00069     \textcolor{keywordflow}{for} (\textcolor{keywordtype}{int} i = 0; i < 15; ++i)
+00070         g_lna_rfe_IndexValuePairs.push\_back(indexValuePair(i, i + 1));
+00071     temp.clear();
+00072     temp.push\_back(\_(\textcolor{stringliteral}{"Gmax-30"}));
+00073     temp.push\_back(\_(\textcolor{stringliteral}{"Gmax-27"}));
+00074     temp.push\_back(\_(\textcolor{stringliteral}{"Gmax-24"}));
+00075     temp.push\_back(\_(\textcolor{stringliteral}{"Gmax-21"}));
+00076     temp.push\_back(\_(\textcolor{stringliteral}{"Gmax-18"}));
+00077     temp.push\_back(\_(\textcolor{stringliteral}{"Gmax-15"}));
+00078     temp.push\_back(\_(\textcolor{stringliteral}{"Gmax-12"}));
+00079     temp.push\_back(\_(\textcolor{stringliteral}{"Gmax-9"}));
+00080     temp.push\_back(\_(\textcolor{stringliteral}{"Gmax-6"}));
+00081     temp.push\_back(\_(\textcolor{stringliteral}{"Gmax-5"}));
+00082     temp.push\_back(\_(\textcolor{stringliteral}{"Gmax-4"}));
+00083     temp.push\_back(\_(\textcolor{stringliteral}{"Gmax-3"}));
+00084     temp.push\_back(\_(\textcolor{stringliteral}{"Gmax-2"}));
+00085     temp.push\_back(\_(\textcolor{stringliteral}{"Gmax-1"}));
+00086     temp.push\_back(\_(\textcolor{stringliteral}{"Gmax"}));
+00087     cmbG_LNA_RFE->Set(temp);
+00088 
+00089     temp.clear();
+00090     temp.push\_back(\_(\textcolor{stringliteral}{"Gmax-40"}));
+00091     temp.push\_back(\_(\textcolor{stringliteral}{"Gmax-24"}));
+00092     temp.push\_back(\_(\textcolor{stringliteral}{"Gmax-17"}));
+00093     temp.push\_back(\_(\textcolor{stringliteral}{"Gmax-14"}));
+00094     temp.push\_back(\_(\textcolor{stringliteral}{"Gmax-11"}));
+00095     temp.push\_back(\_(\textcolor{stringliteral}{"Gmax-9"}));
+00096     temp.push\_back(\_(\textcolor{stringliteral}{"Gmax-7.5"}));
+00097     temp.push\_back(\_(\textcolor{stringliteral}{"Gmax-6.2"}));
+00098     temp.push\_back(\_(\textcolor{stringliteral}{"Gmax-5"}));
+00099     temp.push\_back(\_(\textcolor{stringliteral}{"Gmax-4"}));
+00100     temp.push\_back(\_(\textcolor{stringliteral}{"Gmax-3"}));
+00101     temp.push\_back(\_(\textcolor{stringliteral}{"Gmax-2.4"}));
+00102     temp.push\_back(\_(\textcolor{stringliteral}{"Gmax-1.6"}));
+00103     temp.push\_back(\_(\textcolor{stringliteral}{"Gmax-1"}));
+00104     temp.push\_back(\_(\textcolor{stringliteral}{"Gmax-0.5"}));
+00105     temp.push\_back(\_(\textcolor{stringliteral}{"Gmax"}));
+00106     cmbG_RXLOOPB_RFE->Set(temp);
+00107 
+00108 
+00109     \textcolor{keywordflow}{for} (\textcolor{keywordtype}{int} i = 0; i < 3; ++i)
+00110         g_tia_rfe_IndexValuePairs.push\_back(indexValuePair(i, i + 1));
+00111     temp.clear();
+00112     temp.push\_back(\_(\textcolor{stringliteral}{"Gmax-12"}));
+00113     temp.push\_back(\_(\textcolor{stringliteral}{"Gmax-3"}));
+00114     temp.push\_back(\_(\textcolor{stringliteral}{"Gmax"}));
+00115     cmbG_TIA_RFE->Set(temp);
+00116 
+00117     temp.clear();
+00118     \textcolor{keywordtype}{float} nominalCurrent = 500; \textcolor{comment}{//uA}
+00119     \textcolor{keywordflow}{for} (\textcolor{keywordtype}{int} i = 0; i<32; ++i)
+00120         temp.push\_back(wxString::Format(\_(\textcolor{stringliteral}{"%.1f uA"}), nominalCurrent*(i / 12.0)));
+00121     cmbICT_LNA_RFE->Set(temp);
+00122 
+00123     temp.clear();
+00124     \textcolor{keywordtype}{float} Vth = 0.440; \textcolor{comment}{//V}
+00125     \textcolor{keywordflow}{for} (\textcolor{keywordtype}{int} i = 0; i<32; ++i)
+00126         temp.push\_back(wxString::Format(\_(\textcolor{stringliteral}{"%.3f V"}), Vth + 3500 * 0.000020*(i / 12.0)));
+00127     cmbICT_LODC_RFE->Set(temp);
+00128 
+00129     temp.clear();
+00130     \textcolor{keywordtype}{float} IsupplyNominal = 1.80; \textcolor{comment}{//uA}
+00131     \textcolor{keywordflow}{for} (\textcolor{keywordtype}{int} i = 0; i<32; ++i)
+00132         temp.push\_back(wxString::Format(\_(\textcolor{stringliteral}{"%.3f uA"}), IsupplyNominal*(i / 12.0)));
+00133     cmbICT_LOOPB_RFE->Set(temp);
+00134 
+00135     temp.clear();
+00136     \textcolor{keywordflow}{for} (\textcolor{keywordtype}{int} i = 0; i<32; ++i)
+00137         temp.push\_back(wxString::Format(\_(\textcolor{stringliteral}{"%i"}), i));
+00138     cmbRFB_TIA_RFE->Set(temp);
+00139     cmbICT_LNACMO_RFE->Set(temp);
+00140     cmbCGSIN_LNA_RFE->Set(temp);
+00141 
+00142     temp.clear();
+00143     \textcolor{keywordflow}{for} (\textcolor{keywordtype}{int} i = 0; i<16; ++i)
+00144         temp.push\_back(wxString::Format(\_(\textcolor{stringliteral}{"%i"}), i));
+00145     cmbRCOMP_TIA_RFE->Set(temp);
+00146     cmbCDC_I_RFE->Set(temp);
+00147     cmbCDC_Q_RFE->Set(temp);
+00148     cmbCCOMP_TIA_RFE->Set(temp);
+00149 
+00150     LMS7002_WXGUI::UpdateTooltips(wndId2Enum, \textcolor{keyword}{true});
+00151 \}
+00152 
+00153 \textcolor{keywordtype}{void} lms7002_pnlRFE_view::Initialize(lms_device_t* pControl)
+00154 \{
+00155     lmsControl = pControl;
+00156     assert(lmsControl != \textcolor{keyword}{nullptr});
+00157 \}
+00158 
+00159 \textcolor{keywordtype}{void} lms7002_pnlRFE_view::UpdateGUI()
+00160 \{
+00161     LMS7002_WXGUI::UpdateControlsByMap(\textcolor{keyword}{this}, lmsControl, wndId2Enum);
+00162 
+00163     uint16\_t value;
+00164     LMS_ReadParam(lmsControl,LMS7param(G_LNA_RFE),&value);
+00165     cmbG_LNA_RFE->SetSelection( value2index(value, g_lna_rfe_IndexValuePairs));
+00166 
+00167     LMS_ReadParam(lmsControl,LMS7param(G_TIA_RFE),&value);
+00168     cmbG_TIA_RFE->SetSelection( value2index(value, g_tia_rfe_IndexValuePairs));
+00169 
+00170     LMS_ReadParam(lmsControl,LMS7param(DCOFFI_RFE),&value);
+00171     int16\_t dcvalue = value & 0x3F;
+00172     \textcolor{keywordflow}{if}((value & 0x40) != 0)
+00173         dcvalue *= -1;
+00174     cmbDCOFFI_RFE->SetValue(dcvalue);
+00175     LMS_ReadParam(lmsControl,LMS7param(DCOFFQ_RFE),&value);
+00176     dcvalue = value & 0x3F;
+00177     \textcolor{keywordflow}{if}((value & 0x40) != 0)
+00178         dcvalue *= -1;
+00179     cmbDCOFFQ_RFE->SetValue(dcvalue);
+00180 
+00181     \textcolor{comment}{//check if B channel is enabled}
+00182     uint16\_t macBck;
+00183     LMS_ReadParam(lmsControl,LMS7param(MAC),&macBck);
+00184     \textcolor{keywordflow}{if} (macBck >= 2)
+00185         chkEN_NEXTRX_RFE->Hide();
+00186     \textcolor{keywordflow}{else}
+00187         chkEN_NEXTRX_RFE->Show();
+00188 
+00189     LMS_ReadParam(lmsControl,LMS7param(TRX_GAIN_SRC),&value);
+00190     cmbG_LNA_RFE->Enable(!value);
+00191     cmbG_TIA_RFE->Enable(!value);
+00192 \}
+00193 
+00194 \textcolor{keywordtype}{void} lms7002_pnlRFE_view::ParameterChangeHandler(wxSpinEvent& event)
+00195 \{
+00196     wxCommandEvent evt;
+00197     evt.SetInt(event.GetInt());
+00198     evt.SetId(event.GetId());
+00199     evt.SetEventObject(event.GetEventObject());
+00200     ParameterChangeHandler(evt);
+00201 \}
+00202 
+00203 \textcolor{keywordtype}{void} lms7002_pnlRFE_view::ParameterChangeHandler( wxCommandEvent& event )
+00204 \{
+00205     assert(lmsControl != \textcolor{keyword}{nullptr});
+00206     LMS7Parameter parameter;
+00207     \textcolor{keywordflow}{try}
+00208     \{
+00209         parameter = wndId2Enum.at(reinterpret\_cast<wxWindow*>(event.GetEventObject()));
+00210     \}
+00211     \textcolor{keywordflow}{catch} (std::exception & e)
+00212     \{
+00213         std::cout << \textcolor{stringliteral}{"Control element(ID = "} << \textcolor{keyword}{event}.GetId() << \textcolor{stringliteral}{") don't have assigned LMS parameter."} << 
+      std::endl;
+00214         \textcolor{keywordflow}{return};
+00215     \}
+00216     \textcolor{keywordtype}{long} value = \textcolor{keyword}{event}.GetInt();
+00217     \textcolor{keywordflow}{if} (event.GetEventObject() == cmbG_LNA_RFE)
+00218     \{
+00219         value = index2value(value, g_lna_rfe_IndexValuePairs);
+00220     \}
+00221     \textcolor{keywordflow}{else} \textcolor{keywordflow}{if} (event.GetEventObject() == cmbG_TIA_RFE)
+00222     \{
+00223         value = index2value(value, g_tia_rfe_IndexValuePairs);
+00224     \}
+00225     \textcolor{keywordflow}{else} \textcolor{keywordflow}{if} (event.GetEventObject() == cmbDCOFFI_RFE || \textcolor{keyword}{event}.GetEventObject() == 
+      cmbDCOFFQ_RFE)
+00226     \{
+00227         uint16\_t valToSend = 0;
+00228         \textcolor{keywordflow}{if} (value < 0)
+00229             valToSend |= 0x40;
+00230         valToSend |= labs(value);
+00231         LMS_WriteParam(lmsControl,parameter,valToSend);
+00232         \textcolor{keywordflow}{return};
+00233     \}
+00234     \textcolor{keywordflow}{else} \textcolor{keywordflow}{if}(event.GetEventObject() == cmbSEL_PATH_RFE)
+00235     \{
+00236         wxCommandEvent evt;
+00237         evt.SetEventType(LMS7\_RXPATH\_CHANGED);
+00238         evt.SetEventObject(\textcolor{keyword}{this});
+00239         evt.SetInt(event.GetInt());
+00240         wxPostEvent(\textcolor{keyword}{this}, evt);
+00241     \}
+00242     LMS_WriteParam(lmsControl,parameter,value);
+00243 \}
+\end{DoxyCode}

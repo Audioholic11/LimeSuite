@@ -1,0 +1,60 @@
+\subsection{dlg\+View\+I\+R\+A\+M.\+cpp}
+\label{dlgViewIRAM_8cpp_source}\index{/home/erik/prefix/default/src/limesuite-\/dev/src/lms7002\+\_\+wxgui/dlg\+View\+I\+R\+A\+M.\+cpp@{/home/erik/prefix/default/src/limesuite-\/dev/src/lms7002\+\_\+wxgui/dlg\+View\+I\+R\+A\+M.\+cpp}}
+
+\begin{DoxyCode}
+00001 
+00007 \textcolor{preprocessor}{#include "dlgViewIRAM.h"}
+00008 
+00009 \textcolor{preprocessor}{#include <wx/sizer.h>}
+00010 \textcolor{preprocessor}{#include <wx/grid.h>}
+00011 \textcolor{preprocessor}{#include <wx/intl.h>}
+00012 \textcolor{preprocessor}{#include <wx/string.h>}
+00013 
+00014 \textcolor{keyword}{const} \textcolor{keywordtype}{long} dlgViewIRAM::ID_GRID1 = wxNewId();
+00015 
+00016 BEGIN\_EVENT\_TABLE(dlgViewIRAM,wxDialog)
+00017 END\_EVENT\_TABLE()
+00018 
+00019 dlgViewIRAM::dlgViewIRAM(wxWindow* parent,wxWindowID \textcolor{keywordtype}{id},const wxPoint& pos,const wxSize& 
+      size)
+00020 \{
+00021     wxBoxSizer* BoxSizer1;
+00022 
+00023     Create(parent, \textcolor{keywordtype}{id}, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxDEFAULT\_DIALOG\_STYLE, \_T(\textcolor{stringliteral}{"id"}));
+00024     SetClientSize(wxDefaultSize);
+00025     Move(wxDefaultPosition);
+00026     BoxSizer1 = \textcolor{keyword}{new} wxBoxSizer(wxHORIZONTAL);
+00027     Grid1 = \textcolor{keyword}{new} wxGrid(\textcolor{keyword}{this}, ID\_GRID1, wxDefaultPosition, wxDefaultSize, 0, \_T(\textcolor{stringliteral}{"ID\_GRID1"}));
+00028     Grid1->CreateGrid(32,8);
+00029     Grid1->EnableEditing(\textcolor{keyword}{false});
+00030     Grid1->EnableGridLines(\textcolor{keyword}{true});
+00031     Grid1->SetDefaultCellFont( Grid1->GetFont() );
+00032     Grid1->SetDefaultCellTextColour( Grid1->GetForegroundColour() );
+00033     BoxSizer1->Add(Grid1, 1, wxALL|wxALIGN\_CENTER\_HORIZONTAL|wxALIGN\_CENTER\_VERTICAL, 5);
+00034     SetSizer(BoxSizer1);
+00035     BoxSizer1->Fit(\textcolor{keyword}{this});
+00036     BoxSizer1->SetSizeHints(\textcolor{keyword}{this});
+00037 \}
+00038 
+00039 dlgViewIRAM::~dlgViewIRAM()
+00040 \{
+00041 \}
+00042 
+00043 \textcolor{keywordtype}{void} dlgViewIRAM::InitGridData(\textcolor{keyword}{const} \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{char} *data)
+00044 \{
+00045     \textcolor{keywordflow}{for} (\textcolor{keywordtype}{int} i=0; i<=31; i++)
+00046         Grid1->SetRowLabelValue(i, wxString::Format(\_(\textcolor{stringliteral}{"Row: 0x%02X"}), 0xF8 - i * 8));
+00047 
+00048     \textcolor{keywordflow}{for} (\textcolor{keywordtype}{int} j=0; j<8; j++)     \textcolor{comment}{//columns}
+00049         Grid1->SetColLabelValue(j, wxString::Format(\_(\textcolor{stringliteral}{"Col.: 0x%02X"}), j));
+00050 
+00051     \textcolor{keywordflow}{for} (\textcolor{keywordtype}{int} i=0x0000; i<=0x00FF; i++)
+00052     \{
+00053         \textcolor{keywordtype}{int} row=(i/8);
+00054         \textcolor{keywordtype}{int} col=(i-row*8);
+00055         row=31-row;
+00056         Grid1->SetCellValue(row, col, wxString::Format(\_(\textcolor{stringliteral}{"0x%02X"}), data[i]));
+00057     \}
+00058 \}
+00059 
+\end{DoxyCode}

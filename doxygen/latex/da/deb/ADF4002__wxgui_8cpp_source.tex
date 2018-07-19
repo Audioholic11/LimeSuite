@@ -1,0 +1,682 @@
+\subsection{A\+D\+F4002\+\_\+wxgui.\+cpp}
+\label{ADF4002__wxgui_8cpp_source}\index{/home/erik/prefix/default/src/limesuite-\/dev/src/\+A\+D\+F4002/\+A\+D\+F4002\+\_\+wxgui.\+cpp@{/home/erik/prefix/default/src/limesuite-\/dev/src/\+A\+D\+F4002/\+A\+D\+F4002\+\_\+wxgui.\+cpp}}
+
+\begin{DoxyCode}
+00001 
+00007 \textcolor{preprocessor}{#include "ADF4002_wxgui.h"}
+00008 \textcolor{preprocessor}{#include "ADF4002.h"}
+00009 \textcolor{preprocessor}{#include "lms7_device.h"}
+00010 
+00011 \textcolor{preprocessor}{#include <vector>}
+00012 \textcolor{preprocessor}{#include <wx/msgdlg.h>}
+00013 \textcolor{preprocessor}{#include <wx/sizer.h>}
+00014 \textcolor{preprocessor}{#include <wx/stattext.h>}
+00015 \textcolor{preprocessor}{#include <wx/radiobox.h>}
+00016 \textcolor{preprocessor}{#include <wx/textctrl.h>}
+00017 \textcolor{preprocessor}{#include <wx/spinctrl.h>}
+00018 \textcolor{preprocessor}{#include <wx/intl.h>}
+00019 \textcolor{preprocessor}{#include <wx/button.h>}
+00020 \textcolor{preprocessor}{#include <wx/string.h>}
+00021 \textcolor{preprocessor}{#include <wx/combobox.h>}
+00022 
+00023 \textcolor{keyword}{using namespace }std;
+00024 \textcolor{keyword}{using namespace }lime;
+00025 
+00026 \textcolor{keyword}{const} \textcolor{keywordtype}{long} ADF4002_wxgui::ID_STATICTEXT1 = wxNewId();
+00027 \textcolor{keyword}{const} \textcolor{keywordtype}{long} ADF4002_wxgui::ID_STATICTEXT2 = wxNewId();
+00028 \textcolor{keyword}{const} \textcolor{keywordtype}{long} ADF4002_wxgui::ID_STATICTEXT3 = wxNewId();
+00029 \textcolor{keyword}{const} \textcolor{keywordtype}{long} ADF4002_wxgui::ID_COMBOBOX1 = wxNewId();
+00030 \textcolor{keyword}{const} \textcolor{keywordtype}{long} ADF4002_wxgui::ID_COMBOBOX2 = wxNewId();
+00031 \textcolor{keyword}{const} \textcolor{keywordtype}{long} ADF4002_wxgui::ID_SPINCTRL1 = wxNewId();
+00032 \textcolor{keyword}{const} \textcolor{keywordtype}{long} ADF4002_wxgui::ID_STATICTEXT4 = wxNewId();
+00033 \textcolor{keyword}{const} \textcolor{keywordtype}{long} ADF4002_wxgui::ID_STATICTEXT5 = wxNewId();
+00034 \textcolor{keyword}{const} \textcolor{keywordtype}{long} ADF4002_wxgui::ID_COMBOBOX3 = wxNewId();
+00035 \textcolor{keyword}{const} \textcolor{keywordtype}{long} ADF4002_wxgui::ID_SPINCTRL2 = wxNewId();
+00036 \textcolor{keyword}{const} \textcolor{keywordtype}{long} ADF4002_wxgui::ID_STATICTEXT6 = wxNewId();
+00037 \textcolor{keyword}{const} \textcolor{keywordtype}{long} ADF4002_wxgui::ID_STATICTEXT7 = wxNewId();
+00038 \textcolor{keyword}{const} \textcolor{keywordtype}{long} ADF4002_wxgui::ID_COMBOBOX4 = wxNewId();
+00039 \textcolor{keyword}{const} \textcolor{keywordtype}{long} ADF4002_wxgui::ID_COMBOBOX5 = wxNewId();
+00040 \textcolor{keyword}{const} \textcolor{keywordtype}{long} ADF4002_wxgui::ID_STATICTEXT8 = wxNewId();
+00041 \textcolor{keyword}{const} \textcolor{keywordtype}{long} ADF4002_wxgui::ID_STATICTEXT9 = wxNewId();
+00042 \textcolor{keyword}{const} \textcolor{keywordtype}{long} ADF4002_wxgui::ID_COMBOBOX6 = wxNewId();
+00043 \textcolor{keyword}{const} \textcolor{keywordtype}{long} ADF4002_wxgui::ID_COMBOBOX7 = wxNewId();
+00044 \textcolor{keyword}{const} \textcolor{keywordtype}{long} ADF4002_wxgui::ID_STATICTEXT10 = wxNewId();
+00045 \textcolor{keyword}{const} \textcolor{keywordtype}{long} ADF4002_wxgui::ID_COMBOBOX8 = wxNewId();
+00046 \textcolor{keyword}{const} \textcolor{keywordtype}{long} ADF4002_wxgui::ID_RADIOBOX1 = wxNewId();
+00047 \textcolor{keyword}{const} \textcolor{keywordtype}{long} ADF4002_wxgui::ID_RADIOBOX2 = wxNewId();
+00048 \textcolor{keyword}{const} \textcolor{keywordtype}{long} ADF4002_wxgui::ID_RADIOBOX3 = wxNewId();
+00049 \textcolor{keyword}{const} \textcolor{keywordtype}{long} ADF4002_wxgui::ID_RADIOBOX4 = wxNewId();
+00050 \textcolor{keyword}{const} \textcolor{keywordtype}{long} ADF4002_wxgui::ID_RADIOBOX5 = wxNewId();
+00051 \textcolor{keyword}{const} \textcolor{keywordtype}{long} ADF4002_wxgui::ID_STATICTEXT17 = wxNewId();
+00052 \textcolor{keyword}{const} \textcolor{keywordtype}{long} ADF4002_wxgui::ID_STATICTEXT18 = wxNewId();
+00053 \textcolor{keyword}{const} \textcolor{keywordtype}{long} ADF4002_wxgui::ID_COMBOBOX9 = wxNewId();
+00054 \textcolor{keyword}{const} \textcolor{keywordtype}{long} ADF4002_wxgui::ID_COMBOBOX10 = wxNewId();
+00055 \textcolor{keyword}{const} \textcolor{keywordtype}{long} ADF4002_wxgui::ID_STATICTEXT19 = wxNewId();
+00056 \textcolor{keyword}{const} \textcolor{keywordtype}{long} ADF4002_wxgui::ID_STATICTEXT20 = wxNewId();
+00057 \textcolor{keyword}{const} \textcolor{keywordtype}{long} ADF4002_wxgui::ID_COMBOBOX11 = wxNewId();
+00058 \textcolor{keyword}{const} \textcolor{keywordtype}{long} ADF4002_wxgui::ID_COMBOBOX12 = wxNewId();
+00059 \textcolor{keyword}{const} \textcolor{keywordtype}{long} ADF4002_wxgui::ID_STATICTEXT21 = wxNewId();
+00060 \textcolor{keyword}{const} \textcolor{keywordtype}{long} ADF4002_wxgui::ID_COMBOBOX13 = wxNewId();
+00061 \textcolor{keyword}{const} \textcolor{keywordtype}{long} ADF4002_wxgui::ID_RADIOBOX6 = wxNewId();
+00062 \textcolor{keyword}{const} \textcolor{keywordtype}{long} ADF4002_wxgui::ID_RADIOBOX7 = wxNewId();
+00063 \textcolor{keyword}{const} \textcolor{keywordtype}{long} ADF4002_wxgui::ID_RADIOBOX8 = wxNewId();
+00064 \textcolor{keyword}{const} \textcolor{keywordtype}{long} ADF4002_wxgui::ID_RADIOBOX9 = wxNewId();
+00065 \textcolor{keyword}{const} \textcolor{keywordtype}{long} ADF4002_wxgui::ID_RADIOBOX10 = wxNewId();
+00066 \textcolor{keyword}{const} \textcolor{keywordtype}{long} ADF4002_wxgui::ID_STATICTEXT11 = wxNewId();
+00067 \textcolor{keyword}{const} \textcolor{keywordtype}{long} ADF4002_wxgui::ID_STATICTEXT12 = wxNewId();
+00068 \textcolor{keyword}{const} \textcolor{keywordtype}{long} ADF4002_wxgui::ID_TEXTCTRL1 = wxNewId();
+00069 \textcolor{keyword}{const} \textcolor{keywordtype}{long} ADF4002_wxgui::ID_TEXTCTRL2 = wxNewId();
+00070 \textcolor{keyword}{const} \textcolor{keywordtype}{long} ADF4002_wxgui::ID_STATICTEXT13 = wxNewId();
+00071 \textcolor{keyword}{const} \textcolor{keywordtype}{long} ADF4002_wxgui::ID_STATICTEXT14 = wxNewId();
+00072 \textcolor{keyword}{const} \textcolor{keywordtype}{long} ADF4002_wxgui::ID_STATICTEXT15 = wxNewId();
+00073 \textcolor{keyword}{const} \textcolor{keywordtype}{long} ADF4002_wxgui::ID_STATICTEXT16 = wxNewId();
+00074 \textcolor{keyword}{const} \textcolor{keywordtype}{long} ADF4002_wxgui::ID_BUTTON1 = wxNewId();
+00075 \textcolor{keyword}{const} \textcolor{keywordtype}{long} ADF4002_wxgui::ID_BUTTON2 = wxNewId();
+00076 
+00077 BEGIN\_EVENT\_TABLE(ADF4002_wxgui,wxFrame)
+00078 END\_EVENT\_TABLE()
+00079 
+00080 ADF4002_wxgui::ADF4002_wxgui(wxWindow* parent,wxWindowID \textcolor{keywordtype}{id}, const wxString &title, const wxPoint& pos,
+      const wxSize& size, \textcolor{keywordtype}{int} styles, wxString idname)
+00081 \{
+00082     m\_pModule = NULL;
+00083     wxStaticBoxSizer* StaticBoxSizer2;
+00084     wxFlexGridSizer* FlexGridSizer4;
+00085     wxFlexGridSizer* FlexGridSizer16;
+00086     wxStaticBoxSizer* StaticBoxSizer4;
+00087     wxFlexGridSizer* FlexGridSizer10;
+00088     wxFlexGridSizer* FlexGridSizer3;
+00089     wxFlexGridSizer* FlexGridSizer5;
+00090     wxFlexGridSizer* FlexGridSizer9;
+00091     wxFlexGridSizer* FlexGridSizer2;
+00092     wxFlexGridSizer* FlexGridSizer7;
+00093     wxStaticBoxSizer* StaticBoxSizer3;
+00094     wxStaticBoxSizer* StaticBoxSizer6;
+00095     wxFlexGridSizer* FlexGridSizer15;
+00096     wxFlexGridSizer* FlexGridSizer8;
+00097     wxFlexGridSizer* FlexGridSizer14;
+00098     wxFlexGridSizer* FlexGridSizer13;
+00099     wxFlexGridSizer* FlexGridSizer12;
+00100     wxFlexGridSizer* FlexGridSizer6;
+00101     wxStaticBoxSizer* StaticBoxSizer1;
+00102     wxFlexGridSizer* FlexGridSizer1;
+00103     wxFlexGridSizer* FlexGridSizer11;
+00104     wxStaticBoxSizer* StaticBoxSizer5;
+00105 
+00106     Create(parent, \textcolor{keywordtype}{id}, title, wxDefaultPosition, wxDefaultSize, styles, \_T(\textcolor{stringliteral}{"id"}));
+00107     SetBackgroundColour(wxSystemSettings::GetColour(wxSYS\_COLOUR\_BTNFACE));
+00108     FlexGridSizer1 = \textcolor{keyword}{new} wxFlexGridSizer(0, 2, 0, 0);
+00109     StaticBoxSizer1 = \textcolor{keyword}{new} wxStaticBoxSizer(wxHORIZONTAL, \textcolor{keyword}{this}, \_(\textcolor{stringliteral}{"ADF4002"}));
+00110     FlexGridSizer3 = \textcolor{keyword}{new} wxFlexGridSizer(3, 1, 0, 0);
+00111     FlexGridSizer4 = \textcolor{keyword}{new} wxFlexGridSizer(0, 2, 0, 5);
+00112     FlexGridSizer4->AddGrowableCol(0);
+00113     StaticBoxSizer2 = \textcolor{keyword}{new} wxStaticBoxSizer(wxHORIZONTAL, \textcolor{keyword}{this}, \_(\textcolor{stringliteral}{"Reference Counter Latch"}));
+00114     FlexGridSizer5 = \textcolor{keyword}{new} wxFlexGridSizer(2, 3, 0, 5);
+00115     FlexGridSizer5->AddGrowableCol(0);
+00116     FlexGridSizer5->AddGrowableCol(1);
+00117     FlexGridSizer5->AddGrowableCol(2);
+00118     StaticText1 = \textcolor{keyword}{new} wxStaticText(\textcolor{keyword}{this}, ID\_STATICTEXT1, \_(\textcolor{stringliteral}{"Lock Detect Precision:"}), wxDefaultPosition, 
+      wxDefaultSize, 0, \_T(\textcolor{stringliteral}{"ID\_STATICTEXT1"}));
+00119     FlexGridSizer5->Add(StaticText1, 1, wxALIGN\_LEFT | wxALIGN\_CENTER\_VERTICAL, 5);
+00120     StaticText2 = \textcolor{keyword}{new} wxStaticText(\textcolor{keyword}{this}, ID\_STATICTEXT2, \_(\textcolor{stringliteral}{"Anti-Backlash:"}), wxDefaultPosition, 
+      wxDefaultSize, 0, \_T(\textcolor{stringliteral}{"ID\_STATICTEXT2"}));
+00121     FlexGridSizer5->Add(StaticText2, 1, wxALIGN\_LEFT | wxALIGN\_CENTER\_VERTICAL, 5);
+00122     StaticText3 = \textcolor{keyword}{new} wxStaticText(\textcolor{keyword}{this}, ID\_STATICTEXT3, \_(\textcolor{stringliteral}{"Reference Counter:"}), wxDefaultPosition, 
+      wxDefaultSize, 0, \_T(\textcolor{stringliteral}{"ID\_STATICTEXT3"}));
+00123     FlexGridSizer5->Add(StaticText3, 1, wxALIGN\_LEFT | wxALIGN\_CENTER\_VERTICAL, 5);
+00124     cmbLDP = \textcolor{keyword}{new} wxComboBox(\textcolor{keyword}{this}, ID\_COMBOBOX1, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0, 0, 0, 
+      wxDefaultValidator, \_T(\textcolor{stringliteral}{"ID\_COMBOBOX1"}));
+00125     cmbLDP->SetSelection(cmbLDP->Append(\_(\textcolor{stringliteral}{"Three Cycles"})));
+00126     cmbLDP->Append(\_(\textcolor{stringliteral}{"Five Cycles"}));
+00127     FlexGridSizer5->Add(cmbLDP, 1, wxEXPAND | wxALIGN\_CENTER\_HORIZONTAL | wxALIGN\_CENTER\_VERTICAL, 5);
+00128     cmbABW = \textcolor{keyword}{new} wxComboBox(\textcolor{keyword}{this}, ID\_COMBOBOX2, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0, 0, 0, 
+      wxDefaultValidator, \_T(\textcolor{stringliteral}{"ID\_COMBOBOX2"}));
+00129     cmbABW->SetSelection(cmbABW->Append(\_(\textcolor{stringliteral}{"2.9ns"})));
+00130     cmbABW->Append(\_(\textcolor{stringliteral}{"6.0ns"}));
+00131     cmbABW->Append(\_(\textcolor{stringliteral}{"2.9ns"}));
+00132     FlexGridSizer5->Add(cmbABW, 1, wxEXPAND | wxALIGN\_CENTER\_HORIZONTAL | wxALIGN\_CENTER\_VERTICAL, 5);
+00133     spinRCnt = \textcolor{keyword}{new} wxSpinCtrl(\textcolor{keyword}{this}, ID\_SPINCTRL1, \_T(\textcolor{stringliteral}{"125"}), wxDefaultPosition, wxDefaultSize, 0, 0, 16383,
+       125, \_T(\textcolor{stringliteral}{"ID\_SPINCTRL1"}));
+00134     spinRCnt->SetValue(\_T(\textcolor{stringliteral}{"125"}));
+00135     FlexGridSizer5->Add(spinRCnt, 1, wxEXPAND | wxALIGN\_CENTER\_HORIZONTAL | wxALIGN\_CENTER\_VERTICAL, 5);
+00136     StaticBoxSizer2->Add(FlexGridSizer5, 1, wxALIGN\_CENTER\_HORIZONTAL | wxALIGN\_CENTER\_VERTICAL, 5);
+00137     FlexGridSizer4->Add(StaticBoxSizer2, 1, wxEXPAND | wxALIGN\_CENTER\_HORIZONTAL | wxALIGN\_CENTER\_VERTICAL,
+       5);
+00138     StaticBoxSizer4 = \textcolor{keyword}{new} wxStaticBoxSizer(wxHORIZONTAL, \textcolor{keyword}{this}, \_(\textcolor{stringliteral}{"N Counter Latch"}));
+00139     FlexGridSizer6 = \textcolor{keyword}{new} wxFlexGridSizer(2, 2, 0, 5);
+00140     FlexGridSizer6->AddGrowableCol(0);
+00141     FlexGridSizer6->AddGrowableCol(1);
+00142     StaticText4 = \textcolor{keyword}{new} wxStaticText(\textcolor{keyword}{this}, ID\_STATICTEXT4, \_(\textcolor{stringliteral}{"CP Gain:"}), wxDefaultPosition, wxDefaultSize, 0
+      , \_T(\textcolor{stringliteral}{"ID\_STATICTEXT4"}));
+00143     FlexGridSizer6->Add(StaticText4, 1, wxALIGN\_LEFT | wxALIGN\_CENTER\_VERTICAL, 5);
+00144     StaticText5 = \textcolor{keyword}{new} wxStaticText(\textcolor{keyword}{this}, ID\_STATICTEXT5, \_(\textcolor{stringliteral}{"N Counter:"}), wxDefaultPosition, wxDefaultSize,
+       0, \_T(\textcolor{stringliteral}{"ID\_STATICTEXT5"}));
+00145     FlexGridSizer6->Add(StaticText5, 1, wxALIGN\_LEFT | wxALIGN\_CENTER\_VERTICAL, 5);
+00146     cmbCPG = \textcolor{keyword}{new} wxComboBox(\textcolor{keyword}{this}, ID\_COMBOBOX3, wxEmptyString, wxDefaultPosition, wxSize(65, -1), 0, 0, 0, 
+      wxDefaultValidator, \_T(\textcolor{stringliteral}{"ID\_COMBOBOX3"}));
+00147     cmbCPG->SetSelection(cmbCPG->Append(\_(\textcolor{stringliteral}{"0"})));
+00148     cmbCPG->Append(\_(\textcolor{stringliteral}{"1"}));
+00149     FlexGridSizer6->Add(cmbCPG, 1, wxEXPAND | wxALIGN\_CENTER\_HORIZONTAL | wxALIGN\_CENTER\_VERTICAL, 5);
+00150     spinNCnt = \textcolor{keyword}{new} wxSpinCtrl(\textcolor{keyword}{this}, ID\_SPINCTRL2, \_T(\textcolor{stringliteral}{"384"}), wxDefaultPosition, wxSize(70, -1), 0, 0, 8191,
+       384, \_T(\textcolor{stringliteral}{"ID\_SPINCTRL2"}));
+00151     spinNCnt->SetValue(\_T(\textcolor{stringliteral}{"384"}));
+00152     FlexGridSizer6->Add(spinNCnt, 1, wxEXPAND | wxALIGN\_CENTER\_HORIZONTAL | wxALIGN\_CENTER\_VERTICAL, 5);
+00153     StaticBoxSizer4->Add(FlexGridSizer6, 1, wxALIGN\_CENTER\_HORIZONTAL | wxALIGN\_CENTER\_VERTICAL, 5);
+00154     FlexGridSizer4->Add(StaticBoxSizer4, 1, wxEXPAND | wxALIGN\_CENTER\_HORIZONTAL | wxALIGN\_CENTER\_VERTICAL,
+       5);
+00155     FlexGridSizer3->Add(FlexGridSizer4, 1, wxEXPAND | wxALIGN\_LEFT | wxALIGN\_TOP, 5);
+00156     StaticBoxSizer3 = \textcolor{keyword}{new} wxStaticBoxSizer(wxHORIZONTAL, \textcolor{keyword}{this}, \_(\textcolor{stringliteral}{"Function Latch"}));
+00157     FlexGridSizer7 = \textcolor{keyword}{new} wxFlexGridSizer(0, 3, 0, 5);
+00158     FlexGridSizer8 = \textcolor{keyword}{new} wxFlexGridSizer(4, 2, 0, 5);
+00159     StaticText6 = \textcolor{keyword}{new} wxStaticText(\textcolor{keyword}{this}, ID\_STATICTEXT6, \_(\textcolor{stringliteral}{"Current Setting 1:"}), wxDefaultPosition, 
+      wxDefaultSize, 0, \_T(\textcolor{stringliteral}{"ID\_STATICTEXT6"}));
+00160     FlexGridSizer8->Add(StaticText6, 1, wxALIGN\_LEFT | wxALIGN\_CENTER\_VERTICAL, 5);
+00161     StaticText7 = \textcolor{keyword}{new} wxStaticText(\textcolor{keyword}{this}, ID\_STATICTEXT7, \_(\textcolor{stringliteral}{"Timer Counter:"}), wxDefaultPosition, 
+      wxDefaultSize, 0, \_T(\textcolor{stringliteral}{"ID\_STATICTEXT7"}));
+00162     FlexGridSizer8->Add(StaticText7, 1, wxALIGN\_LEFT | wxALIGN\_CENTER\_VERTICAL, 5);
+00163     cmbCS1\_f = \textcolor{keyword}{new} wxComboBox(\textcolor{keyword}{this}, ID\_COMBOBOX4, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0, 0, 0,
+       wxDefaultValidator, \_T(\textcolor{stringliteral}{"ID\_COMBOBOX4"}));
+00164     cmbCS1\_f->Append(\_(\textcolor{stringliteral}{"0"}));
+00165     cmbCS1\_f->Append(\_(\textcolor{stringliteral}{"1"}));
+00166     cmbCS1\_f->Append(\_(\textcolor{stringliteral}{"2"}));
+00167     cmbCS1\_f->Append(\_(\textcolor{stringliteral}{"3"}));
+00168     cmbCS1\_f->Append(\_(\textcolor{stringliteral}{"4"}));
+00169     cmbCS1\_f->Append(\_(\textcolor{stringliteral}{"5"}));
+00170     cmbCS1\_f->Append(\_(\textcolor{stringliteral}{"6"}));
+00171     cmbCS1\_f->SetSelection(cmbCS1\_f->Append(\_(\textcolor{stringliteral}{"7"})));
+00172     FlexGridSizer8->Add(cmbCS1\_f, 1, wxEXPAND | wxALIGN\_CENTER\_HORIZONTAL | wxALIGN\_CENTER\_VERTICAL, 5);
+00173     cmbTC\_f = \textcolor{keyword}{new} wxComboBox(\textcolor{keyword}{this}, ID\_COMBOBOX5, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0, 0, 0, 
+      wxDefaultValidator, \_T(\textcolor{stringliteral}{"ID\_COMBOBOX5"}));
+00174     cmbTC\_f->SetSelection(cmbTC\_f->Append(\_(\textcolor{stringliteral}{"3"})));
+00175     cmbTC\_f->Append(\_(\textcolor{stringliteral}{"7"}));
+00176     cmbTC\_f->Append(\_(\textcolor{stringliteral}{"11"}));
+00177     cmbTC\_f->Append(\_(\textcolor{stringliteral}{"15"}));
+00178     cmbTC\_f->Append(\_(\textcolor{stringliteral}{"19"}));
+00179     cmbTC\_f->Append(\_(\textcolor{stringliteral}{"23"}));
+00180     cmbTC\_f->Append(\_(\textcolor{stringliteral}{"27"}));
+00181     cmbTC\_f->Append(\_(\textcolor{stringliteral}{"31"}));
+00182     cmbTC\_f->Append(\_(\textcolor{stringliteral}{"35"}));
+00183     cmbTC\_f->Append(\_(\textcolor{stringliteral}{"39"}));
+00184     cmbTC\_f->Append(\_(\textcolor{stringliteral}{"43"}));
+00185     cmbTC\_f->Append(\_(\textcolor{stringliteral}{"47"}));
+00186     cmbTC\_f->Append(\_(\textcolor{stringliteral}{"51"}));
+00187     cmbTC\_f->Append(\_(\textcolor{stringliteral}{"55"}));
+00188     cmbTC\_f->Append(\_(\textcolor{stringliteral}{"59"}));
+00189     cmbTC\_f->Append(\_(\textcolor{stringliteral}{"63"}));
+00190     FlexGridSizer8->Add(cmbTC\_f, 1, wxEXPAND | wxALIGN\_CENTER\_HORIZONTAL | wxALIGN\_CENTER\_VERTICAL, 5);
+00191     StaticText8 = \textcolor{keyword}{new} wxStaticText(\textcolor{keyword}{this}, ID\_STATICTEXT8, \_(\textcolor{stringliteral}{"Current Setting 2:"}), wxDefaultPosition, 
+      wxDefaultSize, 0, \_T(\textcolor{stringliteral}{"ID\_STATICTEXT8"}));
+00192     FlexGridSizer8->Add(StaticText8, 1, wxALIGN\_LEFT | wxALIGN\_CENTER\_VERTICAL, 5);
+00193     StaticText9 = \textcolor{keyword}{new} wxStaticText(\textcolor{keyword}{this}, ID\_STATICTEXT9, \_(\textcolor{stringliteral}{"Fastlock:"}), wxDefaultPosition, wxDefaultSize, 
+      0, \_T(\textcolor{stringliteral}{"ID\_STATICTEXT9"}));
+00194     FlexGridSizer8->Add(StaticText9, 1, wxALIGN\_LEFT | wxALIGN\_CENTER\_VERTICAL, 5);
+00195     cmbCS2\_f = \textcolor{keyword}{new} wxComboBox(\textcolor{keyword}{this}, ID\_COMBOBOX6, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0, 0, 0,
+       wxDefaultValidator, \_T(\textcolor{stringliteral}{"ID\_COMBOBOX6"}));
+00196     cmbCS2\_f->Append(\_(\textcolor{stringliteral}{"0"}));
+00197     cmbCS2\_f->Append(\_(\textcolor{stringliteral}{"1"}));
+00198     cmbCS2\_f->Append(\_(\textcolor{stringliteral}{"2"}));
+00199     cmbCS2\_f->Append(\_(\textcolor{stringliteral}{"3"}));
+00200     cmbCS2\_f->Append(\_(\textcolor{stringliteral}{"4"}));
+00201     cmbCS2\_f->Append(\_(\textcolor{stringliteral}{"5"}));
+00202     cmbCS2\_f->Append(\_(\textcolor{stringliteral}{"6"}));
+00203     cmbCS2\_f->SetSelection(cmbCS2\_f->Append(\_(\textcolor{stringliteral}{"7"})));
+00204     FlexGridSizer8->Add(cmbCS2\_f, 1, wxEXPAND | wxALIGN\_CENTER\_HORIZONTAL | wxALIGN\_CENTER\_VERTICAL, 5);
+00205     cmbFL\_f = \textcolor{keyword}{new} wxComboBox(\textcolor{keyword}{this}, ID\_COMBOBOX7, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0, 0, 0, 
+      wxDefaultValidator, \_T(\textcolor{stringliteral}{"ID\_COMBOBOX7"}));
+00206     cmbFL\_f->SetSelection(cmbFL\_f->Append(\_(\textcolor{stringliteral}{"Disabled"})));
+00207     cmbFL\_f->Append(\_(\textcolor{stringliteral}{"Mode 1"}));
+00208     cmbFL\_f->Append(\_(\textcolor{stringliteral}{"Mode 2"}));
+00209     FlexGridSizer8->Add(cmbFL\_f, 1, wxEXPAND | wxALIGN\_CENTER\_HORIZONTAL | wxALIGN\_CENTER\_VERTICAL, 5);
+00210     FlexGridSizer7->Add(FlexGridSizer8, 1, wxEXPAND | wxALIGN\_CENTER\_HORIZONTAL | wxALIGN\_CENTER\_VERTICAL, 
+      5);
+00211     FlexGridSizer9 = \textcolor{keyword}{new} wxFlexGridSizer(3, 1, 0, 0);
+00212     StaticText10 = \textcolor{keyword}{new} wxStaticText(\textcolor{keyword}{this}, ID\_STATICTEXT10, \_(\textcolor{stringliteral}{"Muxout Control"}), wxDefaultPosition, 
+      wxDefaultSize, 0, \_T(\textcolor{stringliteral}{"ID\_STATICTEXT10"}));
+00213     FlexGridSizer9->Add(StaticText10, 1, wxALIGN\_LEFT | wxALIGN\_CENTER\_VERTICAL, 5);
+00214     cmbMOC\_f = \textcolor{keyword}{new} wxComboBox(\textcolor{keyword}{this}, ID\_COMBOBOX8, wxEmptyString, wxDefaultPosition, wxSize(160, -1), 0, 0, 
+      0, wxDefaultValidator, \_T(\textcolor{stringliteral}{"ID\_COMBOBOX8"}));
+00215     cmbMOC\_f->Append(\_(\textcolor{stringliteral}{"Three-State Output"}));
+00216     cmbMOC\_f->SetSelection(cmbMOC\_f->Append(\_(\textcolor{stringliteral}{"Digital Lock Detect"})));
+00217     cmbMOC\_f->Append(\_(\textcolor{stringliteral}{"N Divider Output"}));
+00218     cmbMOC\_f->Append(\_(\textcolor{stringliteral}{"DVdd"}));
+00219     cmbMOC\_f->Append(\_(\textcolor{stringliteral}{"R Divider Output"}));
+00220     cmbMOC\_f->Append(\_(\textcolor{stringliteral}{"N-Chan OD Lock Detect"}));
+00221     cmbMOC\_f->Append(\_(\textcolor{stringliteral}{"Serial Data Output"}));
+00222     cmbMOC\_f->Append(\_(\textcolor{stringliteral}{"DGND"}));
+00223     FlexGridSizer9->Add(cmbMOC\_f, 1, wxEXPAND | wxALIGN\_CENTER\_HORIZONTAL | wxALIGN\_CENTER\_VERTICAL, 5);
+00224     wxString \_\_wxRadioBoxChoices\_1[2] =
+00225     \{
+00226         \_(\textcolor{stringliteral}{"Negative"}),
+00227         \_(\textcolor{stringliteral}{"Positive"})
+00228     \};
+00229     rgrPDP\_f = \textcolor{keyword}{new} wxRadioBox(\textcolor{keyword}{this}, ID\_RADIOBOX1, \_(\textcolor{stringliteral}{"PD Polarity"}), wxDefaultPosition, wxDefaultSize, 2, 
+      \_\_wxRadioBoxChoices\_1, 1, wxRA\_SPECIFY\_COLS, wxDefaultValidator, \_T(\textcolor{stringliteral}{"ID\_RADIOBOX1"}));
+00230     rgrPDP\_f->SetSelection(1);
+00231     FlexGridSizer9->Add(rgrPDP\_f, 1, wxEXPAND | wxALIGN\_CENTER\_HORIZONTAL | wxALIGN\_CENTER\_VERTICAL, 5);
+00232     FlexGridSizer7->Add(FlexGridSizer9, 1, wxEXPAND | wxALIGN\_TOP | wxALIGN\_CENTER\_HORIZONTAL, 5);
+00233     FlexGridSizer10 = \textcolor{keyword}{new} wxFlexGridSizer(2, 2, 0, 5);
+00234     wxString \_\_wxRadioBoxChoices\_2[2] =
+00235     \{
+00236         \_(\textcolor{stringliteral}{"0"}),
+00237         \_(\textcolor{stringliteral}{"1"})
+00238     \};
+00239     rgrPD1\_f = \textcolor{keyword}{new} wxRadioBox(\textcolor{keyword}{this}, ID\_RADIOBOX2, \_(\textcolor{stringliteral}{"PD1"}), wxDefaultPosition, wxDefaultSize, 2, 
+      \_\_wxRadioBoxChoices\_2, 1, wxRA\_SPECIFY\_COLS, wxDefaultValidator, \_T(\textcolor{stringliteral}{"ID\_RADIOBOX2"}));
+00240     rgrPD1\_f->SetSelection(0);
+00241     FlexGridSizer10->Add(rgrPD1\_f, 1, wxEXPAND | wxALIGN\_CENTER\_HORIZONTAL | wxALIGN\_CENTER\_VERTICAL, 5);
+00242     wxString \_\_wxRadioBoxChoices\_3[2] =
+00243     \{
+00244         \_(\textcolor{stringliteral}{"Normal"}),
+00245         \_(\textcolor{stringliteral}{"R & N Reset"})
+00246     \};
+00247     rgrCR\_f = \textcolor{keyword}{new} wxRadioBox(\textcolor{keyword}{this}, ID\_RADIOBOX3, \_(\textcolor{stringliteral}{"Counter Reset"}), wxDefaultPosition, wxDefaultSize, 2, 
+      \_\_wxRadioBoxChoices\_3, 1, wxRA\_SPECIFY\_COLS, wxDefaultValidator, \_T(\textcolor{stringliteral}{"ID\_RADIOBOX3"}));
+00248     rgrCR\_f->SetSelection(0);
+00249     FlexGridSizer10->Add(rgrCR\_f, 1, wxEXPAND | wxALIGN\_CENTER\_HORIZONTAL | wxALIGN\_CENTER\_VERTICAL, 5);
+00250     wxString \_\_wxRadioBoxChoices\_4[2] =
+00251     \{
+00252         \_(\textcolor{stringliteral}{"0"}),
+00253         \_(\textcolor{stringliteral}{"1"})
+00254     \};
+00255     rgrPD2\_f = \textcolor{keyword}{new} wxRadioBox(\textcolor{keyword}{this}, ID\_RADIOBOX4, \_(\textcolor{stringliteral}{"PD2"}), wxDefaultPosition, wxDefaultSize, 2, 
+      \_\_wxRadioBoxChoices\_4, 1, wxRA\_SPECIFY\_COLS, wxDefaultValidator, \_T(\textcolor{stringliteral}{"ID\_RADIOBOX4"}));
+00256     rgrPD2\_f->SetSelection(0);
+00257     FlexGridSizer10->Add(rgrPD2\_f, 1, wxEXPAND | wxALIGN\_CENTER\_HORIZONTAL | wxALIGN\_CENTER\_VERTICAL, 5);
+00258     wxString \_\_wxRadioBoxChoices\_5[2] =
+00259     \{
+00260         \_(\textcolor{stringliteral}{"Normal"}),
+00261         \_(\textcolor{stringliteral}{"Three-State"})
+00262     \};
+00263     rgrCPS\_f = \textcolor{keyword}{new} wxRadioBox(\textcolor{keyword}{this}, ID\_RADIOBOX5, \_(\textcolor{stringliteral}{"CP State"}), wxDefaultPosition, wxDefaultSize, 2, 
+      \_\_wxRadioBoxChoices\_5, 1, wxRA\_SPECIFY\_COLS, wxDefaultValidator, \_T(\textcolor{stringliteral}{"ID\_RADIOBOX5"}));
+00264     rgrCPS\_f->SetSelection(0);
+00265     FlexGridSizer10->Add(rgrCPS\_f, 1, wxEXPAND | wxALIGN\_CENTER\_HORIZONTAL | wxALIGN\_CENTER\_VERTICAL, 5);
+00266     FlexGridSizer7->Add(FlexGridSizer10, 1, wxEXPAND | wxALIGN\_TOP | wxALIGN\_CENTER\_HORIZONTAL, 5);
+00267     StaticBoxSizer3->Add(FlexGridSizer7, 1, wxEXPAND | wxALIGN\_CENTER\_HORIZONTAL | wxALIGN\_CENTER\_VERTICAL,
+       5);
+00268     FlexGridSizer3->Add(StaticBoxSizer3, 1, wxEXPAND | wxALIGN\_LEFT | wxALIGN\_TOP, 5);
+00269     StaticBoxSizer5 = \textcolor{keyword}{new} wxStaticBoxSizer(wxHORIZONTAL, \textcolor{keyword}{this}, \_(\textcolor{stringliteral}{"Initialization Latch"}));
+00270     FlexGridSizer13 = \textcolor{keyword}{new} wxFlexGridSizer(0, 3, 0, 5);
+00271     FlexGridSizer14 = \textcolor{keyword}{new} wxFlexGridSizer(4, 2, 0, 5);
+00272     StaticText14 = \textcolor{keyword}{new} wxStaticText(\textcolor{keyword}{this}, ID\_STATICTEXT17, \_(\textcolor{stringliteral}{"Current Setting 1:"}), wxDefaultPosition, 
+      wxDefaultSize, 0, \_T(\textcolor{stringliteral}{"ID\_STATICTEXT17"}));
+00273     FlexGridSizer14->Add(StaticText14, 1, wxALIGN\_LEFT | wxALIGN\_CENTER\_VERTICAL, 5);
+00274     StaticText16 = \textcolor{keyword}{new} wxStaticText(\textcolor{keyword}{this}, ID\_STATICTEXT18, \_(\textcolor{stringliteral}{"Timer Counter:"}), wxDefaultPosition, 
+      wxDefaultSize, 0, \_T(\textcolor{stringliteral}{"ID\_STATICTEXT18"}));
+00275     FlexGridSizer14->Add(StaticText16, 1, wxALIGN\_LEFT | wxALIGN\_CENTER\_VERTICAL, 5);
+00276     cmbCS1\_i = \textcolor{keyword}{new} wxComboBox(\textcolor{keyword}{this}, ID\_COMBOBOX9, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0, 0, 0,
+       wxDefaultValidator, \_T(\textcolor{stringliteral}{"ID\_COMBOBOX9"}));
+00277     cmbCS1\_i->Append(\_(\textcolor{stringliteral}{"0"}));
+00278     cmbCS1\_i->Append(\_(\textcolor{stringliteral}{"1"}));
+00279     cmbCS1\_i->Append(\_(\textcolor{stringliteral}{"2"}));
+00280     cmbCS1\_i->Append(\_(\textcolor{stringliteral}{"3"}));
+00281     cmbCS1\_i->Append(\_(\textcolor{stringliteral}{"4"}));
+00282     cmbCS1\_i->Append(\_(\textcolor{stringliteral}{"5"}));
+00283     cmbCS1\_i->Append(\_(\textcolor{stringliteral}{"6"}));
+00284     cmbCS1\_i->SetSelection(cmbCS1\_i->Append(\_(\textcolor{stringliteral}{"7"})));
+00285     FlexGridSizer14->Add(cmbCS1\_i, 1, wxEXPAND | wxALIGN\_CENTER\_HORIZONTAL | wxALIGN\_CENTER\_VERTICAL, 5);
+00286     cmbTC\_i = \textcolor{keyword}{new} wxComboBox(\textcolor{keyword}{this}, ID\_COMBOBOX10, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0, 0, 0,
+       wxDefaultValidator, \_T(\textcolor{stringliteral}{"ID\_COMBOBOX10"}));
+00287     cmbTC\_i->SetSelection(cmbTC\_i->Append(\_(\textcolor{stringliteral}{"3"})));
+00288     cmbTC\_i->Append(\_(\textcolor{stringliteral}{"7"}));
+00289     cmbTC\_i->Append(\_(\textcolor{stringliteral}{"11"}));
+00290     cmbTC\_i->Append(\_(\textcolor{stringliteral}{"15"}));
+00291     cmbTC\_i->Append(\_(\textcolor{stringliteral}{"19"}));
+00292     cmbTC\_i->Append(\_(\textcolor{stringliteral}{"23"}));
+00293     cmbTC\_i->Append(\_(\textcolor{stringliteral}{"27"}));
+00294     cmbTC\_i->Append(\_(\textcolor{stringliteral}{"31"}));
+00295     cmbTC\_i->Append(\_(\textcolor{stringliteral}{"35"}));
+00296     cmbTC\_i->Append(\_(\textcolor{stringliteral}{"39"}));
+00297     cmbTC\_i->Append(\_(\textcolor{stringliteral}{"43"}));
+00298     cmbTC\_i->Append(\_(\textcolor{stringliteral}{"47"}));
+00299     cmbTC\_i->Append(\_(\textcolor{stringliteral}{"51"}));
+00300     cmbTC\_i->Append(\_(\textcolor{stringliteral}{"55"}));
+00301     cmbTC\_i->Append(\_(\textcolor{stringliteral}{"59"}));
+00302     cmbTC\_i->Append(\_(\textcolor{stringliteral}{"63"}));
+00303     FlexGridSizer14->Add(cmbTC\_i, 1, wxEXPAND | wxALIGN\_CENTER\_HORIZONTAL | wxALIGN\_CENTER\_VERTICAL, 5);
+00304     StaticText17 = \textcolor{keyword}{new} wxStaticText(\textcolor{keyword}{this}, ID\_STATICTEXT19, \_(\textcolor{stringliteral}{"Current Setting 2:"}), wxDefaultPosition, 
+      wxDefaultSize, 0, \_T(\textcolor{stringliteral}{"ID\_STATICTEXT19"}));
+00305     FlexGridSizer14->Add(StaticText17, 1, wxALIGN\_LEFT | wxALIGN\_CENTER\_VERTICAL, 5);
+00306     StaticText18 = \textcolor{keyword}{new} wxStaticText(\textcolor{keyword}{this}, ID\_STATICTEXT20, \_(\textcolor{stringliteral}{"Fastlock:"}), wxDefaultPosition, wxDefaultSize
+      , 0, \_T(\textcolor{stringliteral}{"ID\_STATICTEXT20"}));
+00307     FlexGridSizer14->Add(StaticText18, 1, wxALIGN\_LEFT | wxALIGN\_CENTER\_VERTICAL, 5);
+00308     cmbCS2\_i = \textcolor{keyword}{new} wxComboBox(\textcolor{keyword}{this}, ID\_COMBOBOX11, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0, 0, 0
+      , wxDefaultValidator, \_T(\textcolor{stringliteral}{"ID\_COMBOBOX11"}));
+00309     cmbCS2\_i->Append(\_(\textcolor{stringliteral}{"0"}));
+00310     cmbCS2\_i->Append(\_(\textcolor{stringliteral}{"1"}));
+00311     cmbCS2\_i->Append(\_(\textcolor{stringliteral}{"2"}));
+00312     cmbCS2\_i->Append(\_(\textcolor{stringliteral}{"3"}));
+00313     cmbCS2\_i->Append(\_(\textcolor{stringliteral}{"4"}));
+00314     cmbCS2\_i->Append(\_(\textcolor{stringliteral}{"5"}));
+00315     cmbCS2\_i->Append(\_(\textcolor{stringliteral}{"6"}));
+00316     cmbCS2\_i->SetSelection(cmbCS2\_i->Append(\_(\textcolor{stringliteral}{"7"})));
+00317     FlexGridSizer14->Add(cmbCS2\_i, 1, wxEXPAND | wxALIGN\_CENTER\_HORIZONTAL | wxALIGN\_CENTER\_VERTICAL, 5);
+00318     cmbFL\_i = \textcolor{keyword}{new} wxComboBox(\textcolor{keyword}{this}, ID\_COMBOBOX12, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0, 0, 0,
+       wxDefaultValidator, \_T(\textcolor{stringliteral}{"ID\_COMBOBOX12"}));
+00319     cmbFL\_i->SetSelection(cmbFL\_i->Append(\_(\textcolor{stringliteral}{"Disabled"})));
+00320     cmbFL\_i->Append(\_(\textcolor{stringliteral}{"Mode 1"}));
+00321     cmbFL\_i->Append(\_(\textcolor{stringliteral}{"Mode 2"}));
+00322     FlexGridSizer14->Add(cmbFL\_i, 1, wxEXPAND | wxALIGN\_CENTER\_HORIZONTAL | wxALIGN\_CENTER\_VERTICAL, 5);
+00323     FlexGridSizer13->Add(FlexGridSizer14, 1, wxEXPAND | wxALIGN\_CENTER\_HORIZONTAL | wxALIGN\_CENTER\_VERTICAL
+      , 5);
+00324     FlexGridSizer15 = \textcolor{keyword}{new} wxFlexGridSizer(3, 1, 0, 0);
+00325     StaticText19 = \textcolor{keyword}{new} wxStaticText(\textcolor{keyword}{this}, ID\_STATICTEXT21, \_(\textcolor{stringliteral}{"Muxout Control"}), wxDefaultPosition, 
+      wxDefaultSize, 0, \_T(\textcolor{stringliteral}{"ID\_STATICTEXT21"}));
+00326     FlexGridSizer15->Add(StaticText19, 1, wxALIGN\_LEFT | wxALIGN\_CENTER\_VERTICAL, 5);
+00327     cmbMOC\_i = \textcolor{keyword}{new} wxComboBox(\textcolor{keyword}{this}, ID\_COMBOBOX13, wxEmptyString, wxDefaultPosition, wxSize(160, -1), 0, 0,
+       0, wxDefaultValidator, \_T(\textcolor{stringliteral}{"ID\_COMBOBOX13"}));
+00328     cmbMOC\_i->Append(\_(\textcolor{stringliteral}{"Three-State Output"}));
+00329     cmbMOC\_i->SetSelection(cmbMOC\_i->Append(\_(\textcolor{stringliteral}{"Digital Lock Detect"})));
+00330     cmbMOC\_i->Append(\_(\textcolor{stringliteral}{"N Divider Output"}));
+00331     cmbMOC\_i->Append(\_(\textcolor{stringliteral}{"DVdd"}));
+00332     cmbMOC\_i->Append(\_(\textcolor{stringliteral}{"R Divider Output"}));
+00333     cmbMOC\_i->Append(\_(\textcolor{stringliteral}{"N-Chan OD Lock Detect"}));
+00334     cmbMOC\_i->Append(\_(\textcolor{stringliteral}{"Serial Data Output"}));
+00335     cmbMOC\_i->Append(\_(\textcolor{stringliteral}{"DGND"}));
+00336     FlexGridSizer15->Add(cmbMOC\_i, 1, wxEXPAND | wxALIGN\_CENTER\_HORIZONTAL | wxALIGN\_CENTER\_VERTICAL, 5);
+00337     wxString \_\_wxRadioBoxChoices\_6[2] =
+00338     \{
+00339         \_(\textcolor{stringliteral}{"Negative"}),
+00340         \_(\textcolor{stringliteral}{"Positive"})
+00341     \};
+00342     rgrPDP\_i = \textcolor{keyword}{new} wxRadioBox(\textcolor{keyword}{this}, ID\_RADIOBOX6, \_(\textcolor{stringliteral}{"PD Polarity"}), wxDefaultPosition, wxDefaultSize, 2, 
+      \_\_wxRadioBoxChoices\_6, 1, wxRA\_SPECIFY\_COLS, wxDefaultValidator, \_T(\textcolor{stringliteral}{"ID\_RADIOBOX6"}));
+00343     rgrPDP\_i->SetSelection(1);
+00344     FlexGridSizer15->Add(rgrPDP\_i, 1, wxEXPAND | wxALIGN\_CENTER\_HORIZONTAL | wxALIGN\_CENTER\_VERTICAL, 5);
+00345     FlexGridSizer13->Add(FlexGridSizer15, 1, wxEXPAND | wxALIGN\_TOP | wxALIGN\_CENTER\_HORIZONTAL, 5);
+00346     FlexGridSizer16 = \textcolor{keyword}{new} wxFlexGridSizer(2, 2, 0, 5);
+00347     wxString \_\_wxRadioBoxChoices\_7[2] =
+00348     \{
+00349         \_(\textcolor{stringliteral}{"0"}),
+00350         \_(\textcolor{stringliteral}{"1"})
+00351     \};
+00352     rgrPD1\_i = \textcolor{keyword}{new} wxRadioBox(\textcolor{keyword}{this}, ID\_RADIOBOX7, \_(\textcolor{stringliteral}{"PD1"}), wxDefaultPosition, wxDefaultSize, 2, 
+      \_\_wxRadioBoxChoices\_7, 1, wxRA\_SPECIFY\_COLS, wxDefaultValidator, \_T(\textcolor{stringliteral}{"ID\_RADIOBOX7"}));
+00353     rgrPD1\_i->SetSelection(0);
+00354     FlexGridSizer16->Add(rgrPD1\_i, 1, wxEXPAND | wxALIGN\_CENTER\_HORIZONTAL | wxALIGN\_CENTER\_VERTICAL, 5);
+00355     wxString \_\_wxRadioBoxChoices\_8[2] =
+00356     \{
+00357         \_(\textcolor{stringliteral}{"Normal"}),
+00358         \_(\textcolor{stringliteral}{"R & N Reset"})
+00359     \};
+00360     rgrCR\_i = \textcolor{keyword}{new} wxRadioBox(\textcolor{keyword}{this}, ID\_RADIOBOX8, \_(\textcolor{stringliteral}{"Counter Reset"}), wxDefaultPosition, wxDefaultSize, 2, 
+      \_\_wxRadioBoxChoices\_8, 1, wxRA\_SPECIFY\_COLS, wxDefaultValidator, \_T(\textcolor{stringliteral}{"ID\_RADIOBOX8"}));
+00361     rgrCR\_i->SetSelection(0);
+00362     FlexGridSizer16->Add(rgrCR\_i, 1, wxEXPAND | wxALIGN\_CENTER\_HORIZONTAL | wxALIGN\_CENTER\_VERTICAL, 5);
+00363     wxString \_\_wxRadioBoxChoices\_9[2] =
+00364     \{
+00365         \_(\textcolor{stringliteral}{"0"}),
+00366         \_(\textcolor{stringliteral}{"1"})
+00367     \};
+00368     rgrPD2\_i = \textcolor{keyword}{new} wxRadioBox(\textcolor{keyword}{this}, ID\_RADIOBOX9, \_(\textcolor{stringliteral}{"PD2"}), wxDefaultPosition, wxDefaultSize, 2, 
+      \_\_wxRadioBoxChoices\_9, 1, wxRA\_SPECIFY\_COLS, wxDefaultValidator, \_T(\textcolor{stringliteral}{"ID\_RADIOBOX9"}));
+00369     rgrPD2\_i->SetSelection(0);
+00370     FlexGridSizer16->Add(rgrPD2\_i, 1, wxEXPAND | wxALIGN\_CENTER\_HORIZONTAL | wxALIGN\_CENTER\_VERTICAL, 5);
+00371     wxString \_\_wxRadioBoxChoices\_10[2] =
+00372     \{
+00373         \_(\textcolor{stringliteral}{"Normal"}),
+00374         \_(\textcolor{stringliteral}{"Three-State"})
+00375     \};
+00376     rgrCPS\_i = \textcolor{keyword}{new} wxRadioBox(\textcolor{keyword}{this}, ID\_RADIOBOX10, \_(\textcolor{stringliteral}{"CP State"}), wxDefaultPosition, wxDefaultSize, 2, 
+      \_\_wxRadioBoxChoices\_10, 1, wxRA\_SPECIFY\_COLS, wxDefaultValidator, \_T(\textcolor{stringliteral}{"ID\_RADIOBOX10"}));
+00377     rgrCPS\_i->SetSelection(0);
+00378     FlexGridSizer16->Add(rgrCPS\_i, 1, wxEXPAND | wxALIGN\_CENTER\_HORIZONTAL | wxALIGN\_CENTER\_VERTICAL, 5);
+00379     FlexGridSizer13->Add(FlexGridSizer16, 1, wxEXPAND | wxALIGN\_TOP | wxALIGN\_CENTER\_HORIZONTAL, 5);
+00380     StaticBoxSizer5->Add(FlexGridSizer13, 1, wxEXPAND | wxALIGN\_CENTER\_HORIZONTAL | wxALIGN\_CENTER\_VERTICAL
+      , 5);
+00381     FlexGridSizer3->Add(StaticBoxSizer5, 1, wxEXPAND | wxALIGN\_CENTER\_HORIZONTAL | wxALIGN\_CENTER\_VERTICAL,
+       5);
+00382     StaticBoxSizer1->Add(FlexGridSizer3, 1, wxEXPAND | wxALIGN\_LEFT | wxALIGN\_TOP, 5);
+00383     FlexGridSizer1->Add(StaticBoxSizer1, 1, wxEXPAND | wxALIGN\_LEFT | wxALIGN\_TOP, 5);
+00384     FlexGridSizer2 = \textcolor{keyword}{new} wxFlexGridSizer(0, 3, 0, 0);
+00385     StaticBoxSizer6 = \textcolor{keyword}{new} wxStaticBoxSizer(wxVERTICAL, \textcolor{keyword}{this}, \_(\textcolor{stringliteral}{"Calculation of R & N"}));
+00386     FlexGridSizer12 = \textcolor{keyword}{new} wxFlexGridSizer(0, 1, 0, 0);
+00387     FlexGridSizer11 = \textcolor{keyword}{new} wxFlexGridSizer(0, 2, 0, 5);
+00388     StaticText11 = \textcolor{keyword}{new} wxStaticText(\textcolor{keyword}{this}, ID\_STATICTEXT11, \_(\textcolor{stringliteral}{"Fref, MHz"}), wxDefaultPosition, wxDefaultSize
+      , 0, \_T(\textcolor{stringliteral}{"ID\_STATICTEXT11"}));
+00389     FlexGridSizer11->Add(StaticText11, 1, wxALIGN\_LEFT | wxALIGN\_CENTER\_VERTICAL, 5);
+00390     StaticText12 = \textcolor{keyword}{new} wxStaticText(\textcolor{keyword}{this}, ID\_STATICTEXT12, \_(\textcolor{stringliteral}{"Fvco, MHz:"}), wxDefaultPosition, 
+      wxDefaultSize, 0, \_T(\textcolor{stringliteral}{"ID\_STATICTEXT12"}));
+00391     FlexGridSizer11->Add(StaticText12, 1, wxALIGN\_LEFT | wxALIGN\_CENTER\_VERTICAL, 5);
+00392     txtFref = \textcolor{keyword}{new} wxTextCtrl(\textcolor{keyword}{this}, ID\_TEXTCTRL1, \_(\textcolor{stringliteral}{"10"}), wxDefaultPosition, wxDefaultSize, 0, 
+      wxDefaultValidator, \_T(\textcolor{stringliteral}{"ID\_TEXTCTRL1"}));
+00393     FlexGridSizer11->Add(txtFref, 1, wxALIGN\_CENTER\_HORIZONTAL | wxALIGN\_CENTER\_VERTICAL, 5);
+00394     txtFvco = \textcolor{keyword}{new} wxTextCtrl(\textcolor{keyword}{this}, ID\_TEXTCTRL2, \_(\textcolor{stringliteral}{"30.72"}), wxDefaultPosition, wxDefaultSize, 0, 
+      wxDefaultValidator, \_T(\textcolor{stringliteral}{"ID\_TEXTCTRL2"}));
+00395     FlexGridSizer11->Add(txtFvco, 1, wxALIGN\_CENTER\_HORIZONTAL | wxALIGN\_CENTER\_VERTICAL, 5);
+00396     StaticText13 = \textcolor{keyword}{new} wxStaticText(\textcolor{keyword}{this}, ID\_STATICTEXT13, \_(\textcolor{stringliteral}{"Fvco (MHz) ="}), wxDefaultPosition, 
+      wxDefaultSize, 0, \_T(\textcolor{stringliteral}{"ID\_STATICTEXT13"}));
+00397     FlexGridSizer11->Add(StaticText13, 1, wxTOP | wxALIGN\_RIGHT | wxALIGN\_CENTER\_VERTICAL, 5);
+00398     lblFvco = \textcolor{keyword}{new} wxStaticText(\textcolor{keyword}{this}, ID\_STATICTEXT14, \_(\textcolor{stringliteral}{"Fvco"}), wxDefaultPosition, wxDefaultSize, 0, \_T(\textcolor{stringliteral}{"
+      ID\_STATICTEXT14"}));
+00399     FlexGridSizer11->Add(lblFvco, 1, wxTOP | wxALIGN\_LEFT | wxALIGN\_CENTER\_VERTICAL, 5);
+00400     StaticText15 = \textcolor{keyword}{new} wxStaticText(\textcolor{keyword}{this}, ID\_STATICTEXT15, \_(\textcolor{stringliteral}{"LCM ="}), wxDefaultPosition, wxDefaultSize, 0,
+       \_T(\textcolor{stringliteral}{"ID\_STATICTEXT15"}));
+00401     FlexGridSizer11->Add(StaticText15, 1, wxTOP | wxBOTTOM | wxALIGN\_RIGHT | wxALIGN\_CENTER\_VERTICAL, 5);
+00402     lblFcomp = \textcolor{keyword}{new} wxStaticText(\textcolor{keyword}{this}, ID\_STATICTEXT16, \_(\textcolor{stringliteral}{"Fcomp"}), wxDefaultPosition, wxDefaultSize, 0, \_T(\textcolor{stringliteral}{
+      "ID\_STATICTEXT16"}));
+00403     FlexGridSizer11->Add(lblFcomp, 1, wxTOP | wxBOTTOM | wxALIGN\_LEFT | wxALIGN\_CENTER\_VERTICAL, 5);
+00404     FlexGridSizer12->Add(FlexGridSizer11, 1, wxEXPAND | wxALIGN\_CENTER\_HORIZONTAL | wxALIGN\_CENTER\_VERTICAL
+      , 5);
+00405     btnCalcSend = \textcolor{keyword}{new} wxButton(\textcolor{keyword}{this}, ID\_BUTTON1, \_(\textcolor{stringliteral}{"Calculate R, N && Upload"}), wxDefaultPosition, 
+      wxDefaultSize, 0, wxDefaultValidator, \_T(\textcolor{stringliteral}{"ID\_BUTTON1"}));
+00406     FlexGridSizer12->Add(btnCalcSend, 1, wxEXPAND | wxALIGN\_CENTER\_HORIZONTAL | wxALIGN\_CENTER\_VERTICAL, 5)
+      ;
+00407     btnUpload = \textcolor{keyword}{new} wxButton(\textcolor{keyword}{this}, ID\_BUTTON2, \_(\textcolor{stringliteral}{"Upload"}), wxDefaultPosition, wxDefaultSize, 0, 
+      wxDefaultValidator, \_T(\textcolor{stringliteral}{"ID\_BUTTON2"}));
+00408     FlexGridSizer12->Add(btnUpload, 1, wxTOP | wxEXPAND | wxALIGN\_CENTER\_HORIZONTAL | 
+      wxALIGN\_CENTER\_VERTICAL, 5);
+00409     StaticBoxSizer6->Add(FlexGridSizer12, 1, wxEXPAND | wxALIGN\_CENTER\_HORIZONTAL | wxALIGN\_CENTER\_VERTICAL
+      , 5);
+00410     FlexGridSizer2->Add(StaticBoxSizer6, 1, wxEXPAND | wxALIGN\_TOP | wxALIGN\_CENTER\_HORIZONTAL, 5);
+00411     FlexGridSizer1->Add(FlexGridSizer2, 1, wxLEFT | wxEXPAND | wxALIGN\_TOP | wxALIGN\_CENTER\_HORIZONTAL, 5);
+00412     SetSizer(FlexGridSizer1);
+00413     FlexGridSizer1->Fit(\textcolor{keyword}{this});
+00414     FlexGridSizer1->SetSizeHints(\textcolor{keyword}{this});
+00415 
+00416     Connect(ID\_BUTTON1, wxEVT\_COMMAND\_BUTTON\_CLICKED, (wxObjectEventFunction)&
+      ADF4002_wxgui::OnbtnCalcSendClick);
+00417     Connect(ID\_BUTTON2, wxEVT\_COMMAND\_BUTTON\_CLICKED, (wxObjectEventFunction)&
+      ADF4002_wxgui::OnbtnUploadClick);
+00418     \textcolor{comment}{//*)}
+00419 \}
+00420 
+00421 \textcolor{keywordtype}{void} ADF4002_wxgui::Initialize(lms_device_t* pSerPort)
+00422 \{
+00423     m\_pModule = \textcolor{keyword}{new} lime::ADF4002();
+00424     lmsControl = pSerPort;
+00425     \textcolor{keywordflow}{if} (lmsControl != \textcolor{keyword}{nullptr})
+00426     \{
+00427         \textcolor{keywordtype}{double} refclk;
+00428         LMS_GetClockFreq(lmsControl, LMS_CLOCK_REF, &refclk);
+00429         txtFvco->SetValue(wxString::Format(\textcolor{stringliteral}{"%f"}, refclk/1e6));
+00430     \}
+00431 \}
+00432 
+00433 ADF4002_wxgui::~ADF4002_wxgui()
+00434 \{
+00435     \textcolor{keyword}{delete} m\_pModule;
+00436 \}
+00437 
+00438 \textcolor{keywordtype}{void} ADF4002_wxgui::SetGuiDefaults()
+00439 \{
+00440     \textcolor{comment}{//Reference Counter Latch}
+00441     cmbLDP->SetSelection(0);
+00442     cmbABW->SetSelection(0);
+00443     spinRCnt->SetValue(125);
+00444 
+00445     \textcolor{comment}{//N Counter Latch}
+00446     cmbCPG->SetSelection(0);
+00447     spinNCnt->SetValue(384);
+00448 
+00449     \textcolor{comment}{//Function Latch}
+00450     rgrPD2\_f->SetSelection(0);
+00451     cmbCS2\_f->SetSelection(7);
+00452     cmbCS1\_f->SetSelection(7);
+00453     cmbTC\_f->SetSelection(0);
+00454     cmbFL\_f->SetSelection(0);
+00455     rgrCPS\_f->SetSelection(0);
+00456     rgrPDP\_f->SetSelection(1);
+00457     cmbMOC\_f->SetSelection(1);
+00458     rgrPD1\_f->SetSelection(0);
+00459     rgrCR\_f->SetSelection(0);
+00460 
+00461     \textcolor{comment}{//Initialization Latch}
+00462     rgrPD2\_i->SetSelection(0);
+00463     cmbCS2\_i->SetSelection(7);
+00464     cmbCS1\_i->SetSelection(7);
+00465     cmbTC\_i->SetSelection(0);
+00466     cmbFL\_i->SetSelection(0);
+00467     rgrCPS\_i->SetSelection(0);
+00468     rgrPDP\_i->SetSelection(1);
+00469     cmbMOC\_i->SetSelection(1);
+00470     rgrPD1\_i->SetSelection(0);
+00471     rgrCR\_i->SetSelection(0);
+00472 \}
+00473 
+00474 \textcolor{keywordtype}{void} ADF4002_wxgui::OnbtnCalcSendClick(wxCommandEvent& event)
+00475 \{
+00476     \textcolor{keyword}{auto} conn =  ((LMS7_Device*)lmsControl)->GetConnection();
+00477     \textcolor{keywordflow}{if} (conn == \textcolor{keyword}{nullptr})
+00478     \{
+00479         wxMessageBox(\_(\textcolor{stringliteral}{"Device not connected"}), \_(\textcolor{stringliteral}{"Error"}));
+00480         \textcolor{keywordflow}{return};
+00481     \}
+00482     \textcolor{comment}{//reference counter latch}
+00483     \textcolor{keywordtype}{int} ldp = cmbLDP->GetSelection();
+00484     \textcolor{keywordtype}{int} abw = cmbABW->GetSelection();
+00485     \textcolor{keywordtype}{int} rCount = spinRCnt->GetValue();
+00486     m\_pModule->SetReferenceCounterLatch(ldp, abw, rCount);
+00487 
+00488     \textcolor{comment}{//n counter latch}
+00489     \textcolor{keywordtype}{int} cpGain = cmbCPG->GetSelection();
+00490     \textcolor{keywordtype}{int} nCounter = spinNCnt->GetValue();
+00491     m\_pModule->SetNCounterLatch(cpGain, nCounter);
+00492 
+00493     \textcolor{comment}{//function latch}
+00494     \textcolor{keywordtype}{int} currSetting1 = cmbCS1\_f->GetSelection();
+00495     \textcolor{keywordtype}{int} currSetting2 = cmbCS2\_f->GetSelection();
+00496     \textcolor{keywordtype}{int} tCounter = cmbTC\_f->GetSelection();
+00497     \textcolor{keywordtype}{int} fastLock = cmbFL\_f->GetSelection();
+00498     \textcolor{keywordtype}{int} muxControl = cmbMOC\_f->GetSelection();
+00499 
+00500     \textcolor{keywordtype}{int} pdPol = rgrPDP\_f->GetSelection();
+00501     \textcolor{keywordtype}{int} pd1 = rgrPD1\_f->GetSelection();
+00502     \textcolor{keywordtype}{int} pd2 = rgrPD2\_f->GetSelection();
+00503     \textcolor{keywordtype}{int} counterReset = rgrCR\_f->GetSelection();
+00504     \textcolor{keywordtype}{int} cpState = rgrCPS\_f->GetSelection();
+00505     m\_pModule->SetFunctionLatch(currSetting1, currSetting2, tCounter, fastLock, muxControl);
+00506     m\_pModule->SetFunctionLatchRgr(pdPol, pd1,pd2, counterReset, cpState);
+00507 
+00508     \textcolor{comment}{//Initialization latch}
+00509     currSetting1 = cmbCS1\_i->GetSelection();
+00510     currSetting2 = cmbCS2\_i->GetSelection();
+00511     tCounter = cmbTC\_i->GetSelection();
+00512     fastLock = cmbFL\_i->GetSelection();
+00513     muxControl = cmbMOC\_i->GetSelection();
+00514 
+00515     pdPol = rgrPDP\_i->GetSelection();
+00516     pd1 = rgrPD1\_i->GetSelection();
+00517     pd2 = rgrPD2\_i->GetSelection();
+00518     counterReset = rgrCR\_i->GetSelection();
+00519     cpState = rgrCPS\_i->GetSelection();
+00520     m\_pModule->SetInitializationLatch(currSetting1, currSetting2, tCounter, fastLock, muxControl);
+00521     m\_pModule->SetInitializationLatchRgr(pdPol, pd1,pd2, counterReset, cpState);
+00522 
+00523     \textcolor{keywordtype}{double} fref = 0;
+00524     txtFref->GetValue().ToDouble(&fref);
+00525 
+00526     \textcolor{keywordtype}{double} fvco = 0;
+00527     txtFvco->GetValue().ToDouble(&fvco);
+00528     m\_pModule->SetFrefFvco(fref, fvco, rCount, nCounter);
+00529     spinNCnt->SetValue(nCounter);
+00530     spinRCnt->SetValue(rCount);
+00531 
+00532     lblFcomp->SetLabel( wxString::Format(\textcolor{stringliteral}{"%f"}, m\_pModule->lblFcomp));
+00533     lblFvco->SetLabel( wxString::Format(\textcolor{stringliteral}{"%f"}, m\_pModule->lblFvco));
+00534 
+00535     \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{char} data[12];
+00536     m\_pModule->GetConfig(data);
+00537 
+00538     vector<uint32\_t> dataWr;
+00539     \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} i=0; i<12; i+=3)
+00540         dataWr.push\_back((uint32\_t)data[i] << 16 | (uint32\_t)data[i+1] << 8 | data[
+      i+2]);
+00541 
+00542     \textcolor{keywordtype}{int} status;
+00543 \textcolor{comment}{// ADF4002 needs to be writen 4 values of 24 bits}
+00544     status = conn->TransactSPI(0x30, dataWr.data(), \textcolor{keyword}{nullptr}, 4);
+00545     \textcolor{keywordflow}{if} (status != 0)
+00546         wxMessageBox(\_(\textcolor{stringliteral}{"ADF configuration failed"}), \_(\textcolor{stringliteral}{"Error"}));
+00547 \}
+00548 
+00549 \textcolor{keywordtype}{void} ADF4002_wxgui::OnbtnUploadClick(wxCommandEvent& event)
+00550 \{
+00551     \textcolor{keyword}{auto} conn =  ((LMS7_Device*)lmsControl)->GetConnection();
+00552     \textcolor{keywordflow}{if} (conn == \textcolor{keyword}{nullptr})
+00553     \{
+00554         wxMessageBox(\_(\textcolor{stringliteral}{"Device not connected"}), \_(\textcolor{stringliteral}{"Error"}));
+00555         \textcolor{keywordflow}{return};
+00556     \}
+00557  \textcolor{comment}{//reference counter latch}
+00558     \textcolor{keywordtype}{int} ldp = cmbLDP->GetSelection();
+00559     \textcolor{keywordtype}{int} abw = cmbABW->GetSelection();
+00560     \textcolor{keywordtype}{int} rCount = spinRCnt->GetValue();
+00561     m\_pModule->SetReferenceCounterLatch(ldp, abw, rCount);
+00562 
+00563     \textcolor{comment}{//n counter latch}
+00564     \textcolor{keywordtype}{int} cpGain = cmbCPG->GetSelection();
+00565     \textcolor{keywordtype}{int} nCounter = spinNCnt->GetValue();
+00566     m\_pModule->SetNCounterLatch(cpGain, nCounter);
+00567 
+00568     \textcolor{comment}{//function latch}
+00569     \textcolor{keywordtype}{int} currSetting1 = cmbCS1\_f->GetSelection();
+00570     \textcolor{keywordtype}{int} currSetting2 = cmbCS2\_f->GetSelection();
+00571     \textcolor{keywordtype}{int} tCounter = cmbTC\_f->GetSelection();
+00572     \textcolor{keywordtype}{int} fastLock = cmbFL\_f->GetSelection();
+00573     \textcolor{keywordtype}{int} muxControl = cmbMOC\_f->GetSelection();
+00574 
+00575     \textcolor{keywordtype}{int} pdPol = rgrPDP\_f->GetSelection();
+00576     \textcolor{keywordtype}{int} pd1 = rgrPD1\_f->GetSelection();
+00577     \textcolor{keywordtype}{int} pd2 = rgrPD2\_f->GetSelection();
+00578     \textcolor{keywordtype}{int} counterReset = rgrCR\_f->GetSelection();
+00579     \textcolor{keywordtype}{int} cpState = rgrCPS\_f->GetSelection();
+00580     m\_pModule->SetFunctionLatch(currSetting1, currSetting2, tCounter, fastLock, muxControl);
+00581     m\_pModule->SetFunctionLatchRgr(pdPol, pd1,pd2, counterReset, cpState);
+00582 
+00583     \textcolor{comment}{//Initialization latch}
+00584     currSetting1 = cmbCS1\_i->GetSelection();
+00585     currSetting2 = cmbCS2\_i->GetSelection();
+00586     tCounter = cmbTC\_i->GetSelection();
+00587     fastLock = cmbFL\_i->GetSelection();
+00588     muxControl = cmbMOC\_i->GetSelection();
+00589 
+00590     pdPol = rgrPDP\_i->GetSelection();
+00591     pd1 = rgrPD1\_i->GetSelection();
+00592     pd2 = rgrPD2\_i->GetSelection();
+00593     counterReset = rgrCR\_i->GetSelection();
+00594     cpState = rgrCPS\_i->GetSelection();
+00595     m\_pModule->SetInitializationLatch(currSetting1, currSetting2, tCounter, fastLock, muxControl);
+00596     m\_pModule->SetInitializationLatchRgr(pdPol, pd1,pd2, counterReset, cpState);
+00597 
+00598     \textcolor{keywordtype}{double} fref = 0;
+00599     txtFref->GetValue().ToDouble(&fref);
+00600     \textcolor{keywordtype}{double} fvco = 0;
+00601     txtFvco->GetValue().ToDouble(&fvco);
+00602     spinNCnt->SetValue(nCounter);
+00603     spinRCnt->SetValue(rCount);
+00604     \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{char} data[12];
+00605     m\_pModule->GetConfig(data);
+00606 
+00607     vector<uint32\_t> dataWr;
+00608     \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} i=0; i<12; i+=3)
+00609         dataWr.push\_back((uint32\_t)data[i] << 16 | (uint32\_t)data[i+1] << 8 | data[
+      i+2]);
+00610 
+00611     \textcolor{keywordtype}{int} status;
+00612 \textcolor{comment}{// ADF4002 needs to be writen 4 values of 24 bits}
+00613     status = conn->TransactSPI(0x30, dataWr.data(), \textcolor{keyword}{nullptr}, 4);
+00614     \textcolor{keywordflow}{if} (status != 0)
+00615 wxMessageBox(\_(\textcolor{stringliteral}{"ADF configuration failed"}), \_(\textcolor{stringliteral}{"Error"}));
+00616 \}
+\end{DoxyCode}

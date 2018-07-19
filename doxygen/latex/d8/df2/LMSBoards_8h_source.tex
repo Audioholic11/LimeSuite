@@ -1,0 +1,111 @@
+\subsection{L\+M\+S\+Boards.\+h}
+\label{LMSBoards_8h_source}\index{/home/erik/prefix/default/src/limesuite-\/dev/src/protocols/\+L\+M\+S\+Boards.\+h@{/home/erik/prefix/default/src/limesuite-\/dev/src/protocols/\+L\+M\+S\+Boards.\+h}}
+
+\begin{DoxyCode}
+00001 
+00006 \textcolor{preprocessor}{#pragma once}
+00007 
+00008 \textcolor{keyword}{namespace }lime \{
+00009 
+00010 \textcolor{keyword}{enum} eLMS_DEV
+00011 \{
+00012     LMS_DEV_UNKNOWN,
+00013     LMS_DEV_EVB6,
+00014     LMS_DEV_DIGIGREEN,
+00015     LMS_DEV_DIGIRED,
+00016     LMS_DEV_EVB7,
+00017     LMS_DEV_ZIPPER,
+00018     LMS_DEV_SOCKETBOARD,
+00019     LMS_DEV_EVB7V2,
+00020     LMS_DEV_STREAM,
+00021     LMS_DEV_NOVENA,
+00022     LMS_DEV_DATASPARK,
+00023     LMS_DEV_RFSPARK,
+00024     LMS_DEV_LMS6002USB,
+00025     LMS_DEV_RFESPARK,
+00026     LMS_DEV_LIMESDR,
+00027     LMS_DEV_LIMESDR_PCIE,
+00028     LMS_DEV_LIMESDR_QPCIE,
+00029     LMS_DEV_LIMESDRMINI,
+00030     LMS_DEV_USTREAM,
+00031     LMS_DEV_LIMESDR_SONY, \textcolor{comment}{//stand alone board with Sony PAs, tuners}
+00032     LMS_DEV_LIMESDR_USB_SP,
+00033     LMS_DEV_LMS7002M_ULTIMATE_EVB,
+00034 
+00035     LMS_DEV_COUNT
+00036 \};
+00037 
+00038 \textcolor{keyword}{const} \textcolor{keywordtype}{char} LMS_DEV_NAMES[][80] =
+00039 \{
+00040     \textcolor{stringliteral}{"UNKNOWN"},
+00041     \textcolor{stringliteral}{"EVB6"},
+00042     \textcolor{stringliteral}{"DigiGreen"},
+00043     \textcolor{stringliteral}{"DigiRed"},
+00044     \textcolor{stringliteral}{"EVB7"},
+00045     \textcolor{stringliteral}{"ZIPPER"},
+00046     \textcolor{stringliteral}{"Socket Board"},
+00047     \textcolor{stringliteral}{"EVB7\_v2"},
+00048     \textcolor{stringliteral}{"Stream"},
+00049     \textcolor{stringliteral}{"Novena"},
+00050     \textcolor{stringliteral}{"DataSpark"},
+00051     \textcolor{stringliteral}{"RF-Spark"},
+00052     \textcolor{stringliteral}{"LMS6002-USB Stick"},
+00053     \textcolor{stringliteral}{"RF-ESpark"},
+00054     \textcolor{stringliteral}{"LimeSDR-USB"},
+00055     \textcolor{stringliteral}{"LimeSDR-PCIe"},
+00056     \textcolor{stringliteral}{"LimeSDR-QPCIe"},
+00057     \textcolor{stringliteral}{"LimeSDR-Mini"},
+00058     \textcolor{stringliteral}{"uStream"},
+00059     \textcolor{stringliteral}{"LimeSDR SONY PA"},
+00060     \textcolor{stringliteral}{"LimeSDR-USB SP"},
+00061     \textcolor{stringliteral}{"LMS7002M Ultimate EVB"}
+00062 \};
+00063 
+00064 \textcolor{keyword}{static} \textcolor{keyword}{inline} \textcolor{keyword}{const} \textcolor{keywordtype}{char}* GetDeviceName(\textcolor{keyword}{const} eLMS_DEV device)
+00065 \{
+00066     \textcolor{keywordflow}{if} (LMS_DEV_UNKNOWN < device && device < LMS_DEV_COUNT)
+00067         \textcolor{keywordflow}{return} LMS\_DEV\_NAMES[device];
+00068     \textcolor{keywordflow}{else}
+00069         \textcolor{keywordflow}{return} LMS\_DEV\_NAMES[LMS_DEV_UNKNOWN];
+00070 \}
+00071 
+00072 \textcolor{keyword}{enum} eEXP_BOARD
+00073 \{
+00074     EXP_BOARD_UNKNOWN,
+00075     EXP_BOARD_UNSUPPORTED,
+00076     EXP_BOARD_NO,
+00077     EXP_BOARD_MYRIAD1,
+00078     EXP_BOARD_MYRIAD2,
+00079     EXP_BOARD_MYRIAD_NOVENA,
+00080     EXP_BOARD_HPM1000,
+00081     EXP_BOARD_MYRIAD7,
+00082     EXP_BOARD_HPM7,
+00083     EXP_BOARD_MYRIAD7_NOVENA,
+00084 
+00085     EXP_BOARD_COUNT
+00086 \};
+00087 
+00088 \textcolor{keyword}{const} \textcolor{keywordtype}{char} EXP_BOARD_NAMES[][80] =
+00089 \{
+00090     \textcolor{stringliteral}{"UNKNOWN"},
+00091     \textcolor{stringliteral}{"UNSUPPORTED"},
+00092     \textcolor{stringliteral}{"NOT AVAILABLE"},
+00093     \textcolor{stringliteral}{"Myriad1"},
+00094     \textcolor{stringliteral}{"Myriad2"},
+00095     \textcolor{stringliteral}{"Novena"},
+00096     \textcolor{stringliteral}{"HPM1000"},
+00097     \textcolor{stringliteral}{"Myriad7"},
+00098     \textcolor{stringliteral}{"HMP7"},
+00099     \textcolor{stringliteral}{"Myriad7 Novena"},
+00100 \};
+00101 
+00102 \textcolor{keyword}{static} \textcolor{keyword}{inline} \textcolor{keyword}{const} \textcolor{keywordtype}{char}* GetExpansionBoardName(\textcolor{keyword}{const} eEXP_BOARD board)
+00103 \{
+00104     \textcolor{keywordflow}{if} (EXP_BOARD_UNKNOWN < board && board < EXP_BOARD_COUNT)
+00105         \textcolor{keywordflow}{return} EXP\_BOARD\_NAMES[board];
+00106     \textcolor{keywordflow}{else}
+00107         \textcolor{keywordflow}{return} EXP\_BOARD\_NAMES[EXP_BOARD_UNKNOWN];
+00108 \}
+00109 
+00110 \}
+\end{DoxyCode}

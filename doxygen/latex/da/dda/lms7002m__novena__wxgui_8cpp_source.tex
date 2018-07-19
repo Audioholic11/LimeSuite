@@ -1,0 +1,138 @@
+\subsection{lms7002m\+\_\+novena\+\_\+wxgui.\+cpp}
+\label{lms7002m__novena__wxgui_8cpp_source}\index{/home/erik/prefix/default/src/limesuite-\/dev/src/boards\+\_\+wxgui/lms7002m\+\_\+novena\+\_\+wxgui.\+cpp@{/home/erik/prefix/default/src/limesuite-\/dev/src/boards\+\_\+wxgui/lms7002m\+\_\+novena\+\_\+wxgui.\+cpp}}
+
+\begin{DoxyCode}
+00001 \textcolor{preprocessor}{#include "lms7002m_novena_wxgui.h"}
+00002 \textcolor{preprocessor}{#include "lms7suiteEvents.h"}
+00003 
+00004 BEGIN\_EVENT\_TABLE(LMS7002M_Novena_wxgui, wxPanel)
+00005 END\_EVENT\_TABLE()
+00006 
+00007 LMS7002M_Novena_wxgui::LMS7002M_Novena_wxgui(wxWindow* parent, wxWindowID \textcolor{keywordtype}{id}, const wxString &title, const 
+      wxPoint& pos, const wxSize& size, \textcolor{keywordtype}{long} styles)
+00008     :lmsControl(\textcolor{keywordtype}{nullptr})
+00009 \{
+00010     Create(parent, \textcolor{keywordtype}{id}, wxDefaultPosition, wxDefaultSize, styles, title);
+00011 \textcolor{preprocessor}{#ifdef WIN32}
+00012     SetBackgroundColour(wxSystemSettings::GetColour(wxSYS\_COLOUR\_BTNFACE));
+00013 \textcolor{preprocessor}{#endif}
+00014     wxFlexGridSizer* mainSizer = \textcolor{keyword}{new} wxFlexGridSizer(0, 2, 5, 5);
+00015 
+00016     lms\_reset = \textcolor{keyword}{new} wxCheckBox(\textcolor{keyword}{this}, wxNewId(), \_(\textcolor{stringliteral}{"LMS\_RESET"}));
+00017     lms\_reset->SetValue(\textcolor{keyword}{true});
+00018     mainSizer->Add(lms\_reset, 1, wxALL | wxALIGN\_LEFT | wxALIGN\_TOP, 0);
+00019     Connect(lms\_reset->GetId(), wxEVT\_CHECKBOX, (wxObjectEventFunction)&
+      LMS7002M_Novena_wxgui::ParameterChangeHandler);
+00020 
+00021     lms\_rxen = \textcolor{keyword}{new} wxCheckBox(\textcolor{keyword}{this}, wxNewId(), \_(\textcolor{stringliteral}{"LMS\_Rx\_EN"}));
+00022     lms\_rxen->SetValue(\textcolor{keyword}{true});
+00023     mainSizer->Add(lms\_rxen, 1, wxALL | wxALIGN\_LEFT | wxALIGN\_TOP, 0);
+00024     Connect(lms\_rxen->GetId(), wxEVT\_CHECKBOX, (wxObjectEventFunction)&
+      LMS7002M_Novena_wxgui::ParameterChangeHandler);
+00025 
+00026     lms\_txen = \textcolor{keyword}{new} wxCheckBox(\textcolor{keyword}{this}, wxNewId(), \_(\textcolor{stringliteral}{"LMS\_Tx\_EN"}));
+00027     lms\_txen->SetValue(\textcolor{keyword}{true});
+00028     mainSizer->Add(lms\_txen, 1, wxALL | wxALIGN\_LEFT | wxALIGN\_TOP, 0);
+00029     Connect(lms\_txen->GetId(), wxEVT\_CHECKBOX, (wxObjectEventFunction)&
+      LMS7002M_Novena_wxgui::ParameterChangeHandler);
+00030 
+00031     lms\_gpio2 = \textcolor{keyword}{new} wxCheckBox(\textcolor{keyword}{this}, wxNewId(), \_(\textcolor{stringliteral}{"LMS\_GPIO2"}));
+00032     mainSizer->Add(lms\_gpio2, 1, wxALL | wxALIGN\_LEFT | wxALIGN\_TOP, 0);
+00033     Connect(lms\_gpio2->GetId(), wxEVT\_CHECKBOX, (wxObjectEventFunction)&
+      LMS7002M_Novena_wxgui::ParameterChangeHandler);
+00034 
+00035     lms\_gpio1 = \textcolor{keyword}{new} wxCheckBox(\textcolor{keyword}{this}, wxNewId(), \_(\textcolor{stringliteral}{"LMS\_GPIO1"}));
+00036     mainSizer->Add(lms\_gpio1, 1, wxALL | wxALIGN\_LEFT | wxALIGN\_TOP, 0);
+00037     Connect(lms\_gpio1->GetId(), wxEVT\_CHECKBOX, (wxObjectEventFunction)&
+      LMS7002M_Novena_wxgui::ParameterChangeHandler);
+00038 
+00039     lms\_gpio0 = \textcolor{keyword}{new} wxCheckBox(\textcolor{keyword}{this}, wxNewId(), \_(\textcolor{stringliteral}{"LMS\_GPIO0"}));
+00040     mainSizer->Add(lms\_gpio0, 1, wxALL | wxALIGN\_LEFT | wxALIGN\_TOP, 0);
+00041     Connect(lms\_gpio0->GetId(), wxEVT\_CHECKBOX, (wxObjectEventFunction)&
+      LMS7002M_Novena_wxgui::ParameterChangeHandler);
+00042 
+00043     SetSizer(mainSizer);
+00044     mainSizer->Fit(\textcolor{keyword}{this});
+00045     mainSizer->SetSizeHints(\textcolor{keyword}{this});
+00046 
+00047     Bind(READ\_ALL\_VALUES, &LMS7002M_Novena_wxgui::OnReadAll, \textcolor{keyword}{this}, this->GetId());
+00048     Bind(WRITE\_ALL\_VALUES, &LMS7002M_Novena_wxgui::OnWriteAll, \textcolor{keyword}{this}, this->GetId());
+00049 \}
+00050 
+00051 LMS7002M_Novena_wxgui::~LMS7002M_Novena_wxgui()
+00052 \{
+00053 
+00054 \}
+00055 
+00056 \textcolor{keywordtype}{void} LMS7002M_Novena_wxgui::UpdatePanel()
+00057 \{
+00058     \textcolor{keywordflow}{if} (lmsControl == \textcolor{keyword}{nullptr})
+00059         \textcolor{keywordflow}{return};
+00060 
+00061     uint32\_t dataWr = (1<<31) | (0x0806 << 16);
+00062     uint16\_t dataRd = 0;
+00063     \textcolor{keywordtype}{int} status;
+00064     status = LMS_ReadLMSReg(lmsControl,dataWr>>16,&dataRd);
+00065 
+00066     \textcolor{keywordflow}{if} (status != 0)
+00067     \{
+00068         wxMessageBox(\textcolor{stringliteral}{"Read register failed"}, \_(\textcolor{stringliteral}{"Error"}), wxICON\_ERROR | wxOK);
+00069         \textcolor{keywordflow}{return};
+00070     \}
+00071 
+00072     \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{int} value = dataRd & 0xFFFF;
+00073     lms_reset->SetValue((value >> 5)&1);
+00074     lms_rxen->SetValue((value >> 4)&1);
+00075     lms_txen->SetValue((value >> 3)&1);
+00076     lms_gpio2->SetValue((value >> 2)&1);
+00077     lms_gpio1->SetValue((value >> 1)&1);
+00078     lms_gpio0->SetValue((value >> 0)&1);
+00079 \}
+00080 
+00081 \textcolor{keywordtype}{void} LMS7002M_Novena_wxgui::Initialize(lms_device_t* serPort, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} devIndex)
+00082 \{
+00083    lmsControl = serPort;
+00084     \textcolor{keywordflow}{if} (lmsControl != \textcolor{keyword}{nullptr})
+00085     \{
+00086         \textcolor{comment}{//m\_rficSpiAddr = mSerPort->GetDeviceInfo().addrsLMS7002M.at(devIndex);}
+00087     \}
+00088 \}
+00089 
+00102 \textcolor{keywordtype}{void} LMS7002M_Novena_wxgui::ParameterChangeHandler(wxCommandEvent& event)
+00103 \{
+00104     \textcolor{keywordflow}{if} (lmsControl == \textcolor{keyword}{nullptr})
+00105         \textcolor{keywordflow}{return};
+00106 
+00107  \textcolor{comment}{/*   if (mSerPort->IsOpen() == false)}
+00108 \textcolor{comment}{    \{}
+00109 \textcolor{comment}{        wxMessageBox(\_("Device not connected"), \_("Error"), wxICON\_ERROR | wxOK);}
+00110 \textcolor{comment}{        return;}
+00111 \textcolor{comment}{    \}*/}
+00112 
+00113     \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{int} value = 0;
+00114     value |= lms_reset->GetValue() << 5;
+00115     value |= lms_rxen->GetValue() << 4;
+00116     value |= lms_txen->GetValue() << 3;
+00117     value |= lms_gpio2->GetValue() << 2;
+00118     value |= lms_gpio1->GetValue() << 1;
+00119     value |= lms_gpio0->GetValue() << 0;
+00120     uint32\_t dataWr = (1 << 31) | (0x0806 << 16) | (value & 0xFFFF);
+00121     \textcolor{keywordtype}{int} status;
+00122     status = LMS_WriteLMSReg(lmsControl,dataWr>>16,value);
+00123     \textcolor{keywordflow}{if} (status != 0)
+00124     \{
+00125         wxMessageBox(\_(\textcolor{stringliteral}{"Failed to write SPI"}), \_(\textcolor{stringliteral}{"Error"}), wxICON\_ERROR | wxOK);
+00126         \textcolor{keywordflow}{return};
+00127     \}
+00128 \}
+00129 
+00130 \textcolor{keywordtype}{void} LMS7002M_Novena_wxgui::OnReadAll(wxCommandEvent& event)
+00131 \{
+00132     UpdatePanel();
+00133 \}
+00134 
+00135 \textcolor{keywordtype}{void} LMS7002M_Novena_wxgui::OnWriteAll(wxCommandEvent &event)
+00136 \{
+00137     ParameterChangeHandler(event);
+00138 \}
+\end{DoxyCode}

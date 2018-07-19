@@ -1,0 +1,71 @@
+\subsection{R\+F\+Spark\+\_\+wxgui.\+h}
+\label{RFSpark__wxgui_8h_source}\index{/home/erik/prefix/default/src/limesuite-\/dev/src/\+R\+F\+Spark/\+R\+F\+Spark\+\_\+wxgui.\+h@{/home/erik/prefix/default/src/limesuite-\/dev/src/\+R\+F\+Spark/\+R\+F\+Spark\+\_\+wxgui.\+h}}
+
+\begin{DoxyCode}
+00001 
+00005 \textcolor{preprocessor}{#ifndef RF\_SPARK\_WXGUI\_H}
+00006 \textcolor{preprocessor}{#define RF\_SPARK\_WXGUI\_H}
+00007 
+00008 \textcolor{preprocessor}{#include <wx/wx.h>}
+00009 \textcolor{preprocessor}{#include "lime/LimeSuite.h"}
+00010 \textcolor{keyword}{class }wxStaticText;
+00011 \textcolor{keyword}{class }wxFlexGridSizer;
+00012 \textcolor{keyword}{class }wxButton;
+00013 \textcolor{keyword}{class }wxStaticBoxSizer;
+00014 \textcolor{keyword}{class }wxComboBox;
+00015 \textcolor{keyword}{class }wxCheckBox;
+00016 
+00017 \textcolor{preprocessor}{#include <vector>}
+00018 
+00019 \textcolor{keyword}{class }RFSpark_wxgui: \textcolor{keyword}{public} wxPanel
+00020 \{
+00021 \textcolor{keyword}{public}:
+00022     \textcolor{keyword}{struct }ADCdata
+00023     \{
+00024         \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{char} channel;
+00025         std::string units;
+00026         \textcolor{keywordtype}{double} value;
+00027         \textcolor{comment}{/*unsigned char units;}
+00028 \textcolor{comment}{        char powerOf10coefficient;}
+00029 \textcolor{comment}{        short value;*/}
+00030     \};
+00031 
+00032     \textcolor{keyword}{struct }ADCdataGUI
+00033     \{
+00034         wxStaticText* title;
+00035         wxStaticText* units;
+00036         wxStaticText* powerOf10;
+00037         wxStaticText* value;
+00038     \};
+00039 
+00040     RFSpark_wxgui(wxWindow* parent,wxWindowID \textcolor{keywordtype}{id}=wxID\_ANY, \textcolor{keyword}{const} wxString& title=wxEmptyString, \textcolor{keyword}{const} 
+      wxPoint& pos=wxDefaultPosition,\textcolor{keyword}{const} wxSize& size=wxDefaultSize, \textcolor{keywordtype}{long} style = 0);
+00041     \textcolor{keyword}{virtual} \textcolor{keywordtype}{void} Initialize(lms_device_t* pSerPort);
+00042     \textcolor{keyword}{virtual} ~RFSpark_wxgui();
+00043 
+00044 \textcolor{keyword}{protected}:
+00045     \textcolor{keyword}{static} \textcolor{keyword}{const} \textcolor{keywordtype}{int} mADCcount = 32;
+00046     \textcolor{keyword}{static} \textcolor{keyword}{const} \textcolor{keywordtype}{long} ID_BTNREADADC;
+00047     \textcolor{keyword}{static} \textcolor{keyword}{const} \textcolor{keywordtype}{long} ID_BTNREADALLADC;
+00048     \textcolor{keyword}{static} \textcolor{keyword}{const} \textcolor{keywordtype}{long} ID_BTNWRITEGPIO;
+00049     \textcolor{keyword}{static} \textcolor{keyword}{const} \textcolor{keywordtype}{long} ID_BTNREADGPIO;
+00050     \textcolor{keyword}{static} \textcolor{keyword}{const} \textcolor{keywordtype}{long} ID_CMBSELECTADC;
+00051     std::vector<ADCdata> mADCdata;
+00052     std::vector<ADCdataGUI> mADCgui;
+00053     std::vector<wxCheckBox*> mGPIOboxes;
+00054 
+00055 \textcolor{keyword}{private}:
+00056     \textcolor{keywordtype}{void} UpdateADClabels();
+00057     \textcolor{keywordtype}{void} OnRefreshAllADC(wxCommandEvent& event);
+00058     \textcolor{keywordtype}{void} OnWriteGPIO(wxCommandEvent& event);
+00059     \textcolor{keywordtype}{void} OnReadGPIO(wxCommandEvent& event);
+00060 
+00061 \textcolor{keyword}{protected}:
+00062     \textcolor{keywordtype}{void} OnReadAll(wxCommandEvent &event);
+00063     \textcolor{keywordtype}{void} OnWriteAll(wxCommandEvent &event);
+00064     lms_device_t* lmsControl;
+00065     DECLARE\_EVENT\_TABLE()
+00066 \};
+00067 
+00068 \textcolor{preprocessor}{#endif}
+\end{DoxyCode}

@@ -1,0 +1,525 @@
+\subsection{fftviewer\+\_\+wxgui.\+cpp}
+\label{fftviewer__wxgui_8cpp_source}\index{/home/erik/prefix/default/src/limesuite-\/dev/src/fftviewer\+\_\+wxgui/fftviewer\+\_\+wxgui.\+cpp@{/home/erik/prefix/default/src/limesuite-\/dev/src/fftviewer\+\_\+wxgui/fftviewer\+\_\+wxgui.\+cpp}}
+
+\begin{DoxyCode}
+00001 \textcolor{comment}{// C++ code generated with wxFormBuilder (version Feb 16 2016)}
+00003 \textcolor{comment}{// http://www.wxformbuilder.org/}
+00004 \textcolor{comment}{//}
+00005 \textcolor{comment}{// PLEASE DO "NOT" EDIT THIS FILE!}
+00007 \textcolor{comment}{}
+00008 \textcolor{preprocessor}{#include "OpenGLGraph.h"}
+00009 
+00010 \textcolor{preprocessor}{#include "fftviewer_wxgui.h"}
+00011 
+00013 
+00014 frFFTviewer::frFFTviewer( wxWindow* parent, wxWindowID \textcolor{keywordtype}{id}, \textcolor{keyword}{const} wxString& title, \textcolor{keyword}{const} wxPoint& pos, \textcolor{keyword}{const}
+       wxSize& size, \textcolor{keywordtype}{long} style ) : wxFrame( parent, id, title, pos, size, style )
+00015 \{
+00016     this->SetSizeHints( wxDefaultSize, wxDefaultSize );
+00017     this->SetBackgroundColour( wxSystemSettings::GetColour( wxSYS\_COLOUR\_BTNFACE ) );
+00018     
+00019     wxFlexGridSizer* fgSizer7;
+00020     fgSizer7 = \textcolor{keyword}{new} wxFlexGridSizer( 0, 2, 0, 0 );
+00021     fgSizer7->AddGrowableCol( 0 );
+00022     fgSizer7->AddGrowableRow( 0 );
+00023     fgSizer7->SetFlexibleDirection( wxBOTH );
+00024     fgSizer7->SetNonFlexibleGrowMode( wxFLEX\_GROWMODE\_SPECIFIED );
+00025     
+00026     mPlotsSplitter = \textcolor{keyword}{new} wxSplitterWindow( \textcolor{keyword}{this}, wxID\_ANY, wxDefaultPosition, wxDefaultSize, wxSP\_3D );
+00027     mPlotsSplitter->Connect( wxEVT\_IDLE, wxIdleEventHandler( 
+      frFFTviewer::mPlotsSplitterOnIdle ), NULL, \textcolor{keyword}{this} );
+00028     
+00029     mTimeConstellationPanel = \textcolor{keyword}{new} wxPanel( mPlotsSplitter, wxID\_ANY, wxDefaultPosition, wxDefaultSize, 
+      wxTAB\_TRAVERSAL );
+00030     wxFlexGridSizer* fgSizer9;
+00031     fgSizer9 = \textcolor{keyword}{new} wxFlexGridSizer( 1, 2, 0, 0 );
+00032     fgSizer9->AddGrowableCol( 0 );
+00033     fgSizer9->AddGrowableRow( 0 );
+00034     fgSizer9->SetFlexibleDirection( wxBOTH );
+00035     fgSizer9->SetNonFlexibleGrowMode( wxFLEX\_GROWMODE\_SPECIFIED );
+00036     
+00037     wxBoxSizer* bSizer2;
+00038     bSizer2 = \textcolor{keyword}{new} wxBoxSizer( wxHORIZONTAL );
+00039     
+00040     mTimeDomainPanel = \textcolor{keyword}{new} OpenGLGraph( mTimeConstellationPanel, wxID\_ANY, wxDefaultPosition, wxSize( -1,-1
+       ), wxTAB\_TRAVERSAL );
+00041     bSizer2->Add( mTimeDomainPanel, 1, wxALL|wxEXPAND, 5 );
+00042     
+00043     mConstelationPanel = \textcolor{keyword}{new} OpenGLGraph( mTimeConstellationPanel, wxID\_ANY, wxDefaultPosition, wxSize( -1,
+      -1 ), wxTAB\_TRAVERSAL );
+00044     bSizer2->Add( mConstelationPanel, 0, wxALL|wxEXPAND|wxSHAPED, 5 );
+00045     
+00046     
+00047     fgSizer9->Add( bSizer2, 1, wxEXPAND, 5 );
+00048     
+00049     
+00050     mTimeConstellationPanel->SetSizer( fgSizer9 );
+00051     mTimeConstellationPanel->Layout();
+00052     fgSizer9->Fit( mTimeConstellationPanel );
+00053     mFFTpanel = \textcolor{keyword}{new} OpenGLGraph( mPlotsSplitter, wxID\_ANY, wxDefaultPosition, wxDefaultSize, 
+      wxTAB\_TRAVERSAL );
+00054     mPlotsSplitter->SplitHorizontally( mTimeConstellationPanel, mFFTpanel, 0 );
+00055     fgSizer7->Add( mPlotsSplitter, 1, wxEXPAND, 5 );
+00056     
+00057     wxFlexGridSizer* fgSizer10;
+00058     fgSizer10 = \textcolor{keyword}{new} wxFlexGridSizer( 0, 1, 0, 0 );
+00059     fgSizer10->SetFlexibleDirection( wxBOTH );
+00060     fgSizer10->SetNonFlexibleGrowMode( wxFLEX\_GROWMODE\_SPECIFIED );
+00061     
+00062     wxStaticBoxSizer* sbSizer1;
+00063     sbSizer1 = \textcolor{keyword}{new} wxStaticBoxSizer( \textcolor{keyword}{new} wxStaticBox( \textcolor{keyword}{this}, wxID\_ANY, wxT(\textcolor{stringliteral}{"FFT parameters"}) ), wxVERTICAL )
+      ;
+00064     
+00065     wxFlexGridSizer* fgSizer11;
+00066     fgSizer11 = \textcolor{keyword}{new} wxFlexGridSizer( 0, 2, 0, 0 );
+00067     fgSizer11->AddGrowableCol( 1 );
+00068     fgSizer11->SetFlexibleDirection( wxBOTH );
+00069     fgSizer11->SetNonFlexibleGrowMode( wxFLEX\_GROWMODE\_SPECIFIED );
+00070     
+00071     m_staticText6 = \textcolor{keyword}{new} wxStaticText( sbSizer1->GetStaticBox(), wxID\_ANY, wxT(\textcolor{stringliteral}{"Nyquist freq (MHz):"}), 
+      wxDefaultPosition, wxDefaultSize, 0 );
+00072     m_staticText6->Wrap( -1 );
+00073     fgSizer11->Add( m_staticText6, 0, wxALIGN\_CENTER\_VERTICAL, 5 );
+00074     
+00075     txtNyquistFreqMHz = \textcolor{keyword}{new} wxTextCtrl( sbSizer1->GetStaticBox(), wxID\_ANY, wxT(\textcolor{stringliteral}{"15.36"}), wxDefaultPosition
+      , wxDefaultSize, 0 );
+00076 \textcolor{preprocessor}{    #ifdef \_\_WXGTK\_\_}
+00077     \textcolor{keywordflow}{if} ( !txtNyquistFreqMHz->HasFlag( wxTE\_MULTILINE ) )
+00078     \{
+00079     txtNyquistFreqMHz->SetMaxLength( 8 );
+00080     \}
+00081 \textcolor{preprocessor}{    #else}
+00082     txtNyquistFreqMHz->SetMaxLength( 8 );
+00083 \textcolor{preprocessor}{    #endif}
+00084     txtNyquistFreqMHz->SetMinSize( wxSize( 64,-1 ) );
+00085     
+00086     fgSizer11->Add( txtNyquistFreqMHz, 0, wxEXPAND, 5 );
+00087     
+00088     m_staticText7 = \textcolor{keyword}{new} wxStaticText( sbSizer1->GetStaticBox(), wxID\_ANY, wxT(\textcolor{stringliteral}{"Samples count"}), 
+      wxDefaultPosition, wxDefaultSize, 0 );
+00089     m_staticText7->Wrap( -1 );
+00090     fgSizer11->Add( m_staticText7, 0, wxALIGN\_CENTER\_VERTICAL, 5 );
+00091     
+00092     spinFFTsize = \textcolor{keyword}{new} wxSpinCtrl( sbSizer1->GetStaticBox(), wxID\_ANY, wxEmptyString, wxDefaultPosition, 
+      wxDefaultSize, wxSP\_ARROW\_KEYS, 64, 65536, 16384 );
+00093     spinFFTsize->SetMinSize( wxSize( 64,-1 ) );
+00094     
+00095     fgSizer11->Add( spinFFTsize, 0, wxEXPAND, 5 );
+00096     
+00097     
+00098     fgSizer11->Add( 0, 0, 1, wxEXPAND, 5 );
+00099     
+00100     
+00101     sbSizer1->Add( fgSizer11, 1, wxEXPAND, 5 );
+00102     
+00103     
+00104     fgSizer10->Add( sbSizer1, 1, wxEXPAND, 5 );
+00105     
+00106     wxStaticBoxSizer* sbSizer2;
+00107     sbSizer2 = \textcolor{keyword}{new} wxStaticBoxSizer( \textcolor{keyword}{new} wxStaticBox( \textcolor{keyword}{this}, wxID\_ANY, wxT(\textcolor{stringliteral}{"Data reading"}) ), wxVERTICAL );
+00108     
+00109     wxFlexGridSizer* fgSizer12;
+00110     fgSizer12 = \textcolor{keyword}{new} wxFlexGridSizer( 0, 2, 5, 5 );
+00111     fgSizer12->SetFlexibleDirection( wxBOTH );
+00112     fgSizer12->SetNonFlexibleGrowMode( wxFLEX\_GROWMODE\_SPECIFIED );
+00113     
+00114     wxString cmbStreamTypeChoices[] = \{ wxT(\textcolor{stringliteral}{"LMS#1 SISO"}), wxT(\textcolor{stringliteral}{"LMS#1 MIMO"}), wxT(\textcolor{stringliteral}{"LMS#2 SISO"}), wxT(\textcolor{stringliteral}{"LMS#2
+       MIMO"}), wxT(\textcolor{stringliteral}{"Ext. ADC/DAC"}) \};
+00115     \textcolor{keywordtype}{int} cmbStreamTypeNChoices = \textcolor{keyword}{sizeof}( cmbStreamTypeChoices ) / \textcolor{keyword}{sizeof}( wxString );
+00116     cmbStreamType = \textcolor{keyword}{new} wxChoice( sbSizer2->GetStaticBox(), wxID\_ANY, wxDefaultPosition, wxDefaultSize, 
+      cmbStreamTypeNChoices, cmbStreamTypeChoices, 0 );
+00117     cmbStreamType->SetSelection( 0 );
+00118     fgSizer12->Add( cmbStreamType, 0, wxEXPAND, 5 );
+00119     
+00120     wxString cmbFmtChoices[] = \{ wxT(\textcolor{stringliteral}{"12 bit format"}), wxT(\textcolor{stringliteral}{"16 bit format"}) \};
+00121     \textcolor{keywordtype}{int} cmbFmtNChoices = \textcolor{keyword}{sizeof}( cmbFmtChoices ) / \textcolor{keyword}{sizeof}( wxString );
+00122     cmbFmt = \textcolor{keyword}{new} wxChoice( sbSizer2->GetStaticBox(), wxID\_ANY, wxDefaultPosition, wxDefaultSize, 
+      cmbFmtNChoices, cmbFmtChoices, 0 );
+00123     cmbFmt->SetSelection( 0 );
+00124     fgSizer12->Add( cmbFmt, 0, wxEXPAND, 5 );
+00125     
+00126     chkEnTx = \textcolor{keyword}{new} wxCheckBox( sbSizer2->GetStaticBox(), wxID\_ANY, wxT(\textcolor{stringliteral}{"Loopback RX to TX"}), 
+      wxDefaultPosition, wxDefaultSize, 0 );
+00127     chkEnTx->SetToolTip( wxT(\textcolor{stringliteral}{"Freezes FFT plot"}) );
+00128     
+00129     fgSizer12->Add( chkEnTx, 0, wxALL, 2 );
+00130     
+00131     chkEnSync = \textcolor{keyword}{new} wxCheckBox( sbSizer2->GetStaticBox(), wxID\_ANY, wxT(\textcolor{stringliteral}{"Sync timestamp"}), 
+      wxDefaultPosition, wxDefaultSize, 0 );
+00132     chkEnSync->Enable( \textcolor{keyword}{false} );
+00133     chkEnSync->SetToolTip( wxT(\textcolor{stringliteral}{"Freezes FFT plot"}) );
+00134     
+00135     fgSizer12->Add( chkEnSync, 0, wxALL, 2 );
+00136     
+00137     btnStartStop = \textcolor{keyword}{new} wxButton( sbSizer2->GetStaticBox(), wxID\_ANY, wxT(\textcolor{stringliteral}{"START"}), wxDefaultPosition, 
+      wxDefaultSize, 0 );
+00138     fgSizer12->Add( btnStartStop, 1, wxEXPAND, 5 );
+00139     
+00140     wxFlexGridSizer* fgSizer13;
+00141     fgSizer13 = \textcolor{keyword}{new} wxFlexGridSizer( 0, 2, 0, 5 );
+00142     fgSizer13->SetFlexibleDirection( wxBOTH );
+00143     fgSizer13->SetNonFlexibleGrowMode( wxFLEX\_GROWMODE\_SPECIFIED );
+00144     
+00145     m_staticText8 = \textcolor{keyword}{new} wxStaticText( sbSizer2->GetStaticBox(), wxID\_ANY, wxT(\textcolor{stringliteral}{"Rx rate:"}), 
+      wxDefaultPosition, wxDefaultSize, 0 );
+00146     m_staticText8->Wrap( -1 );
+00147     fgSizer13->Add( m_staticText8, 0, 0, 5 );
+00148     
+00149     lblRxDataRate = \textcolor{keyword}{new} wxStaticText( sbSizer2->GetStaticBox(), wxID\_ANY, wxT(\textcolor{stringliteral}{"0 MB/s"}), wxDefaultPosition,
+       wxDefaultSize, 0 );
+00150     lblRxDataRate->Wrap( -1 );
+00151     fgSizer13->Add( lblRxDataRate, 0, 0, 5 );
+00152     
+00153     m_staticText18 = \textcolor{keyword}{new} wxStaticText( sbSizer2->GetStaticBox(), wxID\_ANY, wxT(\textcolor{stringliteral}{"Tx rate:"}), 
+      wxDefaultPosition, wxDefaultSize, 0 );
+00154     m_staticText18->Wrap( -1 );
+00155     fgSizer13->Add( m_staticText18, 0, 0, 5 );
+00156     
+00157     lblTxDataRate = \textcolor{keyword}{new} wxStaticText( sbSizer2->GetStaticBox(), wxID\_ANY, wxT(\textcolor{stringliteral}{"0 MB/s"}), wxDefaultPosition,
+       wxDefaultSize, 0 );
+00158     lblTxDataRate->Wrap( -1 );
+00159     fgSizer13->Add( lblTxDataRate, 0, 0, 5 );
+00160     
+00161     
+00162     fgSizer12->Add( fgSizer13, 1, wxEXPAND, 5 );
+00163     
+00164     
+00165     sbSizer2->Add( fgSizer12, 1, wxEXPAND, 5 );
+00166     
+00167     wxStaticBoxSizer* sbSizer6;
+00168     sbSizer6 = \textcolor{keyword}{new} wxStaticBoxSizer( \textcolor{keyword}{new} wxStaticBox( sbSizer2->GetStaticBox(), wxID\_ANY, wxT(\textcolor{stringliteral}{"Window
+       function:"}) ), wxVERTICAL );
+00169     
+00170     wxString cmbWindowFuncChoices[] = \{ wxT(\textcolor{stringliteral}{"Rectangular"}), wxT(\textcolor{stringliteral}{"Blackman-harris"}), wxT(\textcolor{stringliteral}{"Hamming"}), wxT(\textcolor{stringliteral}{"
+      Hanning"}) \};
+00171     \textcolor{keywordtype}{int} cmbWindowFuncNChoices = \textcolor{keyword}{sizeof}( cmbWindowFuncChoices ) / \textcolor{keyword}{sizeof}( wxString );
+00172     cmbWindowFunc = \textcolor{keyword}{new} wxChoice( sbSizer6->GetStaticBox(), wxID\_ANY, wxDefaultPosition, wxDefaultSize, 
+      cmbWindowFuncNChoices, cmbWindowFuncChoices, 0 );
+00173     cmbWindowFunc->SetSelection( 0 );
+00174     sbSizer6->Add( cmbWindowFunc, 0, wxEXPAND, 5 );
+00175     
+00176     
+00177     sbSizer2->Add( sbSizer6, 0, wxEXPAND, 5 );
+00178     
+00179     wxStaticBoxSizer* sbSizer51;
+00180     sbSizer51 = \textcolor{keyword}{new} wxStaticBoxSizer( \textcolor{keyword}{new} wxStaticBox( sbSizer2->GetStaticBox(), wxID\_ANY, wxT(\textcolor{stringliteral}{"Capture to
+       file"}) ), wxVERTICAL );
+00181     
+00182     wxFlexGridSizer* fgSizer121;
+00183     fgSizer121 = \textcolor{keyword}{new} wxFlexGridSizer( 0, 2, 0, 0 );
+00184     fgSizer121->SetFlexibleDirection( wxBOTH );
+00185     fgSizer121->SetNonFlexibleGrowMode( wxFLEX\_GROWMODE\_SPECIFIED );
+00186     
+00187     chkCaptureToFile = \textcolor{keyword}{new} wxCheckBox( sbSizer51->GetStaticBox(), wxID\_ANY, wxT(\textcolor{stringliteral}{"Capture enable"}), 
+      wxDefaultPosition, wxDefaultSize, 0 );
+00188     fgSizer121->Add( chkCaptureToFile, 0, 0, 5 );
+00189     
+00190     
+00191     fgSizer121->Add( 0, 0, 1, wxEXPAND, 5 );
+00192     
+00193     m_staticText12 = \textcolor{keyword}{new} wxStaticText( sbSizer51->GetStaticBox(), wxID\_ANY, wxT(\textcolor{stringliteral}{"Samples to capture:"}), 
+      wxDefaultPosition, wxDefaultSize, 0 );
+00194     m_staticText12->Wrap( -1 );
+00195     fgSizer121->Add( m_staticText12, 0, wxALL, 5 );
+00196     
+00197     spinCaptureCount = \textcolor{keyword}{new} wxSpinCtrl( sbSizer51->GetStaticBox(), wxID\_ANY, wxT(\textcolor{stringliteral}{"16384"}), wxDefaultPosition
+      , wxDefaultSize, wxSP\_ARROW\_KEYS, 0, 30000000, 16384 );
+00198     fgSizer121->Add( spinCaptureCount, 0, 0, 5 );
+00199     
+00200     
+00201     sbSizer51->Add( fgSizer121, 1, wxEXPAND, 5 );
+00202     
+00203     
+00204     sbSizer2->Add( sbSizer51, 0, wxTOP, 5 );
+00205     
+00206     
+00207     fgSizer10->Add( sbSizer2, 1, wxEXPAND, 5 );
+00208     
+00209     wxStaticBoxSizer* sbSizer3;
+00210     sbSizer3 = \textcolor{keyword}{new} wxStaticBoxSizer( \textcolor{keyword}{new} wxStaticBox( \textcolor{keyword}{this}, wxID\_ANY, wxT(\textcolor{stringliteral}{"Graphs"}) ), wxVERTICAL );
+00211     
+00212     wxFlexGridSizer* fgSizer14;
+00213     fgSizer14 = \textcolor{keyword}{new} wxFlexGridSizer( 0, 1, 0, 0 );
+00214     fgSizer14->SetFlexibleDirection( wxBOTH );
+00215     fgSizer14->SetNonFlexibleGrowMode( wxFLEX\_GROWMODE\_SPECIFIED );
+00216     
+00217     chkFreezeTimeDomain = \textcolor{keyword}{new} wxCheckBox( sbSizer3->GetStaticBox(), wxID\_ANY, wxT(\textcolor{stringliteral}{"Freeze time"}), 
+      wxDefaultPosition, wxDefaultSize, 0 );
+00218     chkFreezeTimeDomain->SetToolTip( wxT(\textcolor{stringliteral}{"Freezes time domain plot"}) );
+00219     
+00220     fgSizer14->Add( chkFreezeTimeDomain, 0, 0, 5 );
+00221     
+00222     chkFreezeConstellation = \textcolor{keyword}{new} wxCheckBox( sbSizer3->GetStaticBox(), wxID\_ANY, wxT(\textcolor{stringliteral}{"Freeze constellation"}
+      ), wxDefaultPosition, wxDefaultSize, 0 );
+00223     chkFreezeConstellation->SetToolTip( wxT(\textcolor{stringliteral}{"Freezes constellation plot"}) );
+00224     
+00225     fgSizer14->Add( chkFreezeConstellation, 0, 0, 5 );
+00226     
+00227     chkFreezeFFT = \textcolor{keyword}{new} wxCheckBox( sbSizer3->GetStaticBox(), wxID\_ANY, wxT(\textcolor{stringliteral}{"Freeze FFT"}), wxDefaultPosition
+      , wxDefaultSize, 0 );
+00228     chkFreezeFFT->SetToolTip( wxT(\textcolor{stringliteral}{"Freezes FFT plot"}) );
+00229     
+00230     fgSizer14->Add( chkFreezeFFT, 0, 0, 5 );
+00231     
+00232     wxFlexGridSizer* fgSizer101;
+00233     fgSizer101 = \textcolor{keyword}{new} wxFlexGridSizer( 0, 2, 0, 0 );
+00234     fgSizer101->SetFlexibleDirection( wxBOTH );
+00235     fgSizer101->SetNonFlexibleGrowMode( wxFLEX\_GROWMODE\_SPECIFIED );
+00236     
+00237     m_staticText11 = \textcolor{keyword}{new} wxStaticText( sbSizer3->GetStaticBox(), wxID\_ANY, wxT(\textcolor{stringliteral}{"Display channel:"}), 
+      wxDefaultPosition, wxDefaultSize, 0 );
+00238     m_staticText11->Wrap( -1 );
+00239     fgSizer101->Add( m_staticText11, 0, wxALL, 5 );
+00240     
+00241     wxString cmbChannelVisibilityChoices[] = \{ wxT(\textcolor{stringliteral}{"A"}), wxT(\textcolor{stringliteral}{"B"}), wxT(\textcolor{stringliteral}{"A&B"}) \};
+00242     \textcolor{keywordtype}{int} cmbChannelVisibilityNChoices = \textcolor{keyword}{sizeof}( cmbChannelVisibilityChoices ) / \textcolor{keyword}{sizeof}( wxString );
+00243     cmbChannelVisibility = \textcolor{keyword}{new} wxChoice( sbSizer3->GetStaticBox(), wxID\_ANY, wxDefaultPosition, 
+      wxDefaultSize, cmbChannelVisibilityNChoices, cmbChannelVisibilityChoices, 0 );
+00244     cmbChannelVisibility->SetSelection( 0 );
+00245     fgSizer101->Add( cmbChannelVisibility, 0, 0, 5 );
+00246     
+00247     m_staticText23 = \textcolor{keyword}{new} wxStaticText( sbSizer3->GetStaticBox(), wxID\_ANY, wxT(\textcolor{stringliteral}{"FFT averaging:"}), 
+      wxDefaultPosition, wxDefaultSize, 0 );
+00248     m_staticText23->Wrap( -1 );
+00249     m_staticText23->SetToolTip( wxT(\textcolor{stringliteral}{"Number of FFTs to average"}) );
+00250     
+00251     fgSizer101->Add( m_staticText23, 0, wxALL, 5 );
+00252     
+00253     spinAvgCount = \textcolor{keyword}{new} wxSpinCtrl( sbSizer3->GetStaticBox(), wxID\_ANY, wxT(\textcolor{stringliteral}{"1"}), wxDefaultPosition, 
+      wxDefaultSize, wxSP\_ARROW\_KEYS, 1, 512, 1 );
+00254     spinAvgCount->SetToolTip( wxT(\textcolor{stringliteral}{"Number of FFTs to average"}) );
+00255     spinAvgCount->SetMinSize( wxSize( 64,-1 ) );
+00256     
+00257     fgSizer101->Add( spinAvgCount, 0, 0, 5 );
+00258     
+00259     
+00260     fgSizer14->Add( fgSizer101, 1, wxEXPAND, 5 );
+00261     
+00262     
+00263     sbSizer3->Add( fgSizer14, 1, wxEXPAND, 5 );
+00264     
+00265     
+00266     fgSizer10->Add( sbSizer3, 1, wxEXPAND, 5 );
+00267     
+00268     wxStaticBoxSizer* sbSizer5;
+00269     sbSizer5 = \textcolor{keyword}{new} wxStaticBoxSizer( \textcolor{keyword}{new} wxStaticBox( \textcolor{keyword}{this}, wxID\_ANY, wxT(\textcolor{stringliteral}{"Buffers status"}) ), wxVERTICAL )
+      ;
+00270     
+00271     wxFlexGridSizer* fgSizer19;
+00272     fgSizer19 = \textcolor{keyword}{new} wxFlexGridSizer( 0, 2, 5, 5 );
+00273     fgSizer19->AddGrowableCol( 1 );
+00274     fgSizer19->SetFlexibleDirection( wxBOTH );
+00275     fgSizer19->SetNonFlexibleGrowMode( wxFLEX\_GROWMODE\_SPECIFIED );
+00276     
+00277     m_staticText15 = \textcolor{keyword}{new} wxStaticText( sbSizer5->GetStaticBox(), wxID\_ANY, wxT(\textcolor{stringliteral}{"Rx:"}), wxDefaultPosition, 
+      wxDefaultSize, 0 );
+00278     m_staticText15->Wrap( -1 );
+00279     fgSizer19->Add( m_staticText15, 0, wxALIGN\_CENTER\_VERTICAL, 5 );
+00280     
+00281     gaugeRxBuffer = \textcolor{keyword}{new} wxGauge( sbSizer5->GetStaticBox(), wxID\_ANY, 100, wxDefaultPosition, wxDefaultSize,
+       wxGA\_HORIZONTAL );
+00282     gaugeRxBuffer->SetValue( 0 ); 
+00283     fgSizer19->Add( gaugeRxBuffer, 1, wxEXPAND, 5 );
+00284     
+00285     m_staticText16 = \textcolor{keyword}{new} wxStaticText( sbSizer5->GetStaticBox(), wxID\_ANY, wxT(\textcolor{stringliteral}{"Tx:"}), wxDefaultPosition, 
+      wxDefaultSize, 0 );
+00286     m_staticText16->Wrap( -1 );
+00287     fgSizer19->Add( m_staticText16, 0, wxALIGN\_CENTER\_VERTICAL, 5 );
+00288     
+00289     gaugeTxBuffer = \textcolor{keyword}{new} wxGauge( sbSizer5->GetStaticBox(), wxID\_ANY, 100, wxDefaultPosition, wxDefaultSize,
+       wxGA\_HORIZONTAL );
+00290     gaugeTxBuffer->SetValue( 0 ); 
+00291     fgSizer19->Add( gaugeTxBuffer, 1, wxEXPAND, 5 );
+00292     
+00293     
+00294     sbSizer5->Add( fgSizer19, 1, wxEXPAND, 5 );
+00295     
+00296     
+00297     fgSizer10->Add( sbSizer5, 1, wxEXPAND, 5 );
+00298     
+00299     wxStaticBoxSizer* sbSizer7;
+00300     sbSizer7 = \textcolor{keyword}{new} wxStaticBoxSizer( \textcolor{keyword}{new} wxStaticBox( \textcolor{keyword}{this}, wxID\_ANY, wxT(\textcolor{stringliteral}{"Measurement"}) ), wxVERTICAL );
+00301     
+00302     wxFlexGridSizer* fgSizer122;
+00303     fgSizer122 = \textcolor{keyword}{new} wxFlexGridSizer( 0, 3, 5, 5 );
+00304     fgSizer122->AddGrowableCol( 1 );
+00305     fgSizer122->AddGrowableCol( 2 );
+00306     fgSizer122->SetFlexibleDirection( wxBOTH );
+00307     fgSizer122->SetNonFlexibleGrowMode( wxFLEX\_GROWMODE\_SPECIFIED );
+00308     
+00309     chkEnPwr = \textcolor{keyword}{new} wxCheckBox( sbSizer7->GetStaticBox(), wxID\_ANY, wxT(\textcolor{stringliteral}{"Enable"}), wxDefaultPosition, 
+      wxDefaultSize, 0 );
+00310     chkEnPwr->SetToolTip( wxT(\textcolor{stringliteral}{"Freezes FFT plot"}) );
+00311     
+00312     fgSizer122->Add( chkEnPwr, 0, wxTOP, 5 );
+00313     
+00314     m_staticText13 = \textcolor{keyword}{new} wxStaticText( sbSizer7->GetStaticBox(), wxID\_ANY, wxT(\textcolor{stringliteral}{"Ch 1"}), wxDefaultPosition, 
+      wxDefaultSize, 0 );
+00315     m_staticText13->Wrap( -1 );
+00316     fgSizer122->Add( m_staticText13, 0, wxALL|wxALIGN\_CENTER\_HORIZONTAL, 5 );
+00317     
+00318     m_staticText14 = \textcolor{keyword}{new} wxStaticText( sbSizer7->GetStaticBox(), wxID\_ANY, wxT(\textcolor{stringliteral}{"Ch 2"}), wxDefaultPosition, 
+      wxDefaultSize, 0 );
+00319     m_staticText14->Wrap( -1 );
+00320     fgSizer122->Add( m_staticText14, 0, wxALL|wxALIGN\_CENTER\_HORIZONTAL, 5 );
+00321     
+00322     m_staticText151 = \textcolor{keyword}{new} wxStaticText( sbSizer7->GetStaticBox(), wxID\_ANY, wxT(\textcolor{stringliteral}{"Center offset (MHz):"}), 
+      wxDefaultPosition, wxDefaultSize, 0 );
+00323     m_staticText151->Wrap( -1 );
+00324     fgSizer122->Add( m_staticText151, 0, wxALIGN\_CENTER\_VERTICAL, 5 );
+00325     
+00326     txtCenterOffset1 = \textcolor{keyword}{new} wxTextCtrl( sbSizer7->GetStaticBox(), wxID\_ANY, wxT(\textcolor{stringliteral}{"0"}), wxDefaultPosition, 
+      wxDefaultSize, 0 );
+00327 \textcolor{preprocessor}{    #ifdef \_\_WXGTK\_\_}
+00328     \textcolor{keywordflow}{if} ( !txtCenterOffset1->HasFlag( wxTE\_MULTILINE ) )
+00329     \{
+00330     txtCenterOffset1->SetMaxLength( 8 );
+00331     \}
+00332 \textcolor{preprocessor}{    #else}
+00333     txtCenterOffset1->SetMaxLength( 8 );
+00334 \textcolor{preprocessor}{    #endif}
+00335     txtCenterOffset1->Enable( \textcolor{keyword}{false} );
+00336     txtCenterOffset1->SetMinSize( wxSize( 32,-1 ) );
+00337     
+00338     fgSizer122->Add( txtCenterOffset1, 0, wxEXPAND, 5 );
+00339     
+00340     txtCenterOffset2 = \textcolor{keyword}{new} wxTextCtrl( sbSizer7->GetStaticBox(), wxID\_ANY, wxT(\textcolor{stringliteral}{"0"}), wxDefaultPosition, 
+      wxDefaultSize, 0 );
+00341 \textcolor{preprocessor}{    #ifdef \_\_WXGTK\_\_}
+00342     \textcolor{keywordflow}{if} ( !txtCenterOffset2->HasFlag( wxTE\_MULTILINE ) )
+00343     \{
+00344     txtCenterOffset2->SetMaxLength( 8 );
+00345     \}
+00346 \textcolor{preprocessor}{    #else}
+00347     txtCenterOffset2->SetMaxLength( 8 );
+00348 \textcolor{preprocessor}{    #endif}
+00349     txtCenterOffset2->Enable( \textcolor{keyword}{false} );
+00350     txtCenterOffset2->SetMinSize( wxSize( 32,-1 ) );
+00351     
+00352     fgSizer122->Add( txtCenterOffset2, 0, wxEXPAND, 5 );
+00353     
+00354     m_staticText161 = \textcolor{keyword}{new} wxStaticText( sbSizer7->GetStaticBox(), wxID\_ANY, wxT(\textcolor{stringliteral}{"Bandwidth (MHz):"}), 
+      wxDefaultPosition, wxDefaultSize, 0 );
+00355     m_staticText161->Wrap( -1 );
+00356     fgSizer122->Add( m_staticText161, 0, wxALIGN\_CENTER\_VERTICAL, 5 );
+00357     
+00358     txtBW1 = \textcolor{keyword}{new} wxTextCtrl( sbSizer7->GetStaticBox(), wxID\_ANY, wxT(\textcolor{stringliteral}{"1"}), wxDefaultPosition, wxDefaultSize
+      , 0 );
+00359 \textcolor{preprocessor}{    #ifdef \_\_WXGTK\_\_}
+00360     \textcolor{keywordflow}{if} ( !txtBW1->HasFlag( wxTE\_MULTILINE ) )
+00361     \{
+00362     txtBW1->SetMaxLength( 8 );
+00363     \}
+00364 \textcolor{preprocessor}{    #else}
+00365     txtBW1->SetMaxLength( 8 );
+00366 \textcolor{preprocessor}{    #endif}
+00367     txtBW1->Enable( \textcolor{keyword}{false} );
+00368     txtBW1->SetMinSize( wxSize( 32,-1 ) );
+00369     
+00370     fgSizer122->Add( txtBW1, 0, wxEXPAND, 5 );
+00371     
+00372     txtBW2 = \textcolor{keyword}{new} wxTextCtrl( sbSizer7->GetStaticBox(), wxID\_ANY, wxT(\textcolor{stringliteral}{"1"}), wxDefaultPosition, wxDefaultSize
+      , 0 );
+00373 \textcolor{preprocessor}{    #ifdef \_\_WXGTK\_\_}
+00374     \textcolor{keywordflow}{if} ( !txtBW2->HasFlag( wxTE\_MULTILINE ) )
+00375     \{
+00376     txtBW2->SetMaxLength( 8 );
+00377     \}
+00378 \textcolor{preprocessor}{    #else}
+00379     txtBW2->SetMaxLength( 8 );
+00380 \textcolor{preprocessor}{    #endif}
+00381     txtBW2->Enable( \textcolor{keyword}{false} );
+00382     txtBW2->SetMinSize( wxSize( 32,-1 ) );
+00383     
+00384     fgSizer122->Add( txtBW2, 0, wxEXPAND, 5 );
+00385     
+00386     m_staticText17 = \textcolor{keyword}{new} wxStaticText( sbSizer7->GetStaticBox(), wxID\_ANY, wxT(\textcolor{stringliteral}{"Power (dBFS):"}), 
+      wxDefaultPosition, wxDefaultSize, 0 );
+00387     m_staticText17->Wrap( -1 );
+00388     fgSizer122->Add( m_staticText17, 0, wxALIGN\_CENTER\_VERTICAL, 5 );
+00389     
+00390     lblPower1 = \textcolor{keyword}{new} wxStaticText( sbSizer7->GetStaticBox(), wxID\_ANY, wxT(\textcolor{stringliteral}{"???"}), wxDefaultPosition, 
+      wxDefaultSize, 0 );
+00391     lblPower1->Wrap( -1 );
+00392     fgSizer122->Add( lblPower1, 0, wxALIGN\_CENTER\_VERTICAL, 5 );
+00393     
+00394     lblPower2 = \textcolor{keyword}{new} wxStaticText( sbSizer7->GetStaticBox(), wxID\_ANY, wxT(\textcolor{stringliteral}{"???"}), wxDefaultPosition, 
+      wxDefaultSize, 0 );
+00395     lblPower2->Wrap( -1 );
+00396     fgSizer122->Add( lblPower2, 0, wxALIGN\_CENTER\_VERTICAL, 5 );
+00397     
+00398     m_staticText20 = \textcolor{keyword}{new} wxStaticText( sbSizer7->GetStaticBox(), wxID\_ANY, wxT(\textcolor{stringliteral}{"dBc"}), wxDefaultPosition, 
+      wxDefaultSize, 0 );
+00399     m_staticText20->Wrap( -1 );
+00400     fgSizer122->Add( m_staticText20, 0, wxALIGN\_CENTER\_VERTICAL, 5 );
+00401     
+00402     lbldBc = \textcolor{keyword}{new} wxStaticText( sbSizer7->GetStaticBox(), wxID\_ANY, wxT(\textcolor{stringliteral}{"???"}), wxDefaultPosition, 
+      wxDefaultSize, 0 );
+00403     lbldBc->Wrap( -1 );
+00404     fgSizer122->Add( lbldBc, 0, wxALIGN\_CENTER\_VERTICAL, 5 );
+00405     
+00406     
+00407     sbSizer7->Add( fgSizer122, 1, wxEXPAND|wxLEFT, 5 );
+00408     
+00409     
+00410     fgSizer10->Add( sbSizer7, 1, wxEXPAND, 5 );
+00411     
+00412     
+00413     fgSizer7->Add( fgSizer10, 1, wxEXPAND, 5 );
+00414     
+00415     
+00416     this->SetSizer( fgSizer7 );
+00417     this->Layout();
+00418     fgSizer7->Fit( \textcolor{keyword}{this} );
+00419     
+00420     this->Centre( wxBOTH );
+00421     
+00422     \textcolor{comment}{// Connect Events}
+00423     spinFFTsize->Connect( wxEVT\_COMMAND\_SPINCTRL\_UPDATED, wxSpinEventHandler( 
+      frFFTviewer::OnFFTsamplesCountChanged ), NULL, \textcolor{keyword}{this} );
+00424     cmbStreamType->Connect( wxEVT\_COMMAND\_CHOICE\_SELECTED, wxCommandEventHandler( 
+      frFFTviewer::OnStreamChange ), NULL, \textcolor{keyword}{this} );
+00425     cmbFmt->Connect( wxEVT\_COMMAND\_CHOICE\_SELECTED, wxCommandEventHandler( 
+      frFFTviewer::OnFmtChange ), NULL, \textcolor{keyword}{this} );
+00426     chkEnTx->Connect( wxEVT\_COMMAND\_CHECKBOX\_CLICKED, wxCommandEventHandler( 
+      frFFTviewer::OnEnTx ), NULL, \textcolor{keyword}{this} );
+00427     btnStartStop->Connect( wxEVT\_COMMAND\_BUTTON\_CLICKED, wxCommandEventHandler( 
+      frFFTviewer::OnbtnStartStop ), NULL, \textcolor{keyword}{this} );
+00428     cmbWindowFunc->Connect( wxEVT\_COMMAND\_CHOICE\_SELECTED, wxCommandEventHandler( 
+      frFFTviewer::OnWindowFunctionChange ), NULL, \textcolor{keyword}{this} );
+00429     cmbChannelVisibility->Connect( wxEVT\_COMMAND\_CHOICE\_SELECTED, wxCommandEventHandler( 
+      frFFTviewer::OnChannelVisibilityChange ), NULL, \textcolor{keyword}{this} );
+00430     spinAvgCount->Connect( wxEVT\_COMMAND\_SPINCTRL\_UPDATED, wxSpinEventHandler( 
+      frFFTviewer::OnAvgChange ), NULL, \textcolor{keyword}{this} );
+00431     spinAvgCount->Connect( wxEVT\_COMMAND\_TEXT\_ENTER, wxCommandEventHandler( 
+      frFFTviewer::OnAvgChangeEnter ), NULL, \textcolor{keyword}{this} );
+00432     chkEnPwr->Connect( wxEVT\_COMMAND\_CHECKBOX\_CLICKED, wxCommandEventHandler( 
+      frFFTviewer::OnEnPwr ), NULL, \textcolor{keyword}{this} );
+00433 \}
+00434 
+00435 frFFTviewer::~frFFTviewer()
+00436 \{
+00437     \textcolor{comment}{// Disconnect Events}
+00438     spinFFTsize->Disconnect( wxEVT\_COMMAND\_SPINCTRL\_UPDATED, wxSpinEventHandler( 
+      frFFTviewer::OnFFTsamplesCountChanged ), NULL, \textcolor{keyword}{this} );
+00439     cmbStreamType->Disconnect( wxEVT\_COMMAND\_CHOICE\_SELECTED, wxCommandEventHandler( 
+      frFFTviewer::OnStreamChange ), NULL, \textcolor{keyword}{this} );
+00440     cmbFmt->Disconnect( wxEVT\_COMMAND\_CHOICE\_SELECTED, wxCommandEventHandler( 
+      frFFTviewer::OnFmtChange ), NULL, \textcolor{keyword}{this} );
+00441     chkEnTx->Disconnect( wxEVT\_COMMAND\_CHECKBOX\_CLICKED, wxCommandEventHandler( 
+      frFFTviewer::OnEnTx ), NULL, \textcolor{keyword}{this} );
+00442     btnStartStop->Disconnect( wxEVT\_COMMAND\_BUTTON\_CLICKED, wxCommandEventHandler( 
+      frFFTviewer::OnbtnStartStop ), NULL, \textcolor{keyword}{this} );
+00443     cmbWindowFunc->Disconnect( wxEVT\_COMMAND\_CHOICE\_SELECTED, wxCommandEventHandler( 
+      frFFTviewer::OnWindowFunctionChange ), NULL, \textcolor{keyword}{this} );
+00444     cmbChannelVisibility->Disconnect( wxEVT\_COMMAND\_CHOICE\_SELECTED, wxCommandEventHandler( 
+      frFFTviewer::OnChannelVisibilityChange ), NULL, \textcolor{keyword}{this} );
+00445     spinAvgCount->Disconnect( wxEVT\_COMMAND\_SPINCTRL\_UPDATED, wxSpinEventHandler( 
+      frFFTviewer::OnAvgChange ), NULL, \textcolor{keyword}{this} );
+00446     spinAvgCount->Disconnect( wxEVT\_COMMAND\_TEXT\_ENTER, wxCommandEventHandler( 
+      frFFTviewer::OnAvgChangeEnter ), NULL, \textcolor{keyword}{this} );
+00447     chkEnPwr->Disconnect( wxEVT\_COMMAND\_CHECKBOX\_CLICKED, wxCommandEventHandler( 
+      frFFTviewer::OnEnPwr ), NULL, \textcolor{keyword}{this} );
+00448     
+00449 \}
+\end{DoxyCode}

@@ -1,0 +1,118 @@
+\subsection{basic\+R\+X.\+cpp}
+\label{basicRX_8cpp_source}\index{/home/erik/prefix/default/src/limesuite-\/dev/src/examples/basic\+R\+X.\+cpp@{/home/erik/prefix/default/src/limesuite-\/dev/src/examples/basic\+R\+X.\+cpp}}
+
+\begin{DoxyCode}
+00001 
+00006 \textcolor{preprocessor}{#include "lime/LimeSuite.h"}
+00007 \textcolor{preprocessor}{#include <iostream>}
+00008 \textcolor{preprocessor}{#include <chrono>}
+00009 \textcolor{preprocessor}{#ifdef USE\_GNU\_PLOT}
+00010 \textcolor{preprocessor}{#include "gnuPlotPipe.h"}
+00011 \textcolor{preprocessor}{#endif}
+00012 
+00013 \textcolor{keyword}{using namespace }std;
+00014 
+00015 \textcolor{comment}{//Device structure, should be initialize to NULL}
+00016 lms_device_t* device = NULL;
+00017 
+00018 \textcolor{keywordtype}{int} error()
+00019 \{
+00020     \textcolor{keywordflow}{if} (device != NULL)
+00021         LMS_Close(device);
+00022     exit(-1);
+00023 \}
+00024 
+00025 \textcolor{keywordtype}{int} main(\textcolor{keywordtype}{int} argc, \textcolor{keywordtype}{char}** argv)
+00026 \{
+00027     \textcolor{comment}{//Find devices}
+00028     \textcolor{keywordtype}{int} n;
+00029     lms_info_str_t list[8]; \textcolor{comment}{//should be large enough to hold all detected devices}
+00030     \textcolor{keywordflow}{if} ((n = LMS_GetDeviceList(list)) < 0) \textcolor{comment}{//NULL can be passed to only get number of devices}
+00031         error();
+00032 
+00033     cout << \textcolor{stringliteral}{"Devices found: "} << n << endl; \textcolor{comment}{//print number of devices}
+00034     \textcolor{keywordflow}{if} (n < 1)
+00035         \textcolor{keywordflow}{return} -1;
+00036 
+00037     \textcolor{comment}{//open the first device}
+00038     \textcolor{keywordflow}{if} (LMS_Open(&device, list[0], NULL))
+00039         error();
+00040 
+00041     \textcolor{comment}{//Initialize device with default configuration}
+00042     \textcolor{comment}{//Do not use if you want to keep existing configuration}
+00043     \textcolor{comment}{//Use LMS\_LoadConfig(device, "/path/to/file.ini") to load config from INI}
+00044     \textcolor{keywordflow}{if} (LMS_Init(device) != 0)
+00045         error();
+00046 
+00047     \textcolor{comment}{//Enable RX channel}
+00048     \textcolor{comment}{//Channels are numbered starting at 0}
+00049     \textcolor{keywordflow}{if} (LMS_EnableChannel(device, LMS_CH_RX, 0, \textcolor{keyword}{true}) != 0)
+00050         error();
+00051 
+00052     \textcolor{comment}{//Set center frequency to 800 MHz}
+00053     \textcolor{keywordflow}{if} (LMS_SetLOFrequency(device, LMS_CH_RX, 0, 800e6) != 0)
+00054         error();
+00055 
+00056     \textcolor{comment}{//Set sample rate to 8 MHz, ask to use 2x oversampling in RF}
+00057     \textcolor{comment}{//This set sampling rate for all channels}
+00058     \textcolor{keywordflow}{if} (LMS_SetSampleRate(device, 8e6, 2) != 0)
+00059         error();
+00060 
+00061     \textcolor{comment}{//Enable test signal generation}
+00062     \textcolor{comment}{//To receive data from RF, remove this line or change signal to LMS\_TESTSIG\_NONE}
+00063     \textcolor{keywordflow}{if} (LMS_SetTestSignal(device, LMS_CH_RX, 0, LMS_TESTSIG_NCODIV8, 0, 0) != 0)
+00064         error();
+00065 
+00066     \textcolor{comment}{//Streaming Setup}
+00067 
+00068     \textcolor{comment}{//Initialize stream}
+00069     lms_stream_t streamId; \textcolor{comment}{//stream structure}
+00070     streamId.channel = 0; \textcolor{comment}{//channel number}
+00071     streamId.fifoSize = 1024 * 1024; \textcolor{comment}{//fifo size in samples}
+00072     streamId.throughputVsLatency = 1.0; \textcolor{comment}{//optimize for max throughput}
+00073     streamId.isTx = \textcolor{keyword}{false}; \textcolor{comment}{//RX channel}
+00074     streamId.dataFmt = lms_stream_t::LMS_FMT_I12; \textcolor{comment}{//12-bit integers}
+00075     \textcolor{keywordflow}{if} (LMS_SetupStream(device, &streamId) != 0)
+00076         error();
+00077 
+00078     \textcolor{comment}{//Initialize data buffers}
+00079     \textcolor{keyword}{const} \textcolor{keywordtype}{int} sampleCnt = 5000; \textcolor{comment}{//complex samples per buffer}
+00080     int16\_t buffer[sampleCnt * 2]; \textcolor{comment}{//buffer to hold complex values (2*samples))}
+00081 
+00082     \textcolor{comment}{//Start streaming}
+00083     LMS_StartStream(&streamId);
+00084 
+00085     \textcolor{comment}{//Streaming}
+00086 \textcolor{preprocessor}{#ifdef USE\_GNU\_PLOT}
+00087     GNUPlotPipe gp;
+00088     gp.write(\textcolor{stringliteral}{"set size square\(\backslash\)n set xrange[-2050:2050]\(\backslash\)n set yrange[-2050:2050]\(\backslash\)n"});
+00089 \textcolor{preprocessor}{#endif}
+00090     \textcolor{keyword}{auto} t1 = chrono::high\_resolution\_clock::now();
+00091     \textcolor{keywordflow}{while} (chrono::high\_resolution\_clock::now() - t1 < chrono::seconds(5)) \textcolor{comment}{//run for 5 seconds}
+00092     \{
+00093         \textcolor{comment}{//Receive samples}
+00094         \textcolor{keywordtype}{int} samplesRead = LMS_RecvStream(&streamId, buffer, sampleCnt, NULL, 1000);
+00095     \textcolor{comment}{//I and Q samples are interleaved in buffer: IQIQIQ...}
+00096         printf(\textcolor{stringliteral}{"Received %d samples\(\backslash\)n"}, samplesRead);
+00097     \textcolor{comment}{/*}
+00098 \textcolor{comment}{        INSERT CODE FOR PROCESSING RECEIVED SAMPLES}
+00099 \textcolor{comment}{    */}
+00100 \textcolor{preprocessor}{#ifdef USE\_GNU\_PLOT}
+00101         \textcolor{comment}{//Plot samples}
+00102         gp.write(\textcolor{stringliteral}{"plot '-' with points\(\backslash\)n"});
+00103         \textcolor{keywordflow}{for} (\textcolor{keywordtype}{int} j = 0; j < samplesRead; ++j)
+00104             gp.writef(\textcolor{stringliteral}{"%i %i\(\backslash\)n"}, buffer[2 * j], buffer[2 * j + 1]);
+00105         gp.write(\textcolor{stringliteral}{"e\(\backslash\)n"});
+00106         gp.flush();
+00107 \textcolor{preprocessor}{#endif}
+00108     \}
+00109     \textcolor{comment}{//Stop streaming}
+00110     LMS_StopStream(&streamId); \textcolor{comment}{//stream is stopped but can be started again with LMS\_StartStream()}
+00111     LMS_DestroyStream(device, &streamId); \textcolor{comment}{//stream is deallocated and can no longer be used}
+00112 
+00113     \textcolor{comment}{//Close device}
+00114     LMS_Close(device);
+00115 
+00116     \textcolor{keywordflow}{return} 0;
+00117 \}
+\end{DoxyCode}

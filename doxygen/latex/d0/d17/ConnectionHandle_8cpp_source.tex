@@ -1,0 +1,115 @@
+\subsection{Connection\+Handle.\+cpp}
+\label{ConnectionHandle_8cpp_source}\index{/home/erik/prefix/default/src/limesuite-\/dev/src/\+Connection\+Registry/\+Connection\+Handle.\+cpp@{/home/erik/prefix/default/src/limesuite-\/dev/src/\+Connection\+Registry/\+Connection\+Handle.\+cpp}}
+
+\begin{DoxyCode}
+00001 
+00007 \textcolor{preprocessor}{#include "ConnectionHandle.h"}
+00008 \textcolor{preprocessor}{#include <cctype>}
+00009 \textcolor{preprocessor}{#include <string>}
+00010 \textcolor{preprocessor}{#include <map>}
+00011 \textcolor{preprocessor}{#include <iso646.h>} \textcolor{comment}{// alternative operators for visual c++: not, and, or...}
+00012 \textcolor{keyword}{using namespace }lime;
+00013 
+00014 \textcolor{comment}{/*******************************************************************}
+00015 \textcolor{comment}{ * String parsing helpers}
+00016 \textcolor{comment}{ ******************************************************************/}
+00017 \textcolor{keyword}{static} std::string trim(\textcolor{keyword}{const} std::string &s)
+00018 \{
+00019     std::string out = s;
+00020     \textcolor{keywordflow}{while} (not out.empty() and std::isspace(out[0])) out = out.substr(1);
+00021     \textcolor{keywordflow}{while} (not out.empty() and std::isspace(out[out.size()-1])) out = out.substr(0, out.size()-1);
+00022     \textcolor{keywordflow}{return} out;
+00023 \}
+00024 
+00025 \textcolor{keyword}{static} std::map<std::string, std::string> argsToMap(\textcolor{keyword}{const} std::string &args)
+00026 \{
+00027     std::map<std::string, std::string> kwmap;
+00028 
+00029     \textcolor{keywordtype}{bool} inKey = \textcolor{keyword}{true};
+00030     std::string key, val;
+00031     \textcolor{keywordflow}{for} (\textcolor{keywordtype}{size\_t} i = 0; i < args.size(); i++)
+00032     \{
+00033         \textcolor{keyword}{const} \textcolor{keywordtype}{char} ch = args[i];
+00034         \textcolor{keywordflow}{if} (inKey)
+00035         \{
+00036             \textcolor{keywordflow}{if} (ch == \textcolor{charliteral}{'='}) inKey = \textcolor{keyword}{false};
+00037             \textcolor{keywordflow}{else} \textcolor{keywordflow}{if} (ch == \textcolor{charliteral}{','}) inKey = \textcolor{keyword}{true};
+00038             \textcolor{keywordflow}{else} key += ch;
+00039         \}
+00040         \textcolor{keywordflow}{else}
+00041         \{
+00042             \textcolor{keywordflow}{if} (ch == \textcolor{charliteral}{','}) inKey = \textcolor{keyword}{true};
+00043             \textcolor{keywordflow}{else} val += ch;
+00044         \}
+00045         \textcolor{keywordflow}{if} ((inKey and not val.empty()) or ((i+1) == args.size()))
+00046         \{
+00047             key = trim(key);
+00048             val = trim(val);
+00049             \textcolor{keywordflow}{if} (not key.empty()) kwmap[key] = val;
+00050             key = \textcolor{stringliteral}{""};
+00051             val = \textcolor{stringliteral}{""};
+00052         \}
+00053     \}
+00054 
+00055     \textcolor{keywordflow}{return} kwmap;
+00056 \}
+00057 
+00058 \textcolor{comment}{/*******************************************************************}
+00059 \textcolor{comment}{ * Connection handle implementation}
+00060 \textcolor{comment}{ ******************************************************************/}
+00061 ConnectionHandle::ConnectionHandle(\textcolor{keywordtype}{void}):
+00062     index(-1)
+00063 \{
+00064     \textcolor{keywordflow}{return};
+00065 \}
+00066 
+00067 ConnectionHandle::ConnectionHandle(\textcolor{keyword}{const} std::string &args):
+00068     index(-1)
+00069 \{
+00070     \textcolor{keyword}{auto} kwmap = argsToMap(\textcolor{stringliteral}{"name="}+args); \textcolor{comment}{//append name= since it was stripped in serialize}
+00071     \textcolor{keywordflow}{if} (kwmap.count(\textcolor{stringliteral}{"module"}) != 0) module = kwmap.at(\textcolor{stringliteral}{"module"});
+00072     \textcolor{keywordflow}{if} (kwmap.count(\textcolor{stringliteral}{"media"}) != 0) media = kwmap.at(\textcolor{stringliteral}{"media"});
+00073     \textcolor{keywordflow}{if} (kwmap.count(\textcolor{stringliteral}{"name"}) != 0) name = kwmap.at(\textcolor{stringliteral}{"name"});
+00074     \textcolor{keywordflow}{if} (kwmap.count(\textcolor{stringliteral}{"addr"}) != 0) addr = kwmap.at(\textcolor{stringliteral}{"addr"});
+00075     \textcolor{keywordflow}{if} (kwmap.count(\textcolor{stringliteral}{"serial"}) != 0) serial = kwmap.at(\textcolor{stringliteral}{"serial"});
+00076     \textcolor{keywordflow}{if} (kwmap.count(\textcolor{stringliteral}{"index"}) != 0) index = std::stoi(kwmap.at(\textcolor{stringliteral}{"index"}));
+00077 \}
+00078 
+00079 std::string ConnectionHandle::serialize(\textcolor{keywordtype}{void})\textcolor{keyword}{ const}
+00080 \textcolor{keyword}{}\{
+00081     std::string out;
+00082     \textcolor{keywordflow}{if} (not name.empty()) out += name;
+00083     \textcolor{keywordflow}{if} (not media.empty()) out += \textcolor{stringliteral}{", media="}+media;
+00084     \textcolor{keywordflow}{if} (not module.empty()) out += \textcolor{stringliteral}{", module="}+module;
+00085     \textcolor{keywordflow}{if} (not addr.empty()) out += \textcolor{stringliteral}{", addr="}+addr;
+00086     \textcolor{keywordflow}{if} (not serial.empty()) out += \textcolor{stringliteral}{", serial="}+serial;
+00087     \textcolor{keywordflow}{if} (index != -1) out += \textcolor{stringliteral}{", index="}+std::to\_string(index);
+00088 
+00089     \textcolor{keywordflow}{return} out;
+00090 \}
+00091 
+00092 std::string ConnectionHandle::ToString(\textcolor{keywordtype}{void})\textcolor{keyword}{ const}
+00093 \textcolor{keyword}{}\{
+00094     \textcolor{comment}{//name and media format}
+00095     std::string out(name);
+00096     \textcolor{keywordflow}{if} (not media.empty()) out += \textcolor{stringliteral}{" ["} + media + \textcolor{stringliteral}{"]"};
+00097 
+00098     \textcolor{comment}{//remove leading zeros for a displayable serial}
+00099     std::string trimmedSerial(serial);
+00100     \textcolor{keywordflow}{while} (not trimmedSerial.empty() and trimmedSerial.at(0) == \textcolor{charliteral}{'0'})
+00101     \{
+00102         trimmedSerial = trimmedSerial.substr(1);
+00103     \}
+00104     \textcolor{keywordflow}{if} (not trimmedSerial.empty()) out += \textcolor{stringliteral}{" "} + trimmedSerial;
+00105 
+00106     \textcolor{comment}{//backup condition if we are empty somehow}
+00107     \textcolor{keywordflow}{if} (out.empty()) out = this->serialize();
+00108 
+00109     \textcolor{keywordflow}{return} out;
+00110 \}
+00111 
+00112 \textcolor{keywordtype}{bool} operator==(\textcolor{keyword}{const} ConnectionHandle &lhs, \textcolor{keyword}{const} ConnectionHandle &rhs)
+00113 \{
+00114     \textcolor{keywordflow}{return} lhs.serialize() == rhs.serialize();
+00115 \}
+\end{DoxyCode}

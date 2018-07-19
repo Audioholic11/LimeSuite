@@ -1,0 +1,708 @@
+\subsection{lms7002m\+\_\+filters.\+c}
+\label{lms7002m__filters_8c_source}\index{/home/erik/prefix/default/src/limesuite-\/dev/mcu\+\_\+program/common\+\_\+src/lms7002m\+\_\+filters.\+c@{/home/erik/prefix/default/src/limesuite-\/dev/mcu\+\_\+program/common\+\_\+src/lms7002m\+\_\+filters.\+c}}
+
+\begin{DoxyCode}
+00001 \textcolor{preprocessor}{#include "lms7002m_controls.h"}
+00002 \textcolor{preprocessor}{#include "lms7002m_calibrations.h"}
+00003 \textcolor{preprocessor}{#include "lms7002m_filters.h"}
+00004 \textcolor{preprocessor}{#include "LMS7002M_parameters_compact.h"}
+00005 \textcolor{preprocessor}{#include "spi.h"}
+00006 \textcolor{preprocessor}{#include <math.h>}
+00007 \textcolor{preprocessor}{#include "mcu_defines.h"}
+00008 
+00009 \textcolor{keyword}{enum}
+00010 \{
+00011     SEARCH_SUCCESS = 0,
+00012     SEARCH_NEED_TO_DECREASE,
+00013     SEARCH_NEED_TO_INCREASE
+00014 \};
+00015 
+00016 \textcolor{comment}{//rx lpf range limits}
+00017 \textcolor{keyword}{static} ROM \textcolor{keyword}{const} float_type RxLPF_RF_LimitLow = 1.4e6;
+00018 \textcolor{keyword}{static} ROM \textcolor{keyword}{const} float_type RxLPF_RF_LimitHigh = 130e6;
+00019 
+00020 \textcolor{comment}{//tx lpf range limits}
+00021 \textcolor{keyword}{static} ROM \textcolor{keyword}{const} float_type TxLPF_RF_LimitLow = 5e6;
+00022 \textcolor{keyword}{static} ROM \textcolor{keyword}{const} float_type TxLPF_RF_LimitLowMid = 40e6;
+00023 \textcolor{keyword}{static} ROM \textcolor{keyword}{const} float_type TxLPF_RF_LimitMidHigh = 50e6;
+00024 \textcolor{keyword}{static} ROM \textcolor{keyword}{const} float_type TxLPF_RF_LimitHigh = 130e6;
+00025 
+00026 \textcolor{keyword}{static} uint8\_t ConfigCGEN_ForLPF_IF(\textcolor{keywordtype}{float} IF\_Hz)
+00027 \{
+00028     uint8\_t cgenMultiplier = clamp(IF\_Hz*20 / 46.08e6 + 0.5, 2, 13);
+00029     \textcolor{keywordflow}{return} SetFrequencyCGEN(46.08e6 * cgenMultiplier + 10e6);
+00030 \}
+00031 
+00032 \textcolor{keyword}{static} uint8\_t RxFilterSearch(\textcolor{keyword}{const} uint16\_t addr, \textcolor{keyword}{const} uint8\_t msblsb, \textcolor{keyword}{const} uint16\_t rssi\_3dB, \textcolor{keyword}{const} 
+      uint16\_t stepLimit)
+00033 \{
+00034     \textcolor{keyword}{const} \textcolor{keywordtype}{bool} doDecrement = GetRSSI() < rssi\_3dB;
+00035     int16\_t value = Get_SPI_Reg_bits(addr, msblsb);
+00036     \textcolor{keyword}{const} uint16\_t maxValue = pow2((msblsb>>4)-(msblsb&0xF)+1)-1;
+00037     uint16\_t stepSize = 1;
+00038     \textcolor{keywordflow}{while}(1)
+00039     \{
+00040         stepSize <<= 1;
+00041         \textcolor{keywordflow}{if}(doDecrement)
+00042             value -= stepSize;
+00043         \textcolor{keywordflow}{else}
+00044             value += stepSize;
+00045         value = clamp(value, 0, maxValue);
+00046         Modify_SPI_Reg_bits(addr, msblsb, value);
+00047         \textcolor{keywordflow}{if}(doDecrement != (GetRSSI() < rssi\_3dB))
+00048             \textcolor{keywordflow}{break};
+00049         \textcolor{keywordflow}{if}(stepSize >= stepLimit)
+00050             \textcolor{keywordflow}{return} doDecrement ? SEARCH_NEED_TO_INCREASE : 
+      SEARCH_NEED_TO_DECREASE;
+00051     \}
+00052     \textcolor{keywordflow}{while}(stepSize > 1)
+00053     \{
+00054         stepSize /= 2;
+00055         \textcolor{keywordflow}{if}(GetRSSI() >= rssi\_3dB)
+00056             value += stepSize;
+00057         \textcolor{keywordflow}{else}
+00058             value -= stepSize;
+00059         value = clamp(value, 0, maxValue);
+00060         Modify_SPI_Reg_bits(addr, msblsb, value);
+00061     \}
+00062     \textcolor{keywordflow}{return} 0;
+00063 \}
+00064 
+00065 uint8\_t TuneRxFilterSetup(\textcolor{keyword}{const} float_type rx\_lpf\_IF)
+00066 \{
+00067     uint8\_t status;
+00068     \textcolor{keyword}{const} uint16\_t ch = SPI_read(0x0020);
+00069     uint8\_t g\_tia\_rfe = Get_SPI_Reg_bits(G_TIA_RFE);
+00070     uint8\_t g\_pga\_rbb = Get_SPI_Reg_bits(G_PGA_RBB);
+00071 
+00072     \textcolor{keywordflow}{if}(RxLPF_RF_LimitLow/2 > rx\_lpf\_IF || rx\_lpf\_IF > RxLPF_RF_LimitHigh/2)
+00073         \textcolor{keywordflow}{return} MCU_RX_LPF_OUT_OF_RANGE;
+00074 \textcolor{preprocessor}{#define BATCH\_RX\_SETUP 1}
+00075 \textcolor{preprocessor}{#if BATCH\_RX\_SETUP}
+00076     \{
+00077         ROM \textcolor{keyword}{const} uint16\_t RxFilterSetupAddr[] = \{0x0085,0x010D,0x0113,0x0114, 0x0084, 0x008B\};
+00078         ROM \textcolor{keyword}{const} uint16\_t RxFilterSetupData[] = \{0x0001,0x0100,0x0004,0x0010, 0x0400, 0x2100\};
+00079         ROM \textcolor{keyword}{const} uint16\_t RxFilterSetupMask[] = \{0x0007,0x0188,0x003C,0x001F, 0xF83F, 0xC1FF\};
+00080         ROM \textcolor{keyword}{const} uint16\_t RxFilterSetupWrOnlyAddr[] = \{0x0082,0x0086,0x0087,0x0088,0x0089,0x008A,0x008C,
+      0x0100,0x0101,0x0102,0x0103,0x0104,0x0105,0x0106,0x0107,0x0108,0x0109,0x010A,0x010C,0x0115,0x0116,0x0117,
+      0x0118,0x0119,0x011A,0x0200,0x0201,0x0202,0x0203,0x0204,0x0205,0x0206,0x0207,0x0208,0x0209,0x0240,0x0400,0x0401,
+      0x0402,0x0403,0x0404,0x0405,0x0406,0x0407,0x0408,0x0409,0x040A,0x040C,0x0440, 0x0081\};
+00081         ROM \textcolor{keyword}{const} uint16\_t RxFilterSetupWrOnlyData[] = \{0x8003,0x4901,0x0400,0x0780,0x0020,0x0514,0x067B,
+      0x3409,0x6001,0x3180,0x0612,0x0088,0x0007,0x318C,0x318C,0x0426,0x61C1,0x104C,0x88C5,0x0009,0x8180,0x280C,
+      0x018C,0x528B,0x2E02,0x008D,0x07FF,0x07FF,0x0000,0x0000,0x0000,0x0000,0x0000,0x2070,0x0000,0x0020,0x0081,0x07FF,
+      0x07FF,0x4000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x1001,0x2038,0x0020\};
+00082         ROM \textcolor{keyword}{const} RegisterBatch batch = \{
+00083             RxFilterSetupAddr, RxFilterSetupData, RxFilterSetupMask, \textcolor{keyword}{sizeof}(RxFilterSetupAddr)/\textcolor{keyword}{sizeof}(
+      uint16\_t),
+00084             RxFilterSetupWrOnlyAddr, RxFilterSetupWrOnlyData, \textcolor{keyword}{sizeof}(RxFilterSetupWrOnlyAddr)/\textcolor{keyword}{sizeof}(
+      uint16\_t), \textcolor{keyword}{sizeof}(RxFilterSetupWrOnlyData)/\textcolor{keyword}{sizeof}(uint16\_t)\};
+00085         WriteMaskedRegs(&batch);
+00086     \}
+00087 \textcolor{preprocessor}{#else}
+00088     \textcolor{keyword}{const} uint8\_t ict\_vco = Get_SPI_Reg_bits(ICT_VCO_CGEN);
+00089     BeginBatch(\textcolor{stringliteral}{"RxFilterSetup"});
+00090 
+00091     SetDefaults(SECTION_RFE);
+00092     Modify_SPI_Reg_bits(SEL_PATH_RFE, 2);
+00093     Modify_SPI_Reg_bits(G_RXLOOPB_RFE, 1);
+00094     Modify_SPI_Reg_bits(PD_RLOOPB_2_RFE, 0);
+00095     Modify_SPI_Reg_bits(EN_INSHSW_LB2_RFE, 0);
+00096     Modify_SPI_Reg_bits(PD_MXLOBUF_RFE, 0);
+00097     Modify_SPI_Reg_bits(PD_QGEN_RFE, 0);
+00098     Modify_SPI_Reg_bits(RFB_TIA_RFE, 16);
+00099 
+00100     \textcolor{comment}{//RBB}
+00101     SetDefaults(SECTION_RBB);
+00102     Modify_SPI_Reg_bits(ICT_PGA_OUT_RBB, 20);
+00103     Modify_SPI_Reg_bits(ICT_PGA_IN_RBB, 20);
+00104 
+00105     \textcolor{comment}{//TRF}
+00106     SetDefaults(SECTION_TRF);
+00107     Modify_SPI_Reg_bits(L_LOOPB_TXPAD_TRF, 0);
+00108     Modify_SPI_Reg_bits(EN_LOOPB_TXPAD_TRF, 1);
+00109     Modify_SPI_Reg_bits(SEL_BAND1_TRF, 0);
+00110     Modify_SPI_Reg_bits(SEL_BAND2_TRF, 1);
+00111 
+00112     \textcolor{comment}{//TBB}
+00113     SetDefaults(SECTION_TBB);
+00114     Modify_SPI_Reg_bits(CG_IAMP_TBB, 1);
+00115     Modify_SPI_Reg_bits(ICT_IAMP_FRP_TBB, 1);
+00116     Modify_SPI_Reg_bits(ICT_IAMP_GG_FRP_TBB, 6);
+00117 
+00118     \textcolor{comment}{//AFE}
+00119     SetDefaults(SECTION_AFE);
+00120     Modify_SPI_Reg_bits(PD_RX_AFE2, 0);
+00121 
+00122     \textcolor{comment}{//LDO}
+00123     \textcolor{comment}{//do nothing}
+00124     \textcolor{comment}{//XBUF}
+00125     Modify_SPI_Reg_bits(PD_XBUF_RX, 0);
+00126     Modify_SPI_Reg_bits(PD_XBUF_TX, 0);
+00127     Modify_SPI_Reg_bits(EN_G_XBUF, 1);
+00128 
+00129     \textcolor{comment}{//TxTSP}
+00130     SetDefaults(SECTION_TxTSP);
+00131     SetDefaults(SECTION_TxNCO);
+00132     Modify_SPI_Reg_bits(TSGMODE_TXTSP, 1);
+00133     Modify_SPI_Reg_bits(INSEL_TXTSP, 1);
+00134     Modify_SPI_Reg_bits(CMIX_SC_TXTSP, 1);
+00135     Modify_SPI_Reg_bits(GFIR3_BYP_TXTSP, 1);
+00136     Modify_SPI_Reg_bits(GFIR2_BYP_TXTSP, 1);
+00137     Modify_SPI_Reg_bits(GFIR1_BYP_TXTSP, 1);
+00138 
+00139     \textcolor{comment}{//RxTSP}
+00140     SetDefaults(SECTION_RxTSP);
+00141     SetDefaults(SECTION_RxNCO);
+00142     Modify_SPI_Reg_bits(AGC_MODE_RXTSP, 1);
+00143     Modify_SPI_Reg_bits(CMIX_BYP_RXTSP, 0);
+00144     Modify_SPI_Reg_bits(GFIR3_BYP_RXTSP, 1);
+00145     Modify_SPI_Reg_bits(GFIR2_BYP_RXTSP, 1);
+00146     Modify_SPI_Reg_bits(GFIR1_BYP_RXTSP, 1);
+00147     Modify_SPI_Reg_bits(AGC_AVG_RXTSP, 1);
+00148     Modify_SPI_Reg_bits(HBD_OVR_RXTSP, 4);
+00149     Modify_SPI_Reg_bits(CMIX_GAIN_RXTSP, 0);
+00150     Modify_SPI_Reg_bits(CMIX_SC_RXTSP, 1);
+00151 
+00152     \textcolor{comment}{//CGEN}
+00153     SetDefaults(SECTION_CGEN);
+00154     Modify_SPI_Reg_bits(ICT_VCO_CGEN, ict\_vco);
+00155     EndBatch();
+00156 
+00157     \textcolor{comment}{//BIAS}
+00158 \textcolor{comment}{/*}
+00159 \textcolor{comment}{    \{}
+00160 \textcolor{comment}{        const uint8\_t rp\_calib\_bias = Get\_SPI\_Reg\_bits(RP\_CALIB\_BIAS);}
+00161 \textcolor{comment}{        SetDefaults(SECTION\_BIAS);}
+00162 \textcolor{comment}{        Modify\_SPI\_Reg\_bits(RP\_CALIB\_BIAS, rp\_calib\_bias);}
+00163 \textcolor{comment}{    \}}
+00164 \textcolor{comment}{*/}
+00165 \textcolor{preprocessor}{#endif}
+00166     Modify_SPI_Reg_bits(G_TIA_RFE, g\_tia\_rfe);
+00167     \textcolor{keywordflow}{if}(g\_pga\_rbb == 31)
+00168         Modify_SPI_Reg_bits(G_PGA_RBB, 22);
+00169     \textcolor{keywordflow}{else}
+00170         Modify_SPI_Reg_bits(G_PGA_RBB, g\_pga\_rbb);
+00171 
+00172     status = ConfigCGEN_ForLPF_IF(rx\_lpf\_IF);
+00173     \textcolor{keywordflow}{if}(status != MCU_NO_ERROR)
+00174         \textcolor{keywordflow}{return} status;
+00175 
+00176     \textcolor{comment}{//SXR}
+00177     Modify_SPI_Reg_bits(MAC, 1);
+00178     SetDefaultsSX();
+00179     status = SetFrequencySX(LMS7002M_Rx, 539.9e6);
+00180     \textcolor{keywordflow}{if}(status != MCU_NO_ERROR)
+00181         \textcolor{keywordflow}{return} status;
+00182 
+00183     \textcolor{comment}{//SXT}
+00184     Modify_SPI_Reg_bits(MAC, 2);
+00185     SetDefaultsSX();
+00186     status = SetFrequencySX(LMS7002M_Tx, 550e6);
+00187     \textcolor{keywordflow}{if}(status != MCU_NO_ERROR)
+00188         \textcolor{keywordflow}{return} status;
+00189     SPI_write(0x0020, ch);
+00190     \textcolor{comment}{//LimeLight & PAD}
+00191     \textcolor{comment}{//do nothing}
+00192 
+00193     LoadDC_REG_TX_IQ();
+00194     SetNCOFrequency(LMS7002M_Tx, 10e6, 0);
+00195     SetNCOFrequency(LMS7002M_Rx, 0, 0);
+00196 
+00197     \textcolor{keywordflow}{if}(rx\_lpf\_IF <= 54e6)
+00198     \{
+00199         SPI_write(0x0112, 1); \textcolor{comment}{//CFB\_TIA\_RFE=1, CCOMP\_TIA\_RFE=0}
+00200         Modify_SPI_Reg_bits(RCOMP_TIA_RFE, 15);
+00201     \}
+00202     \textcolor{keywordflow}{else}
+00203     \{
+00204         int16\_t cfb\_tia\_rfe;
+00205         int8\_t ccomp\_tia\_rfe;
+00206         \textcolor{keywordflow}{if}(g\_tia\_rfe > 1)
+00207         \{
+00208             cfb\_tia\_rfe = (int16\_t)( 1680e6/rx\_lpf\_IF - 10);
+00209             ccomp\_tia\_rfe = cfb\_tia\_rfe/100;
+00210         \}
+00211         \textcolor{keywordflow}{else} \textcolor{keywordflow}{if}(g\_tia\_rfe == 1)
+00212         \{
+00213             cfb\_tia\_rfe = (int16\_t)( 5400e6/rx\_lpf\_IF - 15);
+00214             ccomp\_tia\_rfe = cfb\_tia\_rfe/100 + 1;
+00215         \}
+00216         \textcolor{keywordflow}{else}
+00217             \textcolor{keywordflow}{return} MCU_RX_INVALID_TIA;
+00218         SPI_write(0x0112, (clamp(ccomp\_tia\_rfe, 0, 15)<<8) | clamp(cfb\_tia\_rfe, 0, 4095));
+00219 
+00220         Modify_SPI_Reg_bits(RCOMP_TIA_RFE, clamp(15-cfb\_tia\_rfe/100, 0, 15));
+00221     \}
+00222     \{
+00223         \textcolor{keyword}{const} int8\_t rcc\_ctl\_pga\_rbb = (430 * pow(0.65, g\_pga\_rbb/10) - 110.35)/20.45 + 16;
+00224         SPI_write(0x011A, rcc\_ctl\_pga\_rbb<<9 | GetValueOf_c_ctl_pga_rbb(g\_pga\_rbb));
+00225     \}
+00226 
+00227     \textcolor{keywordflow}{if}(rx\_lpf\_IF < 18e6)
+00228     \{
+00229         Modify_SPI_Reg_bits(0x0115, MSB_LSB(3, 2), 2); \textcolor{comment}{//PD\_LPFL\_RBB=0, PD\_LPFH\_RBB=1}
+00230         Modify_SPI_Reg_bits(INPUT_CTL_PGA_RBB, 0);
+00231         \{
+00232             \textcolor{keyword}{const} \textcolor{keywordtype}{float} freqIF = rx\_lpf\_IF*1.3;
+00233             int16\_t c\_ctl\_lpfl\_rbb = clamp(2160e6/freqIF - 103, 0, 2047);
+00234 
+00235             uint8\_t rcc\_ctl\_lpfl\_rbb = 5;
+00236             \textcolor{keywordflow}{if}(freqIF < 15e6)
+00237                 rcc\_ctl\_lpfl\_rbb = 4;
+00238             \textcolor{keywordflow}{if}(freqIF < 10e6)
+00239                 rcc\_ctl\_lpfl\_rbb = 3;
+00240             \textcolor{keywordflow}{if}(freqIF < 5e6)
+00241                 rcc\_ctl\_lpfl\_rbb = 2;
+00242             \textcolor{keywordflow}{if}(freqIF < 3e6)
+00243                 rcc\_ctl\_lpfl\_rbb = 1;
+00244             \textcolor{keywordflow}{if}(freqIF < 1.4e6)
+00245                 rcc\_ctl\_lpfl\_rbb = 0;
+00246             SPI_write(0x0117, rcc\_ctl\_lpfl\_rbb<<11 | c\_ctl\_lpfl\_rbb);
+00247         \}
+00248     \}
+00249     \textcolor{keywordflow}{else} \textcolor{keywordflow}{if}(rx\_lpf\_IF <= 54e6)
+00250     \{
+00251         Modify_SPI_Reg_bits(0x0115, MSB_LSB(3, 2), 1); \textcolor{comment}{//PD\_LPFL\_RBB=1, PD\_LPFH\_RBB=0}
+00252         Modify_SPI_Reg_bits(INPUT_CTL_PGA_RBB, 1);
+00253         \{
+00254             \textcolor{keyword}{const} \textcolor{keywordtype}{float} lpfIF\_adjusted = rx\_lpf\_IF*1.3;
+00255             uint8\_t c\_ctl\_lpfh\_rbb = clamp( 6000e6/lpfIF\_adjusted - 50, 0, 255);
+00256             uint8\_t rcc\_ctl\_lpfh\_rbb = clamp( lpfIF\_adjusted/10e6 - 3, 0, 7);
+00257             Modify_SPI_Reg_bits(0x0116, MSB_LSB(10, 0), (rcc\_ctl\_lpfh\_rbb<<8) | c\_ctl\_lpfh\_rbb);
+00258         \}
+00259     \}
+00260     \textcolor{keywordflow}{else} \textcolor{comment}{// rx\_lpf\_IF > 54e6}
+00261     \{
+00262         Modify_SPI_Reg_bits(0x0115, MSB_LSB(3, 2), 3); \textcolor{comment}{//PD\_LPFL\_RBB=1, PD\_LPFH\_RBB=1}
+00263         Modify_SPI_Reg_bits(INPUT_CTL_PGA_RBB, 2);
+00264     \}
+00265 
+00266     EnableMIMOBuffersIfNecessary();
+00267     EnableChannelPowerControls();
+00268     \textcolor{keywordflow}{return} MCU_NO_ERROR;
+00269 \}
+00270 
+00271 \textcolor{keyword}{typedef} \textcolor{keyword}{struct}
+00272 \{
+00273     uint16\_t addr;
+00274     uint8\_t msblsb;
+00275     int8\_t step;
+00276     uint8\_t limit;
+00277     uint8\_t rssiShouldIncrease;
+00278 \} ReachRSSIparams;
+00279 
+00280 \textcolor{keyword}{static} \textcolor{keywordtype}{bool} ChangeUntilReachRSSI(\textcolor{keyword}{const} ReachRSSIparams ROM* param, uint16\_t rssiTarget)
+00281 \{
+00282     uint16\_t rssi;
+00283     int8\_t gain = Get_SPI_Reg_bits(param->addr, param->msblsb);
+00284     \textcolor{keywordflow}{while}(((rssi = GetRSSI()) < rssiTarget) == param->rssiShouldIncrease)
+00285     \{
+00286         gain += param->step;
+00287         \textcolor{keywordflow}{if}(param->step > 0 && gain > param->limit)
+00288             \textcolor{keywordflow}{break};
+00289         \textcolor{keywordflow}{else} \textcolor{keywordflow}{if}(param->step < 0 && gain < param->limit)
+00290             \textcolor{keywordflow}{break};
+00291         Modify_SPI_Reg_bits(param->addr, param->msblsb, gain);
+00292     \}
+00293     \textcolor{keywordflow}{return} (rssi > rssiTarget) == param->rssiShouldIncrease;
+00294 \}
+00295 
+00296 uint8\_t TuneRxFilter(\textcolor{keyword}{const} float_type rx\_lpf\_freq\_RF)
+00297 \{
+00298     uint16\_t rssi\_3dB ;
+00299     uint8\_t status = 0;
+00300     \textcolor{comment}{//calculate intermediate frequency}
+00301     float_type rx\_lpf\_IF;
+00302     \textcolor{keywordflow}{if}(Get_SPI_Reg_bits(G_TIA_RFE) == 1 && rx\_lpf\_freq\_RF<4e6)
+00303         rx\_lpf\_IF = 2e6;
+00304     \textcolor{keywordflow}{else}
+00305         rx\_lpf\_IF = rx\_lpf\_freq\_RF/2;
+00306     SaveChipState(0);
+00307 
+00308     status = TuneRxFilterSetup(rx\_lpf\_IF);
+00309     \textcolor{keywordflow}{if}(status != MCU_NO_ERROR)
+00310         \textcolor{keywordflow}{goto} RxFilterSearchEndStage;
+00311     UpdateRSSIDelay();
+00312     \{
+00313     ROM \textcolor{keyword}{const} ReachRSSIparams paramTX = \{CG_IAMP_TBB, 2, 30, \textcolor{keyword}{true}\};
+00314     ROM \textcolor{keyword}{const} ReachRSSIparams paramRX = \{G_RXLOOPB_RFE, 2, 14, \textcolor{keyword}{true}\};
+00315     ChangeUntilReachRSSI(&paramRX, 0x2700);
+00316     ChangeUntilReachRSSI(&paramTX, 0x2700);
+00317     \}
+00318 
+00319     rssi\_3dB = GetRSSI() * 0.7071 * pow(10, (-0.0018 * rx\_lpf\_IF/1e6)/20);
+00320 
+00321     \textcolor{keywordflow}{if}(rx\_lpf\_IF <= 54e6)
+00322     \{
+00323         uint16\_t Caddr, Crange;
+00324         uint8\_t Cmsblsb;
+00325         int8\_t Rstep;
+00326 
+00327         status = SetFrequencySX(LMS7002M_Rx, 539.9e6-rx\_lpf\_IF*1.3);
+00328         \textcolor{keywordflow}{if}(status != MCU_NO_ERROR)
+00329             \textcolor{keywordflow}{goto} RxFilterSearchEndStage;
+00330         SetNCOFrequency(LMS7002M_Rx, rx\_lpf\_IF*1.3, 0);
+00331 
+00332         \textcolor{keywordflow}{if}(rx\_lpf\_IF < 18e6) \textcolor{comment}{//LPFL}
+00333         \{
+00334             Caddr = 0x0117; \textcolor{comment}{//C\_CTL\_LPFL\_RBB}
+00335             Cmsblsb = MSB_LSB(10, 0);
+00336             Rstep = 2;
+00337             Crange = 2048;
+00338         \}
+00339         \textcolor{keywordflow}{else} \textcolor{comment}{//LPFH}
+00340         \{
+00341             Caddr = 0x0116; \textcolor{comment}{//C\_CTL\_LPFH\_RBB}
+00342             Cmsblsb = MSB_LSB(7, 0);
+00343             Rstep = 1;
+00344             Crange = 256;
+00345         \}
+00346         \{ \textcolor{comment}{// Find RC}
+00347         uint8\_t searchStatus;
+00348         int8\_t r\_ctl\_lpf = Get_SPI_Reg_bits(R_CTL_LPF_RBB);
+00349         \textcolor{keywordflow}{while}((searchStatus = RxFilterSearch(Caddr, Cmsblsb, rssi\_3dB, Crange)) != 
+      SEARCH_SUCCESS)
+00350         \{
+00351             r\_ctl\_lpf += (searchStatus == SEARCH_NEED_TO_INCREASE) ? Rstep : -Rstep;
+00352             \textcolor{keywordflow}{if}(r\_ctl\_lpf < 0 || 31 < r\_ctl\_lpf)
+00353                 \textcolor{keywordflow}{break};
+00354             Modify_SPI_Reg_bits(R_CTL_LPF_RBB, r\_ctl\_lpf);
+00355         \}
+00356         \textcolor{keywordflow}{if}(searchStatus != SEARCH_SUCCESS)
+00357         \{
+00358             status = MCU_R_CTL_LPF_LIMIT_REACHED;
+00359             \textcolor{keywordflow}{goto} RxFilterSearchEndStage;
+00360         \}
+00361         \}
+00362 
+00363         status = SetFrequencySX(LMS7002M_Rx, 539.9e6-rx\_lpf\_IF);
+00364         \textcolor{keywordflow}{if}(status != MCU_NO_ERROR)
+00365             \textcolor{keywordflow}{goto} RxFilterSearchEndStage;
+00366         SetNCOFrequency(LMS7002M_Rx, rx\_lpf\_IF, 0); \textcolor{comment}{//0}
+00367 
+00368         \{
+00369             uint16\_t cfb\_tia\_rfe;
+00370             uint8\_t g\_tia\_rfe = Get_SPI_Reg_bits(G_TIA_RFE);
+00371             \textcolor{keywordflow}{if}(g\_tia\_rfe == 3 || g\_tia\_rfe == 2)
+00372                 cfb\_tia\_rfe = (int)( 1680e6 / (rx\_lpf\_IF * 0.72) - 10);
+00373             \textcolor{keywordflow}{else} \textcolor{keywordflow}{if}(g\_tia\_rfe == 1)
+00374                 cfb\_tia\_rfe = (int)( 5400e6 / (rx\_lpf\_IF * 0.72) - 15);
+00375             \textcolor{keywordflow}{else}
+00376             \{
+00377                 status = MCU_RX_INVALID_TIA;
+00378                 \textcolor{keywordflow}{goto} RxFilterSearchEndStage;
+00379             \}
+00380             cfb\_tia\_rfe = clamp(cfb\_tia\_rfe, 0, 4095);
+00381             Modify_SPI_Reg_bits(CFB_TIA_RFE, cfb\_tia\_rfe);
+00382 
+00383             \{
+00384                 uint8\_t ccomp\_tia\_rfe = cfb\_tia\_rfe / 100;
+00385                 \textcolor{keywordflow}{if}(g\_tia\_rfe == 1)
+00386                     ccomp\_tia\_rfe += 1;
+00387                 Modify_SPI_Reg_bits(CCOMP_TIA_RFE, clamp(ccomp\_tia\_rfe, 0, 15));
+00388             \}
+00389             Modify_SPI_Reg_bits(RCOMP_TIA_RFE, clamp(15 - cfb\_tia\_rfe/100, 0, 15));
+00390         \}
+00391     \}
+00392     \textcolor{keywordflow}{else} \textcolor{comment}{//if(rx\_lpf\_IF > 54e6)}
+00393     \{
+00394         status = SetFrequencySX(LMS7002M_Rx, 539.9e6 - rx\_lpf\_IF);
+00395         \textcolor{keywordflow}{if}(status != 0)
+00396             \textcolor{keywordflow}{goto} RxFilterSearchEndStage;
+00397         SetNCOFrequency(LMS7002M_Rx, rx\_lpf\_IF, 0); \textcolor{comment}{//0}
+00398     \}
+00399     \textcolor{comment}{//START TIA}
+00400     \textcolor{keywordflow}{if}(RxFilterSearch(CFB_TIA_RFE, rssi\_3dB, 4096) != SEARCH_SUCCESS)
+00401     \{
+00402         status = MCU_CFB_TIA_RFE_LIMIT_REACHED;
+00403         \textcolor{keywordflow}{goto} RxFilterSearchEndStage;
+00404     \}
+00405     \textcolor{comment}{//END TIA}
+00406 
+00407     \{
+00408     \textcolor{comment}{//Restore settings}
+00409     uint16\_t ccomp\_cfb\_tia\_rfe = SPI_read(0x0112);
+00410     uint16\_t rcc\_c\_ctl\_lpfl\_rbb = SPI_read(0x0117);
+00411     uint16\_t rcc\_c\_ctl\_pga\_rbb = SPI_read(0x011A);
+00412     uint16\_t rcc\_c\_ctl\_lpfh\_rbb = SPI_read(0x0116) & 0x07FF;
+00413     uint8\_t pd\_lpfhl = Get_SPI_Reg_bits(0x0115, MSB_LSB(3, 2));
+00414     uint8\_t input\_ctl\_pga\_rbb = Get_SPI_Reg_bits(INPUT_CTL_PGA_RBB);
+00415     uint8\_t rcomp\_tia\_rfe = Get_SPI_Reg_bits(RCOMP_TIA_RFE);
+00416 RxFilterSearchEndStage:
+00417     SaveChipState(1);
+00418     \textcolor{keywordflow}{if}(status != MCU_NO_ERROR)
+00419         \textcolor{keywordflow}{return} status;
+00420     SPI_write(0x0112, ccomp\_cfb\_tia\_rfe);
+00421     SPI_write(0x0117, rcc\_c\_ctl\_lpfl\_rbb);
+00422     SPI_write(0x011A, rcc\_c\_ctl\_pga\_rbb);
+00423     SPI_write(0x0116, (16 << 11) | rcc\_c\_ctl\_lpfh\_rbb);
+00424     SPI_write(0x0118, input\_ctl\_pga\_rbb << 13 | 0x018C);
+00425     SPI_write(0x0114, rcomp\_tia\_rfe << 5 | 16);
+00426     Modify_SPI_Reg_bits(0x0119, MSB_LSB(14, 5), (20 << 5) | 20);
+00427     Modify_SPI_Reg_bits(0x0115, MSB_LSB(3, 2), pd\_lpfhl);
+00428     \}
+00429     \textcolor{keywordflow}{return} MCU_NO_ERROR;
+00430 \}
+00431 
+00432 \textcolor{keyword}{static} \textcolor{keywordtype}{void} SetTxLPF_PDs(\textcolor{keywordtype}{float} lpf\_IF)
+00433 \{
+00434     uint16\_t filterPDs = SPI_read(0x0105) & ~0x0016;
+00435     \textcolor{keywordflow}{if}(lpf\_IF <= TxLPF_RF_LimitLowMid/2)
+00436     \{
+00437         filterPDs |= 0x10;
+00438         Modify_SPI_Reg_bits(R5_LPF_BYP_TBB, 1);
+00439     \}
+00440     \textcolor{keywordflow}{else}
+00441         filterPDs |= 0x06;
+00442     SPI_write(0x0105, filterPDs);
+00443 \}
+00444 
+00445 uint8\_t TuneTxFilterSetup(\textcolor{keyword}{const} float_type tx\_lpf\_IF)
+00446 \{
+00447     uint8\_t status;
+00448     \textcolor{keyword}{const} uint16\_t reg0020 = SPI_read(0x0020);
+00449 
+00450 \textcolor{preprocessor}{#define BATCH\_TX\_SETUP 1}
+00451 \textcolor{preprocessor}{#if BATCH\_TX\_SETUP}
+00452     \{
+00453         ROM \textcolor{keyword}{const} uint16\_t TxFilterSetupAddr[] = \{0x0082,0x0085,0x0100,0x010C,0x010D, 0x0084, 0x008B\};
+00454         ROM \textcolor{keyword}{const} uint16\_t TxFilterSetupData[] = \{0x8001,0x0001,0x0000,0x0000,0x001E, 0x0400, 0x2100\};
+00455         ROM \textcolor{keyword}{const} uint16\_t TxFilterSetupMask[] = \{0x1FFF,0x0007,0x0001,0x0001,0x001E, 0xF83F, 0xC1FF\};
+00456         ROM \textcolor{keyword}{const} uint16\_t TxFilterSetupWrOnlyAddr[] = \{0x0086,0x0087,0x0088,0x0089,0x008A,0x008C,0x0105,
+      0x0106,0x0107,0x0108,0x0109,0x010A,0x0115,0x0116,0x0117,0x0118,0x0119,0x011A,0x0200,0x0201,0x0202,0x0203,
+      0x0204,0x0205,0x0206,0x0207,0x0208,0x0240,0x0241,0x0400,0x0401,0x0402,0x0403,0x0404,0x0405,0x0406,0x0407,0x0408,
+      0x0409,0x040A,0x040C,0x0440,0x0441,0x0081\};
+00457         ROM \textcolor{keyword}{const} uint16\_t TxFilterSetupWrOnlyData[] = \{0x4901,0x0400,0x0780,0x0020,0x0514,0x067B,0x3007,
+      0x318C,0x318C,0x058C,0x61C1,0x104C,0x000D,0x8180,0x280C,0x618C,0x528C,0x2E02,0x008D,0x07FF,0x07FF,0x0000,
+      0x0000,0x0000,0x0000,0x0000,0x0070,0x0020,0x0000,0x0081,0x07FF,0x07FF,0x4000,0x0000,0x0000,0x0000,0x0000,0x0000,
+      0x0000,0x1001,0x2038,0x0020,0x0000\};
+00458         ROM \textcolor{keyword}{const} RegisterBatch batch = \{
+00459             TxFilterSetupAddr, TxFilterSetupData, TxFilterSetupMask, \textcolor{keyword}{sizeof}(TxFilterSetupAddr)/\textcolor{keyword}{sizeof}(
+      uint16\_t),
+00460             TxFilterSetupWrOnlyAddr, TxFilterSetupWrOnlyData, \textcolor{keyword}{sizeof}(TxFilterSetupWrOnlyAddr)/\textcolor{keyword}{sizeof}(
+      uint16\_t), \textcolor{keyword}{sizeof}(TxFilterSetupWrOnlyData)/\textcolor{keyword}{sizeof}(uint16\_t)\};
+00461         WriteMaskedRegs(&batch);
+00462     \}
+00463 \textcolor{preprocessor}{#else}
+00464     \textcolor{keyword}{const} uint8\_t ict\_vco = Get_SPI_Reg_bits(ICT_VCO_CGEN);
+00465     BeginBatch(\textcolor{stringliteral}{"TxFilterSetup"});
+00466     \textcolor{comment}{//RFE}
+00467     Modify_SPI_Reg_bits(EN_G_RFE, 0);
+00468     Modify_SPI_Reg_bits(0x010D, 4 << 4 | 1, 0xF);
+00469 
+00470     \textcolor{comment}{//RBB}
+00471     SetDefaults(SECTION_RBB);
+00472     Modify_SPI_Reg_bits(PD_LPFL_RBB, 1);
+00473     Modify_SPI_Reg_bits(INPUT_CTL_PGA_RBB, 3);
+00474     Modify_SPI_Reg_bits(G_PGA_RBB, 12);
+00475     Modify_SPI_Reg_bits(RCC_CTL_PGA_RBB, 23);
+00476 
+00477     \textcolor{comment}{//TRF}
+00478     Modify_SPI_Reg_bits(EN_G_TRF, 0);
+00479 
+00480     \textcolor{comment}{//TBB}
+00481     SetDefaults(SECTION_TBB);
+00482     Modify_SPI_Reg_bits(CG_IAMP_TBB, 1);
+00483     Modify_SPI_Reg_bits(LOOPB_TBB, 3);
+00484 
+00485     \textcolor{comment}{//AFE}
+00486     \textcolor{comment}{//if(reg0020 & 0x3 == 2)}
+00487     \{
+00488         Modify_SPI_Reg_bits(PD_RX_AFE2, 0);
+00489         Modify_SPI_Reg_bits(PD_TX_AFE2, 0);
+00490     \{
+00491     \textcolor{keyword}{const} uint8\_t isel\_dac\_afe = Get_SPI_Reg_bits(ISEL_DAC_AFE);
+00492     SetDefaults(SECTION_AFE);
+00493     Modify_SPI_Reg_bits(ISEL_DAC_AFE, isel\_dac\_afe);
+00494     \}
+00495 
+00496     \textcolor{comment}{//XBUF}
+00497     Modify_SPI_Reg_bits(PD_XBUF_RX, 0);
+00498     Modify_SPI_Reg_bits(PD_XBUF_TX, 0);
+00499     Modify_SPI_Reg_bits(EN_G_XBUF, 1);
+00500 
+00501     SetDefaults(SECTION_CGEN);
+00502     Modify_SPI_Reg_bits(ICT_VCO_CGEN, ict\_vco);
+00503 
+00504     \textcolor{comment}{//TxTSP}
+00505     SetDefaults(SECTION_TxTSP);
+00506     SetDefaults(SECTION_TxNCO);
+00507     Modify_SPI_Reg_bits(TSGMODE_TXTSP, 1);
+00508     Modify_SPI_Reg_bits(INSEL_TXTSP, 1);
+00509 
+00510     \textcolor{comment}{//RXTSP}
+00511     SetDefaults(SECTION_RxTSP);
+00512     SetDefaults(SECTION_RxNCO);
+00513     Modify_SPI_Reg_bits(AGC_MODE_RXTSP, 1);
+00514     Modify_SPI_Reg_bits(AGC_AVG_RXTSP, 1);
+00515     Modify_SPI_Reg_bits(HBD_OVR_RXTSP, 4);
+00516     Modify_SPI_Reg_bits(CMIX_SC_RXTSP, 1);
+00517 
+00518     EndBatch();
+00519 \textcolor{preprocessor}{#endif // BATCH\_TX\_SETUP}
+00520     \textcolor{comment}{//BIAS}
+00521     \textcolor{comment}{/*\{}
+00522 \textcolor{comment}{    const uint8\_t rp\_calib\_bias = Get\_SPI\_Reg\_bits(RP\_CALIB\_BIAS);}
+00523 \textcolor{comment}{    //SetDefaults(SECTION\_BIAS);}
+00524 \textcolor{comment}{    Modify\_SPI\_Reg\_bits(RP\_CALIB\_BIAS, rp\_calib\_bias);}
+00525 \textcolor{comment}{    \}*/}
+00526 
+00527     SetTxLPF_PDs(tx\_lpf\_IF);
+00528     \textcolor{keywordflow}{if}(tx\_lpf\_IF <= TxLPF_RF_LimitLowMid/2)
+00529     \{
+00530         \textcolor{keyword}{const} float_type freq = (16.0/20.0)*tx\_lpf\_IF/1e6;
+00531         int16\_t rcal\_lpflad\_tbb =
+00532               pow(freq, 4)*1.29858903647958e-16
+00533             + pow(freq, 3)*(-0.000110746929967704)
+00534             + pow(freq, 2)*0.00277593485991029
+00535             + freq*21.0384293169607
+00536             + (-48.4092606238297);
+00537         Modify_SPI_Reg_bits(RCAL_LPFLAD_TBB, clamp(rcal\_lpflad\_tbb, 0, 255));
+00538     \}
+00539     \textcolor{keywordflow}{else}
+00540     \{
+00541         \textcolor{keyword}{const} float_type freq = tx\_lpf\_IF/1e6;
+00542         int16\_t rcal\_lpfh\_tbb = pow(freq, 4)*1.10383261611112e-06
+00543             + pow(freq, 3)*(-0.000210800032517545)
+00544             + pow(freq,2)*0.0190494874803309
+00545             + freq*1.43317445923528
+00546             + (-47.6950779298333);
+00547         Modify_SPI_Reg_bits(RCAL_LPFH_TBB, clamp(rcal\_lpfh\_tbb, 0, 255));
+00548     \}
+00549 
+00550     \textcolor{comment}{//CGEN}
+00551     status = ConfigCGEN_ForLPF_IF(tx\_lpf\_IF);
+00552     \textcolor{keywordflow}{if}(status != MCU_NO_ERROR)
+00553         \textcolor{keywordflow}{return} status;
+00554 
+00555     \textcolor{comment}{//SXR}
+00556     Modify_SPI_Reg_bits(MAC, 1);
+00557     Modify_SPI_Reg_bits(PD_VCO, 1);
+00558 
+00559     \textcolor{comment}{//SXT}
+00560     Modify_SPI_Reg_bits(MAC, 2);
+00561     Modify_SPI_Reg_bits(PD_VCO, 1);
+00562 
+00563     SPI_write(0x0020, reg0020);
+00564 
+00565     \textcolor{comment}{//TXTSP}
+00566     LoadDC_REG_TX_IQ();
+00567     SetNCOFrequency(LMS7002M_Tx, 1e6, 0);
+00568     SetNCOFrequency(LMS7002M_Tx, tx\_lpf\_IF, 1);
+00569 
+00570     \textcolor{comment}{//RxTSP}
+00571     SetNCOFrequency(LMS7002M_Rx, 0.9e6, 0);
+00572     SetNCOFrequency(LMS7002M_Rx, tx\_lpf\_IF-0.1e6, 1);
+00573 
+00574     EnableMIMOBuffersIfNecessary();
+00575     EnableChannelPowerControls();
+00576     \textcolor{keywordflow}{return} MCU_NO_ERROR;
+00577 \}
+00578 
+00579 \textcolor{keyword}{static} uint8\_t SearchTxFilterCCAL_RCAL(uint16\_t addr, uint8\_t msblsb)
+00580 \{
+00581     ROM \textcolor{keyword}{const} ReachRSSIparams paramLPF\_LAD\_decrease = \{CCAL_LPFLAD_TBB, -1, 0, \textcolor{keyword}{true}\};
+00582     ROM \textcolor{keyword}{const} ReachRSSIparams paramLPF\_LAD\_increase = \{CCAL_LPFLAD_TBB, 1, 31, \textcolor{keyword}{false}\};
+00583     \textcolor{keywordtype}{bool} targetLevelReached;
+00584     uint8\_t iterationsLeft = 6;
+00585     \textcolor{keywordflow}{do}
+00586     \{
+00587         uint16\_t rssi\_3dB\_lad;
+00588         uint8\_t ccal\_limit;
+00589         int8\_t rcal\_step;
+00590         \textcolor{keywordtype}{bool} rssiShouldBeLess;
+00591         \textcolor{keywordtype}{bool} needToChangeCCAL;
+00592         Modify_SPI_Reg_bits(SEL_TX, 0);
+00593         Modify_SPI_Reg_bits(SEL_RX, 0);
+00594         rssi\_3dB\_lad = GetRSSI() * 0.7071;
+00595         Modify_SPI_Reg_bits(SEL_TX, 1);
+00596         Modify_SPI_Reg_bits(SEL_RX, 1);
+00597 
+00598         \textcolor{keywordflow}{if}(GetRSSI() < rssi\_3dB\_lad)
+00599         \{
+00600             ccal\_limit = 0;
+00601             rcal\_step = 25;
+00602             rssiShouldBeLess = \textcolor{keyword}{true};
+00603             needToChangeCCAL = \textcolor{keyword}{false};
+00604         \}
+00605         \textcolor{keywordflow}{else}
+00606         \{
+00607             ccal\_limit = 31;
+00608             rcal\_step = -10;
+00609             rssiShouldBeLess = \textcolor{keyword}{false};
+00610             needToChangeCCAL = \textcolor{keyword}{true};
+00611         \}
+00612 
+00613         \textcolor{keywordflow}{if}(rssiShouldBeLess)
+00614             targetLevelReached = ChangeUntilReachRSSI(&paramLPF\_LAD\_decrease, rssi\_3dB\_lad);
+00615         \textcolor{keywordflow}{else}
+00616             targetLevelReached = ChangeUntilReachRSSI(&paramLPF\_LAD\_increase, rssi\_3dB\_lad);
+00617         \textcolor{keywordflow}{if}( !targetLevelReached && Get_SPI_Reg_bits(CCAL_LPFLAD_TBB) == ccal\_limit)
+00618         \{
+00619             uint8\_t R = Get_SPI_Reg_bits(addr, msblsb);
+00620             \textcolor{keywordflow}{if}(R == 0 || R == 255)
+00621                 \textcolor{keywordflow}{return} MCU_NO_ERROR; \textcolor{comment}{// reached filter bandwidth limit}
+00622             Modify_SPI_Reg_bits(addr, msblsb, clamp(R+rcal\_step, 0, 255));
+00623             Modify_SPI_Reg_bits(CCAL_LPFLAD_TBB, 16);
+00624         \}
+00625         \textcolor{keywordflow}{else} \textcolor{keywordflow}{if}(needToChangeCCAL)
+00626         \{
+00627             uint8\_t ccal\_lpflad\_tbb = Get_SPI_Reg_bits(CCAL_LPFLAD_TBB);
+00628             ccal\_lpflad\_tbb = clamp(++ccal\_lpflad\_tbb, 0, 31);
+00629             Modify_SPI_Reg_bits(CCAL_LPFLAD_TBB, ccal\_lpflad\_tbb);
+00630         \}
+00631         --iterationsLeft;
+00632     \} \textcolor{keywordflow}{while}(!targetLevelReached && iterationsLeft);
+00633     \textcolor{keywordflow}{return} targetLevelReached ? MCU_NO_ERROR : MCU_RCAL_LPF_LIMIT_REACHED;
+00634 \}
+00635 
+00636 uint8\_t TuneTxFilter(\textcolor{keyword}{const} float_type tx\_lpf\_freq\_RF)
+00637 \{
+00638     float_type tx\_lpf\_IF;
+00639     uint8\_t status;
+00640 
+00641     \textcolor{keywordflow}{if}(tx\_lpf\_freq\_RF < TxLPF\_RF\_LimitLow || tx\_lpf\_freq\_RF > TxLPF_RF_LimitHigh)
+00642         \textcolor{keywordflow}{return} MCU_TX_LPF_OUT_OF_RANGE;
+00643     \textcolor{comment}{//calculate intermediate frequency}
+00644     tx\_lpf\_IF = tx\_lpf\_freq\_RF/2;
+00645     \textcolor{keywordflow}{if}(tx\_lpf\_freq\_RF > TxLPF_RF_LimitLowMid && tx\_lpf\_freq\_RF < 
+      TxLPF_RF_LimitMidHigh)
+00646         tx\_lpf\_IF = TxLPF_RF_LimitMidHigh/2;
+00647     SaveChipState(0);
+00648     status = TuneTxFilterSetup(tx\_lpf\_IF);
+00649     \textcolor{keywordflow}{if}(status != MCU_NO_ERROR)
+00650         \textcolor{keywordflow}{goto} TxFilterSearchEndStage;
+00651     UpdateRSSIDelay();
+00652 
+00653     Modify_SPI_Reg_bits(SEL_RX, 0);
+00654     Modify_SPI_Reg_bits(SEL_TX, 0);
+00655     \{
+00656         ROM \textcolor{keyword}{const} ReachRSSIparams paramTX = \{CG_IAMP_TBB, 1, 43, \textcolor{keyword}{true}\};
+00657         ChangeUntilReachRSSI(&paramTX, 0x2700);
+00658     \}
+00659 
+00660     \textcolor{comment}{//LPFL}
+00661     \textcolor{keywordflow}{if}(tx\_lpf\_IF <= TxLPF_RF_LimitLowMid/2)
+00662         status = SearchTxFilterCCAL_RCAL(RCAL_LPFLAD_TBB);
+00663     \textcolor{keywordflow}{else} \textcolor{comment}{// LPFH}
+00664     \{
+00665         Modify_SPI_Reg_bits(C_CTL_PGA_RBB, 2);
+00666         status = SearchTxFilterCCAL_RCAL(RCAL_LPFH_TBB);
+00667     \}
+00668     \{
+00669         uint16\_t ccal\_lpflad\_tbb = Get_SPI_Reg_bits(CCAL_LPFLAD_TBB);
+00670         uint16\_t rcal\_lpfh\_lpflad\_tbb = SPI_read(0x0109);
+00671     TxFilterSearchEndStage:
+00672         SaveChipState(1);
+00673         \textcolor{keywordflow}{if}(status != MCU_NO_ERROR)
+00674             \textcolor{keywordflow}{return} status;
+00675         Modify_SPI_Reg_bits(CCAL_LPFLAD_TBB, ccal\_lpflad\_tbb);
+00676         SPI_write(0x0106, 0x318C);
+00677         SPI_write(0x0107, 0x318C);
+00678         SPI_write(0x0109, rcal\_lpfh\_lpflad\_tbb);
+00679         SetTxLPF_PDs(tx\_lpf\_IF);
+00680     \}
+00681 
+00682     \textcolor{keywordflow}{return} MCU_NO_ERROR;
+00683 \}
+\end{DoxyCode}

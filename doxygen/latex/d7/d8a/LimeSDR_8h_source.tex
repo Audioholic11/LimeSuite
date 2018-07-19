@@ -1,0 +1,42 @@
+\subsection{Lime\+S\+D\+R.\+h}
+\label{LimeSDR_8h_source}\index{/home/erik/prefix/default/src/limesuite-\/dev/src/\+A\+P\+I/\+Lime\+S\+D\+R.\+h@{/home/erik/prefix/default/src/limesuite-\/dev/src/\+A\+P\+I/\+Lime\+S\+D\+R.\+h}}
+
+\begin{DoxyCode}
+00001 \textcolor{comment}{/*}
+00002 \textcolor{comment}{ * File:   LimeSDR.h}
+00003 \textcolor{comment}{ * Author: Ignas J}
+00004 \textcolor{comment}{ *}
+00005 \textcolor{comment}{ * Created on September 18, 2017}
+00006 \textcolor{comment}{ */}
+00007 
+00008 \textcolor{preprocessor}{#ifndef LIMESDR\_H}
+00009 \textcolor{preprocessor}{#define LIMESDR\_H}
+00010 \textcolor{preprocessor}{#include "LmsGeneric.h"}
+00011 
+00012 \textcolor{keyword}{namespace }lime
+00013 \{
+00014 
+00015 \textcolor{keyword}{class }LMS7_LimeSDR : \textcolor{keyword}{public} LMS7_Generic
+00016 \{
+00017 \textcolor{keyword}{public}:
+00018     LMS7_LimeSDR(lime::IConnection* conn, LMS7_Device *obj = \textcolor{keyword}{nullptr});
+00019     \textcolor{keywordtype}{int} SetRate(\textcolor{keywordtype}{double} f\_Hz, \textcolor{keywordtype}{int} oversample) \textcolor{keyword}{override};
+00020     std::vector<std::string> GetProgramModes() \textcolor{keyword}{const override};
+00021     \textcolor{keywordtype}{int} Program(\textcolor{keyword}{const} std::string& mode, \textcolor{keyword}{const} \textcolor{keywordtype}{char}* data, \textcolor{keywordtype}{size\_t} len, 
+      lime::IConnection::ProgrammingCallback callback) \textcolor{keyword}{const override};
+00022 \textcolor{keyword}{private}:
+00023 \};
+00024 
+00025 \textcolor{keyword}{class }LMS7_LimeSDR_PCIE : \textcolor{keyword}{public} LMS7_Generic
+00026 \{
+00027 \textcolor{keyword}{public}:
+00028     LMS7_LimeSDR_PCIE(lime::IConnection* conn, LMS7_Device *obj = \textcolor{keyword}{nullptr});
+00029     std::vector<std::string> GetProgramModes() \textcolor{keyword}{const override};
+00030 \textcolor{keyword}{private}:
+00031 \};
+00032 
+00033 \}
+00034 
+00035 \textcolor{preprocessor}{#endif  }\textcolor{comment}{/* LIMESDR\_H */}\textcolor{preprocessor}{}
+00036 
+\end{DoxyCode}

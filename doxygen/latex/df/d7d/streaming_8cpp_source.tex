@@ -1,0 +1,676 @@
+\subsection{streaming.\+cpp}
+\label{streaming_8cpp_source}\index{/home/erik/prefix/default/src/limesuite-\/dev/src/tests/streaming.\+cpp@{/home/erik/prefix/default/src/limesuite-\/dev/src/tests/streaming.\+cpp}}
+
+\begin{DoxyCode}
+00001 \textcolor{preprocessor}{#include "gtest/gtest.h"}
+00002 \textcolor{preprocessor}{#include "streamingFixture.h"}
+00003 \textcolor{preprocessor}{#include "IConnection.h"}
+00004 \textcolor{preprocessor}{#include "LMS7002M.h"}
+00005 \textcolor{preprocessor}{#include "math.h"}
+00006 \textcolor{preprocessor}{#include <thread>}
+00007 \textcolor{preprocessor}{#include <chrono>}
+00008 \textcolor{preprocessor}{#include "dataTypes.h"}
+00009 \textcolor{keyword}{using namespace }std;
+00010 \textcolor{keyword}{using namespace }lime;
+00011 \textcolor{preprocessor}{#define DRAW\_GNU\_PLOTS 0}
+00012 
+00013 \textcolor{preprocessor}{#if DRAW\_GNU\_PLOTS}
+00014 \textcolor{preprocessor}{#include "gnuPlotPipe.h"}
+00015 GNUPlotPipe gp;
+00016 \textcolor{preprocessor}{#endif}
+00017 \textcolor{keyword}{struct }complexFloat32_t
+00018 \{
+00019     \textcolor{keywordtype}{float} i;
+00020     \textcolor{keywordtype}{float} q;
+00021 \};
+00022 
+00023 TEST_F (StreamingFixture, channelsRxAB)
+00024 \{
+00025     LMS7002M lmsControl;
+00026     lmsControl.SetConnection(serPort, 0);
+00027     lmsControl.ResetChip();
+00028     \textcolor{comment}{//load initial settings to get samples}
+00029     lmsControl.UploadAll();
+00030     lmsControl.SetActiveChannel(LMS7002M::ChA);
+00031     lmsControl.Modify_SPI_Reg_bits(LMS7param(EN_ADCCLKH_CLKGN), 0);
+00032     lmsControl.Modify_SPI_Reg_bits(LMS7param(CLKH_OV_CLKL_CGEN), 2);
+00033     lmsControl.SetFrequencySX(LMS7002M::Tx, 1e6);
+00034     lmsControl.SetFrequencySX(LMS7002M::Rx, 1e6);
+00035     lmsControl.Modify_SPI_Reg_bits(LMS7param(LML1_MODE), 0);
+00036     lmsControl.Modify_SPI_Reg_bits(LMS7param(LML2_MODE), 0);
+00037     lmsControl.Modify_SPI_Reg_bits(LMS7param(PD_RX_AFE2), 0);
+00038 
+00039     lmsControl.SetActiveChannel(LMS7002M::ChAB);
+00040     lmsControl.Modify_SPI_Reg_bits(LMS7param(INSEL_RXTSP), 1);
+00041     lmsControl.Modify_SPI_Reg_bits(LMS7param(GFIR1_BYP_RXTSP), 1);
+00042     lmsControl.Modify_SPI_Reg_bits(LMS7param(GFIR2_BYP_RXTSP), 1);
+00043     lmsControl.Modify_SPI_Reg_bits(LMS7param(GFIR3_BYP_RXTSP), 1);
+00044     lmsControl.Modify_SPI_Reg_bits(LMS7param(AGC_BYP_RXTSP), 1);
+00045     lmsControl.Modify_SPI_Reg_bits(LMS7param(CMIX_BYP_RXTSP), 1);
+00046 
+00047     lmsControl.SetActiveChannel(LMS7002M::ChA);
+00048     lmsControl.Modify_SPI_Reg_bits(LMS7param(TSGFCW_RXTSP), 1);
+00049     lmsControl.Modify_SPI_Reg_bits(LMS7param(TSGFC_RXTSP), 1);
+00050     lmsControl.SetActiveChannel(LMS7002M::ChB);
+00051     lmsControl.Modify_SPI_Reg_bits(LMS7param(TSGFCW_RXTSP), 1);
+00052     lmsControl.Modify_SPI_Reg_bits(LMS7param(TSGFC_RXTSP), 0);
+00053     lmsControl.SetActiveChannel(LMS7002M::ChA);
+00054     \textcolor{keywordtype}{int} ch = lmsControl.GetActiveChannelIndex();
+00055     \textcolor{keywordtype}{float} cgenFreq = 30.72e6 * 4;
+00056     lmsControl.SetInterfaceFrequency(cgenFreq, 0, 0);
+00057     \textcolor{keyword}{auto} txRate = lmsControl.GetSampleRate(LMS7002M::Tx, LMS7002M::ChA);
+00058     \textcolor{keyword}{auto} rxRate = lmsControl.GetSampleRate(LMS7002M::Rx, LMS7002M::ChA);
+00059     serPort->UpdateExternalDataRate(0, txRate, rxRate);
+00060 
+00061     \textcolor{keyword}{const} \textcolor{keywordtype}{int} chCount = 2;
+00062 
+00063     \textcolor{comment}{//setup streaming}
+00064     \textcolor{keywordtype}{size\_t} streamIds[chCount];
+00065     StreamConfig config;
+00066     config.isTx = \textcolor{keyword}{false};
+00067     config.format = StreamConfig::STREAM\_12\_BIT\_COMPRESSED;
+00068     \textcolor{comment}{//create streaming channel}
+00069     \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} i=0; i<chCount; ++i)
+00070     \{
+00071         config.channelID = i;
+00072         serPort->SetupStream(streamIds[i], config);
+00073         ASSERT\_NE(streamIds[i], \textcolor{keywordtype}{size\_t}(~0));
+00074     \}
+00075 
+00076     \textcolor{keyword}{const} uint32\_t streamsize = 680*32;
+00077     complex16_t** buffers = \textcolor{keyword}{new} complex16_t*[chCount];
+00078     \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} i=0; i<chCount; ++i)
+00079         buffers[i] = \textcolor{keyword}{new} complex16_t[streamsize];
+00080 
+00081     \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} i=0; i<chCount; ++i)
+00082     \{
+00083         \textcolor{keyword}{auto} status = serPort->ControlStream(streamIds[i], \textcolor{keyword}{true});
+00084         ASSERT\_EQ(status, 0);
+00085     \}
+00086 
+00087     \textcolor{comment}{//Both channels are set to receive test signal}
+00088     \textcolor{comment}{//A channel full scale, B channel -6 dB}
+00089     \textcolor{comment}{//A channel amplitude should always be bigger than channel B}
+00090     \textcolor{comment}{//otherwise it would show channels data swapping}
+00091     lime::IStreamChannel::Metadata metadata;
+00092 
+00093 \textcolor{preprocessor}{#if DRAW\_GNU\_PLOTS}
+00094     gp.write(\textcolor{stringliteral}{"set title 'Channels Rx AB'\(\backslash\)n"});
+00095     gp.write(\textcolor{stringliteral}{"set size square\(\backslash\)n set xrange[-2050:2050]\(\backslash\)n set yrange[-2050:2050]\(\backslash\)n"});
+00096     gp.write(\textcolor{stringliteral}{"plot '-' with points title 'A', '-' with points title 'B'\(\backslash\)n"});
+00097 \textcolor{preprocessor}{#endif}
+00098     \textcolor{keywordtype}{int} samplesRead[chCount];
+00099     \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} i=0; i<chCount; ++i)
+00100     \{
+00101         samplesRead[i] = ((IStreamChannel*)streamIds[i])->Read((\textcolor{keywordtype}{void} *)buffers[i], streamsize, &metadata, 1
+      000);
+00102         EXPECT\_EQ(streamsize, samplesRead[i]);
+00103 \textcolor{preprocessor}{#if DRAW\_GNU\_PLOTS}
+00104         \textcolor{keywordflow}{for}(uint32\_t j=0; j<streamsize; ++j)
+00105             gp.writef(\textcolor{stringliteral}{"%i %i\(\backslash\)n"}, buffers[i][j].i, buffers[i][j].q);
+00106         gp.write(\textcolor{stringliteral}{"e\(\backslash\)n"});
+00107         gp.flush();
+00108 \textcolor{preprocessor}{#endif}
+00109     \}
+00110 
+00111     \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} i=0; i < samplesRead[ch]; ++i)
+00112     \{
+00113         \textcolor{comment}{//compare amplitudes from each channel, should be A > B}
+00114         \textcolor{keywordtype}{float} ampA = pow(buffers[0][i].i, 2) + pow(buffers[0][i].q, 2);
+00115         \textcolor{keywordtype}{float} ampB = pow(buffers[1][i].i, 2) + pow(buffers[1][i].q, 2);
+00116         \textcolor{comment}{//make sure both channels are receiving valid samples}
+00117         ASSERT\_NE(0, ampA);
+00118         ASSERT\_NE(0, ampB);
+00119         ASSERT\_GT(ampA, ampB);
+00120         constexpr \textcolor{keywordtype}{int} maxAmp = 2100;
+00121         ASSERT\_LT(ampA, maxAmp*maxAmp);
+00122         ASSERT\_LT(ampB, maxAmp*maxAmp);
+00123     \}
+00124 
+00125     \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} i=0; i<chCount; ++i)
+00126     \{
+00127         \textcolor{keyword}{auto} status = serPort->ControlStream(streamIds[i], \textcolor{keyword}{false});
+00128         ASSERT\_EQ(status, 0);
+00129     \}
+00130     \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} i=0; i<chCount; ++i)
+00131     \{
+00132         \textcolor{keyword}{auto} status = serPort->CloseStream(streamIds[i]);
+00133         ASSERT\_EQ(status, 0);
+00134     \}
+00135     \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} i=0; i<chCount; ++i)
+00136         \textcolor{keyword}{delete} []buffers[i];
+00137     \textcolor{keyword}{delete} buffers;
+00138 \}
+00139 
+00140 TEST_F (StreamingFixture, channelsRxA)
+00141 \{
+00142     LMS7002M lmsControl;
+00143     lmsControl.SetConnection(serPort, 0);
+00144     lmsControl.ResetChip();
+00145     \textcolor{comment}{//load initial settings to get samples}
+00146     lmsControl.UploadAll();
+00147     lmsControl.SetActiveChannel(LMS7002M::ChA);
+00148     lmsControl.Modify_SPI_Reg_bits(LMS7param(EN_ADCCLKH_CLKGN), 0);
+00149     lmsControl.Modify_SPI_Reg_bits(LMS7param(CLKH_OV_CLKL_CGEN), 2);
+00150     lmsControl.SetFrequencySX(LMS7002M::Tx, 1e6);
+00151     lmsControl.SetFrequencySX(LMS7002M::Rx, 1e6);
+00152     lmsControl.Modify_SPI_Reg_bits(LMS7param(LML1_MODE), 0);
+00153     lmsControl.Modify_SPI_Reg_bits(LMS7param(LML2_MODE), 0);
+00154     lmsControl.Modify_SPI_Reg_bits(LMS7param(PD_RX_AFE2), 0);
+00155 
+00156     lmsControl.SetActiveChannel(LMS7002M::ChAB);
+00157     lmsControl.Modify_SPI_Reg_bits(LMS7param(INSEL_RXTSP), 1);
+00158     lmsControl.Modify_SPI_Reg_bits(LMS7param(GFIR1_BYP_RXTSP), 1);
+00159     lmsControl.Modify_SPI_Reg_bits(LMS7param(GFIR2_BYP_RXTSP), 1);
+00160     lmsControl.Modify_SPI_Reg_bits(LMS7param(GFIR3_BYP_RXTSP), 1);
+00161     lmsControl.Modify_SPI_Reg_bits(LMS7param(AGC_BYP_RXTSP), 1);
+00162     lmsControl.Modify_SPI_Reg_bits(LMS7param(CMIX_BYP_RXTSP), 1);
+00163 
+00164     lmsControl.SetActiveChannel(LMS7002M::ChA);
+00165     lmsControl.Modify_SPI_Reg_bits(LMS7param(TSGFCW_RXTSP), 1);
+00166     lmsControl.Modify_SPI_Reg_bits(LMS7param(TSGFC_RXTSP), 1);
+00167     lmsControl.SetActiveChannel(LMS7002M::ChB);
+00168     lmsControl.Modify_SPI_Reg_bits(LMS7param(TSGFCW_RXTSP), 1);
+00169     lmsControl.Modify_SPI_Reg_bits(LMS7param(TSGFC_RXTSP), 0);
+00170     lmsControl.SetActiveChannel(LMS7002M::ChA);
+00171     \textcolor{keywordtype}{float} cgenFreq = 30.72e6 * 4;
+00172     lmsControl.SetInterfaceFrequency(cgenFreq, 0, 0);
+00173     \textcolor{keyword}{auto} txRate = lmsControl.GetSampleRate(LMS7002M::Tx, LMS7002M::ChA);
+00174     \textcolor{keyword}{auto} rxRate = lmsControl.GetSampleRate(LMS7002M::Rx, LMS7002M::ChA);
+00175     serPort->UpdateExternalDataRate(0, txRate, rxRate);
+00176 
+00177     \textcolor{comment}{//setup streaming}
+00178     \textcolor{keywordtype}{size\_t} streamId;
+00179     StreamConfig config;
+00180     config.channelID = 0;
+00181     config.isTx = \textcolor{keyword}{false};
+00182     config.format = StreamConfig::STREAM\_12\_BIT\_COMPRESSED;
+00183 
+00184     \textcolor{comment}{//create streaming channel}
+00185     serPort->SetupStream(streamId, config);
+00186     ASSERT\_NE(streamId, \textcolor{keywordtype}{size\_t}(~0));
+00187 
+00188     \textcolor{keyword}{const} \textcolor{keywordtype}{int} streamsize = 680*32;
+00189     complex16_t* buffer = \textcolor{keyword}{new} complex16_t[streamsize];
+00190 
+00191     \textcolor{keyword}{auto} status = serPort->ControlStream(streamId, \textcolor{keyword}{true});
+00192 
+00193     \textcolor{comment}{//Both channels are set to receive test signal}
+00194     \textcolor{comment}{//A channel full scale, B channel -6 dB}
+00195     \textcolor{comment}{//A channel amplitude should always be bigger than channel B}
+00196     \textcolor{comment}{//otherwise it would show channels data swapping}
+00197     lime::IStreamChannel::Metadata metadata;
+00198     \textcolor{keywordtype}{int} samplesRead = 0;
+00199     samplesRead = ((IStreamChannel*)streamId)->Read((\textcolor{keywordtype}{void} *)buffer, streamsize, &metadata, 1000);
+00200     EXPECT\_EQ(streamsize, samplesRead);
+00201 \textcolor{preprocessor}{#if DRAW\_GNU\_PLOTS}
+00202     gp.write(\textcolor{stringliteral}{"set title 'Channel Rx A'\(\backslash\)n"});
+00203     gp.write(\textcolor{stringliteral}{"set size square\(\backslash\)n set xrange[-2050:2050]\(\backslash\)n set yrange[-2050:2050]\(\backslash\)n"});
+00204     gp.write(\textcolor{stringliteral}{"plot '-' with points title 'A'\(\backslash\)n"});
+00205     \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} j=0; j<streamsize; ++j)
+00206         gp.writef(\textcolor{stringliteral}{"%i %i\(\backslash\)n"}, buffer[j].i, buffer[j].q);
+00207     gp.write(\textcolor{stringliteral}{"e\(\backslash\)n"});
+00208     gp.flush();
+00209 \textcolor{preprocessor}{#endif}
+00210     \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} i=0; i < samplesRead; ++i)
+00211     \{
+00212         \textcolor{keywordtype}{float} ampA = pow(buffer[i].i, 2) + pow(buffer[i].q, 2);
+00213         \textcolor{comment}{//make sure both channels are receiving valid samples}
+00214         ASSERT\_NE(0, ampA);
+00215         \textcolor{keyword}{const} \textcolor{keywordtype}{int} minAmp = 1900*1900;
+00216         \textcolor{keyword}{const} \textcolor{keywordtype}{int} maxAmp = 2100*2100;
+00217         ASSERT\_GT(ampA, minAmp);
+00218         ASSERT\_LT(ampA, maxAmp);
+00219     \}
+00220     status = serPort->ControlStream(streamId, \textcolor{keyword}{false});
+00221     ASSERT\_EQ(status, 0);
+00222     status = serPort->CloseStream(streamId);
+00223     ASSERT\_EQ(status, 0);
+00224 
+00225     \textcolor{keyword}{delete} []buffer;
+00226 \}
+00227 
+00228 TEST_F (StreamingFixture, channelsRxB)
+00229 \{
+00230     LMS7002M lmsControl;
+00231     lmsControl.SetConnection(serPort, 0);
+00232     lmsControl.ResetChip();
+00233     \textcolor{comment}{//load initial settings to get samples}
+00234     lmsControl.UploadAll();
+00235     lmsControl.SetActiveChannel(LMS7002M::ChA);
+00236     lmsControl.Modify_SPI_Reg_bits(LMS7param(EN_ADCCLKH_CLKGN), 0);
+00237     lmsControl.Modify_SPI_Reg_bits(LMS7param(CLKH_OV_CLKL_CGEN), 2);
+00238     lmsControl.SetFrequencySX(LMS7002M::Tx, 1e6);
+00239     lmsControl.SetFrequencySX(LMS7002M::Rx, 1e6);
+00240     lmsControl.Modify_SPI_Reg_bits(LMS7param(LML1_MODE), 0);
+00241     lmsControl.Modify_SPI_Reg_bits(LMS7param(LML2_MODE), 0);
+00242     lmsControl.Modify_SPI_Reg_bits(LMS7param(PD_RX_AFE2), 0);
+00243 
+00244     lmsControl.SetActiveChannel(LMS7002M::ChAB);
+00245     lmsControl.Modify_SPI_Reg_bits(LMS7param(INSEL_RXTSP), 1);
+00246     lmsControl.Modify_SPI_Reg_bits(LMS7param(GFIR1_BYP_RXTSP), 1);
+00247     lmsControl.Modify_SPI_Reg_bits(LMS7param(GFIR2_BYP_RXTSP), 1);
+00248     lmsControl.Modify_SPI_Reg_bits(LMS7param(GFIR3_BYP_RXTSP), 1);
+00249     lmsControl.Modify_SPI_Reg_bits(LMS7param(AGC_BYP_RXTSP), 1);
+00250     lmsControl.Modify_SPI_Reg_bits(LMS7param(CMIX_BYP_RXTSP), 1);
+00251 
+00252     lmsControl.SetActiveChannel(LMS7002M::ChA);
+00253     lmsControl.Modify_SPI_Reg_bits(LMS7param(TSGFCW_RXTSP), 1);
+00254     lmsControl.Modify_SPI_Reg_bits(LMS7param(TSGFC_RXTSP), 1);
+00255     lmsControl.SetActiveChannel(LMS7002M::ChB);
+00256     lmsControl.Modify_SPI_Reg_bits(LMS7param(TSGFCW_RXTSP), 1);
+00257     lmsControl.Modify_SPI_Reg_bits(LMS7param(TSGFC_RXTSP), 0);
+00258     lmsControl.SetActiveChannel(LMS7002M::ChA);
+00259     \textcolor{keywordtype}{float} cgenFreq = 30.72e6 * 4;
+00260     lmsControl.SetInterfaceFrequency(cgenFreq, 0, 0);
+00261     \textcolor{keyword}{auto} txRate = lmsControl.GetSampleRate(LMS7002M::Tx, LMS7002M::ChA);
+00262     \textcolor{keyword}{auto} rxRate = lmsControl.GetSampleRate(LMS7002M::Rx, LMS7002M::ChA);
+00263     serPort->UpdateExternalDataRate(0, txRate, rxRate);
+00264 
+00265     \textcolor{comment}{//setup streaming}
+00266     \textcolor{keywordtype}{size\_t} streamId;
+00267     StreamConfig config;
+00268     config.channelID = 1;
+00269     config.isTx = \textcolor{keyword}{false};
+00270     config.format = StreamConfig::STREAM\_12\_BIT\_COMPRESSED;
+00271 
+00272     \textcolor{comment}{//create streaming channel}
+00273     serPort->SetupStream(streamId, config);
+00274     ASSERT\_NE(streamId, \textcolor{keywordtype}{size\_t}(~0));
+00275 
+00276     \textcolor{keyword}{const} \textcolor{keywordtype}{int} streamsize = 680*32;
+00277     complex16_t* buffer = \textcolor{keyword}{new} complex16_t[streamsize];
+00278 
+00279     \textcolor{keyword}{auto} status = serPort->ControlStream(streamId, \textcolor{keyword}{true});
+00280 
+00281     \textcolor{comment}{//Both channels are set to receive test signal}
+00282     \textcolor{comment}{//A channel full scale, B channel -6 dB}
+00283     \textcolor{comment}{//A channel amplitude should always be bigger than channel B}
+00284     \textcolor{comment}{//otherwise it would show channels data swapping}
+00285     lime::IStreamChannel::Metadata metadata;
+00286     \textcolor{keywordtype}{int} samplesRead = 0;
+00287     samplesRead = ((IStreamChannel*)streamId)->Read((\textcolor{keywordtype}{void} *)buffer, streamsize, &metadata, 1000);
+00288     EXPECT\_EQ(streamsize, samplesRead);
+00289 \textcolor{preprocessor}{#if DRAW\_GNU\_PLOTS}
+00290     gp.write(\textcolor{stringliteral}{"set title 'Channel Rx B'\(\backslash\)n"});
+00291     gp.write(\textcolor{stringliteral}{"set size square\(\backslash\)n set xrange[-2050:2050]\(\backslash\)n set yrange[-2050:2050]\(\backslash\)n"});
+00292     gp.write(\textcolor{stringliteral}{"plot '-' with points title 'B'\(\backslash\)n"});
+00293     \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} j=0; j<streamsize; ++j)
+00294         gp.writef(\textcolor{stringliteral}{"%i %i\(\backslash\)n"}, buffer[j].i, buffer[j].q);
+00295     gp.write(\textcolor{stringliteral}{"e\(\backslash\)n"});
+00296     gp.flush();
+00297 \textcolor{preprocessor}{#endif}
+00298     \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} i=0; i < samplesRead; ++i)
+00299     \{
+00300         \textcolor{keywordtype}{float} ampB = pow(buffer[i].i, 2) + pow(buffer[i].q, 2);
+00301         \textcolor{comment}{//make sure both channels are receiving valid samples}
+00302         ASSERT\_NE(0, ampB);
+00303         \textcolor{keyword}{const} \textcolor{keywordtype}{int} minAmp = 1900/2;
+00304         \textcolor{keyword}{const} \textcolor{keywordtype}{int} maxAmp = 2100/2;
+00305         ASSERT\_GT(ampB, minAmp*minAmp);
+00306         ASSERT\_LT(ampB, maxAmp*maxAmp);
+00307     \}
+00308     status = serPort->ControlStream(streamId, \textcolor{keyword}{false});
+00309     ASSERT\_EQ(status, 0);
+00310     status = serPort->CloseStream(streamId);
+00311     ASSERT\_EQ(status, 0);
+00312 
+00313     \textcolor{keyword}{delete} []buffer;
+00314 \}
+00315 
+00316 TEST_F (StreamingFixture, channelsRxAB\_TxAB)
+00317 \{
+00318     LMS7002M lmsControl;
+00319     lmsControl.SetConnection(serPort, 0);
+00320     lmsControl.ResetChip();
+00321     \textcolor{comment}{//load initial settings to get samples}
+00322     lmsControl.UploadAll();
+00323     lmsControl.SetActiveChannel(LMS7002M::ChA);
+00324     lmsControl.Modify_SPI_Reg_bits(LMS7param(EN_ADCCLKH_CLKGN), 0);
+00325     lmsControl.Modify_SPI_Reg_bits(LMS7param(CLKH_OV_CLKL_CGEN), 2);
+00326     lmsControl.SetFrequencySX(LMS7002M::Tx, 1e6);
+00327     lmsControl.SetFrequencySX(LMS7002M::Rx, 1e6);
+00328     lmsControl.Modify_SPI_Reg_bits(LMS7param(LML1_MODE), 0);
+00329     lmsControl.Modify_SPI_Reg_bits(LMS7param(LML2_MODE), 0);
+00330     lmsControl.Modify_SPI_Reg_bits(LMS7param(PD_RX_AFE2), 0);
+00331 
+00332     lmsControl.SetActiveChannel(LMS7002M::ChAB);
+00333     lmsControl.Modify_SPI_Reg_bits(LMS7param(INSEL_RXTSP), 1);
+00334     lmsControl.Modify_SPI_Reg_bits(LMS7param(GFIR1_BYP_RXTSP), 1);
+00335     lmsControl.Modify_SPI_Reg_bits(LMS7param(GFIR2_BYP_RXTSP), 1);
+00336     lmsControl.Modify_SPI_Reg_bits(LMS7param(GFIR3_BYP_RXTSP), 1);
+00337     lmsControl.Modify_SPI_Reg_bits(LMS7param(AGC_BYP_RXTSP), 1);
+00338     lmsControl.Modify_SPI_Reg_bits(LMS7param(CMIX_BYP_RXTSP), 1);
+00339 
+00340     lmsControl.SetActiveChannel(LMS7002M::ChA);
+00341     lmsControl.Modify_SPI_Reg_bits(LMS7param(TSGFCW_RXTSP), 1);
+00342     lmsControl.Modify_SPI_Reg_bits(LMS7param(TSGFC_RXTSP), 1);
+00343     lmsControl.SetActiveChannel(LMS7002M::ChB);
+00344     lmsControl.Modify_SPI_Reg_bits(LMS7param(TSGFCW_RXTSP), 1);
+00345     lmsControl.Modify_SPI_Reg_bits(LMS7param(TSGFC_RXTSP), 0);
+00346     lmsControl.SetActiveChannel(LMS7002M::ChA);
+00347     \textcolor{keywordtype}{int} ch = lmsControl.GetActiveChannelIndex();
+00348     \textcolor{keywordtype}{float} cgenFreq = 30.72e6 * 4;
+00349     lmsControl.SetInterfaceFrequency(cgenFreq, 0, 0);
+00350     \textcolor{keyword}{auto} txRate = lmsControl.GetSampleRate(LMS7002M::Tx, LMS7002M::ChA);
+00351     \textcolor{keyword}{auto} rxRate = lmsControl.GetSampleRate(LMS7002M::Rx, LMS7002M::ChA);
+00352     serPort->UpdateExternalDataRate(0, txRate, rxRate);
+00353 
+00354     \textcolor{keyword}{const} \textcolor{keywordtype}{int} chCount = 2;
+00355 
+00356     \textcolor{comment}{//setup streaming}
+00357     \textcolor{keywordtype}{size\_t} streamIdsRx[chCount];
+00358     \textcolor{keywordtype}{size\_t} streamIdsTx[chCount];
+00359     StreamConfig config;
+00360     config.channelID = 0;
+00361     config.isTx = \textcolor{keyword}{false};
+00362     config.format = StreamConfig::STREAM\_12\_BIT\_COMPRESSED;
+00363 
+00364     \textcolor{comment}{//create streaming channel}
+00365     \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} i=0; i<chCount; ++i)
+00366     \{
+00367         config.isTx = \textcolor{keyword}{false};
+00368         config.channelID = i;
+00369         serPort->SetupStream(streamIdsRx[i], config);
+00370         ASSERT\_NE(streamIdsRx[i], \textcolor{keywordtype}{size\_t}(~0));
+00371     \}
+00372 
+00373     \textcolor{comment}{//create streaming channel}
+00374     \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} i=0; i<chCount; ++i)
+00375     \{
+00376         config.isTx = \textcolor{keyword}{true};
+00377         config.channelID = i;
+00378         serPort->SetupStream(streamIdsTx[i], config);
+00379         ASSERT\_NE(streamIdsTx[i], \textcolor{keywordtype}{size\_t}(~0));
+00380     \}
+00381 
+00382     \textcolor{keyword}{const} \textcolor{keywordtype}{int} streamsize = 680*32;
+00383     complex16_t** buffers = \textcolor{keyword}{new} complex16_t*[chCount];
+00384     \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} i=0; i<chCount; ++i)
+00385         buffers[i] = \textcolor{keyword}{new} complex16_t[streamsize];
+00386 
+00387     \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} i=0; i<chCount; ++i)
+00388     \{
+00389         \textcolor{keyword}{auto} status = serPort->ControlStream(streamIdsRx[i], \textcolor{keyword}{true});
+00390         ASSERT\_EQ(status, 0);
+00391     \}
+00392     \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} i=0; i<chCount; ++i)
+00393     \{
+00394         \textcolor{keyword}{auto} status = serPort->ControlStream(streamIdsTx[i], \textcolor{keyword}{true});
+00395         ASSERT\_EQ(status, 0);
+00396     \}
+00397 
+00398 \textcolor{preprocessor}{#if DRAW\_GNU\_PLOTS}
+00399     gp.write(\textcolor{stringliteral}{"set title 'Channels Rx AB 2 Tx AB'\(\backslash\)n"});
+00400     gp.write(\textcolor{stringliteral}{"set size square\(\backslash\)n set xrange[-2050:2050]\(\backslash\)n set yrange[-2050:2050]\(\backslash\)n"});
+00401     gp.write(\textcolor{stringliteral}{"plot '-' with points"});
+00402     \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} i=1; i<chCount; ++i)
+00403         gp.write(\textcolor{stringliteral}{", '-' with points"});
+00404     gp.write(\textcolor{stringliteral}{"\(\backslash\)n"});
+00405 \textcolor{preprocessor}{#endif}
+00406     \textcolor{comment}{//Both channels are set to receive test signal}
+00407     \textcolor{comment}{//A channel full scale, B channel -6 dB}
+00408     \textcolor{comment}{//A channel amplitude should always be bigger than channel B}
+00409     \textcolor{comment}{//otherwise it would show channels data swapping}
+00410     lime::IStreamChannel::Metadata metadata;
+00411     \textcolor{keywordtype}{int} samplesRead[chCount];
+00412     \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} i=0; i<chCount; ++i)
+00413     \{
+00414         samplesRead[i] = ((IStreamChannel*)streamIdsRx[i])->Read((\textcolor{keywordtype}{void} *)buffers[i], streamsize, &metadata,
+       1000);
+00415         EXPECT\_EQ(streamsize, samplesRead[i]);
+00416 \textcolor{preprocessor}{#if DRAW\_GNU\_PLOTS}
+00417         \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} j=0; j<streamsize; ++j)
+00418             gp.writef(\textcolor{stringliteral}{"%i %i\(\backslash\)n"}, buffers[i][j].i, buffers[i][j].q);
+00419         gp.write(\textcolor{stringliteral}{"e\(\backslash\)n"});
+00420         gp.flush();
+00421 \textcolor{preprocessor}{#endif}
+00422     \}
+00423 
+00424     \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} i=0; i < samplesRead[ch] && chCount > 1; ++i)
+00425     \{
+00426         \textcolor{comment}{//compare amplitudes from each channel, should be A > B}
+00427         \textcolor{keywordtype}{float} ampA = pow(buffers[0][i].i, 2) + pow(buffers[0][i].q, 2);
+00428         \textcolor{keywordtype}{float} ampB = pow(buffers[1][i].i, 2) + pow(buffers[1][i].q, 2);
+00429         \textcolor{comment}{//make sure both channels are receiving valid samples}
+00430         ASSERT\_NE(0, ampA);
+00431         ASSERT\_NE(0, ampB);
+00432         ASSERT\_GT(ampA, ampB);
+00433         constexpr \textcolor{keywordtype}{int} maxAmp = 2100;
+00434         ASSERT\_LT(ampA, maxAmp*maxAmp);
+00435         ASSERT\_LT(ampB, maxAmp*maxAmp);
+00436     \}
+00437     \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} i=0; i<chCount; ++i)
+00438     \{
+00439         \textcolor{keyword}{auto} status = serPort->ControlStream(streamIdsRx[i], \textcolor{keyword}{false});
+00440         ASSERT\_EQ(status, 0);
+00441         status = serPort->ControlStream(streamIdsTx[i], \textcolor{keyword}{false});
+00442         ASSERT\_EQ(status, 0);
+00443     \}
+00444     \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} i=0; i<chCount; ++i)
+00445     \{
+00446         \textcolor{keyword}{auto} status = serPort->CloseStream(streamIdsRx[i]);
+00447         ASSERT\_EQ(status, 0);
+00448         status = serPort->CloseStream(streamIdsTx[i]);
+00449         ASSERT\_EQ(status, 0);
+00450     \}
+00451     \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} i=0; i<chCount; ++i)
+00452         \textcolor{keyword}{delete} []buffers[i];
+00453     \textcolor{keyword}{delete} buffers;
+00454 \}
+00455 
+00456 TEST_F (StreamingFixture, DISABLED\_Rx2TxLoopback)
+00457 \{
+00458     \textcolor{keyword}{const} \textcolor{keyword}{auto} testDuration = std::chrono::seconds(5);
+00459     LMS7002M lmsControl;
+00460     lmsControl.SetConnection(serPort, 0);
+00461     lmsControl.ResetChip();
+00462     \textcolor{comment}{//load initial settings to get samples}
+00463     lmsControl.UploadAll();
+00464     lmsControl.SetActiveChannel(LMS7002M::ChA);
+00465     lmsControl.Modify_SPI_Reg_bits(LMS7param(EN_ADCCLKH_CLKGN), 0);
+00466     lmsControl.Modify_SPI_Reg_bits(LMS7param(CLKH_OV_CLKL_CGEN), 2);
+00467     lmsControl.SetFrequencySX(LMS7002M::Tx, 1e6);
+00468     lmsControl.SetFrequencySX(LMS7002M::Rx, 1e6);
+00469     lmsControl.Modify_SPI_Reg_bits(LMS7param(LML1_MODE), 0);
+00470     lmsControl.Modify_SPI_Reg_bits(LMS7param(LML2_MODE), 0);
+00471     lmsControl.Modify_SPI_Reg_bits(LMS7param(PD_RX_AFE2), 0);
+00472 
+00473     lmsControl.SetActiveChannel(LMS7002M::ChAB);
+00474     lmsControl.Modify_SPI_Reg_bits(LMS7param(INSEL_RXTSP), 1);
+00475     lmsControl.Modify_SPI_Reg_bits(LMS7param(GFIR1_BYP_RXTSP), 1);
+00476     lmsControl.Modify_SPI_Reg_bits(LMS7param(GFIR2_BYP_RXTSP), 1);
+00477     lmsControl.Modify_SPI_Reg_bits(LMS7param(GFIR3_BYP_RXTSP), 1);
+00478     lmsControl.Modify_SPI_Reg_bits(LMS7param(AGC_BYP_RXTSP), 1);
+00479     lmsControl.Modify_SPI_Reg_bits(LMS7param(CMIX_BYP_RXTSP), 1);
+00480 
+00481     lmsControl.SetActiveChannel(LMS7002M::ChA);
+00482     lmsControl.Modify_SPI_Reg_bits(LMS7param(TSGFCW_RXTSP), 1);
+00483     lmsControl.Modify_SPI_Reg_bits(LMS7param(TSGFC_RXTSP), 1);
+00484     lmsControl.SetActiveChannel(LMS7002M::ChB);
+00485     lmsControl.Modify_SPI_Reg_bits(LMS7param(TSGFCW_RXTSP), 1);
+00486     lmsControl.Modify_SPI_Reg_bits(LMS7param(TSGFC_RXTSP), 0);
+00487     lmsControl.SetActiveChannel(LMS7002M::ChA);
+00488 
+00489     \textcolor{keywordtype}{float} cgenFreq = 40e6;
+00490     \textcolor{keywordtype}{int} statusInterface = lmsControl.SetInterfaceFrequency(cgenFreq, 0, 0);
+00491     ASSERT\_EQ(0, statusInterface );
+00492     \textcolor{keyword}{auto} txRate = lmsControl.GetSampleRate(LMS7002M::Tx, LMS7002M::ChA);
+00493     \textcolor{keyword}{auto} rxRate = lmsControl.GetSampleRate(LMS7002M::Rx, LMS7002M::ChA);
+00494     printf(\textcolor{stringliteral}{"Rx rate: %g , Tx rate: %g\(\backslash\)n"}, rxRate, txRate);
+00495     serPort->UpdateExternalDataRate(0, txRate, rxRate);
+00496 
+00497     \textcolor{comment}{//setup streaming}
+00498     \textcolor{keywordtype}{size\_t} streamIds[2];
+00499     StreamConfig config;
+00500     config.channelID = 0;
+00501     config.isTx = \textcolor{keyword}{false};
+00502     config.format = StreamConfig::STREAM\_12\_BIT\_COMPRESSED;
+00503     serPort->SetupStream(streamIds[0], config);
+00504 
+00505     config.isTx = \textcolor{keyword}{true};
+00506     serPort->SetupStream(streamIds[1], config);
+00507 
+00508     \textcolor{keyword}{const} \textcolor{keywordtype}{int} streamsize = 16*1360;
+00509     complex16_t buffers[streamsize];
+00510 
+00511     \textcolor{keyword}{auto} status = serPort->ControlStream(streamIds[0], \textcolor{keyword}{true});
+00512     ASSERT\_EQ(status, 0);
+00513     status = serPort->ControlStream(streamIds[1], \textcolor{keyword}{true});
+00514     ASSERT\_EQ(status, 0);
+00515 
+00516     \textcolor{comment}{//this\_thread::sleep\_for(chrono::seconds(2));}
+00517     lime::IStreamChannel::Metadata metadata;
+00518     \textcolor{keyword}{auto} testStart = chrono::high\_resolution\_clock::now();
+00519     \textcolor{keyword}{auto} t2 = testStart;
+00520     \textcolor{keyword}{auto} infoStart = testStart;
+00521     \textcolor{keyword}{auto} infoPeriod = std::chrono::seconds(1);
+00522     \textcolor{keywordflow}{while}(t2-testStart < testDuration)
+00523     \{
+00524         \textcolor{keywordtype}{int} samplesRead = ((IStreamChannel*)streamIds[0])->Read((\textcolor{keywordtype}{void} *)buffers, streamsize, &metadata, 100
+      0);
+00525         ASSERT\_EQ(samplesRead, streamsize);
+00526         metadata.timestamp += 1024*1024;
+00527         \textcolor{keywordtype}{int} samplesWrite = ((IStreamChannel*)streamIds[1])->Write((\textcolor{keywordtype}{void} *)buffers, samplesRead, &metadata, 
+      1000);
+00528         ASSERT\_EQ(samplesWrite, samplesRead);
+00529         t2 = chrono::high\_resolution\_clock::now();
+00530 
+00531         \textcolor{keywordflow}{if} (t2-infoStart >= infoPeriod)
+00532         \{
+00533             infoStart = t2;
+00534             IStreamChannel::Info rxStats = ((IStreamChannel*)streamIds[0])->GetInfo();
+00535             IStreamChannel::Info txStats = ((IStreamChannel*)streamIds[1])->GetInfo();
+00536             printf(\textcolor{stringliteral}{"Rx FIFO %2.1f%% \(\backslash\)t\(\backslash\)t Tx FIFO %2.1f%%\(\backslash\)n"}, 100.0*rxStats.fifoItemsCount/rxStats.fifoSize,
+       100.0*txStats.fifoItemsCount/txStats.fifoSize);
+00537         \}
+00538     \}
+00539 
+00540     status = serPort->ControlStream(streamIds[0], \textcolor{keyword}{false});
+00541     ASSERT\_EQ(status, 0);
+00542     status = serPort->ControlStream(streamIds[1], \textcolor{keyword}{false});
+00543     ASSERT\_EQ(status, 0);
+00544     status = serPort->CloseStream(streamIds[0]);
+00545     ASSERT\_EQ(status, 0);
+00546     status = serPort->CloseStream(streamIds[1]);
+00547     ASSERT\_EQ(status, 0);
+00548 \}
+00549 
+00550 TEST_F (StreamingFixture, channelsRxAB\_Float)
+00551 \{
+00552     LMS7002M lmsControl;
+00553     lmsControl.SetConnection(serPort, 0);
+00554     lmsControl.ResetChip();
+00555     \textcolor{comment}{//load initial settings to get samples}
+00556     lmsControl.UploadAll();
+00557     lmsControl.SetActiveChannel(LMS7002M::ChA);
+00558     lmsControl.Modify_SPI_Reg_bits(LMS7param(EN_ADCCLKH_CLKGN), 0);
+00559     lmsControl.Modify_SPI_Reg_bits(LMS7param(CLKH_OV_CLKL_CGEN), 2);
+00560     lmsControl.SetFrequencySX(LMS7002M::Tx, 1e6);
+00561     lmsControl.SetFrequencySX(LMS7002M::Rx, 1e6);
+00562     lmsControl.Modify_SPI_Reg_bits(LMS7param(LML1_MODE), 0);
+00563     lmsControl.Modify_SPI_Reg_bits(LMS7param(LML2_MODE), 0);
+00564     lmsControl.Modify_SPI_Reg_bits(LMS7param(PD_RX_AFE2), 0);
+00565 
+00566     lmsControl.SetActiveChannel(LMS7002M::ChAB);
+00567     lmsControl.Modify_SPI_Reg_bits(LMS7param(INSEL_RXTSP), 1);
+00568     lmsControl.Modify_SPI_Reg_bits(LMS7param(GFIR1_BYP_RXTSP), 1);
+00569     lmsControl.Modify_SPI_Reg_bits(LMS7param(GFIR2_BYP_RXTSP), 1);
+00570     lmsControl.Modify_SPI_Reg_bits(LMS7param(GFIR3_BYP_RXTSP), 1);
+00571     lmsControl.Modify_SPI_Reg_bits(LMS7param(AGC_BYP_RXTSP), 1);
+00572     lmsControl.Modify_SPI_Reg_bits(LMS7param(CMIX_BYP_RXTSP), 1);
+00573 
+00574     lmsControl.SetActiveChannel(LMS7002M::ChA);
+00575     lmsControl.Modify_SPI_Reg_bits(LMS7param(TSGFCW_RXTSP), 1);
+00576     lmsControl.Modify_SPI_Reg_bits(LMS7param(TSGFC_RXTSP), 1);
+00577     lmsControl.SetActiveChannel(LMS7002M::ChB);
+00578     lmsControl.Modify_SPI_Reg_bits(LMS7param(TSGFCW_RXTSP), 1);
+00579     lmsControl.Modify_SPI_Reg_bits(LMS7param(TSGFC_RXTSP), 0);
+00580     lmsControl.SetActiveChannel(LMS7002M::ChA);
+00581     \textcolor{keywordtype}{int} ch = lmsControl.GetActiveChannelIndex();
+00582     \textcolor{keywordtype}{float} cgenFreq = 30.72e6 * 4;
+00583     lmsControl.SetInterfaceFrequency(cgenFreq, 0, 0);
+00584     \textcolor{keyword}{auto} txRate = lmsControl.GetSampleRate(LMS7002M::Tx, LMS7002M::ChA);
+00585     \textcolor{keyword}{auto} rxRate = lmsControl.GetSampleRate(LMS7002M::Rx, LMS7002M::ChA);
+00586     serPort->UpdateExternalDataRate(0, txRate, rxRate);
+00587 
+00588     \textcolor{keyword}{const} \textcolor{keywordtype}{int} chCount = 2;
+00589 
+00590     \textcolor{comment}{//setup streaming}
+00591     \textcolor{keywordtype}{size\_t} streamIds[chCount];
+00592     StreamConfig config;
+00593     config.isTx = \textcolor{keyword}{false};
+00594     config.format = StreamConfig::STREAM\_COMPLEX\_FLOAT32;
+00595     \textcolor{comment}{//create streaming channel}
+00596     \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} i=0; i<chCount; ++i)
+00597     \{
+00598         config.channelID = i;
+00599         serPort->SetupStream(streamIds[i], config);
+00600         ASSERT\_NE(streamIds[i], \textcolor{keywordtype}{size\_t}(~0));
+00601     \}
+00602 
+00603     \textcolor{keyword}{const} uint32\_t streamsize = 680*32;
+00604     complexFloat32_t** buffers = \textcolor{keyword}{new} complexFloat32_t*[chCount];
+00605     \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} i=0; i<chCount; ++i)
+00606         buffers[i] = \textcolor{keyword}{new} complexFloat32_t[streamsize];
+00607 
+00608     \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} i=0; i<chCount; ++i)
+00609     \{
+00610         \textcolor{keyword}{auto} status = serPort->ControlStream(streamIds[i], \textcolor{keyword}{true});
+00611         ASSERT\_EQ(status, 0);
+00612     \}
+00613 
+00614     \textcolor{comment}{//Both channels are set to receive test signal}
+00615     \textcolor{comment}{//A channel full scale, B channel -6 dB}
+00616     \textcolor{comment}{//A channel amplitude should always be bigger than channel B}
+00617     \textcolor{comment}{//otherwise it would show channels data swapping}
+00618     lime::IStreamChannel::Metadata metadata;
+00619 
+00620 \textcolor{preprocessor}{#if DRAW\_GNU\_PLOTS}
+00621     gp.write(\textcolor{stringliteral}{"set title 'Channels Rx AB floats'\(\backslash\)n"});
+00622     gp.write(\textcolor{stringliteral}{"set size square\(\backslash\)n set xrange[-1:1]\(\backslash\)n set yrange[-1:1]\(\backslash\)n"});
+00623     gp.write(\textcolor{stringliteral}{"plot '-' with points title 'A', '-' with points title 'B'\(\backslash\)n"});
+00624 \textcolor{preprocessor}{#endif}
+00625     \textcolor{keywordtype}{int} samplesRead[chCount];
+00626     \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} i=0; i<chCount; ++i)
+00627     \{
+00628         samplesRead[i] = ((IStreamChannel*)streamIds[i])->Read((\textcolor{keywordtype}{void} *)buffers[i], streamsize, &metadata, 1
+      000);
+00629         EXPECT\_EQ(streamsize, samplesRead[i]);
+00630 \textcolor{preprocessor}{#if DRAW\_GNU\_PLOTS}
+00631         \textcolor{keywordflow}{for}(uint32\_t j=0; j<streamsize; ++j)
+00632             gp.writef(\textcolor{stringliteral}{"%f %f\(\backslash\)n"}, buffers[i][j].i, buffers[i][j].q);
+00633         gp.write(\textcolor{stringliteral}{"e\(\backslash\)n"});
+00634         gp.flush();
+00635 \textcolor{preprocessor}{#endif}
+00636     \}
+00637 
+00638     \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} i=0; i < samplesRead[ch]; ++i)
+00639     \{
+00640         \textcolor{comment}{//compare amplitudes from each channel, should be A > B}
+00641         \textcolor{keywordtype}{float} ampA = pow(buffers[0][i].i, 2) + pow(buffers[0][i].q, 2);
+00642         \textcolor{keywordtype}{float} ampB = pow(buffers[1][i].i, 2) + pow(buffers[1][i].q, 2);
+00643         \textcolor{comment}{//make sure both channels are receiving valid samples}
+00644         ASSERT\_NE(0, ampA);
+00645         ASSERT\_NE(0, ampB);
+00646         ASSERT\_GT(ampA, ampB);
+00647         constexpr \textcolor{keywordtype}{int} maxAmp = 1;
+00648         ASSERT\_LT(ampA, maxAmp*maxAmp);
+00649         ASSERT\_LT(ampB, maxAmp*maxAmp);
+00650     \}
+00651 
+00652     \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} i=0; i<chCount; ++i)
+00653     \{
+00654         \textcolor{keyword}{auto} status = serPort->ControlStream(streamIds[i], \textcolor{keyword}{false});
+00655         ASSERT\_EQ(status, 0);
+00656     \}
+00657     \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} i=0; i<chCount; ++i)
+00658     \{
+00659         \textcolor{keyword}{auto} status = serPort->CloseStream(streamIds[i]);
+00660         ASSERT\_EQ(status, 0);
+00661     \}
+00662     \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} i=0; i<chCount; ++i)
+00663         \textcolor{keyword}{delete} []buffers[i];
+00664     \textcolor{keyword}{delete} buffers;
+00665 \}
+\end{DoxyCode}

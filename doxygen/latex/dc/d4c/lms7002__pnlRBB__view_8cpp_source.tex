@@ -1,0 +1,206 @@
+\subsection{lms7002\+\_\+pnl\+R\+B\+B\+\_\+view.\+cpp}
+\label{lms7002__pnlRBB__view_8cpp_source}\index{/home/erik/prefix/default/src/limesuite-\/dev/src/lms7002\+\_\+wxgui/lms7002\+\_\+pnl\+R\+B\+B\+\_\+view.\+cpp@{/home/erik/prefix/default/src/limesuite-\/dev/src/lms7002\+\_\+wxgui/lms7002\+\_\+pnl\+R\+B\+B\+\_\+view.\+cpp}}
+
+\begin{DoxyCode}
+00001 \textcolor{preprocessor}{#include "lms7002_pnlRBB_view.h"}
+00002 \textcolor{preprocessor}{#include <map>}
+00003 \textcolor{preprocessor}{#include <wx/msgdlg.h>}
+00004 \textcolor{preprocessor}{#include "numericSlider.h"}
+00005 \textcolor{preprocessor}{#include "lms7002_gui_utilities.h"}
+00006 \textcolor{preprocessor}{#include "lms7suiteEvents.h"}
+00007 \textcolor{preprocessor}{#include "lms7suiteAppFrame.h"}
+00008 \textcolor{keyword}{using namespace }lime;
+00009 
+00010 lms7002_pnlRBB_view::lms7002_pnlRBB_view( wxWindow* parent )
+00011 :
+00012 pnlRBB_view( parent )
+00013 \{
+00014 
+00015 \}
+00016 
+00017 lms7002_pnlRBB_view::lms7002_pnlRBB_view( wxWindow* parent, wxWindowID \textcolor{keywordtype}{id}, \textcolor{keyword}{const} wxPoint& pos, \textcolor{keyword}{const} wxSize
+      & size, \textcolor{keywordtype}{long} style )
+00018     : pnlRBB_view(parent, id, pos, size, style), lmsControl(nullptr)
+00019 \{
+00020     wndId2Enum[cmbC_CTL_LPFH_RBB] = LMS7param(C_CTL_LPFH_RBB);
+00021     wndId2Enum[cmbC_CTL_LPFL_RBB] = LMS7param(C_CTL_LPFL_RBB);
+00022     wndId2Enum[cmbC_CTL_PGA_RBB] = LMS7param(C_CTL_PGA_RBB);
+00023     wndId2Enum[chkEN_G_RBB] = LMS7param(EN_G_RBB);
+00024     wndId2Enum[cmbG_PGA_RBB] = LMS7param(G_PGA_RBB);
+00025     wndId2Enum[cmbICT_LPF_IN_RBB] = LMS7param(ICT_LPF_IN_RBB);
+00026     wndId2Enum[cmbICT_LPF_OUT_RBB] = LMS7param(ICT_LPF_OUT_RBB);
+00027     wndId2Enum[cmbICT_PGA_IN_RBB] = LMS7param(ICT_PGA_IN_RBB);
+00028     wndId2Enum[cmbICT_PGA_OUT_RBB] = LMS7param(ICT_PGA_OUT_RBB);
+00029     wndId2Enum[cmbINPUT_CTL_PGA_RBB] = LMS7param(INPUT_CTL_PGA_RBB);
+00030     wndId2Enum[rgrOSW_PGA_RBB] = LMS7param(OSW_PGA_RBB);
+00031     wndId2Enum[chkPD_LPFH_RBB] = LMS7param(PD_LPFH_RBB);
+00032     wndId2Enum[chkPD_LPFL_RBB] = LMS7param(PD_LPFL_RBB);
+00033     wndId2Enum[chkPD_PGA_RBB] = LMS7param(PD_PGA_RBB);
+00034     wndId2Enum[cmbRCC_CTL_LPFH_RBB] = LMS7param(RCC_CTL_LPFH_RBB);
+00035     wndId2Enum[cmbRCC_CTL_LPFL_RBB] = LMS7param(RCC_CTL_LPFL_RBB);
+00036     wndId2Enum[cmbRCC_CTL_PGA_RBB] = LMS7param(RCC_CTL_PGA_RBB);
+00037     wndId2Enum[cmbR_CTL_LPF_RBB] = LMS7param(R_CTL_LPF_RBB);
+00038     wndId2Enum[chkEN_DIR_RBB] = LMS7param(EN_DIR_RBB);
+00039 
+00040     wxArrayString temp;
+00041     temp.clear();
+00042     \textcolor{keywordflow}{for} (\textcolor{keywordtype}{int} i = 0; i<32; ++i)
+00043     \{
+00044         temp.push\_back(wxString::Format(\_(\textcolor{stringliteral}{"%i dB"}), -12 + i));
+00045     \}
+00046     cmbG_PGA_RBB->Set(temp);
+00047 
+00048     temp.clear();
+00049     \textcolor{keywordflow}{for} (\textcolor{keywordtype}{int} i = 0; i<32; ++i)
+00050     \{
+00051         temp.push\_back(wxString::Format(\_(\textcolor{stringliteral}{"%i"}), i));
+00052     \}
+00053     cmbICT_LPF_IN_RBB->Set(temp);
+00054     cmbICT_LPF_OUT_RBB->Set(temp);
+00055     cmbICT_PGA_IN_RBB->Set(temp);
+00056     cmbICT_PGA_OUT_RBB->Set(temp);
+00057     cmbRCC_CTL_PGA_RBB->Append(temp);
+00058     cmbR_CTL_LPF_RBB->Append(temp);
+00059 
+00060     temp.clear();
+00061     temp.push\_back(\textcolor{stringliteral}{"LPFL\_RBB"});
+00062     temp.push\_back(\textcolor{stringliteral}{"LPFH\_RBB"});
+00063     temp.push\_back(\textcolor{stringliteral}{"LPF bypass"});
+00064     temp.push\_back(\textcolor{stringliteral}{"Loopback from TX"});
+00065     temp.push\_back(\textcolor{stringliteral}{"Loopback path from peak detector"});
+00066     cmbINPUT_CTL_PGA_RBB->Set(temp);
+00067 
+00068     temp.clear();
+00069     \textcolor{keywordflow}{for} (\textcolor{keywordtype}{int} i = 0; i<8; ++i)
+00070     \{
+00071         temp.push\_back(wxString::Format(\_(\textcolor{stringliteral}{"%i"}), i));
+00072     \}
+00073     cmbRCC_CTL_LPFH_RBB->Set(temp);
+00074 
+00075     temp.clear();
+00076     temp.push\_back(\textcolor{stringliteral}{"when rxMode is 1.4 MHz"});
+00077     temp.push\_back(\textcolor{stringliteral}{"when 3 MHz"});
+00078     temp.push\_back(\textcolor{stringliteral}{"when 5 MHz"});
+00079     temp.push\_back(\textcolor{stringliteral}{"when 10 MHz"});
+00080     temp.push\_back(\textcolor{stringliteral}{"when 15 MHz"});
+00081     temp.push\_back(\textcolor{stringliteral}{"when 20 MHz"});
+00082     cmbRCC_CTL_LPFL_RBB->Set(temp);
+00083 
+00084     LMS7002_WXGUI::UpdateTooltips(wndId2Enum, \textcolor{keyword}{true});
+00085 \}
+00086 
+00087 \textcolor{keywordtype}{void} lms7002_pnlRBB_view::Initialize(lms_device_t* pControl)
+00088 \{
+00089     lmsControl = pControl;
+00090     assert(lmsControl != \textcolor{keyword}{nullptr});
+00091 \}
+00092 
+00093 \textcolor{keywordtype}{void} lms7002_pnlRBB_view::ParameterChangeHandler(wxSpinEvent& event)
+00094 \{
+00095     wxCommandEvent evt;
+00096     evt.SetInt(event.GetInt());
+00097     evt.SetId(event.GetId());
+00098     evt.SetEventObject(event.GetEventObject());
+00099     ParameterChangeHandler(evt);
+00100 \}
+00101 
+00102 \textcolor{keywordtype}{void} lms7002_pnlRBB_view::ParameterChangeHandler(wxCommandEvent& event)
+00103 \{
+00104     assert(lmsControl != \textcolor{keyword}{nullptr});
+00105     LMS7Parameter parameter;
+00106     \textcolor{keywordflow}{try}
+00107     \{
+00108         parameter = wndId2Enum.at(reinterpret\_cast<wxWindow*>(event.GetEventObject()));
+00109     \}
+00110     \textcolor{keywordflow}{catch} (std::exception & e)
+00111     \{
+00112         std::cout << \textcolor{stringliteral}{"Control element(ID = "} << \textcolor{keyword}{event}.GetId() << \textcolor{stringliteral}{") don't have assigned LMS parameter."} << 
+      std::endl;
+00113         \textcolor{keywordflow}{return};
+00114     \}
+00115     LMS_WriteParam(lmsControl,parameter,event.GetInt());
+00116 \}
+00117 
+00118 \textcolor{keywordtype}{void} lms7002_pnlRBB_view::OncmbBBLoopbackSelected( wxCommandEvent& event )
+00119 \{
+00120     \textcolor{keywordflow}{switch} (cmbBBLoopback->GetSelection())
+00121     \{
+00122     \textcolor{keywordflow}{case} 0:
+00123         LMS_WriteParam(lmsControl,LMS7param(EN_LB_LPFH_RBB),\textcolor{keyword}{true});
+00124         LMS_WriteParam(lmsControl,LMS7param(EN_LB_LPFL_RBB),\textcolor{keyword}{false});
+00125         \textcolor{keywordflow}{break};
+00126     \textcolor{keywordflow}{case} 1:
+00127         LMS_WriteParam(lmsControl,LMS7param(EN_LB_LPFH_RBB),\textcolor{keyword}{false});
+00128         LMS_WriteParam(lmsControl,LMS7param(EN_LB_LPFL_RBB),\textcolor{keyword}{true});
+00129         \textcolor{keywordflow}{break};
+00130     \textcolor{keywordflow}{case} 2:
+00131         LMS_WriteParam(lmsControl,LMS7param(EN_LB_LPFH_RBB),\textcolor{keyword}{false});
+00132         LMS_WriteParam(lmsControl,LMS7param(EN_LB_LPFL_RBB),\textcolor{keyword}{false});
+00133         \textcolor{keywordflow}{break};
+00134     \textcolor{keywordflow}{default}:
+00135         LMS_WriteParam(lmsControl,LMS7param(EN_LB_LPFH_RBB),\textcolor{keyword}{false});
+00136         LMS_WriteParam(lmsControl,LMS7param(EN_LB_LPFL_RBB),\textcolor{keyword}{false});
+00137     \}
+00138 \}
+00139 
+00140 \textcolor{keywordtype}{void} lms7002_pnlRBB_view::UpdateGUI()
+00141 \{
+00142     assert(lmsControl != \textcolor{keyword}{nullptr});
+00143 
+00144     LMS7002_WXGUI::UpdateControlsByMap(\textcolor{keyword}{this}, lmsControl, wndId2Enum);
+00145 
+00146     \textcolor{keywordtype}{long} BBloopbackValue = 0;
+00147     uint16\_t EN\_LB\_LPFH\_RBBvalue;
+00148     LMS_ReadParam(lmsControl,LMS7param(EN_LB_LPFH_RBB),&EN\_LB\_LPFH\_RBBvalue);
+00149 
+00150     uint16\_t EN\_LB\_LPFL\_RBBvalue;
+00151     LMS_ReadParam(lmsControl,LMS7param(EN_LB_LPFL_RBB),&EN\_LB\_LPFL\_RBBvalue);
+00152     \textcolor{keywordflow}{if} (!EN\_LB\_LPFH\_RBBvalue && !EN\_LB\_LPFL\_RBBvalue)
+00153         BBloopbackValue = 2;
+00154     \textcolor{keywordflow}{else} \textcolor{keywordflow}{if} (EN\_LB\_LPFH\_RBBvalue && !EN\_LB\_LPFL\_RBBvalue)
+00155         BBloopbackValue = 0;
+00156     \textcolor{keywordflow}{else} \textcolor{keywordflow}{if} (!EN\_LB\_LPFH\_RBBvalue && EN\_LB\_LPFL\_RBBvalue)
+00157         BBloopbackValue = 1;
+00158     \textcolor{keywordflow}{else} \textcolor{comment}{//invalid combination}
+00159     \{
+00160         BBloopbackValue = 2;
+00161         LMS_WriteParam(lmsControl,LMS7param(EN_LB_LPFH_RBB),\textcolor{keyword}{false});
+00162         LMS_WriteParam(lmsControl,LMS7param(EN_LB_LPFL_RBB),\textcolor{keyword}{false});
+00163     \}
+00164     cmbBBLoopback->SetSelection(BBloopbackValue);
+00165 
+00166     \textcolor{comment}{//check if B channel is enabled}
+00167     uint16\_t value;
+00168     LMS_ReadParam(lmsControl,LMS7param(MAC),&value);
+00169     \textcolor{keywordflow}{if} (value >= 2)
+00170     \{
+00171         LMS_ReadParam(lmsControl,LMS7param(MIMO_SISO),&value);
+00172         \textcolor{keywordflow}{if} (value != 0)
+00173             wxMessageBox(\_(\textcolor{stringliteral}{"MIMO channel B is disabled"}), \_(\textcolor{stringliteral}{"Warning"}));
+00174     \}
+00175 
+00176     LMS_ReadParam(lmsControl,LMS7param(TRX_GAIN_SRC),&value);
+00177     cmbG_PGA_RBB->Enable(!value);
+00178     cmbC_CTL_PGA_RBB->Enable(!value);
+00179 \}
+00180 
+00181 \textcolor{keywordtype}{void} lms7002_pnlRBB_view::OnbtnTuneFilter(wxCommandEvent& event)
+00182 \{
+00183     \textcolor{keywordtype}{double} input1;
+00184     txtLowBW_MHz->GetValue().ToDouble(&input1);
+00185 
+00186     \textcolor{keywordtype}{int} status;
+00187     uint16\_t ch;
+00188 
+00189     LMS_ReadParam(lmsControl,LMS7param(MAC),&ch);
+00190     ch = (ch == 2) ? 1 : 0;
+00191     ch += 2*LMS7SuiteAppFrame::m_lmsSelection;
+00192     status = LMS_SetLPFBW(lmsControl,LMS_CH_RX,ch,input1*1e6);
+00193     \textcolor{keywordflow}{if} (status != 0)\{
+00194         wxMessageBox(wxString(\_(\textcolor{stringliteral}{"Rx Filter tune failed"})), \_(\textcolor{stringliteral}{"Error"}));
+00195         \textcolor{keywordflow}{return};
+00196     \}
+00197     LMS_Synchronize(lmsControl,\textcolor{keyword}{false});
+00198     UpdateGUI();
+00199 \}
+\end{DoxyCode}

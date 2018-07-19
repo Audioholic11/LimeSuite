@@ -1,0 +1,48 @@
+\subsection{lms.\+h}
+\label{lms_8h_source}\index{/home/erik/prefix/default/src/limesuite-\/dev/src/\+G\+F\+I\+R/lms.\+h@{/home/erik/prefix/default/src/limesuite-\/dev/src/\+G\+F\+I\+R/lms.\+h}}
+
+\begin{DoxyCode}
+00001 \textcolor{comment}{/* ************************************************************************ }
+00002 \textcolor{comment}{   FILE:    lms.h}
+00003 \textcolor{comment}{   COMMENT: }
+00004 \textcolor{comment}{   CONTENT:}
+00005 \textcolor{comment}{   AUTHOR:  Lime Microsystems}
+00006 \textcolor{comment}{   DATE:    Feb 24, 2000}
+00007 \textcolor{comment}{   REVISION:}
+00008 \textcolor{comment}{   ************************************************************************ */}
+00009 \textcolor{preprocessor}{#ifndef LMS\_GFIR\_HDR}
+00010 \textcolor{preprocessor}{#define LMS\_GFIR\_HDR}
+00011 
+00012 \textcolor{preprocessor}{#include <stdlib.h>}
+00013 \textcolor{preprocessor}{#include <math.h>}
+00014 
+00015 \textcolor{comment}{/* This two parameters define filter symmetry */}
+00016 \textcolor{preprocessor}{#define POSITIVE    (1)}
+00017 \textcolor{preprocessor}{#define NEGATIVE    (-1)}
+00018 
+00019 \textcolor{comment}{/* Number of points on the frequency grid */}
+00020 \textcolor{comment}{//#define LMS\_POINTS 1000}
+00021 \textcolor{preprocessor}{#define LMS\_POINTS 4000}
+00022 
+00023 \textcolor{comment}{/* Amplitude correction functions */}
+00024 \textcolor{keywordtype}{double} InvSinc();
+00025 \textcolor{keywordtype}{double} InvSincS();
+00026 \textcolor{keywordtype}{double} One();
+00027 
+00028 \textcolor{comment}{/* Amplitude correction functions we can support */}
+00029 \textcolor{preprocessor}{#define NONE        One     }\textcolor{comment}{/* Constant */}\textcolor{preprocessor}{}
+00030 \textcolor{preprocessor}{#define ONE     One     }\textcolor{comment}{/* as well */}\textcolor{preprocessor}{}
+00031 \textcolor{preprocessor}{#define INVSINC     InvSinc     }\textcolor{comment}{/* Iverse sinc */}\textcolor{preprocessor}{}
+00032 \textcolor{preprocessor}{#define INVSINCS    InvSincS    }\textcolor{comment}{/* Shifted Inverse Sinc */}\textcolor{preprocessor}{}
+00033 
+00034 \textcolor{comment}{/* Cosine filter type selection */}
+00035 \textcolor{preprocessor}{#define RAISEDCOSINE        1}
+00036 \textcolor{preprocessor}{#define ROOTRAISEDCOSINE    2}
+00037 
+00038 \textcolor{keywordtype}{int} lms(\textcolor{keywordtype}{double} * hr, \textcolor{keywordtype}{double} * hi, \textcolor{keywordtype}{double} * hcsd, \textcolor{keywordtype}{int} n, 
+00039     \textcolor{keywordtype}{double} * w, \textcolor{keywordtype}{double} * des, \textcolor{keywordtype}{double} * weight, \textcolor{keywordtype}{int} p, 
+00040     \textcolor{keywordtype}{int} cprec, \textcolor{keywordtype}{int} csdprec, \textcolor{keywordtype}{int} symmetry,
+00041     \textcolor{keywordtype}{int} ** bincode, \textcolor{keywordtype}{int} ** csdcode, \textcolor{keywordtype}{int} **csdcoder); 
+00042 
+00043 \textcolor{preprocessor}{#endif}
+\end{DoxyCode}

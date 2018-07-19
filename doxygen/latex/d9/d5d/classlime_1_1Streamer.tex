@@ -1,0 +1,822 @@
+\subsection{lime\+:\+:Streamer Class Reference}
+\label{classlime_1_1Streamer}\index{lime\+::\+Streamer@{lime\+::\+Streamer}}
+
+
+{\ttfamily \#include $<$Streamer.\+h$>$}
+
+
+
+Collaboration diagram for lime\+:\+:Streamer\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=550pt]{da/dc1/classlime_1_1Streamer__coll__graph}
+\end{center}
+\end{figure}
+\subsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+{\bf Streamer} ({\bf F\+P\+GA} $\ast$f, {\bf L\+M\+S7002M} $\ast$chip, {\bf int} {\bf id})
+\item 
+{\bf $\sim$\+Streamer} ()
+\item 
+{\bf Stream\+Channel} $\ast$ {\bf Setup\+Stream} (const {\bf Stream\+Config} \&config)
+\item 
+{\bf int} {\bf Get\+Stream\+Size} (bool {\bf tx})
+\item 
+uint64\+\_\+t {\bf Get\+Hardware\+Timestamp} ({\bf void})
+\item 
+{\bf void} {\bf Set\+Hardware\+Timestamp} (const uint64\+\_\+t now)
+\item 
+{\bf int} {\bf Update\+Threads} (bool stop\+All=false)
+\item 
+{\bf void} {\bf Receive\+Packets\+Loop} ()
+\begin{DoxyCompactList}\small\item\em Function dedicated for receiving data samples from board. \end{DoxyCompactList}\item 
+{\bf void} {\bf Transmit\+Packets\+Loop} ()
+\end{DoxyCompactItemize}
+\subsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+std\+::atomic$<$ uint32\+\_\+t $>$ {\bf rx\+Data\+Rate\+\_\+\+Bps}
+\item 
+std\+::atomic$<$ uint32\+\_\+t $>$ {\bf tx\+Data\+Rate\+\_\+\+Bps}
+\item 
+{\bf I\+Connection} $\ast$ {\bf data\+Port}
+\item 
+std\+::thread {\bf rx\+Thread}
+\item 
+std\+::thread {\bf tx\+Thread}
+\item 
+std\+::atomic$<$ bool $>$ {\bf terminate\+Rx}
+\item 
+std\+::atomic$<$ bool $>$ {\bf terminate\+Tx}
+\item 
+{\bf std\+::vector}$<$ {\bf Stream\+Channel} $>$ {\bf m\+Rx\+Streams}
+\item 
+{\bf std\+::vector}$<$ {\bf Stream\+Channel} $>$ {\bf m\+Tx\+Streams}
+\item 
+std\+::atomic$<$ uint64\+\_\+t $>$ {\bf rx\+Last\+Timestamp}
+\item 
+std\+::atomic$<$ uint64\+\_\+t $>$ {\bf tx\+Last\+Timestamp}
+\item 
+uint64\+\_\+t {\bf m\+Timestamp\+Offset}
+\item 
+{\bf int} {\bf stream\+Size}
+\item 
+unsigned {\bf tx\+Batch\+Size}
+\item 
+unsigned {\bf rx\+Batch\+Size}
+\item 
+{\bf Stream\+Config\+::\+Stream\+Data\+Format} {\bf data\+Link\+Format}
+\end{DoxyCompactItemize}
+\subsubsection*{Private Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+{\bf void} {\bf Align\+Rx\+T\+SP} ()
+\item 
+{\bf void} {\bf Align\+Rx\+RF} (bool restore\+Values)
+\item 
+{\bf void} {\bf Align\+Quadrature} (bool restore\+Values)
+\item 
+{\bf void} {\bf Rst\+Rx\+I\+Q\+Gen} ()
+\item 
+double {\bf Get\+Phase\+Offset} ({\bf int} bin)
+\end{DoxyCompactItemize}
+\subsubsection*{Private Attributes}
+\begin{DoxyCompactItemize}
+\item 
+{\bf F\+P\+GA} $\ast$ {\bf fpga}
+\item 
+{\bf L\+M\+S7002M} $\ast$ {\bf lms}
+\item 
+{\bf int} {\bf chip\+Id}
+\end{DoxyCompactItemize}
+
+
+\subsubsection{Detailed Description}
+
+
+Definition at line {\bf 125} of file {\bf Streamer.\+h}.
+
+
+
+\subsubsection{Constructor \& Destructor Documentation}
+\index{lime\+::\+Streamer@{lime\+::\+Streamer}!Streamer@{Streamer}}
+\index{Streamer@{Streamer}!lime\+::\+Streamer@{lime\+::\+Streamer}}
+\paragraph[{Streamer(\+F\+P\+G\+A $\ast$f, L\+M\+S7002\+M $\ast$chip, int id)}]{\setlength{\rightskip}{0pt plus 5cm}lime\+::\+Streamer\+::\+Streamer (
+\begin{DoxyParamCaption}
+\item[{{\bf F\+P\+GA} $\ast$}]{f, }
+\item[{{\bf L\+M\+S7002M} $\ast$}]{chip, }
+\item[{{\bf int}}]{id}
+\end{DoxyParamCaption}
+)}\label{classlime_1_1Streamer_a6110482f7c3d4380174e06afa315a1a1}
+
+
+Definition at line {\bf 156} of file {\bf Streamer.\+cpp}.
+
+
+
+References {\bf chip\+Id}, {\bf data\+Port}, {\bf fpga}, {\bf lime\+::\+F\+P\+G\+A\+::\+Get\+Connection()}, {\bf id}, {\bf lms}, {\bf m\+Timestamp\+Offset}, {\bf rx\+Batch\+Size}, {\bf rx\+Data\+Rate\+\_\+\+Bps}, {\bf rx\+Last\+Timestamp}, {\bf stream\+Size}, {\bf terminate\+Rx}, {\bf terminate\+Tx}, {\bf tx\+Batch\+Size}, and {\bf tx\+Data\+Rate\+\_\+\+Bps}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{d9/d5d/classlime_1_1Streamer_a6110482f7c3d4380174e06afa315a1a1_cgraph}
+\end{center}
+\end{figure}
+
+
+\index{lime\+::\+Streamer@{lime\+::\+Streamer}!````~Streamer@{$\sim$\+Streamer}}
+\index{````~Streamer@{$\sim$\+Streamer}!lime\+::\+Streamer@{lime\+::\+Streamer}}
+\paragraph[{$\sim$\+Streamer()}]{\setlength{\rightskip}{0pt plus 5cm}lime\+::\+Streamer\+::$\sim$\+Streamer (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}\label{classlime_1_1Streamer_ad03f3a748f2398711d044b6710e40740}
+
+
+Definition at line {\bf 173} of file {\bf Streamer.\+cpp}.
+
+
+
+References {\bf rx\+Thread}, {\bf terminate\+Rx}, {\bf terminate\+Tx}, and {\bf tx\+Thread}.
+
+
+
+\subsubsection{Member Function Documentation}
+\index{lime\+::\+Streamer@{lime\+::\+Streamer}!Align\+Quadrature@{Align\+Quadrature}}
+\index{Align\+Quadrature@{Align\+Quadrature}!lime\+::\+Streamer@{lime\+::\+Streamer}}
+\paragraph[{Align\+Quadrature(bool restore\+Values)}]{\setlength{\rightskip}{0pt plus 5cm}{\bf void} lime\+::\+Streamer\+::\+Align\+Quadrature (
+\begin{DoxyParamCaption}
+\item[{bool}]{restore\+Values}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [private]}}\label{classlime_1_1Streamer_a44a390ff3b22aabf1c112ba0f13a9e7f}
+
+
+Definition at line {\bf 458} of file {\bf Streamer.\+cpp}.
+
+
+
+References {\bf lime\+::\+L\+M\+S7002\+M\+::\+Backup\+Register\+Map()}, {\bf lime\+::\+L\+M\+S7002\+M\+::\+ChA}, {\bf chip\+Id}, {\bf data\+Port}, {\bf fpga}, {\bf freq}, {\bf lime\+::\+L\+M\+S7002\+M\+::\+Get\+\_\+\+S\+P\+I\+\_\+\+Reg\+\_\+bits()}, {\bf lime\+::\+L\+M\+S7002\+M\+::\+Get\+Frequency\+S\+X()}, {\bf Get\+Phase\+Offset()}, {\bf lime\+::\+L\+M\+S7002\+M\+::\+Get\+Sample\+Rate()}, {\bf i}, {\bf lms}, {\bf L\+M\+S7\+\_\+\+S\+E\+L\+\_\+\+P\+A\+T\+H\+\_\+\+R\+FE}, {\bf lime\+::\+L\+M\+S7002\+M\+::\+Load\+D\+C\+\_\+\+R\+E\+G\+\_\+\+I\+Q()}, {\bf lime\+::\+L\+M\+S7002\+M\+::\+R\+BB}, {\bf lime\+::\+L\+M\+S7002\+M\+::\+Restore\+Register\+Map()}, {\bf Rst\+Rx\+I\+Q\+Gen()}, {\bf lime\+::\+L\+M\+S7002\+M\+::\+Set\+Defaults()}, {\bf lime\+::\+L\+M\+S7002\+M\+::\+Set\+Frequency\+S\+X()}, {\bf lime\+::\+L\+M\+S7002\+M\+::\+S\+P\+I\+\_\+write()}, {\bf lime\+::\+F\+P\+G\+A\+::\+Stop\+Streaming()}, {\bf lime\+::\+L\+M\+S7002\+M\+::\+T\+BB}, {\bf lime\+::\+L\+M\+S7002\+M\+::\+T\+RF}, {\bf val}, {\bf lime\+::warning()}, and {\bf lime\+::\+I\+Connection\+::\+Write\+Register()}.
+
+
+
+Referenced by {\bf Align\+Rx\+R\+F()}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{d9/d5d/classlime_1_1Streamer_a44a390ff3b22aabf1c112ba0f13a9e7f_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{d9/d5d/classlime_1_1Streamer_a44a390ff3b22aabf1c112ba0f13a9e7f_icgraph}
+\end{center}
+\end{figure}
+
+
+\index{lime\+::\+Streamer@{lime\+::\+Streamer}!Align\+Rx\+RF@{Align\+Rx\+RF}}
+\index{Align\+Rx\+RF@{Align\+Rx\+RF}!lime\+::\+Streamer@{lime\+::\+Streamer}}
+\paragraph[{Align\+Rx\+R\+F(bool restore\+Values)}]{\setlength{\rightskip}{0pt plus 5cm}{\bf void} lime\+::\+Streamer\+::\+Align\+Rx\+RF (
+\begin{DoxyParamCaption}
+\item[{bool}]{restore\+Values}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [private]}}\label{classlime_1_1Streamer_a05cbd39a0d43b90b7fc2543ec246e9bb}
+
+
+Definition at line {\bf 385} of file {\bf Streamer.\+cpp}.
+
+
+
+References {\bf Align\+Quadrature()}, {\bf Align\+Rx\+T\+S\+P()}, {\bf lime\+::\+L\+M\+S7002\+M\+::\+Backup\+Register\+Map()}, {\bf lime\+::\+L\+M\+S7002\+M\+::\+ChA}, {\bf chip\+Id}, {\bf data\+Port}, {\bf fpga}, {\bf lime\+::\+L\+M\+S7002\+M\+::\+Get\+\_\+\+S\+P\+I\+\_\+\+Reg\+\_\+bits()}, {\bf Get\+Phase\+Offset()}, {\bf lime\+::\+L\+M\+S7002\+M\+::\+Get\+Sample\+Rate()}, {\bf i}, {\bf lms}, {\bf L\+M\+S7\+\_\+\+H\+B\+D\+\_\+\+O\+V\+R\+\_\+\+R\+X\+T\+SP}, {\bf L\+M\+S7\+\_\+\+P\+D\+\_\+\+F\+D\+I\+V\+\_\+\+O\+\_\+\+C\+G\+EN}, {\bf lime\+::\+L\+M\+S7002\+M\+::\+Load\+D\+C\+\_\+\+R\+E\+G\+\_\+\+I\+Q()}, {\bf lime\+::\+L\+M\+S7002\+M\+::\+Modify\+\_\+\+S\+P\+I\+\_\+\+Reg\+\_\+bits()}, {\bf lime\+::\+L\+M\+S7002\+M\+::\+R\+BB}, {\bf lime\+::\+I\+Connection\+::\+Read\+Registers()}, {\bf lime\+::\+L\+M\+S7002\+M\+::\+Restore\+Register\+Map()}, {\bf lime\+::\+L\+M\+S7002\+M\+::\+R\+FE}, {\bf lime\+::\+L\+M\+S7002\+M\+::\+Set\+Defaults()}, {\bf lime\+::\+L\+M\+S7002\+M\+::\+Set\+Frequency\+S\+X()}, {\bf lime\+::\+L\+M\+S7002\+M\+::\+S\+P\+I\+\_\+read()}, {\bf lime\+::\+L\+M\+S7002\+M\+::\+S\+P\+I\+\_\+write()}, {\bf lime\+::\+F\+P\+G\+A\+::\+Stop\+Streaming()}, {\bf lime\+::\+L\+M\+S7002\+M\+::\+T\+BB}, {\bf lime\+::\+L\+M\+S7002\+M\+::\+T\+RF}, {\bf val}, {\bf lime\+::warning()}, and {\bf lime\+::\+I\+Connection\+::\+Write\+Register()}.
+
+
+
+Referenced by {\bf Update\+Threads()}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{d9/d5d/classlime_1_1Streamer_a05cbd39a0d43b90b7fc2543ec246e9bb_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{d9/d5d/classlime_1_1Streamer_a05cbd39a0d43b90b7fc2543ec246e9bb_icgraph}
+\end{center}
+\end{figure}
+
+
+\index{lime\+::\+Streamer@{lime\+::\+Streamer}!Align\+Rx\+T\+SP@{Align\+Rx\+T\+SP}}
+\index{Align\+Rx\+T\+SP@{Align\+Rx\+T\+SP}!lime\+::\+Streamer@{lime\+::\+Streamer}}
+\paragraph[{Align\+Rx\+T\+S\+P()}]{\setlength{\rightskip}{0pt plus 5cm}{\bf void} lime\+::\+Streamer\+::\+Align\+Rx\+T\+SP (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [private]}}\label{classlime_1_1Streamer_af72084cb1bf47cd49edb8395eea1f04b}
+
+
+Definition at line {\bf 281} of file {\bf Streamer.\+cpp}.
+
+
+
+References {\bf lime\+::\+I\+Connection\+::\+Abort\+Reading()}, {\bf chip\+Id}, {\bf data\+Port}, {\bf fpga}, {\bf i}, {\bf lime\+::\+I\+Connection\+::\+Read\+L\+M\+S7002\+M\+S\+P\+I()}, {\bf lime\+::\+I\+Connection\+::\+Receive\+Data()}, {\bf lime\+::\+I\+Connection\+::\+Reset\+Stream\+Buffers()}, {\bf lime\+::\+F\+P\+G\+A\+::\+Start\+Streaming()}, {\bf lime\+::\+F\+P\+G\+A\+::\+Stop\+Streaming()}, {\bf lime\+::warning()}, {\bf lime\+::\+I\+Connection\+::\+Write\+L\+M\+S7002\+M\+S\+P\+I()}, and {\bf lime\+::\+I\+Connection\+::\+Write\+Register()}.
+
+
+
+Referenced by {\bf Align\+Rx\+R\+F()}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{d9/d5d/classlime_1_1Streamer_af72084cb1bf47cd49edb8395eea1f04b_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{d9/d5d/classlime_1_1Streamer_af72084cb1bf47cd49edb8395eea1f04b_icgraph}
+\end{center}
+\end{figure}
+
+
+\index{lime\+::\+Streamer@{lime\+::\+Streamer}!Get\+Hardware\+Timestamp@{Get\+Hardware\+Timestamp}}
+\index{Get\+Hardware\+Timestamp@{Get\+Hardware\+Timestamp}!lime\+::\+Streamer@{lime\+::\+Streamer}}
+\paragraph[{Get\+Hardware\+Timestamp(void)}]{\setlength{\rightskip}{0pt plus 5cm}uint64\+\_\+t lime\+::\+Streamer\+::\+Get\+Hardware\+Timestamp (
+\begin{DoxyParamCaption}
+\item[{{\bf void}}]{}
+\end{DoxyParamCaption}
+)}\label{classlime_1_1Streamer_a3b515dd1d151c18ddb8050e14eca1928}
+
+
+Definition at line {\bf 233} of file {\bf Streamer.\+cpp}.
+
+
+
+References {\bf chip\+Id}, {\bf data\+Port}, {\bf fpga}, {\bf m\+Timestamp\+Offset}, {\bf lime\+::\+F\+P\+G\+A\+::\+Reset\+Timestamp()}, {\bf rx\+Last\+Timestamp}, {\bf rx\+Thread}, {\bf lime\+::\+F\+P\+G\+A\+::\+Stop\+Streaming()}, {\bf tx\+Thread}, and {\bf lime\+::\+I\+Connection\+::\+Write\+Register()}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{d9/d5d/classlime_1_1Streamer_a3b515dd1d151c18ddb8050e14eca1928_cgraph}
+\end{center}
+\end{figure}
+
+
+\index{lime\+::\+Streamer@{lime\+::\+Streamer}!Get\+Phase\+Offset@{Get\+Phase\+Offset}}
+\index{Get\+Phase\+Offset@{Get\+Phase\+Offset}!lime\+::\+Streamer@{lime\+::\+Streamer}}
+\paragraph[{Get\+Phase\+Offset(int bin)}]{\setlength{\rightskip}{0pt plus 5cm}double lime\+::\+Streamer\+::\+Get\+Phase\+Offset (
+\begin{DoxyParamCaption}
+\item[{{\bf int}}]{bin}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [private]}}\label{classlime_1_1Streamer_ace46b832a3e2e6ea6ae23c6672bca45f}
+
+
+Definition at line {\bf 348} of file {\bf Streamer.\+cpp}.
+
+
+
+References {\bf lime\+::\+I\+Connection\+::\+Abort\+Reading()}, {\bf chip\+Id}, {\bf data\+Port}, {\bf fpga}, {\bf lime\+::\+I\+Connection\+::\+Receive\+Data()}, {\bf lime\+::\+I\+Connection\+::\+Reset\+Stream\+Buffers()}, {\bf lime\+::\+F\+P\+G\+A\+::\+Start\+Streaming()}, {\bf lime\+::\+F\+P\+G\+A\+::\+Stop\+Streaming()}, and {\bf lime\+::warning()}.
+
+
+
+Referenced by {\bf Align\+Quadrature()}, and {\bf Align\+Rx\+R\+F()}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{d9/d5d/classlime_1_1Streamer_ace46b832a3e2e6ea6ae23c6672bca45f_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{d9/d5d/classlime_1_1Streamer_ace46b832a3e2e6ea6ae23c6672bca45f_icgraph}
+\end{center}
+\end{figure}
+
+
+\index{lime\+::\+Streamer@{lime\+::\+Streamer}!Get\+Stream\+Size@{Get\+Stream\+Size}}
+\index{Get\+Stream\+Size@{Get\+Stream\+Size}!lime\+::\+Streamer@{lime\+::\+Streamer}}
+\paragraph[{Get\+Stream\+Size(bool tx)}]{\setlength{\rightskip}{0pt plus 5cm}{\bf int} lime\+::\+Streamer\+::\+Get\+Stream\+Size (
+\begin{DoxyParamCaption}
+\item[{bool}]{tx}
+\end{DoxyParamCaption}
+)}\label{classlime_1_1Streamer_a15a75e77c4efa75674b0e78319e79cf3}
+
+
+Definition at line {\bf 219} of file {\bf Streamer.\+cpp}.
+
+
+
+References {\bf lime\+::\+Stream\+Config\+::\+F\+M\+T\+\_\+\+I\+N\+T12}, {\bf i}, {\bf m\+Rx\+Streams}, {\bf m\+Tx\+Streams}, {\bf rx\+Batch\+Size}, {\bf lime\+::samples12\+In\+Pkt}, {\bf lime\+::samples16\+In\+Pkt}, {\bf stream\+Size}, and {\bf tx\+Batch\+Size}.
+
+
+
+Referenced by {\bf lime\+::\+Stream\+Channel\+::\+Get\+Stream\+Size()}.
+
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{d9/d5d/classlime_1_1Streamer_a15a75e77c4efa75674b0e78319e79cf3_icgraph}
+\end{center}
+\end{figure}
+
+
+\index{lime\+::\+Streamer@{lime\+::\+Streamer}!Receive\+Packets\+Loop@{Receive\+Packets\+Loop}}
+\index{Receive\+Packets\+Loop@{Receive\+Packets\+Loop}!lime\+::\+Streamer@{lime\+::\+Streamer}}
+\paragraph[{Receive\+Packets\+Loop()}]{\setlength{\rightskip}{0pt plus 5cm}{\bf void} lime\+::\+Streamer\+::\+Receive\+Packets\+Loop (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}\label{classlime_1_1Streamer_add8371b157e8f8f301829f48afeea50e}
+
+
+Function dedicated for receiving data samples from board. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em stream} & a pointer to an active receiver stream \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line {\bf 780} of file {\bf Streamer.\+cpp}.
+
+
+
+References {\bf lime\+::\+I\+Connection\+::\+Abort\+Reading()}, {\bf lime\+::\+I\+Connection\+::\+Begin\+Data\+Reading()}, {\bf ch\+Count}, {\bf lime\+::\+I\+Connection\+::\+Check\+Stream\+Size()}, {\bf chip\+Id}, {\bf lime\+::\+F\+P\+G\+A\+\_\+\+Data\+Packet\+::counter}, {\bf data\+Link\+Format}, {\bf data\+Port}, {\bf lime\+::error()}, {\bf lime\+::\+I\+Connection\+::\+Finish\+Data\+Reading()}, {\bf lime\+::\+Stream\+Channel\+::\+Metadata\+::flags}, {\bf lime\+::\+Stream\+Config\+::\+F\+M\+T\+\_\+\+I\+N\+T12}, {\bf lime\+::\+F\+P\+G\+A\+::\+F\+P\+G\+A\+Packet\+Payload2\+Samples()}, {\bf lime\+::\+I\+Connection\+::\+Get\+Buffers\+Count()}, {\bf i}, {\bf ind}, {\bf meta}, {\bf m\+Rx\+Streams}, {\bf m\+Tx\+Streams}, {\bf lime\+::\+Ring\+F\+I\+F\+O\+::\+O\+V\+E\+R\+W\+R\+I\+T\+E\+\_\+\+O\+LD}, {\bf port}, {\bf lime\+::\+I\+Connection\+::\+Read\+Register()}, {\bf lime\+::\+F\+P\+G\+A\+\_\+\+Data\+Packet\+::reserved}, {\bf rx\+Batch\+Size}, {\bf rx\+Data\+Rate\+\_\+\+Bps}, {\bf rx\+Last\+Timestamp}, {\bf samples}, {\bf lime\+::samples12\+In\+Pkt}, {\bf lime\+::samples16\+In\+Pkt}, {\bf stream\+Size}, {\bf lime\+::\+Ring\+F\+I\+F\+O\+::\+S\+Y\+N\+C\+\_\+\+T\+I\+M\+E\+S\+T\+A\+MP}, {\bf t1}, {\bf t2}, {\bf terminate\+Rx}, {\bf lime\+::\+Stream\+Channel\+::\+Metadata\+::timestamp}, {\bf lime\+::\+I\+Connection\+::\+Wait\+For\+Reading()}, {\bf lime\+::warning()}, and {\bf lime\+::\+I\+Connection\+::\+Write\+Registers()}.
+
+
+
+Referenced by {\bf Update\+Threads()}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{d9/d5d/classlime_1_1Streamer_add8371b157e8f8f301829f48afeea50e_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{d9/d5d/classlime_1_1Streamer_add8371b157e8f8f301829f48afeea50e_icgraph}
+\end{center}
+\end{figure}
+
+
+\index{lime\+::\+Streamer@{lime\+::\+Streamer}!Rst\+Rx\+I\+Q\+Gen@{Rst\+Rx\+I\+Q\+Gen}}
+\index{Rst\+Rx\+I\+Q\+Gen@{Rst\+Rx\+I\+Q\+Gen}!lime\+::\+Streamer@{lime\+::\+Streamer}}
+\paragraph[{Rst\+Rx\+I\+Q\+Gen()}]{\setlength{\rightskip}{0pt plus 5cm}{\bf void} lime\+::\+Streamer\+::\+Rst\+Rx\+I\+Q\+Gen (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [private]}}\label{classlime_1_1Streamer_a7dc600168a329a5c20e8ffb4ed444765}
+
+
+Definition at line {\bf 255} of file {\bf Streamer.\+cpp}.
+
+
+
+References {\bf chip\+Id}, {\bf data\+Port}, {\bf lime\+::\+I\+Connection\+::\+Read\+L\+M\+S7002\+M\+S\+P\+I()}, and {\bf lime\+::\+I\+Connection\+::\+Write\+L\+M\+S7002\+M\+S\+P\+I()}.
+
+
+
+Referenced by {\bf Align\+Quadrature()}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{d9/d5d/classlime_1_1Streamer_a7dc600168a329a5c20e8ffb4ed444765_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{d9/d5d/classlime_1_1Streamer_a7dc600168a329a5c20e8ffb4ed444765_icgraph}
+\end{center}
+\end{figure}
+
+
+\index{lime\+::\+Streamer@{lime\+::\+Streamer}!Set\+Hardware\+Timestamp@{Set\+Hardware\+Timestamp}}
+\index{Set\+Hardware\+Timestamp@{Set\+Hardware\+Timestamp}!lime\+::\+Streamer@{lime\+::\+Streamer}}
+\paragraph[{Set\+Hardware\+Timestamp(const uint64\+\_\+t now)}]{\setlength{\rightskip}{0pt plus 5cm}{\bf void} lime\+::\+Streamer\+::\+Set\+Hardware\+Timestamp (
+\begin{DoxyParamCaption}
+\item[{const uint64\+\_\+t}]{now}
+\end{DoxyParamCaption}
+)}\label{classlime_1_1Streamer_a2faa8c29f887b7d5ab5788bb7b677b62}
+
+
+Definition at line {\bf 250} of file {\bf Streamer.\+cpp}.
+
+
+
+References {\bf m\+Timestamp\+Offset}, and {\bf rx\+Last\+Timestamp}.
+
+\index{lime\+::\+Streamer@{lime\+::\+Streamer}!Setup\+Stream@{Setup\+Stream}}
+\index{Setup\+Stream@{Setup\+Stream}!lime\+::\+Streamer@{lime\+::\+Streamer}}
+\paragraph[{Setup\+Stream(const Stream\+Config \&config)}]{\setlength{\rightskip}{0pt plus 5cm}{\bf Stream\+Channel} $\ast$ lime\+::\+Streamer\+::\+Setup\+Stream (
+\begin{DoxyParamCaption}
+\item[{const {\bf Stream\+Config} \&}]{config}
+\end{DoxyParamCaption}
+)}\label{classlime_1_1Streamer_aaa946b5fe7814a97160d6efd015295e7}
+
+
+Definition at line {\bf 184} of file {\bf Streamer.\+cpp}.
+
+
+
+References {\bf lime\+::\+L\+M\+S7002\+M\+::\+ChA}, {\bf lime\+::\+Stream\+Config\+::channel\+ID}, {\bf lime\+::error()}, {\bf lime\+::\+L\+M\+S7002\+M\+::\+Get\+Sample\+Rate()}, {\bf lime\+::\+Stream\+Config\+::is\+Tx}, {\bf lms}, {\bf m\+Rx\+Streams}, {\bf m\+Tx\+Streams}, {\bf lime\+::\+Stream\+Config\+::performance\+Latency}, {\bf rate}, {\bf rx\+Batch\+Size}, {\bf rx\+Thread}, {\bf stream\+Size}, {\bf tx\+Batch\+Size}, {\bf tx\+Thread}, {\bf Update\+Threads()}, and {\bf lime\+::warning()}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{d9/d5d/classlime_1_1Streamer_aaa946b5fe7814a97160d6efd015295e7_cgraph}
+\end{center}
+\end{figure}
+
+
+\index{lime\+::\+Streamer@{lime\+::\+Streamer}!Transmit\+Packets\+Loop@{Transmit\+Packets\+Loop}}
+\index{Transmit\+Packets\+Loop@{Transmit\+Packets\+Loop}!lime\+::\+Streamer@{lime\+::\+Streamer}}
+\paragraph[{Transmit\+Packets\+Loop()}]{\setlength{\rightskip}{0pt plus 5cm}{\bf void} lime\+::\+Streamer\+::\+Transmit\+Packets\+Loop (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}\label{classlime_1_1Streamer_a7609688279492ce5938fcee2e9a5cfb2}
+
+
+Definition at line {\bf 637} of file {\bf Streamer.\+cpp}.
+
+
+
+References {\bf lime\+::\+I\+Connection\+::\+Abort\+Sending()}, {\bf lime\+::\+I\+Connection\+::\+Begin\+Data\+Sending()}, {\bf ch\+Count}, {\bf lime\+::\+I\+Connection\+::\+Check\+Stream\+Size()}, {\bf chip\+Id}, {\bf lime\+::\+F\+P\+G\+A\+\_\+\+Data\+Packet\+::counter}, {\bf data\+Link\+Format}, {\bf data\+Port}, {\bf lime\+::\+Ring\+F\+I\+F\+O\+::\+E\+N\+D\+\_\+\+B\+U\+R\+ST}, {\bf lime\+::error()}, {\bf lime\+::\+I\+Connection\+::\+Finish\+Data\+Sending()}, {\bf lime\+::\+Stream\+Channel\+::\+Metadata\+::flags}, {\bf lime\+::\+Stream\+Config\+::\+F\+M\+T\+\_\+\+I\+N\+T12}, {\bf lime\+::\+I\+Connection\+::\+Get\+Buffers\+Count()}, {\bf i}, {\bf ind}, {\bf int()}, {\bf meta}, {\bf m\+Tx\+Streams}, {\bf lime\+::\+F\+P\+G\+A\+\_\+\+Data\+Packet\+::reserved}, {\bf rx\+Batch\+Size}, {\bf samples}, {\bf lime\+::samples12\+In\+Pkt}, {\bf lime\+::samples16\+In\+Pkt}, {\bf lime\+::\+F\+P\+G\+A\+::\+Samples2\+F\+P\+G\+A\+Packet\+Payload()}, {\bf src}, {\bf stream\+Size}, {\bf lime\+::\+Ring\+F\+I\+F\+O\+::\+S\+Y\+N\+C\+\_\+\+T\+I\+M\+E\+S\+T\+A\+MP}, {\bf t1}, {\bf t2}, {\bf terminate\+Tx}, {\bf lime\+::\+Stream\+Channel\+::\+Metadata\+::timestamp}, {\bf tx\+Data\+Rate\+\_\+\+Bps}, {\bf tx\+Last\+Timestamp}, {\bf lime\+::\+I\+Connection\+::\+Wait\+For\+Sending()}, and {\bf lime\+::warning()}.
+
+
+
+Referenced by {\bf Update\+Threads()}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{d9/d5d/classlime_1_1Streamer_a7609688279492ce5938fcee2e9a5cfb2_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{d9/d5d/classlime_1_1Streamer_a7609688279492ce5938fcee2e9a5cfb2_icgraph}
+\end{center}
+\end{figure}
+
+
+\index{lime\+::\+Streamer@{lime\+::\+Streamer}!Update\+Threads@{Update\+Threads}}
+\index{Update\+Threads@{Update\+Threads}!lime\+::\+Streamer@{lime\+::\+Streamer}}
+\paragraph[{Update\+Threads(bool stop\+All=false)}]{\setlength{\rightskip}{0pt plus 5cm}{\bf int} lime\+::\+Streamer\+::\+Update\+Threads (
+\begin{DoxyParamCaption}
+\item[{bool}]{stop\+All = {\ttfamily false}}
+\end{DoxyParamCaption}
+)}\label{classlime_1_1Streamer_a33a233f1c863b9710f3b685d5fb494f6}
+
+
+Definition at line {\bf 520} of file {\bf Streamer.\+cpp}.
+
+
+
+References {\bf Align\+Rx\+R\+F()}, {\bf chip\+Id}, {\bf data\+Link\+Format}, {\bf data\+Port}, {\bf lime\+::\+Stream\+Config\+::\+F\+M\+T\+\_\+\+I\+N\+T12}, {\bf lime\+::\+Stream\+Config\+::\+F\+M\+T\+\_\+\+I\+N\+T16}, {\bf fpga}, {\bf lime\+::\+L\+M\+S7002\+M\+::\+Get\+\_\+\+S\+P\+I\+\_\+\+Reg\+\_\+bits()}, {\bf i}, {\bf lms}, {\bf L\+M\+S7param}, {\bf mode}, {\bf m\+Rx\+Streams}, {\bf m\+Tx\+Streams}, {\bf lime\+::\+I\+Connection\+::\+Read\+Register()}, {\bf Receive\+Packets\+Loop()}, {\bf lime\+::\+I\+Connection\+::\+Reset\+Stream\+Buffers()}, {\bf lime\+::\+F\+P\+G\+A\+::\+Reset\+Timestamp()}, {\bf rx\+Last\+Timestamp}, {\bf rx\+Thread}, {\bf lime\+::\+F\+P\+G\+A\+::\+Start\+Streaming()}, {\bf lime\+::\+F\+P\+G\+A\+::\+Stop\+Streaming()}, {\bf terminate\+Rx}, {\bf terminate\+Tx}, {\bf Transmit\+Packets\+Loop()}, {\bf tx\+Thread}, {\bf lime\+::\+I\+Connection\+::\+Write\+Register()}, and {\bf lime\+::\+I\+Connection\+::\+Write\+Registers()}.
+
+
+
+Referenced by {\bf Setup\+Stream()}, {\bf lime\+::\+Stream\+Channel\+::\+Start()}, and {\bf lime\+::\+Stream\+Channel\+::\+Stop()}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{d9/d5d/classlime_1_1Streamer_a33a233f1c863b9710f3b685d5fb494f6_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{d9/d5d/classlime_1_1Streamer_a33a233f1c863b9710f3b685d5fb494f6_icgraph}
+\end{center}
+\end{figure}
+
+
+
+
+\subsubsection{Member Data Documentation}
+\index{lime\+::\+Streamer@{lime\+::\+Streamer}!chip\+Id@{chip\+Id}}
+\index{chip\+Id@{chip\+Id}!lime\+::\+Streamer@{lime\+::\+Streamer}}
+\paragraph[{chip\+Id}]{\setlength{\rightskip}{0pt plus 5cm}{\bf int} lime\+::\+Streamer\+::chip\+Id\hspace{0.3cm}{\ttfamily [private]}}\label{classlime_1_1Streamer_abefd7afb714673aa37ebb56132571e7f}
+
+
+Definition at line {\bf 165} of file {\bf Streamer.\+h}.
+
+
+
+Referenced by {\bf Align\+Quadrature()}, {\bf Align\+Rx\+R\+F()}, {\bf Align\+Rx\+T\+S\+P()}, {\bf Get\+Hardware\+Timestamp()}, {\bf Get\+Phase\+Offset()}, {\bf Receive\+Packets\+Loop()}, {\bf Rst\+Rx\+I\+Q\+Gen()}, {\bf Streamer()}, {\bf Transmit\+Packets\+Loop()}, and {\bf Update\+Threads()}.
+
+\index{lime\+::\+Streamer@{lime\+::\+Streamer}!data\+Link\+Format@{data\+Link\+Format}}
+\index{data\+Link\+Format@{data\+Link\+Format}!lime\+::\+Streamer@{lime\+::\+Streamer}}
+\paragraph[{data\+Link\+Format}]{\setlength{\rightskip}{0pt plus 5cm}{\bf Stream\+Config\+::\+Stream\+Data\+Format} lime\+::\+Streamer\+::data\+Link\+Format}\label{classlime_1_1Streamer_a4d54c12664e65d2cceae1428e2d7d7fe}
+
+
+Definition at line {\bf 154} of file {\bf Streamer.\+h}.
+
+
+
+Referenced by {\bf Receive\+Packets\+Loop()}, {\bf Transmit\+Packets\+Loop()}, and {\bf Update\+Threads()}.
+
+\index{lime\+::\+Streamer@{lime\+::\+Streamer}!data\+Port@{data\+Port}}
+\index{data\+Port@{data\+Port}!lime\+::\+Streamer@{lime\+::\+Streamer}}
+\paragraph[{data\+Port}]{\setlength{\rightskip}{0pt plus 5cm}{\bf I\+Connection}$\ast$ lime\+::\+Streamer\+::data\+Port}\label{classlime_1_1Streamer_a7282280d633007bb7fd2d1e27a698ae7}
+
+
+Definition at line {\bf 140} of file {\bf Streamer.\+h}.
+
+
+
+Referenced by {\bf Align\+Quadrature()}, {\bf Align\+Rx\+R\+F()}, {\bf Align\+Rx\+T\+S\+P()}, {\bf Get\+Hardware\+Timestamp()}, {\bf Get\+Phase\+Offset()}, {\bf Receive\+Packets\+Loop()}, {\bf Rst\+Rx\+I\+Q\+Gen()}, {\bf Streamer()}, {\bf Transmit\+Packets\+Loop()}, and {\bf Update\+Threads()}.
+
+\index{lime\+::\+Streamer@{lime\+::\+Streamer}!fpga@{fpga}}
+\index{fpga@{fpga}!lime\+::\+Streamer@{lime\+::\+Streamer}}
+\paragraph[{fpga}]{\setlength{\rightskip}{0pt plus 5cm}{\bf F\+P\+GA}$\ast$ lime\+::\+Streamer\+::fpga\hspace{0.3cm}{\ttfamily [private]}}\label{classlime_1_1Streamer_a729560ce9527503e12f21c64e6e5d781}
+
+
+Definition at line {\bf 163} of file {\bf Streamer.\+h}.
+
+
+
+Referenced by {\bf Align\+Quadrature()}, {\bf Align\+Rx\+R\+F()}, {\bf Align\+Rx\+T\+S\+P()}, {\bf Get\+Hardware\+Timestamp()}, {\bf Get\+Phase\+Offset()}, {\bf Streamer()}, and {\bf Update\+Threads()}.
+
+\index{lime\+::\+Streamer@{lime\+::\+Streamer}!lms@{lms}}
+\index{lms@{lms}!lime\+::\+Streamer@{lime\+::\+Streamer}}
+\paragraph[{lms}]{\setlength{\rightskip}{0pt plus 5cm}{\bf L\+M\+S7002M}$\ast$ lime\+::\+Streamer\+::lms\hspace{0.3cm}{\ttfamily [private]}}\label{classlime_1_1Streamer_acccfcc9efdf3f4b3df92860e8daa92cb}
+
+
+Definition at line {\bf 164} of file {\bf Streamer.\+h}.
+
+
+
+Referenced by {\bf Align\+Quadrature()}, {\bf Align\+Rx\+R\+F()}, {\bf Setup\+Stream()}, {\bf Streamer()}, and {\bf Update\+Threads()}.
+
+\index{lime\+::\+Streamer@{lime\+::\+Streamer}!m\+Rx\+Streams@{m\+Rx\+Streams}}
+\index{m\+Rx\+Streams@{m\+Rx\+Streams}!lime\+::\+Streamer@{lime\+::\+Streamer}}
+\paragraph[{m\+Rx\+Streams}]{\setlength{\rightskip}{0pt plus 5cm}{\bf std\+::vector}$<${\bf Stream\+Channel}$>$ lime\+::\+Streamer\+::m\+Rx\+Streams}\label{classlime_1_1Streamer_a9f1b1c40c42bc8a02dfde53d9596cd96}
+
+
+Definition at line {\bf 146} of file {\bf Streamer.\+h}.
+
+
+
+Referenced by {\bf Get\+Stream\+Size()}, {\bf Receive\+Packets\+Loop()}, {\bf Setup\+Stream()}, and {\bf Update\+Threads()}.
+
+\index{lime\+::\+Streamer@{lime\+::\+Streamer}!m\+Timestamp\+Offset@{m\+Timestamp\+Offset}}
+\index{m\+Timestamp\+Offset@{m\+Timestamp\+Offset}!lime\+::\+Streamer@{lime\+::\+Streamer}}
+\paragraph[{m\+Timestamp\+Offset}]{\setlength{\rightskip}{0pt plus 5cm}uint64\+\_\+t lime\+::\+Streamer\+::m\+Timestamp\+Offset}\label{classlime_1_1Streamer_a8c3e9262ec599581a75dc12bc3e45583}
+
+
+Definition at line {\bf 150} of file {\bf Streamer.\+h}.
+
+
+
+Referenced by {\bf Get\+Hardware\+Timestamp()}, {\bf Set\+Hardware\+Timestamp()}, and {\bf Streamer()}.
+
+\index{lime\+::\+Streamer@{lime\+::\+Streamer}!m\+Tx\+Streams@{m\+Tx\+Streams}}
+\index{m\+Tx\+Streams@{m\+Tx\+Streams}!lime\+::\+Streamer@{lime\+::\+Streamer}}
+\paragraph[{m\+Tx\+Streams}]{\setlength{\rightskip}{0pt plus 5cm}{\bf std\+::vector}$<${\bf Stream\+Channel}$>$ lime\+::\+Streamer\+::m\+Tx\+Streams}\label{classlime_1_1Streamer_a76ba9dc33e6bdccbda735faa6953c180}
+
+
+Definition at line {\bf 147} of file {\bf Streamer.\+h}.
+
+
+
+Referenced by {\bf Get\+Stream\+Size()}, {\bf Receive\+Packets\+Loop()}, {\bf Setup\+Stream()}, {\bf Transmit\+Packets\+Loop()}, and {\bf Update\+Threads()}.
+
+\index{lime\+::\+Streamer@{lime\+::\+Streamer}!rx\+Batch\+Size@{rx\+Batch\+Size}}
+\index{rx\+Batch\+Size@{rx\+Batch\+Size}!lime\+::\+Streamer@{lime\+::\+Streamer}}
+\paragraph[{rx\+Batch\+Size}]{\setlength{\rightskip}{0pt plus 5cm}unsigned lime\+::\+Streamer\+::rx\+Batch\+Size}\label{classlime_1_1Streamer_ab9836edafedfa653415ca6ae2d8acd2e}
+
+
+Definition at line {\bf 153} of file {\bf Streamer.\+h}.
+
+
+
+Referenced by {\bf Get\+Stream\+Size()}, {\bf Receive\+Packets\+Loop()}, {\bf Setup\+Stream()}, {\bf Streamer()}, and {\bf Transmit\+Packets\+Loop()}.
+
+\index{lime\+::\+Streamer@{lime\+::\+Streamer}!rx\+Data\+Rate\+\_\+\+Bps@{rx\+Data\+Rate\+\_\+\+Bps}}
+\index{rx\+Data\+Rate\+\_\+\+Bps@{rx\+Data\+Rate\+\_\+\+Bps}!lime\+::\+Streamer@{lime\+::\+Streamer}}
+\paragraph[{rx\+Data\+Rate\+\_\+\+Bps}]{\setlength{\rightskip}{0pt plus 5cm}std\+::atomic$<$uint32\+\_\+t$>$ lime\+::\+Streamer\+::rx\+Data\+Rate\+\_\+\+Bps}\label{classlime_1_1Streamer_adc125cfae72d5e94f775a3f5e3fdd2e9}
+
+
+Definition at line {\bf 138} of file {\bf Streamer.\+h}.
+
+
+
+Referenced by {\bf lime\+::\+Stream\+Channel\+::\+Get\+Info()}, {\bf Receive\+Packets\+Loop()}, and {\bf Streamer()}.
+
+\index{lime\+::\+Streamer@{lime\+::\+Streamer}!rx\+Last\+Timestamp@{rx\+Last\+Timestamp}}
+\index{rx\+Last\+Timestamp@{rx\+Last\+Timestamp}!lime\+::\+Streamer@{lime\+::\+Streamer}}
+\paragraph[{rx\+Last\+Timestamp}]{\setlength{\rightskip}{0pt plus 5cm}std\+::atomic$<$uint64\+\_\+t$>$ lime\+::\+Streamer\+::rx\+Last\+Timestamp}\label{classlime_1_1Streamer_a63dbdc66ed33bb6f503605d9c1f66924}
+
+
+Definition at line {\bf 148} of file {\bf Streamer.\+h}.
+
+
+
+Referenced by {\bf Get\+Hardware\+Timestamp()}, {\bf lime\+::\+Stream\+Channel\+::\+Get\+Info()}, {\bf Receive\+Packets\+Loop()}, {\bf Set\+Hardware\+Timestamp()}, {\bf Streamer()}, and {\bf Update\+Threads()}.
+
+\index{lime\+::\+Streamer@{lime\+::\+Streamer}!rx\+Thread@{rx\+Thread}}
+\index{rx\+Thread@{rx\+Thread}!lime\+::\+Streamer@{lime\+::\+Streamer}}
+\paragraph[{rx\+Thread}]{\setlength{\rightskip}{0pt plus 5cm}std\+::thread lime\+::\+Streamer\+::rx\+Thread}\label{classlime_1_1Streamer_a7417e97c63b56482c2730b6df05a6526}
+
+
+Definition at line {\bf 141} of file {\bf Streamer.\+h}.
+
+
+
+Referenced by {\bf Get\+Hardware\+Timestamp()}, {\bf Setup\+Stream()}, {\bf Update\+Threads()}, and {\bf $\sim$\+Streamer()}.
+
+\index{lime\+::\+Streamer@{lime\+::\+Streamer}!stream\+Size@{stream\+Size}}
+\index{stream\+Size@{stream\+Size}!lime\+::\+Streamer@{lime\+::\+Streamer}}
+\paragraph[{stream\+Size}]{\setlength{\rightskip}{0pt plus 5cm}{\bf int} lime\+::\+Streamer\+::stream\+Size}\label{classlime_1_1Streamer_a09f4d312f6ee5f04494455fe2fe7b482}
+
+
+Definition at line {\bf 151} of file {\bf Streamer.\+h}.
+
+
+
+Referenced by {\bf Get\+Stream\+Size()}, {\bf Receive\+Packets\+Loop()}, {\bf Setup\+Stream()}, {\bf Streamer()}, and {\bf Transmit\+Packets\+Loop()}.
+
+\index{lime\+::\+Streamer@{lime\+::\+Streamer}!terminate\+Rx@{terminate\+Rx}}
+\index{terminate\+Rx@{terminate\+Rx}!lime\+::\+Streamer@{lime\+::\+Streamer}}
+\paragraph[{terminate\+Rx}]{\setlength{\rightskip}{0pt plus 5cm}std\+::atomic$<$bool$>$ lime\+::\+Streamer\+::terminate\+Rx}\label{classlime_1_1Streamer_a88834a0ea3ec6d9df65d75db0091fd28}
+
+
+Definition at line {\bf 143} of file {\bf Streamer.\+h}.
+
+
+
+Referenced by {\bf Receive\+Packets\+Loop()}, {\bf Streamer()}, {\bf Update\+Threads()}, and {\bf $\sim$\+Streamer()}.
+
+\index{lime\+::\+Streamer@{lime\+::\+Streamer}!terminate\+Tx@{terminate\+Tx}}
+\index{terminate\+Tx@{terminate\+Tx}!lime\+::\+Streamer@{lime\+::\+Streamer}}
+\paragraph[{terminate\+Tx}]{\setlength{\rightskip}{0pt plus 5cm}std\+::atomic$<$bool$>$ lime\+::\+Streamer\+::terminate\+Tx}\label{classlime_1_1Streamer_ac08fdbdb56cbe888e14c0d9daece9ac5}
+
+
+Definition at line {\bf 144} of file {\bf Streamer.\+h}.
+
+
+
+Referenced by {\bf Streamer()}, {\bf Transmit\+Packets\+Loop()}, {\bf Update\+Threads()}, and {\bf $\sim$\+Streamer()}.
+
+\index{lime\+::\+Streamer@{lime\+::\+Streamer}!tx\+Batch\+Size@{tx\+Batch\+Size}}
+\index{tx\+Batch\+Size@{tx\+Batch\+Size}!lime\+::\+Streamer@{lime\+::\+Streamer}}
+\paragraph[{tx\+Batch\+Size}]{\setlength{\rightskip}{0pt plus 5cm}unsigned lime\+::\+Streamer\+::tx\+Batch\+Size}\label{classlime_1_1Streamer_ac3f56ce0e84b1556b77bf6a081e2fe09}
+
+
+Definition at line {\bf 152} of file {\bf Streamer.\+h}.
+
+
+
+Referenced by {\bf Get\+Stream\+Size()}, {\bf Setup\+Stream()}, and {\bf Streamer()}.
+
+\index{lime\+::\+Streamer@{lime\+::\+Streamer}!tx\+Data\+Rate\+\_\+\+Bps@{tx\+Data\+Rate\+\_\+\+Bps}}
+\index{tx\+Data\+Rate\+\_\+\+Bps@{tx\+Data\+Rate\+\_\+\+Bps}!lime\+::\+Streamer@{lime\+::\+Streamer}}
+\paragraph[{tx\+Data\+Rate\+\_\+\+Bps}]{\setlength{\rightskip}{0pt plus 5cm}std\+::atomic$<$uint32\+\_\+t$>$ lime\+::\+Streamer\+::tx\+Data\+Rate\+\_\+\+Bps}\label{classlime_1_1Streamer_af0888ee52ab1dd461c8dd15f5d20182c}
+
+
+Definition at line {\bf 139} of file {\bf Streamer.\+h}.
+
+
+
+Referenced by {\bf lime\+::\+Stream\+Channel\+::\+Get\+Info()}, {\bf Streamer()}, and {\bf Transmit\+Packets\+Loop()}.
+
+\index{lime\+::\+Streamer@{lime\+::\+Streamer}!tx\+Last\+Timestamp@{tx\+Last\+Timestamp}}
+\index{tx\+Last\+Timestamp@{tx\+Last\+Timestamp}!lime\+::\+Streamer@{lime\+::\+Streamer}}
+\paragraph[{tx\+Last\+Timestamp}]{\setlength{\rightskip}{0pt plus 5cm}std\+::atomic$<$uint64\+\_\+t$>$ lime\+::\+Streamer\+::tx\+Last\+Timestamp}\label{classlime_1_1Streamer_ad6489237eecb85f84c4fdc9a4619a648}
+
+
+Definition at line {\bf 149} of file {\bf Streamer.\+h}.
+
+
+
+Referenced by {\bf lime\+::\+Stream\+Channel\+::\+Get\+Info()}, and {\bf Transmit\+Packets\+Loop()}.
+
+\index{lime\+::\+Streamer@{lime\+::\+Streamer}!tx\+Thread@{tx\+Thread}}
+\index{tx\+Thread@{tx\+Thread}!lime\+::\+Streamer@{lime\+::\+Streamer}}
+\paragraph[{tx\+Thread}]{\setlength{\rightskip}{0pt plus 5cm}std\+::thread lime\+::\+Streamer\+::tx\+Thread}\label{classlime_1_1Streamer_aa90caa658ae054c9dd389f6b09bad00a}
+
+
+Definition at line {\bf 142} of file {\bf Streamer.\+h}.
+
+
+
+Referenced by {\bf Get\+Hardware\+Timestamp()}, {\bf Setup\+Stream()}, {\bf Update\+Threads()}, and {\bf $\sim$\+Streamer()}.
+
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+/home/erik/prefix/default/src/limesuite-\/dev/src/protocols/{\bf Streamer.\+h}\item 
+/home/erik/prefix/default/src/limesuite-\/dev/src/protocols/{\bf Streamer.\+cpp}\end{DoxyCompactItemize}

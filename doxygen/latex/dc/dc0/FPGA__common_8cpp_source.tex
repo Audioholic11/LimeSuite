@@ -1,0 +1,859 @@
+\subsection{F\+P\+G\+A\+\_\+common.\+cpp}
+\label{FPGA__common_8cpp_source}\index{/home/erik/prefix/default/src/limesuite-\/dev/src/\+F\+P\+G\+A\+\_\+common/\+F\+P\+G\+A\+\_\+common.\+cpp@{/home/erik/prefix/default/src/limesuite-\/dev/src/\+F\+P\+G\+A\+\_\+common/\+F\+P\+G\+A\+\_\+common.\+cpp}}
+
+\begin{DoxyCode}
+00001 \textcolor{preprocessor}{#include "FPGA_common.h"}
+00002 \textcolor{preprocessor}{#include "IConnection.h"}
+00003 \textcolor{preprocessor}{#include "LMS64CProtocol.h"}
+00004 \textcolor{preprocessor}{#include <ciso646>}
+00005 \textcolor{preprocessor}{#include <vector>}
+00006 \textcolor{preprocessor}{#include <map>}
+00007 \textcolor{preprocessor}{#include <math.h>}
+00008 \textcolor{preprocessor}{#include <assert.h>}
+00009 \textcolor{preprocessor}{#include <thread>}
+00010 \textcolor{preprocessor}{#include "Logger.h"}
+00011 \textcolor{keyword}{using namespace }std;
+00012 
+00013 \textcolor{keyword}{namespace }lime
+00014 \{
+00015 
+00016 \textcolor{comment}{// 0x000A}
+00017 \textcolor{keyword}{const} \textcolor{keywordtype}{int} RX_EN = 1; \textcolor{comment}{//controls both receiver and transmitter}
+00018 \textcolor{keyword}{const} \textcolor{keywordtype}{int} TX_EN = 1 << 1; \textcolor{comment}{//used for wfm playback from fpga}
+00019 \textcolor{keyword}{const} \textcolor{keywordtype}{int} STREAM_LOAD = 1 << 2;
+00020 
+00021 \textcolor{comment}{// 0x0009}
+00022 \textcolor{keyword}{const} \textcolor{keywordtype}{int} SMPL_NR_CLR = 1; \textcolor{comment}{// rising edge clears}
+00023 \textcolor{keyword}{const} \textcolor{keywordtype}{int} TXPCT_LOSS_CLR = 1 << 1; \textcolor{comment}{// 0 - normal operation, 1-clear}
+00024 
+00025 \textcolor{keyword}{const} uint16\_t PLLCFG_START = 0x1;
+00026 \textcolor{keyword}{const} uint16\_t PHCFG_START = 0x2;
+00027 \textcolor{keyword}{const} uint16\_t PLLRST_START = 0x4;
+00028 \textcolor{keyword}{const} uint16\_t PHCFG_UPDN = 1 << 13;
+00029 \textcolor{keyword}{const} uint16\_t PHCFG_MODE = 1 << 14;
+00030 
+00031 \textcolor{keyword}{const} uint16\_t busyAddr = 0x0021;
+00032 
+00033 
+00034 \textcolor{keywordtype}{void} FPGA::SetConnection(IConnection* conn)
+00035 \{
+00036     connection = conn;
+00037 \}
+00038 
+00039 IConnection* FPGA::GetConnection()\textcolor{keyword}{ const}
+00040 \textcolor{keyword}{}\{
+00041     \textcolor{keywordflow}{return} connection;
+00042 \}
+00043 
+00044 \textcolor{keywordtype}{int} FPGA::StartStreaming()
+00045 \{
+00046     uint16\_t interface\_ctrl\_000A;
+00047     \textcolor{keywordtype}{int} status = connection->ReadRegister(0x000A, interface\_ctrl\_000A);
+00048     \textcolor{keywordflow}{if} (status != 0)
+00049         \textcolor{keywordflow}{return} status;
+00050     uint32\_t value = RX_EN;
+00051     status = connection->WriteRegister(0x000A, interface\_ctrl\_000A | value);
+00052     \textcolor{keywordflow}{return} status;
+00053 \}
+00054 
+00055 \textcolor{keywordtype}{int} FPGA::StopStreaming()
+00056 \{
+00057     uint16\_t interface\_ctrl\_000A;
+00058     \textcolor{keywordtype}{int} status = connection->ReadRegister(0x000A, interface\_ctrl\_000A);
+00059     \textcolor{keywordflow}{if} (status != 0)
+00060         \textcolor{keywordflow}{return} status;
+00061     uint32\_t value = ~(RX\_EN | TX_EN);
+00062     connection->WriteRegister(0x000A, interface\_ctrl\_000A & value);
+00063     \textcolor{keywordflow}{return} status;
+00064 \}
+00065 
+00066 \textcolor{keywordtype}{int} FPGA::ResetTimestamp()
+00067 \{
+00068     \textcolor{keywordtype}{int} status;
+00069 \textcolor{preprocessor}{#ifndef NDEBUG}
+00070     uint16\_t interface\_ctrl\_000A;
+00071     status = connection->ReadRegister(0x000A, interface\_ctrl\_000A);
+00072     \textcolor{keywordflow}{if} (status != 0)
+00073         \textcolor{keywordflow}{return} 0;
+00074 
+00075     \textcolor{keywordflow}{if} ((interface\_ctrl\_000A & RX\_EN))
+00076         \textcolor{keywordflow}{return} ReportError(EPERM, \textcolor{stringliteral}{"Streaming must be stopped to reset timestamp"});
+00077 
+00078 \textcolor{preprocessor}{#endif // NDEBUG}
+00079     \textcolor{comment}{//reset hardware timestamp to 0}
+00080     uint16\_t interface\_ctrl\_0009;
+00081     status = connection->ReadRegister(0x0009, interface\_ctrl\_0009);
+00082     \textcolor{keywordflow}{if} (status != 0)
+00083         \textcolor{keywordflow}{return} 0;
+00084     uint32\_t value = (TXPCT\_LOSS\_CLR | SMPL_NR_CLR);
+00085     connection->WriteRegister(0x0009, interface\_ctrl\_0009 & ~(value));
+00086     connection->WriteRegister(0x0009, interface\_ctrl\_0009 | value);
+00087     connection->WriteRegister(0x0009, interface\_ctrl\_0009 & ~value);
+00088     \textcolor{keywordflow}{return} status;
+00089 \}
+00090 
+00091 \textcolor{keywordtype}{int} FPGA::SetPllClock(\textcolor{keywordtype}{int} clockIndex, \textcolor{keywordtype}{int} nSteps, \textcolor{keywordtype}{bool} waitLock, uint16\_t &reg23val)
+00092 \{
+00093     \textcolor{keyword}{const} \textcolor{keyword}{auto} timeout = chrono::seconds(3);
+00094     \textcolor{keyword}{auto} t1 = chrono::high\_resolution\_clock::now();
+00095     \textcolor{keyword}{auto} t2 = t1;
+00096     vector<uint32\_t> addrs;
+00097     vector<uint32\_t> values;
+00098     addrs.push\_back(0x0023); values.push\_back(reg23val & ~PLLCFG\_START);
+00099     addrs.push\_back(0x0024); values.push\_back(abs(nSteps)); \textcolor{comment}{//CNT\_PHASE}
+00100     \textcolor{keywordtype}{int} cnt\_ind = (clockIndex + 2) & 0x1F; \textcolor{comment}{//C0 index 2, C1 index 3...}
+00101     reg23val &= ~(0xF<<8);
+00102     reg23val &= ~(PHCFG_MODE);
+00103     reg23val = reg23val | (cnt\_ind << 8);
+00104     \textcolor{keywordflow}{if}(nSteps >= 0)
+00105         reg23val |= PHCFG_UPDN;
+00106     \textcolor{keywordflow}{else}
+00107         reg23val &= ~PHCFG\_UPDN;
+00108     addrs.push\_back(0x0023); values.push\_back(reg23val); \textcolor{comment}{//PHCFG\_UpDn, CNT\_IND}
+00109     addrs.push\_back(0x0023); values.push\_back(reg23val | PHCFG\_START);
+00110 
+00111     \textcolor{keywordflow}{if}(connection->WriteRegisters(addrs.data(), values.data(), values.size()) != 0)
+00112         ReportError(EIO, \textcolor{stringliteral}{"SetPllFrequency: PHCFG, failed to write registers"});
+00113     addrs.clear(); values.clear();
+00114 
+00115     \textcolor{keywordtype}{bool} done = \textcolor{keyword}{false};
+00116     uint8\_t errorCode = 0;
+00117     t1 = chrono::high\_resolution\_clock::now();
+00118     \textcolor{keywordflow}{if}(waitLock) \textcolor{keywordflow}{do}
+00119     \{
+00120         uint16\_t statusReg;
+00121         connection->ReadRegister(busyAddr, statusReg);
+00122         done = statusReg & 0x1;
+00123         errorCode = (statusReg >> 7) & 0xFF;
+00124         t2 = chrono::high\_resolution\_clock::now();
+00125         std::this\_thread::sleep\_for(chrono::milliseconds(10));
+00126     \} \textcolor{keywordflow}{while}(!done && errorCode == 0 && (t2-t1) < timeout);
+00127     \textcolor{keywordflow}{if}(t2 - t1 > timeout)
+00128         \textcolor{keywordflow}{return} ReportError(ENODEV, \textcolor{stringliteral}{"SetPllFrequency: PHCFG timeout, busy bit is still 1"});
+00129     \textcolor{keywordflow}{if}(errorCode != 0)
+00130         \textcolor{keywordflow}{return} ReportError(EBUSY, \textcolor{stringliteral}{"SetPllFrequency: error configuring PHCFG"});
+00131     addrs.push\_back(0x0023); values.push\_back(reg23val & ~PHCFG\_START);
+00132     \textcolor{keywordflow}{if}(connection->WriteRegisters(addrs.data(), values.data(), values.size()) != 0)
+00133         ReportError(EIO, \textcolor{stringliteral}{"SetPllFrequency: configure FPGA PLL, failed to write registers"});
+00134     \textcolor{keywordflow}{return} 0;
+00135 \}
+00136 
+00144 \textcolor{keywordtype}{int} FPGA::SetPllFrequency(\textcolor{keyword}{const} uint8\_t pllIndex, \textcolor{keyword}{const} \textcolor{keywordtype}{double} inputFreq, 
+      FPGA_PLL_clock* clocks, \textcolor{keyword}{const} uint8\_t clockCount)
+00145 \{
+00146     \textcolor{keyword}{auto} t1 = chrono::high\_resolution\_clock::now();
+00147     \textcolor{keyword}{auto} t2 = t1;
+00148     \textcolor{keyword}{const} \textcolor{keyword}{auto} timeout = chrono::seconds(3);
+00149     \textcolor{keywordflow}{if}(not connection)
+00150         \textcolor{keywordflow}{return} ReportError(ENODEV, \textcolor{stringliteral}{"ConfigureFPGA\_PLL: connection port is NULL"});
+00151     \textcolor{keywordflow}{if}(not connection->IsOpen())
+00152         \textcolor{keywordflow}{return} ReportError(ENODEV, \textcolor{stringliteral}{"ConfigureFPGA\_PLL: configure FPGA PLL, device not connected"});
+00153     eLMS_DEV boardType = connection->GetDeviceInfo().deviceName == GetDeviceName(
+      LMS_DEV_LIMESDR_QPCIE) ? LMS_DEV_LIMESDR_QPCIE : LMS_DEV_UNKNOWN;
+00154 
+00155     \textcolor{keywordflow}{if}(pllIndex > 15)
+00156         ReportError(ERANGE, \textcolor{stringliteral}{"SetPllFrequency: PLL index(%i) out of range [0-15]"}, pllIndex);
+00157 
+00158     \textcolor{comment}{//check if all clocks are above 5MHz}
+00159     \textcolor{keyword}{const} \textcolor{keywordtype}{double} PLLlowerLimit = 5e6;
+00160     \textcolor{keywordflow}{if}(inputFreq < PLLlowerLimit)
+00161         \textcolor{keywordflow}{return} ReportError(ERANGE, \textcolor{stringliteral}{"SetPllFrequency: input frequency must be >=%g MHz"}, PLLlowerLimit/1e6);
+00162     \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} i=0; i<clockCount; ++i)
+00163         \textcolor{keywordflow}{if}(clocks[i].outFrequency < PLLlowerLimit && not clocks[i].bypass)
+00164             \textcolor{keywordflow}{return} ReportError(ERANGE, \textcolor{stringliteral}{"SetPllFrequency: clock(%i) must be >=%g MHz"}, 
+      i, PLLlowerLimit/1e6);
+00165 
+00166     \textcolor{comment}{//disable direct clock source}
+00167     uint16\_t drct\_clk\_ctrl\_0005 = 0;
+00168     connection->ReadRegister(0x0005, drct\_clk\_ctrl\_0005);
+00169     connection->WriteRegister(0x0005, drct\_clk\_ctrl\_0005 & ~(1 << pllIndex));
+00170 
+00171     uint16\_t reg23val = 0;
+00172     \textcolor{keywordflow}{if}(connection->ReadRegister(0x0003, reg23val) != 0)
+00173         \textcolor{keywordflow}{return} ReportError(ENODEV, \textcolor{stringliteral}{"SetPllFrequency: failed to read register"});
+00174 
+00175     reg23val &= ~(0x1F << 3); \textcolor{comment}{//clear PLL index}
+00176     reg23val &= ~PLLCFG\_START; \textcolor{comment}{//clear PLLCFG\_START}
+00177     reg23val &= ~PHCFG\_START; \textcolor{comment}{//clear PHCFG}
+00178     reg23val &= ~PLLRST\_START; \textcolor{comment}{//clear PLL reset}
+00179     reg23val &= ~PHCFG\_UPDN; \textcolor{comment}{//clear PHCFG\_UpDn}
+00180     reg23val |= pllIndex << 3;
+00181 
+00182     uint16\_t reg25 = 0x0170;
+00183     connection->ReadRegister(0x0025, reg25);
+00184 
+00185     uint16\_t statusReg;
+00186     \textcolor{keywordtype}{bool} done = \textcolor{keyword}{false};
+00187     uint8\_t errorCode = 0;
+00188     vector<uint32\_t> addrs;
+00189     vector<uint32\_t> values;
+00190     addrs.push\_back(0x0025); values.push\_back(reg25 | 0x80);
+00191     addrs.push\_back(0x0023); values.push\_back(reg23val); \textcolor{comment}{//PLL\_IND}
+00192     \textcolor{keywordflow}{if} (clocks->findPhase == \textcolor{keyword}{false})
+00193     \{
+00194         addrs.push\_back(0x0023); values.push\_back(reg23val | PLLRST\_START);
+00195     \}
+00196     connection->WriteRegisters(addrs.data(), values.data(), values.size());
+00197     addrs.clear(); values.clear();
+00198 
+00199     t1 = chrono::high\_resolution\_clock::now();
+00200     \textcolor{keywordflow}{if}(boardType == LMS_DEV_LIMESDR_QPCIE) \textcolor{keywordflow}{do} \textcolor{comment}{//wait for reset to activate}
+00201     \{
+00202         connection->ReadRegister(busyAddr, statusReg);
+00203         done = statusReg & 0x1;
+00204         errorCode = (statusReg >> 7) & 0xFF;
+00205         std::this\_thread::sleep\_for(chrono::milliseconds(10));
+00206         t2 = chrono::high\_resolution\_clock::now();
+00207     \} \textcolor{keywordflow}{while}(not done && errorCode == 0 && (t2-t1) < timeout);
+00208     \textcolor{keywordflow}{if}(t2 - t1 > timeout)
+00209         \textcolor{keywordflow}{return} ReportError(ENODEV, \textcolor{stringliteral}{"SetPllFrequency: PLLRST timeout, busy bit is still 1"});
+00210     \textcolor{keywordflow}{if}(errorCode != 0)
+00211         \textcolor{keywordflow}{return} ReportError(EBUSY, \textcolor{stringliteral}{"SetPllFrequency: error resetting PLL"});
+00212 
+00213     addrs.push\_back(0x0023); values.push\_back(reg23val & ~PLLRST\_START);
+00214 
+00215     \textcolor{comment}{//configure FPGA PLLs}
+00216     \textcolor{keyword}{const} \textcolor{keywordtype}{double} vcoLimits\_Hz[2] = \{ 600e6, 1300e6 \};
+00217 
+00218     map< unsigned long, int> availableVCOs; \textcolor{comment}{//all available frequencies for VCO}
+00219     \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} i=0; i<clockCount; ++i)
+00220     \{
+00221         \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{long} freq;
+00222         freq = clocks[i].outFrequency*(int(vcoLimits\_Hz[0]/clocks[i].outFrequency) + 1);
+00223         \textcolor{keywordflow}{while}(freq >= vcoLimits\_Hz[0] && freq <= vcoLimits\_Hz[1])
+00224         \{
+00225             \textcolor{comment}{//add all output frequency multiples that are in VCO interval}
+00226             availableVCOs.insert( pair<unsigned long, int>(freq, 0));
+00227             freq += clocks[i].outFrequency;
+00228         \}
+00229     \}
+00230 
+00231     \textcolor{keywordtype}{int} bestScore = 0; \textcolor{comment}{//score shows how many outputs have integer dividers}
+00232     \textcolor{comment}{//calculate scores for all available frequencies}
+00233     \textcolor{keywordflow}{for} (\textcolor{keyword}{auto} &it : availableVCOs)
+00234     \{
+00235         \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} i=0; i<clockCount; ++i)
+00236         \{
+00237             \textcolor{keywordflow}{if}(clocks[i].outFrequency == 0 || clocks[i].bypass)
+00238                 \textcolor{keywordflow}{continue};
+00239 
+00240             \textcolor{keywordflow}{if}( (\textcolor{keywordtype}{int}(it.first) % \textcolor{keywordtype}{int}(clocks[i].outFrequency)) == 0)
+00241                 it.second = it.second+1;
+00242         \}
+00243         \textcolor{keywordflow}{if}(it.second > bestScore)
+00244         \{
+00245             bestScore = it.second;
+00246         \}
+00247     \}
+00248     \textcolor{keywordtype}{int} N(0), M(0);
+00249     \textcolor{keywordtype}{double} bestDeviation = 1e9;
+00250     \textcolor{keywordtype}{double} Fvco;
+00251     \textcolor{keywordflow}{for}(\textcolor{keyword}{auto} it : availableVCOs)
+00252     \{
+00253         \textcolor{keywordflow}{if}(it.second == bestScore)
+00254         \{
+00255             \textcolor{keywordtype}{float} coef = (it.first / inputFreq);
+00256             \textcolor{keywordtype}{int} Ntemp = 1;
+00257             \textcolor{keywordtype}{int} Mtemp = int(coef + 0.5);
+00258             \textcolor{keywordflow}{while}(inputFreq / Ntemp > PLLlowerLimit)
+00259             \{
+00260                 ++Ntemp;
+00261                 Mtemp = int(coef*Ntemp + 0.5);
+00262                 \textcolor{keywordflow}{if}(Mtemp > 255)
+00263                 \{
+00264                     --Ntemp;
+00265                     Mtemp = int(coef*Ntemp + 0.5);
+00266                     \textcolor{keywordflow}{break};
+00267                 \}
+00268             \}
+00269             \textcolor{keywordtype}{double} deviation = fabs(it.first - inputFreq*Mtemp / Ntemp);
+00270             \textcolor{keywordflow}{if}(deviation <= bestDeviation)
+00271             \{
+00272                 bestDeviation = deviation;
+00273                 Fvco = it.first;
+00274                 M = Mtemp;
+00275                 N = Ntemp;
+00276             \}
+00277         \}
+00278     \}
+00279 
+00280     \textcolor{keywordtype}{int} mlow = M / 2;
+00281     \textcolor{keywordtype}{int} mhigh = mlow + M % 2;
+00282     Fvco = inputFreq*M/N; \textcolor{comment}{//actual VCO freq}
+00283     lime::debug(\textcolor{stringliteral}{"M=%i, N=%i, Fvco=%.3f MHz"}, M, N, Fvco / 1e6);
+00284     \textcolor{keywordflow}{if}(Fvco < vcoLimits\_Hz[0] || Fvco > vcoLimits\_Hz[1])
+00285         \textcolor{keywordflow}{return} ReportError(ERANGE, \textcolor{stringliteral}{"SetPllFrequency: VCO(%g MHz) out of range [%g:%g] MHz"}, Fvco/1e6, 
+      vcoLimits\_Hz[0]/1e6, vcoLimits\_Hz[1]/1e6);
+00286 
+00287     uint16\_t M\_N\_odd\_byp = (M%2 << 3) | (N%2 << 1);
+00288     \textcolor{keywordflow}{if}(M == 1)
+00289         M\_N\_odd\_byp |= 1 << 2; \textcolor{comment}{//bypass M}
+00290     \textcolor{keywordflow}{if}(N == 1)
+00291         M\_N\_odd\_byp |= 1; \textcolor{comment}{//bypass N}
+00292     addrs.push\_back(0x0026); values.push\_back(M\_N\_odd\_byp);
+00293     \textcolor{keywordtype}{int} nlow = N / 2;
+00294     \textcolor{keywordtype}{int} nhigh = nlow + N % 2;
+00295     addrs.push\_back(0x002A); values.push\_back(nhigh << 8 | nlow); \textcolor{comment}{//N\_high\_cnt, N\_low\_cnt}
+00296     addrs.push\_back(0x002B); values.push\_back(mhigh << 8 | mlow);
+00297 
+00298     uint16\_t c7\_c0\_odds\_byps = 0x5555; \textcolor{comment}{//bypass all C}
+00299     uint16\_t c15\_c8\_odds\_byps = 0x5555; \textcolor{comment}{//bypass all C}
+00300 
+00301     \textcolor{comment}{//set outputs}
+00302     \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} i=0; i<clockCount; ++i)
+00303     \{
+00304         \textcolor{keywordtype}{int} C = int(Fvco / clocks[i].outFrequency + 0.5);
+00305         \textcolor{keywordtype}{int} clow = C / 2;
+00306         \textcolor{keywordtype}{int} chigh = clow + C % 2;
+00307         \textcolor{keywordflow}{if}(i < 8)
+00308         \{
+00309             \textcolor{keywordflow}{if}(not clocks[i].bypass && C != 1)
+00310                 c7\_c0\_odds\_byps &= ~(1 << (i*2)); \textcolor{comment}{//enable output}
+00311             c7\_c0\_odds\_byps |= (C % 2) << (i*2+1); \textcolor{comment}{//odd bit}
+00312         \}
+00313         \textcolor{keywordflow}{else}
+00314         \{
+00315             \textcolor{keywordflow}{if}(not clocks[i].bypass && C != 1)
+00316                 c15\_c8\_odds\_byps &= ~(1 << ((i-8)*2)); \textcolor{comment}{//enable output}
+00317             c15\_c8\_odds\_byps |= (C % 2) << ((i-8)*2+1); \textcolor{comment}{//odd bit}
+00318         \}
+00319         addrs.push\_back(0x002E + i); values.push\_back(chigh << 8 | clow);
+00320         clocks[i].rd_actualFrequency = (inputFreq * M / N) / (chigh + clow);
+00321     \}
+00322     addrs.push\_back(0x0027); values.push\_back(c7\_c0\_odds\_byps);
+00323     addrs.push\_back(0x0028); values.push\_back(c15\_c8\_odds\_byps);
+00324     \textcolor{keywordflow}{if} (clockCount != 4 || clocks->index == 3)
+00325     \{
+00326         addrs.push\_back(0x0023); values.push\_back(reg23val | PLLCFG\_START);
+00327     \}
+00328     \textcolor{keywordflow}{if}(connection->WriteRegisters(addrs.data(), values.data(), values.size()) != 0)
+00329         lime::error(\textcolor{stringliteral}{"SetPllFrequency: PLL CFG, failed to write registers"});
+00330     addrs.clear(); values.clear();
+00331 
+00332     t1 = chrono::high\_resolution\_clock::now();
+00333     \textcolor{keywordflow}{if}(boardType == LMS_DEV_LIMESDR_QPCIE) \textcolor{keywordflow}{do} \textcolor{comment}{//wait for config to activate}
+00334     \{
+00335         connection->ReadRegister(busyAddr, statusReg);
+00336         done = statusReg & 0x1;
+00337         errorCode = (statusReg >> 7) & 0xFF;
+00338         t2 = chrono::high\_resolution\_clock::now();
+00339         std::this\_thread::sleep\_for(chrono::milliseconds(10));
+00340     \} \textcolor{keywordflow}{while}(not done && errorCode == 0 && (t2-t1) < timeout);
+00341     \textcolor{keywordflow}{if}(t2 - t1 > timeout)
+00342         \textcolor{keywordflow}{return} ReportError(ENODEV, \textcolor{stringliteral}{"SetPllFrequency: PLLCFG timeout, busy bit is still 1"});
+00343     \textcolor{keywordflow}{if}(errorCode != 0)
+00344         \textcolor{keywordflow}{return} ReportError(EBUSY, \textcolor{stringliteral}{"SetPllFrequency: error configuring PLLCFG"});
+00345 
+00346     \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} i=0; i<clockCount; ++i)
+00347     \{
+00348         \textcolor{keywordtype}{int} C = int(Fvco / clocks[i].outFrequency + 0.5);
+00349         \textcolor{keywordtype}{float} fOut\_MHz = inputFreq/1e6;
+00350         \textcolor{keywordtype}{float} Fstep\_us = 1 / (8 * fOut\_MHz*C);
+00351         \textcolor{keywordtype}{float} Fstep\_deg = (360 * Fstep\_us) / (1 / fOut\_MHz);
+00352         \textcolor{keywordflow}{if} (clocks[i].findPhase == \textcolor{keyword}{false})
+00353         \{
+00354            \textcolor{keyword}{const} \textcolor{keywordtype}{int} nSteps = 0.49 + clocks[i].phaseShift_deg  / Fstep\_deg;
+00355            SetPllClock(clocks[i].index,nSteps, boardType, reg23val);
+00356         \}
+00357         \textcolor{keywordflow}{else}
+00358         \{
+00359             \textcolor{keyword}{const} \textcolor{keywordtype}{int} nSteps = (360.0 / Fstep\_deg)-0.5;
+00360             \textcolor{keyword}{const} \textcolor{keyword}{auto} timeout = chrono::seconds(3);
+00361             t1 = chrono::high\_resolution\_clock::now();
+00362             t2 = t1;
+00363             addrs.clear(); values.clear();
+00364             \textcolor{keywordtype}{int} cnt\_ind = (clocks[i].index + 2) & 0x1F; \textcolor{comment}{//C0 index 2, C1 index 3...}
+00365             reg23val &= ~PLLCFG\_START;
+00366             reg23val &= ~(0xF << 8);
+00367             reg23val |= (cnt\_ind << 8);
+00368             reg23val |= PHCFG_UPDN;
+00369             reg23val |= PHCFG_MODE;
+00370 
+00371             addrs.push\_back(0x0023); values.push\_back(reg23val); \textcolor{comment}{//PHCFG\_UpDn, CNT\_IND}
+00372             addrs.push\_back(0x0024); values.push\_back(abs(nSteps)); \textcolor{comment}{//CNT\_PHASE}
+00373             addrs.push\_back(0x0023); values.push\_back(reg23val | PHCFG\_START);
+00374 
+00375             \textcolor{keywordflow}{if} (connection->WriteRegisters(addrs.data(), values.data(), values.size()) != 0)
+00376                 lime::error( \textcolor{stringliteral}{"SetPllFrequency: find phase, failed to write registers"});
+00377             addrs.clear(); values.clear();
+00378 
+00379             \textcolor{keywordtype}{bool} done = \textcolor{keyword}{false};
+00380             \textcolor{keywordtype}{bool} error = \textcolor{keyword}{false};
+00381 
+00382             t1 = chrono::high\_resolution\_clock::now();
+00383             \textcolor{keywordflow}{do}
+00384             \{
+00385                 uint16\_t statusReg;
+00386                 connection->ReadRegister(busyAddr, statusReg);
+00387                 done = statusReg & 0x4;
+00388                 error = statusReg & 0x08;
+00389                 t2 = chrono::high\_resolution\_clock::now();
+00390                 std::this\_thread::sleep\_for(chrono::milliseconds(10));
+00391             \} \textcolor{keywordflow}{while} (!done && (t2 - t1) < timeout);
+00392             \textcolor{keywordflow}{if} (!done && t2 - t1 > timeout)
+00393                 lime::error(\textcolor{stringliteral}{"SetPllFrequency: timeout, busy bit is still 1"});
+00394             \textcolor{keywordflow}{if} (error)
+00395                 lime::error(\textcolor{stringliteral}{"SetPllFrequency: error configuring phase"});
+00396             addrs.push\_back(0x0023); values.push\_back(reg23val & ~PHCFG\_START);
+00397             \textcolor{keywordflow}{if} (connection->WriteRegisters(addrs.data(), values.data(), values.size()) != 0)
+00398                 lime::error(\textcolor{stringliteral}{"SetPllFrequency: configure FPGA PLL, failed to write registers"});
+00399             \textcolor{keywordflow}{return} (!done) || error ? -1 : 0;
+00400         \}
+00401     \}
+00402     \textcolor{keywordflow}{return} 0;
+00403 \}
+00404 
+00405 \textcolor{keywordtype}{int} FPGA::SetDirectClocking(\textcolor{keywordtype}{int} clockIndex)
+00406 \{
+00407     \textcolor{keywordflow}{if}(not connection)
+00408         \textcolor{keywordflow}{return} ReportError(ENODEV, \textcolor{stringliteral}{"SetDirectClocking: connection port is NULL"});
+00409     \textcolor{keywordflow}{if}(not connection->IsOpen())
+00410         \textcolor{keywordflow}{return} ReportError(ENODEV, \textcolor{stringliteral}{"SetDirectClocking: device not connected"});
+00411 
+00412     uint16\_t drct\_clk\_ctrl\_0005 = 0;
+00413     connection->ReadRegister(0x0005, drct\_clk\_ctrl\_0005);
+00414     uint16\_t drct\_clk\_ctrl\_0006;
+00415     connection->ReadRegister(0x0006, drct\_clk\_ctrl\_0006);
+00416     vector<uint32\_t> addres;
+00417     vector<uint32\_t> values;
+00418     \textcolor{comment}{//enable direct clocking}
+00419     addres.push\_back(0x0005); values.push\_back(drct\_clk\_ctrl\_0005 | (1 << clockIndex));
+00420     \textcolor{keywordflow}{if}(connection->WriteRegisters(addres.data(), values.data(), values.size()) != 0)
+00421         \textcolor{keywordflow}{return} ReportError(EIO, \textcolor{stringliteral}{"SetDirectClocking: failed to write registers"});
+00422     \textcolor{keywordflow}{return} 0;
+00423 \}
+00424 
+00427 \textcolor{keywordtype}{int} FPGA::FPGAPacketPayload2Samples(\textcolor{keyword}{const} uint8\_t* buffer, \textcolor{keywordtype}{int} bufLen, \textcolor{keywordtype}{bool} mimo, \textcolor{keywordtype}{bool} compressed, 
+      complex16_t** samples)
+00428 \{
+00429     \textcolor{keywordflow}{if}(compressed) \textcolor{comment}{//compressed samples}
+00430     \{
+00431         int16\_t sample;
+00432         \textcolor{keywordtype}{int} collected = 0;
+00433         \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} b=0; b<bufLen;collected++)
+00434         \{
+00435             \textcolor{comment}{//I sample}
+00436             sample = buffer[b++];
+00437             sample |= (buffer[b] << 8);
+00438             sample <<= 4;
+00439             samples[0][collected].i = sample >> 4;
+00440             \textcolor{comment}{//Q sample}
+00441             sample =  buffer[b++];
+00442             sample |= buffer[b++] << 8;
+00443             samples[0][collected].q = sample >> 4;
+00444             \textcolor{keywordflow}{if} (mimo)
+00445             \{
+00446                 \textcolor{comment}{//I sample}
+00447                 sample = buffer[b++];
+00448                 sample |= (buffer[b] << 8);
+00449                 sample <<= 4;
+00450                 samples[1][collected].i = sample >> 4;
+00451                 \textcolor{comment}{//Q sample}
+00452                 sample =  buffer[b++];
+00453                 sample |= buffer[b++] << 8;
+00454                 samples[1][collected].q = sample >> 4;
+00455             \}
+00456         \}
+00457         \textcolor{keywordflow}{return} collected;
+00458     \}
+00459 
+00460     \textcolor{keywordflow}{if} (mimo) \textcolor{comment}{//uncompressed samples}
+00461     \{
+00462         complex16_t* ptr = (complex16_t*)buffer;
+00463         \textcolor{keyword}{const} \textcolor{keywordtype}{int} collected = bufLen/\textcolor{keyword}{sizeof}(complex16_t)/2;
+00464         \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} i=0; i<collected;i++)
+00465         \{
+00466             samples[0][i] = *ptr++;
+00467             samples[1][i] = *ptr++;
+00468         \}
+00469         \textcolor{keywordflow}{return} collected;
+00470     \}
+00471 
+00472     memcpy(samples[0],buffer,bufLen);
+00473     \textcolor{keywordflow}{return} bufLen/\textcolor{keyword}{sizeof}(complex16_t);
+00474 \}
+00475 
+00476 \textcolor{keywordtype}{int} FPGA::Samples2FPGAPacketPayload(\textcolor{keyword}{const} complex16_t* \textcolor{keyword}{const}* samples, \textcolor{keywordtype}{int} samplesCount, \textcolor{keywordtype}{bool} mimo, \textcolor{keywordtype}{bool} 
+      compressed, uint8\_t* buffer)
+00477 \{
+00478     \textcolor{keywordflow}{if}(compressed)
+00479     \{
+00480         \textcolor{keywordtype}{int} b=0;
+00481         \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} src=0; src<samplesCount; ++src)
+00482         \{
+00483             buffer[b++] = samples[0][src].i;
+00484             buffer[b++] = ((samples[0][src].i >> 8) & 0x0F) | (samples[0][src].q << 4);
+00485             buffer[b++] = samples[0][src].q >> 4;
+00486             \textcolor{keywordflow}{if} (mimo)
+00487             \{
+00488                 buffer[b++] = samples[1][src].i;
+00489                 buffer[b++] = ((samples[1][src].i >> 8) & 0x0F) | (samples[1][
+      src].q << 4);
+00490                 buffer[b++] = samples[1][src].q >> 4;
+00491             \}
+00492         \}
+00493         \textcolor{keywordflow}{return} b;
+00494     \}
+00495 
+00496     \textcolor{keywordflow}{if} (mimo)
+00497     \{
+00498         complex16_t* ptr = (complex16_t*)buffer;
+00499         \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} src=0; src<samplesCount; ++src)
+00500         \{
+00501             *ptr++ = samples[0][src];
+00502             *ptr++ = samples[1][src];
+00503         \}
+00504         \textcolor{keywordflow}{return} samplesCount*2*\textcolor{keyword}{sizeof}(complex16_t);
+00505     \}
+00506     memcpy(buffer,samples[0],samplesCount*\textcolor{keyword}{sizeof}(complex16_t));
+00507     \textcolor{keywordflow}{return} samplesCount*\textcolor{keyword}{sizeof}(complex16_t);
+00508 \}
+00509 
+00510 \textcolor{keywordtype}{int} FPGA::UploadWFM(\textcolor{keyword}{const} \textcolor{keywordtype}{void}* \textcolor{keyword}{const}* samples, uint8\_t chCount, \textcolor{keywordtype}{size\_t} 
+      sample_count, StreamConfig::StreamDataFormat format, \textcolor{keywordtype}{int} epIndex)
+00511 \{
+00512     \textcolor{keywordtype}{bool} comp = (epIndex==2 && format!=StreamConfig::FMT\_INT12) ? \textcolor{keyword}{false} : \textcolor{keyword}{true};
+00513 
+00514     \textcolor{keyword}{const} \textcolor{keywordtype}{int} samplesInPkt = comp ? samples12InPkt : samples16InPkt;
+00515     connection->WriteRegister(0xFFFF, 1 << epIndex);
+00516     connection->WriteRegister(0x000C, chCount == 2 ? 0x3 : 0x1); \textcolor{comment}{//channels 0,1}
+00517     connection->WriteRegister(0x000E, comp ? 0x2 : 0x0); \textcolor{comment}{//16bit samples}
+00518 
+00519     uint16\_t regValue = 0;
+00520     connection->ReadRegister(0x000D,regValue);
+00521     regValue |= 0x4;
+00522     connection->WriteRegister(0x000D, regValue);
+00523 
+00524     lime::FPGA_DataPacket pkt;
+00525     \textcolor{keywordtype}{size\_t} samplesUsed = 0;
+00526     \textcolor{keywordtype}{int} cnt = sample_count;
+00527 
+00528     \textcolor{keyword}{const} complex16_t* \textcolor{keyword}{const}* src = (\textcolor{keyword}{const} complex16_t* \textcolor{keyword}{const}*)samples;
+00529     \textcolor{keyword}{const} lime::complex16_t** batch = \textcolor{keyword}{new} \textcolor{keyword}{const} lime::complex16_t*[chCount];
+00530     lime::complex16_t** samplesShort = \textcolor{keyword}{new} lime::complex16_t*[chCount];
+00531     \textcolor{keywordflow}{for}(\textcolor{keywordtype}{unsigned} i=0; i<chCount; ++i)
+00532         samplesShort[i] = \textcolor{keyword}{nullptr};
+00533 
+00534     \textcolor{keywordflow}{if} (format == StreamConfig::FMT\_INT16 && comp == \textcolor{keyword}{true})
+00535     \{
+00536         \textcolor{keywordflow}{for}(\textcolor{keywordtype}{unsigned} i=0; i<chCount; ++i)
+00537             samplesShort[i] = \textcolor{keyword}{new} lime::complex16_t[sample\_count];
+00538         \textcolor{keywordflow}{for} (\textcolor{keywordtype}{int} ch = 0; ch < chCount; ch++)
+00539             \textcolor{keywordflow}{for}(\textcolor{keywordtype}{size\_t} i=0; i < sample_count; ++i)
+00540             \{
+00541                 samplesShort[ch][i].i = src[ch][i].i >> 4;
+00542                 samplesShort[ch][i].q = src[ch][i].q >> 4;
+00543             \}
+00544         src = samplesShort;
+00545     \}
+00546     \textcolor{keywordflow}{else} \textcolor{keywordflow}{if}(format == StreamConfig::FMT\_FLOAT32)
+00547     \{
+00548         \textcolor{keyword}{const} \textcolor{keywordtype}{float} mult = comp ? 2047.0f : 32767.0f;
+00549         \textcolor{keywordflow}{for}(\textcolor{keywordtype}{unsigned} i=0; i<chCount; ++i)
+00550             samplesShort[i] = \textcolor{keyword}{new} lime::complex16_t[sample\_count];
+00551 
+00552         \textcolor{keyword}{const} \textcolor{keywordtype}{float}* \textcolor{keyword}{const}* samplesFloat = (\textcolor{keyword}{const} \textcolor{keywordtype}{float}* \textcolor{keyword}{const}*)samples;
+00553         \textcolor{keywordflow}{for} (\textcolor{keywordtype}{int} ch = 0; ch < chCount; ch++)
+00554             \textcolor{keywordflow}{for}(\textcolor{keywordtype}{size\_t} i=0; i < sample_count; ++i)
+00555             \{
+00556                 samplesShort[ch][i].i = samplesFloat[ch][2*i]*mult;
+00557                 samplesShort[ch][i].q = samplesFloat[ch][2*i+1]*mult;
+00558             \}
+00559         src = samplesShort;
+00560     \}
+00561 
+00562     \textcolor{keywordflow}{while}(cnt > 0)
+00563     \{
+00564         pkt.counter = 0;
+00565         pkt.reserved[0] = 0;
+00566         \textcolor{keywordtype}{int} samplesToSend = cnt > samplesInPkt/chCount ? samplesInPkt/chCount : cnt;
+00567 
+00568         \textcolor{keywordflow}{for}(\textcolor{keywordtype}{unsigned} i=0; i<chCount; ++i)
+00569             batch[i] = &src[i][samplesUsed];
+00570         samplesUsed += samplesToSend;
+00571 
+00572         \textcolor{keywordtype}{int} bufPos = Samples2FPGAPacketPayload(batch, samplesToSend, chCount==2, comp, pkt.
+      data);
+00573         \textcolor{keywordtype}{int} payloadSize = (bufPos / 4) * 4;
+00574         \textcolor{keywordflow}{if}(bufPos % 4 != 0)
+00575             lime::warning(\textcolor{stringliteral}{"Packet samples count not multiple of 4"});
+00576         pkt.reserved[2] = (payloadSize >> 8) & 0xFF; \textcolor{comment}{//WFM loading}
+00577         pkt.reserved[1] = payloadSize & 0xFF; \textcolor{comment}{//WFM loading}
+00578         pkt.reserved[0] = 0x1 << 5; \textcolor{comment}{//WFM loading}
+00579 
+00580         \textcolor{keywordtype}{long} bToSend = 16+payloadSize;
+00581         \textcolor{keywordflow}{if} (connection->SendData((\textcolor{keyword}{const} \textcolor{keywordtype}{char}*)&pkt,bToSend,epIndex,500)!=bToSend)
+00582             \textcolor{keywordflow}{break};
+00583         cnt -= samplesToSend;
+00584     \}
+00585     \textcolor{keyword}{delete}[] batch;
+00586     \textcolor{keywordflow}{for}(\textcolor{keywordtype}{unsigned} i=0; i<chCount; ++i)
+00587         \textcolor{keywordflow}{if} (samplesShort[i])
+00588             \textcolor{keyword}{delete} [] samplesShort[i];
+00589     \textcolor{keyword}{delete}[] samplesShort;
+00590 
+00591     \textcolor{comment}{/*Give some time to load samples to FPGA*/}
+00592     std::this\_thread::sleep\_for(std::chrono::milliseconds(500));
+00593     connection->AbortSending(epIndex);
+00594     \textcolor{keywordflow}{if}(cnt == 0)
+00595         \textcolor{keywordflow}{return} 0;
+00596     \textcolor{keywordflow}{else}
+00597         \textcolor{keywordflow}{return} ReportError(-1, \textcolor{stringliteral}{"Failed to upload waveform"});
+00598 \}
+00599 
+00600 
+00603 \textcolor{keywordtype}{int} FPGA::SetInterfaceFreq(\textcolor{keywordtype}{double} txRate\_Hz, \textcolor{keywordtype}{double} rxRate\_Hz, \textcolor{keywordtype}{double} txPhase, \textcolor{keywordtype}{double} rxPhase, \textcolor{keywordtype}{int} channel)
+00604 \{
+00605     lime::FPGA::FPGA_PLL_clock clocks[2];
+00606     \textcolor{keywordtype}{int} status = 0;
+00607 
+00608     \textcolor{keyword}{const} uint32\_t addr = (0x02A<<16);
+00609     uint32\_t val;
+00610     val = (1 << 31) | (uint32\_t(0x0020) << 16) | 0xFFFD; \textcolor{comment}{//msbit 1=SPI write}
+00611     connection->WriteLMS7002MSPI(&val, 1, channel);
+00612     connection->ReadLMS7002MSPI(&addr, &val, 1, channel);
+00613     \textcolor{keywordtype}{bool} bypassTx = (val&0xF0) == 0x00;
+00614     \textcolor{keywordtype}{bool} bypassRx = (val&0x0F) == 0x0D;
+00615 
+00616     \textcolor{keywordflow}{if}  (rxRate\_Hz >= 5e6)
+00617     \{
+00618         clocks[0].index = 0;
+00619         clocks[0].outFrequency = bypassRx ? 2*rxRate\_Hz:rxRate\_Hz;
+00620         clocks[1].index = 1;
+00621         clocks[1].outFrequency = bypassRx ? 2*rxRate\_Hz:rxRate\_Hz;
+00622         clocks[1].phaseShift_deg = rxPhase;
+00623         status = SetPllFrequency(1, rxRate\_Hz, clocks, 2);
+00624     \}
+00625     \textcolor{keywordflow}{else}
+00626         status = SetDirectClocking(1);
+00627 
+00628     \textcolor{keywordflow}{if} (txRate\_Hz >= 5e6)
+00629     \{
+00630         clocks[0].index = 0;
+00631         clocks[0].outFrequency = bypassTx ? 2*txRate\_Hz:txRate\_Hz;
+00632         clocks[1].index = 1;
+00633         clocks[1].outFrequency = bypassTx ? 2*txRate\_Hz:txRate\_Hz;
+00634         clocks[1].phaseShift_deg = txPhase;
+00635         status |= SetPllFrequency(0, txRate\_Hz, clocks, 2);
+00636     \}
+00637     \textcolor{keywordflow}{else}
+00638         status |= SetDirectClocking(0);
+00639     \textcolor{keywordflow}{return} status;
+00640 \}
+00641 
+00644 \textcolor{keywordtype}{int} FPGA::SetInterfaceFreq(\textcolor{keywordtype}{double} txRate\_Hz, \textcolor{keywordtype}{double} rxRate\_Hz, \textcolor{keywordtype}{int} channel)
+00645 \{
+00646     \textcolor{keyword}{const} \textcolor{keywordtype}{int} pll\_ind = (channel == 1) ? 2 : 0;
+00647     \textcolor{keywordtype}{int} status = 0;
+00648     uint32\_t reg20;
+00649     \textcolor{keywordtype}{bool} bypassTx = \textcolor{keyword}{false};
+00650     \textcolor{keywordtype}{bool} bypassRx = \textcolor{keyword}{false};
+00651     \textcolor{keyword}{const} \textcolor{keywordtype}{double} rxPhC1 =  89.46;
+00652     \textcolor{keyword}{const} \textcolor{keywordtype}{double} rxPhC2 =  1.24e-6;
+00653     \textcolor{keyword}{const} \textcolor{keywordtype}{double} txPhC1 =  89.61;
+00654     \textcolor{keyword}{const} \textcolor{keywordtype}{double} txPhC2 =  2.71e-7;
+00655 
+00656     \textcolor{keyword}{const} std::vector<uint32\_t> spiAddr = \{ 0x021, 0x022, 0x023, 0x024, 0x027, 0x02A, 0x82,
+00657                                             0x400, 0x40C, 0x40B, 0x400, 0x40B, 0x400\};
+00658     \textcolor{keyword}{const} \textcolor{keywordtype}{int} bakRegCnt = spiAddr.size() - 4;
+00659 
+00660     \textcolor{keywordtype}{bool} phaseSearch = \textcolor{keyword}{false};
+00661     \textcolor{comment}{//if (!(mStreamers.size() > channel && (mStreamers[channel]->rxRunning ||
+       mStreamers[channel]->txRunning)))}
+00662     \textcolor{keywordflow}{if}(rxRate\_Hz >= 5e6 && txRate\_Hz >= 5e6)
+00663     \{
+00664         uint32\_t addr[3] = \{0, 1, 2\};
+00665         uint32\_t vals[3];
+00666         connection->ReadRegisters(addr,vals,3);
+00667         vals[1] = (vals[1]<<8)|vals[2];
+00668         \textcolor{keywordflow}{if} ((vals[0]==0xE && vals[1]>0x20E)||(vals[0]==0xF && vals[1]>0x206)||(vals[0]==0x10 && vals[1]>0
+      x102))
+00669             phaseSearch = \textcolor{keyword}{true};
+00670     \}
+00671 
+00672     \textcolor{keywordflow}{if} (!phaseSearch)
+00673         \textcolor{keywordflow}{return} SetInterfaceFreq(txRate\_Hz, rxRate\_Hz, txPhC1 + txPhC2 * txRate\_Hz, rxPhC1 + rxPhC2 * 
+      rxRate\_Hz, channel);
+00674 
+00675     std::vector<uint32\_t> dataRdA;
+00676     std::vector<uint32\_t> dataRdB;
+00677     std::vector<uint32\_t> dataWr;
+00678 
+00679     dataWr.resize(spiAddr.size());
+00680     dataRdA.resize(bakRegCnt);
+00681     dataRdB.clear();
+00682     \textcolor{comment}{//backup registers}
+00683     dataWr[0] = (uint32\_t(0x0020) << 16);
+00684     connection->ReadLMS7002MSPI(dataWr.data(), &reg20, 1, channel);
+00685 
+00686     dataWr[0] = (1 << 31) | (uint32\_t(0x0020) << 16) | 0xFFFD; \textcolor{comment}{//msbit 1=SPI write}
+00687     connection->WriteLMS7002MSPI(dataWr.data(), 1, channel);
+00688 
+00689     \textcolor{keywordflow}{for} (\textcolor{keywordtype}{int} i = 0; i < bakRegCnt; ++i)
+00690         dataWr[i] = (spiAddr[i] << 16);
+00691     connection->ReadLMS7002MSPI(dataWr.data(),dataRdA.data(), bakRegCnt, channel);
+00692 
+00693     \{
+00694         \textcolor{keyword}{const} uint32\_t addr = (0x02A<<16);
+00695         uint32\_t val;
+00696         connection->ReadLMS7002MSPI(&addr, &val, 1, channel);
+00697         bypassTx = (val&0xF0) == 0x00;
+00698         bypassRx = (val&0x0F) == 0x0D;
+00699     \}
+00700 
+00701     dataWr[0] = (1 << 31) | (uint32\_t(0x0020) << 16) | 0xFFFE; \textcolor{comment}{//msbit 1=SPI write}
+00702     connection->WriteLMS7002MSPI(dataWr.data(), 1, channel);
+00703 
+00704     \textcolor{keywordflow}{for} (\textcolor{keywordtype}{int} i = 0; i < bakRegCnt; ++i)
+00705         \textcolor{keywordflow}{if} (spiAddr[i] >= 0x100)
+00706             dataRdB.push\_back(spiAddr[i] << 16);
+00707     connection->ReadLMS7002MSPI(dataRdB.data(), dataRdB.data(), dataRdB.size(), channel);
+00708 
+00709     dataWr[0] = (1 << 31) | (uint32\_t(0x0020) << 16) | 0xFFFF; \textcolor{comment}{//msbit 1=SPI write}
+00710     connection->WriteLMS7002MSPI(dataWr.data(), 1, channel);
+00711 
+00712     \{
+00713         std::vector<uint32\_t> spiData = \{ 0x0E9F, 0x0FFF, 0x5550, 0xE4E4, 0xE4E4, 0x0086, 0x8001,
+00714                                           0x028D, 0x00FF, 0x5555, 0x02CD, 0xAAAA, 0x02ED\};
+00715         \textcolor{keywordflow}{if} (bypassRx)spiData[5] = 0xD;
+00716         \textcolor{comment}{//Load test config}
+00717         \textcolor{keyword}{const} \textcolor{keywordtype}{int} setRegCnt = spiData.size();
+00718         \textcolor{keywordflow}{for} (\textcolor{keywordtype}{int} i = 0; i < setRegCnt; ++i)
+00719             dataWr[i] = (1 << 31) | (uint32\_t(spiAddr[i]) << 16) | spiData[i]; \textcolor{comment}{//msbit 1=SPI write}
+00720         connection->WriteLMS7002MSPI(dataWr.data(), setRegCnt, channel);
+00721     \}
+00722 
+00723     lime::FPGA::FPGA_PLL_clock clocks[2];
+00724     clocks[0].index = 1;
+00725     clocks[0].outFrequency = bypassRx ? 2*rxRate\_Hz : rxRate\_Hz;
+00726     clocks[0].phaseShift_deg = rxPhC1 + rxPhC2 * rxRate\_Hz;
+00727     clocks[0].findPhase = \textcolor{keyword}{true};
+00728     clocks[1] = clocks[0];
+00729     \textcolor{keywordflow}{if} (SetPllFrequency(pll\_ind+1, rxRate\_Hz, clocks, 2)!=0)
+00730     \{
+00731         status = -1;
+00732         clocks[0].index = 0;
+00733         clocks[0].phaseShift_deg = 0;
+00734         clocks[0].findPhase = \textcolor{keyword}{false};
+00735         clocks[1].findPhase = \textcolor{keyword}{false};
+00736         SetPllFrequency(pll\_ind+1, rxRate\_Hz, clocks, 2);
+00737     \}
+00738 
+00739     \{
+00740         std::vector<uint32\_t> spiData = \{0x0E9F, 0x0FFF, 0x5550, 0xE4E4, 0xE4E4, 0x0484, 0x8001\};
+00741         \textcolor{keywordflow}{if} (bypassTx)spiData[5] ^= 0x80;
+00742         \textcolor{keywordflow}{if} (bypassRx)spiData[5] ^= 0x9;
+00743         connection->WriteRegister(0xFFFF, 1 << channel);
+00744         connection->WriteRegister(0x000A, 0x0000);
+00745         \textcolor{comment}{//Load test config}
+00746         \textcolor{keyword}{const} \textcolor{keywordtype}{int} setRegCnt = spiData.size();
+00747         \textcolor{keywordflow}{for} (\textcolor{keywordtype}{int} i = 0; i < setRegCnt; ++i)
+00748             dataWr[i] = (1 << 31) | (uint32\_t(spiAddr[i]) << 16) | spiData[i]; \textcolor{comment}{//msbit 1=SPI write}
+00749         connection->WriteLMS7002MSPI(dataWr.data(), setRegCnt, channel);
+00750     \}
+00751 
+00752     clocks[0].index = 1;
+00753     clocks[0].outFrequency = bypassTx ? 2*txRate\_Hz:txRate\_Hz;
+00754     clocks[0].phaseShift_deg = txPhC1 + txPhC2 * txRate\_Hz;
+00755     clocks[0].findPhase = \textcolor{keyword}{true};
+00756     clocks[1] = clocks[0];
+00757     connection->WriteRegister(0x000A, 0x0200);
+00758     \textcolor{keywordflow}{if} (SetPllFrequency(pll\_ind, txRate\_Hz, clocks, 2)!=0)
+00759     \{
+00760         status = -1;
+00761         clocks[0].index = 0;
+00762         clocks[0].phaseShift_deg = 0;
+00763         clocks[0].findPhase = \textcolor{keyword}{false};
+00764         clocks[1].findPhase = \textcolor{keyword}{false};
+00765         SetPllFrequency(pll\_ind, txRate\_Hz, clocks, 2);
+00766     \}
+00767 
+00768     \textcolor{comment}{//Restore registers}
+00769     dataWr[0] = (1 << 31) | (uint32\_t(0x0020) << 16) | 0xFFFD; \textcolor{comment}{//msbit 1=SPI write}
+00770     connection->WriteLMS7002MSPI(dataWr.data(), 1, channel);
+00771     \textcolor{keywordflow}{for} (\textcolor{keywordtype}{int} i = 0; i < bakRegCnt; ++i)
+00772         dataWr[i] = (1 << 31) | (uint32\_t(spiAddr[i]) << 16) | dataRdA[i]; \textcolor{comment}{//msbit 1=SPI write}
+00773     connection->WriteLMS7002MSPI(dataWr.data(), bakRegCnt, channel);
+00774     dataWr[0] = (1 << 31) | (uint32\_t(0x0020) << 16) | 0xFFFE; \textcolor{comment}{//msbit 1=SPI write}
+00775     connection->WriteLMS7002MSPI(dataWr.data(), 1, channel);
+00776 
+00777     \textcolor{keywordtype}{int} k = 0;
+00778     \textcolor{keywordflow}{for} (\textcolor{keywordtype}{int} i = 0; i < bakRegCnt; ++i)
+00779         \textcolor{keywordflow}{if} (spiAddr[i] >= 0x100)\{
+00780             dataWr[k] = (1 << 31) | (uint32\_t(spiAddr[i]) << 16) | dataRdB[k]; \textcolor{comment}{//msbit 1=SPI write}
+00781             k++;
+00782         \}
+00783     connection->WriteLMS7002MSPI(dataWr.data(), k, channel);
+00784     dataWr[0] = (1 << 31) | (uint32\_t(0x0020) << 16) | reg20; \textcolor{comment}{//msbit 1=SPI write}
+00785     connection->WriteLMS7002MSPI(dataWr.data(), 1, channel);
+00786     connection->WriteRegister(0x000A, 0);
+00787 
+00788     \textcolor{keywordflow}{return} status;
+00789 \}
+00790 
+00791 \textcolor{keywordtype}{int} FPGA::ReadRawStreamData(\textcolor{keywordtype}{char}* buffer, \textcolor{keywordtype}{unsigned} length, \textcolor{keywordtype}{int} epIndex, \textcolor{keywordtype}{int} 
+      timeout_ms)
+00792 \{
+00793     connection->WriteRegister(0xFFFF, 1 << epIndex);
+00794     StopStreaming();
+00795     connection->ResetStreamBuffers();
+00796     connection->WriteRegister(0x0008, 0x0100 | 0x2);
+00797     connection->WriteRegister(0x0007, 1);
+00798     StartStreaming();
+00799     \textcolor{keywordtype}{int} totalBytesReceived = connection->ReceiveData(buffer,length, epIndex, timeout\_ms);
+00800     StopStreaming();
+00801     connection->AbortReading(epIndex);
+00802     \textcolor{keywordflow}{return} totalBytesReceived;
+00803 \}
+00804 
+00805 \textcolor{keywordtype}{double} FPGA::DetectRefClk(\textcolor{keywordtype}{double} fx3Clk)
+00806 \{
+00807     \textcolor{keyword}{const} \textcolor{keywordtype}{double} fx3Cnt = 16777210;         \textcolor{comment}{//fixed fx3 counter in FPGA}
+00808     \textcolor{keyword}{const} \textcolor{keywordtype}{double} clkTbl[] = \{ 30.72e6, 38.4e6, 40e6, 52e6 \};
+00809     \textcolor{keyword}{const} uint32\_t addr[] = \{ 0x61, 0x63 \};
+00810     \textcolor{keyword}{const} uint32\_t vals[] = \{ 0x0, 0x0 \};
+00811     \textcolor{keywordflow}{if} (connection->WriteRegisters(addr, vals, 2) != 0)
+00812         \textcolor{keywordflow}{return} -1;
+00813 
+00814     \textcolor{keyword}{auto} start = std::chrono::steady\_clock::now();
+00815     \textcolor{keywordflow}{if} (connection->WriteRegister(0x61, 0x4) != 0)
+00816         \textcolor{keywordflow}{return} -1;
+00817 
+00818     \textcolor{keywordflow}{while} (1) \textcolor{comment}{//wait for test to finish}
+00819     \{
+00820         \textcolor{keywordtype}{unsigned} completed;
+00821         \textcolor{keywordflow}{if} (connection->ReadRegister(0x65, completed) != 0)
+00822             \textcolor{keywordflow}{return} -1;
+00823 
+00824         \textcolor{keywordflow}{if} (completed & 0x4)
+00825             \textcolor{keywordflow}{break};
+00826 
+00827         \textcolor{keyword}{auto} end = std::chrono::steady\_clock::now();
+00828         std::chrono::duration<double> elapsed\_seconds = end - start;
+00829         \textcolor{keywordflow}{if} (elapsed\_seconds.count() > 0.5) \textcolor{comment}{//timeout}
+00830             \textcolor{keywordflow}{return} -1;
+00831     \}
+00832 
+00833     \textcolor{keyword}{const} uint32\_t addr2[] = \{ 0x72, 0x73 \};
+00834     uint32\_t vals2[2];
+00835     \textcolor{keywordflow}{if} (connection->ReadRegisters(addr2, vals2, 2) != 0)
+00836         \textcolor{keywordflow}{return} -1;
+00837 
+00838     \textcolor{keywordtype}{double} count = (vals2[0] | (vals2[1] << 16)); \textcolor{comment}{//cock counter}
+00839     count *= fx3Clk / fx3Cnt;   \textcolor{comment}{//estimate ref clock based on FX3 Clock}
+00840     lime::debug(\textcolor{stringliteral}{"Estimated reference clock %1.4f MHz"}, count/1e6);
+00841     \textcolor{keywordtype}{unsigned} i = 0;
+00842     \textcolor{keywordtype}{double} delta = 100e6;
+00843 
+00844     \textcolor{keywordflow}{while} (i < \textcolor{keyword}{sizeof}(clkTbl) / \textcolor{keyword}{sizeof}(*clkTbl))
+00845         \textcolor{keywordflow}{if} (delta < fabs(count - clkTbl[i]))
+00846             \textcolor{keywordflow}{break};
+00847         \textcolor{keywordflow}{else}
+00848             delta = fabs(count - clkTbl[i++]);
+00849 
+00850     lime::info(\textcolor{stringliteral}{"Reference clock %1.2f MHz"}, clkTbl[i - 1] / 1e6);
+00851     \textcolor{keywordflow}{return} clkTbl[i - 1];
+00852 \}
+00853 
+00854 \} \textcolor{comment}{//namespace lime}
+\end{DoxyCode}

@@ -1,0 +1,186 @@
+\subsection{L\+M\+S64\+C\+Protocol.\+h}
+\label{LMS64CProtocol_8h_source}\index{/home/erik/prefix/default/src/limesuite-\/dev/src/protocols/\+L\+M\+S64\+C\+Protocol.\+h@{/home/erik/prefix/default/src/limesuite-\/dev/src/protocols/\+L\+M\+S64\+C\+Protocol.\+h}}
+
+\begin{DoxyCode}
+00001 
+00007 \textcolor{preprocessor}{#pragma once}
+00008 \textcolor{preprocessor}{#include <IConnection.h>}
+00009 \textcolor{preprocessor}{#include <mutex>}
+00010 \textcolor{preprocessor}{#include <LMS64CCommands.h>}
+00011 \textcolor{preprocessor}{#include <LMSBoards.h>}
+00012 
+00013 \textcolor{keyword}{namespace }lime\{
+00014 
+00021 \textcolor{keyword}{class }LIME_API LMS64CProtocol : \textcolor{keyword}{public} \textcolor{keyword}{virtual} IConnection
+00022 \{
+00023 \textcolor{keyword}{public}:
+00024     LMS64CProtocol(\textcolor{keywordtype}{void});
+00025 
+00026     \textcolor{keyword}{virtual} ~LMS64CProtocol(\textcolor{keywordtype}{void});
+00027 
+00028     \textcolor{keyword}{virtual} DeviceInfo GetDeviceInfo(\textcolor{keywordtype}{void});
+00029 
+00031     \textcolor{keywordtype}{int} DeviceReset(\textcolor{keywordtype}{int} ind=0);
+00032 
+00034     \textcolor{keywordtype}{int} TransactSPI(\textcolor{keyword}{const} \textcolor{keywordtype}{int} addr, \textcolor{keyword}{const} uint32\_t *writeData, uint32\_t *readData, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} 
+      size)\textcolor{keyword}{override};
+00035 
+00037     \textcolor{keywordtype}{int} WriteI2C(\textcolor{keyword}{const} \textcolor{keywordtype}{int} addr, \textcolor{keyword}{const} std::string &data);
+00038 
+00040     \textcolor{keywordtype}{int} ReadI2C(\textcolor{keyword}{const} \textcolor{keywordtype}{int} addr, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} numBytes, std::string &data);
+00041 
+00043     \textcolor{keywordtype}{int} WriteRegisters(\textcolor{keyword}{const} uint32\_t *addrs, \textcolor{keyword}{const} uint32\_t *data, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} size);
+00044 
+00046     \textcolor{keywordtype}{int} ReadRegisters(\textcolor{keyword}{const} uint32\_t *addrs, uint32\_t *data, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} size);
+00047 
+00049     \textcolor{keyword}{enum} eConnectionType
+00050     \{
+00051         CONNECTION\_UNDEFINED = -1,
+00052         COM\_PORT = 0,
+00053         USB\_PORT = 1,
+00054         SPI\_PORT = 2,
+00055         PCIE\_PORT = 3,
+00056         \textcolor{comment}{//insert new types here}
+00057         CONNECTION\_TYPES\_COUNT \textcolor{comment}{//used only for memory allocation}
+00058     \};
+00059 
+00060     \textcolor{keyword}{enum} eLMS_PROTOCOL
+00061     \{
+00062         LMS\_PROTOCOL\_UNDEFINED = 0,
+00063         LMS_PROTOCOL_DIGIC,
+00064         LMS_PROTOCOL_LMS64C,
+00065         LMS_PROTOCOL_NOVENA,
+00066     \};
+00067 
+00068     \textcolor{keyword}{struct }GenericPacket
+00069     \{
+00070         GenericPacket()
+00071         \{
+00072             cmd = CMD_GET_INFO;
+00073             status = STATUS_UNDEFINED;
+00074             periphID = 0;
+00075         \}
+00076 
+00077         eCMD_LMS cmd;
+00078         eCMD_STATUS status;
+00079         \textcolor{keywordtype}{unsigned} periphID;
+00080         std::vector<unsigned char> outBuffer;
+00081         std::vector<unsigned char> inBuffer;
+00082     \};
+00083 
+00084     \textcolor{keyword}{struct }ProtocolDIGIC
+00085     \{
+00086         \textcolor{keyword}{static} \textcolor{keyword}{const} \textcolor{keywordtype}{int} pktLength = 64;
+00087         \textcolor{keyword}{static} \textcolor{keyword}{const} \textcolor{keywordtype}{int} maxDataLength = 60;
+00088         ProtocolDIGIC() : cmd(0), i2cAddr(0), blockCount(0) \{\};
+00089         \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{char} cmd;
+00090         \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{char} i2cAddr;
+00091         \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{char} blockCount;
+00092         \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{char} reserved;
+00093         \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{char} data[maxDataLength];
+00094     \};
+00095 
+00096     \textcolor{keyword}{struct }ProtocolLMS64C
+00097     \{
+00098         \textcolor{keyword}{static} \textcolor{keyword}{const} \textcolor{keywordtype}{int} pktLength = 64;
+00099         \textcolor{keyword}{static} \textcolor{keyword}{const} \textcolor{keywordtype}{int} maxDataLength = 56;
+00100         ProtocolLMS64C() :cmd(0),status(STATUS_UNDEFINED),blockCount(0)
+00101         \{
+00102              memset(reserved, 0, 4);
+00103         \};
+00104         \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{char} cmd;
+00105         \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{char} status;
+00106         \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{char} blockCount;
+00107         \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{char} periphID;
+00108         \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{char} reserved[4];
+00109         \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{char} data[maxDataLength];
+00110     \};
+00111 
+00112     \textcolor{keyword}{struct }ProtocolNovena
+00113     \{
+00114         \textcolor{keyword}{static} \textcolor{keyword}{const} \textcolor{keywordtype}{int} pktLength = 128;
+00115         \textcolor{keyword}{static} \textcolor{keyword}{const} \textcolor{keywordtype}{int} maxDataLength = 128;
+00116         ProtocolNovena() :cmd(0),status(0) \{\};
+00117         \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{char} cmd;
+00118         \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{char} status;
+00119         \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{char} blockCount;
+00120         \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{char} data[maxDataLength];
+00121     \};
+00122 
+00130     \textcolor{keyword}{virtual} \textcolor{keywordtype}{int} TransferPacket(GenericPacket &pkt);
+00131 
+00132     \textcolor{keyword}{struct }LMSinfo
+00133     \{
+00134         eLMS_DEV device;
+00135         eEXP_BOARD expansion;
+00136         \textcolor{keywordtype}{int} firmware;
+00137         \textcolor{keywordtype}{int} hardware;
+00138         \textcolor{keywordtype}{int} protocol;
+00139         uint64\_t boardSerialNumber;
+00140     \};
+00141 
+00142     LMSinfo GetInfo();
+00143 
+00144     \textcolor{keyword}{struct }FPGAinfo
+00145     \{
+00146         \textcolor{keywordtype}{int} boardID;
+00147         \textcolor{keywordtype}{int} gatewareVersion;
+00148         \textcolor{keywordtype}{int} gatewareRevision;
+00149         \textcolor{keywordtype}{int} hwVersion;
+00150     \};
+00151 
+00152     FPGAinfo GetFPGAInfo();
+00153     \textcolor{keywordtype}{void} VersionCheck();
+00154     \textcolor{keywordtype}{int} ProgramUpdate(\textcolor{keyword}{const} \textcolor{keywordtype}{bool} download, IConnection::ProgrammingCallback 
+      callback) \textcolor{keyword}{override};
+00155 
+00157     \textcolor{keyword}{virtual} eConnectionType GetType(\textcolor{keywordtype}{void}) = 0;
+00158 
+00160     \textcolor{keyword}{virtual} \textcolor{keywordtype}{int} Write(\textcolor{keyword}{const} \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{char} *buffer, \textcolor{keywordtype}{int} length, \textcolor{keywordtype}{int} timeout_ms = 100) = 0;
+00161 
+00163     \textcolor{keyword}{virtual} \textcolor{keywordtype}{int} Read(\textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{char} *buffer, \textcolor{keywordtype}{int} length, \textcolor{keywordtype}{int} timeout_ms = 100) = 0;
+00164 
+00165     \textcolor{keyword}{enum} ProgramWriteTarget
+00166     \{
+00167         HPM,
+00168         FX3, \textcolor{comment}{//}
+00169         FPGA, \textcolor{comment}{// prog\_modes: 0-bitstream to FPGA, 1-to FLASH, 2-bitstream from FLASH}
+00170 
+00171         PROGRAM\_WRITE\_TARGET\_COUNT
+00172     \};
+00173 
+00174     \textcolor{keyword}{virtual} \textcolor{keywordtype}{int} ProgramWrite(\textcolor{keyword}{const} \textcolor{keywordtype}{char} *buffer, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} length, \textcolor{keyword}{const} \textcolor{keywordtype}{int} programmingMode, \textcolor{keyword}{const} \textcolor{keywordtype}{int} 
+      device, ProgrammingCallback callback = \textcolor{keyword}{nullptr});
+00175 
+00176     \textcolor{keyword}{virtual} \textcolor{keywordtype}{int} CustomParameterRead(\textcolor{keyword}{const} uint8\_t *ids, \textcolor{keywordtype}{double} *values, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} 
+      count, std::string* units) \textcolor{keyword}{override};
+00177     \textcolor{keyword}{virtual} \textcolor{keywordtype}{int} CustomParameterWrite(\textcolor{keyword}{const} uint8\_t *ids, \textcolor{keyword}{const} \textcolor{keywordtype}{double} *values, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} 
+      count, \textcolor{keyword}{const} std::string& units) \textcolor{keyword}{override};
+00178 
+00179     \textcolor{keyword}{virtual} \textcolor{keywordtype}{int} GPIOWrite(\textcolor{keyword}{const} uint8\_t *buffer, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} bufLength) \textcolor{keyword}{override};
+00180     \textcolor{keyword}{virtual} \textcolor{keywordtype}{int} GPIORead(uint8\_t *buffer, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} bufLength) \textcolor{keyword}{override};
+00181     \textcolor{keyword}{virtual} \textcolor{keywordtype}{int} GPIODirWrite(\textcolor{keyword}{const} uint8\_t *buffer, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} bufLength) \textcolor{keyword}{override};
+00182     \textcolor{keyword}{virtual} \textcolor{keywordtype}{int} GPIODirRead(uint8\_t *buffer, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} bufLength) \textcolor{keyword}{override};
+00183 
+00184     \textcolor{keywordtype}{int} ProgramMCU(\textcolor{keyword}{const} uint8\_t *buffer, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} length, \textcolor{keyword}{const} 
+      MCU_PROG_MODE mode, ProgrammingCallback callback) \textcolor{keyword}{override};
+00185     \textcolor{keywordtype}{int} WriteLMS7002MSPI(\textcolor{keyword}{const} uint32\_t *writeData, \textcolor{keywordtype}{size\_t} size,\textcolor{keywordtype}{unsigned} periphID = 0) \textcolor{keyword}{override};
+00186     \textcolor{keywordtype}{int} ReadLMS7002MSPI(\textcolor{keyword}{const} uint32\_t *writeData, uint32\_t *readData, \textcolor{keywordtype}{size\_t} size, \textcolor{keywordtype}{unsigned} periphID = 0) \textcolor{keyword}{
+      override};
+00187 \textcolor{keyword}{private}:
+00188 
+00189     \textcolor{keywordtype}{int} WriteSi5351I2C(\textcolor{keyword}{const} std::string &data);
+00190     \textcolor{keywordtype}{int} ReadSi5351I2C(\textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} numBytes, std::string &data);
+00191 
+00192     \textcolor{keywordtype}{int} WriteADF4002SPI(\textcolor{keyword}{const} uint32\_t *writeData, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} size);
+00193     \textcolor{keywordtype}{int} ReadADF4002SPI(\textcolor{keyword}{const} uint32\_t *writeData, uint32\_t *readData, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} size);
+00194 
+00195     \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{char}* PreparePacket(\textcolor{keyword}{const} GenericPacket &pkt, \textcolor{keywordtype}{int} &length, \textcolor{keyword}{const} 
+      eLMS_PROTOCOL protocol);
+00196     \textcolor{keywordtype}{int} ParsePacket(GenericPacket &pkt, \textcolor{keyword}{const} \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{char}* buffer, \textcolor{keyword}{const} \textcolor{keywordtype}{int} 
+      length, \textcolor{keyword}{const} eLMS_PROTOCOL protocol);
+00197     std::mutex mControlPortLock;
+00198     \textcolor{keywordtype}{double} _cachedRefClockRate;
+00199 \};
+00200 \}
+\end{DoxyCode}

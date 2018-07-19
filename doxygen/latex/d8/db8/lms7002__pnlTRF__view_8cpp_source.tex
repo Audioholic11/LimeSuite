@@ -1,0 +1,183 @@
+\subsection{lms7002\+\_\+pnl\+T\+R\+F\+\_\+view.\+cpp}
+\label{lms7002__pnlTRF__view_8cpp_source}\index{/home/erik/prefix/default/src/limesuite-\/dev/src/lms7002\+\_\+wxgui/lms7002\+\_\+pnl\+T\+R\+F\+\_\+view.\+cpp@{/home/erik/prefix/default/src/limesuite-\/dev/src/lms7002\+\_\+wxgui/lms7002\+\_\+pnl\+T\+R\+F\+\_\+view.\+cpp}}
+
+\begin{DoxyCode}
+00001 \textcolor{preprocessor}{#include "lms7002_pnlTRF_view.h"}
+00002 \textcolor{preprocessor}{#include <map>}
+00003 \textcolor{preprocessor}{#include <vector>}
+00004 \textcolor{preprocessor}{#include "lms7002_gui_utilities.h"}
+00005 \textcolor{preprocessor}{#include "wx/msgdlg.h"}
+00006 \textcolor{preprocessor}{#include "lms7suiteEvents.h"}
+00007 \textcolor{keyword}{using namespace }lime;
+00008 \textcolor{keyword}{using namespace }LMS7002_WXGUI;
+00009 \textcolor{keyword}{static} indexValueMap en_amphf_pdet_trfIndexValuePairs;
+00010 
+00011 lms7002_pnlTRF_view::lms7002_pnlTRF_view( wxWindow* parent )
+00012 :
+00013 pnlTRF_view( parent )
+00014 \{
+00015 
+00016 \}
+00017 
+00018 lms7002_pnlTRF_view::lms7002_pnlTRF_view( wxWindow* parent, wxWindowID \textcolor{keywordtype}{id}, \textcolor{keyword}{const} wxPoint& pos, \textcolor{keyword}{const} wxSize
+      & size, \textcolor{keywordtype}{long} style )
+00019     : pnlTRF_view(parent, id, pos, size, style), lmsControl(nullptr)
+00020 \{
+00021     wndId2Enum[cmbEN_AMPHF_PDET_TRF] = LMS7param(EN_AMPHF_PDET_TRF);
+00022     wndId2Enum[chkEN_G_TRF] = LMS7param(EN_G_TRF);
+00023     wndId2Enum[chkEN_LOOPB_TXPAD_TRF] = LMS7param(EN_LOOPB_TXPAD_TRF);
+00024     wndId2Enum[cmbEN_LOWBWLOMX_TMX_TRF] = LMS7param(EN_LOWBWLOMX_TMX_TRF);
+00025     wndId2Enum[chkEN_NEXTTX_TRF] = LMS7param(EN_NEXTTX_TRF);
+00026     wndId2Enum[cmbF_TXPAD_TRF] = LMS7param(F_TXPAD_TRF);
+00027     wndId2Enum[rgrGCAS_GNDREF_TXPAD_TRF] = LMS7param(GCAS_GNDREF_TXPAD_TRF);
+00028     wndId2Enum[cmbICT_LIN_TXPAD_TRF] = LMS7param(ICT_LIN_TXPAD_TRF);
+00029     wndId2Enum[cmbICT_MAIN_TXPAD_TRF] = LMS7param(ICT_MAIN_TXPAD_TRF);
+00030     wndId2Enum[cmbLOADR_PDET_TRF] = LMS7param(LOADR_PDET_TRF);
+00031     wndId2Enum[cmbLOBIASN_TXM_TRF] = LMS7param(LOBIASN_TXM_TRF);
+00032     wndId2Enum[cmbLOBIASP_TXX_TRF] = LMS7param(LOBIASP_TXX_TRF);
+00033     wndId2Enum[cmbLOSS_LIN_TXPAD_TRF] = LMS7param(LOSS_LIN_TXPAD_TRF);
+00034     wndId2Enum[cmbLOSS_MAIN_TXPAD_TRF] = LMS7param(LOSS_MAIN_TXPAD_TRF);
+00035     wndId2Enum[cmbL_LOOPB_TXPAD_TRF] = LMS7param(L_LOOPB_TXPAD_TRF);
+00036     wndId2Enum[chkPD_PDET_TRF] = LMS7param(PD_PDET_TRF);
+00037     wndId2Enum[chkPD_TLOBUF_TRF] = LMS7param(PD_TLOBUF_TRF);
+00038     wndId2Enum[chkPD_TXPAD_TRF] = LMS7param(PD_TXPAD_TRF);
+00039     wndId2Enum[cmbVGCAS_TXPAD_TRF] = LMS7param(VGCAS_TXPAD_TRF);
+00040     wndId2Enum[cmbCDC_I_TRF] = LMS7param(CDC_I_TRF);
+00041     wndId2Enum[cmbCDC_Q_TRF] = LMS7param(CDC_Q_TRF);
+00042     wndId2Enum[chkEN_DIR_TRF] = LMS7param(EN_DIR_TRF);
+00043 
+00044     wxArrayString temp;
+00045     temp.clear();
+00046     temp.push\_back(\_(\textcolor{stringliteral}{"-10 db"}));
+00047     en_amphf_pdet_trfIndexValuePairs.push\_back(indexValuePair(0,0));
+00048     temp.push\_back(\_(\textcolor{stringliteral}{"7 db"}));
+00049     en_amphf_pdet_trfIndexValuePairs.push\_back(indexValuePair(1,1));
+00050     temp.push\_back(\_(\textcolor{stringliteral}{"25 db"}));
+00051     en_amphf_pdet_trfIndexValuePairs.push\_back(indexValuePair(2,3));
+00052     cmbEN_AMPHF_PDET_TRF->Set(temp);
+00053 
+00054     temp.clear();
+00055     \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} i=0; i<8; ++i)
+00056         temp.push\_back(wxString::Format(\_(\textcolor{stringliteral}{"%i"}), i));
+00057     cmbF_TXPAD_TRF->Append(temp);
+00058 
+00059     temp.clear();
+00060     \textcolor{keywordtype}{float} IbiasNominal = 20; \textcolor{comment}{//uA}
+00061     \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} i=0; i<32; ++i)
+00062         temp.push\_back(wxString::Format(\_(\textcolor{stringliteral}{"%.1f uA"}), IbiasNominal*(i/12.0)));
+00063     cmbICT_LIN_TXPAD_TRF->Append(temp);
+00064 
+00065     temp.clear();
+00066     \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} i=0; i<32; ++i)
+00067         temp.push\_back(wxString::Format(\_(\textcolor{stringliteral}{"%i"}), i));
+00068     cmbICT_MAIN_TXPAD_TRF->Append(temp);
+00069     cmbLOBIASN_TXM_TRF->Append(temp);
+00070     cmbLOBIASP_TXX_TRF->Append(temp);
+00071     cmbLOSS_LIN_TXPAD_TRF->Append(temp);
+00072     cmbLOSS_MAIN_TXPAD_TRF->Append(temp);
+00073     cmbVGCAS_TXPAD_TRF->Append(temp);
+00074 
+00075     temp.clear();
+00076     \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} i=0; i<16; ++i)
+00077         temp.push\_back(wxString::Format(\_(\textcolor{stringliteral}{"%i"}), i));
+00078     cmbCDC_I_TRF->Append(temp);
+00079     cmbCDC_Q_TRF->Append(temp);
+00080 
+00081     LMS7002_WXGUI::UpdateTooltips(wndId2Enum, \textcolor{keyword}{true});
+00082 \}
+00083 
+00084 \textcolor{keywordtype}{void} lms7002_pnlTRF_view::Initialize(lms_device_t* pControl)
+00085 \{
+00086     lmsControl = pControl;
+00087     assert(lmsControl != \textcolor{keyword}{nullptr});
+00088 \}
+00089 
+00090 \textcolor{keywordtype}{void} lms7002_pnlTRF_view::ParameterChangeHandler(wxCommandEvent& event)
+00091 \{
+00092     assert(lmsControl != \textcolor{keyword}{nullptr});
+00093     LMS7Parameter parameter;
+00094     \textcolor{keywordflow}{try}
+00095     \{
+00096         parameter = wndId2Enum.at(reinterpret\_cast<wxWindow*>(event.GetEventObject()));
+00097     \}
+00098     \textcolor{keywordflow}{catch} (std::exception & e)
+00099     \{
+00100         std::cout << \textcolor{stringliteral}{"Control element(ID = "} << \textcolor{keyword}{event}.GetId() << \textcolor{stringliteral}{") don't have assigned LMS parameter."} << 
+      std::endl;
+00101         \textcolor{keywordflow}{return};
+00102     \}
+00103     \textcolor{keywordtype}{long} value = \textcolor{keyword}{event}.GetInt();
+00104     \textcolor{keywordflow}{if}(event.GetEventObject() == cmbEN_AMPHF_PDET_TRF)
+00105         value = index2value(value, en_amphf_pdet_trfIndexValuePairs);
+00106 
+00107     LMS_WriteParam(lmsControl,parameter,value);
+00108 \}
+00109 
+00110 \textcolor{keywordtype}{void} lms7002_pnlTRF_view::OnBandChange( wxCommandEvent& event )
+00111 \{
+00112     \textcolor{keywordflow}{switch} (cmbTXFEoutput->GetSelection())
+00113     \{
+00114     \textcolor{keywordflow}{case} 0:
+00115         LMS_WriteParam(lmsControl,LMS7param(SEL_BAND1_TRF),\textcolor{keyword}{true});
+00116         LMS_WriteParam(lmsControl,LMS7param(SEL_BAND2_TRF),\textcolor{keyword}{false});
+00117         \textcolor{keywordflow}{break};
+00118     \textcolor{keywordflow}{case} 1:
+00119         LMS_WriteParam(lmsControl,LMS7param(SEL_BAND1_TRF),\textcolor{keyword}{false});
+00120         LMS_WriteParam(lmsControl,LMS7param(SEL_BAND2_TRF),\textcolor{keyword}{true});
+00121         \textcolor{keywordflow}{break};
+00122     \textcolor{keywordflow}{case} 2:
+00123         LMS_WriteParam(lmsControl,LMS7param(SEL_BAND1_TRF),\textcolor{keyword}{false});
+00124         LMS_WriteParam(lmsControl,LMS7param(SEL_BAND2_TRF),\textcolor{keyword}{false});
+00125         \textcolor{keywordflow}{break};
+00126     \textcolor{keywordflow}{default}:
+00127         LMS_WriteParam(lmsControl,LMS7param(SEL_BAND1_TRF),\textcolor{keyword}{false});
+00128         LMS_WriteParam(lmsControl,LMS7param(SEL_BAND2_TRF),\textcolor{keyword}{false});
+00129     \}
+00130     wxCommandEvent evt;
+00131     evt.SetEventType(LMS7\_TXBAND\_CHANGED);
+00132     evt.SetEventObject(\textcolor{keyword}{this});
+00133     evt.SetInt(event.GetInt());
+00134     wxPostEvent(\textcolor{keyword}{this}, evt);
+00135 \}
+00136 
+00137 \textcolor{keywordtype}{void} lms7002_pnlTRF_view::UpdateGUI()
+00138 \{
+00139     LMS7002_WXGUI::UpdateControlsByMap(\textcolor{keyword}{this}, lmsControl, wndId2Enum);
+00140 
+00141     uint16\_t value;
+00142     LMS_ReadParam(lmsControl,LMS7param(EN_AMPHF_PDET_TRF),&value);
+00143     cmbEN_AMPHF_PDET_TRF->SetSelection(value2index(value, 
+      en_amphf_pdet_trfIndexValuePairs));
+00144 
+00145     uint16\_t SEL\_BAND1\_TRFvalue;
+00146     LMS_ReadParam(lmsControl,LMS7param(SEL_BAND1_TRF),&SEL\_BAND1\_TRFvalue);
+00147     uint16\_t SEL\_BAND2\_TRFvalue;
+00148     LMS_ReadParam(lmsControl,LMS7param(SEL_BAND2_TRF),&SEL\_BAND2\_TRFvalue);
+00149     \textcolor{keywordtype}{long} TXFEoutputValue = 0;
+00150     \textcolor{keywordflow}{if} (!SEL\_BAND1\_TRFvalue && !SEL\_BAND2\_TRFvalue)
+00151         TXFEoutputValue = 2;
+00152     \textcolor{keywordflow}{else} \textcolor{keywordflow}{if} (SEL\_BAND1\_TRFvalue && !SEL\_BAND2\_TRFvalue)
+00153         TXFEoutputValue = 0;
+00154     \textcolor{keywordflow}{else} \textcolor{keywordflow}{if} (!SEL\_BAND1\_TRFvalue && SEL\_BAND2\_TRFvalue)
+00155         TXFEoutputValue = 1;
+00156     \textcolor{keywordflow}{else}
+00157     \{
+00158         TXFEoutputValue = 2;
+00159         LMS_WriteParam(lmsControl,LMS7param(SEL_BAND1_TRF),\textcolor{keyword}{false});
+00160         LMS_WriteParam(lmsControl,LMS7param(SEL_BAND2_TRF),\textcolor{keyword}{false});
+00161     \}
+00162     cmbTXFEoutput->SetSelection(TXFEoutputValue);
+00163 
+00164     \textcolor{comment}{//check if B channel is enabled}
+00165     uint16\_t macBck;
+00166     LMS_ReadParam(lmsControl,LMS7param(MAC),&macBck);
+00167     \textcolor{keywordflow}{if} (macBck >= 2)
+00168         chkEN_NEXTTX_TRF->Hide();
+00169     \textcolor{keywordflow}{else}
+00170         chkEN_NEXTTX_TRF->Show();
+00171 
+00172     LMS_ReadParam(lmsControl,LMS7param(TRX_GAIN_SRC),&value);
+00173     cmbLOSS_LIN_TXPAD_TRF->Enable(!value);
+00174     cmbLOSS_MAIN_TXPAD_TRF->Enable(!value);
+00175 \}
+\end{DoxyCode}

@@ -1,0 +1,42 @@
+\subsection{lms7002\+\_\+pnl\+S\+X\+\_\+view.\+h}
+\label{lms7002__pnlSX__view_8h_source}\index{/home/erik/prefix/default/src/limesuite-\/dev/src/lms7002\+\_\+wxgui/lms7002\+\_\+pnl\+S\+X\+\_\+view.\+h@{/home/erik/prefix/default/src/limesuite-\/dev/src/lms7002\+\_\+wxgui/lms7002\+\_\+pnl\+S\+X\+\_\+view.\+h}}
+
+\begin{DoxyCode}
+00001 \textcolor{preprocessor}{#ifndef \_\_lms7002\_pnlSX\_view\_\_}
+00002 \textcolor{preprocessor}{#define \_\_lms7002\_pnlSX\_view\_\_}
+00003 
+00009 \textcolor{preprocessor}{#include "lms7002_wxgui.h"}
+00010 
+00012 \textcolor{preprocessor}{#include <map>}
+00013 \textcolor{preprocessor}{#include "lime/LimeSuite.h"}
+00014 \textcolor{keyword}{namespace }lime\{
+00015 
+00016 \}
+00018 \textcolor{keyword}{class }lms7002_pnlSX_view : \textcolor{keyword}{public} pnlSX_view
+00019 \{
+00020     \textcolor{keyword}{protected}:
+00021         \textcolor{comment}{// Handlers for pnlSX\_view events.}
+00022         \textcolor{keywordtype}{void} ParameterChangeHandler( wxCommandEvent& event );
+00023         \textcolor{keywordtype}{void} ParameterChangeHandler( wxSpinEvent& event);
+00024         \textcolor{keywordtype}{void} OnbtnReadComparators(wxCommandEvent& event);
+00025         \textcolor{keywordtype}{void} OnbtnChangeRefClkClick( wxCommandEvent& event );
+00026         \textcolor{keywordtype}{void} OnbtnCalculateClick( wxCommandEvent& event );
+00027         \textcolor{keywordtype}{void} OnbtnTuneClick( wxCommandEvent& event );
+00028         \textcolor{keywordtype}{void} OnShowVCOclicked(wxCommandEvent& event);
+00029         \textcolor{keywordtype}{void} OnEnableRefSpurCancelation(wxCommandEvent& event);
+00030 
+00031         wxComboBox* cmbRZ_CTRL;
+00032         wxComboBox* cmbCMPLO_CTRL;
+00033     \textcolor{keyword}{public}:
+00035         lms7002_pnlSX_view( wxWindow* parent );
+00037     lms7002_pnlSX_view(wxWindow* parent, wxWindowID \textcolor{keywordtype}{id} = wxID\_ANY, \textcolor{keyword}{const} wxPoint& pos = wxDefaultPosition, \textcolor{keyword}{
+      const} wxSize& size = wxDefaultSize, \textcolor{keywordtype}{long} style = wxTAB\_TRAVERSAL);
+00038     \textcolor{keywordtype}{void} Initialize(lms_device_t* pControl);
+00039     \textcolor{keywordtype}{void} UpdateGUI();
+00040 \textcolor{keyword}{protected}:
+00041     lms_device_t* lmsControl;
+00042     std::map<wxWindow*, LMS7Parameter> wndId2Enum;
+00043 \};
+00044 
+00045 \textcolor{preprocessor}{#endif // \_\_lms7002\_pnlSX\_view\_\_}
+\end{DoxyCode}

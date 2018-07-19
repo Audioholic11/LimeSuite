@@ -1,0 +1,320 @@
+\subsection{rounding.\+c}
+\label{rounding_8c_source}\index{/home/erik/prefix/default/src/limesuite-\/dev/src/\+G\+F\+I\+R/rounding.\+c@{/home/erik/prefix/default/src/limesuite-\/dev/src/\+G\+F\+I\+R/rounding.\+c}}
+
+\begin{DoxyCode}
+00001 \textcolor{comment}{/* ************************************************************************ }
+00002 \textcolor{comment}{   FILE:    rounding.c}
+00003 \textcolor{comment}{   COMMENT: Functions related to filter coefficients rounding to}
+00004 \textcolor{comment}{        integer values or CSD form.}
+00005 \textcolor{comment}{   CONTENT:}
+00006 \textcolor{comment}{   AUTHOR:  Lime Microsystems}
+00007 \textcolor{comment}{   DATE:    Jun 18, 2000}
+00008 \textcolor{comment}{   REVISION:    Nov 30, 2007:   Tiger project}
+00009 \textcolor{comment}{   ************************************************************************ */}
+00010 \textcolor{preprocessor}{#include <math.h>}
+00011 \textcolor{preprocessor}{#include <stdio.h>}
+00012 
+00013 \textcolor{preprocessor}{#include "rounding.h"}
+00014 
+00015 \textcolor{keywordtype}{void} int2csd(\textcolor{keywordtype}{int} a, \textcolor{keywordtype}{int} cprec, \textcolor{keywordtype}{int} csdprec, \textcolor{keywordtype}{int} * bincode, \textcolor{keywordtype}{int} * csdcode, \textcolor{keywordtype}{int} * csdcoder); 
+00016 \textcolor{keywordtype}{int} csd2int(\textcolor{keywordtype}{int} cprec, \textcolor{keywordtype}{int} *code);
+00017 
+00018 \textcolor{comment}{/* ************************************************************************ }
+00019 \textcolor{comment}{   ************************************************************************ */}
+00020 \textcolor{keywordtype}{void} round2int(a, b, n, cprec)
+00021 double *a, *b;
+00022 \textcolor{keywordtype}{int} n, cprec;
+00023 \{
+00024     \textcolor{keywordtype}{int} i,k;
+00025 
+00026     \textcolor{keywordflow}{for}(i=0; i<n; i++) \{
+00027         k = a[i] > 0.0 ? 1 : -1;
+00028         b[i] = (int)(a[i]*(1<<cprec) + k*0.5);
+00029         b[i] /= (double)(1<<cprec);
+00030     \}
+00031 \}
+00032 
+00033 \textcolor{comment}{/* ************************************************************************ }
+00034 \textcolor{comment}{   ************************************************************************ */}
+00035 \textcolor{keywordtype}{void} round2csd(a, b, n, cprec, csdprec, bincode, csdcode, csdcoder)
+00036 double *a, *b;
+00037 \textcolor{keywordtype}{int} n, cprec, csdprec;
+00038 \textcolor{keywordtype}{int} **bincode, **csdcode, **csdcoder;
+00039 \{
+00040     \textcolor{keywordtype}{int} i,k, ia;
+00041 
+00042     \textcolor{keywordflow}{for}(i=0; i<n; i++) \{
+00043         k = a[i] > 0.0 ? 1 : -1;
+00044         ia = (int)(a[i]*(1<<cprec) + k*0.5);
+00045         int2csd(ia, cprec, csdprec, bincode[i], csdcode[i], csdcoder[i]);
+00046         ia = csd2int(cprec, csdcoder[i]);
+00047         b[i] = (double)(ia)/(double)(1<<cprec);
+00048     \}
+00049 \}
+00050 
+00051 \textcolor{comment}{/* ************************************************************************ }
+00052 \textcolor{comment}{   ************************************************************************ */}
+00053 \textcolor{keywordtype}{void} printcode(\textcolor{keywordtype}{int} ** code, \textcolor{keywordtype}{int} n, \textcolor{keywordtype}{int} cprec)
+00054 \{
+00055     \textcolor{keywordtype}{int} i, j;
+00056     \textcolor{keywordtype}{double} sumh, sume, sumo;
+00057     \textcolor{keywordtype}{int} ih; \textcolor{keywordtype}{double} h;
+00058     \textcolor{keywordtype}{int} negative, sign, shift, csdprec;
+00059     \textcolor{keywordtype}{int} symmetry;
+00060 
+00061     \textcolor{comment}{/* Find maximum nonzero bits per coefficient */}
+00062     csdprec = 0;
+00063     \textcolor{keywordflow}{for}(i=0; i<n; i++) \{
+00064         negative = 0;
+00065         \textcolor{keywordflow}{for}(j=0; j<= cprec; j++) \textcolor{keywordflow}{if}(code[i][j] != 0) negative++;
+00066         \textcolor{keywordflow}{if}(negative > csdprec) csdprec = negative;
+00067     \}
+00068 
+00069     \textcolor{comment}{/* Check symmetry of the filter */}
+00070     \textcolor{keywordflow}{if}( csd2int(cprec, code[0]) == csd2int(cprec,code[n-1]) ) symmetry = 1;
+00071     \textcolor{keywordflow}{else} symmetry = -1;
+00072 
+00073     sumh=0.0; sume=0.0; sumo=0.0;
+00074     \textcolor{keywordflow}{for}(i=0; i<n; i++) \{
+00075         ih = csd2int(cprec, code[i]);
+00076         h = (double)ih/(\textcolor{keywordtype}{double})(1<<cprec);
+00077         sumh += fabs(h);
+00078         \textcolor{keywordflow}{if}(i%2) sumo += fabs(h);
+00079         \textcolor{keywordflow}{else} sume += fabs(h);
+00080 
+00081         \textcolor{keywordflow}{if} ((ih != 0) && (i<(n+1)/2) ) \{
+00082             negative = 0;
+00083             \textcolor{keywordflow}{for}(j=0; j<=cprec; j++) \{
+00084                 \textcolor{keywordflow}{if}(code[i][j] == -1) negative ++;
+00085                 \textcolor{keywordflow}{if}(code[i][j] != 0 ) shift = j;
+00086             \}
+00087 
+00088             \textcolor{keywordflow}{if}(negative <= (csdprec-1)) sign = 1;
+00089             \textcolor{keywordflow}{else} sign = -1;
+00090 
+00091             shift = cprec - shift;
+00092             \textcolor{keywordflow}{if}(fabs(h)*(1<<shift) > 1.0) shift --;
+00093 
+00094             printf(\textcolor{stringliteral}{"h(%2d) = %11lg = %2d x ("}, i, h, sign);
+00095             \textcolor{keywordflow}{for}(j=cprec; j>=0; j--) \{
+00096                 \textcolor{keywordflow}{if}(sign*code[i][j] == 1) \{
+00097                     \textcolor{comment}{// printf(" +1/2^%d", cprec-j-shift);}
+00098                     printf(\textcolor{stringliteral}{" +1/2^%d"}, cprec-j);
+00099                 \} \textcolor{keywordflow}{else} \textcolor{keywordflow}{if}(sign*code[i][j] == -1) \{
+00100                     \textcolor{comment}{// printf(" -1/2^%d", cprec-j-shift);}
+00101                     printf(\textcolor{stringliteral}{" -1/2^%d"}, cprec-j);
+00102                 \}
+00103             \}
+00104             \textcolor{comment}{// printf(" ) / ( 2^%d )\(\backslash\)n", shift);}
+00105             printf(\textcolor{stringliteral}{" )\(\backslash\)n"});
+00106         \}\textcolor{keywordflow}{else} \textcolor{keywordflow}{if} (ih != 0) \{
+00107             printf(\textcolor{stringliteral}{"h(%2d) = %11lg = %2d x h(%2d)\(\backslash\)n"}, 
+00108                 i, h, symmetry, n-1-i);
+00109         \} \textcolor{keywordflow}{else} \{
+00110             printf(\textcolor{stringliteral}{"h(%2d) = %11lg\(\backslash\)n"}, i, 0.0);
+00111         \}
+00112     \}
+00113     printf(\textcolor{stringliteral}{"Sum of all abs(coefficients): %lg\(\backslash\)n"}, sumh);
+00114     printf(\textcolor{stringliteral}{"Sum of even coefficients: %lg\(\backslash\)n"}, sume);
+00115     printf(\textcolor{stringliteral}{"Sum of odd  coefficients: %lg\(\backslash\)n\(\backslash\)n"}, sumo);
+00116 \}
+00117 
+00118 \textcolor{comment}{/* ************************************************************************ }
+00119 \textcolor{comment}{   Print CSD code in the form of two common sub-expressions sharing }
+00120 \textcolor{comment}{   ************************************************************************ */}
+00121 \textcolor{keywordtype}{void} print_cses_code(xpx, xmx, x, n, cprec)
+00122 int **xpx, **xmx, **x, n, cprec;
+00123 \{
+00124     \textcolor{keywordtype}{int} i, j;
+00125     \textcolor{keywordtype}{int} symmetry;
+00126     \textcolor{keywordtype}{int} ixpx, ixmx, ix;
+00127     \textcolor{keywordtype}{double} h;
+00128 
+00129     \textcolor{comment}{/* Check symmetry of the filter */}
+00130     \textcolor{keywordflow}{if}( (csd2int(cprec, xpx[0]) == csd2int(cprec,xpx[n-1])) &&
+00131         (csd2int(cprec, xmx[0]) == csd2int(cprec,xmx[n-1])) &&
+00132         (csd2int(cprec,   x[0]) == csd2int(cprec,x[n-1])) ) symmetry = 1;
+00133     \textcolor{keywordflow}{else} symmetry = -1;
+00134 
+00135     \textcolor{keywordflow}{for}(i=0; i<n; i++) \{
+00136         ixpx = csd2int(cprec, xpx[i]);
+00137         ixmx = csd2int(cprec, xmx[i]);
+00138         ix   = csd2int(cprec, x[i]);
+00139         h =     (1.0+1.0/4.0)*(double)ixpx/(\textcolor{keywordtype}{double})(1<<cprec) +
+00140             (1.0-1.0/4.0)*(double)ixmx/(\textcolor{keywordtype}{double})(1<<cprec) + 
+00141             (\textcolor{keywordtype}{double})ix/(double)(1<<cprec);
+00142 
+00143         \textcolor{keywordflow}{if} ((h != 0.0) && (i<(n+1)/2) ) \{
+00144             printf(\textcolor{stringliteral}{"h(%2d) = %11lg = "}, i, h);
+00145             \textcolor{keywordflow}{if}( ixpx ) \{
+00146                 printf(\textcolor{stringliteral}{"(1+1/4)x("});
+00147                 \textcolor{keywordflow}{for}(j=cprec; j>=0; j--) \{
+00148                     \textcolor{keywordflow}{if}(xpx[i][j] == 1) \{
+00149                         printf(\textcolor{stringliteral}{" +1/2^%d"}, cprec-j);
+00150                     \} \textcolor{keywordflow}{else} \textcolor{keywordflow}{if}(xpx[i][j] == -1) \{
+00151                         printf(\textcolor{stringliteral}{" -1/2^%d"}, cprec-j);
+00152                     \}
+00153                 \}
+00154                 printf(\textcolor{stringliteral}{" )"});
+00155             \}
+00156 
+00157             \textcolor{keywordflow}{if}( ixmx ) \{
+00158                 \textcolor{keywordflow}{if}( ixpx ) printf(\textcolor{stringliteral}{" + (1-1/4)x("});
+00159                 \textcolor{keywordflow}{else} printf(\textcolor{stringliteral}{"(1-1/4)x("});
+00160 
+00161                 \textcolor{keywordflow}{for}(j=cprec; j>=0; j--) \{
+00162                     \textcolor{keywordflow}{if}(xmx[i][j] == 1) \{
+00163                         printf(\textcolor{stringliteral}{" +1/2^%d"}, cprec-j);
+00164                     \} \textcolor{keywordflow}{else} \textcolor{keywordflow}{if}(xmx[i][j] == -1) \{
+00165                         printf(\textcolor{stringliteral}{" -1/2^%d"}, cprec-j);
+00166                     \}
+00167                 \}
+00168                 printf(\textcolor{stringliteral}{" )"});
+00169             \}
+00170 
+00171             \textcolor{keywordflow}{if}( ix ) \{
+00172                 \textcolor{keywordflow}{if}( ixpx || ixmx ) printf(\textcolor{stringliteral}{" + ("});
+00173                 \textcolor{keywordflow}{else} printf(\textcolor{stringliteral}{"("});
+00174 
+00175                 \textcolor{keywordflow}{for}(j=cprec; j>=0; j--) \{
+00176                     \textcolor{keywordflow}{if}(x[i][j] == 1) \{
+00177                         printf(\textcolor{stringliteral}{" +1/2^%d"}, cprec-j);
+00178                     \} \textcolor{keywordflow}{else} \textcolor{keywordflow}{if}(x[i][j] == -1) \{
+00179                         printf(\textcolor{stringliteral}{" -1/2^%d"}, cprec-j);
+00180                     \}
+00181                 \}
+00182                 printf(\textcolor{stringliteral}{" )"});
+00183             \}
+00184 
+00185             printf(\textcolor{stringliteral}{"\(\backslash\)n"});
+00186         \} \textcolor{keywordflow}{else} \textcolor{keywordflow}{if} (h != 0) \{
+00187             printf(\textcolor{stringliteral}{"h(%2d) = %11lg = %2d x h(%2d)\(\backslash\)n"}, 
+00188                 i, h, symmetry, n-1-i);
+00189         \} \textcolor{keywordflow}{else} \{
+00190             printf(\textcolor{stringliteral}{"h(%2d) = %11lg\(\backslash\)n"}, i, 0.0);
+00191         \}
+00192     \}
+00193 \}
+00194 
+00195 \textcolor{comment}{/* ************************************************************************ }
+00196 \textcolor{comment}{   ************************************************************************ */}
+00197 \textcolor{keywordtype}{void} int2csd(a, cprec, csdprec, bincode, csdcode, csdcoder)
+00198 int a;      \textcolor{comment}{/* Input integer to be converted into CSD code */}
+00199 \textcolor{keywordtype}{int} cprec;  \textcolor{comment}{/* Integer precision */}
+00200 \textcolor{keywordtype}{int} csdprec;    \textcolor{comment}{/* CSD precistion */}
+00201 \textcolor{keywordtype}{int} *bincode;   \textcolor{comment}{/* Binary code */}
+00202 \textcolor{keywordtype}{int} *csdcode;   \textcolor{comment}{/* CSD code */}
+00203 \textcolor{keywordtype}{int} *csdcoder;  \textcolor{comment}{/* CSD code rounded to 'csdprec' nonzero bits */}
+00204 \{
+00205     \textcolor{keywordtype}{int} i, sign, ci, ci1, nzeroes;
+00206 
+00207     \textcolor{keywordflow}{if}( a < 0 ) \{
+00208         a *= -1;
+00209         sign = -1; 
+00210     \} \textcolor{keywordflow}{else} \{
+00211         sign = 1;
+00212     \}
+00213 
+00214     \textcolor{comment}{/* Generate binary code of input */}
+00215     \textcolor{keywordflow}{for}(i=0; i<cprec; i++) \{
+00216         \textcolor{keywordflow}{if}( a & (1<<i) ) bincode[i] = 1;
+00217         \textcolor{keywordflow}{else} bincode[i] = 0;
+00218     \}
+00219     bincode[cprec] = 0;
+00220     
+00221     \textcolor{comment}{/* Construct CSD code */}
+00222     ci = 0;
+00223     \textcolor{keywordflow}{for}(i=0; i<cprec; i++) \{
+00224         \textcolor{keywordflow}{if}( (ci + bincode[i] + bincode[i+1]) > 1 ) ci1 = 1;
+00225         \textcolor{keywordflow}{else} ci1 = 0;
+00226 
+00227         csdcode[i] = sign*(bincode[i] + ci -2*ci1);
+00228         bincode[i] *= sign;
+00229         ci = ci1;
+00230     \}
+00231     csdcode[cprec] = sign*ci;
+00232 
+00233     \textcolor{comment}{/* Round CSD code */}
+00234     nzeroes = 0;
+00235     \textcolor{keywordflow}{for}(i=cprec; i >= 0 ; i--) \{
+00236         \textcolor{keywordflow}{if}(csdcode[i] != 0) nzeroes ++;
+00237 
+00238         \textcolor{keywordflow}{if}(nzeroes <= csdprec) csdcoder[i] = csdcode[i];
+00239         \textcolor{keywordflow}{else} csdcoder[i] = 0;
+00240     \}
+00241 
+00242 \}
+00243 
+00244 \textcolor{comment}{/* ************************************************************************ }
+00245 \textcolor{comment}{   ************************************************************************ */}
+00246 \textcolor{keywordtype}{int} csd2int(cprec, code)
+00247 int cprec, *code;
+00248 \{
+00249     \textcolor{keywordtype}{int} i, a;
+00250     
+00251     a = 0;
+00252     \textcolor{keywordflow}{for}(i=cprec; i>=0; i--) a = a*2 + code[i];
+00253 
+00254     \textcolor{keywordflow}{return}(a);
+00255 \}
+00256 
+00257 \textcolor{comment}{/* ************************************************************************ }
+00258 \textcolor{comment}{    Extract x+x>>2 and x-x>>2 subexpressions from the CSD code}
+00259 \textcolor{comment}{   ************************************************************************ */}
+00260 \textcolor{keywordtype}{void} csesh(code, n, cprec, xpx, xmx, x )
+00261 int n, cprec;
+00262 \textcolor{keywordtype}{int} **code, **xpx, **xmx, **x;
+00263 \{
+00264     \textcolor{keywordtype}{int} i, k;
+00265 
+00266     \textcolor{comment}{/* Set code matrices to zero */}
+00267     \textcolor{keywordflow}{for}(i = 0; i < n; i++) \{
+00268         \textcolor{keywordflow}{for}(k=0; k <= cprec; k++) \{
+00269             xpx[i][k] = 0;
+00270             xmx[i][k] = 0;
+00271             x[i][k] = 0;
+00272         \}
+00273     \}
+00274             
+00275     \textcolor{comment}{/* Extract two common subexpressions from all filter coefficients */}
+00276     \textcolor{keywordflow}{for}(i = 0; i <n; i++) \{
+00277         k = cprec;
+00278         \textcolor{keywordflow}{while}(1) \{
+00279             \textcolor{comment}{/* Find next nonzero element in CSD code */}
+00280             \textcolor{keywordflow}{for}(; k >= 0; k--) \textcolor{keywordflow}{if}(code[i][k] != 0) \textcolor{keywordflow}{break};
+00281 
+00282             \textcolor{keywordflow}{if}(k == -1) \{       \textcolor{comment}{/* There are no more nonzero digits */}
+00283                 \textcolor{keywordflow}{break};
+00284             \} \textcolor{keywordflow}{else} \textcolor{keywordflow}{if}(k == 0) \{ \textcolor{comment}{/* It is the last digit */}
+00285                 x[i][0] = code[i][0];
+00286                 \textcolor{keywordflow}{break};
+00287             \} \textcolor{keywordflow}{else} \textcolor{keywordflow}{if}(k == 1) \{ \textcolor{comment}{/* Two more digits left */}
+00288                 x[i][0] = code[i][0];
+00289                 x[i][1] = code[i][1];
+00290                 \textcolor{keywordflow}{break};
+00291             \} \textcolor{keywordflow}{else} \{
+00292                 \textcolor{keywordflow}{if}((code[i][k] == 1) && (code[i][k-2] == 1) ) \{
+00293                     xpx[i][k] = 1;
+00294                     code[i][k] = 0;
+00295                     code[i][k-2] = 0;
+00296                 \} \textcolor{keywordflow}{else} \textcolor{keywordflow}{if}((code[i][k] == -1) && (code[i][k-2] == -1) ) \{ 
+00297                     xpx[i][k] = -1;
+00298                     code[i][k] = 0;
+00299                     code[i][k-2] = 0;
+00300                 \} \textcolor{keywordflow}{else} \textcolor{keywordflow}{if}((code[i][k] ==  1) && (code[i][k-2] == -1) ) \{ 
+00301                     xmx[i][k] = 1;
+00302                     code[i][k] = 0;
+00303                     code[i][k-2] = 0;
+00304                 \} \textcolor{keywordflow}{else} \textcolor{keywordflow}{if}((code[i][k] == -1) && (code[i][k-2] ==  1) ) \{ 
+00305                     xmx[i][k] = -1;
+00306                     code[i][k] = 0;
+00307                     code[i][k-2] = 0;
+00308                 \} \textcolor{keywordflow}{else} \{
+00309                     x[i][k] = code[i][k];
+00310                     code[i][k] = 0;
+00311                 \}
+00312             \} 
+00313         \}
+00314     \}
+00315 \}
+\end{DoxyCode}

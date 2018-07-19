@@ -1,0 +1,53 @@
+\subsection{lms7002\+\_\+main\+Panel.\+h}
+\label{lms7002__mainPanel_8h_source}\index{/home/erik/prefix/default/src/limesuite-\/dev/src/lms7002\+\_\+wxgui/lms7002\+\_\+main\+Panel.\+h@{/home/erik/prefix/default/src/limesuite-\/dev/src/lms7002\+\_\+wxgui/lms7002\+\_\+main\+Panel.\+h}}
+
+\begin{DoxyCode}
+00001 \textcolor{preprocessor}{#ifndef \_\_lms7002\_mainPanel\_\_}
+00002 \textcolor{preprocessor}{#define \_\_lms7002\_mainPanel\_\_}
+00003 
+00008 \textcolor{preprocessor}{#include "lime/LimeSuite.h"}
+00009 \textcolor{preprocessor}{#include "lms7002_wxgui.h"}
+00010 
+00012 \textcolor{keyword}{namespace }lime\{
+00013 \textcolor{keyword}{class }MCU\_BD;
+00014 \}
+00015 \textcolor{keyword}{class }lms7002_pnlMCU_BD_view;
+00016 \textcolor{keyword}{class }lms7002_pnlR3_view;
+00017 
+00019 \textcolor{keyword}{class }lms7002_mainPanel : \textcolor{keyword}{public} mainPanel
+00020 \{
+00021     \textcolor{keyword}{protected}:
+00022         \textcolor{comment}{// Handlers for mainPanel events.}
+00023         \textcolor{keywordtype}{void} OnNewProject( wxCommandEvent& event );
+00024         \textcolor{keywordtype}{void} OnOpenProject( wxCommandEvent& event );
+00025         \textcolor{keywordtype}{void} OnSaveProject( wxCommandEvent& event );
+00026         \textcolor{keywordtype}{void} OnUploadAll( wxCommandEvent& event );
+00027         \textcolor{keywordtype}{void} OnDownloadAll( wxCommandEvent& event );
+00028         \textcolor{keywordtype}{void} OnReset( wxCommandEvent& event );
+00029         \textcolor{keywordtype}{void} OnRegistersTest( wxCommandEvent& event );
+00030         \textcolor{keywordtype}{void} OnSwitchToChannelA(wxCommandEvent& event);
+00031         \textcolor{keywordtype}{void} OnSwitchToChannelB(wxCommandEvent& event);
+00032         \textcolor{keywordtype}{void} Onnotebook\_modulesPageChanged( wxNotebookEvent& event );
+00033         \textcolor{keywordtype}{void} OnResetChip(wxCommandEvent& event);
+00034         \textcolor{keywordtype}{void} OnLoadDefault(wxCommandEvent& event);
+00035         \textcolor{keywordtype}{void} OnReadTemperature(wxCommandEvent& event);
+00036         \textcolor{keywordtype}{void} OnSyncABchecked(wxCommandEvent& event);
+00037         \textcolor{keywordtype}{void} OnEnableMIMOchecked(wxCommandEvent& event);
+00038         \textcolor{keywordtype}{void} OnCalibrateInternalADC(wxCommandEvent& event);
+00039         \textcolor{keywordtype}{int} GetLmsSelection();
+00040         \textcolor{keywordtype}{void} OnLmsDeviceSelect( wxCommandEvent& event );
+00041     \textcolor{keyword}{public}:
+00043         lms7002_mainPanel( wxWindow* parent, wxWindowID \textcolor{keywordtype}{id} = wxID\_ANY, \textcolor{keyword}{const} wxPoint& pos = 
+      wxDefaultPosition, \textcolor{keyword}{const} wxSize& size = wxDefaultSize, \textcolor{keywordtype}{long} style = wxTAB\_TRAVERSAL );
+00045         \textcolor{keywordtype}{void} UpdateVisiblePanel();
+00046         ~lms7002_mainPanel();
+00047         \textcolor{keywordtype}{void} UpdateGUI();
+00048         \textcolor{keywordtype}{void} Initialize(lms_device_t* pControl);
+00049 \textcolor{keyword}{protected}:
+00050         lms7002_pnlMCU_BD_view *mTabMCU;
+00051         lms7002_pnlR3_view *mTabR3;
+00052         lms_device_t* lmsControl;
+00053 \};
+00054 
+00055 \textcolor{preprocessor}{#endif // \_\_lms7002\_mainPanel\_\_}
+\end{DoxyCode}

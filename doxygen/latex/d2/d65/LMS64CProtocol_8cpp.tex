@@ -1,0 +1,167 @@
+\subsection{/home/erik/prefix/default/src/limesuite-\/dev/src/protocols/\+L\+M\+S64\+C\+Protocol.cpp File Reference}
+\label{LMS64CProtocol_8cpp}\index{/home/erik/prefix/default/src/limesuite-\/dev/src/protocols/\+L\+M\+S64\+C\+Protocol.\+cpp@{/home/erik/prefix/default/src/limesuite-\/dev/src/protocols/\+L\+M\+S64\+C\+Protocol.\+cpp}}
+
+
+Implementation of L\+M\+S64C protocol.  
+
+
+{\ttfamily \#include \char`\"{}Logger.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}L\+M\+S64\+C\+Protocol.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}Si5351\+C.\+h\char`\"{}}\\*
+{\ttfamily \#include $<$chrono$>$}\\*
+{\ttfamily \#include $<$iostream$>$}\\*
+{\ttfamily \#include $<$assert.\+h$>$}\\*
+{\ttfamily \#include $<$math.\+h$>$}\\*
+{\ttfamily \#include $<$algorithm$>$}\\*
+{\ttfamily \#include $<$iso646.\+h$>$}\\*
+{\ttfamily \#include $<$A\+D\+C\+Units.\+h$>$}\\*
+{\ttfamily \#include $<$sstream$>$}\\*
+Include dependency graph for L\+M\+S64\+C\+Protocol.\+cpp\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{df/d69/LMS64CProtocol_8cpp__incl}
+\end{center}
+\end{figure}
+\subsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define {\bf L\+M\+S7002\+M\+\_\+\+S\+P\+I\+\_\+\+I\+N\+D\+EX}~0x10
+\begin{DoxyCompactList}\small\item\em arbitrary spi constants used to dispatch calls \end{DoxyCompactList}\item 
+\#define {\bf A\+D\+F4002\+\_\+\+S\+P\+I\+\_\+\+I\+N\+D\+EX}~0x30
+\end{DoxyCompactItemize}
+\subsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+static {\bf int} {\bf convert\+Status} (const {\bf int} \&{\bf status}, const {\bf L\+M\+S64\+C\+Protocol\+::\+Generic\+Packet} \&pkt)
+\end{DoxyCompactItemize}
+\subsubsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+const {\bf int} {\bf L\+M\+S\+\_\+\+R\+S\+T\+\_\+\+D\+E\+A\+C\+T\+I\+V\+A\+TE} = 0
+\begin{DoxyCompactList}\small\item\em C\+M\+D\+\_\+\+L\+M\+S7002\+\_\+\+R\+ST options. \end{DoxyCompactList}\item 
+const {\bf int} {\bf L\+M\+S\+\_\+\+R\+S\+T\+\_\+\+A\+C\+T\+I\+V\+A\+TE} = 1
+\item 
+const {\bf int} {\bf L\+M\+S\+\_\+\+R\+S\+T\+\_\+\+P\+U\+L\+SE} = 2
+\end{DoxyCompactItemize}
+
+
+\subsubsection{Detailed Description}
+Implementation of L\+M\+S64C protocol. 
+
+\begin{DoxyAuthor}{Author}
+Lime Microsystems 
+\end{DoxyAuthor}
+
+
+Definition in file {\bf L\+M\+S64\+C\+Protocol.\+cpp}.
+
+
+
+\subsubsection{Macro Definition Documentation}
+\index{L\+M\+S64\+C\+Protocol.\+cpp@{L\+M\+S64\+C\+Protocol.\+cpp}!A\+D\+F4002\+\_\+\+S\+P\+I\+\_\+\+I\+N\+D\+EX@{A\+D\+F4002\+\_\+\+S\+P\+I\+\_\+\+I\+N\+D\+EX}}
+\index{A\+D\+F4002\+\_\+\+S\+P\+I\+\_\+\+I\+N\+D\+EX@{A\+D\+F4002\+\_\+\+S\+P\+I\+\_\+\+I\+N\+D\+EX}!L\+M\+S64\+C\+Protocol.\+cpp@{L\+M\+S64\+C\+Protocol.\+cpp}}
+\paragraph[{A\+D\+F4002\+\_\+\+S\+P\+I\+\_\+\+I\+N\+D\+EX}]{\setlength{\rightskip}{0pt plus 5cm}\#define A\+D\+F4002\+\_\+\+S\+P\+I\+\_\+\+I\+N\+D\+EX~0x30}\label{LMS64CProtocol_8cpp_a195e5c4ce3c72d61fa8c5a6383003e3f}
+
+
+Definition at line {\bf 27} of file {\bf L\+M\+S64\+C\+Protocol.\+cpp}.
+
+
+
+Referenced by {\bf lime\+::\+L\+M\+S64\+C\+Protocol\+::\+Transact\+S\+P\+I()}.
+
+\index{L\+M\+S64\+C\+Protocol.\+cpp@{L\+M\+S64\+C\+Protocol.\+cpp}!L\+M\+S7002\+M\+\_\+\+S\+P\+I\+\_\+\+I\+N\+D\+EX@{L\+M\+S7002\+M\+\_\+\+S\+P\+I\+\_\+\+I\+N\+D\+EX}}
+\index{L\+M\+S7002\+M\+\_\+\+S\+P\+I\+\_\+\+I\+N\+D\+EX@{L\+M\+S7002\+M\+\_\+\+S\+P\+I\+\_\+\+I\+N\+D\+EX}!L\+M\+S64\+C\+Protocol.\+cpp@{L\+M\+S64\+C\+Protocol.\+cpp}}
+\paragraph[{L\+M\+S7002\+M\+\_\+\+S\+P\+I\+\_\+\+I\+N\+D\+EX}]{\setlength{\rightskip}{0pt plus 5cm}\#define L\+M\+S7002\+M\+\_\+\+S\+P\+I\+\_\+\+I\+N\+D\+EX~0x10}\label{LMS64CProtocol_8cpp_af78346fa53726ddc227b3dde7fbcf2bd}
+
+
+arbitrary spi constants used to dispatch calls 
+
+
+
+Definition at line {\bf 26} of file {\bf L\+M\+S64\+C\+Protocol.\+cpp}.
+
+
+
+Referenced by {\bf lime\+::\+L\+M\+S64\+C\+Protocol\+::\+Transact\+S\+P\+I()}.
+
+
+
+\subsubsection{Function Documentation}
+\index{L\+M\+S64\+C\+Protocol.\+cpp@{L\+M\+S64\+C\+Protocol.\+cpp}!convert\+Status@{convert\+Status}}
+\index{convert\+Status@{convert\+Status}!L\+M\+S64\+C\+Protocol.\+cpp@{L\+M\+S64\+C\+Protocol.\+cpp}}
+\paragraph[{convert\+Status(const int \&status, const L\+M\+S64\+C\+Protocol\+::\+Generic\+Packet \&pkt)}]{\setlength{\rightskip}{0pt plus 5cm}static {\bf int} convert\+Status (
+\begin{DoxyParamCaption}
+\item[{const {\bf int} \&}]{status, }
+\item[{const {\bf L\+M\+S64\+C\+Protocol\+::\+Generic\+Packet} \&}]{pkt}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [static]}}\label{LMS64CProtocol_8cpp_af62b1cc795d9086a8ad8d7164b0cad8b}
+
+
+Definition at line {\bf 29} of file {\bf L\+M\+S64\+C\+Protocol.\+cpp}.
+
+
+
+References {\bf lime\+::\+Report\+Error()}, {\bf lime\+::\+L\+M\+S64\+C\+Protocol\+::\+Generic\+Packet\+::status}, {\bf lime\+::status2string()}, {\bf lime\+::\+S\+T\+A\+T\+U\+S\+\_\+\+C\+O\+M\+P\+L\+E\+T\+E\+D\+\_\+\+C\+MD}, and {\bf lime\+::\+S\+T\+A\+T\+U\+S\+\_\+\+U\+N\+K\+N\+O\+W\+N\+\_\+\+C\+MD}.
+
+
+
+Referenced by {\bf lime\+::\+L\+M\+S64\+C\+Protocol\+::\+Device\+Reset()}, {\bf lime\+::\+L\+M\+S64\+C\+Protocol\+::\+G\+P\+I\+O\+Dir\+Read()}, {\bf lime\+::\+L\+M\+S64\+C\+Protocol\+::\+Read\+L\+M\+S7002\+M\+S\+P\+I()}, {\bf lime\+::\+L\+M\+S64\+C\+Protocol\+::\+Read\+Registers()}, {\bf lime\+::\+L\+M\+S64\+C\+Protocol\+::\+Read\+Si5351\+I2\+C()}, {\bf lime\+::\+L\+M\+S64\+C\+Protocol\+::\+Transfer\+Packet()}, {\bf lime\+::\+L\+M\+S64\+C\+Protocol\+::\+Write\+A\+D\+F4002\+S\+P\+I()}, {\bf lime\+::\+L\+M\+S64\+C\+Protocol\+::\+Write\+L\+M\+S7002\+M\+S\+P\+I()}, {\bf lime\+::\+L\+M\+S64\+C\+Protocol\+::\+Write\+Registers()}, and {\bf lime\+::\+L\+M\+S64\+C\+Protocol\+::\+Write\+Si5351\+I2\+C()}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{d2/d65/LMS64CProtocol_8cpp_af62b1cc795d9086a8ad8d7164b0cad8b_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{d2/d65/LMS64CProtocol_8cpp_af62b1cc795d9086a8ad8d7164b0cad8b_icgraph}
+\end{center}
+\end{figure}
+
+
+
+
+\subsubsection{Variable Documentation}
+\index{L\+M\+S64\+C\+Protocol.\+cpp@{L\+M\+S64\+C\+Protocol.\+cpp}!L\+M\+S\+\_\+\+R\+S\+T\+\_\+\+A\+C\+T\+I\+V\+A\+TE@{L\+M\+S\+\_\+\+R\+S\+T\+\_\+\+A\+C\+T\+I\+V\+A\+TE}}
+\index{L\+M\+S\+\_\+\+R\+S\+T\+\_\+\+A\+C\+T\+I\+V\+A\+TE@{L\+M\+S\+\_\+\+R\+S\+T\+\_\+\+A\+C\+T\+I\+V\+A\+TE}!L\+M\+S64\+C\+Protocol.\+cpp@{L\+M\+S64\+C\+Protocol.\+cpp}}
+\paragraph[{L\+M\+S\+\_\+\+R\+S\+T\+\_\+\+A\+C\+T\+I\+V\+A\+TE}]{\setlength{\rightskip}{0pt plus 5cm}const {\bf int} L\+M\+S\+\_\+\+R\+S\+T\+\_\+\+A\+C\+T\+I\+V\+A\+TE = 1}\label{LMS64CProtocol_8cpp_ac916c3ad4a8d88d16a5556f690a436e5}
+
+
+Definition at line {\bf 22} of file {\bf L\+M\+S64\+C\+Protocol.\+cpp}.
+
+\index{L\+M\+S64\+C\+Protocol.\+cpp@{L\+M\+S64\+C\+Protocol.\+cpp}!L\+M\+S\+\_\+\+R\+S\+T\+\_\+\+D\+E\+A\+C\+T\+I\+V\+A\+TE@{L\+M\+S\+\_\+\+R\+S\+T\+\_\+\+D\+E\+A\+C\+T\+I\+V\+A\+TE}}
+\index{L\+M\+S\+\_\+\+R\+S\+T\+\_\+\+D\+E\+A\+C\+T\+I\+V\+A\+TE@{L\+M\+S\+\_\+\+R\+S\+T\+\_\+\+D\+E\+A\+C\+T\+I\+V\+A\+TE}!L\+M\+S64\+C\+Protocol.\+cpp@{L\+M\+S64\+C\+Protocol.\+cpp}}
+\paragraph[{L\+M\+S\+\_\+\+R\+S\+T\+\_\+\+D\+E\+A\+C\+T\+I\+V\+A\+TE}]{\setlength{\rightskip}{0pt plus 5cm}const {\bf int} L\+M\+S\+\_\+\+R\+S\+T\+\_\+\+D\+E\+A\+C\+T\+I\+V\+A\+TE = 0}\label{LMS64CProtocol_8cpp_afc5375f442555f63ed507d453a32fa1a}
+
+
+C\+M\+D\+\_\+\+L\+M\+S7002\+\_\+\+R\+ST options. 
+
+
+
+Definition at line {\bf 21} of file {\bf L\+M\+S64\+C\+Protocol.\+cpp}.
+
+\index{L\+M\+S64\+C\+Protocol.\+cpp@{L\+M\+S64\+C\+Protocol.\+cpp}!L\+M\+S\+\_\+\+R\+S\+T\+\_\+\+P\+U\+L\+SE@{L\+M\+S\+\_\+\+R\+S\+T\+\_\+\+P\+U\+L\+SE}}
+\index{L\+M\+S\+\_\+\+R\+S\+T\+\_\+\+P\+U\+L\+SE@{L\+M\+S\+\_\+\+R\+S\+T\+\_\+\+P\+U\+L\+SE}!L\+M\+S64\+C\+Protocol.\+cpp@{L\+M\+S64\+C\+Protocol.\+cpp}}
+\paragraph[{L\+M\+S\+\_\+\+R\+S\+T\+\_\+\+P\+U\+L\+SE}]{\setlength{\rightskip}{0pt plus 5cm}const {\bf int} L\+M\+S\+\_\+\+R\+S\+T\+\_\+\+P\+U\+L\+SE = 2}\label{LMS64CProtocol_8cpp_ab1b247c91c5fa29b56dab6c0e4f8497c}
+
+
+Definition at line {\bf 23} of file {\bf L\+M\+S64\+C\+Protocol.\+cpp}.
+
+
+
+Referenced by {\bf lime\+::\+L\+M\+S64\+C\+Protocol\+::\+Device\+Reset()}.
+

@@ -1,0 +1,175 @@
+\subsection{Connection\+F\+X3.\+h}
+\label{ConnectionFX3_8h_source}\index{/home/erik/prefix/default/src/limesuite-\/dev/src/\+Connection\+F\+X3/\+Connection\+F\+X3.\+h@{/home/erik/prefix/default/src/limesuite-\/dev/src/\+Connection\+F\+X3/\+Connection\+F\+X3.\+h}}
+
+\begin{DoxyCode}
+00001 
+00007 \textcolor{preprocessor}{#pragma once}
+00008 \textcolor{preprocessor}{#include <ConnectionRegistry.h>}
+00009 
+00010 \textcolor{preprocessor}{#include "LMS64CProtocol.h"}
+00011 \textcolor{preprocessor}{#include <vector>}
+00012 \textcolor{preprocessor}{#include <set>}
+00013 \textcolor{preprocessor}{#include <string>}
+00014 \textcolor{preprocessor}{#include <atomic>}
+00015 \textcolor{preprocessor}{#include <memory>}
+00016 \textcolor{preprocessor}{#include <thread>}
+00017 \textcolor{preprocessor}{#include <ciso646>}
+00018 
+00019 \textcolor{preprocessor}{#ifndef \_\_unix\_\_}
+00020 \textcolor{preprocessor}{#include "windows.h"}
+00021 \textcolor{preprocessor}{#include "CyAPI.h"}
+00022 \textcolor{preprocessor}{#else}
+00023 \textcolor{preprocessor}{#include <libusb.h>}
+00024 \textcolor{preprocessor}{#include <mutex>}
+00025 \textcolor{preprocessor}{#include <condition\_variable>}
+00026 \textcolor{preprocessor}{#include <chrono>}
+00027 \textcolor{preprocessor}{#endif}
+00028 
+00029 \textcolor{keyword}{namespace }lime
+00030 \{
+00031 
+00034 \textcolor{keyword}{class }USBTransferContext
+00035 \{
+00036 \textcolor{keyword}{public}:
+00037     USBTransferContext() : used(false)
+00038     \{
+00039 \textcolor{preprocessor}{#ifndef \_\_unix\_\_}
+00040         inOvLap = \textcolor{keyword}{new} OVERLAPPED;
+00041         memset(inOvLap, 0, \textcolor{keyword}{sizeof}(OVERLAPPED));
+00042         inOvLap->hEvent = CreateEvent(NULL, \textcolor{keyword}{false}, \textcolor{keyword}{false}, NULL);
+00043         context = NULL;
+00044         EndPt = \textcolor{keyword}{nullptr};
+00045 \textcolor{preprocessor}{#else}
+00046         transfer = libusb\_alloc\_transfer(0);
+00047         bytesXfered = 0;
+00048         done = 0;
+00049 \textcolor{preprocessor}{#endif}
+00050     \}
+00051     ~USBTransferContext()
+00052     \{
+00053 \textcolor{preprocessor}{#ifndef \_\_unix\_\_}
+00054         CloseHandle(inOvLap->hEvent);
+00055         \textcolor{keyword}{delete} inOvLap;
+00056 \textcolor{preprocessor}{#else}
+00057         libusb\_free\_transfer(transfer);
+00058 \textcolor{preprocessor}{#endif}
+00059     \}
+00060     \textcolor{keywordtype}{bool} reset()
+00061     \{
+00062         \textcolor{keywordflow}{if}(used)
+00063             \textcolor{keywordflow}{return} \textcolor{keyword}{false};
+00064 \textcolor{preprocessor}{#ifndef \_\_unix\_\_}
+00065         CloseHandle(inOvLap->hEvent);
+00066         memset(inOvLap, 0, \textcolor{keyword}{sizeof}(OVERLAPPED));
+00067         inOvLap->hEvent = CreateEvent(NULL, \textcolor{keyword}{false}, \textcolor{keyword}{false}, NULL);
+00068 \textcolor{preprocessor}{#endif}
+00069         \textcolor{keywordflow}{return} \textcolor{keyword}{true};
+00070     \}
+00071     \textcolor{keywordtype}{bool} used;
+00072 \textcolor{preprocessor}{#ifndef \_\_unix\_\_}
+00073     PUCHAR context;
+00074     CCyUSBEndPoint* EndPt;
+00075     OVERLAPPED* inOvLap;
+00076 \textcolor{preprocessor}{#else}
+00077     libusb\_transfer* transfer;
+00078     \textcolor{keywordtype}{long} bytesXfered;
+00079     std::atomic<bool> done;
+00080     std::mutex transferLock;
+00081     std::condition\_variable cv;
+00082 \textcolor{preprocessor}{#endif}
+00083 \};
+00084 
+00085 \textcolor{keyword}{class }ConnectionFX3 : \textcolor{keyword}{public} LMS64CProtocol
+00086 \{
+00087 \textcolor{keyword}{public}:
+00088     ConnectionFX3(\textcolor{keywordtype}{void}* arg, \textcolor{keyword}{const} std::string &vidpid, \textcolor{keyword}{const} std::string &serial, \textcolor{keyword}{const} \textcolor{keywordtype}{unsigned} 
+      index);
+00089     ~ConnectionFX3(\textcolor{keywordtype}{void});
+00090 
+00091     \textcolor{keywordtype}{int} Open(\textcolor{keyword}{const} std::string &vidpid, \textcolor{keyword}{const} std::string &serial, \textcolor{keyword}{const} \textcolor{keywordtype}{unsigned} index);
+00092     \textcolor{keywordtype}{void} Close();
+00093     \textcolor{keywordtype}{bool} IsOpen();
+00094     \textcolor{keywordtype}{int} GetOpenedIndex();
+00095 
+00096     \textcolor{keywordtype}{int} Write(\textcolor{keyword}{const} \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{char}* buffer, \textcolor{keywordtype}{int} length, \textcolor{keywordtype}{int} timeout_ms = 100) \textcolor{keyword}{override};
+00097     \textcolor{keywordtype}{int} Read(\textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{char}* buffer, \textcolor{keywordtype}{int} length, \textcolor{keywordtype}{int} timeout_ms = 100) \textcolor{keyword}{override};
+00098 
+00099     \textcolor{comment}{//hooks to update FPGA plls when baseband interface data rate is changed}
+00100     \textcolor{keywordtype}{int} ProgramWrite(\textcolor{keyword}{const} \textcolor{keywordtype}{char} *buffer, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} length, \textcolor{keyword}{const} \textcolor{keywordtype}{int} programmingMode, \textcolor{keyword}{const} \textcolor{keywordtype}{int} 
+      device, ProgrammingCallback callback) \textcolor{keyword}{override};
+00101 \textcolor{keyword}{protected}:
+00102     \textcolor{keywordtype}{int} GetBuffersCount() \textcolor{keyword}{const};
+00103     \textcolor{keywordtype}{int} CheckStreamSize(\textcolor{keywordtype}{int} size)\textcolor{keyword}{const};
+00104     \textcolor{keywordtype}{int} SendData(\textcolor{keyword}{const} \textcolor{keywordtype}{char}* buffer, \textcolor{keywordtype}{int} length, \textcolor{keywordtype}{int} epIndex = 0, \textcolor{keywordtype}{int} timeout = 100)\textcolor{keyword}{override};
+00105     \textcolor{keywordtype}{int} ReceiveData(\textcolor{keywordtype}{char}* buffer, \textcolor{keywordtype}{int} length, \textcolor{keywordtype}{int} epIndex = 0, \textcolor{keywordtype}{int} timeout = 100)\textcolor{keyword}{override};
+00106 
+00107     \textcolor{keywordtype}{int} BeginDataReading(\textcolor{keywordtype}{char}* buffer, uint32\_t length, \textcolor{keywordtype}{int} ep) \textcolor{keyword}{override};
+00108     \textcolor{keywordtype}{bool} WaitForReading(\textcolor{keywordtype}{int} contextHandle, \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{int} timeout_ms) \textcolor{keyword}{override};
+00109     \textcolor{keywordtype}{int} FinishDataReading(\textcolor{keywordtype}{char}* buffer, uint32\_t length, \textcolor{keywordtype}{int} contextHandle) \textcolor{keyword}{override};
+00110     \textcolor{keywordtype}{void} AbortReading(\textcolor{keywordtype}{int} ep) \textcolor{keyword}{override};
+00111 
+00112     \textcolor{keywordtype}{int} BeginDataSending(\textcolor{keyword}{const} \textcolor{keywordtype}{char}* buffer, uint32\_t length, \textcolor{keywordtype}{int} ep) \textcolor{keyword}{override};
+00113     \textcolor{keywordtype}{bool} WaitForSending(\textcolor{keywordtype}{int} contextHandle, uint32\_t timeout\_ms) \textcolor{keyword}{override};
+00114     \textcolor{keywordtype}{int} FinishDataSending(\textcolor{keyword}{const} \textcolor{keywordtype}{char}* buffer, uint32\_t length, \textcolor{keywordtype}{int} contextHandle) \textcolor{keyword}{override};
+00115     \textcolor{keywordtype}{void} AbortSending(\textcolor{keywordtype}{int} ep) \textcolor{keyword}{override};
+00116 
+00117     \textcolor{keywordtype}{int} ResetStreamBuffers() \textcolor{keyword}{override};
+00118     eConnectionType GetType(\textcolor{keywordtype}{void}) \{\textcolor{keywordflow}{return} USB\_PORT;\}
+00119     
+00120     \textcolor{keyword}{static} \textcolor{keyword}{const} \textcolor{keywordtype}{int} USB\_MAX\_CONTEXTS = 16; \textcolor{comment}{//maximum number of contexts for asynchronous transfers}
+00121     
+00122     USBTransferContext contexts[USB\_MAX\_CONTEXTS];
+00123     USBTransferContext contextsToSend[USB\_MAX\_CONTEXTS];
+00124 
+00125     \textcolor{keywordtype}{bool} isConnected;
+00126 
+00127 \textcolor{preprocessor}{#ifndef \_\_unix\_\_}
+00128     \textcolor{keyword}{static} \textcolor{keyword}{const} \textcolor{keywordtype}{int} MAX\_EP\_CNT = 16;
+00129     CCyFX3Device* USBDevicePrimary;
+00130     \textcolor{comment}{//control endpoints}
+00131     CCyControlEndPoint* InCtrlEndPt3;
+00132     CCyControlEndPoint* OutCtrlEndPt3;
+00133 
+00134     \textcolor{comment}{//end points for samples reading and writing}
+00135     CCyUSBEndPoint* InEndPt[MAX\_EP\_CNT];
+00136     CCyUSBEndPoint* OutEndPt[MAX\_EP\_CNT];
+00137 
+00138     CCyUSBEndPoint* InCtrlBulkEndPt;
+00139     CCyUSBEndPoint* OutCtrlBulkEndPt;
+00140 \textcolor{preprocessor}{#else}
+00141     libusb\_device\_handle* dev\_handle; \textcolor{comment}{//a device handle}
+00142     libusb\_context* ctx; \textcolor{comment}{//a libusb session}
+00143     \textcolor{keywordtype}{int} read\_firmware\_image(\textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{char} *buf, \textcolor{keywordtype}{int} len);
+00144     \textcolor{keywordtype}{int} fx3\_usbboot\_download(\textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{char} *buf, \textcolor{keywordtype}{int} len);
+00145     \textcolor{keywordtype}{int} ram\_write(\textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{char} *buf, \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{int} ramAddress, \textcolor{keywordtype}{int} len);
+00146 \textcolor{preprocessor}{#endif}
+00147     \textcolor{keyword}{static} \textcolor{keyword}{const} uint8\_t ctrlBulkOutAddr;
+00148     \textcolor{keyword}{static} \textcolor{keyword}{const} uint8\_t ctrlBulkInAddr;
+00149     \textcolor{keyword}{static} \textcolor{keyword}{const} std::set<uint8\_t> commandsToBulkCtrlHw1;
+00150     \textcolor{keyword}{static} \textcolor{keyword}{const} std::set<uint8\_t> commandsToBulkCtrlHw2;
+00151     std::set<uint8\_t> commandsToBulkCtrl;
+00152     \textcolor{keywordtype}{bool} bulkCtrlInProgress;
+00153     \textcolor{keywordtype}{bool} bulkCtrlAvailable;
+00154     std::mutex mExtraUsbMutex;
+00155 \};
+00156 
+00157 \textcolor{keyword}{class }ConnectionFX3Entry : \textcolor{keyword}{public} ConnectionRegistryEntry
+00158 \{
+00159 \textcolor{keyword}{public}:
+00160     ConnectionFX3Entry(\textcolor{keywordtype}{void});
+00161     \textcolor{keyword}{virtual} ~ConnectionFX3Entry(\textcolor{keywordtype}{void});
+00162     std::vector<ConnectionHandle> enumerate(\textcolor{keyword}{const} ConnectionHandle& hint);
+00163     IConnection* make(\textcolor{keyword}{const} ConnectionHandle& handle);
+00164 \textcolor{keyword}{protected}:
+00165 \textcolor{preprocessor}{#ifndef \_\_unix\_\_}
+00166     \textcolor{keywordtype}{void} *ctx; \textcolor{comment}{//not used, just for mirroring unix}
+00167 \textcolor{preprocessor}{#else}
+00168     libusb\_context* ctx; \textcolor{comment}{//a libusb session}
+00169     std::thread mUSBProcessingThread;
+00170     \textcolor{keywordtype}{void} handle\_libusb\_events();
+00171     std::atomic<bool> mProcessUSBEvents;
+00172 \textcolor{preprocessor}{#endif}
+00173 \};
+00174 
+00175 \}
+\end{DoxyCode}

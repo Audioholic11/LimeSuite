@@ -1,0 +1,1298 @@
+\subsection{utilities\+\_\+gui.\+cpp}
+\label{utilities__gui_8cpp_source}\index{/home/erik/prefix/default/src/limesuite-\/dev/src/utilities\+\_\+gui/utilities\+\_\+gui.\+cpp@{/home/erik/prefix/default/src/limesuite-\/dev/src/utilities\+\_\+gui/utilities\+\_\+gui.\+cpp}}
+
+\begin{DoxyCode}
+00001 \textcolor{comment}{// C++ code generated with wxFormBuilder (version Feb 16 2016)}
+00003 \textcolor{comment}{// http://www.wxformbuilder.org/}
+00004 \textcolor{comment}{//}
+00005 \textcolor{comment}{// PLEASE DO "NOT" EDIT THIS FILE!}
+00007 \textcolor{comment}{}
+00008 \textcolor{preprocessor}{#include "utilities_gui.h"}
+00009 
+00011 
+00012 dlgConnectionSettings_view::dlgConnectionSettings_view( wxWindow* parent, wxWindowID \textcolor{keywordtype}{id}, \textcolor{keyword}{const} wxString& 
+      title, \textcolor{keyword}{const} wxPoint& pos, \textcolor{keyword}{const} wxSize& size, \textcolor{keywordtype}{long} style ) : wxDialog( parent, id, title, pos, size, style )
+00013 \{
+00014     this->SetSizeHints( wxDefaultSize, wxDefaultSize );
+00015     
+00016     wxFlexGridSizer* fgSizer211;
+00017     fgSizer211 = \textcolor{keyword}{new} wxFlexGridSizer( 0, 1, 0, 0 );
+00018     fgSizer211->AddGrowableCol( 0 );
+00019     fgSizer211->AddGrowableRow( 0 );
+00020     fgSizer211->SetFlexibleDirection( wxBOTH );
+00021     fgSizer211->SetNonFlexibleGrowMode( wxFLEX\_GROWMODE\_SPECIFIED );
+00022     
+00023     wxFlexGridSizer* fgSizer212;
+00024     fgSizer212 = \textcolor{keyword}{new} wxFlexGridSizer( 0, 1, 0, 0 );
+00025     fgSizer212->AddGrowableCol( 0 );
+00026     fgSizer212->AddGrowableRow( 1 );
+00027     fgSizer212->SetFlexibleDirection( wxBOTH );
+00028     fgSizer212->SetNonFlexibleGrowMode( wxFLEX\_GROWMODE\_SPECIFIED );
+00029     
+00030     m_staticText472 = \textcolor{keyword}{new} wxStaticText( \textcolor{keyword}{this}, wxID\_ANY, wxT(\textcolor{stringliteral}{"Board connections:"}), wxDefaultPosition, 
+      wxDefaultSize, 0 );
+00031     m_staticText472->Wrap( -1 );
+00032     fgSizer212->Add( m_staticText472, 0, wxALIGN\_CENTER\_HORIZONTAL|wxALL, 5 );
+00033     
+00034     mListLMS7ports = \textcolor{keyword}{new} wxListBox( \textcolor{keyword}{this}, wxID\_ANY, wxDefaultPosition, wxSize( -1,-1 ), 0, NULL, 0 ); 
+00035     mListLMS7ports->SetMinSize( wxSize( 400,150 ) );
+00036     
+00037     fgSizer212->Add( mListLMS7ports, 0, wxALL|wxEXPAND, 5 );
+00038     
+00039     
+00040     fgSizer211->Add( fgSizer212, 1, wxEXPAND, 5 );
+00041     
+00042     wxFlexGridSizer* fgSizer213;
+00043     fgSizer213 = \textcolor{keyword}{new} wxFlexGridSizer( 0, 3, 0, 0 );
+00044     fgSizer213->AddGrowableCol( 0 );
+00045     fgSizer213->AddGrowableCol( 1 );
+00046     fgSizer213->AddGrowableCol( 2 );
+00047     fgSizer213->SetFlexibleDirection( wxBOTH );
+00048     fgSizer213->SetNonFlexibleGrowMode( wxFLEX\_GROWMODE\_SPECIFIED );
+00049     
+00050     btnConnect = \textcolor{keyword}{new} wxButton( \textcolor{keyword}{this}, wxID\_ANY, wxT(\textcolor{stringliteral}{"Connect"}), wxDefaultPosition, wxDefaultSize, 0 );
+00051     fgSizer213->Add( btnConnect, 0, wxALL|wxALIGN\_CENTER\_HORIZONTAL, 5 );
+00052     
+00053     btnCancel = \textcolor{keyword}{new} wxButton( \textcolor{keyword}{this}, wxID\_ANY, wxT(\textcolor{stringliteral}{"Cancel"}), wxDefaultPosition, wxDefaultSize, 0 );
+00054     fgSizer213->Add( btnCancel, 0, wxALL|wxALIGN\_CENTER\_HORIZONTAL, 5 );
+00055     
+00056     btnDisconnect = \textcolor{keyword}{new} wxButton( \textcolor{keyword}{this}, wxID\_ANY, wxT(\textcolor{stringliteral}{"Disconnect"}), wxDefaultPosition, wxDefaultSize, 0 );
+00057     fgSizer213->Add( btnDisconnect, 0, wxALL|wxALIGN\_CENTER\_HORIZONTAL, 5 );
+00058     
+00059     
+00060     fgSizer211->Add( fgSizer213, 1, wxALIGN\_CENTER\_HORIZONTAL, 5 );
+00061     
+00062     
+00063     this->SetSizer( fgSizer211 );
+00064     this->Layout();
+00065     fgSizer211->Fit( \textcolor{keyword}{this} );
+00066     
+00067     this->Centre( wxBOTH );
+00068     
+00069     \textcolor{comment}{// Connect Events}
+00070     this->Connect( wxEVT\_INIT\_DIALOG, wxInitDialogEventHandler( 
+      dlgConnectionSettings_view::GetDeviceList ) );
+00071     btnConnect->Connect( wxEVT\_COMMAND\_BUTTON\_CLICKED, wxCommandEventHandler( 
+      dlgConnectionSettings_view::OnConnect ), NULL, \textcolor{keyword}{this} );
+00072     btnCancel->Connect( wxEVT\_COMMAND\_BUTTON\_CLICKED, wxCommandEventHandler( 
+      dlgConnectionSettings_view::OnCancel ), NULL, \textcolor{keyword}{this} );
+00073     btnDisconnect->Connect( wxEVT\_COMMAND\_BUTTON\_CLICKED, wxCommandEventHandler( 
+      dlgConnectionSettings_view::OnDisconnect ), NULL, \textcolor{keyword}{this} );
+00074 \}
+00075 
+00076 dlgConnectionSettings_view::~dlgConnectionSettings_view()
+00077 \{
+00078     \textcolor{comment}{// Disconnect Events}
+00079     this->Disconnect( wxEVT\_INIT\_DIALOG, wxInitDialogEventHandler( 
+      dlgConnectionSettings_view::GetDeviceList ) );
+00080     btnConnect->Disconnect( wxEVT\_COMMAND\_BUTTON\_CLICKED, wxCommandEventHandler( 
+      dlgConnectionSettings_view::OnConnect ), NULL, \textcolor{keyword}{this} );
+00081     btnCancel->Disconnect( wxEVT\_COMMAND\_BUTTON\_CLICKED, wxCommandEventHandler( 
+      dlgConnectionSettings_view::OnCancel ), NULL, \textcolor{keyword}{this} );
+00082     btnDisconnect->Disconnect( wxEVT\_COMMAND\_BUTTON\_CLICKED, wxCommandEventHandler( 
+      dlgConnectionSettings_view::OnDisconnect ), NULL, \textcolor{keyword}{this} );
+00083     
+00084 \}
+00085 
+00086 pnlMiniLog_view::pnlMiniLog_view( wxWindow* parent, wxWindowID \textcolor{keywordtype}{id}, \textcolor{keyword}{const} wxPoint& pos, \textcolor{keyword}{const} wxSize& 
+      size, \textcolor{keywordtype}{long} style ) : wxPanel( parent, id, pos, size, style )
+00087 \{
+00088     wxFlexGridSizer* fgSizer4;
+00089     fgSizer4 = \textcolor{keyword}{new} wxFlexGridSizer( 0, 2, 0, 0 );
+00090     fgSizer4->AddGrowableCol( 0 );
+00091     fgSizer4->AddGrowableRow( 0 );
+00092     fgSizer4->SetFlexibleDirection( wxBOTH );
+00093     fgSizer4->SetNonFlexibleGrowMode( wxFLEX\_GROWMODE\_SPECIFIED );
+00094     
+00095     txtMessageField = \textcolor{keyword}{new} wxTextCtrl( \textcolor{keyword}{this}, wxID\_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 
+      wxTE\_MULTILINE|wxTE\_READONLY|wxTE\_RICH2 );
+00096 \textcolor{preprocessor}{    #ifdef \_\_WXGTK\_\_}
+00097     \textcolor{keywordflow}{if} ( !txtMessageField->HasFlag( wxTE\_MULTILINE ) )
+00098     \{
+00099     txtMessageField->SetMaxLength( 100 );
+00100     \}
+00101 \textcolor{preprocessor}{    #else}
+00102     txtMessageField->SetMaxLength( 100 );
+00103 \textcolor{preprocessor}{    #endif}
+00104     txtMessageField->SetMinSize( wxSize( 300,48 ) );
+00105     
+00106     fgSizer4->Add( txtMessageField, 0, wxEXPAND, 5 );
+00107     
+00108     wxFlexGridSizer* fgSizer5;
+00109     fgSizer5 = \textcolor{keyword}{new} wxFlexGridSizer( 0, 1, 0, 0 );
+00110     fgSizer5->SetFlexibleDirection( wxBOTH );
+00111     fgSizer5->SetNonFlexibleGrowMode( wxFLEX\_GROWMODE\_SPECIFIED );
+00112     
+00113     btnClear = \textcolor{keyword}{new} wxButton( \textcolor{keyword}{this}, wxID\_ANY, wxT(\textcolor{stringliteral}{"Clear"}), wxDefaultPosition, wxDefaultSize, 0 );
+00114     btnClear->SetMinSize( wxSize( 48,-1 ) );
+00115     
+00116     fgSizer5->Add( btnClear, 0, wxEXPAND, 5 );
+00117     
+00118     btnFullLog = \textcolor{keyword}{new} wxButton( \textcolor{keyword}{this}, wxID\_ANY, wxT(\textcolor{stringliteral}{"Show Log"}), wxDefaultPosition, wxDefaultSize, 0 );
+00119     btnFullLog->SetMinSize( wxSize( 48,-1 ) );
+00120     
+00121     fgSizer5->Add( btnFullLog, 0, wxEXPAND, 5 );
+00122     
+00123     chkLogData = \textcolor{keyword}{new} wxCheckBox( \textcolor{keyword}{this}, wxID\_ANY, wxT(\textcolor{stringliteral}{"Log data"}), wxDefaultPosition, wxDefaultSize, 0 );
+00124     fgSizer5->Add( chkLogData, 0, 0, 5 );
+00125     
+00126     wxStaticText* m\_staticText52;
+00127     m\_staticText52 = \textcolor{keyword}{new} wxStaticText( \textcolor{keyword}{this}, wxID\_ANY, wxT(\textcolor{stringliteral}{"Log level:"}), wxDefaultPosition, wxDefaultSize,
+       0 );
+00128     m\_staticText52->Wrap( -1 );
+00129     fgSizer5->Add( m\_staticText52, 0, wxTOP, 5 );
+00130     
+00131     wxString choiceLogLvlChoices[] = \{ wxT(\textcolor{stringliteral}{"Error"}), wxT(\textcolor{stringliteral}{"Warning"}), wxT(\textcolor{stringliteral}{"Info"}), wxT(\textcolor{stringliteral}{"Debug"}) \};
+00132     \textcolor{keywordtype}{int} choiceLogLvlNChoices = \textcolor{keyword}{sizeof}( choiceLogLvlChoices ) / \textcolor{keyword}{sizeof}( wxString );
+00133     choiceLogLvl = \textcolor{keyword}{new} wxChoice( \textcolor{keyword}{this}, wxID\_ANY, wxDefaultPosition, wxDefaultSize, choiceLogLvlNChoices, 
+      choiceLogLvlChoices, 0 );
+00134     choiceLogLvl->SetSelection( 2 );
+00135     fgSizer5->Add( choiceLogLvl, 0, 0, 1 );
+00136     
+00137     
+00138     fgSizer4->Add( fgSizer5, 1, 0, 5 );
+00139     
+00140     
+00141     this->SetSizer( fgSizer4 );
+00142     this->Layout();
+00143     fgSizer4->Fit( \textcolor{keyword}{this} );
+00144     
+00145     \textcolor{comment}{// Connect Events}
+00146     this->Connect( wxEVT\_UPDATE\_UI, wxUpdateUIEventHandler( 
+      pnlMiniLog_view::OnUpdateGUI ) );
+00147     btnClear->Connect( wxEVT\_COMMAND\_BUTTON\_CLICKED, wxCommandEventHandler( 
+      pnlMiniLog_view::OnBtnClearClicked ), NULL, \textcolor{keyword}{this} );
+00148     btnFullLog->Connect( wxEVT\_COMMAND\_BUTTON\_CLICKED, wxCommandEventHandler( 
+      pnlMiniLog_view::OnShowFullLog ), NULL, \textcolor{keyword}{this} );
+00149     chkLogData->Connect( wxEVT\_COMMAND\_CHECKBOX\_CLICKED, wxCommandEventHandler( 
+      pnlMiniLog_view::OnLogDataClicked ), NULL, \textcolor{keyword}{this} );
+00150     choiceLogLvl->Connect( wxEVT\_COMMAND\_CHOICE\_SELECTED, wxCommandEventHandler( 
+      pnlMiniLog_view::onLogLvlChange ), NULL, \textcolor{keyword}{this} );
+00151 \}
+00152 
+00153 pnlMiniLog_view::~pnlMiniLog_view()
+00154 \{
+00155     \textcolor{comment}{// Disconnect Events}
+00156     this->Disconnect( wxEVT\_UPDATE\_UI, wxUpdateUIEventHandler( 
+      pnlMiniLog_view::OnUpdateGUI ) );
+00157     btnClear->Disconnect( wxEVT\_COMMAND\_BUTTON\_CLICKED, wxCommandEventHandler( 
+      pnlMiniLog_view::OnBtnClearClicked ), NULL, \textcolor{keyword}{this} );
+00158     btnFullLog->Disconnect( wxEVT\_COMMAND\_BUTTON\_CLICKED, wxCommandEventHandler( 
+      pnlMiniLog_view::OnShowFullLog ), NULL, \textcolor{keyword}{this} );
+00159     chkLogData->Disconnect( wxEVT\_COMMAND\_CHECKBOX\_CLICKED, wxCommandEventHandler( 
+      pnlMiniLog_view::OnLogDataClicked ), NULL, \textcolor{keyword}{this} );
+00160     choiceLogLvl->Disconnect( wxEVT\_COMMAND\_CHOICE\_SELECTED, wxCommandEventHandler( 
+      pnlMiniLog_view::onLogLvlChange ), NULL, \textcolor{keyword}{this} );
+00161     
+00162 \}
+00163 
+00164 dlgFullMessageLog_view::dlgFullMessageLog_view( wxWindow* parent, wxWindowID \textcolor{keywordtype}{id}, \textcolor{keyword}{const} wxString& title, \textcolor{keyword}{
+      const} wxPoint& pos, \textcolor{keyword}{const} wxSize& size, \textcolor{keywordtype}{long} style ) : wxDialog( parent, id, title, pos, size, style )
+00165 \{
+00166     this->SetSizeHints( wxSize( 500,200 ), wxDefaultSize );
+00167     
+00168     wxFlexGridSizer* fgSizer19;
+00169     fgSizer19 = \textcolor{keyword}{new} wxFlexGridSizer( 0, 2, 0, 0 );
+00170     fgSizer19->AddGrowableCol( 0 );
+00171     fgSizer19->AddGrowableRow( 0 );
+00172     fgSizer19->SetFlexibleDirection( wxBOTH );
+00173     fgSizer19->SetNonFlexibleGrowMode( wxFLEX\_GROWMODE\_SPECIFIED );
+00174     
+00175     txtMessageField = \textcolor{keyword}{new} wxTextCtrl( \textcolor{keyword}{this}, wxID\_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 
+      wxTE\_MULTILINE|wxTE\_READONLY|wxTE\_RICH2 );
+00176 \textcolor{preprocessor}{    #ifdef \_\_WXGTK\_\_}
+00177     \textcolor{keywordflow}{if} ( !txtMessageField->HasFlag( wxTE\_MULTILINE ) )
+00178     \{
+00179     txtMessageField->SetMaxLength( 100 );
+00180     \}
+00181 \textcolor{preprocessor}{    #else}
+00182     txtMessageField->SetMaxLength( 100 );
+00183 \textcolor{preprocessor}{    #endif}
+00184     txtMessageField->SetMinSize( wxSize( 300,100 ) );
+00185     
+00186     fgSizer19->Add( txtMessageField, 1, wxEXPAND, 5 );
+00187     
+00188     
+00189     this->SetSizer( fgSizer19 );
+00190     this->Layout();
+00191     fgSizer19->Fit( \textcolor{keyword}{this} );
+00192     
+00193     this->Centre( wxBOTH );
+00194 \}
+00195 
+00196 dlgFullMessageLog_view::~dlgFullMessageLog_view()
+00197 \{
+00198 \}
+00199 
+00200 dlgDeviceInfo_view::dlgDeviceInfo_view( wxWindow* parent, wxWindowID \textcolor{keywordtype}{id}, \textcolor{keyword}{const} wxString& title, \textcolor{keyword}{const} 
+      wxPoint& pos, \textcolor{keyword}{const} wxSize& size, \textcolor{keywordtype}{long} style ) : wxDialog( parent, id, title, pos, size, style )
+00201 \{
+00202     this->SetSizeHints( wxDefaultSize, wxDefaultSize );
+00203     
+00204     wxFlexGridSizer* fgSizer12;
+00205     fgSizer12 = \textcolor{keyword}{new} wxFlexGridSizer( 0, 1, 0, 0 );
+00206     fgSizer12->SetFlexibleDirection( wxBOTH );
+00207     fgSizer12->SetNonFlexibleGrowMode( wxFLEX\_GROWMODE\_SPECIFIED );
+00208     
+00209     btnGetInfo = \textcolor{keyword}{new} wxButton( \textcolor{keyword}{this}, wxID\_ANY, wxT(\textcolor{stringliteral}{"GET INFO"}), wxDefaultPosition, wxDefaultSize, 0 );
+00210     fgSizer12->Add( btnGetInfo, 0, wxALIGN\_CENTER\_HORIZONTAL, 5 );
+00211     
+00212     wxFlexGridSizer* fgSizer8;
+00213     fgSizer8 = \textcolor{keyword}{new} wxFlexGridSizer( 0, 2, 0, 0 );
+00214     fgSizer8->SetFlexibleDirection( wxBOTH );
+00215     fgSizer8->SetNonFlexibleGrowMode( wxFLEX\_GROWMODE\_SPECIFIED );
+00216     
+00217     m_staticText6 = \textcolor{keyword}{new} wxStaticText( \textcolor{keyword}{this}, wxID\_ANY, wxT(\textcolor{stringliteral}{"Device:"}), wxDefaultPosition, wxDefaultSize, 0 )
+      ;
+00218     m_staticText6->Wrap( -1 );
+00219     fgSizer8->Add( m_staticText6, 0, wxALL, 5 );
+00220     
+00221     lblDeviceCtr = \textcolor{keyword}{new} wxStaticText( \textcolor{keyword}{this}, wxID\_ANY, wxT(\textcolor{stringliteral}{"?"}), wxDefaultPosition, wxSize( 100,-1 ), 0 );
+00222     lblDeviceCtr->Wrap( -1 );
+00223     fgSizer8->Add( lblDeviceCtr, 0, wxALL, 5 );
+00224     
+00225     m_staticText8 = \textcolor{keyword}{new} wxStaticText( \textcolor{keyword}{this}, wxID\_ANY, wxT(\textcolor{stringliteral}{"Expansion:"}), wxDefaultPosition, wxDefaultSize, 
+      0 );
+00226     m_staticText8->Wrap( -1 );
+00227     fgSizer8->Add( m_staticText8, 0, wxALL, 5 );
+00228     
+00229     lblExpansionCtr = \textcolor{keyword}{new} wxStaticText( \textcolor{keyword}{this}, wxID\_ANY, wxT(\textcolor{stringliteral}{"?"}), wxDefaultPosition, wxDefaultSize, 0 );
+00230     lblExpansionCtr->Wrap( -1 );
+00231     fgSizer8->Add( lblExpansionCtr, 0, wxALL, 5 );
+00232     
+00233     m_staticText10 = \textcolor{keyword}{new} wxStaticText( \textcolor{keyword}{this}, wxID\_ANY, wxT(\textcolor{stringliteral}{"Firmware:"}), wxDefaultPosition, wxDefaultSize, 
+      0 );
+00234     m_staticText10->Wrap( -1 );
+00235     fgSizer8->Add( m_staticText10, 0, wxALL, 5 );
+00236     
+00237     lblFirmwareCtr = \textcolor{keyword}{new} wxStaticText( \textcolor{keyword}{this}, wxID\_ANY, wxT(\textcolor{stringliteral}{"?"}), wxDefaultPosition, wxDefaultSize, 0 );
+00238     lblFirmwareCtr->Wrap( -1 );
+00239     fgSizer8->Add( lblFirmwareCtr, 0, wxALL, 5 );
+00240     
+00241     m_staticText12 = \textcolor{keyword}{new} wxStaticText( \textcolor{keyword}{this}, wxID\_ANY, wxT(\textcolor{stringliteral}{"Hardware:"}), wxDefaultPosition, wxDefaultSize, 
+      0 );
+00242     m_staticText12->Wrap( -1 );
+00243     fgSizer8->Add( m_staticText12, 0, wxALL, 5 );
+00244     
+00245     lblHardwareCtr = \textcolor{keyword}{new} wxStaticText( \textcolor{keyword}{this}, wxID\_ANY, wxT(\textcolor{stringliteral}{"?"}), wxDefaultPosition, wxDefaultSize, 0 );
+00246     lblHardwareCtr->Wrap( -1 );
+00247     fgSizer8->Add( lblHardwareCtr, 0, wxALL, 5 );
+00248     
+00249     m_staticText14 = \textcolor{keyword}{new} wxStaticText( \textcolor{keyword}{this}, wxID\_ANY, wxT(\textcolor{stringliteral}{"Protocol:"}), wxDefaultPosition, wxDefaultSize, 
+      0 );
+00250     m_staticText14->Wrap( -1 );
+00251     fgSizer8->Add( m_staticText14, 0, wxALL, 5 );
+00252     
+00253     lblProtocolCtr = \textcolor{keyword}{new} wxStaticText( \textcolor{keyword}{this}, wxID\_ANY, wxT(\textcolor{stringliteral}{"?"}), wxDefaultPosition, wxDefaultSize, 0 );
+00254     lblProtocolCtr->Wrap( -1 );
+00255     fgSizer8->Add( lblProtocolCtr, 0, wxALL, 5 );
+00256     
+00257     m_staticText41 = \textcolor{keyword}{new} wxStaticText( \textcolor{keyword}{this}, wxID\_ANY, wxT(\textcolor{stringliteral}{"Gateware:"}), wxDefaultPosition, wxDefaultSize, 
+      0 );
+00258     m_staticText41->Wrap( -1 );
+00259     fgSizer8->Add( m_staticText41, 0, wxALL, 5 );
+00260     
+00261     lblGatewareCtr = \textcolor{keyword}{new} wxStaticText( \textcolor{keyword}{this}, wxID\_ANY, wxT(\textcolor{stringliteral}{"?"}), wxDefaultPosition, wxDefaultSize, 0 );
+00262     lblGatewareCtr->Wrap( -1 );
+00263     fgSizer8->Add( lblGatewareCtr, 0, wxALL, 5 );
+00264     
+00265     m_staticText45 = \textcolor{keyword}{new} wxStaticText( \textcolor{keyword}{this}, wxID\_ANY, wxT(\textcolor{stringliteral}{"Gateware target:"}), wxDefaultPosition, 
+      wxDefaultSize, 0 );
+00266     m_staticText45->Wrap( -1 );
+00267     fgSizer8->Add( m_staticText45, 0, wxALL, 5 );
+00268     
+00269     lblGatewareTargetCtr = \textcolor{keyword}{new} wxStaticText( \textcolor{keyword}{this}, wxID\_ANY, wxT(\textcolor{stringliteral}{"?"}), wxDefaultPosition, wxDefaultSize, 0 
+      );
+00270     lblGatewareTargetCtr->Wrap( -1 );
+00271     fgSizer8->Add( lblGatewareTargetCtr, 0, wxALL, 5 );
+00272     
+00273     
+00274     fgSizer12->Add( fgSizer8, 1, wxEXPAND, 5 );
+00275     
+00276     
+00277     this->SetSizer( fgSizer12 );
+00278     this->Layout();
+00279     fgSizer12->Fit( \textcolor{keyword}{this} );
+00280     
+00281     this->Centre( wxBOTH );
+00282     
+00283     \textcolor{comment}{// Connect Events}
+00284     btnGetInfo->Connect( wxEVT\_COMMAND\_BUTTON\_CLICKED, wxCommandEventHandler( 
+      dlgDeviceInfo_view::OnGetInfo ), NULL, \textcolor{keyword}{this} );
+00285 \}
+00286 
+00287 dlgDeviceInfo_view::~dlgDeviceInfo_view()
+00288 \{
+00289     \textcolor{comment}{// Disconnect Events}
+00290     btnGetInfo->Disconnect( wxEVT\_COMMAND\_BUTTON\_CLICKED, wxCommandEventHandler( 
+      dlgDeviceInfo_view::OnGetInfo ), NULL, \textcolor{keyword}{this} );
+00291     
+00292 \}
+00293 
+00294 SPI_view::SPI_view( wxWindow* parent, wxWindowID \textcolor{keywordtype}{id}, \textcolor{keyword}{const} wxString& title, \textcolor{keyword}{const} wxPoint& pos, \textcolor{keyword}{const} 
+      wxSize& size, \textcolor{keywordtype}{long} style ) : wxFrame( parent, id, title, pos, size, style )
+00295 \{
+00296     this->SetSizeHints( wxDefaultSize, wxDefaultSize );
+00297     this->SetBackgroundColour( wxSystemSettings::GetColour( wxSYS\_COLOUR\_BTNFACE ) );
+00298     
+00299     wxFlexGridSizer* fgSizer305;
+00300     fgSizer305 = \textcolor{keyword}{new} wxFlexGridSizer( 0, 1, 0, 0 );
+00301     fgSizer305->SetFlexibleDirection( wxBOTH );
+00302     fgSizer305->SetNonFlexibleGrowMode( wxFLEX\_GROWMODE\_SPECIFIED );
+00303     
+00304     wxStaticBoxSizer* sbSizer160;
+00305     sbSizer160 = \textcolor{keyword}{new} wxStaticBoxSizer( \textcolor{keyword}{new} wxStaticBox( \textcolor{keyword}{this}, wxID\_ANY, wxT(\textcolor{stringliteral}{"LMS SPI "}) ), wxVERTICAL );
+00306     
+00307     wxFlexGridSizer* fgSizer306;
+00308     fgSizer306 = \textcolor{keyword}{new} wxFlexGridSizer( 0, 8, 5, 5 );
+00309     fgSizer306->SetFlexibleDirection( wxBOTH );
+00310     fgSizer306->SetNonFlexibleGrowMode( wxFLEX\_GROWMODE\_SPECIFIED );
+00311     
+00312     ID_STATICTEXT1 = \textcolor{keyword}{new} wxStaticText( sbSizer160->GetStaticBox(), wxID\_ANY, wxT(\textcolor{stringliteral}{"Address(Hex):"}), 
+      wxDefaultPosition, wxDefaultSize, 0 );
+00313     ID_STATICTEXT1->Wrap( 0 );
+00314     fgSizer306->Add( ID_STATICTEXT1, 1, wxALIGN\_CENTER\_HORIZONTAL|wxALIGN\_CENTER\_VERTICAL|wxALL, 5 );
+00315     
+00316     txtLMSwriteAddr = \textcolor{keyword}{new} wxTextCtrl( sbSizer160->GetStaticBox(), wxID\_ANY, wxT(\textcolor{stringliteral}{"FFFF"}), wxDefaultPosition,
+       wxSize( -1,-1 ), 0 );
+00317     txtLMSwriteAddr->SetMinSize( wxSize( 48,-1 ) );
+00318     
+00319     fgSizer306->Add( txtLMSwriteAddr, 1, wxALIGN\_CENTER\_HORIZONTAL|wxALIGN\_CENTER\_VERTICAL, 5 );
+00320     
+00321     ID_STATICTEXT9 = \textcolor{keyword}{new} wxStaticText( sbSizer160->GetStaticBox(), wxID\_ANY, wxT(\textcolor{stringliteral}{"Value(Hex):"}), 
+      wxDefaultPosition, wxDefaultSize, 0 );
+00322     ID_STATICTEXT9->Wrap( 0 );
+00323     fgSizer306->Add( ID_STATICTEXT9, 1, wxALIGN\_CENTER\_HORIZONTAL|wxALIGN\_CENTER\_VERTICAL|wxALL, 5 );
+00324     
+00325     txtLMSwriteValue = \textcolor{keyword}{new} wxTextCtrl( sbSizer160->GetStaticBox(), wxID\_ANY, wxT(\textcolor{stringliteral}{"FFFF"}), wxDefaultPosition
+      , wxDefaultSize, 0 );
+00326     txtLMSwriteValue->SetMinSize( wxSize( 48,-1 ) );
+00327     
+00328     fgSizer306->Add( txtLMSwriteValue, 1, wxALIGN\_CENTER\_HORIZONTAL|wxALIGN\_CENTER\_VERTICAL, 5 );
+00329     
+00330     btnLMSwrite = \textcolor{keyword}{new} wxButton( sbSizer160->GetStaticBox(), wxID\_ANY, wxT(\textcolor{stringliteral}{"Write"}), wxDefaultPosition, 
+      wxDefaultSize, 0 );
+00331     btnLMSwrite->SetDefault(); 
+00332     fgSizer306->Add( btnLMSwrite, 1, wxALIGN\_CENTER\_VERTICAL, 5 );
+00333     
+00334     btnLMSread = \textcolor{keyword}{new} wxButton( sbSizer160->GetStaticBox(), wxID\_ANY, wxT(\textcolor{stringliteral}{"Read"}), wxDefaultPosition, 
+      wxDefaultSize, 0 );
+00335     btnLMSread->SetDefault(); 
+00336     fgSizer306->Add( btnLMSread, 0, 0, 5 );
+00337     
+00338     ID_STATICTEXT5 = \textcolor{keyword}{new} wxStaticText( sbSizer160->GetStaticBox(), wxID\_ANY, wxT(\textcolor{stringliteral}{"Status:"}), 
+      wxDefaultPosition, wxDefaultSize, 0 );
+00339     ID_STATICTEXT5->Wrap( 0 );
+00340     fgSizer306->Add( ID_STATICTEXT5, 1, wxALIGN\_CENTER\_HORIZONTAL|wxALIGN\_CENTER\_VERTICAL, 5 );
+00341     
+00342     lblLMSwriteStatus = \textcolor{keyword}{new} wxStaticText( sbSizer160->GetStaticBox(), wxID\_ANY, wxT(\textcolor{stringliteral}{"???"}), 
+      wxDefaultPosition, wxSize( 134,13 ), 0 );
+00343     lblLMSwriteStatus->Wrap( 0 );
+00344     fgSizer306->Add( lblLMSwriteStatus, 1, wxALIGN\_LEFT|wxALIGN\_CENTER\_VERTICAL, 5 );
+00345     
+00346     
+00347     sbSizer160->Add( fgSizer306, 1, wxEXPAND, 5 );
+00348     
+00349     wxFlexGridSizer* fgSizer3061;
+00350     fgSizer3061 = \textcolor{keyword}{new} wxFlexGridSizer( 0, 8, 5, 5 );
+00351     fgSizer3061->SetFlexibleDirection( wxBOTH );
+00352     fgSizer3061->SetNonFlexibleGrowMode( wxFLEX\_GROWMODE\_SPECIFIED );
+00353     
+00354     ID_STATICTEXT11 = \textcolor{keyword}{new} wxStaticText( sbSizer160->GetStaticBox(), wxID\_ANY, wxT(\textcolor{stringliteral}{"Address(Hex):"}), 
+      wxDefaultPosition, wxDefaultSize, 0 );
+00355     ID_STATICTEXT11->Wrap( 0 );
+00356     fgSizer3061->Add( ID_STATICTEXT11, 1, wxALIGN\_CENTER\_HORIZONTAL|wxALIGN\_CENTER\_VERTICAL|wxALL, 5 );
+00357     
+00358     txtLMSwriteAddr1 = \textcolor{keyword}{new} wxTextCtrl( sbSizer160->GetStaticBox(), wxID\_ANY, wxT(\textcolor{stringliteral}{"FFFF"}), wxDefaultPosition
+      , wxSize( -1,-1 ), 0 );
+00359     txtLMSwriteAddr1->SetMinSize( wxSize( 48,-1 ) );
+00360     
+00361     fgSizer3061->Add( txtLMSwriteAddr1, 1, wxALIGN\_CENTER\_HORIZONTAL|wxALIGN\_CENTER\_VERTICAL, 5 );
+00362     
+00363     ID_STATICTEXT91 = \textcolor{keyword}{new} wxStaticText( sbSizer160->GetStaticBox(), wxID\_ANY, wxT(\textcolor{stringliteral}{"Value(Hex):"}), 
+      wxDefaultPosition, wxDefaultSize, 0 );
+00364     ID_STATICTEXT91->Wrap( 0 );
+00365     fgSizer3061->Add( ID_STATICTEXT91, 1, wxALIGN\_CENTER\_HORIZONTAL|wxALIGN\_CENTER\_VERTICAL|wxALL, 5 );
+00366     
+00367     txtLMSwriteValue1 = \textcolor{keyword}{new} wxTextCtrl( sbSizer160->GetStaticBox(), wxID\_ANY, wxT(\textcolor{stringliteral}{"FFFF"}), 
+      wxDefaultPosition, wxDefaultSize, 0 );
+00368     txtLMSwriteValue1->SetMinSize( wxSize( 48,-1 ) );
+00369     
+00370     fgSizer3061->Add( txtLMSwriteValue1, 1, wxALIGN\_CENTER\_HORIZONTAL|wxALIGN\_CENTER\_VERTICAL, 5 );
+00371     
+00372     btnLMSwrite1 = \textcolor{keyword}{new} wxButton( sbSizer160->GetStaticBox(), wxID\_ANY, wxT(\textcolor{stringliteral}{"Write"}), wxDefaultPosition, 
+      wxDefaultSize, 0 );
+00373     btnLMSwrite1->SetDefault(); 
+00374     fgSizer3061->Add( btnLMSwrite1, 1, wxALIGN\_CENTER\_VERTICAL, 5 );
+00375     
+00376     btnLMSread1 = \textcolor{keyword}{new} wxButton( sbSizer160->GetStaticBox(), wxID\_ANY, wxT(\textcolor{stringliteral}{"Read"}), wxDefaultPosition, 
+      wxDefaultSize, 0 );
+00377     btnLMSread1->SetDefault(); 
+00378     fgSizer3061->Add( btnLMSread1, 0, 0, 5 );
+00379     
+00380     ID_STATICTEXT51 = \textcolor{keyword}{new} wxStaticText( sbSizer160->GetStaticBox(), wxID\_ANY, wxT(\textcolor{stringliteral}{"Status:"}), 
+      wxDefaultPosition, wxDefaultSize, 0 );
+00381     ID_STATICTEXT51->Wrap( 0 );
+00382     fgSizer3061->Add( ID_STATICTEXT51, 1, wxALIGN\_CENTER\_HORIZONTAL|wxALIGN\_CENTER\_VERTICAL, 5 );
+00383     
+00384     lblLMSwriteStatus1 = \textcolor{keyword}{new} wxStaticText( sbSizer160->GetStaticBox(), wxID\_ANY, wxT(\textcolor{stringliteral}{"???"}), 
+      wxDefaultPosition, wxSize( 134,13 ), 0 );
+00385     lblLMSwriteStatus1->Wrap( 0 );
+00386     fgSizer3061->Add( lblLMSwriteStatus1, 1, wxALIGN\_LEFT|wxALIGN\_CENTER\_VERTICAL, 5 );
+00387     
+00388     
+00389     sbSizer160->Add( fgSizer3061, 1, wxEXPAND, 5 );
+00390     
+00391     wxFlexGridSizer* fgSizer3062;
+00392     fgSizer3062 = \textcolor{keyword}{new} wxFlexGridSizer( 0, 8, 5, 5 );
+00393     fgSizer3062->SetFlexibleDirection( wxBOTH );
+00394     fgSizer3062->SetNonFlexibleGrowMode( wxFLEX\_GROWMODE\_SPECIFIED );
+00395     
+00396     ID_STATICTEXT12 = \textcolor{keyword}{new} wxStaticText( sbSizer160->GetStaticBox(), wxID\_ANY, wxT(\textcolor{stringliteral}{"Address(Hex):"}), 
+      wxDefaultPosition, wxDefaultSize, 0 );
+00397     ID_STATICTEXT12->Wrap( 0 );
+00398     fgSizer3062->Add( ID_STATICTEXT12, 1, wxALIGN\_CENTER\_HORIZONTAL|wxALIGN\_CENTER\_VERTICAL|wxALL, 5 );
+00399     
+00400     txtLMSwriteAddr2 = \textcolor{keyword}{new} wxTextCtrl( sbSizer160->GetStaticBox(), wxID\_ANY, wxT(\textcolor{stringliteral}{"FFFF"}), wxDefaultPosition
+      , wxSize( -1,-1 ), 0 );
+00401     txtLMSwriteAddr2->SetMinSize( wxSize( 48,-1 ) );
+00402     
+00403     fgSizer3062->Add( txtLMSwriteAddr2, 1, wxALIGN\_CENTER\_HORIZONTAL|wxALIGN\_CENTER\_VERTICAL, 5 );
+00404     
+00405     ID_STATICTEXT92 = \textcolor{keyword}{new} wxStaticText( sbSizer160->GetStaticBox(), wxID\_ANY, wxT(\textcolor{stringliteral}{"Value(Hex):"}), 
+      wxDefaultPosition, wxDefaultSize, 0 );
+00406     ID_STATICTEXT92->Wrap( 0 );
+00407     fgSizer3062->Add( ID_STATICTEXT92, 1, wxALIGN\_CENTER\_HORIZONTAL|wxALIGN\_CENTER\_VERTICAL|wxALL, 5 );
+00408     
+00409     txtLMSwriteValue2 = \textcolor{keyword}{new} wxTextCtrl( sbSizer160->GetStaticBox(), wxID\_ANY, wxT(\textcolor{stringliteral}{"FFFF"}), 
+      wxDefaultPosition, wxDefaultSize, 0 );
+00410     txtLMSwriteValue2->SetMinSize( wxSize( 48,-1 ) );
+00411     
+00412     fgSizer3062->Add( txtLMSwriteValue2, 1, wxALIGN\_CENTER\_HORIZONTAL|wxALIGN\_CENTER\_VERTICAL, 5 );
+00413     
+00414     btnLMSwrite2 = \textcolor{keyword}{new} wxButton( sbSizer160->GetStaticBox(), wxID\_ANY, wxT(\textcolor{stringliteral}{"Write"}), wxDefaultPosition, 
+      wxDefaultSize, 0 );
+00415     btnLMSwrite2->SetDefault(); 
+00416     fgSizer3062->Add( btnLMSwrite2, 1, wxALIGN\_CENTER\_VERTICAL, 5 );
+00417     
+00418     btnLMSread2 = \textcolor{keyword}{new} wxButton( sbSizer160->GetStaticBox(), wxID\_ANY, wxT(\textcolor{stringliteral}{"Read"}), wxDefaultPosition, 
+      wxDefaultSize, 0 );
+00419     btnLMSread2->SetDefault(); 
+00420     fgSizer3062->Add( btnLMSread2, 0, 0, 5 );
+00421     
+00422     ID_STATICTEXT52 = \textcolor{keyword}{new} wxStaticText( sbSizer160->GetStaticBox(), wxID\_ANY, wxT(\textcolor{stringliteral}{"Status:"}), 
+      wxDefaultPosition, wxDefaultSize, 0 );
+00423     ID_STATICTEXT52->Wrap( 0 );
+00424     fgSizer3062->Add( ID_STATICTEXT52, 1, wxALIGN\_CENTER\_HORIZONTAL|wxALIGN\_CENTER\_VERTICAL, 5 );
+00425     
+00426     lblLMSwriteStatus2 = \textcolor{keyword}{new} wxStaticText( sbSizer160->GetStaticBox(), wxID\_ANY, wxT(\textcolor{stringliteral}{"???"}), 
+      wxDefaultPosition, wxSize( 134,13 ), 0 );
+00427     lblLMSwriteStatus2->Wrap( 0 );
+00428     fgSizer3062->Add( lblLMSwriteStatus2, 1, wxALIGN\_LEFT|wxALIGN\_CENTER\_VERTICAL, 5 );
+00429     
+00430     
+00431     sbSizer160->Add( fgSizer3062, 1, wxEXPAND, 5 );
+00432     
+00433     wxFlexGridSizer* fgSizer3063;
+00434     fgSizer3063 = \textcolor{keyword}{new} wxFlexGridSizer( 0, 8, 5, 5 );
+00435     fgSizer3063->SetFlexibleDirection( wxBOTH );
+00436     fgSizer3063->SetNonFlexibleGrowMode( wxFLEX\_GROWMODE\_SPECIFIED );
+00437     
+00438     ID_STATICTEXT13 = \textcolor{keyword}{new} wxStaticText( sbSizer160->GetStaticBox(), wxID\_ANY, wxT(\textcolor{stringliteral}{"Address(Hex):"}), 
+      wxDefaultPosition, wxDefaultSize, 0 );
+00439     ID_STATICTEXT13->Wrap( 0 );
+00440     fgSizer3063->Add( ID_STATICTEXT13, 1, wxALIGN\_CENTER\_HORIZONTAL|wxALIGN\_CENTER\_VERTICAL|wxALL, 5 );
+00441     
+00442     txtLMSwriteAddr3 = \textcolor{keyword}{new} wxTextCtrl( sbSizer160->GetStaticBox(), wxID\_ANY, wxT(\textcolor{stringliteral}{"FFFF"}), wxDefaultPosition
+      , wxSize( -1,-1 ), 0 );
+00443     txtLMSwriteAddr3->SetMinSize( wxSize( 48,-1 ) );
+00444     
+00445     fgSizer3063->Add( txtLMSwriteAddr3, 1, wxALIGN\_CENTER\_HORIZONTAL|wxALIGN\_CENTER\_VERTICAL, 5 );
+00446     
+00447     ID_STATICTEXT93 = \textcolor{keyword}{new} wxStaticText( sbSizer160->GetStaticBox(), wxID\_ANY, wxT(\textcolor{stringliteral}{"Value(Hex):"}), 
+      wxDefaultPosition, wxDefaultSize, 0 );
+00448     ID_STATICTEXT93->Wrap( 0 );
+00449     fgSizer3063->Add( ID_STATICTEXT93, 1, wxALIGN\_CENTER\_HORIZONTAL|wxALIGN\_CENTER\_VERTICAL|wxALL, 5 );
+00450     
+00451     txtLMSwriteValue3 = \textcolor{keyword}{new} wxTextCtrl( sbSizer160->GetStaticBox(), wxID\_ANY, wxT(\textcolor{stringliteral}{"FFFF"}), 
+      wxDefaultPosition, wxDefaultSize, 0 );
+00452     txtLMSwriteValue3->SetMinSize( wxSize( 48,-1 ) );
+00453     
+00454     fgSizer3063->Add( txtLMSwriteValue3, 1, wxALIGN\_CENTER\_HORIZONTAL|wxALIGN\_CENTER\_VERTICAL, 5 );
+00455     
+00456     btnLMSwrite3 = \textcolor{keyword}{new} wxButton( sbSizer160->GetStaticBox(), wxID\_ANY, wxT(\textcolor{stringliteral}{"Write"}), wxDefaultPosition, 
+      wxDefaultSize, 0 );
+00457     btnLMSwrite3->SetDefault(); 
+00458     fgSizer3063->Add( btnLMSwrite3, 1, wxALIGN\_CENTER\_VERTICAL, 5 );
+00459     
+00460     btnLMSread3 = \textcolor{keyword}{new} wxButton( sbSizer160->GetStaticBox(), wxID\_ANY, wxT(\textcolor{stringliteral}{"Read"}), wxDefaultPosition, 
+      wxDefaultSize, 0 );
+00461     btnLMSread3->SetDefault(); 
+00462     fgSizer3063->Add( btnLMSread3, 0, 0, 5 );
+00463     
+00464     ID_STATICTEXT53 = \textcolor{keyword}{new} wxStaticText( sbSizer160->GetStaticBox(), wxID\_ANY, wxT(\textcolor{stringliteral}{"Status:"}), 
+      wxDefaultPosition, wxDefaultSize, 0 );
+00465     ID_STATICTEXT53->Wrap( 0 );
+00466     fgSizer3063->Add( ID_STATICTEXT53, 1, wxALIGN\_CENTER\_HORIZONTAL|wxALIGN\_CENTER\_VERTICAL, 5 );
+00467     
+00468     lblLMSwriteStatus3 = \textcolor{keyword}{new} wxStaticText( sbSizer160->GetStaticBox(), wxID\_ANY, wxT(\textcolor{stringliteral}{"???"}), 
+      wxDefaultPosition, wxSize( 134,13 ), 0 );
+00469     lblLMSwriteStatus3->Wrap( 0 );
+00470     fgSizer3063->Add( lblLMSwriteStatus3, 1, wxALIGN\_LEFT|wxALIGN\_CENTER\_VERTICAL, 5 );
+00471     
+00472     
+00473     sbSizer160->Add( fgSizer3063, 1, wxEXPAND, 5 );
+00474     
+00475     wxFlexGridSizer* fgSizer3064;
+00476     fgSizer3064 = \textcolor{keyword}{new} wxFlexGridSizer( 0, 8, 5, 5 );
+00477     fgSizer3064->SetFlexibleDirection( wxBOTH );
+00478     fgSizer3064->SetNonFlexibleGrowMode( wxFLEX\_GROWMODE\_SPECIFIED );
+00479     
+00480     ID_STATICTEXT14 = \textcolor{keyword}{new} wxStaticText( sbSizer160->GetStaticBox(), wxID\_ANY, wxT(\textcolor{stringliteral}{"Address(Hex):"}), 
+      wxDefaultPosition, wxDefaultSize, 0 );
+00481     ID_STATICTEXT14->Wrap( 0 );
+00482     fgSizer3064->Add( ID_STATICTEXT14, 1, wxALIGN\_CENTER\_HORIZONTAL|wxALIGN\_CENTER\_VERTICAL|wxALL, 5 );
+00483     
+00484     txtLMSwriteAddr4 = \textcolor{keyword}{new} wxTextCtrl( sbSizer160->GetStaticBox(), wxID\_ANY, wxT(\textcolor{stringliteral}{"FFFF"}), wxDefaultPosition
+      , wxSize( -1,-1 ), 0 );
+00485     txtLMSwriteAddr4->SetMinSize( wxSize( 48,-1 ) );
+00486     
+00487     fgSizer3064->Add( txtLMSwriteAddr4, 1, wxALIGN\_CENTER\_HORIZONTAL|wxALIGN\_CENTER\_VERTICAL, 5 );
+00488     
+00489     ID_STATICTEXT94 = \textcolor{keyword}{new} wxStaticText( sbSizer160->GetStaticBox(), wxID\_ANY, wxT(\textcolor{stringliteral}{"Value(Hex):"}), 
+      wxDefaultPosition, wxDefaultSize, 0 );
+00490     ID_STATICTEXT94->Wrap( 0 );
+00491     fgSizer3064->Add( ID_STATICTEXT94, 1, wxALIGN\_CENTER\_HORIZONTAL|wxALIGN\_CENTER\_VERTICAL|wxALL, 5 );
+00492     
+00493     txtLMSwriteValue4 = \textcolor{keyword}{new} wxTextCtrl( sbSizer160->GetStaticBox(), wxID\_ANY, wxT(\textcolor{stringliteral}{"FFFF"}), 
+      wxDefaultPosition, wxDefaultSize, 0 );
+00494     txtLMSwriteValue4->SetMinSize( wxSize( 48,-1 ) );
+00495     
+00496     fgSizer3064->Add( txtLMSwriteValue4, 1, wxALIGN\_CENTER\_HORIZONTAL|wxALIGN\_CENTER\_VERTICAL, 5 );
+00497     
+00498     btnLMSwrite4 = \textcolor{keyword}{new} wxButton( sbSizer160->GetStaticBox(), wxID\_ANY, wxT(\textcolor{stringliteral}{"Write"}), wxDefaultPosition, 
+      wxDefaultSize, 0 );
+00499     btnLMSwrite4->SetDefault(); 
+00500     fgSizer3064->Add( btnLMSwrite4, 1, wxALIGN\_CENTER\_VERTICAL, 5 );
+00501     
+00502     btnLMSread4 = \textcolor{keyword}{new} wxButton( sbSizer160->GetStaticBox(), wxID\_ANY, wxT(\textcolor{stringliteral}{"Read"}), wxDefaultPosition, 
+      wxDefaultSize, 0 );
+00503     btnLMSread4->SetDefault(); 
+00504     fgSizer3064->Add( btnLMSread4, 0, 0, 5 );
+00505     
+00506     ID_STATICTEXT54 = \textcolor{keyword}{new} wxStaticText( sbSizer160->GetStaticBox(), wxID\_ANY, wxT(\textcolor{stringliteral}{"Status:"}), 
+      wxDefaultPosition, wxDefaultSize, 0 );
+00507     ID_STATICTEXT54->Wrap( 0 );
+00508     fgSizer3064->Add( ID_STATICTEXT54, 1, wxALIGN\_CENTER\_HORIZONTAL|wxALIGN\_CENTER\_VERTICAL, 5 );
+00509     
+00510     lblLMSwriteStatus4 = \textcolor{keyword}{new} wxStaticText( sbSizer160->GetStaticBox(), wxID\_ANY, wxT(\textcolor{stringliteral}{"???"}), 
+      wxDefaultPosition, wxSize( 134,13 ), 0 );
+00511     lblLMSwriteStatus4->Wrap( 0 );
+00512     fgSizer3064->Add( lblLMSwriteStatus4, 1, wxALIGN\_LEFT|wxALIGN\_CENTER\_VERTICAL, 5 );
+00513     
+00514     
+00515     sbSizer160->Add( fgSizer3064, 1, wxEXPAND, 5 );
+00516     
+00517     wxFlexGridSizer* fgSizer3065;
+00518     fgSizer3065 = \textcolor{keyword}{new} wxFlexGridSizer( 0, 8, 5, 5 );
+00519     fgSizer3065->SetFlexibleDirection( wxBOTH );
+00520     fgSizer3065->SetNonFlexibleGrowMode( wxFLEX\_GROWMODE\_SPECIFIED );
+00521     
+00522     ID_STATICTEXT18 = \textcolor{keyword}{new} wxStaticText( sbSizer160->GetStaticBox(), wxID\_ANY, wxT(\textcolor{stringliteral}{"Address(Hex):"}), 
+      wxDefaultPosition, wxDefaultSize, 0 );
+00523     ID_STATICTEXT18->Wrap( 0 );
+00524     fgSizer3065->Add( ID_STATICTEXT18, 1, wxALIGN\_CENTER\_HORIZONTAL|wxALIGN\_CENTER\_VERTICAL|wxALL, 5 );
+00525     
+00526     txtLMSwriteAddr5 = \textcolor{keyword}{new} wxTextCtrl( sbSizer160->GetStaticBox(), wxID\_ANY, wxT(\textcolor{stringliteral}{"FFFF"}), wxDefaultPosition
+      , wxSize( -1,-1 ), 0 );
+00527     txtLMSwriteAddr5->SetMinSize( wxSize( 48,-1 ) );
+00528     
+00529     fgSizer3065->Add( txtLMSwriteAddr5, 1, wxALIGN\_CENTER\_HORIZONTAL|wxALIGN\_CENTER\_VERTICAL, 5 );
+00530     
+00531     ID_STATICTEXT95 = \textcolor{keyword}{new} wxStaticText( sbSizer160->GetStaticBox(), wxID\_ANY, wxT(\textcolor{stringliteral}{"Value(Hex):"}), 
+      wxDefaultPosition, wxDefaultSize, 0 );
+00532     ID_STATICTEXT95->Wrap( 0 );
+00533     fgSizer3065->Add( ID_STATICTEXT95, 1, wxALIGN\_CENTER\_HORIZONTAL|wxALIGN\_CENTER\_VERTICAL|wxALL, 5 );
+00534     
+00535     txtLMSwriteValue5 = \textcolor{keyword}{new} wxTextCtrl( sbSizer160->GetStaticBox(), wxID\_ANY, wxT(\textcolor{stringliteral}{"FFFF"}), 
+      wxDefaultPosition, wxDefaultSize, 0 );
+00536     txtLMSwriteValue5->SetMinSize( wxSize( 48,-1 ) );
+00537     
+00538     fgSizer3065->Add( txtLMSwriteValue5, 1, wxALIGN\_CENTER\_HORIZONTAL|wxALIGN\_CENTER\_VERTICAL, 5 );
+00539     
+00540     btnLMSwrite5 = \textcolor{keyword}{new} wxButton( sbSizer160->GetStaticBox(), wxID\_ANY, wxT(\textcolor{stringliteral}{"Write"}), wxDefaultPosition, 
+      wxDefaultSize, 0 );
+00541     btnLMSwrite5->SetDefault(); 
+00542     fgSizer3065->Add( btnLMSwrite5, 1, wxALIGN\_CENTER\_VERTICAL, 5 );
+00543     
+00544     btnLMSread5 = \textcolor{keyword}{new} wxButton( sbSizer160->GetStaticBox(), wxID\_ANY, wxT(\textcolor{stringliteral}{"Read"}), wxDefaultPosition, 
+      wxDefaultSize, 0 );
+00545     btnLMSread5->SetDefault(); 
+00546     fgSizer3065->Add( btnLMSread5, 0, 0, 5 );
+00547     
+00548     ID_STATICTEXT55 = \textcolor{keyword}{new} wxStaticText( sbSizer160->GetStaticBox(), wxID\_ANY, wxT(\textcolor{stringliteral}{"Status:"}), 
+      wxDefaultPosition, wxDefaultSize, 0 );
+00549     ID_STATICTEXT55->Wrap( 0 );
+00550     fgSizer3065->Add( ID_STATICTEXT55, 1, wxALIGN\_CENTER\_HORIZONTAL|wxALIGN\_CENTER\_VERTICAL, 5 );
+00551     
+00552     lblLMSwriteStatus5 = \textcolor{keyword}{new} wxStaticText( sbSizer160->GetStaticBox(), wxID\_ANY, wxT(\textcolor{stringliteral}{"???"}), 
+      wxDefaultPosition, wxSize( 134,13 ), 0 );
+00553     lblLMSwriteStatus5->Wrap( 0 );
+00554     fgSizer3065->Add( lblLMSwriteStatus5, 1, wxALIGN\_LEFT|wxALIGN\_CENTER\_VERTICAL, 5 );
+00555     
+00556     
+00557     sbSizer160->Add( fgSizer3065, 1, wxEXPAND, 5 );
+00558     
+00559     wxFlexGridSizer* fgSizer3066;
+00560     fgSizer3066 = \textcolor{keyword}{new} wxFlexGridSizer( 0, 8, 5, 5 );
+00561     fgSizer3066->SetFlexibleDirection( wxBOTH );
+00562     fgSizer3066->SetNonFlexibleGrowMode( wxFLEX\_GROWMODE\_SPECIFIED );
+00563     
+00564     ID_STATICTEXT19 = \textcolor{keyword}{new} wxStaticText( sbSizer160->GetStaticBox(), wxID\_ANY, wxT(\textcolor{stringliteral}{"Address(Hex):"}), 
+      wxDefaultPosition, wxDefaultSize, 0 );
+00565     ID_STATICTEXT19->Wrap( 0 );
+00566     fgSizer3066->Add( ID_STATICTEXT19, 1, wxALIGN\_CENTER\_HORIZONTAL|wxALIGN\_CENTER\_VERTICAL|wxALL, 5 );
+00567     
+00568     txtLMSwriteAddr6 = \textcolor{keyword}{new} wxTextCtrl( sbSizer160->GetStaticBox(), wxID\_ANY, wxT(\textcolor{stringliteral}{"FFFF"}), wxDefaultPosition
+      , wxSize( -1,-1 ), 0 );
+00569     txtLMSwriteAddr6->SetMinSize( wxSize( 48,-1 ) );
+00570     
+00571     fgSizer3066->Add( txtLMSwriteAddr6, 1, wxALIGN\_CENTER\_HORIZONTAL|wxALIGN\_CENTER\_VERTICAL, 5 );
+00572     
+00573     ID_STATICTEXT96 = \textcolor{keyword}{new} wxStaticText( sbSizer160->GetStaticBox(), wxID\_ANY, wxT(\textcolor{stringliteral}{"Value(Hex):"}), 
+      wxDefaultPosition, wxDefaultSize, 0 );
+00574     ID_STATICTEXT96->Wrap( 0 );
+00575     fgSizer3066->Add( ID_STATICTEXT96, 1, wxALIGN\_CENTER\_HORIZONTAL|wxALIGN\_CENTER\_VERTICAL|wxALL, 5 );
+00576     
+00577     txtLMSwriteValue6 = \textcolor{keyword}{new} wxTextCtrl( sbSizer160->GetStaticBox(), wxID\_ANY, wxT(\textcolor{stringliteral}{"FFFF"}), 
+      wxDefaultPosition, wxDefaultSize, 0 );
+00578     txtLMSwriteValue6->SetMinSize( wxSize( 48,-1 ) );
+00579     
+00580     fgSizer3066->Add( txtLMSwriteValue6, 1, wxALIGN\_CENTER\_HORIZONTAL|wxALIGN\_CENTER\_VERTICAL, 5 );
+00581     
+00582     btnLMSwrite6 = \textcolor{keyword}{new} wxButton( sbSizer160->GetStaticBox(), wxID\_ANY, wxT(\textcolor{stringliteral}{"Write"}), wxDefaultPosition, 
+      wxDefaultSize, 0 );
+00583     btnLMSwrite6->SetDefault(); 
+00584     fgSizer3066->Add( btnLMSwrite6, 1, wxALIGN\_CENTER\_VERTICAL, 5 );
+00585     
+00586     btnLMSread6 = \textcolor{keyword}{new} wxButton( sbSizer160->GetStaticBox(), wxID\_ANY, wxT(\textcolor{stringliteral}{"Read"}), wxDefaultPosition, 
+      wxDefaultSize, 0 );
+00587     btnLMSread6->SetDefault(); 
+00588     fgSizer3066->Add( btnLMSread6, 0, 0, 5 );
+00589     
+00590     ID_STATICTEXT56 = \textcolor{keyword}{new} wxStaticText( sbSizer160->GetStaticBox(), wxID\_ANY, wxT(\textcolor{stringliteral}{"Status:"}), 
+      wxDefaultPosition, wxDefaultSize, 0 );
+00591     ID_STATICTEXT56->Wrap( 0 );
+00592     fgSizer3066->Add( ID_STATICTEXT56, 1, wxALIGN\_CENTER\_HORIZONTAL|wxALIGN\_CENTER\_VERTICAL, 5 );
+00593     
+00594     lblLMSwriteStatus6 = \textcolor{keyword}{new} wxStaticText( sbSizer160->GetStaticBox(), wxID\_ANY, wxT(\textcolor{stringliteral}{"???"}), 
+      wxDefaultPosition, wxSize( 134,13 ), 0 );
+00595     lblLMSwriteStatus6->Wrap( 0 );
+00596     fgSizer3066->Add( lblLMSwriteStatus6, 1, wxALIGN\_LEFT|wxALIGN\_CENTER\_VERTICAL, 5 );
+00597     
+00598     
+00599     sbSizer160->Add( fgSizer3066, 1, wxEXPAND, 5 );
+00600     
+00601     wxFlexGridSizer* fgSizer3067;
+00602     fgSizer3067 = \textcolor{keyword}{new} wxFlexGridSizer( 0, 8, 5, 5 );
+00603     fgSizer3067->SetFlexibleDirection( wxBOTH );
+00604     fgSizer3067->SetNonFlexibleGrowMode( wxFLEX\_GROWMODE\_SPECIFIED );
+00605     
+00606     ID_STATICTEXT110 = \textcolor{keyword}{new} wxStaticText( sbSizer160->GetStaticBox(), wxID\_ANY, wxT(\textcolor{stringliteral}{"Address(Hex):"}), 
+      wxDefaultPosition, wxDefaultSize, 0 );
+00607     ID_STATICTEXT110->Wrap( 0 );
+00608     fgSizer3067->Add( ID_STATICTEXT110, 1, wxALIGN\_CENTER\_HORIZONTAL|wxALIGN\_CENTER\_VERTICAL|wxALL, 5 );
+00609     
+00610     txtLMSwriteAddr7 = \textcolor{keyword}{new} wxTextCtrl( sbSizer160->GetStaticBox(), wxID\_ANY, wxT(\textcolor{stringliteral}{"FFFF"}), wxDefaultPosition
+      , wxSize( -1,-1 ), 0 );
+00611     txtLMSwriteAddr7->SetMinSize( wxSize( 48,-1 ) );
+00612     
+00613     fgSizer3067->Add( txtLMSwriteAddr7, 1, wxALIGN\_CENTER\_HORIZONTAL|wxALIGN\_CENTER\_VERTICAL, 5 );
+00614     
+00615     ID_STATICTEXT97 = \textcolor{keyword}{new} wxStaticText( sbSizer160->GetStaticBox(), wxID\_ANY, wxT(\textcolor{stringliteral}{"Value(Hex):"}), 
+      wxDefaultPosition, wxDefaultSize, 0 );
+00616     ID_STATICTEXT97->Wrap( 0 );
+00617     fgSizer3067->Add( ID_STATICTEXT97, 1, wxALIGN\_CENTER\_HORIZONTAL|wxALIGN\_CENTER\_VERTICAL|wxALL, 5 );
+00618     
+00619     txtLMSwriteValue7 = \textcolor{keyword}{new} wxTextCtrl( sbSizer160->GetStaticBox(), wxID\_ANY, wxT(\textcolor{stringliteral}{"FFFF"}), 
+      wxDefaultPosition, wxDefaultSize, 0 );
+00620     txtLMSwriteValue7->SetMinSize( wxSize( 48,-1 ) );
+00621     
+00622     fgSizer3067->Add( txtLMSwriteValue7, 1, wxALIGN\_CENTER\_HORIZONTAL|wxALIGN\_CENTER\_VERTICAL, 5 );
+00623     
+00624     btnLMSwrite7 = \textcolor{keyword}{new} wxButton( sbSizer160->GetStaticBox(), wxID\_ANY, wxT(\textcolor{stringliteral}{"Write"}), wxDefaultPosition, 
+      wxDefaultSize, 0 );
+00625     btnLMSwrite7->SetDefault(); 
+00626     fgSizer3067->Add( btnLMSwrite7, 1, wxALIGN\_CENTER\_VERTICAL, 5 );
+00627     
+00628     btnLMSread7 = \textcolor{keyword}{new} wxButton( sbSizer160->GetStaticBox(), wxID\_ANY, wxT(\textcolor{stringliteral}{"Read"}), wxDefaultPosition, 
+      wxDefaultSize, 0 );
+00629     btnLMSread7->SetDefault(); 
+00630     fgSizer3067->Add( btnLMSread7, 0, 0, 5 );
+00631     
+00632     ID_STATICTEXT57 = \textcolor{keyword}{new} wxStaticText( sbSizer160->GetStaticBox(), wxID\_ANY, wxT(\textcolor{stringliteral}{"Status:"}), 
+      wxDefaultPosition, wxDefaultSize, 0 );
+00633     ID_STATICTEXT57->Wrap( 0 );
+00634     fgSizer3067->Add( ID_STATICTEXT57, 1, wxALIGN\_CENTER\_HORIZONTAL|wxALIGN\_CENTER\_VERTICAL, 5 );
+00635     
+00636     lblLMSwriteStatus7 = \textcolor{keyword}{new} wxStaticText( sbSizer160->GetStaticBox(), wxID\_ANY, wxT(\textcolor{stringliteral}{"???"}), 
+      wxDefaultPosition, wxSize( 134,13 ), 0 );
+00637     lblLMSwriteStatus7->Wrap( 0 );
+00638     fgSizer3067->Add( lblLMSwriteStatus7, 1, wxALIGN\_LEFT|wxALIGN\_CENTER\_VERTICAL, 5 );
+00639     
+00640     
+00641     sbSizer160->Add( fgSizer3067, 1, wxEXPAND, 5 );
+00642     
+00643     
+00644     fgSizer305->Add( sbSizer160, 1, wxALIGN\_LEFT|wxALIGN\_TOP|wxEXPAND, 5 );
+00645     
+00646     wxStaticBoxSizer* sbSizer168;
+00647     sbSizer168 = \textcolor{keyword}{new} wxStaticBoxSizer( \textcolor{keyword}{new} wxStaticBox( \textcolor{keyword}{this}, wxID\_ANY, wxT(\textcolor{stringliteral}{"Board SPI"}) ), wxVERTICAL );
+00648     
+00649     wxFlexGridSizer* fgSizer320;
+00650     fgSizer320 = \textcolor{keyword}{new} wxFlexGridSizer( 0, 8, 5, 5 );
+00651     fgSizer320->SetFlexibleDirection( wxBOTH );
+00652     fgSizer320->SetNonFlexibleGrowMode( wxFLEX\_GROWMODE\_SPECIFIED );
+00653     
+00654     ID_STATICTEXT15 = \textcolor{keyword}{new} wxStaticText( sbSizer168->GetStaticBox(), wxID\_ANY, wxT(\textcolor{stringliteral}{"Address(Hex):"}), 
+      wxDefaultPosition, wxDefaultSize, 0 );
+00655     ID_STATICTEXT15->Wrap( 0 );
+00656     fgSizer320->Add( ID_STATICTEXT15, 1, wxALIGN\_CENTER\_HORIZONTAL|wxALIGN\_CENTER\_VERTICAL|wxALL, 5 );
+00657     
+00658     txtBoardwriteAddr = \textcolor{keyword}{new} wxTextCtrl( sbSizer168->GetStaticBox(), wxID\_ANY, wxT(\textcolor{stringliteral}{"FFFF"}), 
+      wxDefaultPosition, wxSize( -1,-1 ), 0 );
+00659     txtBoardwriteAddr->SetMinSize( wxSize( 48,-1 ) );
+00660     
+00661     fgSizer320->Add( txtBoardwriteAddr, 1, wxALIGN\_CENTER\_HORIZONTAL|wxALIGN\_CENTER\_VERTICAL, 5 );
+00662     
+00663     ID_STATICTEXT16 = \textcolor{keyword}{new} wxStaticText( sbSizer168->GetStaticBox(), wxID\_ANY, wxT(\textcolor{stringliteral}{"Value(Hex):"}), 
+      wxDefaultPosition, wxDefaultSize, 0 );
+00664     ID_STATICTEXT16->Wrap( 0 );
+00665     fgSizer320->Add( ID_STATICTEXT16, 1, wxALIGN\_CENTER\_HORIZONTAL|wxALIGN\_CENTER\_VERTICAL|wxALL, 5 );
+00666     
+00667     txtBoardwriteValue = \textcolor{keyword}{new} wxTextCtrl( sbSizer168->GetStaticBox(), wxID\_ANY, wxT(\textcolor{stringliteral}{"FFFF"}), 
+      wxDefaultPosition, wxSize( -1,-1 ), 0 );
+00668     txtBoardwriteValue->SetMinSize( wxSize( 48,-1 ) );
+00669     
+00670     fgSizer320->Add( txtBoardwriteValue, 1, wxALIGN\_CENTER\_HORIZONTAL|wxALIGN\_CENTER\_VERTICAL, 5 );
+00671     
+00672     ID_BUTTON24 = \textcolor{keyword}{new} wxButton( sbSizer168->GetStaticBox(), wxID\_ANY, wxT(\textcolor{stringliteral}{"Write"}), wxDefaultPosition, 
+      wxDefaultSize, 0 );
+00673     ID_BUTTON24->SetDefault(); 
+00674     fgSizer320->Add( ID_BUTTON24, 1, wxALIGN\_CENTER\_VERTICAL, 5 );
+00675     
+00676     ID_BUTTON25 = \textcolor{keyword}{new} wxButton( sbSizer168->GetStaticBox(), wxID\_ANY, wxT(\textcolor{stringliteral}{"Read"}), wxDefaultPosition, 
+      wxDefaultSize, 0 );
+00677     ID_BUTTON25->SetDefault(); 
+00678     fgSizer320->Add( ID_BUTTON25, 1, wxALIGN\_CENTER\_VERTICAL, 5 );
+00679     
+00680     ID_STATICTEXT17 = \textcolor{keyword}{new} wxStaticText( sbSizer168->GetStaticBox(), wxID\_ANY, wxT(\textcolor{stringliteral}{"Status:"}), 
+      wxDefaultPosition, wxDefaultSize, 0 );
+00681     ID_STATICTEXT17->Wrap( 0 );
+00682     fgSizer320->Add( ID_STATICTEXT17, 1, wxALIGN\_CENTER\_HORIZONTAL|wxALIGN\_CENTER\_VERTICAL, 5 );
+00683     
+00684     lblBoardwriteStatus = \textcolor{keyword}{new} wxStaticText( sbSizer168->GetStaticBox(), wxID\_ANY, wxT(\textcolor{stringliteral}{"???"}), 
+      wxDefaultPosition, wxSize( 100,-1 ), 0 );
+00685     lblBoardwriteStatus->Wrap( 0 );
+00686     fgSizer320->Add( lblBoardwriteStatus, 1, wxALIGN\_LEFT|wxALIGN\_CENTER\_VERTICAL, 5 );
+00687     
+00688     
+00689     sbSizer168->Add( fgSizer320, 1, wxEXPAND, 5 );
+00690     
+00691     wxFlexGridSizer* fgSizer3201;
+00692     fgSizer3201 = \textcolor{keyword}{new} wxFlexGridSizer( 0, 8, 5, 5 );
+00693     fgSizer3201->SetFlexibleDirection( wxBOTH );
+00694     fgSizer3201->SetNonFlexibleGrowMode( wxFLEX\_GROWMODE\_SPECIFIED );
+00695     
+00696     ID_STATICTEXT151 = \textcolor{keyword}{new} wxStaticText( sbSizer168->GetStaticBox(), wxID\_ANY, wxT(\textcolor{stringliteral}{"Address(Hex):"}), 
+      wxDefaultPosition, wxDefaultSize, 0 );
+00697     ID_STATICTEXT151->Wrap( 0 );
+00698     fgSizer3201->Add( ID_STATICTEXT151, 1, wxALIGN\_CENTER\_HORIZONTAL|wxALIGN\_CENTER\_VERTICAL|wxALL, 5 );
+00699     
+00700     txtBoardwriteAddr1 = \textcolor{keyword}{new} wxTextCtrl( sbSizer168->GetStaticBox(), wxID\_ANY, wxT(\textcolor{stringliteral}{"FFFF"}), 
+      wxDefaultPosition, wxSize( -1,-1 ), 0 );
+00701     txtBoardwriteAddr1->SetMinSize( wxSize( 48,-1 ) );
+00702     
+00703     fgSizer3201->Add( txtBoardwriteAddr1, 1, wxALIGN\_CENTER\_HORIZONTAL|wxALIGN\_CENTER\_VERTICAL, 5 );
+00704     
+00705     ID_STATICTEXT161 = \textcolor{keyword}{new} wxStaticText( sbSizer168->GetStaticBox(), wxID\_ANY, wxT(\textcolor{stringliteral}{"Value(Hex):"}), 
+      wxDefaultPosition, wxDefaultSize, 0 );
+00706     ID_STATICTEXT161->Wrap( 0 );
+00707     fgSizer3201->Add( ID_STATICTEXT161, 1, wxALL|wxALIGN\_CENTER\_HORIZONTAL|wxALIGN\_CENTER\_VERTICAL, 5 );
+00708     
+00709     txtBoardwriteValue1 = \textcolor{keyword}{new} wxTextCtrl( sbSizer168->GetStaticBox(), wxID\_ANY, wxT(\textcolor{stringliteral}{"FFFF"}), 
+      wxDefaultPosition, wxSize( -1,-1 ), 0 );
+00710     txtBoardwriteValue1->SetMinSize( wxSize( 48,-1 ) );
+00711     
+00712     fgSizer3201->Add( txtBoardwriteValue1, 1, wxALIGN\_CENTER\_HORIZONTAL|wxALIGN\_CENTER\_VERTICAL, 5 );
+00713     
+00714     ID_BUTTON241 = \textcolor{keyword}{new} wxButton( sbSizer168->GetStaticBox(), wxID\_ANY, wxT(\textcolor{stringliteral}{"Write"}), wxDefaultPosition, 
+      wxDefaultSize, 0 );
+00715     ID_BUTTON241->SetDefault(); 
+00716     fgSizer3201->Add( ID_BUTTON241, 1, wxALIGN\_CENTER\_VERTICAL, 5 );
+00717     
+00718     ID_BUTTON251 = \textcolor{keyword}{new} wxButton( sbSizer168->GetStaticBox(), wxID\_ANY, wxT(\textcolor{stringliteral}{"Read"}), wxDefaultPosition, 
+      wxDefaultSize, 0 );
+00719     ID_BUTTON251->SetDefault(); 
+00720     fgSizer3201->Add( ID_BUTTON251, 1, wxALIGN\_CENTER\_VERTICAL, 5 );
+00721     
+00722     ID_STATICTEXT171 = \textcolor{keyword}{new} wxStaticText( sbSizer168->GetStaticBox(), wxID\_ANY, wxT(\textcolor{stringliteral}{"Status:"}), 
+      wxDefaultPosition, wxDefaultSize, 0 );
+00723     ID_STATICTEXT171->Wrap( 0 );
+00724     fgSizer3201->Add( ID_STATICTEXT171, 1, wxALIGN\_CENTER\_HORIZONTAL|wxALIGN\_CENTER\_VERTICAL, 5 );
+00725     
+00726     lblBoardwriteStatus1 = \textcolor{keyword}{new} wxStaticText( sbSizer168->GetStaticBox(), wxID\_ANY, wxT(\textcolor{stringliteral}{"???"}), 
+      wxDefaultPosition, wxSize( 100,-1 ), 0 );
+00727     lblBoardwriteStatus1->Wrap( 0 );
+00728     fgSizer3201->Add( lblBoardwriteStatus1, 1, wxALIGN\_LEFT|wxALIGN\_CENTER\_VERTICAL, 5 );
+00729     
+00730     
+00731     sbSizer168->Add( fgSizer3201, 1, wxEXPAND, 5 );
+00732     
+00733     wxFlexGridSizer* fgSizer3202;
+00734     fgSizer3202 = \textcolor{keyword}{new} wxFlexGridSizer( 0, 8, 5, 5 );
+00735     fgSizer3202->SetFlexibleDirection( wxBOTH );
+00736     fgSizer3202->SetNonFlexibleGrowMode( wxFLEX\_GROWMODE\_SPECIFIED );
+00737     
+00738     ID_STATICTEXT152 = \textcolor{keyword}{new} wxStaticText( sbSizer168->GetStaticBox(), wxID\_ANY, wxT(\textcolor{stringliteral}{"Address(Hex):"}), 
+      wxDefaultPosition, wxDefaultSize, 0 );
+00739     ID_STATICTEXT152->Wrap( 0 );
+00740     fgSizer3202->Add( ID_STATICTEXT152, 1, wxALIGN\_CENTER\_HORIZONTAL|wxALIGN\_CENTER\_VERTICAL|wxALL, 5 );
+00741     
+00742     txtBoardwriteAddr2 = \textcolor{keyword}{new} wxTextCtrl( sbSizer168->GetStaticBox(), wxID\_ANY, wxT(\textcolor{stringliteral}{"FFFF"}), 
+      wxDefaultPosition, wxSize( -1,-1 ), 0 );
+00743     txtBoardwriteAddr2->SetMinSize( wxSize( 48,-1 ) );
+00744     
+00745     fgSizer3202->Add( txtBoardwriteAddr2, 1, wxALIGN\_CENTER\_HORIZONTAL|wxALIGN\_CENTER\_VERTICAL, 5 );
+00746     
+00747     ID_STATICTEXT162 = \textcolor{keyword}{new} wxStaticText( sbSizer168->GetStaticBox(), wxID\_ANY, wxT(\textcolor{stringliteral}{"Value(Hex):"}), 
+      wxDefaultPosition, wxDefaultSize, 0 );
+00748     ID_STATICTEXT162->Wrap( 0 );
+00749     fgSizer3202->Add( ID_STATICTEXT162, 1, wxALL|wxALIGN\_CENTER\_HORIZONTAL|wxALIGN\_CENTER\_VERTICAL, 5 );
+00750     
+00751     txtBoardwriteValue2 = \textcolor{keyword}{new} wxTextCtrl( sbSizer168->GetStaticBox(), wxID\_ANY, wxT(\textcolor{stringliteral}{"FFFF"}), 
+      wxDefaultPosition, wxSize( -1,-1 ), 0 );
+00752     txtBoardwriteValue2->SetMinSize( wxSize( 48,-1 ) );
+00753     
+00754     fgSizer3202->Add( txtBoardwriteValue2, 1, wxALIGN\_CENTER\_HORIZONTAL|wxALIGN\_CENTER\_VERTICAL, 5 );
+00755     
+00756     ID_BUTTON242 = \textcolor{keyword}{new} wxButton( sbSizer168->GetStaticBox(), wxID\_ANY, wxT(\textcolor{stringliteral}{"Write"}), wxDefaultPosition, 
+      wxDefaultSize, 0 );
+00757     ID_BUTTON242->SetDefault(); 
+00758     fgSizer3202->Add( ID_BUTTON242, 1, wxALIGN\_CENTER\_VERTICAL, 5 );
+00759     
+00760     ID_BUTTON252 = \textcolor{keyword}{new} wxButton( sbSizer168->GetStaticBox(), wxID\_ANY, wxT(\textcolor{stringliteral}{"Read"}), wxDefaultPosition, 
+      wxDefaultSize, 0 );
+00761     ID_BUTTON252->SetDefault(); 
+00762     fgSizer3202->Add( ID_BUTTON252, 1, wxALIGN\_CENTER\_VERTICAL, 5 );
+00763     
+00764     ID_STATICTEXT172 = \textcolor{keyword}{new} wxStaticText( sbSizer168->GetStaticBox(), wxID\_ANY, wxT(\textcolor{stringliteral}{"Status:"}), 
+      wxDefaultPosition, wxDefaultSize, 0 );
+00765     ID_STATICTEXT172->Wrap( 0 );
+00766     fgSizer3202->Add( ID_STATICTEXT172, 1, wxALIGN\_CENTER\_HORIZONTAL|wxALIGN\_CENTER\_VERTICAL, 5 );
+00767     
+00768     lblBoardwriteStatus2 = \textcolor{keyword}{new} wxStaticText( sbSizer168->GetStaticBox(), wxID\_ANY, wxT(\textcolor{stringliteral}{"???"}), 
+      wxDefaultPosition, wxSize( 100,-1 ), 0 );
+00769     lblBoardwriteStatus2->Wrap( 0 );
+00770     fgSizer3202->Add( lblBoardwriteStatus2, 1, wxALIGN\_LEFT|wxALIGN\_CENTER\_VERTICAL, 5 );
+00771     
+00772     
+00773     sbSizer168->Add( fgSizer3202, 1, wxEXPAND, 5 );
+00774     
+00775     wxFlexGridSizer* fgSizer3203;
+00776     fgSizer3203 = \textcolor{keyword}{new} wxFlexGridSizer( 0, 8, 5, 5 );
+00777     fgSizer3203->SetFlexibleDirection( wxBOTH );
+00778     fgSizer3203->SetNonFlexibleGrowMode( wxFLEX\_GROWMODE\_SPECIFIED );
+00779     
+00780     ID_STATICTEXT153 = \textcolor{keyword}{new} wxStaticText( sbSizer168->GetStaticBox(), wxID\_ANY, wxT(\textcolor{stringliteral}{"Address(Hex):"}), 
+      wxDefaultPosition, wxDefaultSize, 0 );
+00781     ID_STATICTEXT153->Wrap( 0 );
+00782     fgSizer3203->Add( ID_STATICTEXT153, 1, wxALIGN\_CENTER\_HORIZONTAL|wxALIGN\_CENTER\_VERTICAL|wxALL, 5 );
+00783     
+00784     txtBoardwriteAddr3 = \textcolor{keyword}{new} wxTextCtrl( sbSizer168->GetStaticBox(), wxID\_ANY, wxT(\textcolor{stringliteral}{"FFFF"}), 
+      wxDefaultPosition, wxSize( -1,-1 ), 0 );
+00785     txtBoardwriteAddr3->SetMinSize( wxSize( 48,-1 ) );
+00786     
+00787     fgSizer3203->Add( txtBoardwriteAddr3, 1, wxALIGN\_CENTER\_HORIZONTAL|wxALIGN\_CENTER\_VERTICAL, 5 );
+00788     
+00789     ID_STATICTEXT163 = \textcolor{keyword}{new} wxStaticText( sbSizer168->GetStaticBox(), wxID\_ANY, wxT(\textcolor{stringliteral}{"Value(Hex):"}), 
+      wxDefaultPosition, wxDefaultSize, 0 );
+00790     ID_STATICTEXT163->Wrap( 0 );
+00791     fgSizer3203->Add( ID_STATICTEXT163, 1, wxALL|wxALIGN\_CENTER\_HORIZONTAL|wxALIGN\_CENTER\_VERTICAL, 5 );
+00792     
+00793     txtBoardwriteValue3 = \textcolor{keyword}{new} wxTextCtrl( sbSizer168->GetStaticBox(), wxID\_ANY, wxT(\textcolor{stringliteral}{"FFFF"}), 
+      wxDefaultPosition, wxSize( -1,-1 ), 0 );
+00794     txtBoardwriteValue3->SetMinSize( wxSize( 48,-1 ) );
+00795     
+00796     fgSizer3203->Add( txtBoardwriteValue3, 1, wxALIGN\_CENTER\_HORIZONTAL|wxALIGN\_CENTER\_VERTICAL, 5 );
+00797     
+00798     ID_BUTTON243 = \textcolor{keyword}{new} wxButton( sbSizer168->GetStaticBox(), wxID\_ANY, wxT(\textcolor{stringliteral}{"Write"}), wxDefaultPosition, 
+      wxDefaultSize, 0 );
+00799     ID_BUTTON243->SetDefault(); 
+00800     fgSizer3203->Add( ID_BUTTON243, 1, wxALIGN\_CENTER\_VERTICAL, 5 );
+00801     
+00802     ID_BUTTON253 = \textcolor{keyword}{new} wxButton( sbSizer168->GetStaticBox(), wxID\_ANY, wxT(\textcolor{stringliteral}{"Read"}), wxDefaultPosition, 
+      wxDefaultSize, 0 );
+00803     ID_BUTTON253->SetDefault(); 
+00804     fgSizer3203->Add( ID_BUTTON253, 1, wxALIGN\_CENTER\_VERTICAL, 5 );
+00805     
+00806     ID_STATICTEXT173 = \textcolor{keyword}{new} wxStaticText( sbSizer168->GetStaticBox(), wxID\_ANY, wxT(\textcolor{stringliteral}{"Status:"}), 
+      wxDefaultPosition, wxDefaultSize, 0 );
+00807     ID_STATICTEXT173->Wrap( 0 );
+00808     fgSizer3203->Add( ID_STATICTEXT173, 1, wxALIGN\_CENTER\_HORIZONTAL|wxALIGN\_CENTER\_VERTICAL, 5 );
+00809     
+00810     lblBoardwriteStatus3 = \textcolor{keyword}{new} wxStaticText( sbSizer168->GetStaticBox(), wxID\_ANY, wxT(\textcolor{stringliteral}{"???"}), 
+      wxDefaultPosition, wxSize( 100,-1 ), 0 );
+00811     lblBoardwriteStatus3->Wrap( 0 );
+00812     fgSizer3203->Add( lblBoardwriteStatus3, 1, wxALIGN\_LEFT|wxALIGN\_CENTER\_VERTICAL, 5 );
+00813     
+00814     
+00815     sbSizer168->Add( fgSizer3203, 1, wxEXPAND, 5 );
+00816     
+00817     wxFlexGridSizer* fgSizer3204;
+00818     fgSizer3204 = \textcolor{keyword}{new} wxFlexGridSizer( 0, 8, 5, 5 );
+00819     fgSizer3204->SetFlexibleDirection( wxBOTH );
+00820     fgSizer3204->SetNonFlexibleGrowMode( wxFLEX\_GROWMODE\_SPECIFIED );
+00821     
+00822     ID_STATICTEXT154 = \textcolor{keyword}{new} wxStaticText( sbSizer168->GetStaticBox(), wxID\_ANY, wxT(\textcolor{stringliteral}{"Address(Hex):"}), 
+      wxDefaultPosition, wxDefaultSize, 0 );
+00823     ID_STATICTEXT154->Wrap( 0 );
+00824     fgSizer3204->Add( ID_STATICTEXT154, 1, wxALIGN\_CENTER\_HORIZONTAL|wxALIGN\_CENTER\_VERTICAL|wxALL, 5 );
+00825     
+00826     txtBoardwriteAddr4 = \textcolor{keyword}{new} wxTextCtrl( sbSizer168->GetStaticBox(), wxID\_ANY, wxT(\textcolor{stringliteral}{"FFFF"}), 
+      wxDefaultPosition, wxSize( -1,-1 ), 0 );
+00827     txtBoardwriteAddr4->SetMinSize( wxSize( 48,-1 ) );
+00828     
+00829     fgSizer3204->Add( txtBoardwriteAddr4, 1, wxALIGN\_CENTER\_HORIZONTAL|wxALIGN\_CENTER\_VERTICAL, 5 );
+00830     
+00831     ID_STATICTEXT164 = \textcolor{keyword}{new} wxStaticText( sbSizer168->GetStaticBox(), wxID\_ANY, wxT(\textcolor{stringliteral}{"Value(Hex):"}), 
+      wxDefaultPosition, wxDefaultSize, 0 );
+00832     ID_STATICTEXT164->Wrap( 0 );
+00833     fgSizer3204->Add( ID_STATICTEXT164, 1, wxALL|wxALIGN\_CENTER\_HORIZONTAL|wxALIGN\_CENTER\_VERTICAL, 5 );
+00834     
+00835     txtBoardwriteValue4 = \textcolor{keyword}{new} wxTextCtrl( sbSizer168->GetStaticBox(), wxID\_ANY, wxT(\textcolor{stringliteral}{"FFFF"}), 
+      wxDefaultPosition, wxSize( -1,-1 ), 0 );
+00836     txtBoardwriteValue4->SetMinSize( wxSize( 48,-1 ) );
+00837     
+00838     fgSizer3204->Add( txtBoardwriteValue4, 1, wxALIGN\_CENTER\_HORIZONTAL|wxALIGN\_CENTER\_VERTICAL, 5 );
+00839     
+00840     ID_BUTTON244 = \textcolor{keyword}{new} wxButton( sbSizer168->GetStaticBox(), wxID\_ANY, wxT(\textcolor{stringliteral}{"Write"}), wxDefaultPosition, 
+      wxDefaultSize, 0 );
+00841     ID_BUTTON244->SetDefault(); 
+00842     fgSizer3204->Add( ID_BUTTON244, 1, wxALIGN\_CENTER\_VERTICAL, 5 );
+00843     
+00844     ID_BUTTON254 = \textcolor{keyword}{new} wxButton( sbSizer168->GetStaticBox(), wxID\_ANY, wxT(\textcolor{stringliteral}{"Read"}), wxDefaultPosition, 
+      wxDefaultSize, 0 );
+00845     ID_BUTTON254->SetDefault(); 
+00846     fgSizer3204->Add( ID_BUTTON254, 1, wxALIGN\_CENTER\_VERTICAL, 5 );
+00847     
+00848     ID_STATICTEXT174 = \textcolor{keyword}{new} wxStaticText( sbSizer168->GetStaticBox(), wxID\_ANY, wxT(\textcolor{stringliteral}{"Status:"}), 
+      wxDefaultPosition, wxDefaultSize, 0 );
+00849     ID_STATICTEXT174->Wrap( 0 );
+00850     fgSizer3204->Add( ID_STATICTEXT174, 1, wxALIGN\_CENTER\_HORIZONTAL|wxALIGN\_CENTER\_VERTICAL, 5 );
+00851     
+00852     lblBoardwriteStatus4 = \textcolor{keyword}{new} wxStaticText( sbSizer168->GetStaticBox(), wxID\_ANY, wxT(\textcolor{stringliteral}{"???"}), 
+      wxDefaultPosition, wxSize( 100,-1 ), 0 );
+00853     lblBoardwriteStatus4->Wrap( 0 );
+00854     fgSizer3204->Add( lblBoardwriteStatus4, 1, wxALIGN\_LEFT|wxALIGN\_CENTER\_VERTICAL, 5 );
+00855     
+00856     
+00857     sbSizer168->Add( fgSizer3204, 1, wxEXPAND, 5 );
+00858     
+00859     wxFlexGridSizer* fgSizer3205;
+00860     fgSizer3205 = \textcolor{keyword}{new} wxFlexGridSizer( 0, 8, 5, 5 );
+00861     fgSizer3205->SetFlexibleDirection( wxBOTH );
+00862     fgSizer3205->SetNonFlexibleGrowMode( wxFLEX\_GROWMODE\_SPECIFIED );
+00863     
+00864     ID_STATICTEXT155 = \textcolor{keyword}{new} wxStaticText( sbSizer168->GetStaticBox(), wxID\_ANY, wxT(\textcolor{stringliteral}{"Address(Hex):"}), 
+      wxDefaultPosition, wxDefaultSize, 0 );
+00865     ID_STATICTEXT155->Wrap( 0 );
+00866     fgSizer3205->Add( ID_STATICTEXT155, 1, wxALIGN\_CENTER\_HORIZONTAL|wxALIGN\_CENTER\_VERTICAL|wxALL, 5 );
+00867     
+00868     txtBoardwriteAddr5 = \textcolor{keyword}{new} wxTextCtrl( sbSizer168->GetStaticBox(), wxID\_ANY, wxT(\textcolor{stringliteral}{"FFFF"}), 
+      wxDefaultPosition, wxSize( -1,-1 ), 0 );
+00869     txtBoardwriteAddr5->SetMinSize( wxSize( 48,-1 ) );
+00870     
+00871     fgSizer3205->Add( txtBoardwriteAddr5, 1, wxALIGN\_CENTER\_HORIZONTAL|wxALIGN\_CENTER\_VERTICAL, 5 );
+00872     
+00873     ID_STATICTEXT165 = \textcolor{keyword}{new} wxStaticText( sbSizer168->GetStaticBox(), wxID\_ANY, wxT(\textcolor{stringliteral}{"Value(Hex):"}), 
+      wxDefaultPosition, wxDefaultSize, 0 );
+00874     ID_STATICTEXT165->Wrap( 0 );
+00875     fgSizer3205->Add( ID_STATICTEXT165, 1, wxALIGN\_CENTER\_HORIZONTAL|wxALIGN\_CENTER\_VERTICAL|wxALL, 5 );
+00876     
+00877     txtBoardwriteValue5 = \textcolor{keyword}{new} wxTextCtrl( sbSizer168->GetStaticBox(), wxID\_ANY, wxT(\textcolor{stringliteral}{"FFFF"}), 
+      wxDefaultPosition, wxSize( -1,-1 ), 0 );
+00878     txtBoardwriteValue5->SetMinSize( wxSize( 48,-1 ) );
+00879     
+00880     fgSizer3205->Add( txtBoardwriteValue5, 1, wxALIGN\_CENTER\_HORIZONTAL|wxALIGN\_CENTER\_VERTICAL, 5 );
+00881     
+00882     ID_BUTTON245 = \textcolor{keyword}{new} wxButton( sbSizer168->GetStaticBox(), wxID\_ANY, wxT(\textcolor{stringliteral}{"Write"}), wxDefaultPosition, 
+      wxDefaultSize, 0 );
+00883     ID_BUTTON245->SetDefault(); 
+00884     fgSizer3205->Add( ID_BUTTON245, 1, wxALIGN\_CENTER\_VERTICAL, 5 );
+00885     
+00886     ID_BUTTON255 = \textcolor{keyword}{new} wxButton( sbSizer168->GetStaticBox(), wxID\_ANY, wxT(\textcolor{stringliteral}{"Read"}), wxDefaultPosition, 
+      wxDefaultSize, 0 );
+00887     ID_BUTTON255->SetDefault(); 
+00888     fgSizer3205->Add( ID_BUTTON255, 1, wxALIGN\_CENTER\_VERTICAL, 5 );
+00889     
+00890     ID_STATICTEXT175 = \textcolor{keyword}{new} wxStaticText( sbSizer168->GetStaticBox(), wxID\_ANY, wxT(\textcolor{stringliteral}{"Status:"}), 
+      wxDefaultPosition, wxDefaultSize, 0 );
+00891     ID_STATICTEXT175->Wrap( 0 );
+00892     fgSizer3205->Add( ID_STATICTEXT175, 1, wxALIGN\_CENTER\_HORIZONTAL|wxALIGN\_CENTER\_VERTICAL, 5 );
+00893     
+00894     lblBoardwriteStatus5 = \textcolor{keyword}{new} wxStaticText( sbSizer168->GetStaticBox(), wxID\_ANY, wxT(\textcolor{stringliteral}{"???"}), 
+      wxDefaultPosition, wxSize( 100,-1 ), 0 );
+00895     lblBoardwriteStatus5->Wrap( 0 );
+00896     fgSizer3205->Add( lblBoardwriteStatus5, 1, wxALIGN\_LEFT|wxALIGN\_CENTER\_VERTICAL, 5 );
+00897     
+00898     
+00899     sbSizer168->Add( fgSizer3205, 1, wxEXPAND, 5 );
+00900     
+00901     wxFlexGridSizer* fgSizer3206;
+00902     fgSizer3206 = \textcolor{keyword}{new} wxFlexGridSizer( 0, 8, 5, 5 );
+00903     fgSizer3206->SetFlexibleDirection( wxBOTH );
+00904     fgSizer3206->SetNonFlexibleGrowMode( wxFLEX\_GROWMODE\_SPECIFIED );
+00905     
+00906     ID_STATICTEXT156 = \textcolor{keyword}{new} wxStaticText( sbSizer168->GetStaticBox(), wxID\_ANY, wxT(\textcolor{stringliteral}{"Address(Hex):"}), 
+      wxDefaultPosition, wxDefaultSize, 0 );
+00907     ID_STATICTEXT156->Wrap( 0 );
+00908     fgSizer3206->Add( ID_STATICTEXT156, 1, wxALIGN\_CENTER\_HORIZONTAL|wxALIGN\_CENTER\_VERTICAL|wxALL, 5 );
+00909     
+00910     txtBoardwriteAddr6 = \textcolor{keyword}{new} wxTextCtrl( sbSizer168->GetStaticBox(), wxID\_ANY, wxT(\textcolor{stringliteral}{"FFFF"}), 
+      wxDefaultPosition, wxSize( -1,-1 ), 0 );
+00911     txtBoardwriteAddr6->SetMinSize( wxSize( 48,-1 ) );
+00912     
+00913     fgSizer3206->Add( txtBoardwriteAddr6, 1, wxALIGN\_CENTER\_HORIZONTAL|wxALIGN\_CENTER\_VERTICAL, 5 );
+00914     
+00915     ID_STATICTEXT166 = \textcolor{keyword}{new} wxStaticText( sbSizer168->GetStaticBox(), wxID\_ANY, wxT(\textcolor{stringliteral}{"Value(Hex):"}), 
+      wxDefaultPosition, wxDefaultSize, 0 );
+00916     ID_STATICTEXT166->Wrap( 0 );
+00917     fgSizer3206->Add( ID_STATICTEXT166, 1, wxALIGN\_CENTER\_HORIZONTAL|wxALIGN\_CENTER\_VERTICAL|wxALL, 5 );
+00918     
+00919     txtBoardwriteValue6 = \textcolor{keyword}{new} wxTextCtrl( sbSizer168->GetStaticBox(), wxID\_ANY, wxT(\textcolor{stringliteral}{"FFFF"}), 
+      wxDefaultPosition, wxSize( -1,-1 ), 0 );
+00920     txtBoardwriteValue6->SetMinSize( wxSize( 48,-1 ) );
+00921     
+00922     fgSizer3206->Add( txtBoardwriteValue6, 1, wxALIGN\_CENTER\_HORIZONTAL|wxALIGN\_CENTER\_VERTICAL, 5 );
+00923     
+00924     ID_BUTTON246 = \textcolor{keyword}{new} wxButton( sbSizer168->GetStaticBox(), wxID\_ANY, wxT(\textcolor{stringliteral}{"Write"}), wxDefaultPosition, 
+      wxDefaultSize, 0 );
+00925     ID_BUTTON246->SetDefault(); 
+00926     fgSizer3206->Add( ID_BUTTON246, 1, wxALIGN\_CENTER\_VERTICAL, 5 );
+00927     
+00928     ID_BUTTON256 = \textcolor{keyword}{new} wxButton( sbSizer168->GetStaticBox(), wxID\_ANY, wxT(\textcolor{stringliteral}{"Read"}), wxDefaultPosition, 
+      wxDefaultSize, 0 );
+00929     ID_BUTTON256->SetDefault(); 
+00930     fgSizer3206->Add( ID_BUTTON256, 1, wxALIGN\_CENTER\_VERTICAL, 5 );
+00931     
+00932     ID_STATICTEXT176 = \textcolor{keyword}{new} wxStaticText( sbSizer168->GetStaticBox(), wxID\_ANY, wxT(\textcolor{stringliteral}{"Status:"}), 
+      wxDefaultPosition, wxDefaultSize, 0 );
+00933     ID_STATICTEXT176->Wrap( 0 );
+00934     fgSizer3206->Add( ID_STATICTEXT176, 1, wxALIGN\_CENTER\_HORIZONTAL|wxALIGN\_CENTER\_VERTICAL, 5 );
+00935     
+00936     lblBoardwriteStatus6 = \textcolor{keyword}{new} wxStaticText( sbSizer168->GetStaticBox(), wxID\_ANY, wxT(\textcolor{stringliteral}{"???"}), 
+      wxDefaultPosition, wxSize( 100,-1 ), 0 );
+00937     lblBoardwriteStatus6->Wrap( 0 );
+00938     fgSizer3206->Add( lblBoardwriteStatus6, 1, wxALIGN\_LEFT|wxALIGN\_CENTER\_VERTICAL, 5 );
+00939     
+00940     
+00941     sbSizer168->Add( fgSizer3206, 1, wxEXPAND, 5 );
+00942     
+00943     wxFlexGridSizer* fgSizer3207;
+00944     fgSizer3207 = \textcolor{keyword}{new} wxFlexGridSizer( 0, 8, 5, 5 );
+00945     fgSizer3207->SetFlexibleDirection( wxBOTH );
+00946     fgSizer3207->SetNonFlexibleGrowMode( wxFLEX\_GROWMODE\_SPECIFIED );
+00947     
+00948     ID_STATICTEXT157 = \textcolor{keyword}{new} wxStaticText( sbSizer168->GetStaticBox(), wxID\_ANY, wxT(\textcolor{stringliteral}{"Address(Hex):"}), 
+      wxDefaultPosition, wxDefaultSize, 0 );
+00949     ID_STATICTEXT157->Wrap( 0 );
+00950     fgSizer3207->Add( ID_STATICTEXT157, 1, wxALIGN\_CENTER\_HORIZONTAL|wxALIGN\_CENTER\_VERTICAL|wxALL, 5 );
+00951     
+00952     txtBoardwriteAddr7 = \textcolor{keyword}{new} wxTextCtrl( sbSizer168->GetStaticBox(), wxID\_ANY, wxT(\textcolor{stringliteral}{"FFFF"}), 
+      wxDefaultPosition, wxSize( -1,-1 ), 0 );
+00953     txtBoardwriteAddr7->SetMinSize( wxSize( 48,-1 ) );
+00954     
+00955     fgSizer3207->Add( txtBoardwriteAddr7, 1, wxALIGN\_CENTER\_HORIZONTAL|wxALIGN\_CENTER\_VERTICAL, 5 );
+00956     
+00957     ID_STATICTEXT167 = \textcolor{keyword}{new} wxStaticText( sbSizer168->GetStaticBox(), wxID\_ANY, wxT(\textcolor{stringliteral}{"Value(Hex):"}), 
+      wxDefaultPosition, wxDefaultSize, 0 );
+00958     ID_STATICTEXT167->Wrap( 0 );
+00959     fgSizer3207->Add( ID_STATICTEXT167, 1, wxALIGN\_CENTER\_HORIZONTAL|wxALIGN\_CENTER\_VERTICAL|wxALL, 5 );
+00960     
+00961     txtBoardwriteValue7 = \textcolor{keyword}{new} wxTextCtrl( sbSizer168->GetStaticBox(), wxID\_ANY, wxT(\textcolor{stringliteral}{"FFFF"}), 
+      wxDefaultPosition, wxSize( -1,-1 ), 0 );
+00962     txtBoardwriteValue7->SetMinSize( wxSize( 48,-1 ) );
+00963     
+00964     fgSizer3207->Add( txtBoardwriteValue7, 1, wxALIGN\_CENTER\_HORIZONTAL|wxALIGN\_CENTER\_VERTICAL, 5 );
+00965     
+00966     ID_BUTTON247 = \textcolor{keyword}{new} wxButton( sbSizer168->GetStaticBox(), wxID\_ANY, wxT(\textcolor{stringliteral}{"Write"}), wxDefaultPosition, 
+      wxDefaultSize, 0 );
+00967     ID_BUTTON247->SetDefault(); 
+00968     fgSizer3207->Add( ID_BUTTON247, 1, wxALIGN\_CENTER\_VERTICAL, 5 );
+00969     
+00970     ID_BUTTON257 = \textcolor{keyword}{new} wxButton( sbSizer168->GetStaticBox(), wxID\_ANY, wxT(\textcolor{stringliteral}{"Read"}), wxDefaultPosition, 
+      wxDefaultSize, 0 );
+00971     ID_BUTTON257->SetDefault(); 
+00972     fgSizer3207->Add( ID_BUTTON257, 1, wxALIGN\_CENTER\_VERTICAL, 5 );
+00973     
+00974     ID_STATICTEXT177 = \textcolor{keyword}{new} wxStaticText( sbSizer168->GetStaticBox(), wxID\_ANY, wxT(\textcolor{stringliteral}{"Status:"}), 
+      wxDefaultPosition, wxDefaultSize, 0 );
+00975     ID_STATICTEXT177->Wrap( 0 );
+00976     fgSizer3207->Add( ID_STATICTEXT177, 1, wxALIGN\_CENTER\_HORIZONTAL|wxALIGN\_CENTER\_VERTICAL, 5 );
+00977     
+00978     lblBoardwriteStatus7 = \textcolor{keyword}{new} wxStaticText( sbSizer168->GetStaticBox(), wxID\_ANY, wxT(\textcolor{stringliteral}{"???"}), 
+      wxDefaultPosition, wxSize( 100,-1 ), 0 );
+00979     lblBoardwriteStatus7->Wrap( 0 );
+00980     fgSizer3207->Add( lblBoardwriteStatus7, 1, wxALIGN\_LEFT|wxALIGN\_CENTER\_VERTICAL, 5 );
+00981     
+00982     
+00983     sbSizer168->Add( fgSizer3207, 1, wxEXPAND, 5 );
+00984     
+00985     
+00986     fgSizer305->Add( sbSizer168, 1, wxALIGN\_LEFT|wxALIGN\_TOP|wxEXPAND, 5 );
+00987     
+00988     
+00989     this->SetSizer( fgSizer305 );
+00990     this->Layout();
+00991     fgSizer305->Fit( \textcolor{keyword}{this} );
+00992     
+00993     this->Centre( wxBOTH );
+00994     
+00995     \textcolor{comment}{// Connect Events}
+00996     btnLMSwrite->Connect( wxEVT\_COMMAND\_BUTTON\_CLICKED, wxCommandEventHandler( 
+      SPI_view::onLMSwrite ), NULL, \textcolor{keyword}{this} );
+00997     btnLMSread->Connect( wxEVT\_COMMAND\_BUTTON\_CLICKED, wxCommandEventHandler( 
+      SPI_view::onLMSread ), NULL, \textcolor{keyword}{this} );
+00998     btnLMSwrite1->Connect( wxEVT\_COMMAND\_BUTTON\_CLICKED, wxCommandEventHandler( 
+      SPI_view::onLMSwrite ), NULL, \textcolor{keyword}{this} );
+00999     btnLMSread1->Connect( wxEVT\_COMMAND\_BUTTON\_CLICKED, wxCommandEventHandler( 
+      SPI_view::onLMSread ), NULL, \textcolor{keyword}{this} );
+01000     btnLMSwrite2->Connect( wxEVT\_COMMAND\_BUTTON\_CLICKED, wxCommandEventHandler( 
+      SPI_view::onLMSwrite ), NULL, \textcolor{keyword}{this} );
+01001     btnLMSread2->Connect( wxEVT\_COMMAND\_BUTTON\_CLICKED, wxCommandEventHandler( 
+      SPI_view::onLMSread ), NULL, \textcolor{keyword}{this} );
+01002     btnLMSwrite3->Connect( wxEVT\_COMMAND\_BUTTON\_CLICKED, wxCommandEventHandler( 
+      SPI_view::onLMSwrite ), NULL, \textcolor{keyword}{this} );
+01003     btnLMSread3->Connect( wxEVT\_COMMAND\_BUTTON\_CLICKED, wxCommandEventHandler( 
+      SPI_view::onLMSread ), NULL, \textcolor{keyword}{this} );
+01004     btnLMSwrite4->Connect( wxEVT\_COMMAND\_BUTTON\_CLICKED, wxCommandEventHandler( 
+      SPI_view::onLMSwrite ), NULL, \textcolor{keyword}{this} );
+01005     btnLMSread4->Connect( wxEVT\_COMMAND\_BUTTON\_CLICKED, wxCommandEventHandler( 
+      SPI_view::onLMSread ), NULL, \textcolor{keyword}{this} );
+01006     btnLMSwrite5->Connect( wxEVT\_COMMAND\_BUTTON\_CLICKED, wxCommandEventHandler( 
+      SPI_view::onLMSwrite ), NULL, \textcolor{keyword}{this} );
+01007     btnLMSread5->Connect( wxEVT\_COMMAND\_BUTTON\_CLICKED, wxCommandEventHandler( 
+      SPI_view::onLMSread ), NULL, \textcolor{keyword}{this} );
+01008     btnLMSwrite6->Connect( wxEVT\_COMMAND\_BUTTON\_CLICKED, wxCommandEventHandler( 
+      SPI_view::onLMSwrite ), NULL, \textcolor{keyword}{this} );
+01009     btnLMSread6->Connect( wxEVT\_COMMAND\_BUTTON\_CLICKED, wxCommandEventHandler( 
+      SPI_view::onLMSread ), NULL, \textcolor{keyword}{this} );
+01010     btnLMSwrite7->Connect( wxEVT\_COMMAND\_BUTTON\_CLICKED, wxCommandEventHandler( 
+      SPI_view::onLMSwrite ), NULL, \textcolor{keyword}{this} );
+01011     btnLMSread7->Connect( wxEVT\_COMMAND\_BUTTON\_CLICKED, wxCommandEventHandler( 
+      SPI_view::onLMSread ), NULL, \textcolor{keyword}{this} );
+01012     ID_BUTTON24->Connect( wxEVT\_COMMAND\_BUTTON\_CLICKED, wxCommandEventHandler( 
+      SPI_view::onBoardWrite ), NULL, \textcolor{keyword}{this} );
+01013     ID_BUTTON25->Connect( wxEVT\_COMMAND\_BUTTON\_CLICKED, wxCommandEventHandler( 
+      SPI_view::OnBoardRead ), NULL, \textcolor{keyword}{this} );
+01014     ID_BUTTON241->Connect( wxEVT\_COMMAND\_BUTTON\_CLICKED, wxCommandEventHandler( 
+      SPI_view::onBoardWrite ), NULL, \textcolor{keyword}{this} );
+01015     ID_BUTTON251->Connect( wxEVT\_COMMAND\_BUTTON\_CLICKED, wxCommandEventHandler( 
+      SPI_view::OnBoardRead ), NULL, \textcolor{keyword}{this} );
+01016     ID_BUTTON242->Connect( wxEVT\_COMMAND\_BUTTON\_CLICKED, wxCommandEventHandler( 
+      SPI_view::onBoardWrite ), NULL, \textcolor{keyword}{this} );
+01017     ID_BUTTON252->Connect( wxEVT\_COMMAND\_BUTTON\_CLICKED, wxCommandEventHandler( 
+      SPI_view::OnBoardRead ), NULL, \textcolor{keyword}{this} );
+01018     ID_BUTTON243->Connect( wxEVT\_COMMAND\_BUTTON\_CLICKED, wxCommandEventHandler( 
+      SPI_view::onBoardWrite ), NULL, \textcolor{keyword}{this} );
+01019     ID_BUTTON253->Connect( wxEVT\_COMMAND\_BUTTON\_CLICKED, wxCommandEventHandler( 
+      SPI_view::OnBoardRead ), NULL, \textcolor{keyword}{this} );
+01020     ID_BUTTON244->Connect( wxEVT\_COMMAND\_BUTTON\_CLICKED, wxCommandEventHandler( 
+      SPI_view::onBoardWrite ), NULL, \textcolor{keyword}{this} );
+01021     ID_BUTTON254->Connect( wxEVT\_COMMAND\_BUTTON\_CLICKED, wxCommandEventHandler( 
+      SPI_view::OnBoardRead ), NULL, \textcolor{keyword}{this} );
+01022     ID_BUTTON245->Connect( wxEVT\_COMMAND\_BUTTON\_CLICKED, wxCommandEventHandler( 
+      SPI_view::onBoardWrite ), NULL, \textcolor{keyword}{this} );
+01023     ID_BUTTON255->Connect( wxEVT\_COMMAND\_BUTTON\_CLICKED, wxCommandEventHandler( 
+      SPI_view::OnBoardRead ), NULL, \textcolor{keyword}{this} );
+01024     ID_BUTTON246->Connect( wxEVT\_COMMAND\_BUTTON\_CLICKED, wxCommandEventHandler( 
+      SPI_view::onBoardWrite ), NULL, \textcolor{keyword}{this} );
+01025     ID_BUTTON256->Connect( wxEVT\_COMMAND\_BUTTON\_CLICKED, wxCommandEventHandler( 
+      SPI_view::OnBoardRead ), NULL, \textcolor{keyword}{this} );
+01026     ID_BUTTON247->Connect( wxEVT\_COMMAND\_BUTTON\_CLICKED, wxCommandEventHandler( 
+      SPI_view::onBoardWrite ), NULL, \textcolor{keyword}{this} );
+01027     ID_BUTTON257->Connect( wxEVT\_COMMAND\_BUTTON\_CLICKED, wxCommandEventHandler( 
+      SPI_view::OnBoardRead ), NULL, \textcolor{keyword}{this} );
+01028 \}
+01029 
+01030 SPI_view::~SPI_view()
+01031 \{
+01032     \textcolor{comment}{// Disconnect Events}
+01033     btnLMSwrite->Disconnect( wxEVT\_COMMAND\_BUTTON\_CLICKED, wxCommandEventHandler( 
+      SPI_view::onLMSwrite ), NULL, \textcolor{keyword}{this} );
+01034     btnLMSread->Disconnect( wxEVT\_COMMAND\_BUTTON\_CLICKED, wxCommandEventHandler( 
+      SPI_view::onLMSread ), NULL, \textcolor{keyword}{this} );
+01035     btnLMSwrite1->Disconnect( wxEVT\_COMMAND\_BUTTON\_CLICKED, wxCommandEventHandler( 
+      SPI_view::onLMSwrite ), NULL, \textcolor{keyword}{this} );
+01036     btnLMSread1->Disconnect( wxEVT\_COMMAND\_BUTTON\_CLICKED, wxCommandEventHandler( 
+      SPI_view::onLMSread ), NULL, \textcolor{keyword}{this} );
+01037     btnLMSwrite2->Disconnect( wxEVT\_COMMAND\_BUTTON\_CLICKED, wxCommandEventHandler( 
+      SPI_view::onLMSwrite ), NULL, \textcolor{keyword}{this} );
+01038     btnLMSread2->Disconnect( wxEVT\_COMMAND\_BUTTON\_CLICKED, wxCommandEventHandler( 
+      SPI_view::onLMSread ), NULL, \textcolor{keyword}{this} );
+01039     btnLMSwrite3->Disconnect( wxEVT\_COMMAND\_BUTTON\_CLICKED, wxCommandEventHandler( 
+      SPI_view::onLMSwrite ), NULL, \textcolor{keyword}{this} );
+01040     btnLMSread3->Disconnect( wxEVT\_COMMAND\_BUTTON\_CLICKED, wxCommandEventHandler( 
+      SPI_view::onLMSread ), NULL, \textcolor{keyword}{this} );
+01041     btnLMSwrite4->Disconnect( wxEVT\_COMMAND\_BUTTON\_CLICKED, wxCommandEventHandler( 
+      SPI_view::onLMSwrite ), NULL, \textcolor{keyword}{this} );
+01042     btnLMSread4->Disconnect( wxEVT\_COMMAND\_BUTTON\_CLICKED, wxCommandEventHandler( 
+      SPI_view::onLMSread ), NULL, \textcolor{keyword}{this} );
+01043     btnLMSwrite5->Disconnect( wxEVT\_COMMAND\_BUTTON\_CLICKED, wxCommandEventHandler( 
+      SPI_view::onLMSwrite ), NULL, \textcolor{keyword}{this} );
+01044     btnLMSread5->Disconnect( wxEVT\_COMMAND\_BUTTON\_CLICKED, wxCommandEventHandler( 
+      SPI_view::onLMSread ), NULL, \textcolor{keyword}{this} );
+01045     btnLMSwrite6->Disconnect( wxEVT\_COMMAND\_BUTTON\_CLICKED, wxCommandEventHandler( 
+      SPI_view::onLMSwrite ), NULL, \textcolor{keyword}{this} );
+01046     btnLMSread6->Disconnect( wxEVT\_COMMAND\_BUTTON\_CLICKED, wxCommandEventHandler( 
+      SPI_view::onLMSread ), NULL, \textcolor{keyword}{this} );
+01047     btnLMSwrite7->Disconnect( wxEVT\_COMMAND\_BUTTON\_CLICKED, wxCommandEventHandler( 
+      SPI_view::onLMSwrite ), NULL, \textcolor{keyword}{this} );
+01048     btnLMSread7->Disconnect( wxEVT\_COMMAND\_BUTTON\_CLICKED, wxCommandEventHandler( 
+      SPI_view::onLMSread ), NULL, \textcolor{keyword}{this} );
+01049     ID_BUTTON24->Disconnect( wxEVT\_COMMAND\_BUTTON\_CLICKED, wxCommandEventHandler( 
+      SPI_view::onBoardWrite ), NULL, \textcolor{keyword}{this} );
+01050     ID_BUTTON25->Disconnect( wxEVT\_COMMAND\_BUTTON\_CLICKED, wxCommandEventHandler( 
+      SPI_view::OnBoardRead ), NULL, \textcolor{keyword}{this} );
+01051     ID_BUTTON241->Disconnect( wxEVT\_COMMAND\_BUTTON\_CLICKED, wxCommandEventHandler( 
+      SPI_view::onBoardWrite ), NULL, \textcolor{keyword}{this} );
+01052     ID_BUTTON251->Disconnect( wxEVT\_COMMAND\_BUTTON\_CLICKED, wxCommandEventHandler( 
+      SPI_view::OnBoardRead ), NULL, \textcolor{keyword}{this} );
+01053     ID_BUTTON242->Disconnect( wxEVT\_COMMAND\_BUTTON\_CLICKED, wxCommandEventHandler( 
+      SPI_view::onBoardWrite ), NULL, \textcolor{keyword}{this} );
+01054     ID_BUTTON252->Disconnect( wxEVT\_COMMAND\_BUTTON\_CLICKED, wxCommandEventHandler( 
+      SPI_view::OnBoardRead ), NULL, \textcolor{keyword}{this} );
+01055     ID_BUTTON243->Disconnect( wxEVT\_COMMAND\_BUTTON\_CLICKED, wxCommandEventHandler( 
+      SPI_view::onBoardWrite ), NULL, \textcolor{keyword}{this} );
+01056     ID_BUTTON253->Disconnect( wxEVT\_COMMAND\_BUTTON\_CLICKED, wxCommandEventHandler( 
+      SPI_view::OnBoardRead ), NULL, \textcolor{keyword}{this} );
+01057     ID_BUTTON244->Disconnect( wxEVT\_COMMAND\_BUTTON\_CLICKED, wxCommandEventHandler( 
+      SPI_view::onBoardWrite ), NULL, \textcolor{keyword}{this} );
+01058     ID_BUTTON254->Disconnect( wxEVT\_COMMAND\_BUTTON\_CLICKED, wxCommandEventHandler( 
+      SPI_view::OnBoardRead ), NULL, \textcolor{keyword}{this} );
+01059     ID_BUTTON245->Disconnect( wxEVT\_COMMAND\_BUTTON\_CLICKED, wxCommandEventHandler( 
+      SPI_view::onBoardWrite ), NULL, \textcolor{keyword}{this} );
+01060     ID_BUTTON255->Disconnect( wxEVT\_COMMAND\_BUTTON\_CLICKED, wxCommandEventHandler( 
+      SPI_view::OnBoardRead ), NULL, \textcolor{keyword}{this} );
+01061     ID_BUTTON246->Disconnect( wxEVT\_COMMAND\_BUTTON\_CLICKED, wxCommandEventHandler( 
+      SPI_view::onBoardWrite ), NULL, \textcolor{keyword}{this} );
+01062     ID_BUTTON256->Disconnect( wxEVT\_COMMAND\_BUTTON\_CLICKED, wxCommandEventHandler( 
+      SPI_view::OnBoardRead ), NULL, \textcolor{keyword}{this} );
+01063     ID_BUTTON247->Disconnect( wxEVT\_COMMAND\_BUTTON\_CLICKED, wxCommandEventHandler( 
+      SPI_view::onBoardWrite ), NULL, \textcolor{keyword}{this} );
+01064     ID_BUTTON257->Disconnect( wxEVT\_COMMAND\_BUTTON\_CLICKED, wxCommandEventHandler( 
+      SPI_view::OnBoardRead ), NULL, \textcolor{keyword}{this} );
+01065     
+01066 \}
+\end{DoxyCode}

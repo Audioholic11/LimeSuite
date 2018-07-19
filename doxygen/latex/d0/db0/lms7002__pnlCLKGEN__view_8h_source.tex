@@ -1,0 +1,43 @@
+\subsection{lms7002\+\_\+pnl\+C\+L\+K\+G\+E\+N\+\_\+view.\+h}
+\label{lms7002__pnlCLKGEN__view_8h_source}\index{/home/erik/prefix/default/src/limesuite-\/dev/src/lms7002\+\_\+wxgui/lms7002\+\_\+pnl\+C\+L\+K\+G\+E\+N\+\_\+view.\+h@{/home/erik/prefix/default/src/limesuite-\/dev/src/lms7002\+\_\+wxgui/lms7002\+\_\+pnl\+C\+L\+K\+G\+E\+N\+\_\+view.\+h}}
+
+\begin{DoxyCode}
+00001 \textcolor{preprocessor}{#ifndef \_\_lms7002\_pnlCLKGEN\_view\_\_}
+00002 \textcolor{preprocessor}{#define \_\_lms7002\_pnlCLKGEN\_view\_\_}
+00003 
+00009 \textcolor{preprocessor}{#include "lms7002_wxgui.h"}
+00010 
+00012 \textcolor{preprocessor}{#include <map>}
+00013 \textcolor{preprocessor}{#include "lime/LimeSuite.h"}
+00014 \textcolor{keyword}{namespace }lime\{
+00015 \}
+00017 \textcolor{keyword}{class }lms7002_pnlCLKGEN_view : \textcolor{keyword}{public} pnlCLKGEN_view
+00018 \{
+00019     \textcolor{keyword}{protected}:
+00020         \textcolor{comment}{// Handlers for pnlCLKGEN\_view events.}
+00021         \textcolor{keywordtype}{void} ParameterChangeHandler( wxCommandEvent& event );
+00022         \textcolor{keywordtype}{void} ParameterChangeHandler(wxSpinEvent& event);
+00023         \textcolor{keywordtype}{void} onbtnTuneClick( wxCommandEvent& event );
+00024         \textcolor{keywordtype}{void} OnbtnReadComparators(wxCommandEvent& event);
+00025         \textcolor{keywordtype}{void} OnbtnUpdateCoarse(wxCommandEvent& event);
+00026         \textcolor{keywordtype}{void} OnShowVCOclicked(wxCommandEvent& event);
+00027 
+00028         wxComboBox *cmbCMPLO_CTRL;
+00029     \textcolor{keyword}{public}:
+00030         \textcolor{keywordtype}{void} onbtnCalculateClick(wxCommandEvent& event);
+00031         \textcolor{keywordtype}{void} onbtnCalculateClick(wxSpinEvent& event);
+00032         \textcolor{keywordtype}{void} OnAutoPhase(wxCommandEvent& event);
+00034         lms7002_pnlCLKGEN_view( wxWindow* parent );
+00036     lms7002_pnlCLKGEN_view(wxWindow* parent, wxWindowID \textcolor{keywordtype}{id} = wxID\_ANY, \textcolor{keyword}{const} wxPoint& pos = 
+      wxDefaultPosition, \textcolor{keyword}{const} wxSize& size = wxDefaultSize, \textcolor{keywordtype}{long} style = wxTAB\_TRAVERSAL);
+00037     \textcolor{keywordtype}{void} Initialize(lms_device_t* pControl);
+00038     \textcolor{keywordtype}{void} UpdateGUI();
+00039     \textcolor{keywordtype}{void} UpdateInterfaceFrequencies();
+00040 \textcolor{keyword}{protected}:
+00041     \textcolor{keywordtype}{void} UpdateCLKL();
+00042     lms_device_t* lmsControl;
+00043     std::map<wxWindow*, LMS7Parameter> wndId2Enum;
+00044 \};
+00045 
+00046 \textcolor{preprocessor}{#endif // \_\_lms7002\_pnlCLKGEN\_view\_\_}
+\end{DoxyCode}

@@ -1,0 +1,1148 @@
+\subsection{/home/erik/prefix/default/src/limesuite-\/dev/mcu\+\_\+program/common\+\_\+src/lms7002m\+\_\+calibrations.c File Reference}
+\label{lms7002m__calibrations_8c}\index{/home/erik/prefix/default/src/limesuite-\/dev/mcu\+\_\+program/common\+\_\+src/lms7002m\+\_\+calibrations.\+c@{/home/erik/prefix/default/src/limesuite-\/dev/mcu\+\_\+program/common\+\_\+src/lms7002m\+\_\+calibrations.\+c}}
+{\ttfamily \#include \char`\"{}lms7002m\+\_\+calibrations.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}L\+M\+S7002\+M\+\_\+parameters\+\_\+compact.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}spi.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}lms7002m\+\_\+controls.\+h\char`\"{}}\\*
+{\ttfamily \#include $<$math.\+h$>$}\\*
+{\ttfamily \#include \char`\"{}mcu\+\_\+defines.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}lms7002\+\_\+regx51.\+h\char`\"{}}\\*
+Include dependency graph for lms7002m\+\_\+calibrations.\+c\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{dc/d59/lms7002m__calibrations_8c__incl}
+\end{center}
+\end{figure}
+\subsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct {\bf Bin\+Search\+Param}
+\end{DoxyCompactItemize}
+\subsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define {\bf E\+N\+A\+B\+L\+E\+\_\+\+E\+X\+T\+E\+R\+N\+A\+L\+\_\+\+L\+O\+O\+P\+B\+A\+CK}~1
+\item 
+\#define {\bf V\+E\+R\+B\+O\+SE}~0
+\item 
+\#define {\bf P\+U\+S\+H\+\_\+\+G\+M\+E\+A\+S\+U\+R\+E\+M\+E\+N\+T\+\_\+\+V\+A\+L\+U\+ES}(value,  rssi)
+\item 
+\#define {\bf calibration\+S\+X\+Offset\+\_\+\+Hz}~1e6
+\item 
+\#define {\bf offset\+N\+CO}~0.\+1e6
+\item 
+\#define {\bf calib\+User\+Bw\+Divider}~5
+\end{DoxyCompactItemize}
+\subsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+int16\+\_\+t {\bf clamp} (int16\+\_\+t value, int16\+\_\+t min\+Bound, int16\+\_\+t max\+Bound)
+\item 
+static {\bf void} {\bf Flip\+Rising\+Edge} (const uint16\+\_\+t addr, const uint8\+\_\+t bits)
+\item 
+static bool {\bf Is\+P\+L\+L\+Tuned} ()
+\item 
+{\bf void} {\bf Load\+D\+C\+\_\+\+R\+E\+G\+\_\+\+T\+X\+\_\+\+IQ} ()
+\item 
+{\bf void} {\bf Update\+R\+S\+S\+I\+Delay} ()
+\item 
+uint32\+\_\+t {\bf Get\+R\+S\+SI} ()
+\item 
+static {\bf void} {\bf Set\+Rx\+G\+F\+I\+R3\+Coefficients} ()
+\item 
+{\bf int} {\bf Check\+Saturation\+Tx\+Rx} (bool ext\+Loopback)
+\item 
+{\bf void} {\bf Binary\+Search} ({\bf Bin\+Search\+Param} $\ast${\bf args})
+\item 
+int16\+\_\+t {\bf Read\+Analog\+DC} (const uint16\+\_\+t addr)
+\item 
+static {\bf void} {\bf Write\+Analog\+DC} (const uint16\+\_\+t addr, int16\+\_\+t value)
+\item 
+static {\bf void} {\bf Tx\+Dc\+Binary\+Search} ({\bf Bin\+Search\+Param} $\ast${\bf args})
+\item 
+{\bf void} {\bf Adjust\+Auto\+DC} (const uint16\+\_\+t {\bf address}, bool {\bf tx})
+\item 
+{\bf void} {\bf Calibrate\+Rx\+D\+C\+Auto} ()
+\item 
+{\bf void} {\bf Calibrate\+Tx\+D\+C\+Auto} ()
+\item 
+{\bf void} {\bf Calibrate\+I\+Q\+Imbalance} (bool {\bf tx})
+\item 
+uint8\+\_\+t {\bf Setup\+C\+G\+EN} ()
+\item 
+uint8\+\_\+t {\bf Calibrate\+Tx\+Setup} (bool ext\+Loopback)
+\item 
+uint8\+\_\+t {\bf Calibrate\+Tx} (bool ext\+Loopback)
+\item 
+uint8\+\_\+t {\bf Calibrate\+Rx\+Setup} (bool ext\+Loopback)
+\item 
+uint8\+\_\+t {\bf Check\+Saturation\+Rx} (const {\bf float\+\_\+type} bandwidth\+\_\+\+Hz, bool ext\+Loopback)
+\item 
+uint8\+\_\+t {\bf Calibrate\+Rx} (bool ext\+Loopback, bool dc\+Only)
+\end{DoxyCompactItemize}
+\subsubsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+float {\bf bandwidth\+RF} = 5e6
+\item 
+uint16\+\_\+t {\bf R\+S\+S\+I\+Delay\+Counter} = 1
+\item 
+uint8\+\_\+t {\bf ext\+Loopback\+Pair} = 0
+\item 
+{\bf float\+\_\+type} {\bf Ref\+Clk}
+\end{DoxyCompactItemize}
+
+
+\subsubsection{Macro Definition Documentation}
+\index{lms7002m\+\_\+calibrations.\+c@{lms7002m\+\_\+calibrations.\+c}!calibration\+S\+X\+Offset\+\_\+\+Hz@{calibration\+S\+X\+Offset\+\_\+\+Hz}}
+\index{calibration\+S\+X\+Offset\+\_\+\+Hz@{calibration\+S\+X\+Offset\+\_\+\+Hz}!lms7002m\+\_\+calibrations.\+c@{lms7002m\+\_\+calibrations.\+c}}
+\paragraph[{calibration\+S\+X\+Offset\+\_\+\+Hz}]{\setlength{\rightskip}{0pt plus 5cm}\#define calibration\+S\+X\+Offset\+\_\+\+Hz~1e6}\label{lms7002m__calibrations_8c_a58a4e913f1cec1b7256f672928f32d5e}
+
+
+Definition at line {\bf 76} of file {\bf lms7002m\+\_\+calibrations.\+c}.
+
+
+
+Referenced by {\bf Calibrate\+Tx()}, {\bf Calibrate\+Tx\+Setup()}, and {\bf Check\+Saturation\+Tx\+Rx()}.
+
+\index{lms7002m\+\_\+calibrations.\+c@{lms7002m\+\_\+calibrations.\+c}!calib\+User\+Bw\+Divider@{calib\+User\+Bw\+Divider}}
+\index{calib\+User\+Bw\+Divider@{calib\+User\+Bw\+Divider}!lms7002m\+\_\+calibrations.\+c@{lms7002m\+\_\+calibrations.\+c}}
+\paragraph[{calib\+User\+Bw\+Divider}]{\setlength{\rightskip}{0pt plus 5cm}\#define calib\+User\+Bw\+Divider~5}\label{lms7002m__calibrations_8c_ad22f29824c585276c32a5f2866ccbfe2}
+
+
+Definition at line {\bf 78} of file {\bf lms7002m\+\_\+calibrations.\+c}.
+
+
+
+Referenced by {\bf Calibrate\+Rx()}, {\bf Calibrate\+Rx\+Setup()}, {\bf Calibrate\+Tx()}, {\bf Calibrate\+Tx\+Setup()}, {\bf Check\+Saturation\+Rx()}, and {\bf Check\+Saturation\+Tx\+Rx()}.
+
+\index{lms7002m\+\_\+calibrations.\+c@{lms7002m\+\_\+calibrations.\+c}!E\+N\+A\+B\+L\+E\+\_\+\+E\+X\+T\+E\+R\+N\+A\+L\+\_\+\+L\+O\+O\+P\+B\+A\+CK@{E\+N\+A\+B\+L\+E\+\_\+\+E\+X\+T\+E\+R\+N\+A\+L\+\_\+\+L\+O\+O\+P\+B\+A\+CK}}
+\index{E\+N\+A\+B\+L\+E\+\_\+\+E\+X\+T\+E\+R\+N\+A\+L\+\_\+\+L\+O\+O\+P\+B\+A\+CK@{E\+N\+A\+B\+L\+E\+\_\+\+E\+X\+T\+E\+R\+N\+A\+L\+\_\+\+L\+O\+O\+P\+B\+A\+CK}!lms7002m\+\_\+calibrations.\+c@{lms7002m\+\_\+calibrations.\+c}}
+\paragraph[{E\+N\+A\+B\+L\+E\+\_\+\+E\+X\+T\+E\+R\+N\+A\+L\+\_\+\+L\+O\+O\+P\+B\+A\+CK}]{\setlength{\rightskip}{0pt plus 5cm}\#define E\+N\+A\+B\+L\+E\+\_\+\+E\+X\+T\+E\+R\+N\+A\+L\+\_\+\+L\+O\+O\+P\+B\+A\+CK~1}\label{lms7002m__calibrations_8c_acacc9991b390551659024e26a37d1b66}
+
+
+Definition at line {\bf 12} of file {\bf lms7002m\+\_\+calibrations.\+c}.
+
+\index{lms7002m\+\_\+calibrations.\+c@{lms7002m\+\_\+calibrations.\+c}!offset\+N\+CO@{offset\+N\+CO}}
+\index{offset\+N\+CO@{offset\+N\+CO}!lms7002m\+\_\+calibrations.\+c@{lms7002m\+\_\+calibrations.\+c}}
+\paragraph[{offset\+N\+CO}]{\setlength{\rightskip}{0pt plus 5cm}\#define offset\+N\+CO~0.\+1e6}\label{lms7002m__calibrations_8c_acd72b57e0d65cfabf34889d4dab95273}
+
+
+Definition at line {\bf 77} of file {\bf lms7002m\+\_\+calibrations.\+c}.
+
+
+
+Referenced by {\bf Calibrate\+Rx()}, {\bf Calibrate\+Rx\+Setup()}, {\bf Calibrate\+Tx()}, {\bf Check\+Saturation\+Rx()}, and {\bf Check\+Saturation\+Tx\+Rx()}.
+
+\index{lms7002m\+\_\+calibrations.\+c@{lms7002m\+\_\+calibrations.\+c}!P\+U\+S\+H\+\_\+\+G\+M\+E\+A\+S\+U\+R\+E\+M\+E\+N\+T\+\_\+\+V\+A\+L\+U\+ES@{P\+U\+S\+H\+\_\+\+G\+M\+E\+A\+S\+U\+R\+E\+M\+E\+N\+T\+\_\+\+V\+A\+L\+U\+ES}}
+\index{P\+U\+S\+H\+\_\+\+G\+M\+E\+A\+S\+U\+R\+E\+M\+E\+N\+T\+\_\+\+V\+A\+L\+U\+ES@{P\+U\+S\+H\+\_\+\+G\+M\+E\+A\+S\+U\+R\+E\+M\+E\+N\+T\+\_\+\+V\+A\+L\+U\+ES}!lms7002m\+\_\+calibrations.\+c@{lms7002m\+\_\+calibrations.\+c}}
+\paragraph[{P\+U\+S\+H\+\_\+\+G\+M\+E\+A\+S\+U\+R\+E\+M\+E\+N\+T\+\_\+\+V\+A\+L\+U\+ES}]{\setlength{\rightskip}{0pt plus 5cm}\#define P\+U\+S\+H\+\_\+\+G\+M\+E\+A\+S\+U\+R\+E\+M\+E\+N\+T\+\_\+\+V\+A\+L\+U\+ES(
+\begin{DoxyParamCaption}
+\item[{}]{value, }
+\item[{}]{rssi}
+\end{DoxyParamCaption}
+)}\label{lms7002m__calibrations_8c_abbc4c0cca5c22606836e720f1d08d53a}
+
+
+Definition at line {\bf 71} of file {\bf lms7002m\+\_\+calibrations.\+c}.
+
+
+
+Referenced by {\bf Binary\+Search()}, {\bf Check\+Saturation\+Rx()}, {\bf Check\+Saturation\+Tx\+Rx()}, and {\bf Tx\+Dc\+Binary\+Search()}.
+
+\index{lms7002m\+\_\+calibrations.\+c@{lms7002m\+\_\+calibrations.\+c}!V\+E\+R\+B\+O\+SE@{V\+E\+R\+B\+O\+SE}}
+\index{V\+E\+R\+B\+O\+SE@{V\+E\+R\+B\+O\+SE}!lms7002m\+\_\+calibrations.\+c@{lms7002m\+\_\+calibrations.\+c}}
+\paragraph[{V\+E\+R\+B\+O\+SE}]{\setlength{\rightskip}{0pt plus 5cm}\#define V\+E\+R\+B\+O\+SE~0}\label{lms7002m__calibrations_8c_a42f8c497a1968074f38bf5055c650dca}
+
+
+Definition at line {\bf 70} of file {\bf lms7002m\+\_\+calibrations.\+c}.
+
+
+
+\subsubsection{Function Documentation}
+\index{lms7002m\+\_\+calibrations.\+c@{lms7002m\+\_\+calibrations.\+c}!Adjust\+Auto\+DC@{Adjust\+Auto\+DC}}
+\index{Adjust\+Auto\+DC@{Adjust\+Auto\+DC}!lms7002m\+\_\+calibrations.\+c@{lms7002m\+\_\+calibrations.\+c}}
+\paragraph[{Adjust\+Auto\+D\+C(const uint16\+\_\+t address, bool tx)}]{\setlength{\rightskip}{0pt plus 5cm}{\bf void} Adjust\+Auto\+DC (
+\begin{DoxyParamCaption}
+\item[{const uint16\+\_\+t}]{address, }
+\item[{bool}]{tx}
+\end{DoxyParamCaption}
+)}\label{lms7002m__calibrations_8c_a2f54f535ec2dc39eef098a41fc221952}
+
+
+Definition at line {\bf 383} of file {\bf lms7002m\+\_\+calibrations.\+c}.
+
+
+
+References {\bf clamp()}, {\bf Get\+R\+S\+S\+I()}, {\bf i}, {\bf range}, {\bf Read\+Analog\+D\+C()}, and {\bf Write\+Analog\+D\+C()}.
+
+
+
+Referenced by {\bf Calibrate\+Rx\+D\+C\+Auto()}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{d3/dec/lms7002m__calibrations_8c_a2f54f535ec2dc39eef098a41fc221952_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{d3/dec/lms7002m__calibrations_8c_a2f54f535ec2dc39eef098a41fc221952_icgraph}
+\end{center}
+\end{figure}
+
+
+\index{lms7002m\+\_\+calibrations.\+c@{lms7002m\+\_\+calibrations.\+c}!Binary\+Search@{Binary\+Search}}
+\index{Binary\+Search@{Binary\+Search}!lms7002m\+\_\+calibrations.\+c@{lms7002m\+\_\+calibrations.\+c}}
+\paragraph[{Binary\+Search(\+Bin\+Search\+Param $\ast$args)}]{\setlength{\rightskip}{0pt plus 5cm}{\bf void} Binary\+Search (
+\begin{DoxyParamCaption}
+\item[{{\bf Bin\+Search\+Param} $\ast$}]{args}
+\end{DoxyParamCaption}
+)}\label{lms7002m__calibrations_8c_af968f74e152b5b46aab9c0318d0e1de5}
+
+
+Definition at line {\bf 275} of file {\bf lms7002m\+\_\+calibrations.\+c}.
+
+
+
+References {\bf Get\+R\+S\+S\+I()}, {\bf Modify\+\_\+\+S\+P\+I\+\_\+\+Reg\+\_\+bits()}, and {\bf P\+U\+S\+H\+\_\+\+G\+M\+E\+A\+S\+U\+R\+E\+M\+E\+N\+T\+\_\+\+V\+A\+L\+U\+ES}.
+
+
+
+Referenced by {\bf Calibrate\+I\+Q\+Imbalance()}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{d3/dec/lms7002m__calibrations_8c_af968f74e152b5b46aab9c0318d0e1de5_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{d3/dec/lms7002m__calibrations_8c_af968f74e152b5b46aab9c0318d0e1de5_icgraph}
+\end{center}
+\end{figure}
+
+
+\index{lms7002m\+\_\+calibrations.\+c@{lms7002m\+\_\+calibrations.\+c}!Calibrate\+I\+Q\+Imbalance@{Calibrate\+I\+Q\+Imbalance}}
+\index{Calibrate\+I\+Q\+Imbalance@{Calibrate\+I\+Q\+Imbalance}!lms7002m\+\_\+calibrations.\+c@{lms7002m\+\_\+calibrations.\+c}}
+\paragraph[{Calibrate\+I\+Q\+Imbalance(bool tx)}]{\setlength{\rightskip}{0pt plus 5cm}{\bf void} Calibrate\+I\+Q\+Imbalance (
+\begin{DoxyParamCaption}
+\item[{bool}]{tx}
+\end{DoxyParamCaption}
+)}\label{lms7002m__calibrations_8c_a6af7d7b5195308346d2ceeba3a7958e4}
+
+
+Definition at line {\bf 570} of file {\bf lms7002m\+\_\+calibrations.\+c}.
+
+
+
+References {\bf L\+M\+S7\+Parameter\+::address}, {\bf Binary\+Search()}, {\bf dir\+Name}, {\bf Get\+R\+S\+S\+I()}, {\bf Bin\+Search\+Param\+::max\+Value}, {\bf Bin\+Search\+Param\+::min\+Value}, {\bf Modify\+\_\+\+S\+P\+I\+\_\+\+Reg\+\_\+bits()}, {\bf M\+S\+B\+\_\+\+L\+SB}, {\bf L\+M\+S7\+Parameter\+::msblsb}, {\bf Bin\+Search\+Param\+::param}, {\bf Bin\+Search\+Param\+::result}, {\bf S\+P\+I\+\_\+write()}, {\bf G\+N\+U\+Plot\+Pipe\+::write()}, and {\bf G\+N\+U\+Plot\+Pipe\+::writef()}.
+
+
+
+Referenced by {\bf Calibrate\+Rx()}, and {\bf Calibrate\+Tx()}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{d3/dec/lms7002m__calibrations_8c_a6af7d7b5195308346d2ceeba3a7958e4_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{d3/dec/lms7002m__calibrations_8c_a6af7d7b5195308346d2ceeba3a7958e4_icgraph}
+\end{center}
+\end{figure}
+
+
+\index{lms7002m\+\_\+calibrations.\+c@{lms7002m\+\_\+calibrations.\+c}!Calibrate\+Rx@{Calibrate\+Rx}}
+\index{Calibrate\+Rx@{Calibrate\+Rx}!lms7002m\+\_\+calibrations.\+c@{lms7002m\+\_\+calibrations.\+c}}
+\paragraph[{Calibrate\+Rx(bool ext\+Loopback, bool dc\+Only)}]{\setlength{\rightskip}{0pt plus 5cm}uint8\+\_\+t Calibrate\+Rx (
+\begin{DoxyParamCaption}
+\item[{bool}]{ext\+Loopback, }
+\item[{bool}]{dc\+Only}
+\end{DoxyParamCaption}
+)}\label{lms7002m__calibrations_8c_a69b1e143409bc9a1c0b53f360bf608cf}
+
+
+Definition at line {\bf 1229} of file {\bf lms7002m\+\_\+calibrations.\+c}.
+
+
+
+References {\bf bandwidth\+RF}, {\bf Calibrate\+I\+Q\+Imbalance()}, {\bf Calibrate\+Rx\+D\+C\+Auto()}, {\bf Calibrate\+Rx\+Setup()}, {\bf calib\+User\+Bw\+Divider}, {\bf Check\+Saturation\+Rx()}, {\bf C\+M\+I\+X\+\_\+\+B\+Y\+P\+\_\+\+R\+X\+T\+SP}, {\bf C\+M\+I\+X\+\_\+\+S\+C\+\_\+\+R\+X\+T\+SP}, {\bf D\+C\+M\+O\+DE}, {\bf E\+N\+\_\+\+I\+N\+S\+H\+S\+W\+\_\+\+L\+B1\+\_\+\+R\+FE}, {\bf E\+N\+\_\+\+I\+N\+S\+H\+S\+W\+\_\+\+L\+B2\+\_\+\+R\+FE}, {\bf G\+\_\+\+L\+N\+A\+\_\+\+R\+FE}, {\bf G\+\_\+\+P\+G\+A\+\_\+\+R\+BB}, {\bf G\+\_\+\+T\+I\+A\+\_\+\+R\+FE}, {\bf G\+C\+O\+R\+R\+I\+\_\+\+R\+X\+T\+SP}, {\bf G\+C\+O\+R\+R\+Q\+\_\+\+R\+X\+T\+SP}, {\bf Get\+\_\+\+S\+P\+I\+\_\+\+Reg\+\_\+bits()}, {\bf Get\+Frequency\+S\+X()}, {\bf I\+Q\+C\+O\+R\+R\+\_\+\+R\+X\+T\+SP}, {\bf L\+M\+S7002\+M\+\_\+\+Rx}, {\bf M\+AC}, {\bf M\+C\+U\+\_\+\+N\+O\+\_\+\+E\+R\+R\+OR}, {\bf M\+C\+U\+\_\+\+P\+R\+O\+C\+E\+D\+U\+R\+E\+\_\+\+D\+I\+S\+A\+B\+L\+ED}, {\bf Modify\+\_\+\+S\+P\+I\+\_\+\+Reg\+\_\+bits()}, {\bf M\+S\+B\+\_\+\+L\+SB}, {\bf offset\+N\+CO}, {\bf P\+D\+\_\+\+D\+C\+D\+A\+C\+\_\+\+R\+XA}, {\bf P\+D\+\_\+\+D\+C\+D\+A\+C\+\_\+\+R\+XB}, {\bf P\+D\+\_\+\+L\+O\+C\+H\+\_\+\+T2\+R\+B\+UF}, {\bf P\+D\+\_\+\+R\+L\+O\+O\+P\+B\+\_\+1\+\_\+\+R\+FE}, {\bf P\+D\+\_\+\+R\+L\+O\+O\+P\+B\+\_\+2\+\_\+\+R\+FE}, {\bf P\+D\+\_\+\+V\+CO}, {\bf Read\+Analog\+D\+C()}, {\bf Save\+Chip\+State()}, {\bf S\+E\+L\+\_\+\+P\+A\+T\+H\+\_\+\+R\+FE}, {\bf Set\+N\+C\+O\+Frequency()}, {\bf S\+P\+I\+\_\+read()}, {\bf S\+P\+I\+\_\+write()}, {\bf status}, and {\bf Update\+R\+S\+S\+I\+Delay()}.
+
+
+
+Referenced by {\bf D\+C\+I\+Q()}, {\bf main()}, and {\bf Run\+A\+G\+C()}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{d3/dec/lms7002m__calibrations_8c_a69b1e143409bc9a1c0b53f360bf608cf_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=314pt]{d3/dec/lms7002m__calibrations_8c_a69b1e143409bc9a1c0b53f360bf608cf_icgraph}
+\end{center}
+\end{figure}
+
+
+\index{lms7002m\+\_\+calibrations.\+c@{lms7002m\+\_\+calibrations.\+c}!Calibrate\+Rx\+D\+C\+Auto@{Calibrate\+Rx\+D\+C\+Auto}}
+\index{Calibrate\+Rx\+D\+C\+Auto@{Calibrate\+Rx\+D\+C\+Auto}!lms7002m\+\_\+calibrations.\+c@{lms7002m\+\_\+calibrations.\+c}}
+\paragraph[{Calibrate\+Rx\+D\+C\+Auto()}]{\setlength{\rightskip}{0pt plus 5cm}{\bf void} Calibrate\+Rx\+D\+C\+Auto (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}\label{lms7002m__calibrations_8c_a7c0a6f483692ebbddb2c412f3908d58e}
+
+
+Definition at line {\bf 412} of file {\bf lms7002m\+\_\+calibrations.\+c}.
+
+
+
+References {\bf Adjust\+Auto\+D\+C()}, {\bf D\+C\+\_\+\+B\+Y\+P\+\_\+\+R\+X\+T\+SP}, {\bf D\+C\+M\+O\+DE}, {\bf E\+N\+\_\+\+G\+\_\+\+T\+RF}, {\bf G\+C\+O\+R\+R\+Q\+\_\+\+R\+X\+T\+SP}, {\bf Get\+\_\+\+S\+P\+I\+\_\+\+Reg\+\_\+bits()}, {\bf Get\+R\+S\+S\+I()}, {\bf M\+AC}, {\bf Modify\+\_\+\+S\+P\+I\+\_\+\+Reg\+\_\+bits()}, {\bf P\+D\+\_\+\+D\+C\+C\+M\+P\+\_\+\+R\+XA}, {\bf P\+D\+\_\+\+D\+C\+C\+M\+P\+\_\+\+R\+XB}, {\bf P\+D\+\_\+\+D\+C\+D\+A\+C\+\_\+\+R\+XA}, {\bf P\+D\+\_\+\+D\+C\+D\+A\+C\+\_\+\+R\+XB}, {\bf Read\+Analog\+D\+C()}, {\bf S\+P\+I\+\_\+read()}, and {\bf S\+P\+I\+\_\+write()}.
+
+
+
+Referenced by {\bf Calibrate\+Rx()}, and {\bf Calibrate\+Tx()}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{d3/dec/lms7002m__calibrations_8c_a7c0a6f483692ebbddb2c412f3908d58e_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{d3/dec/lms7002m__calibrations_8c_a7c0a6f483692ebbddb2c412f3908d58e_icgraph}
+\end{center}
+\end{figure}
+
+
+\index{lms7002m\+\_\+calibrations.\+c@{lms7002m\+\_\+calibrations.\+c}!Calibrate\+Rx\+Setup@{Calibrate\+Rx\+Setup}}
+\index{Calibrate\+Rx\+Setup@{Calibrate\+Rx\+Setup}!lms7002m\+\_\+calibrations.\+c@{lms7002m\+\_\+calibrations.\+c}}
+\paragraph[{Calibrate\+Rx\+Setup(bool ext\+Loopback)}]{\setlength{\rightskip}{0pt plus 5cm}uint8\+\_\+t Calibrate\+Rx\+Setup (
+\begin{DoxyParamCaption}
+\item[{bool}]{ext\+Loopback}
+\end{DoxyParamCaption}
+)}\label{lms7002m__calibrations_8c_a1d40cb80bcb3fc34aef71ce7f6dc74c2}
+
+
+Definition at line {\bf 940} of file {\bf lms7002m\+\_\+calibrations.\+c}.
+
+
+
+References {\bf bandwidth\+RF}, {\bf calib\+User\+Bw\+Divider}, {\bf Enable\+Channel\+Power\+Controls()}, {\bf Enable\+M\+I\+M\+O\+Buffers\+If\+Necessary()}, {\bf ext\+Loopback\+Pair}, {\bf Get\+\_\+\+S\+P\+I\+\_\+\+Reg\+\_\+bits()}, {\bf Get\+Frequency\+S\+X()}, {\bf Is\+P\+L\+L\+Tuned()}, {\bf L\+M\+S7002\+M\+\_\+\+Rx}, {\bf L\+M\+S7002\+M\+\_\+\+Tx}, {\bf Load\+D\+C\+\_\+\+R\+E\+G\+\_\+\+T\+X\+\_\+\+I\+Q()}, {\bf M\+AC}, {\bf M\+C\+U\+\_\+\+I\+N\+V\+A\+L\+I\+D\+\_\+\+R\+X\+\_\+\+P\+A\+TH}, {\bf M\+C\+U\+\_\+\+N\+O\+\_\+\+E\+R\+R\+OR}, {\bf M\+C\+U\+\_\+\+S\+X\+R\+\_\+\+T\+U\+N\+E\+\_\+\+F\+A\+I\+L\+ED}, {\bf Modify\+\_\+\+S\+P\+I\+\_\+\+Reg\+\_\+bits()}, {\bf M\+S\+B\+\_\+\+L\+SB}, {\bf offset\+N\+CO}, {\bf P\+D\+\_\+\+L\+O\+C\+H\+\_\+\+T2\+R\+B\+UF}, {\bf P\+D\+\_\+\+T\+X\+\_\+\+A\+F\+E1}, {\bf P\+D\+\_\+\+T\+X\+\_\+\+A\+F\+E2}, {\bf R\+OM}, {\bf S\+E\+L\+\_\+\+P\+A\+T\+H\+\_\+\+R\+FE}, {\bf Set\+Defaults\+S\+X()}, {\bf Set\+Frequency\+S\+X()}, {\bf Set\+N\+C\+O\+Frequency()}, {\bf Set\+Rx\+G\+F\+I\+R3\+Coefficients()}, {\bf Setup\+C\+G\+E\+N()}, {\bf S\+P\+I\+\_\+read()}, {\bf S\+P\+I\+\_\+write()}, {\bf status}, and {\bf Write\+Masked\+Regs()}.
+
+
+
+Referenced by {\bf Calibrate\+Rx()}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{d3/dec/lms7002m__calibrations_8c_a1d40cb80bcb3fc34aef71ce7f6dc74c2_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{d3/dec/lms7002m__calibrations_8c_a1d40cb80bcb3fc34aef71ce7f6dc74c2_icgraph}
+\end{center}
+\end{figure}
+
+
+\index{lms7002m\+\_\+calibrations.\+c@{lms7002m\+\_\+calibrations.\+c}!Calibrate\+Tx@{Calibrate\+Tx}}
+\index{Calibrate\+Tx@{Calibrate\+Tx}!lms7002m\+\_\+calibrations.\+c@{lms7002m\+\_\+calibrations.\+c}}
+\paragraph[{Calibrate\+Tx(bool ext\+Loopback)}]{\setlength{\rightskip}{0pt plus 5cm}uint8\+\_\+t Calibrate\+Tx (
+\begin{DoxyParamCaption}
+\item[{bool}]{ext\+Loopback}
+\end{DoxyParamCaption}
+)}\label{lms7002m__calibrations_8c_a208452a11189052c6dcd2fe639e4fcae}
+
+
+Definition at line {\bf 860} of file {\bf lms7002m\+\_\+calibrations.\+c}.
+
+
+
+References {\bf bandwidth\+RF}, {\bf Calibrate\+I\+Q\+Imbalance()}, {\bf Calibrate\+Rx\+D\+C\+Auto()}, {\bf Calibrate\+Tx\+D\+C\+Auto()}, {\bf Calibrate\+Tx\+Setup()}, {\bf calibration\+S\+X\+Offset\+\_\+\+Hz}, {\bf calib\+User\+Bw\+Divider}, {\bf C\+G\+\_\+\+I\+A\+M\+P\+\_\+\+T\+BB}, {\bf Check\+Saturation\+Tx\+Rx()}, {\bf D\+C\+\_\+\+B\+Y\+P\+\_\+\+T\+X\+T\+SP}, {\bf D\+C\+M\+O\+DE}, {\bf G\+C\+O\+R\+R\+I\+\_\+\+T\+X\+T\+SP}, {\bf G\+C\+O\+R\+R\+Q\+\_\+\+T\+X\+T\+SP}, {\bf Get\+\_\+\+S\+P\+I\+\_\+\+Reg\+\_\+bits()}, {\bf I\+Q\+C\+O\+R\+R\+\_\+\+T\+X\+T\+SP}, {\bf L\+M\+S7002\+M\+\_\+\+Rx}, {\bf L\+M\+S7002\+M\+\_\+\+Tx}, {\bf M\+C\+U\+\_\+\+N\+O\+\_\+\+E\+R\+R\+OR}, {\bf M\+C\+U\+\_\+\+P\+R\+O\+C\+E\+D\+U\+R\+E\+\_\+\+D\+I\+S\+A\+B\+L\+ED}, {\bf Modify\+\_\+\+S\+P\+I\+\_\+\+Reg\+\_\+bits()}, {\bf M\+S\+B\+\_\+\+L\+SB}, {\bf offset\+N\+CO}, {\bf P\+D\+\_\+\+D\+C\+D\+A\+C\+\_\+\+T\+XA}, {\bf P\+D\+\_\+\+D\+C\+D\+A\+C\+\_\+\+T\+XB}, {\bf Read\+Analog\+D\+C()}, {\bf Save\+Chip\+State()}, {\bf S\+E\+L\+\_\+\+B\+A\+N\+D1\+\_\+\+T\+RF}, {\bf Set\+N\+C\+O\+Frequency()}, {\bf S\+P\+I\+\_\+read()}, {\bf S\+P\+I\+\_\+write()}, {\bf status}, and {\bf Update\+R\+S\+S\+I\+Delay()}.
+
+
+
+Referenced by {\bf D\+C\+I\+Q()}, and {\bf main()}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{d3/dec/lms7002m__calibrations_8c_a208452a11189052c6dcd2fe639e4fcae_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=299pt]{d3/dec/lms7002m__calibrations_8c_a208452a11189052c6dcd2fe639e4fcae_icgraph}
+\end{center}
+\end{figure}
+
+
+\index{lms7002m\+\_\+calibrations.\+c@{lms7002m\+\_\+calibrations.\+c}!Calibrate\+Tx\+D\+C\+Auto@{Calibrate\+Tx\+D\+C\+Auto}}
+\index{Calibrate\+Tx\+D\+C\+Auto@{Calibrate\+Tx\+D\+C\+Auto}!lms7002m\+\_\+calibrations.\+c@{lms7002m\+\_\+calibrations.\+c}}
+\paragraph[{Calibrate\+Tx\+D\+C\+Auto()}]{\setlength{\rightskip}{0pt plus 5cm}{\bf void} Calibrate\+Tx\+D\+C\+Auto (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}\label{lms7002m__calibrations_8c_aa026f3df786068d9f328b676c496c5f2}
+
+
+Definition at line {\bf 469} of file {\bf lms7002m\+\_\+calibrations.\+c}.
+
+
+
+References {\bf L\+M\+S7\+Parameter\+::address}, {\bf clamp()}, {\bf C\+M\+I\+X\+\_\+\+B\+Y\+P\+\_\+\+R\+X\+T\+SP}, {\bf C\+M\+I\+X\+\_\+\+B\+Y\+P\+\_\+\+T\+X\+T\+SP}, {\bf D\+C\+\_\+\+B\+Y\+P\+\_\+\+T\+X\+T\+SP}, {\bf D\+C\+M\+O\+DE}, {\bf E\+N\+\_\+\+G\+\_\+\+T\+RF}, {\bf Get\+\_\+\+S\+P\+I\+\_\+\+Reg\+\_\+bits()}, {\bf Get\+R\+S\+S\+I()}, {\bf i}, {\bf M\+AC}, {\bf Bin\+Search\+Param\+::max\+Value}, {\bf Bin\+Search\+Param\+::min\+Value}, {\bf Modify\+\_\+\+S\+P\+I\+\_\+\+Reg\+\_\+bits()}, {\bf L\+M\+S7\+Parameter\+::msblsb}, {\bf Bin\+Search\+Param\+::param}, {\bf P\+D\+\_\+\+D\+C\+C\+M\+P\+\_\+\+T\+XA}, {\bf P\+D\+\_\+\+D\+C\+C\+M\+P\+\_\+\+T\+XB}, {\bf P\+D\+\_\+\+D\+C\+D\+A\+C\+\_\+\+T\+XA}, {\bf P\+D\+\_\+\+D\+C\+D\+A\+C\+\_\+\+T\+XB}, {\bf Read\+Analog\+D\+C()}, {\bf Bin\+Search\+Param\+::result}, {\bf R\+OM}, {\bf Tx\+Dc\+Binary\+Search()}, {\bf G\+N\+U\+Plot\+Pipe\+::write()}, {\bf Write\+Analog\+D\+C()}, and {\bf G\+N\+U\+Plot\+Pipe\+::writef()}.
+
+
+
+Referenced by {\bf Calibrate\+Tx()}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{d3/dec/lms7002m__calibrations_8c_aa026f3df786068d9f328b676c496c5f2_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{d3/dec/lms7002m__calibrations_8c_aa026f3df786068d9f328b676c496c5f2_icgraph}
+\end{center}
+\end{figure}
+
+
+\index{lms7002m\+\_\+calibrations.\+c@{lms7002m\+\_\+calibrations.\+c}!Calibrate\+Tx\+Setup@{Calibrate\+Tx\+Setup}}
+\index{Calibrate\+Tx\+Setup@{Calibrate\+Tx\+Setup}!lms7002m\+\_\+calibrations.\+c@{lms7002m\+\_\+calibrations.\+c}}
+\paragraph[{Calibrate\+Tx\+Setup(bool ext\+Loopback)}]{\setlength{\rightskip}{0pt plus 5cm}uint8\+\_\+t Calibrate\+Tx\+Setup (
+\begin{DoxyParamCaption}
+\item[{bool}]{ext\+Loopback}
+\end{DoxyParamCaption}
+)}\label{lms7002m__calibrations_8c_af4dde95732a49a1d5b097d8214ed53ec}
+
+
+Definition at line {\bf 687} of file {\bf lms7002m\+\_\+calibrations.\+c}.
+
+
+
+References {\bf bandwidth\+RF}, {\bf calibration\+S\+X\+Offset\+\_\+\+Hz}, {\bf calib\+User\+Bw\+Divider}, {\bf Enable\+Channel\+Power\+Controls()}, {\bf Enable\+M\+I\+M\+O\+Buffers\+If\+Necessary()}, {\bf ext\+Loopback\+Pair}, {\bf Get\+\_\+\+S\+P\+I\+\_\+\+Reg\+\_\+bits()}, {\bf Get\+Frequency\+S\+X()}, {\bf Is\+P\+L\+L\+Tuned()}, {\bf L\+M\+S7002\+M\+\_\+\+Rx}, {\bf L\+M\+S7002\+M\+\_\+\+Tx}, {\bf Load\+D\+C\+\_\+\+R\+E\+G\+\_\+\+T\+X\+\_\+\+I\+Q()}, {\bf M\+AC}, {\bf M\+C\+U\+\_\+\+I\+N\+V\+A\+L\+I\+D\+\_\+\+T\+X\+\_\+\+B\+A\+ND}, {\bf M\+C\+U\+\_\+\+N\+O\+\_\+\+E\+R\+R\+OR}, {\bf M\+C\+U\+\_\+\+S\+X\+T\+\_\+\+T\+U\+N\+E\+\_\+\+F\+A\+I\+L\+ED}, {\bf Modify\+\_\+\+S\+P\+I\+\_\+\+Reg\+\_\+bits()}, {\bf M\+S\+B\+\_\+\+L\+SB}, {\bf P\+D\+\_\+\+L\+N\+A\+\_\+\+R\+FE}, {\bf P\+D\+\_\+\+L\+O\+C\+H\+\_\+\+T2\+R\+B\+UF}, {\bf P\+D\+\_\+\+R\+X\+\_\+\+A\+F\+E1}, {\bf P\+D\+\_\+\+R\+X\+\_\+\+A\+F\+E2}, {\bf R\+OM}, {\bf S\+E\+L\+\_\+\+P\+A\+T\+H\+\_\+\+R\+FE}, {\bf Set\+Defaults\+S\+X()}, {\bf Set\+Frequency\+S\+X()}, {\bf Set\+N\+C\+O\+Frequency()}, {\bf Set\+Rx\+G\+F\+I\+R3\+Coefficients()}, {\bf Setup\+C\+G\+E\+N()}, {\bf S\+P\+I\+\_\+read()}, {\bf S\+P\+I\+\_\+write()}, {\bf status}, and {\bf Write\+Masked\+Regs()}.
+
+
+
+Referenced by {\bf Calibrate\+Tx()}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{d3/dec/lms7002m__calibrations_8c_af4dde95732a49a1d5b097d8214ed53ec_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{d3/dec/lms7002m__calibrations_8c_af4dde95732a49a1d5b097d8214ed53ec_icgraph}
+\end{center}
+\end{figure}
+
+
+\index{lms7002m\+\_\+calibrations.\+c@{lms7002m\+\_\+calibrations.\+c}!Check\+Saturation\+Rx@{Check\+Saturation\+Rx}}
+\index{Check\+Saturation\+Rx@{Check\+Saturation\+Rx}!lms7002m\+\_\+calibrations.\+c@{lms7002m\+\_\+calibrations.\+c}}
+\paragraph[{Check\+Saturation\+Rx(const float\+\_\+type bandwidth\+\_\+\+Hz, bool ext\+Loopback)}]{\setlength{\rightskip}{0pt plus 5cm}uint8\+\_\+t Check\+Saturation\+Rx (
+\begin{DoxyParamCaption}
+\item[{const {\bf float\+\_\+type}}]{bandwidth\+\_\+\+Hz, }
+\item[{bool}]{ext\+Loopback}
+\end{DoxyParamCaption}
+)}\label{lms7002m__calibrations_8c_a3c09e7c416b748a881c1be540feddf48}
+
+
+Definition at line {\bf 1118} of file {\bf lms7002m\+\_\+calibrations.\+c}.
+
+
+
+References {\bf calib\+User\+Bw\+Divider}, {\bf C\+G\+\_\+\+I\+A\+M\+P\+\_\+\+T\+BB}, {\bf C\+M\+I\+X\+\_\+\+B\+Y\+P\+\_\+\+R\+X\+T\+SP}, {\bf C\+M\+I\+X\+\_\+\+S\+C\+\_\+\+R\+X\+T\+SP}, {\bf G\+N\+U\+Plot\+Pipe\+::flush()}, {\bf G\+\_\+\+R\+X\+L\+O\+O\+P\+B\+\_\+\+R\+FE}, {\bf Get\+\_\+\+S\+P\+I\+\_\+\+Reg\+\_\+bits()}, {\bf Get\+R\+S\+S\+I()}, {\bf index}, {\bf L\+M\+S7002\+M\+\_\+\+Rx}, {\bf L\+O\+S\+S\+\_\+\+M\+A\+I\+N\+\_\+\+T\+X\+P\+A\+D\+\_\+\+T\+RF}, {\bf M\+C\+U\+\_\+\+L\+O\+O\+P\+B\+A\+C\+K\+\_\+\+S\+I\+G\+N\+A\+L\+\_\+\+W\+E\+AK}, {\bf M\+C\+U\+\_\+\+N\+O\+\_\+\+E\+R\+R\+OR}, {\bf Modify\+\_\+\+S\+P\+I\+\_\+\+Reg\+\_\+bits()}, {\bf offset\+N\+CO}, {\bf P\+U\+S\+H\+\_\+\+G\+M\+E\+A\+S\+U\+R\+E\+M\+E\+N\+T\+\_\+\+V\+A\+L\+U\+ES}, {\bf R\+OM}, {\bf Set\+N\+C\+O\+Frequency()}, {\bf G\+N\+U\+Plot\+Pipe\+::write()}, and {\bf G\+N\+U\+Plot\+Pipe\+::writef()}.
+
+
+
+Referenced by {\bf Calibrate\+Rx()}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{d3/dec/lms7002m__calibrations_8c_a3c09e7c416b748a881c1be540feddf48_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{d3/dec/lms7002m__calibrations_8c_a3c09e7c416b748a881c1be540feddf48_icgraph}
+\end{center}
+\end{figure}
+
+
+\index{lms7002m\+\_\+calibrations.\+c@{lms7002m\+\_\+calibrations.\+c}!Check\+Saturation\+Tx\+Rx@{Check\+Saturation\+Tx\+Rx}}
+\index{Check\+Saturation\+Tx\+Rx@{Check\+Saturation\+Tx\+Rx}!lms7002m\+\_\+calibrations.\+c@{lms7002m\+\_\+calibrations.\+c}}
+\paragraph[{Check\+Saturation\+Tx\+Rx(bool ext\+Loopback)}]{\setlength{\rightskip}{0pt plus 5cm}{\bf int} Check\+Saturation\+Tx\+Rx (
+\begin{DoxyParamCaption}
+\item[{bool}]{ext\+Loopback}
+\end{DoxyParamCaption}
+)}\label{lms7002m__calibrations_8c_a04cfd3ce56bed08c8c50078fdcd432f9}
+
+
+Definition at line {\bf 167} of file {\bf lms7002m\+\_\+calibrations.\+c}.
+
+
+
+References {\bf bandwidth\+RF}, {\bf calibration\+S\+X\+Offset\+\_\+\+Hz}, {\bf calib\+User\+Bw\+Divider}, {\bf C\+M\+I\+X\+\_\+\+B\+Y\+P\+\_\+\+R\+X\+T\+SP}, {\bf D\+C\+\_\+\+B\+Y\+P\+\_\+\+R\+X\+T\+SP}, {\bf G\+N\+U\+Plot\+Pipe\+::flush()}, {\bf G\+\_\+\+L\+N\+A\+\_\+\+R\+FE}, {\bf G\+\_\+\+P\+G\+A\+\_\+\+R\+BB}, {\bf G\+\_\+\+R\+X\+L\+O\+O\+P\+B\+\_\+\+R\+FE}, {\bf Get\+\_\+\+S\+P\+I\+\_\+\+Reg\+\_\+bits()}, {\bf Get\+R\+S\+S\+I()}, {\bf index}, {\bf L\+M\+S7002\+M\+\_\+\+Rx}, {\bf M\+C\+U\+\_\+\+L\+O\+O\+P\+B\+A\+C\+K\+\_\+\+S\+I\+G\+N\+A\+L\+\_\+\+W\+E\+AK}, {\bf M\+C\+U\+\_\+\+N\+O\+\_\+\+E\+R\+R\+OR}, {\bf Modify\+\_\+\+S\+P\+I\+\_\+\+Reg\+\_\+bits()}, {\bf offset\+N\+CO}, {\bf P\+U\+S\+H\+\_\+\+G\+M\+E\+A\+S\+U\+R\+E\+M\+E\+N\+T\+\_\+\+V\+A\+L\+U\+ES}, {\bf Set\+N\+C\+O\+Frequency()}, {\bf G\+N\+U\+Plot\+Pipe\+::write()}, and {\bf G\+N\+U\+Plot\+Pipe\+::writef()}.
+
+
+
+Referenced by {\bf Calibrate\+Tx()}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{d3/dec/lms7002m__calibrations_8c_a04cfd3ce56bed08c8c50078fdcd432f9_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{d3/dec/lms7002m__calibrations_8c_a04cfd3ce56bed08c8c50078fdcd432f9_icgraph}
+\end{center}
+\end{figure}
+
+
+\index{lms7002m\+\_\+calibrations.\+c@{lms7002m\+\_\+calibrations.\+c}!clamp@{clamp}}
+\index{clamp@{clamp}!lms7002m\+\_\+calibrations.\+c@{lms7002m\+\_\+calibrations.\+c}}
+\paragraph[{clamp(int16\+\_\+t value, int16\+\_\+t min\+Bound, int16\+\_\+t max\+Bound)}]{\setlength{\rightskip}{0pt plus 5cm}int16\+\_\+t clamp (
+\begin{DoxyParamCaption}
+\item[{int16\+\_\+t}]{value, }
+\item[{int16\+\_\+t}]{min\+Bound, }
+\item[{int16\+\_\+t}]{max\+Bound}
+\end{DoxyParamCaption}
+)}\label{lms7002m__calibrations_8c_a95a4619c54b4149b4fb43670c8467fd3}
+
+
+Definition at line {\bf 85} of file {\bf lms7002m\+\_\+calibrations.\+c}.
+
+
+
+Referenced by {\bf Adjust\+Auto\+D\+C()}, {\bf Calibrate\+Tx\+D\+C\+Auto()}, {\bf Config\+C\+G\+E\+N\+\_\+\+For\+L\+P\+F\+\_\+\+I\+F()}, {\bf Run\+A\+G\+C()}, {\bf Rx\+Filter\+Search()}, {\bf Search\+Tx\+Filter\+C\+C\+A\+L\+\_\+\+R\+C\+A\+L()}, {\bf Setup\+C\+G\+E\+N()}, {\bf Tune\+Rx\+Filter()}, {\bf Tune\+Rx\+Filter\+Setup()}, and {\bf Tune\+Tx\+Filter\+Setup()}.
+
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{d3/dec/lms7002m__calibrations_8c_a95a4619c54b4149b4fb43670c8467fd3_icgraph}
+\end{center}
+\end{figure}
+
+
+\index{lms7002m\+\_\+calibrations.\+c@{lms7002m\+\_\+calibrations.\+c}!Flip\+Rising\+Edge@{Flip\+Rising\+Edge}}
+\index{Flip\+Rising\+Edge@{Flip\+Rising\+Edge}!lms7002m\+\_\+calibrations.\+c@{lms7002m\+\_\+calibrations.\+c}}
+\paragraph[{Flip\+Rising\+Edge(const uint16\+\_\+t addr, const uint8\+\_\+t bits)}]{\setlength{\rightskip}{0pt plus 5cm}static {\bf void} Flip\+Rising\+Edge (
+\begin{DoxyParamCaption}
+\item[{const uint16\+\_\+t}]{addr, }
+\item[{const uint8\+\_\+t}]{bits}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [static]}}\label{lms7002m__calibrations_8c_af20d931e0e2448c2240c95f2b4c45a86}
+
+
+Definition at line {\bf 94} of file {\bf lms7002m\+\_\+calibrations.\+c}.
+
+
+
+References {\bf Modify\+\_\+\+S\+P\+I\+\_\+\+Reg\+\_\+bits()}.
+
+
+
+Referenced by {\bf Get\+R\+S\+S\+I()}, and {\bf Load\+D\+C\+\_\+\+R\+E\+G\+\_\+\+T\+X\+\_\+\+I\+Q()}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{d3/dec/lms7002m__calibrations_8c_af20d931e0e2448c2240c95f2b4c45a86_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{d3/dec/lms7002m__calibrations_8c_af20d931e0e2448c2240c95f2b4c45a86_icgraph}
+\end{center}
+\end{figure}
+
+
+\index{lms7002m\+\_\+calibrations.\+c@{lms7002m\+\_\+calibrations.\+c}!Get\+R\+S\+SI@{Get\+R\+S\+SI}}
+\index{Get\+R\+S\+SI@{Get\+R\+S\+SI}!lms7002m\+\_\+calibrations.\+c@{lms7002m\+\_\+calibrations.\+c}}
+\paragraph[{Get\+R\+S\+S\+I()}]{\setlength{\rightskip}{0pt plus 5cm}uint32\+\_\+t Get\+R\+S\+SI (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}\label{lms7002m__calibrations_8c_ac781de973d6717ea8f84ba5d3668a9ba}
+
+
+Definition at line {\bf 131} of file {\bf lms7002m\+\_\+calibrations.\+c}.
+
+
+
+References {\bf C\+A\+P\+T\+U\+RE}, {\bf Flip\+Rising\+Edge()}, {\bf Ref\+Clk}, {\bf R\+S\+S\+I\+Delay\+Counter}, {\bf S\+P\+I\+\_\+read()}, {\bf T\+F0}, {\bf T\+H0}, {\bf T\+L0}, and {\bf T\+R0}.
+
+
+
+Referenced by {\bf Adjust\+Auto\+D\+C()}, {\bf Binary\+Search()}, {\bf Calibrate\+I\+Q\+Imbalance()}, {\bf Calibrate\+Rx\+D\+C\+Auto()}, {\bf Calibrate\+Tx\+D\+C\+Auto()}, {\bf Change\+Until\+Reach\+R\+S\+S\+I()}, {\bf Check\+Saturation\+Rx()}, {\bf Check\+Saturation\+Tx\+Rx()}, {\bf Rx\+Filter\+Search()}, {\bf Search\+Tx\+Filter\+C\+C\+A\+L\+\_\+\+R\+C\+A\+L()}, {\bf Tune\+Rx\+Filter()}, and {\bf Tx\+Dc\+Binary\+Search()}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{d3/dec/lms7002m__calibrations_8c_ac781de973d6717ea8f84ba5d3668a9ba_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{d3/dec/lms7002m__calibrations_8c_ac781de973d6717ea8f84ba5d3668a9ba_icgraph}
+\end{center}
+\end{figure}
+
+
+\index{lms7002m\+\_\+calibrations.\+c@{lms7002m\+\_\+calibrations.\+c}!Is\+P\+L\+L\+Tuned@{Is\+P\+L\+L\+Tuned}}
+\index{Is\+P\+L\+L\+Tuned@{Is\+P\+L\+L\+Tuned}!lms7002m\+\_\+calibrations.\+c@{lms7002m\+\_\+calibrations.\+c}}
+\paragraph[{Is\+P\+L\+L\+Tuned()}]{\setlength{\rightskip}{0pt plus 5cm}static bool Is\+P\+L\+L\+Tuned (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [static]}}\label{lms7002m__calibrations_8c_a0bf61e6c75e7b27588ed2da1696fcc44}
+
+
+Definition at line {\bf 100} of file {\bf lms7002m\+\_\+calibrations.\+c}.
+
+
+
+References {\bf Get\+\_\+\+S\+P\+I\+\_\+\+Reg\+\_\+bits()}, {\bf M\+C\+U\+\_\+\+N\+O\+\_\+\+E\+R\+R\+OR}, {\bf M\+S\+B\+\_\+\+L\+SB}, and {\bf Tune\+V\+C\+O()}.
+
+
+
+Referenced by {\bf Calibrate\+Rx\+Setup()}, and {\bf Calibrate\+Tx\+Setup()}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{d3/dec/lms7002m__calibrations_8c_a0bf61e6c75e7b27588ed2da1696fcc44_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{d3/dec/lms7002m__calibrations_8c_a0bf61e6c75e7b27588ed2da1696fcc44_icgraph}
+\end{center}
+\end{figure}
+
+
+\index{lms7002m\+\_\+calibrations.\+c@{lms7002m\+\_\+calibrations.\+c}!Load\+D\+C\+\_\+\+R\+E\+G\+\_\+\+T\+X\+\_\+\+IQ@{Load\+D\+C\+\_\+\+R\+E\+G\+\_\+\+T\+X\+\_\+\+IQ}}
+\index{Load\+D\+C\+\_\+\+R\+E\+G\+\_\+\+T\+X\+\_\+\+IQ@{Load\+D\+C\+\_\+\+R\+E\+G\+\_\+\+T\+X\+\_\+\+IQ}!lms7002m\+\_\+calibrations.\+c@{lms7002m\+\_\+calibrations.\+c}}
+\paragraph[{Load\+D\+C\+\_\+\+R\+E\+G\+\_\+\+T\+X\+\_\+\+I\+Q()}]{\setlength{\rightskip}{0pt plus 5cm}{\bf void} Load\+D\+C\+\_\+\+R\+E\+G\+\_\+\+T\+X\+\_\+\+IQ (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}\label{lms7002m__calibrations_8c_a9c51685034dd7ae8c5406902e8e95ba7}
+
+
+Definition at line {\bf 107} of file {\bf lms7002m\+\_\+calibrations.\+c}.
+
+
+
+References {\bf Flip\+Rising\+Edge()}, {\bf Ref\+Clk}, {\bf S\+P\+I\+\_\+write()}, {\bf T\+S\+G\+D\+C\+L\+D\+I\+\_\+\+T\+X\+T\+SP}, and {\bf T\+S\+G\+D\+C\+L\+D\+Q\+\_\+\+T\+X\+T\+SP}.
+
+
+
+Referenced by {\bf Calibrate\+Rx\+Setup()}, {\bf Calibrate\+Tx\+Setup()}, {\bf Tune\+Rx\+Filter\+Setup()}, and {\bf Tune\+Tx\+Filter\+Setup()}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{d3/dec/lms7002m__calibrations_8c_a9c51685034dd7ae8c5406902e8e95ba7_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{d3/dec/lms7002m__calibrations_8c_a9c51685034dd7ae8c5406902e8e95ba7_icgraph}
+\end{center}
+\end{figure}
+
+
+\index{lms7002m\+\_\+calibrations.\+c@{lms7002m\+\_\+calibrations.\+c}!Read\+Analog\+DC@{Read\+Analog\+DC}}
+\index{Read\+Analog\+DC@{Read\+Analog\+DC}!lms7002m\+\_\+calibrations.\+c@{lms7002m\+\_\+calibrations.\+c}}
+\paragraph[{Read\+Analog\+D\+C(const uint16\+\_\+t addr)}]{\setlength{\rightskip}{0pt plus 5cm}int16\+\_\+t Read\+Analog\+DC (
+\begin{DoxyParamCaption}
+\item[{const uint16\+\_\+t}]{addr}
+\end{DoxyParamCaption}
+)}\label{lms7002m__calibrations_8c_af4c134b643295eb27405135fa95fed0e}
+
+
+Definition at line {\bf 314} of file {\bf lms7002m\+\_\+calibrations.\+c}.
+
+
+
+References {\bf S\+P\+I\+\_\+read()}, and {\bf S\+P\+I\+\_\+write()}.
+
+
+
+Referenced by {\bf Adjust\+Auto\+D\+C()}, {\bf Calibrate\+Rx()}, {\bf Calibrate\+Rx\+D\+C\+Auto()}, {\bf Calibrate\+Tx()}, and {\bf Calibrate\+Tx\+D\+C\+Auto()}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=260pt]{d3/dec/lms7002m__calibrations_8c_af4c134b643295eb27405135fa95fed0e_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{d3/dec/lms7002m__calibrations_8c_af4c134b643295eb27405135fa95fed0e_icgraph}
+\end{center}
+\end{figure}
+
+
+\index{lms7002m\+\_\+calibrations.\+c@{lms7002m\+\_\+calibrations.\+c}!Set\+Rx\+G\+F\+I\+R3\+Coefficients@{Set\+Rx\+G\+F\+I\+R3\+Coefficients}}
+\index{Set\+Rx\+G\+F\+I\+R3\+Coefficients@{Set\+Rx\+G\+F\+I\+R3\+Coefficients}!lms7002m\+\_\+calibrations.\+c@{lms7002m\+\_\+calibrations.\+c}}
+\paragraph[{Set\+Rx\+G\+F\+I\+R3\+Coefficients()}]{\setlength{\rightskip}{0pt plus 5cm}static {\bf void} Set\+Rx\+G\+F\+I\+R3\+Coefficients (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [static]}}\label{lms7002m__calibrations_8c_aad629027d35cff4c7c633225f5887b40}
+
+
+Definition at line {\bf 150} of file {\bf lms7002m\+\_\+calibrations.\+c}.
+
+
+
+References {\bf index}, {\bf R\+OM}, and {\bf S\+P\+I\+\_\+write()}.
+
+
+
+Referenced by {\bf Calibrate\+Rx\+Setup()}, and {\bf Calibrate\+Tx\+Setup()}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=301pt]{d3/dec/lms7002m__calibrations_8c_aad629027d35cff4c7c633225f5887b40_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{d3/dec/lms7002m__calibrations_8c_aad629027d35cff4c7c633225f5887b40_icgraph}
+\end{center}
+\end{figure}
+
+
+\index{lms7002m\+\_\+calibrations.\+c@{lms7002m\+\_\+calibrations.\+c}!Setup\+C\+G\+EN@{Setup\+C\+G\+EN}}
+\index{Setup\+C\+G\+EN@{Setup\+C\+G\+EN}!lms7002m\+\_\+calibrations.\+c@{lms7002m\+\_\+calibrations.\+c}}
+\paragraph[{Setup\+C\+G\+E\+N()}]{\setlength{\rightskip}{0pt plus 5cm}uint8\+\_\+t Setup\+C\+G\+EN (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}\label{lms7002m__calibrations_8c_a42909940a5d69231e9e987ca534e20c8}
+
+
+Definition at line {\bf 665} of file {\bf lms7002m\+\_\+calibrations.\+c}.
+
+
+
+References {\bf clamp()}, {\bf C\+L\+K\+H\+\_\+\+O\+V\+\_\+\+C\+L\+K\+L\+\_\+\+C\+G\+EN}, {\bf E\+N\+\_\+\+A\+D\+C\+C\+L\+K\+H\+\_\+\+C\+L\+K\+GN}, {\bf Get\+\_\+\+S\+P\+I\+\_\+\+Reg\+\_\+bits()}, {\bf Get\+Frequency\+C\+G\+E\+N()}, {\bf G\+F\+I\+R3\+\_\+\+N\+\_\+\+R\+X\+T\+SP}, {\bf Modify\+\_\+\+S\+P\+I\+\_\+\+Reg\+\_\+bits()}, {\bf pow2()}, and {\bf Set\+Frequency\+C\+G\+E\+N()}.
+
+
+
+Referenced by {\bf Calibrate\+Rx\+Setup()}, and {\bf Calibrate\+Tx\+Setup()}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{d3/dec/lms7002m__calibrations_8c_a42909940a5d69231e9e987ca534e20c8_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{d3/dec/lms7002m__calibrations_8c_a42909940a5d69231e9e987ca534e20c8_icgraph}
+\end{center}
+\end{figure}
+
+
+\index{lms7002m\+\_\+calibrations.\+c@{lms7002m\+\_\+calibrations.\+c}!Tx\+Dc\+Binary\+Search@{Tx\+Dc\+Binary\+Search}}
+\index{Tx\+Dc\+Binary\+Search@{Tx\+Dc\+Binary\+Search}!lms7002m\+\_\+calibrations.\+c@{lms7002m\+\_\+calibrations.\+c}}
+\paragraph[{Tx\+Dc\+Binary\+Search(\+Bin\+Search\+Param $\ast$args)}]{\setlength{\rightskip}{0pt plus 5cm}static {\bf void} Tx\+Dc\+Binary\+Search (
+\begin{DoxyParamCaption}
+\item[{{\bf Bin\+Search\+Param} $\ast$}]{args}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [static]}}\label{lms7002m__calibrations_8c_a605cb22053de5d2af17095829d0ff146}
+
+
+Definition at line {\bf 344} of file {\bf lms7002m\+\_\+calibrations.\+c}.
+
+
+
+References {\bf L\+M\+S7\+Parameter\+::address}, {\bf Get\+R\+S\+S\+I()}, {\bf Bin\+Search\+Param\+::max\+Value}, {\bf Bin\+Search\+Param\+::min\+Value}, {\bf Bin\+Search\+Param\+::param}, {\bf P\+U\+S\+H\+\_\+\+G\+M\+E\+A\+S\+U\+R\+E\+M\+E\+N\+T\+\_\+\+V\+A\+L\+U\+ES}, {\bf Bin\+Search\+Param\+::result}, and {\bf Write\+Analog\+D\+C()}.
+
+
+
+Referenced by {\bf Calibrate\+Tx\+D\+C\+Auto()}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{d3/dec/lms7002m__calibrations_8c_a605cb22053de5d2af17095829d0ff146_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{d3/dec/lms7002m__calibrations_8c_a605cb22053de5d2af17095829d0ff146_icgraph}
+\end{center}
+\end{figure}
+
+
+\index{lms7002m\+\_\+calibrations.\+c@{lms7002m\+\_\+calibrations.\+c}!Update\+R\+S\+S\+I\+Delay@{Update\+R\+S\+S\+I\+Delay}}
+\index{Update\+R\+S\+S\+I\+Delay@{Update\+R\+S\+S\+I\+Delay}!lms7002m\+\_\+calibrations.\+c@{lms7002m\+\_\+calibrations.\+c}}
+\paragraph[{Update\+R\+S\+S\+I\+Delay()}]{\setlength{\rightskip}{0pt plus 5cm}{\bf void} Update\+R\+S\+S\+I\+Delay (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}\label{lms7002m__calibrations_8c_a5678945bfe4581a28f364f9f95de6642}
+
+
+Definition at line {\bf 117} of file {\bf lms7002m\+\_\+calibrations.\+c}.
+
+
+
+References {\bf A\+G\+C\+\_\+\+A\+V\+G\+\_\+\+R\+X\+T\+SP}, {\bf Get\+\_\+\+S\+P\+I\+\_\+\+Reg\+\_\+bits()}, {\bf Get\+Reference\+Clk\+\_\+\+T\+S\+P\+\_\+\+M\+Hz()}, {\bf H\+B\+D\+\_\+\+O\+V\+R\+\_\+\+R\+X\+T\+SP}, {\bf Ref\+Clk}, and {\bf R\+S\+S\+I\+Delay\+Counter}.
+
+
+
+Referenced by {\bf Calibrate\+Rx()}, {\bf Calibrate\+Tx()}, {\bf Run\+A\+G\+C()}, {\bf Tune\+Rx\+Filter()}, and {\bf Tune\+Tx\+Filter()}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{d3/dec/lms7002m__calibrations_8c_a5678945bfe4581a28f364f9f95de6642_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{d3/dec/lms7002m__calibrations_8c_a5678945bfe4581a28f364f9f95de6642_icgraph}
+\end{center}
+\end{figure}
+
+
+\index{lms7002m\+\_\+calibrations.\+c@{lms7002m\+\_\+calibrations.\+c}!Write\+Analog\+DC@{Write\+Analog\+DC}}
+\index{Write\+Analog\+DC@{Write\+Analog\+DC}!lms7002m\+\_\+calibrations.\+c@{lms7002m\+\_\+calibrations.\+c}}
+\paragraph[{Write\+Analog\+D\+C(const uint16\+\_\+t addr, int16\+\_\+t value)}]{\setlength{\rightskip}{0pt plus 5cm}static {\bf void} Write\+Analog\+DC (
+\begin{DoxyParamCaption}
+\item[{const uint16\+\_\+t}]{addr, }
+\item[{int16\+\_\+t}]{value}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [static]}}\label{lms7002m__calibrations_8c_a7c0cbbebceb2e3721786e9d65a5d76e9}
+
+
+Definition at line {\bf 329} of file {\bf lms7002m\+\_\+calibrations.\+c}.
+
+
+
+References {\bf S\+P\+I\+\_\+write()}.
+
+
+
+Referenced by {\bf Adjust\+Auto\+D\+C()}, {\bf Calibrate\+Tx\+D\+C\+Auto()}, and {\bf Tx\+Dc\+Binary\+Search()}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=260pt]{d3/dec/lms7002m__calibrations_8c_a7c0cbbebceb2e3721786e9d65a5d76e9_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{d3/dec/lms7002m__calibrations_8c_a7c0cbbebceb2e3721786e9d65a5d76e9_icgraph}
+\end{center}
+\end{figure}
+
+
+
+
+\subsubsection{Variable Documentation}
+\index{lms7002m\+\_\+calibrations.\+c@{lms7002m\+\_\+calibrations.\+c}!bandwidth\+RF@{bandwidth\+RF}}
+\index{bandwidth\+RF@{bandwidth\+RF}!lms7002m\+\_\+calibrations.\+c@{lms7002m\+\_\+calibrations.\+c}}
+\paragraph[{bandwidth\+RF}]{\setlength{\rightskip}{0pt plus 5cm}float bandwidth\+RF = 5e6}\label{lms7002m__calibrations_8c_a2ebcd4609895042a2ee1e80a6644de70}
+
+
+Definition at line {\bf 74} of file {\bf lms7002m\+\_\+calibrations.\+c}.
+
+
+
+Referenced by {\bf Calibrate\+Rx()}, {\bf Calibrate\+Rx\+Setup()}, {\bf Calibrate\+Tx()}, {\bf Calibrate\+Tx\+Setup()}, {\bf Check\+Saturation\+Tx\+Rx()}, {\bf main()}, and {\bf Update\+Freq()}.
+
+\index{lms7002m\+\_\+calibrations.\+c@{lms7002m\+\_\+calibrations.\+c}!ext\+Loopback\+Pair@{ext\+Loopback\+Pair}}
+\index{ext\+Loopback\+Pair@{ext\+Loopback\+Pair}!lms7002m\+\_\+calibrations.\+c@{lms7002m\+\_\+calibrations.\+c}}
+\paragraph[{ext\+Loopback\+Pair}]{\setlength{\rightskip}{0pt plus 5cm}uint8\+\_\+t ext\+Loopback\+Pair = 0}\label{lms7002m__calibrations_8c_ac7d7f1c9dac1f8b84d0997fdc4cbc5a4}
+
+
+Definition at line {\bf 83} of file {\bf lms7002m\+\_\+calibrations.\+c}.
+
+
+
+Referenced by {\bf Calibrate\+Rx\+Setup()}, {\bf Calibrate\+Tx\+Setup()}, {\bf D\+C\+I\+Q()}, and {\bf main()}.
+
+\index{lms7002m\+\_\+calibrations.\+c@{lms7002m\+\_\+calibrations.\+c}!Ref\+Clk@{Ref\+Clk}}
+\index{Ref\+Clk@{Ref\+Clk}!lms7002m\+\_\+calibrations.\+c@{lms7002m\+\_\+calibrations.\+c}}
+\paragraph[{Ref\+Clk}]{\setlength{\rightskip}{0pt plus 5cm}{\bf float\+\_\+type} Ref\+Clk}\label{lms7002m__calibrations_8c_ade9c63dab5fa56fdab2394edec268508}
+
+
+Definition at line {\bf 22} of file {\bf lms7002m\+\_\+controls.\+c}.
+
+
+
+Referenced by {\bf Get\+R\+S\+S\+I()}, {\bf Load\+D\+C\+\_\+\+R\+E\+G\+\_\+\+T\+X\+\_\+\+I\+Q()}, and {\bf Update\+R\+S\+S\+I\+Delay()}.
+
+\index{lms7002m\+\_\+calibrations.\+c@{lms7002m\+\_\+calibrations.\+c}!R\+S\+S\+I\+Delay\+Counter@{R\+S\+S\+I\+Delay\+Counter}}
+\index{R\+S\+S\+I\+Delay\+Counter@{R\+S\+S\+I\+Delay\+Counter}!lms7002m\+\_\+calibrations.\+c@{lms7002m\+\_\+calibrations.\+c}}
+\paragraph[{R\+S\+S\+I\+Delay\+Counter}]{\setlength{\rightskip}{0pt plus 5cm}uint16\+\_\+t R\+S\+S\+I\+Delay\+Counter = 1}\label{lms7002m__calibrations_8c_a21b2e06a2670ac86af8ecf2322ceabcc}
+
+
+Definition at line {\bf 75} of file {\bf lms7002m\+\_\+calibrations.\+c}.
+
+
+
+Referenced by {\bf Get\+R\+S\+S\+I()}, and {\bf Update\+R\+S\+S\+I\+Delay()}.
+

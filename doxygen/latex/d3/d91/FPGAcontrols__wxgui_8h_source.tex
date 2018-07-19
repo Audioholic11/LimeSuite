@@ -1,0 +1,80 @@
+\subsection{F\+P\+G\+Acontrols\+\_\+wxgui.\+h}
+\label{FPGAcontrols__wxgui_8h_source}\index{/home/erik/prefix/default/src/limesuite-\/dev/src/\+F\+P\+G\+Acontrols\+\_\+wxgui/\+F\+P\+G\+Acontrols\+\_\+wxgui.\+h@{/home/erik/prefix/default/src/limesuite-\/dev/src/\+F\+P\+G\+Acontrols\+\_\+wxgui/\+F\+P\+G\+Acontrols\+\_\+wxgui.\+h}}
+
+\begin{DoxyCode}
+00001 
+00005 \textcolor{preprocessor}{#ifndef FPGA\_CONTROLS\_WXGUI\_H}
+00006 \textcolor{preprocessor}{#define FPGA\_CONTROLS\_WXGUI\_H}
+00007 
+00008 \textcolor{preprocessor}{#include <wx/frame.h>}
+00009 \textcolor{preprocessor}{#include <wx/timer.h>}
+00010 \textcolor{preprocessor}{#include <wx/wx.h>}
+00011 \textcolor{keyword}{class }wxGauge;
+00012 \textcolor{keyword}{class }wxStaticText;
+00013 \textcolor{keyword}{class }wxBitmapButton;
+00014 \textcolor{keyword}{class }wxFlexGridSizer;
+00015 \textcolor{keyword}{class }wxButton;
+00016 \textcolor{keyword}{class }wxStaticBoxSizer;
+00017 \textcolor{keyword}{class }wxToggleButton;
+00018 \textcolor{keyword}{class }wxCheckBox;
+00019 
+00020 \textcolor{preprocessor}{#include "lime/LimeSuite.h"}
+00021 \textcolor{preprocessor}{#include <vector>}
+00022 \textcolor{preprocessor}{#include <map>}
+00023 
+00024 
+00025 \textcolor{keyword}{class }FPGAcontrols_wxgui: \textcolor{keyword}{public} wxFrame
+00026 \{
+00027     \textcolor{keyword}{public}:
+00028         FPGAcontrols_wxgui(wxWindow* parent,wxWindowID \textcolor{keywordtype}{id}=wxID\_ANY, \textcolor{keyword}{const} wxString &title = wxEmptyString, \textcolor{keyword}{
+      const} wxPoint& pos=wxDefaultPosition,\textcolor{keyword}{const} wxSize& size=wxDefaultSize, \textcolor{keywordtype}{long} styles = 0);
+00029         \textcolor{keyword}{virtual} \textcolor{keywordtype}{void} Initialize(lms_device_t* dataPort);
+00030         \textcolor{keyword}{virtual} ~FPGAcontrols_wxgui();
+00031 
+00032         \textcolor{keywordtype}{int} UploadFile(\textcolor{keyword}{const} wxString &filename);
+00033         \textcolor{keywordtype}{int} UploadFile(std::vector<int16\_t> isamples, std::vector<int16\_t> qsamples);
+00034         wxButton* btnPlayWFM;
+00035         wxButton* btnStopWFM;
+00036         wxStaticText* lblProgressPercent;
+00037         wxGauge* progressBar;
+00038         wxBitmapButton* btnOpenWFM;
+00039         wxToggleButton* btnLoadOnetone;
+00040         wxStaticText* txtFilename;
+00041         wxToggleButton* btnLoadCustom;
+00042         wxToggleButton* btnLoadWCDMA;
+00043         wxStaticText* txtDataRate;
+00044         wxCheckBox* chkDigitalLoopbackEnable;
+00045         wxCheckBox* chkMIMO;
+00046 
+00047     \textcolor{keyword}{protected}:
+00048         \textcolor{keyword}{static} \textcolor{keyword}{const} \textcolor{keywordtype}{long} ID_BUTTON6;
+00049         \textcolor{keyword}{static} \textcolor{keyword}{const} \textcolor{keywordtype}{long} ID_BUTTON7;
+00050         \textcolor{keyword}{static} \textcolor{keyword}{const} \textcolor{keywordtype}{long} ID_BUTTON8;
+00051         \textcolor{keyword}{static} \textcolor{keyword}{const} \textcolor{keywordtype}{long} ID_BITMAPBUTTON1;
+00052         \textcolor{keyword}{static} \textcolor{keyword}{const} \textcolor{keywordtype}{long} ID_STATICTEXT2;
+00053         \textcolor{keyword}{static} \textcolor{keyword}{const} \textcolor{keywordtype}{long} ID_STATICTEXT5;
+00054         \textcolor{keyword}{static} \textcolor{keyword}{const} \textcolor{keywordtype}{long} ID_GAUGE1;
+00055         \textcolor{keyword}{static} \textcolor{keyword}{const} \textcolor{keywordtype}{long} ID_BUTTON3;
+00056         \textcolor{keyword}{static} \textcolor{keyword}{const} \textcolor{keywordtype}{long} ID_BUTTON4;
+00057         \textcolor{keyword}{static} \textcolor{keyword}{const} \textcolor{keywordtype}{long} ID_STREAMING_TIMER;
+00058 
+00059     \textcolor{keyword}{private}:
+00060         wxChoice* cmbDevice;
+00061         \textcolor{keywordtype}{void} OnbtnUploadClick(wxCommandEvent& event);
+00062         \textcolor{keywordtype}{void} OnbtnOpenFileClick(wxCommandEvent& event);
+00063         \textcolor{keywordtype}{void} OnbtnMifClick(wxCommandEvent& event);
+00064         \textcolor{keywordtype}{void} OnbtnHexClick(wxCommandEvent& event);
+00065         \textcolor{keywordtype}{void} OnbtnPlayWFMClick(wxCommandEvent& event);
+00066         \textcolor{keywordtype}{void} OnbtnStopWFMClick(wxCommandEvent& event);
+00067         \textcolor{keywordtype}{void} OnbtnLoadOnetoneClick(wxCommandEvent& event);
+00068         \textcolor{keywordtype}{void} OnbtnLoadWCDMAClick(wxCommandEvent& event);
+00069         \textcolor{keywordtype}{void} OnbtnLoadCustomClick(wxCommandEvent& event);
+00070         \textcolor{keywordtype}{void} OnChkDigitalLoopbackEnableClick(wxCommandEvent& event);
+00071     \textcolor{keyword}{protected}:
+00072         lms_device_t* lmsControl;
+00073         wxTimer* mStreamingTimer;
+00074         DECLARE\_EVENT\_TABLE()
+00075 \};
+00076 
+00077 \textcolor{preprocessor}{#endif}
+\end{DoxyCode}

@@ -1,0 +1,277 @@
+\subsection{L\+M\+S\+\_\+\+Programing\+\_\+wxgui.\+cpp}
+\label{LMS__Programing__wxgui_8cpp_source}\index{/home/erik/prefix/default/src/limesuite-\/dev/src/\+L\+M\+S\+\_\+\+Programing/\+L\+M\+S\+\_\+\+Programing\+\_\+wxgui.\+cpp@{/home/erik/prefix/default/src/limesuite-\/dev/src/\+L\+M\+S\+\_\+\+Programing/\+L\+M\+S\+\_\+\+Programing\+\_\+wxgui.\+cpp}}
+
+\begin{DoxyCode}
+00001 
+00006 \textcolor{preprocessor}{#include "LMS_Programing_wxgui.h"}
+00007 
+00008 \textcolor{preprocessor}{#include <wx/sizer.h>}
+00009 \textcolor{preprocessor}{#include <wx/stattext.h>}
+00010 \textcolor{preprocessor}{#include <wx/choice.h>}
+00011 \textcolor{preprocessor}{#include <wx/button.h>}
+00012 \textcolor{preprocessor}{#include <wx/string.h>}
+00013 \textcolor{preprocessor}{#include <wx/gauge.h>}
+00014 
+00015 \textcolor{preprocessor}{#include <wx/filedlg.h>}
+00016 \textcolor{preprocessor}{#include <wx/msgdlg.h>}
+00017 \textcolor{preprocessor}{#include <wx/wfstream.h>}
+00018 
+00019 \textcolor{preprocessor}{#include "LMSBoards.h"}
+00020 
+00021 \textcolor{keyword}{const} \textcolor{keywordtype}{long} LMS_Programing_wxgui::ID_PROGRAMING_FINISHED_EVENT = wxNewId();
+00022 \textcolor{keyword}{const} \textcolor{keywordtype}{long} LMS_Programing_wxgui::ID_PROGRAMING_STATUS_EVENT = wxNewId();
+00023 \textcolor{keyword}{const} \textcolor{keywordtype}{long} LMS_Programing_wxgui::ID_BUTTON1 = wxNewId();
+00024 \textcolor{keyword}{const} \textcolor{keywordtype}{long} LMS_Programing_wxgui::ID_BUTTON2 = wxNewId();
+00025 \textcolor{keyword}{const} \textcolor{keywordtype}{long} LMS_Programing_wxgui::ID_GAUGE1 = wxNewId();
+00026 \textcolor{keyword}{const} \textcolor{keywordtype}{long} LMS_Programing_wxgui::ID_CHOICE2 = wxNewId();
+00027 \textcolor{keyword}{const} \textcolor{keywordtype}{long} LMS_Programing_wxgui::ID_CHOICE1 = wxNewId();
+00028 
+00029 BEGIN\_EVENT\_TABLE(LMS_Programing_wxgui, wxFrame)
+00030 END\_EVENT\_TABLE()
+00031 
+00032 LMS_Programing_wxgui::LMS_Programing_wxgui(wxWindow* parent, wxWindowID \textcolor{keywordtype}{id}, const wxString& title, const 
+      wxPoint& pos, const wxSize& size, \textcolor{keywordtype}{int} styles, wxString idname)
+00033 \{
+00034     mProgrammingInProgress.store(\textcolor{keyword}{false});
+00035     mAbortProgramming.store(\textcolor{keyword}{false});
+00036     wxFlexGridSizer* FlexGridSizer3;
+00037     wxFlexGridSizer* FlexGridSizer2;
+00038     wxFlexGridSizer* FlexGridSizer7;
+00039     wxFlexGridSizer* FlexGridSizer8;
+00040     wxFlexGridSizer* FlexGridSizer6;
+00041     wxFlexGridSizer* FlexGridSizer1;
+00042 
+00043     wxFrame::Create(parent, \textcolor{keywordtype}{id}, title, wxDefaultPosition, wxDefaultSize, styles, \_T(\textcolor{stringliteral}{"id"}));
+00044     SetBackgroundColour(wxSystemSettings::GetColour(wxSYS\_COLOUR\_BTNFACE));
+00045     FlexGridSizer1 = \textcolor{keyword}{new} wxFlexGridSizer(0, 1, 5, 0);
+00046     FlexGridSizer2 = \textcolor{keyword}{new} wxFlexGridSizer(0, 2, 5, 5);
+00047     btnOpen = \textcolor{keyword}{new} wxButton(\textcolor{keyword}{this}, ID\_BUTTON1, \_T(\textcolor{stringliteral}{"Open"}), wxDefaultPosition, wxDefaultSize, 0, 
+      wxDefaultValidator, \_T(\textcolor{stringliteral}{"ID\_BUTTON1"}));
+00048     FlexGridSizer2->Add(btnOpen, 1, wxEXPAND | wxALIGN\_LEFT | wxALIGN\_TOP, 5);
+00049     FlexGridSizer6 = \textcolor{keyword}{new} wxFlexGridSizer(0, 2, 0, 0);
+00050     StaticText1 = \textcolor{keyword}{new} wxStaticText(\textcolor{keyword}{this}, wxID\_ANY, \_T(\textcolor{stringliteral}{"File:"}), wxDefaultPosition, wxDefaultSize, 0, \_T(\textcolor{stringliteral}{"
+      ID\_STATICTEXT1"}));
+00051     FlexGridSizer6->Add(StaticText1, 1, wxALIGN\_LEFT | wxALIGN\_CENTER\_VERTICAL, 5);
+00052     lblFilename = \textcolor{keyword}{new} wxStaticText(\textcolor{keyword}{this}, wxID\_ANY, \_T(\textcolor{stringliteral}{"\(\backslash\)?"}), wxDefaultPosition, wxSize(400, -1), 
+      wxST\_ELLIPSIZE\_START, \_T(\textcolor{stringliteral}{"ID\_STATICTEXT2"}));
+00053     FlexGridSizer6->Add(lblFilename, 1, wxALL | wxEXPAND | wxALIGN\_LEFT | wxALIGN\_CENTER\_VERTICAL, 5);
+00054     FlexGridSizer2->Add(FlexGridSizer6, 1, wxEXPAND | wxALIGN\_LEFT | wxALIGN\_TOP, 5);
+00055     btnStartStop = \textcolor{keyword}{new} wxButton(\textcolor{keyword}{this}, ID\_BUTTON2, \_T(\textcolor{stringliteral}{"Program"}), wxDefaultPosition, wxDefaultSize, 0, 
+      wxDefaultValidator, \_T(\textcolor{stringliteral}{"ID\_BUTTON2"}));
+00056     FlexGridSizer2->Add(btnStartStop, 1, wxEXPAND | wxALIGN\_LEFT | wxALIGN\_CENTER\_VERTICAL, 5);
+00057     FlexGridSizer8 = \textcolor{keyword}{new} wxFlexGridSizer(0, 1, 0, 0);
+00058     FlexGridSizer8->AddGrowableCol(0);
+00059     lblProgressPercent = \textcolor{keyword}{new} wxStaticText(\textcolor{keyword}{this}, wxID\_ANY, \_T(\textcolor{stringliteral}{""}), wxDefaultPosition, wxSize(48, -1), 0, \_T(\textcolor{stringliteral}{
+      "ID\_STATICTEXT5"}));
+00060 
+00061     progressBar = \textcolor{keyword}{new} wxGauge(\textcolor{keyword}{this}, ID\_GAUGE1, 100, wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator
+      , \_T(\textcolor{stringliteral}{"ID\_GAUGE1"}));
+00062     FlexGridSizer8->Add(progressBar, 1, wxEXPAND | wxALIGN\_CENTER\_HORIZONTAL | wxALIGN\_CENTER\_VERTICAL, 0);
+00063     FlexGridSizer8->AddGrowableRow(0);
+00064     FlexGridSizer2->Add(FlexGridSizer8, 1, wxEXPAND | wxALIGN\_LEFT | wxALIGN\_CENTER\_VERTICAL, 0);
+00065     FlexGridSizer2->Add(lblProgressPercent, 1, wxEXPAND | wxALL | wxALIGN\_LEFT | wxALIGN\_CENTER\_VERTICAL, 5
+      );
+00066     FlexGridSizer1->Add(FlexGridSizer2, 1, wxALIGN\_LEFT | wxALIGN\_TOP, 5);
+00067     FlexGridSizer3 = \textcolor{keyword}{new} wxFlexGridSizer(0, 3, 0, 5);
+00068     FlexGridSizer7 = \textcolor{keyword}{new} wxFlexGridSizer(0, 2, 0, 5);
+00069     StaticText2 = \textcolor{keyword}{new} wxStaticText(\textcolor{keyword}{this}, wxID\_ANY, \_T(\textcolor{stringliteral}{"Programming mode:"}), wxDefaultPosition, 
+      wxDefaultSize, 0, \_T(\textcolor{stringliteral}{"ID\_STATICTEXT3"}));
+00070     FlexGridSizer7->Add(StaticText2, 1, wxALIGN\_LEFT | wxALIGN\_CENTER\_VERTICAL, 5);
+00071     cmbDevice = \textcolor{keyword}{new} wxChoice(\textcolor{keyword}{this}, ID\_CHOICE2, wxDefaultPosition, wxDefaultSize, 0, 0, 0, 
+      wxDefaultValidator, \_T(\textcolor{stringliteral}{"ID\_CHOICE2"}));
+00072     FlexGridSizer7->Add(cmbDevice, 1, wxEXPAND | wxALIGN\_LEFT | wxALIGN\_CENTER\_VERTICAL, 5);
+00073     FlexGridSizer3->Add(FlexGridSizer7, 1, wxALIGN\_LEFT | wxALIGN\_CENTER\_VERTICAL, 5);
+00074     FlexGridSizer1->Add(FlexGridSizer3, 1, wxEXPAND | wxALIGN\_LEFT | wxALIGN\_TOP, 5);
+00075     SetSizer(FlexGridSizer1);
+00076     FlexGridSizer1->Fit(\textcolor{keyword}{this});
+00077     FlexGridSizer1->SetSizeHints(\textcolor{keyword}{this});
+00078 
+00079     Connect(ID\_BUTTON1, wxEVT\_COMMAND\_BUTTON\_CLICKED, (wxObjectEventFunction)&
+      LMS_Programing_wxgui::OnbtnOpenClick);
+00080     Connect(btnStartStop->GetId(), wxEVT\_COMMAND\_BUTTON\_CLICKED, (wxObjectEventFunction)&
+      LMS_Programing_wxgui::OnbtnStartProgrammingClick);
+00081     Connect(ID\_CHOICE2, wxEVT\_COMMAND\_CHOICE\_SELECTED, (wxObjectEventFunction)&
+      LMS_Programing_wxgui::OncmbDeviceSelect);
+00082     Connect(ID\_PROGRAMING\_FINISHED\_EVENT, wxEVT\_COMMAND\_THREAD, (wxObjectEventFunction)&
+      LMS_Programing_wxgui::OnProgramingFinished);
+00083     Connect(ID\_PROGRAMING\_STATUS\_EVENT, wxEVT\_COMMAND\_THREAD, (wxObjectEventFunction)&
+      LMS_Programing_wxgui::OnProgramingStatusUpdate);
+00084 \}
+00085 
+00086 LMS_Programing_wxgui::~LMS_Programing_wxgui()
+00087 \{
+00088     \textcolor{comment}{//make sure the thread has stopped before destroying data}
+00089     \textcolor{keywordflow}{if}(mProgrammingInProgress.load() == \textcolor{keyword}{true})
+00090     \{
+00091         mAbortProgramming.store(\textcolor{keyword}{true});
+00092         mWorkerThread.join();
+00093     \}
+00094 \}
+00095 
+00096 \textcolor{keywordtype}{void} LMS_Programing_wxgui::OnbtnOpenClick(wxCommandEvent& event)
+00097 \{
+00098     wxString wildcards;
+00099     wxString deviceSelection = cmbDevice->GetStringSelection();
+00100     \textcolor{keyword}{auto} info = LMS_GetDeviceInfo(lmsControl);
+00101     \textcolor{keywordflow}{if} (info)
+00102     \{
+00103         \textcolor{keywordflow}{if} (strstr(info->deviceName, lime::GetDeviceName(lime::LMS_DEV_LIMESDR)))
+00104         \{
+00105             \textcolor{keywordflow}{if} (deviceSelection.find(\textcolor{stringliteral}{"FPGA"}) != wxString::npos)
+00106                 wildcards = \textcolor{stringliteral}{"rbf(*.rbf)|*.rbf|All files(*.*)|*.*"};
+00107             \textcolor{keywordflow}{else}
+00108                 wildcards = \textcolor{stringliteral}{"img(*.img)|*.img|All files(*.*)|*.*"};
+00109         \}
+00110         \textcolor{keywordflow}{else} \textcolor{keywordflow}{if} (strstr(info->deviceName, lime::GetDeviceName(
+      lime::LMS_DEV_LIMESDRMINI)))
+00111             wildcards = \textcolor{stringliteral}{"rpd(*.rpd)|*.rpd|All files(*.*)|*.*"};
+00112         \textcolor{keywordflow}{else} \textcolor{keywordflow}{if} (strstr(info->deviceName, lime::GetDeviceName(
+      lime::LMS_DEV_LIMESDR_QPCIE)))
+00113             wildcards = \textcolor{stringliteral}{"rbf(*.rbf)|*.rbf|All files(*.*)|*.*"};
+00114     \}
+00115     \textcolor{keywordflow}{else} \textcolor{keywordflow}{if} (deviceSelection.find(\textcolor{stringliteral}{"FPGA"}) != wxString::npos)
+00116         wildcards = \textcolor{stringliteral}{"rbf(*.rbf)|*.rbf|bin(*.bin)|*.bin|rpd(*.rpd)|*.rpd|img(*.img)|*.img|All files(*.*)|*.*
+      "};
+00117     \textcolor{keywordflow}{else}
+00118          wildcards = \textcolor{stringliteral}{"img(*.img)|*.img|rbf(*.rbf)|*.rbf|bin(*.bin)|*.bin|rpd(*.rpd)|*.rpd|All
+       files(*.*)|*.*"};
+00119 
+00120     wxFileDialog dlg(\textcolor{keyword}{this}, \_(\textcolor{stringliteral}{"Select file"}), \_(\textcolor{stringliteral}{""}), \_(\textcolor{stringliteral}{""}), wildcards, wxFD\_OPEN | wxFD\_FILE\_MUST\_EXIST);
+00121 
+00122     \textcolor{keywordflow}{if} (dlg.ShowModal() == wxID\_CANCEL)
+00123         \textcolor{keywordflow}{return};
+00124 
+00125     lblFilename->SetLabel(dlg.GetPath());
+00126 \}
+00127 
+00128 \textcolor{keywordtype}{void} LMS_Programing_wxgui::OnbtnStartProgrammingClick(wxCommandEvent& event)
+00129 \{
+00130     \textcolor{comment}{//if needed load program data from file}
+00131     wxString deviceSelection = cmbDevice->GetStringSelection();
+00132 
+00133     \textcolor{keywordflow}{if}(
+00134         (deviceSelection.find(\textcolor{stringliteral}{"Reset"}) == wxString::npos) &&
+00135         (deviceSelection.find(\textcolor{stringliteral}{"Auto"}) == wxString::npos))
+00136     \{
+00137         \textcolor{keywordflow}{if} (lblFilename->GetLabel().length() <= 1)
+00138         \{
+00139             wxMessageBox(\_(\textcolor{stringliteral}{"Program file not selected"}), \_(\textcolor{stringliteral}{"Warning"}));
+00140             \textcolor{keywordflow}{return};
+00141         \}
+00142 
+00143         \textcolor{comment}{//using wxWidgets to read file, to support nonascii characters in path}
+00144         wxFFileInputStream fin(lblFilename->GetLabel());
+00145 
+00146         \textcolor{keywordflow}{if}(!fin.IsOk())
+00147         \{
+00148             wxMessageBox(\_(\textcolor{stringliteral}{"Error loading program file"}), \_(\textcolor{stringliteral}{"Error"}));
+00149             \textcolor{keywordflow}{return};
+00150         \}
+00151 
+00152         fin.SeekI(0, wxFromEnd);
+00153         \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{int} m\_data\_size = fin.TellI();
+00154 
+00155         mProgramData.resize(m\_data\_size, 0);
+00156         fin.SeekI(0, wxFromStart);
+00157         fin.Read(mProgramData.data(), m\_data\_size);
+00158     \}
+00159 
+00160     Disconnect(btnStartStop->GetId(), wxEVT\_COMMAND\_BUTTON\_CLICKED, (wxObjectEventFunction)&
+      LMS_Programing_wxgui::OnbtnStartProgrammingClick);
+00161     btnOpen->Disable();
+00162     btnStartStop->SetLabel(\_(\textcolor{stringliteral}{"Abort"}));
+00163 
+00164     mAbortProgramming.store(\textcolor{keyword}{false});
+00165     \textcolor{comment}{//run programming in separate thread, to prevent GUI freeze}
+00166     mWorkerThread = std::thread(&LMS_Programing_wxgui::DoProgramming, \textcolor{keyword}{this});
+00167     Connect(btnStartStop->GetId(), wxEVT\_COMMAND\_BUTTON\_CLICKED, (wxObjectEventFunction)&
+      LMS_Programing_wxgui::OnAbortProgramming);
+00168 \}
+00169 
+00172 \textcolor{keywordtype}{void} LMS_Programing_wxgui::OncmbDeviceSelect(wxCommandEvent& event)
+00173 \{
+00174     wxString deviceSelection = cmbDevice->GetStringSelection();
+00175     \textcolor{keywordflow}{if}(
+00176         (deviceSelection.find(\textcolor{stringliteral}{"Reset"}) == wxString::npos) &&
+00177         (deviceSelection.find(\textcolor{stringliteral}{"Auto"}) == wxString::npos))
+00178         btnOpenEnb = \textcolor{keyword}{true};
+00179     \textcolor{keywordflow}{else}
+00180         btnOpenEnb = \textcolor{keyword}{false};
+00181     btnOpen->Enable(btnOpenEnb);
+00182     StaticText1->Enable(btnOpenEnb);
+00183     lblFilename->Enable(btnOpenEnb);
+00184 \}
+00185 
+00186 \textcolor{keywordtype}{void} LMS_Programing_wxgui::OnProgramingFinished(wxCommandEvent& event)
+00187 \{
+00188     mWorkerThread.join();
+00189     wxMessageBox(event.GetString(), \_(\textcolor{stringliteral}{"INFO"}), wxICON\_INFORMATION | wxOK);
+00190     btnOpen->Enable(btnOpenEnb);
+00191     Disconnect(btnStartStop->GetId(), wxEVT\_COMMAND\_BUTTON\_CLICKED, (wxObjectEventFunction)&
+      LMS_Programing_wxgui::OnAbortProgramming);
+00192     Connect(btnStartStop->GetId(), wxEVT\_COMMAND\_BUTTON\_CLICKED, (wxObjectEventFunction)&
+      LMS_Programing_wxgui::OnbtnStartProgrammingClick);
+00193     btnStartStop->SetLabel(\_(\textcolor{stringliteral}{"Program"}));
+00194 \}
+00195 
+00196 \textcolor{keywordtype}{void} LMS_Programing_wxgui::OnAbortProgramming(wxCommandEvent& event)
+00197 \{
+00198     mAbortProgramming.store(\textcolor{keyword}{true});
+00199 \}
+00200 
+00201 \textcolor{keywordtype}{void} LMS_Programing_wxgui::SetConnection(lms_device_t* port)
+00202 \{
+00203     lmsControl = port;
+00204     \textcolor{keywordflow}{if} (lmsControl)
+00205     \{
+00206         cmbDevice->Clear();
+00207         lms_name_t modes[16];
+00208         \textcolor{keywordtype}{int} count = LMS_GetProgramModes(lmsControl, modes);
+00209         \textcolor{keywordflow}{for} (\textcolor{keywordtype}{int} i = 0; i < count; i ++)
+00210             \textcolor{keywordflow}{if} (strstr(modes[i],\textcolor{stringliteral}{"MCU"}) == \textcolor{keyword}{nullptr})
+00211                 cmbDevice->Append(wxString(modes[i]));
+00212         cmbDevice->SetSelection(0);
+00213         wxCommandEvent evt;
+00214         OncmbDeviceSelect(evt);
+00215         Layout();
+00216     \}
+00217 \}
+00218 
+00219 LMS_Programing_wxgui* LMS_Programing_wxgui::obj_ptr=\textcolor{keyword}{nullptr};
+00220 \textcolor{keywordtype}{bool} LMS_Programing_wxgui::OnProgrammingCallback(\textcolor{keywordtype}{int} bsent, \textcolor{keywordtype}{int} btotal, \textcolor{keyword}{const} \textcolor{keywordtype}{char}* progressMsg)
+00221 \{
+00222     wxCommandEvent evt;
+00223     evt.SetEventObject(obj_ptr);
+00224     evt.SetInt(100.0 * bsent / btotal); \textcolor{comment}{//round to int}
+00225     evt.SetString(wxString::From8BitData(progressMsg));
+00226     evt.SetEventType(wxEVT\_COMMAND\_THREAD);
+00227     evt.SetId(ID_PROGRAMING_STATUS_EVENT);
+00228     wxPostEvent(obj_ptr, evt);
+00229     \textcolor{keywordflow}{return} obj_ptr->mAbortProgramming.load();
+00230 \}
+00231 
+00232 
+00233 \textcolor{keywordtype}{void} LMS_Programing_wxgui::DoProgramming()
+00234 \{
+00235     mProgrammingInProgress.store(\textcolor{keyword}{true});
+00236     obj_ptr = \textcolor{keyword}{this};
+00237     wxString device = cmbDevice->GetStringSelection();
+00238     \textcolor{keywordtype}{int} status = LMS_Program(lmsControl, mProgramData.data(), mProgramData.size(), device.c\_str(), 
+      OnProgrammingCallback);
+00239     wxCommandEvent evt;
+00240     evt.SetEventObject(\textcolor{keyword}{this});
+00241     evt.SetId(ID_PROGRAMING_FINISHED_EVENT);
+00242     evt.SetEventType(wxEVT\_COMMAND\_THREAD);
+00243     evt.SetString(status == 0 ? \_(\textcolor{stringliteral}{"Programming Completed!"}) : \_(\textcolor{stringliteral}{"Programming failed!\(\backslash\)n"}));
+00244 
+00245     wxPostEvent(\textcolor{keyword}{this}, evt);
+00246     mProgrammingInProgress.store(\textcolor{keyword}{false});
+00247     \textcolor{keywordflow}{return};
+00248 \}
+00249 
+00252 \textcolor{keywordtype}{void} LMS_Programing_wxgui::OnProgramingStatusUpdate(wxCommandEvent& event)
+00253 \{
+00254     progressBar->SetValue(event.GetInt());
+00255     lblProgressPercent->SetLabel(event.GetString());
+00256 \}
+\end{DoxyCode}

@@ -1,0 +1,49 @@
+\subsection{window\+Function.\+cpp}
+\label{windowFunction_8cpp_source}\index{/home/erik/prefix/default/src/limesuite-\/dev/src/window\+Function.\+cpp@{/home/erik/prefix/default/src/limesuite-\/dev/src/window\+Function.\+cpp}}
+
+\begin{DoxyCode}
+00001 \textcolor{preprocessor}{#include "windowFunction.h"}
+00002 \textcolor{preprocessor}{#include <cmath>}
+00003 
+00004 \textcolor{keywordtype}{void} GenerateWindowCoefficients(\textcolor{keywordtype}{int} func, \textcolor{keywordtype}{int} N \textcolor{comment}{/*coef count*/}, std::vector<float> &windowFcoefs, \textcolor{keywordtype}{float} 
+      amplitudeCorrection)
+00005 \{
+00006     windowFcoefs.clear();
+00007 
+00008     windowFcoefs.resize(N);
+00009     \textcolor{keywordtype}{float} a0 = 0.35875;
+00010     \textcolor{keywordtype}{float} a1 = 0.48829;
+00011     \textcolor{keywordtype}{float} a2 = 0.14128;
+00012     \textcolor{keywordtype}{float} a3 = 0.01168;
+00013     \textcolor{keywordtype}{float} PI = 3.14159265359;
+00014     \textcolor{keywordflow}{switch}(func)
+00015     \{
+00016     \textcolor{keywordflow}{case} 1: \textcolor{comment}{//blackman-harris}
+00017             \textcolor{keywordflow}{for} (\textcolor{keywordtype}{int} i = 0; i<N; ++i)
+00018                 windowFcoefs[i] = a0 - a1*cos((2 * PI*i) / (N - 1)) + a2*cos((4 * PI*i) / (N - 1)) - a3*cos
+      ((6 * PI*i) / (N - 1));
+00019             \textcolor{keywordflow}{break};
+00020         \textcolor{keywordflow}{case} 2: \textcolor{comment}{//hamming}
+00021             amplitudeCorrection = 0;
+00022             a0 = 0.54;
+00023             \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} i=0; i<N; ++i)
+00024                 windowFcoefs[i] = a0 -(1-a0)*cos((2*PI*i)/(N));
+00025             \textcolor{keywordflow}{break};
+00026         \textcolor{keywordflow}{case} 3: \textcolor{comment}{//hanning}
+00027             amplitudeCorrection = 0;
+00028             \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} i=0; i<N; ++i)
+00029                 windowFcoefs[i] = 0.5 *(1 - cos((2*PI*i)/(N)));
+00030             \textcolor{keywordflow}{break};
+00031         \textcolor{keywordflow}{default}:
+00032             \textcolor{keywordflow}{for} (\textcolor{keywordtype}{int} i = 0; i<N; ++i)
+00033                 windowFcoefs[i] = 1;
+00034             \textcolor{keywordflow}{return};
+00035     \}
+00036     \textcolor{keywordflow}{for} (\textcolor{keywordtype}{int} i = 0; i<N; ++i)
+00037         amplitudeCorrection += windowFcoefs[i];
+00038     amplitudeCorrection = 1.0/(amplitudeCorrection/N);
+00039     \textcolor{keywordflow}{for} (\textcolor{keywordtype}{int} i = 0; i<N; ++i)
+00040         windowFcoefs[i] *= amplitudeCorrection;
+00041 
+00042 \}
+\end{DoxyCode}

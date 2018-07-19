@@ -1,0 +1,184 @@
+\subsection{L\+M\+S7002\+M\+\_\+filters\+Calibration.\+cpp}
+\label{LMS7002M__filtersCalibration_8cpp_source}\index{/home/erik/prefix/default/src/limesuite-\/dev/src/lms7002m/\+L\+M\+S7002\+M\+\_\+filters\+Calibration.\+cpp@{/home/erik/prefix/default/src/limesuite-\/dev/src/lms7002m/\+L\+M\+S7002\+M\+\_\+filters\+Calibration.\+cpp}}
+
+\begin{DoxyCode}
+00001 
+00007 \textcolor{preprocessor}{#include "LMS7002M.h"}
+00008 \textcolor{preprocessor}{#include "IConnection.h"}
+00009 \textcolor{preprocessor}{#include "Logger.h"}
+00010 \textcolor{preprocessor}{#include "LMS7002M_RegistersMap.h"}
+00011 \textcolor{preprocessor}{#include <cmath>}
+00012 \textcolor{preprocessor}{#include <iostream>}
+00013 \textcolor{preprocessor}{#include <assert.h>}
+00014 \textcolor{preprocessor}{#include "MCU_BD.h"}
+00015 \textcolor{preprocessor}{#include "mcu_programs.h"}
+00016 \textcolor{preprocessor}{#include "Logger.h"}
+00017 
+00018 \textcolor{preprocessor}{#ifdef \_MSC\_VER}
+00019 \textcolor{preprocessor}{#include <ciso646>}
+00020 \textcolor{preprocessor}{#endif}
+00021 \textcolor{keyword}{using namespace }lime;
+00022 
+00023 \textcolor{comment}{//rx lpf range limits}
+00024 \textcolor{keyword}{static} \textcolor{keyword}{const} float_type RxLPF_RF_LimitLow = 1.4e6;
+00025 \textcolor{keyword}{static} \textcolor{keyword}{const} float_type RxLPF_RF_LimitHigh = 130e6;
+00026 
+00027 \textcolor{comment}{//tx lpf range limits}
+00028 \textcolor{keyword}{const} float_type TxLPF_RF_LimitLow = 5e6;
+00029 \textcolor{keyword}{const} float_type TxLPF_RF_LimitLowMid = 40e6;
+00030 \textcolor{keyword}{const} float_type TxLPF_RF_LimitMidHigh = 50e6;
+00031 \textcolor{keyword}{const} float_type TxLPF_RF_LimitHigh = 130e6;
+00032 
+00033 LMS7002M_RegistersMap *LMS7002M::BackupRegisterMap(\textcolor{keywordtype}{void})
+00034 \{
+00035     \textcolor{comment}{//BackupAllRegisters(); return NULL;}
+00036     \textcolor{keyword}{auto} backup = \textcolor{keyword}{new} LMS7002M_RegistersMap();
+00037     Channel chBck = this->GetActiveChannel();
+00038     this->SetActiveChannel(ChA);
+00039     *backup = *mRegistersMap;
+00040     this->SetActiveChannel(chBck);
+00041     \textcolor{keywordflow}{return} backup;
+00042 \}
+00043 
+00044 \textcolor{keywordtype}{void} LMS7002M::RestoreRegisterMap(LMS7002M_RegistersMap *backup)
+00045 \{
+00046     \textcolor{comment}{//RestoreAllRegisters(); return;}
+00047     Channel chBck = this->GetActiveChannel();
+00048 
+00049     \textcolor{keywordflow}{for} (\textcolor{keywordtype}{int} ch = 0; ch < 2; ch++)
+00050     \{
+00051         \textcolor{comment}{//determine addresses that have been changed}
+00052         \textcolor{comment}{//and restore backup to the main register map}
+00053         std::vector<uint16\_t> restoreAddrs, restoreData;
+00054         \textcolor{keywordflow}{for} (\textcolor{keyword}{const} uint16\_t addr : mRegistersMap->GetUsedAddresses(ch))
+00055         \{
+00056             uint16\_t original = backup->GetValue(ch, addr);
+00057             uint16\_t current = mRegistersMap->GetValue(ch, addr);
+00058             mRegistersMap->SetValue(ch, addr, original);
+00059 
+00060             \textcolor{keywordflow}{if} (ch == 1 and addr < 0x0100) \textcolor{keywordflow}{continue};
+00061             \textcolor{keywordflow}{if} (original == current) \textcolor{keywordflow}{continue};
+00062             restoreAddrs.push\_back(addr);
+00063             restoreData.push\_back(original);
+00064         \}
+00065 
+00066         \textcolor{comment}{//bulk write the original register values from backup}
+00067         this->SetActiveChannel((ch==0)?ChA:ChB);
+00068         SPI_write_batch(restoreAddrs.data(), restoreData.data(), restoreData.size(), \textcolor{keyword}{true});
+00069     \}
+00070 
+00071     \textcolor{comment}{//cleanup}
+00072     \textcolor{keyword}{delete} backup;
+00073     backup = \textcolor{keyword}{nullptr};
+00074     this->SetActiveChannel(chBck);
+00075 \}
+00076 
+00077 \textcolor{keywordtype}{int} LMS7002M::TuneRxFilter(float_type rx\_lpf\_freq\_RF)
+00078 \{
+00079     \textcolor{keywordtype}{int} status;
+00080     \textcolor{keywordflow}{if}(RxLPF_RF_LimitLow > rx\_lpf\_freq\_RF || rx\_lpf\_freq\_RF > RxLPF_RF_LimitHigh)
+00081         \textcolor{keywordflow}{return} ReportError(ERANGE, \textcolor{stringliteral}{"RxLPF frequency out of range, available range from %g to %g MHz"}, 
+      RxLPF_RF_LimitLow/1e6, RxLPF_RF_LimitHigh/1e6);
+00082 
+00083     uint8\_t g\_tia = Get_SPI_Reg_bits(LMS7param(G_TIA_RFE));
+00084     \textcolor{keywordflow}{if}(g\_tia == 1 && rx\_lpf\_freq\_RF < 4e6)
+00085     \{
+00086         rx\_lpf\_freq\_RF = 4e6;
+00087         Log(LOG_WARNING, \textcolor{stringliteral}{"Rx LPF min bandwidth is 4MHz when TIA gain is set to -12 dB"});
+00088     \}
+00089 
+00090     \textcolor{keywordflow}{if}(mcuControl->ReadMCUProgramID() != MCU_ID_CALIBRATIONS_SINGLE_IMAGE)
+00091     \{
+00092         \textcolor{keywordflow}{if}((status = mcuControl->Program_MCU(
+      mcu_program_lms7_dc_iq_calibration_bin, IConnection::MCU\_PROG\_MODE::SRAM)))
+00093             \textcolor{keywordflow}{return} ReportError(status, \textcolor{stringliteral}{"Tune Rx Filter: failed to program MCU"});
+00094     \}
+00095 
+00096     \textcolor{comment}{//set reference clock parameter inside MCU}
+00097     \textcolor{keywordtype}{long} refClk = GetReferenceClk_SX(\textcolor{keyword}{false});
+00098     mcuControl->SetParameter(MCU_BD::MCU_REF_CLK, refClk);
+00099     lime::debug(\textcolor{stringliteral}{"MCU Ref. clock: %g MHz"}, refClk / 1e6);
+00100     \textcolor{comment}{//set bandwidth for MCU to read from register, value is integer stored in MHz}
+00101     mcuControl->SetParameter(MCU_BD::MCU_BW, rx\_lpf\_freq\_RF);
+00102     mcuControl->RunProcedure(5);
+00103 
+00104     status = mcuControl->WaitForMCU(1000);
+00105     \textcolor{keywordflow}{if}(status != MCU_BD::MCU_NO_ERROR)
+00106     \{
+00107         lime::error(\textcolor{stringliteral}{"Tune Rx Filter: MCU error %i (%s)"}, status, 
+      MCU_BD::MCUStatusMessage(status));
+00108         \textcolor{keywordflow}{return} -1;
+00109     \}
+00110     \textcolor{comment}{//sync registers to cache}
+00111     std::vector<uint16\_t> regsToSync = \{0x0112, 0x0117, 0x011A, 0x0116, 0x0118, 0x0114, 0x0019, 0x0115\};
+00112     \textcolor{keywordflow}{for}(\textcolor{keyword}{const} \textcolor{keyword}{auto} addr : regsToSync)
+00113         this->SPI_read(addr, \textcolor{keyword}{true});
+00114 
+00115     \textcolor{keywordflow}{return} status;
+00116 \}
+00117 
+00118 \textcolor{keywordtype}{int} LMS7002M::TuneTxFilter(\textcolor{keyword}{const} float_type tx\_lpf\_freq\_RF)
+00119 \{
+00120     \textcolor{keywordtype}{int} status;
+00121 
+00122     \textcolor{keywordflow}{if}(tx\_lpf\_freq\_RF < TxLPF\_RF\_LimitLow || tx\_lpf\_freq\_RF > TxLPF_RF_LimitHigh)
+00123         \textcolor{keywordflow}{return} ReportError(ERANGE, \textcolor{stringliteral}{"Tx lpf(%g MHz) out of range %g-%g MHz and %g-%g MHz"}, tx\_lpf\_freq\_RF/1
+      e6,
+00124                         TxLPF_RF_LimitLow/1e6, TxLPF_RF_LimitLowMid/1e6,
+00125                         TxLPF_RF_LimitMidHigh/1e6, TxLPF\_RF\_LimitHigh/1e6);
+00126     \textcolor{comment}{//calculate intermediate frequency}
+00127     float_type tx\_lpf\_IF = tx\_lpf\_freq\_RF/2;
+00128     \textcolor{keywordflow}{if}(tx\_lpf\_freq\_RF > TxLPF_RF_LimitLowMid && tx\_lpf\_freq\_RF < 
+      TxLPF_RF_LimitMidHigh)
+00129     \{
+00130         Log(LOG_WARNING, \textcolor{stringliteral}{"Tx lpf(%g MHz) out of range %g-%g MHz and %g-%g MHz. Setting to %g MHz"}, 
+      tx\_lpf\_freq\_RF/1e6,
+00131                         TxLPF_RF_LimitLow/1e6, TxLPF_RF_LimitLowMid/1e6,
+00132                         TxLPF_RF_LimitMidHigh/1e6, TxLPF\_RF\_LimitHigh/1e6,
+00133                         TxLPF_RF_LimitMidHigh/1e6);
+00134         tx\_lpf\_IF = TxLPF_RF_LimitMidHigh/2;
+00135     \}
+00136 
+00137     \textcolor{keywordflow}{if} (!controlPort)\{
+00138         lime::error(\textcolor{stringliteral}{"Tune Tx Filter: No device connected"});
+00139         \textcolor{keywordflow}{return} -1;
+00140     \}
+00141 
+00142     \textcolor{keywordflow}{if}(mcuControl->ReadMCUProgramID() != MCU_ID_CALIBRATIONS_SINGLE_IMAGE)
+00143     \{
+00144         \textcolor{keywordflow}{if}((status = mcuControl->Program_MCU(
+      mcu_program_lms7_dc_iq_calibration_bin, IConnection::MCU\_PROG\_MODE::SRAM)))
+00145             \textcolor{keywordflow}{return} ReportError(status, \textcolor{stringliteral}{"Tune Tx Filter: failed to program MCU"});
+00146     \}
+00147 
+00148     \textcolor{keywordtype}{int} ind = this->GetActiveChannelIndex()%2;
+00149     opt_gain_tbb[ind] = -1;
+00150 
+00151     \textcolor{comment}{//set reference clock parameter inside MCU}
+00152     \textcolor{keywordtype}{long} refClk = GetReferenceClk_SX(\textcolor{keyword}{false});
+00153     mcuControl->SetParameter(MCU_BD::MCU_REF_CLK, refClk);
+00154     lime::debug(\textcolor{stringliteral}{"MCU Ref. clock: %g MHz"}, refClk / 1e6);
+00155     \textcolor{comment}{//set bandwidth for MCU to read from register, value is integer stored in MHz}
+00156     mcuControl->SetParameter(MCU_BD::MCU_BW, tx\_lpf\_freq\_RF);
+00157     mcuControl->RunProcedure(6);
+00158 
+00159     status = mcuControl->WaitForMCU(1000);
+00160     \textcolor{keywordflow}{if}(status != MCU_BD::MCU_NO_ERROR)
+00161     \{
+00162         lime::error(\textcolor{stringliteral}{"Tune Tx Filter: MCU error %i (%s)"}, status, 
+      MCU_BD::MCUStatusMessage(status));
+00163         \textcolor{keywordflow}{return} -1;
+00164     \}
+00165     \textcolor{comment}{//sync registers to cache}
+00166     std::vector<uint16\_t> regsToSync = \{0x0105, 0x0106, 0x0109, 0x010A, 0x010B\};
+00167     \textcolor{keywordflow}{for}(\textcolor{keyword}{const} \textcolor{keyword}{auto} addr : regsToSync)
+00168         this->SPI_read(addr, \textcolor{keyword}{true});
+00169 
+00170     \textcolor{keywordflow}{if}(tx\_lpf\_IF <= TxLPF_RF_LimitLowMid/2)
+00171         Log(LOG_INFO, \textcolor{stringliteral}{"Filter calibrated. Filter order-4th, filter bandwidth set to %g MHz."}
+00172             \textcolor{stringliteral}{"Real pole 1st order filter set to 2.5 MHz. Preemphasis filter not active"}, tx\_lpf\_IF/1e6 * 2);
+00173     \textcolor{keywordflow}{else}
+00174         Log(LOG_INFO, \textcolor{stringliteral}{"Filter calibrated. Filter order-2nd, set to %g MHz"}, tx\_lpf\_IF/1e6 * 2);
+00175     \textcolor{keywordflow}{return} 0;
+00176 \}
+\end{DoxyCode}

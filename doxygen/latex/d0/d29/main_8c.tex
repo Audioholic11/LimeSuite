@@ -1,0 +1,418 @@
+\subsection{/home/erik/prefix/default/src/limesuite-\/dev/mcu\+\_\+program/mcu\+\_\+src/main.c File Reference}
+\label{main_8c}\index{/home/erik/prefix/default/src/limesuite-\/dev/mcu\+\_\+program/mcu\+\_\+src/main.\+c@{/home/erik/prefix/default/src/limesuite-\/dev/mcu\+\_\+program/mcu\+\_\+src/main.\+c}}
+{\ttfamily \#include \char`\"{}L\+M\+S7002\+\_\+\+R\+E\+Gx51.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}spi.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}lms7002m\+\_\+calibrations.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}lms7002m\+\_\+filters.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}L\+M\+S7002\+M\+\_\+parameters\+\_\+compact.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}lms7002m\+\_\+controls.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}typedefs.\+h\char`\"{}}\\*
+Include dependency graph for main.\+c\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{d4/d10/main_8c__incl}
+\end{center}
+\end{figure}
+\subsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define {\bf M\+C\+U\+\_\+\+P\+A\+R\+A\+M\+E\+T\+E\+R\+\_\+\+A\+D\+D\+R\+E\+SS}~0x002D
+\item 
+\#define {\bf I\+N\+P\+U\+T\+\_\+\+C\+O\+U\+NT}~3
+\end{DoxyCompactItemize}
+\subsubsection*{Enumerations}
+\begin{DoxyCompactItemize}
+\item 
+enum \{ {\bf M\+C\+U\+\_\+\+W\+O\+R\+K\+I\+NG} = 0x\+FF, 
+{\bf M\+C\+U\+\_\+\+I\+D\+LE} = 0x00
+ \}
+\end{DoxyCompactItemize}
+\subsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+{\bf void} {\bf Update\+Freq} (bool ref\+Clk)
+\begin{DoxyCompactList}\small\item\em Reads reference clock from L\+MS register. \end{DoxyCompactList}\item 
+{\bf void} {\bf ext2\+\_\+int} ()
+\item 
+{\bf void} {\bf ext3\+\_\+int} ()
+\item 
+uint8\+\_\+t {\bf Proxy\+Write} ()
+\item 
+uint8\+\_\+t {\bf Proxy\+Read} ()
+\item 
+{\bf void} {\bf main} ()
+\end{DoxyCompactItemize}
+\subsubsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+bool {\bf stop\+Procedure} = false
+\item 
+bool {\bf has\+Stopped} = true
+\item 
+bool {\bf run\+Procedure} = false
+\item 
+uint8\+\_\+t {\bf current\+Instruction}
+\item 
+{\bf float\+\_\+type} {\bf Ref\+Clk}
+\item 
+{\bf float\+\_\+type} {\bf bandwidth\+RF}
+\item 
+uint8\+\_\+t {\bf ext\+Loopback\+Pair}
+\item 
+uint8\+\_\+t {\bf input\+Regs} [3]
+\item 
+const uint16\+\_\+t {\bf proxy\+Reg\+Addr} = 0x002D
+\item 
+const uint16\+\_\+t {\bf proxy\+Wr\+Value} = 0x020C
+\item 
+const uint16\+\_\+t {\bf proxy\+Rd\+Value} = 0x040B
+\end{DoxyCompactItemize}
+
+
+\subsubsection{Macro Definition Documentation}
+\index{main.\+c@{main.\+c}!I\+N\+P\+U\+T\+\_\+\+C\+O\+U\+NT@{I\+N\+P\+U\+T\+\_\+\+C\+O\+U\+NT}}
+\index{I\+N\+P\+U\+T\+\_\+\+C\+O\+U\+NT@{I\+N\+P\+U\+T\+\_\+\+C\+O\+U\+NT}!main.\+c@{main.\+c}}
+\paragraph[{I\+N\+P\+U\+T\+\_\+\+C\+O\+U\+NT}]{\setlength{\rightskip}{0pt plus 5cm}\#define I\+N\+P\+U\+T\+\_\+\+C\+O\+U\+NT~3}\label{main_8c_a08f4cb5cb205c824902548906a61cb60}
+
+
+Definition at line {\bf 19} of file {\bf main.\+c}.
+
+
+
+Referenced by {\bf ext2\+\_\+int()}.
+
+\index{main.\+c@{main.\+c}!M\+C\+U\+\_\+\+P\+A\+R\+A\+M\+E\+T\+E\+R\+\_\+\+A\+D\+D\+R\+E\+SS@{M\+C\+U\+\_\+\+P\+A\+R\+A\+M\+E\+T\+E\+R\+\_\+\+A\+D\+D\+R\+E\+SS}}
+\index{M\+C\+U\+\_\+\+P\+A\+R\+A\+M\+E\+T\+E\+R\+\_\+\+A\+D\+D\+R\+E\+SS@{M\+C\+U\+\_\+\+P\+A\+R\+A\+M\+E\+T\+E\+R\+\_\+\+A\+D\+D\+R\+E\+SS}!main.\+c@{main.\+c}}
+\paragraph[{M\+C\+U\+\_\+\+P\+A\+R\+A\+M\+E\+T\+E\+R\+\_\+\+A\+D\+D\+R\+E\+SS}]{\setlength{\rightskip}{0pt plus 5cm}\#define M\+C\+U\+\_\+\+P\+A\+R\+A\+M\+E\+T\+E\+R\+\_\+\+A\+D\+D\+R\+E\+SS~0x002D}\label{main_8c_a8f031e543cbfc816ce9e5dec4d123a2c}
+
+
+Definition at line {\bf 17} of file {\bf main.\+c}.
+
+
+
+Referenced by {\bf main()}.
+
+
+
+\subsubsection{Enumeration Type Documentation}
+\paragraph[{anonymous enum}]{\setlength{\rightskip}{0pt plus 5cm}anonymous enum}\label{main_8c_ae4d5251432e1a9e6803c0240cc492e18}
+\begin{Desc}
+\item[Enumerator]\par
+\begin{description}
+\index{M\+C\+U\+\_\+\+W\+O\+R\+K\+I\+NG@{M\+C\+U\+\_\+\+W\+O\+R\+K\+I\+NG}!main.\+c@{main.\+c}}\index{main.\+c@{main.\+c}!M\+C\+U\+\_\+\+W\+O\+R\+K\+I\+NG@{M\+C\+U\+\_\+\+W\+O\+R\+K\+I\+NG}}\item[{\em 
+M\+C\+U\+\_\+\+W\+O\+R\+K\+I\+NG\label{main_8c_ae4d5251432e1a9e6803c0240cc492e18afbce38945475262783596d19aca23b18}
+}]\index{M\+C\+U\+\_\+\+I\+D\+LE@{M\+C\+U\+\_\+\+I\+D\+LE}!main.\+c@{main.\+c}}\index{main.\+c@{main.\+c}!M\+C\+U\+\_\+\+I\+D\+LE@{M\+C\+U\+\_\+\+I\+D\+LE}}\item[{\em 
+M\+C\+U\+\_\+\+I\+D\+LE\label{main_8c_ae4d5251432e1a9e6803c0240cc492e18a04f9744b5a1ce001cf127b188cde3218}
+}]\end{description}
+\end{Desc}
+
+
+Definition at line {\bf 22} of file {\bf main.\+c}.
+
+
+
+\subsubsection{Function Documentation}
+\index{main.\+c@{main.\+c}!ext2\+\_\+int@{ext2\+\_\+int}}
+\index{ext2\+\_\+int@{ext2\+\_\+int}!main.\+c@{main.\+c}}
+\paragraph[{ext2\+\_\+int()}]{\setlength{\rightskip}{0pt plus 5cm}{\bf void} ext2\+\_\+int (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}\label{main_8c_a31c7047dca911675d9be8e574f59ba00}
+
+
+Definition at line {\bf 40} of file {\bf main.\+c}.
+
+
+
+References {\bf i}, {\bf I\+N\+P\+U\+T\+\_\+\+C\+O\+U\+NT}, {\bf input\+Regs}, {\bf M\+C\+U\+\_\+\+I\+D\+LE}, {\bf M\+C\+U\+\_\+\+W\+O\+R\+K\+I\+NG}, {\bf P0}, and {\bf P1}.
+
+\index{main.\+c@{main.\+c}!ext3\+\_\+int@{ext3\+\_\+int}}
+\index{ext3\+\_\+int@{ext3\+\_\+int}!main.\+c@{main.\+c}}
+\paragraph[{ext3\+\_\+int()}]{\setlength{\rightskip}{0pt plus 5cm}{\bf void} ext3\+\_\+int (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}\label{main_8c_ad0dfdec90fc30325e13359fa72abfe7a}
+
+
+Definition at line {\bf 50} of file {\bf main.\+c}.
+
+
+
+References {\bf current\+Instruction}, {\bf M\+C\+U\+\_\+\+W\+O\+R\+K\+I\+NG}, {\bf P0}, {\bf P1}, {\bf run\+Procedure}, and {\bf stop\+Procedure}.
+
+\index{main.\+c@{main.\+c}!main@{main}}
+\index{main@{main}!main.\+c@{main.\+c}}
+\paragraph[{main()}]{\setlength{\rightskip}{0pt plus 5cm}{\bf void} main (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}\label{main_8c_acdef7a1fd863a6d3770c1268cb06add3}
+
+
+Definition at line {\bf 88} of file {\bf main.\+c}.
+
+
+
+References {\bf bandwidth\+RF}, {\bf Calibrate\+Rx()}, {\bf Calibrate\+Tx()}, {\bf current\+Instruction}, {\bf D\+I\+R0}, {\bf D\+I\+R1}, {\bf D\+I\+R2}, {\bf ext\+Loopback\+Pair}, {\bf has\+Stopped}, {\bf I\+E\+N0}, {\bf I\+E\+N1}, {\bf input\+Regs}, {\bf M\+C\+U\+\_\+\+I\+D\+LE}, {\bf M\+C\+U\+\_\+\+P\+A\+R\+A\+M\+E\+T\+E\+R\+\_\+\+A\+D\+D\+R\+E\+SS}, {\bf P1}, {\bf Proxy\+Read()}, {\bf Proxy\+Write()}, {\bf Run\+A\+G\+C()}, {\bf run\+Procedure}, {\bf SP}, {\bf S\+P\+I\+\_\+read()}, {\bf stop\+Procedure}, {\bf T\+M\+OD}, {\bf Tune\+Rx\+Filter()}, {\bf Tune\+Tx\+Filter()}, {\bf uc\+S\+C\+LK}, {\bf uc\+S\+EN}, and {\bf Update\+Freq()}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=550pt]{d0/d29/main_8c_acdef7a1fd863a6d3770c1268cb06add3_cgraph}
+\end{center}
+\end{figure}
+
+
+\index{main.\+c@{main.\+c}!Proxy\+Read@{Proxy\+Read}}
+\index{Proxy\+Read@{Proxy\+Read}!main.\+c@{main.\+c}}
+\paragraph[{Proxy\+Read()}]{\setlength{\rightskip}{0pt plus 5cm}uint8\+\_\+t Proxy\+Read (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}\label{main_8c_a57fdcfff2e774db134f34cd6c412858d}
+
+
+Definition at line {\bf 73} of file {\bf main.\+c}.
+
+
+
+References {\bf M\+C\+U\+\_\+\+I\+D\+LE}, {\bf M\+C\+U\+\_\+\+W\+O\+R\+K\+I\+NG}, {\bf P1}, {\bf proxy\+Rd\+Value}, {\bf proxy\+Reg\+Addr}, {\bf S\+P\+I\+\_\+read()}, {\bf S\+P\+I\+\_\+read\+\_\+slow()}, and {\bf S\+P\+I\+\_\+write()}.
+
+
+
+Referenced by {\bf main()}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=264pt]{d0/d29/main_8c_a57fdcfff2e774db134f34cd6c412858d_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=219pt]{d0/d29/main_8c_a57fdcfff2e774db134f34cd6c412858d_icgraph}
+\end{center}
+\end{figure}
+
+
+\index{main.\+c@{main.\+c}!Proxy\+Write@{Proxy\+Write}}
+\index{Proxy\+Write@{Proxy\+Write}!main.\+c@{main.\+c}}
+\paragraph[{Proxy\+Write()}]{\setlength{\rightskip}{0pt plus 5cm}uint8\+\_\+t Proxy\+Write (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}\label{main_8c_afd5539f03c575159d7bc781cd3fbd313}
+
+
+Definition at line {\bf 62} of file {\bf main.\+c}.
+
+
+
+References {\bf M\+C\+U\+\_\+\+I\+D\+LE}, {\bf M\+C\+U\+\_\+\+W\+O\+R\+K\+I\+NG}, {\bf P1}, {\bf proxy\+Reg\+Addr}, {\bf proxy\+Wr\+Value}, {\bf S\+P\+I\+\_\+read()}, and {\bf S\+P\+I\+\_\+write\+\_\+slow()}.
+
+
+
+Referenced by {\bf main()}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=266pt]{d0/d29/main_8c_afd5539f03c575159d7bc781cd3fbd313_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=219pt]{d0/d29/main_8c_afd5539f03c575159d7bc781cd3fbd313_icgraph}
+\end{center}
+\end{figure}
+
+
+\index{main.\+c@{main.\+c}!Update\+Freq@{Update\+Freq}}
+\index{Update\+Freq@{Update\+Freq}!main.\+c@{main.\+c}}
+\paragraph[{Update\+Freq(bool ref\+Clk)}]{\setlength{\rightskip}{0pt plus 5cm}{\bf void} Update\+Freq (
+\begin{DoxyParamCaption}
+\item[{bool}]{ref\+Clk}
+\end{DoxyParamCaption}
+)}\label{main_8c_a5885ccb6b7e7a226a0a29550b9a53daa}
+
+
+Reads reference clock from L\+MS register. 
+
+
+
+Definition at line {\bf 30} of file {\bf main.\+c}.
+
+
+
+References {\bf bandwidth\+RF}, {\bf freq}, {\bf input\+Regs}, {\bf M\+C\+U\+\_\+\+I\+D\+LE}, {\bf P1}, and {\bf Ref\+Clk}.
+
+
+
+Referenced by {\bf main()}.
+
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=222pt]{d0/d29/main_8c_a5885ccb6b7e7a226a0a29550b9a53daa_icgraph}
+\end{center}
+\end{figure}
+
+
+
+
+\subsubsection{Variable Documentation}
+\index{main.\+c@{main.\+c}!bandwidth\+RF@{bandwidth\+RF}}
+\index{bandwidth\+RF@{bandwidth\+RF}!main.\+c@{main.\+c}}
+\paragraph[{bandwidth\+RF}]{\setlength{\rightskip}{0pt plus 5cm}{\bf float\+\_\+type} bandwidth\+RF}\label{main_8c_a1970c49a0634e5d470cc13c9220eeb8b}
+
+
+Definition at line {\bf 74} of file {\bf lms7002m\+\_\+calibrations.\+c}.
+
+
+
+Referenced by {\bf Calibrate\+Rx()}, {\bf Calibrate\+Rx\+Setup()}, {\bf Calibrate\+Tx()}, {\bf Calibrate\+Tx\+Setup()}, {\bf Check\+Saturation\+Tx\+Rx()}, {\bf main()}, and {\bf Update\+Freq()}.
+
+\index{main.\+c@{main.\+c}!current\+Instruction@{current\+Instruction}}
+\index{current\+Instruction@{current\+Instruction}!main.\+c@{main.\+c}}
+\paragraph[{current\+Instruction}]{\setlength{\rightskip}{0pt plus 5cm}uint8\+\_\+t current\+Instruction}\label{main_8c_a97aa663083e3fa5280b44e9760e3e6ba}
+
+
+Definition at line {\bf 13} of file {\bf main.\+c}.
+
+
+
+Referenced by {\bf ext3\+\_\+int()}, and {\bf main()}.
+
+\index{main.\+c@{main.\+c}!ext\+Loopback\+Pair@{ext\+Loopback\+Pair}}
+\index{ext\+Loopback\+Pair@{ext\+Loopback\+Pair}!main.\+c@{main.\+c}}
+\paragraph[{ext\+Loopback\+Pair}]{\setlength{\rightskip}{0pt plus 5cm}uint8\+\_\+t ext\+Loopback\+Pair}\label{main_8c_ac7d7f1c9dac1f8b84d0997fdc4cbc5a4}
+
+
+Definition at line {\bf 83} of file {\bf lms7002m\+\_\+calibrations.\+c}.
+
+
+
+Referenced by {\bf Calibrate\+Rx\+Setup()}, {\bf Calibrate\+Tx\+Setup()}, and {\bf main()}.
+
+\index{main.\+c@{main.\+c}!has\+Stopped@{has\+Stopped}}
+\index{has\+Stopped@{has\+Stopped}!main.\+c@{main.\+c}}
+\paragraph[{has\+Stopped}]{\setlength{\rightskip}{0pt plus 5cm}bool has\+Stopped = true}\label{main_8c_ac270116f25a6da3a3aca9b2d98ef648f}
+
+
+Definition at line {\bf 11} of file {\bf main.\+c}.
+
+
+
+Referenced by {\bf main()}, and {\bf Run\+A\+G\+C()}.
+
+\index{main.\+c@{main.\+c}!input\+Regs@{input\+Regs}}
+\index{input\+Regs@{input\+Regs}!main.\+c@{main.\+c}}
+\paragraph[{input\+Regs}]{\setlength{\rightskip}{0pt plus 5cm}uint8\+\_\+t input\+Regs[3]}\label{main_8c_a638463ca1cb19dea2c9f09b5557cc864}
+
+
+Definition at line {\bf 20} of file {\bf main.\+c}.
+
+
+
+Referenced by {\bf ext2\+\_\+int()}, {\bf main()}, {\bf M\+C\+U\+\_\+\+Set\+Parameter()}, {\bf lime\+::\+M\+C\+U\+\_\+\+B\+D\+::\+Set\+Parameter()}, and {\bf Update\+Freq()}.
+
+\index{main.\+c@{main.\+c}!proxy\+Rd\+Value@{proxy\+Rd\+Value}}
+\index{proxy\+Rd\+Value@{proxy\+Rd\+Value}!main.\+c@{main.\+c}}
+\paragraph[{proxy\+Rd\+Value}]{\setlength{\rightskip}{0pt plus 5cm}const uint16\+\_\+t proxy\+Rd\+Value = 0x040B}\label{main_8c_a5d1eac4399ffde68aeaccc3748549836}
+
+
+Definition at line {\bf 60} of file {\bf main.\+c}.
+
+
+
+Referenced by {\bf Proxy\+Read()}.
+
+\index{main.\+c@{main.\+c}!proxy\+Reg\+Addr@{proxy\+Reg\+Addr}}
+\index{proxy\+Reg\+Addr@{proxy\+Reg\+Addr}!main.\+c@{main.\+c}}
+\paragraph[{proxy\+Reg\+Addr}]{\setlength{\rightskip}{0pt plus 5cm}const uint16\+\_\+t proxy\+Reg\+Addr = 0x002D}\label{main_8c_aff35d95ffe1110d0fefdb88cef23f2ce}
+
+
+Definition at line {\bf 58} of file {\bf main.\+c}.
+
+
+
+Referenced by {\bf Proxy\+Read()}, and {\bf Proxy\+Write()}.
+
+\index{main.\+c@{main.\+c}!proxy\+Wr\+Value@{proxy\+Wr\+Value}}
+\index{proxy\+Wr\+Value@{proxy\+Wr\+Value}!main.\+c@{main.\+c}}
+\paragraph[{proxy\+Wr\+Value}]{\setlength{\rightskip}{0pt plus 5cm}const uint16\+\_\+t proxy\+Wr\+Value = 0x020C}\label{main_8c_afbf39a92d158d558616df89e9dbb531b}
+
+
+Definition at line {\bf 59} of file {\bf main.\+c}.
+
+
+
+Referenced by {\bf Proxy\+Write()}.
+
+\index{main.\+c@{main.\+c}!Ref\+Clk@{Ref\+Clk}}
+\index{Ref\+Clk@{Ref\+Clk}!main.\+c@{main.\+c}}
+\paragraph[{Ref\+Clk}]{\setlength{\rightskip}{0pt plus 5cm}{\bf float\+\_\+type} Ref\+Clk}\label{main_8c_ade9c63dab5fa56fdab2394edec268508}
+
+
+Definition at line {\bf 22} of file {\bf lms7002m\+\_\+controls.\+c}.
+
+
+
+Referenced by {\bf Get\+Frequency\+C\+G\+E\+N()}, {\bf Get\+Frequency\+S\+X()}, {\bf Set\+Frequency\+C\+G\+E\+N()}, {\bf Set\+Frequency\+S\+X()}, {\bf Tune\+V\+C\+O()}, and {\bf Update\+Freq()}.
+
+\index{main.\+c@{main.\+c}!run\+Procedure@{run\+Procedure}}
+\index{run\+Procedure@{run\+Procedure}!main.\+c@{main.\+c}}
+\paragraph[{run\+Procedure}]{\setlength{\rightskip}{0pt plus 5cm}bool run\+Procedure = false}\label{main_8c_a00db6c1c2f4c546104af9d1538b065a8}
+
+
+Definition at line {\bf 12} of file {\bf main.\+c}.
+
+
+
+Referenced by {\bf ext3\+\_\+int()}, and {\bf main()}.
+
+\index{main.\+c@{main.\+c}!stop\+Procedure@{stop\+Procedure}}
+\index{stop\+Procedure@{stop\+Procedure}!main.\+c@{main.\+c}}
+\paragraph[{stop\+Procedure}]{\setlength{\rightskip}{0pt plus 5cm}bool stop\+Procedure = false}\label{main_8c_a9892bd020ffd46c1744bbbf4d78346a5}
+
+
+Definition at line {\bf 10} of file {\bf main.\+c}.
+
+
+
+Referenced by {\bf ext3\+\_\+int()}, {\bf main()}, and {\bf Run\+A\+G\+C()}.
+

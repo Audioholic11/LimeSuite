@@ -1,0 +1,114 @@
+\subsection{myriad7\+\_\+wxgui.\+cpp}
+\label{myriad7__wxgui_8cpp_source}\index{/home/erik/prefix/default/src/limesuite-\/dev/src/myriad7/myriad7\+\_\+wxgui.\+cpp@{/home/erik/prefix/default/src/limesuite-\/dev/src/myriad7/myriad7\+\_\+wxgui.\+cpp}}
+
+\begin{DoxyCode}
+00001 
+00007 \textcolor{preprocessor}{#include <wx/sizer.h>}
+00008 \textcolor{preprocessor}{#include <wx/stattext.h>}
+00009 \textcolor{preprocessor}{#include <wx/string.h>}
+00010 \textcolor{preprocessor}{#include <wx/combobox.h>}
+00011 \textcolor{preprocessor}{#include <wx/msgdlg.h>}
+00012 
+00013 \textcolor{preprocessor}{#include "myriad7_wxgui.h"}
+00014 \textcolor{preprocessor}{#include <LMSBoards.h>}
+00015 
+00016 \textcolor{keyword}{using namespace }lime;
+00017 
+00018 \textcolor{keyword}{const} \textcolor{keywordtype}{long} Myriad7_wxgui::ID_STATICTEXT1 = wxNewId();
+00019 \textcolor{keyword}{const} \textcolor{keywordtype}{long} Myriad7_wxgui::ID_COMBOBOX1 = wxNewId();
+00020 \textcolor{keyword}{const} \textcolor{keywordtype}{long} Myriad7_wxgui::ID_STATICTEXT2 = wxNewId();
+00021 \textcolor{keyword}{const} \textcolor{keywordtype}{long} Myriad7_wxgui::ID_COMBOBOX2 = wxNewId();
+00022 
+00023 BEGIN\_EVENT\_TABLE(Myriad7_wxgui,wxFrame)
+00024 END\_EVENT\_TABLE()
+00025 
+00026 Myriad7_wxgui::Myriad7_wxgui(wxWindow* parent,wxWindowID \textcolor{keywordtype}{id}, const wxString &title, const wxPoint& pos,
+      const wxSize& size, \textcolor{keywordtype}{long} styles)
+00027 \{
+00028     wxFlexGridSizer* FlexGridSizer2;
+00029     wxFlexGridSizer* FlexGridSizer1;
+00030 
+00031     Create(parent, \textcolor{keywordtype}{id}, title, wxDefaultPosition, wxDefaultSize, styles, title);
+00032 \textcolor{preprocessor}{#ifdef WIN32}
+00033     SetBackgroundColour(wxSystemSettings::GetColour(wxSYS\_COLOUR\_BTNFACE));
+00034 \textcolor{preprocessor}{#endif}
+00035     FlexGridSizer1 = \textcolor{keyword}{new} wxFlexGridSizer(0, 1, 0, 0);
+00036     FlexGridSizer2 = \textcolor{keyword}{new} wxFlexGridSizer(0, 2, 0, 0);
+00037     StaticText1 = \textcolor{keyword}{new} wxStaticText(\textcolor{keyword}{this}, ID\_STATICTEXT1, \_T(\textcolor{stringliteral}{"Rx (A/B) Input:"}), wxDefaultPosition, 
+      wxDefaultSize, 0, \_T(\textcolor{stringliteral}{"ID\_STATICTEXT1"}));
+00038     FlexGridSizer2->Add(StaticText1, 1, wxALL|wxALIGN\_RIGHT|wxALIGN\_CENTER\_VERTICAL, 5);
+00039     cmbGPIO\_1\_0 = \textcolor{keyword}{new} wxComboBox(\textcolor{keyword}{this}, ID\_COMBOBOX1, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0, 0,
+       0, wxDefaultValidator, \_T(\textcolor{stringliteral}{"ID\_COMBOBOX1"}));
+00040     cmbGPIO\_1\_0->SetSelection( cmbGPIO\_1\_0->Append(\_T(\textcolor{stringliteral}{"No connection"})) );
+00041     cmbGPIO\_1\_0->Append(\_T(\textcolor{stringliteral}{"LNAW"}));
+00042     cmbGPIO\_1\_0->Append(\_T(\textcolor{stringliteral}{"LNAH"}));
+00043     cmbGPIO\_1\_0->Append(\_T(\textcolor{stringliteral}{"LNAL"}));
+00044     FlexGridSizer2->Add(cmbGPIO\_1\_0, 1, wxALIGN\_CENTER\_HORIZONTAL|wxALIGN\_CENTER\_VERTICAL, 5);
+00045     StaticText2 = \textcolor{keyword}{new} wxStaticText(\textcolor{keyword}{this}, ID\_STATICTEXT2, \_T(\textcolor{stringliteral}{"Tx (A/B) output:"}), wxDefaultPosition, 
+      wxDefaultSize, 0, \_T(\textcolor{stringliteral}{"ID\_STATICTEXT2"}));
+00046     FlexGridSizer2->Add(StaticText2, 1, wxALL|wxALIGN\_RIGHT|wxALIGN\_CENTER\_VERTICAL, 5);
+00047     cmbGPIO2 = \textcolor{keyword}{new} wxComboBox(\textcolor{keyword}{this}, ID\_COMBOBOX2, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0, 0, 0,
+       wxDefaultValidator, \_T(\textcolor{stringliteral}{"ID\_COMBOBOX2"}));
+00048     cmbGPIO2->SetSelection( cmbGPIO2->Append(\_T(\textcolor{stringliteral}{"TX1"})) );
+00049     cmbGPIO2->Append(\_T(\textcolor{stringliteral}{"TX2"}));
+00050     FlexGridSizer2->Add(cmbGPIO2, 1, wxEXPAND|wxALIGN\_LEFT|wxALIGN\_CENTER\_VERTICAL, 5);
+00051     FlexGridSizer1->Add(FlexGridSizer2, 1, wxALL|wxALIGN\_CENTER\_HORIZONTAL|wxALIGN\_CENTER\_VERTICAL, 5);
+00052     SetSizer(FlexGridSizer1);
+00053     FlexGridSizer1->Fit(\textcolor{keyword}{this});
+00054     FlexGridSizer1->SetSizeHints(\textcolor{keyword}{this});
+00055 
+00056     Connect(ID\_COMBOBOX1,wxEVT\_COMMAND\_COMBOBOX\_SELECTED,(wxObjectEventFunction)&
+      Myriad7_wxgui::ParameterChangeHandler);
+00057     Connect(ID\_COMBOBOX2,wxEVT\_COMMAND\_COMBOBOX\_SELECTED,(wxObjectEventFunction)&
+      Myriad7\_wxgui::ParameterChangeHandler);
+00058 \}
+00059 
+00060 Myriad7_wxgui::~Myriad7_wxgui()
+00061 \{
+00062 \}
+00063 
+00064 \textcolor{keywordtype}{void} Myriad7_wxgui::Initialize(lms_device_t* pSerPort)
+00065 \{
+00066     lmsControl = pSerPort;
+00067 \}
+00068 
+00069 \textcolor{keywordtype}{void} Myriad7_wxgui::ParameterChangeHandler(wxCommandEvent& event)
+00070 \{
+00071     \textcolor{keywordflow}{if} (lmsControl == \textcolor{keyword}{nullptr})
+00072         \textcolor{keywordflow}{return};
+00073     \textcolor{keywordtype}{unsigned} rxInput = cmbGPIO\_1\_0->GetSelection();
+00074     \textcolor{keywordtype}{unsigned} txOutput = cmbGPIO2->GetSelection();
+00075     uint8\_t value = txOutput << 2 | rxInput;
+00076 
+00077     \textcolor{keywordtype}{int} status;
+00078     status = LMS_GPIOWrite(lmsControl,&value,1);
+00079 
+00080     \textcolor{keywordflow}{if} (status != 0)
+00081     \{
+00082         wxMessageBox(\_(\textcolor{stringliteral}{"Failed to write Myriad7 GPIOs"}), \_(\textcolor{stringliteral}{"Error"}), wxICON\_ERROR | wxOK);
+00083         \textcolor{keywordflow}{return};
+00084     \}
+00085 \}
+00086 
+00087 \textcolor{keywordtype}{void} Myriad7_wxgui::UpdatePanel()
+00088 \{
+00089     \textcolor{keywordflow}{if} (lmsControl == \textcolor{keyword}{nullptr})
+00090         \textcolor{keywordflow}{return};
+00091     \textcolor{keyword}{const} lms_dev_info_t* info;
+00092     \textcolor{keywordflow}{if} ((info = LMS_GetDeviceInfo(lmsControl)) == \textcolor{keyword}{nullptr})
+00093         \textcolor{keywordflow}{return};
+00094     \textcolor{keywordflow}{if} (info->expansionName != GetExpansionBoardName(EXP_BOARD_MYRIAD7))
+00095             \textcolor{keywordflow}{return};
+00096 
+00097     uint8\_t dataRd[64];
+00098     \textcolor{keywordtype}{int} status = LMS_GPIORead(lmsControl,dataRd, 64);
+00099 
+00100     \textcolor{keywordflow}{if} (status != 0)
+00101     \{
+00102         wxMessageBox(\_(\textcolor{stringliteral}{"Failed to read Myriad7 GPIOs"}), \_(\textcolor{stringliteral}{"Error"}), wxICON\_ERROR | wxOK);
+00103         \textcolor{keywordflow}{return};
+00104     \}
+00105     cmbGPIO\_1\_0->SetSelection(dataRd[0] & 0x3);
+00106     cmbGPIO2->SetSelection((dataRd[0] & 0x4) > 0);
+00107 \}
+\end{DoxyCode}

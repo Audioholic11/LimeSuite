@@ -1,0 +1,56 @@
+\subsection{Connection\+Registry.\+h}
+\label{ConnectionRegistry_8h_source}\index{/home/erik/prefix/default/src/limesuite-\/dev/src/\+Connection\+Registry/\+Connection\+Registry.\+h@{/home/erik/prefix/default/src/limesuite-\/dev/src/\+Connection\+Registry/\+Connection\+Registry.\+h}}
+
+\begin{DoxyCode}
+00001 
+00007 \textcolor{preprocessor}{#ifndef CONNECTION\_REGISTRY\_H}
+00008 \textcolor{preprocessor}{#define CONNECTION\_REGISTRY\_H}
+00009 
+00010 \textcolor{preprocessor}{#include "LimeSuiteConfig.h"}
+00011 \textcolor{preprocessor}{#include "ConnectionHandle.h"}
+00012 \textcolor{preprocessor}{#include <string>}
+00013 \textcolor{preprocessor}{#include <vector>}
+00014 
+00015 \textcolor{keyword}{namespace }lime\{
+00016 
+00017 \textcolor{keyword}{class }IConnection;
+00018 
+00024 \textcolor{keyword}{class }LIME_API ConnectionRegistry
+00025 \{
+00026 \textcolor{keyword}{public}:  
+00027 
+00034     \textcolor{keyword}{static} std::vector<ConnectionHandle> findConnections(\textcolor{keyword}{const} ConnectionHandle &hint = 
+      ConnectionHandle());
+00035 
+00042     \textcolor{keyword}{static} IConnection *makeConnection(\textcolor{keyword}{const} ConnectionHandle &handle);
+00043 
+00047     \textcolor{keyword}{static} \textcolor{keywordtype}{void} freeConnection(IConnection *conn);
+00048 
+00050     \textcolor{keyword}{static} std::vector<std::string> moduleNames(\textcolor{keywordtype}{void});
+00051 \};
+00052     
+00053 \textcolor{comment}{/*******************************************************************}
+00054 \textcolor{comment}{ * This section below is the registry API for connections.}
+00055 \textcolor{comment}{ * The registry API is intended for device developers.}
+00056 \textcolor{comment}{ ******************************************************************/}
+00057 
+00065 \textcolor{keyword}{class }LIME_API ConnectionRegistryEntry
+00066 \{
+00067 \textcolor{keyword}{public}:
+00068 
+00075     ConnectionRegistryEntry(\textcolor{keyword}{const} std::string &name);
+00076 
+00078     \textcolor{keyword}{virtual} ~ConnectionRegistryEntry(\textcolor{keywordtype}{void});
+00079 
+00087     \textcolor{keyword}{virtual} std::vector<ConnectionHandle> enumerate(\textcolor{keyword}{const} ConnectionHandle &hint) = 0;
+00088 
+00094     \textcolor{keyword}{virtual} IConnection *make(\textcolor{keyword}{const} ConnectionHandle &handle) = 0;
+00095 
+00096 \textcolor{keyword}{private}:
+00097     std::string _name;
+00098 \};
+00099 
+00100 \}
+00101 \textcolor{preprocessor}{#endif}
+00102 
+\end{DoxyCode}

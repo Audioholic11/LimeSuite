@@ -1,0 +1,76 @@
+\subsection{lms7002\+\_\+pnl\+R3.\+h}
+\label{lms7002__pnlR3_8h_source}\index{/home/erik/prefix/default/src/limesuite-\/dev/src/lms7002\+\_\+wxgui/lms7002\+\_\+pnl\+R3.\+h@{/home/erik/prefix/default/src/limesuite-\/dev/src/lms7002\+\_\+wxgui/lms7002\+\_\+pnl\+R3.\+h}}
+
+\begin{DoxyCode}
+00001 \textcolor{preprocessor}{#ifndef \_\_lms7002\_R3\_\_}
+00002 \textcolor{preprocessor}{#define \_\_lms7002\_R3\_\_}
+00003 
+00004 \textcolor{preprocessor}{#include <wx/panel.h>}
+00005 \textcolor{preprocessor}{#include <wx/checkbox.h>}
+00006 \textcolor{preprocessor}{#include <wx/spinctrl.h>}
+00007 \textcolor{preprocessor}{#include <wx/combobox.h>}
+00008 \textcolor{preprocessor}{#include "numericSlider.h"}
+00009 
+00010 \textcolor{preprocessor}{#include <map>}
+00011 \textcolor{preprocessor}{#include <vector>}
+00012 \textcolor{preprocessor}{#include "lime/LimeSuite.h"}
+00013 \textcolor{keyword}{namespace }lime\{
+00014 
+00015 \}
+00016 
+00017 \textcolor{keyword}{class }lms7002_pnlR3_view : \textcolor{keyword}{public} wxPanel
+00018 \{
+00019     \textcolor{keyword}{protected}:
+00020         wxComboBox* cmbISINK_SPIBUFF;
+00021         wxButton* btnReadADC;
+00022         wxStaticText* dccal\_statuses[8];
+00023         wxStaticText* dccal\_cmpstatuses[8];
+00024         wxCheckBox* dccal\_cmpcfg[8];
+00025         wxCheckBox* dccal\_start[8];
+00026         wxStaticText* rssi\_vals[2];
+00027         wxStaticText* pdet\_vals[2];
+00028         wxStaticText* tref_val;
+00029         wxStaticText* tvptat_val;
+00030         wxStaticText* rssidc_cmpstatus;
+00031                 NumericSlider* cmbRSSIDC_HYSCMP;
+00032                 wxCheckBox* chkRSSI_PD;
+00033                 NumericSlider* spinDCO1;
+00034                 NumericSlider* spinDCO2;
+00035                 wxComboBox* cmbRSEL;
+00036         std::vector<NumericSlider*> cmbDCControlsRx;
+00037         std::vector<NumericSlider*> cmbDCControlsTx;
+00038 
+00039         wxStaticText* rssiCMPSTATUS[6];
+00040         wxCheckBox* rssiCMPCFG[6];
+00041 
+00042         \textcolor{comment}{// Virtual event handlers, overide them in your derived class}
+00043         \textcolor{keywordtype}{void} ParameterChangeHandler( wxSpinEvent& event );
+00044         \textcolor{keywordtype}{void} ParameterChangeHandler( wxCommandEvent& event );
+00045         \textcolor{keywordtype}{void} OnRSSICMPCFGChanged(wxCommandEvent& event);
+00046         \textcolor{keywordtype}{void} OnDCCMPCFGChanged(wxCommandEvent& event);
+00047         \textcolor{keywordtype}{void} OnReadRSSICMP(wxCommandEvent& event);
+00048         \textcolor{keywordtype}{void} OnReadDCCMP(wxCommandEvent& event);
+00049         \textcolor{keywordtype}{void} OnCalibrateAnalogRSSI( wxCommandEvent& event );
+00050 
+00051         \textcolor{keywordtype}{void} OnWriteRxDC( wxCommandEvent& event );
+00052         \textcolor{keywordtype}{void} OnWriteTxDC( wxCommandEvent& event );
+00053         \textcolor{keywordtype}{void} OnDCCMPCFGRead();
+00054         \textcolor{keywordtype}{void} OnReadDC( wxCommandEvent& event );
+00055         \textcolor{keywordtype}{void} UpdateGUISlow();
+00056         \textcolor{keywordtype}{void} ParameterChangeHandlerCMPRead( wxCommandEvent& event );
+00057         \textcolor{keywordtype}{void} MCU_RunProcedure(uint8\_t \textcolor{keywordtype}{id});
+00058         uint8\_t MCU_WaitForStatus(uint16\_t timeout_ms);
+00059     \textcolor{keyword}{public}:
+00060         lms7002_pnlR3_view( wxWindow* parent );
+00061         lms7002_pnlR3_view(wxWindow* parent, wxWindowID \textcolor{keywordtype}{id} = wxID\_ANY, \textcolor{keyword}{const} wxPoint& pos = 
+      wxDefaultPosition, \textcolor{keyword}{const} wxSize& size = wxDefaultSize, \textcolor{keywordtype}{long} style = wxTAB\_TRAVERSAL);
+00062         ~lms7002_pnlR3_view();
+00063         \textcolor{keywordtype}{void} Initialize(lms_device_t* pControl);
+00064         \textcolor{keywordtype}{void} UpdateGUI();
+00065 \textcolor{keyword}{protected}:
+00066     lms_device_t* lmsControl;
+00067     std::map<wxWindow*, LMS7Parameter> wndId2Enum;
+00068 \};
+00069 
+00070 \textcolor{preprocessor}{#endif // \_\_lms7002\_pnlAFE\_view\_\_}
+\end{DoxyCode}

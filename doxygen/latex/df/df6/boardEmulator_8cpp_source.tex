@@ -1,0 +1,233 @@
+\subsection{board\+Emulator.\+cpp}
+\label{boardEmulator_8cpp_source}\index{/home/erik/prefix/default/src/limesuite-\/dev/src/board\+Emulator.\+cpp@{/home/erik/prefix/default/src/limesuite-\/dev/src/board\+Emulator.\+cpp}}
+
+\begin{DoxyCode}
+00001 \textcolor{preprocessor}{#include <signal.h>}
+00002 \textcolor{preprocessor}{#include <stdlib.h>}
+00003 \textcolor{preprocessor}{#include <stdio.h>}
+00004 \textcolor{preprocessor}{#include <iostream>}
+00005 \textcolor{preprocessor}{#include <thread>}
+00006 \textcolor{preprocessor}{#include <unistd.h>}
+00007 \textcolor{preprocessor}{#include <fcntl.h>}
+00008 \textcolor{preprocessor}{#include <errno.h>}
+00009 \textcolor{preprocessor}{#include <string.h>}
+00010 \textcolor{preprocessor}{#include <vector>}
+00011 \textcolor{preprocessor}{#include <termios.h>}
+00012 \textcolor{preprocessor}{#include <map>}
+00013 \textcolor{preprocessor}{#include <ctime>}
+00014 \textcolor{preprocessor}{#include <LMS64CProtocol.h>}
+00015 \textcolor{preprocessor}{#include <LMSBoards.h>}
+00016 
+00017 \textcolor{keyword}{using namespace }std;
+00018 \textcolor{keyword}{using namespace }lime;
+00019 
+00020 \textcolor{keywordtype}{bool} stopApplication = \textcolor{keyword}{false};
+00021 
+00022 \textcolor{keywordtype}{int} ProcessLMS64C(\textcolor{keyword}{const} uint8\_t *input, uint8\_t *output);
+00023 
+00024 \textcolor{keywordtype}{void} ApplicationStopHandler(\textcolor{keywordtype}{int} s)
+00025 \{
+00026     printf(\textcolor{stringliteral}{"Caught signal %d, stopping application\(\backslash\)n"},s);
+00027     stopApplication = \textcolor{keyword}{true};
+00028 \}
+00029 
+00030 \textcolor{keywordtype}{int} main(\textcolor{keywordtype}{int} argc, \textcolor{keywordtype}{char}** argv)
+00031 \{
+00032     \textcolor{keyword}{struct }sigaction sigIntHandler;
+00033     sigIntHandler.sa\_handler = ApplicationStopHandler;
+00034     sigemptyset(&sigIntHandler.sa\_mask);
+00035     sigIntHandler.sa\_flags = 0;
+00036     sigaction(SIGINT, &sigIntHandler, NULL);
+00037 
+00038     \textcolor{keywordtype}{int} masterFd = posix\_openpt(O\_RDWR);
+00039     \textcolor{keywordflow}{if}(masterFd < 0)
+00040     \{
+00041         printf(\textcolor{stringliteral}{"failed to open ptmx\(\backslash\)n"});
+00042         \textcolor{keywordflow}{return} -1;
+00043     \}
+00044     grantpt(masterFd);
+00045     unlockpt(masterFd);
+00046     printf(\textcolor{stringliteral}{"slave: %s\(\backslash\)n"}, ptsname(masterFd));
+00047 
+00048     \textcolor{comment}{//create soft link to emulator}
+00049     \textcolor{keywordtype}{char} linkCommand[256];
+00050     printf(\textcolor{stringliteral}{"Creating symbolik link /dev/ttyACM\_LMS7emulator\(\backslash\)n"});
+00051     sprintf(linkCommand, \textcolor{stringliteral}{"sudo ln -s %s /dev/ttyACM\_LMS7emulator"}, ptsname(masterFd));
+00052     system(linkCommand);
+00053 
+00054     cout << \textcolor{stringliteral}{"LMS7 board emulator started"} << endl;
+00055 
+00056     \textcolor{keyword}{const} \textcolor{keywordtype}{int} bufSize = 64;
+00057     vector<uint8\_t> inputBuf;
+00058 
+00059     uint8\_t outputBuf[64];
+00060 
+00061     \textcolor{keyword}{struct }termios term\_settings;
+00062     tcgetattr(masterFd, &term\_settings);
+00063     \textcolor{comment}{// Set raw mode on the slave side of the PTY}
+00064     cfmakeraw (&term\_settings);
+00065     tcsetattr (masterFd, TCSANOW, &term\_settings);
+00066 
+00067     \textcolor{keywordflow}{while}(not stopApplication)
+00068     \{
+00069         \textcolor{keywordtype}{char} tempbuf[128];
+00070         \textcolor{keywordtype}{int} bwrite = 0;
+00071         \textcolor{keywordtype}{int} bread = read(masterFd, tempbuf, bufSize);
+00072         \textcolor{keywordflow}{if}(bread < 0)
+00073         \{
+00074             \textcolor{keywordtype}{int} errsv = errno;
+00075             printf(\textcolor{stringliteral}{"%s\(\backslash\)n"}, strerror(errsv));
+00076             std::this\_thread::sleep\_for(std::chrono::milliseconds(1000));
+00077             \textcolor{keywordflow}{continue};
+00078         \}
+00079 
+00080         time\_t rawtime;
+00081         \textcolor{keyword}{struct }tm * timeinfo;
+00082         \textcolor{keywordtype}{char} timeBuf[80];
+00083         time(&rawtime);
+00084         timeinfo = localtime(&rawtime);
+00085         strftime(timeBuf, 80, \textcolor{stringliteral}{"[%H:%M:%S] "}, timeinfo);
+00086 
+00087         printf(\textcolor{stringliteral}{"%s Received: %i\(\backslash\)n"}, timeBuf, bread);
+00088         \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} i=0; i<bread; ++i)
+00089         \{
+00090             inputBuf.push\_back(tempbuf[i]);
+00091             \textcolor{keywordflow}{if}(inputBuf.size() == 64)
+00092             \{
+00093                 ProcessLMS64C(inputBuf.data(), outputBuf);
+00094                 bwrite = write(masterFd, outputBuf, bufSize);
+00095                 \textcolor{keywordflow}{if}(bwrite < 0)
+00096                 \{
+00097                     \textcolor{keywordtype}{int} errsv = errno;
+00098                     printf(\textcolor{stringliteral}{"error writing data %s\(\backslash\)n"}, strerror(errsv));
+00099                 \}
+00100                 time(&rawtime);
+00101                 timeinfo = localtime(&rawtime);
+00102                 strftime(timeBuf, 80, \textcolor{stringliteral}{"[%H:%M:%S] "}, timeinfo);
+00103                 printf(\textcolor{stringliteral}{"%s Transmitted: %i\(\backslash\)n"}, timeBuf, bwrite);
+00104                 inputBuf.clear();
+00105             \}
+00106         \}
+00107     \}
+00108     close(masterFd);
+00109     printf(\textcolor{stringliteral}{"Removing symbolic link /dev/ttyACM\_LMS7emulator\(\backslash\)n"});
+00110     sprintf(linkCommand, \textcolor{stringliteral}{"sudo rm /dev/ttyACM\_LMS7emulator"});
+00111     system(linkCommand);
+00112     \textcolor{keywordflow}{return} 0;
+00113 \}
+00114 
+00115 
+00116 \textcolor{comment}{//LMS7002 registers}
+00117 map<uint16\_t, uint16\_t> channelA;
+00118 map<uint16\_t, uint16\_t> channelB;
+00119 
+00120 \textcolor{comment}{//FPGA registers}
+00121 map<uint16\_t, uint16\_t> fpgaRegisters;
+00122 
+00123 \textcolor{keywordtype}{void} WriteRegister(\textcolor{keyword}{const} uint16\_t addr, \textcolor{keyword}{const} uint16\_t data)
+00124 \{
+00125     \textcolor{keywordflow}{if}((channelA[0x0020] & 0x1) != 0 || addr < 0x0100) \textcolor{comment}{//A channel}
+00126         channelA[addr] = data;
+00127     \textcolor{keywordflow}{if}((channelA[0x0020] & 0x2) != 0 && addr >= 0x0100) \textcolor{comment}{//B channel}
+00128         channelB[addr] = data;
+00129 \}
+00130 uint16\_t ReadRegister(\textcolor{keyword}{const} uint16\_t addr)
+00131 \{
+00132     uint16\_t retValue = 0;
+00133     \textcolor{keywordflow}{if}((channelA[0x0020] & 0x1) != 0 || addr < 0x0100) \textcolor{comment}{//A channel}
+00134         retValue |= channelA[addr];
+00135     \textcolor{keywordflow}{if}((channelA[0x0020] & 0x2) != 0 && addr >= 0x0100) \textcolor{comment}{//B channel}
+00136         retValue |= channelB[addr];
+00137     \textcolor{keywordflow}{return} retValue;
+00138 \}
+00139 
+00140 \textcolor{keywordtype}{int} ProcessLMS64C(\textcolor{keyword}{const} uint8\_t *input, uint8\_t *output)
+00141 \{
+00142     printf(\textcolor{stringliteral}{"Got cmd: %i\(\backslash\)n"}, input[0]);
+00143     \textcolor{keyword}{const} \textcolor{keywordtype}{int} hs = 8; \textcolor{comment}{//header size}
+00144     \textcolor{keyword}{const} \textcolor{keywordtype}{int} bufSize = 64;
+00145     memset(output, 0, bufSize);
+00146     \textcolor{keywordflow}{switch}(input[0])
+00147     \{
+00148     \textcolor{keywordflow}{case} CMD_GET_INFO:
+00149         memcpy(output, input, hs);
+00150         output[1] = STATUS_COMPLETED_CMD;
+00151         output[hs+0] = 255; \textcolor{comment}{//firmware}
+00152         output[hs+1] = LMS_DEV_EVB7V2; \textcolor{comment}{//device}
+00153         output[hs+2] = 255; \textcolor{comment}{//protocol}
+00154         output[hs+3] = 255; \textcolor{comment}{//hardware}
+00155         output[hs+4] = EXP_BOARD_UNSUPPORTED; \textcolor{comment}{//expansion board}
+00156         \textcolor{keywordflow}{break};
+00157     \textcolor{keywordflow}{case} CMD_LMS7002_WR:\{
+00158         memcpy(output, input, bufSize);
+00159         output[1] = STATUS_COMPLETED_CMD;
+00160         \textcolor{keywordtype}{int} blockCount = input[2];
+00161         \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} i=0; i<blockCount; ++i)
+00162         \{
+00163             \textcolor{keywordtype}{int} bufPos = hs+i*4;
+00164             \textcolor{keywordtype}{int} addr = (input[bufPos]<<8) | input[bufPos+1];
+00165             addr = addr & 0x7FFF;
+00166             \textcolor{keywordtype}{int} data = (input[bufPos+2]<<8) | input[bufPos+3];
+00167             WriteRegister(addr, data);
+00168         \}
+00169         \textcolor{keywordflow}{break};\}
+00170     \textcolor{keywordflow}{case} CMD_LMS7002_RD:\{
+00171         memcpy(output, input, hs);
+00172         output[1] = STATUS_COMPLETED_CMD;
+00173         \textcolor{keywordtype}{int} blockCount = input[2];
+00174         \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} i=0; i<blockCount; ++i)
+00175         \{
+00176             \textcolor{keywordtype}{int} bufPos = hs+i*2;
+00177             \textcolor{keywordtype}{int} addr = (input[bufPos]<<8) | input[bufPos+1];
+00178             addr = addr & 0x7FFF;
+00179             \textcolor{keywordtype}{int} data = ReadRegister(addr);
+00180             \textcolor{keywordtype}{int} outBufPos = hs+i*4;
+00181             output[outBufPos] = input[bufPos];
+00182             output[outBufPos+1] = input[bufPos+1];
+00183             output[outBufPos+2] = data >> 8;
+00184             output[outBufPos+3] = data & 0xFF;
+00185         \}
+00186         \textcolor{keywordflow}{break};\}
+00187     \textcolor{keywordflow}{case} CMD_BRDSPI_WR:\{
+00188         memcpy(output, input, bufSize);
+00189         output[1] = STATUS_COMPLETED_CMD;
+00190         \textcolor{keywordtype}{int} blockCount = input[2];
+00191         \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} i=0; i<blockCount; ++i)
+00192         \{
+00193             \textcolor{keywordtype}{int} bufPos = hs+i*4;
+00194             \textcolor{keywordtype}{int} addr = (input[bufPos]<<8) | input[bufPos+1];
+00195             addr = addr & 0x7FFF;
+00196             \textcolor{keywordtype}{int} data = (input[bufPos+2]<<8) | input[bufPos+3];
+00197             fpgaRegisters[addr] = data;
+00198         \}
+00199         \textcolor{keywordflow}{break};\}
+00200     \textcolor{keywordflow}{case} CMD_BRDSPI_RD:\{
+00201         memcpy(output, input, hs);
+00202         output[1] = STATUS_COMPLETED_CMD;
+00203         \textcolor{keywordtype}{int} blockCount = input[2];
+00204         \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} i=0; i<blockCount; ++i)
+00205         \{
+00206             \textcolor{keywordtype}{int} bufPos = hs+i*2;
+00207             \textcolor{keywordtype}{int} addr = (input[bufPos]<<8) | input[bufPos+1];
+00208             addr = addr & 0x7FFF;
+00209             \textcolor{keywordtype}{int} data = fpgaRegisters[addr];
+00210             \textcolor{keywordtype}{int} outBufPos = hs+i*4;
+00211             output[outBufPos] = input[bufPos];
+00212             output[outBufPos+1] = input[bufPos+1];
+00213             output[outBufPos+2] = data >> 8;
+00214             output[outBufPos+3] = data & 0xFF;
+00215         \}
+00216         \textcolor{keywordflow}{break};\}
+00217     \textcolor{keywordflow}{case} CMD_ALTERA_FPGA_GW_WR:
+00218     \textcolor{keywordflow}{case} CMD_ALTERA_FPGA_GW_RD:
+00219     \textcolor{keywordflow}{case} CMD_MEMORY_WR:
+00220         memcpy(output, input, hs);
+00221         output[1] = STATUS_COMPLETED_CMD;
+00222         \textcolor{keywordflow}{break};
+00223     \textcolor{keywordflow}{default}:
+00224         memcpy(output, input, hs);
+00225         output[1] = STATUS_UNKNOWN_CMD;
+00226     \}
+00227     \textcolor{keywordflow}{return} 0;
+00228 \}
+\end{DoxyCode}

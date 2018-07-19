@@ -1,0 +1,36 @@
+\subsection{Version\+Info.\+in.\+cpp}
+\label{VersionInfo_8in_8cpp_source}\index{/home/erik/prefix/default/src/limesuite-\/dev/src/\+Version\+Info.\+in.\+cpp@{/home/erik/prefix/default/src/limesuite-\/dev/src/\+Version\+Info.\+in.\+cpp}}
+
+\begin{DoxyCode}
+00001 
+00007 \textcolor{preprocessor}{#include "VersionInfo.h"}
+00008 \textcolor{preprocessor}{#include <sstream>}
+00009 
+00010 \textcolor{preprocessor}{#define QUOTE\_(x) #x}
+00011 \textcolor{preprocessor}{#define QUOTE(x) QUOTE\_(x)}
+00012 
+00013 std::string lime::GetLibraryVersion(\textcolor{keywordtype}{void})
+00014 \{
+00015     \textcolor{keywordflow}{return} \textcolor{stringliteral}{"@LIME\_SUITE\_VERSION@"};
+00016 \}
+00017 
+00018 std::string lime::GetBuildTimestamp(\textcolor{keywordtype}{void})
+00019 \{
+00020     \textcolor{keywordflow}{return} \textcolor{stringliteral}{"@BUILD\_TIMESTAMP@"};
+00021 \}
+00022 
+00023 std::string lime::GetAPIVersion(\textcolor{keywordtype}{void})
+00024 \{
+00025     \textcolor{keyword}{const} std::string verStr(QUOTE(LIME_SUITE_API_VERSION));
+00026     std::stringstream ss;
+00027     ss << std::stoi(verStr.substr(2, 4)) << \textcolor{stringliteral}{"."}
+00028        << std::stoi(verStr.substr(6, 2)) << \textcolor{stringliteral}{"."}
+00029        << std::stoi(verStr.substr(8, 2));
+00030     \textcolor{keywordflow}{return} ss.str();
+00031 \}
+00032 
+00033 std::string lime::GetABIVersion(\textcolor{keywordtype}{void})
+00034 \{
+00035     \textcolor{keywordflow}{return} \textcolor{stringliteral}{"@LIME\_SUITE\_SOVER@"};
+00036 \}
+\end{DoxyCode}

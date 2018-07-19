@@ -1,0 +1,223 @@
+\subsection{dual\+R\+X\+T\+X.\+cpp}
+\label{dualRXTX_8cpp_source}\index{/home/erik/prefix/default/src/limesuite-\/dev/src/examples/dual\+R\+X\+T\+X.\+cpp@{/home/erik/prefix/default/src/limesuite-\/dev/src/examples/dual\+R\+X\+T\+X.\+cpp}}
+
+\begin{DoxyCode}
+00001 
+00006 \textcolor{preprocessor}{#include "lime/LimeSuite.h"}
+00007 \textcolor{preprocessor}{#include <iostream>}
+00008 \textcolor{preprocessor}{#include <chrono>}
+00009 \textcolor{preprocessor}{#ifdef USE\_GNU\_PLOT}
+00010 \textcolor{preprocessor}{#include "gnuPlotPipe.h"}
+00011 \textcolor{preprocessor}{#endif}
+00012 
+00013 \textcolor{keyword}{using namespace }std;
+00014 
+00015 \textcolor{comment}{//Device structure, should be initialize to NULL}
+00016 lms_device_t* device = NULL;
+00017 
+00018 \textcolor{keywordtype}{int} error()
+00019 \{
+00020     \textcolor{keywordflow}{if} (device != NULL)
+00021         LMS_Close(device);
+00022     exit(-1);
+00023 \}
+00024 
+00025 \textcolor{keywordtype}{int} main(\textcolor{keywordtype}{int} argc, \textcolor{keywordtype}{char}** argv)
+00026 \{
+00027     \textcolor{comment}{//Find devices}
+00028     \textcolor{keywordtype}{int} n;
+00029     lms_info_str_t list[8]; \textcolor{comment}{//should be large enough to hold all detected devices}
+00030     \textcolor{keywordflow}{if} ((n = LMS_GetDeviceList(list)) < 0) \textcolor{comment}{//NULL can be passed to only get number of devices}
+00031         error();
+00032 
+00033     cout << \textcolor{stringliteral}{"Devices found: "} << n << endl; \textcolor{comment}{//print number of devices}
+00034     \textcolor{keywordflow}{if} (n < 1)
+00035         \textcolor{keywordflow}{return} -1;
+00036 
+00037     \textcolor{comment}{//open the first device}
+00038     \textcolor{keywordflow}{if} (LMS_Open(&device, list[0], NULL))
+00039         error();
+00040 
+00041     \textcolor{comment}{//Initialize device with default configuration}
+00042     \textcolor{comment}{//Do not use if you want to keep existing configuration}
+00043     \textcolor{comment}{//Use LMS\_LoadConfig(device, "/path/to/file.ini") to load config from INI}
+00044     \textcolor{keywordflow}{if} (LMS_Init(device) != 0)
+00045         error();
+00046 
+00047     \textcolor{comment}{//Get number of channels}
+00048     \textcolor{keywordflow}{if} ((n = LMS_GetNumChannels(device, LMS_CH_RX)) < 0)
+00049         error();
+00050     cout << \textcolor{stringliteral}{"Number of RX channels: "} << n << endl;
+00051     \textcolor{keywordflow}{if} ((n = LMS_GetNumChannels(device, LMS_CH_TX)) < 0)
+00052         error();
+00053     cout << \textcolor{stringliteral}{"Number of TX channels: "} << n << endl;
+00054 
+00055     \textcolor{comment}{//Enable RX channel}
+00056     \textcolor{comment}{//Channels are numbered starting at 0}
+00057     \textcolor{keywordflow}{if} (LMS_EnableChannel(device, LMS_CH_RX, 0, \textcolor{keyword}{true}) != 0)
+00058         error();
+00059     \textcolor{keywordflow}{if} (LMS_EnableChannel(device, LMS_CH_RX, 1, \textcolor{keyword}{true}) != 0)
+00060         error();
+00061     \textcolor{comment}{//Enable TX channels}
+00062     \textcolor{keywordflow}{if} (LMS_EnableChannel(device, LMS_CH_TX, 0, \textcolor{keyword}{true}) != 0)
+00063         error();
+00064     \textcolor{keywordflow}{if} (LMS_EnableChannel(device, LMS_CH_TX, 1, \textcolor{keyword}{true}) != 0)
+00065         error();
+00066 
+00067     \textcolor{comment}{//Set RX center frequency to 1 GHz}
+00068     \textcolor{keywordflow}{if} (LMS_SetLOFrequency(device, LMS_CH_RX, 0, 1e9) != 0)
+00069         error();
+00070     \textcolor{keywordflow}{if} (LMS_SetLOFrequency(device, LMS_CH_RX, 1, 1e9) != 0)
+00071         error();
+00072     \textcolor{comment}{//Set TX center frequency to 1 GHz}
+00073     \textcolor{comment}{//Automatically selects antenna port}
+00074     \textcolor{keywordflow}{if} (LMS_SetLOFrequency(device, LMS_CH_TX, 0, 1.2e9) != 0)
+00075         error();
+00076     \textcolor{keywordflow}{if} (LMS_SetLOFrequency(device, LMS_CH_TX, 1, 1.2e9) != 0)
+00077         error();
+00078 
+00079     \textcolor{comment}{//Set sample rate to 10 MHz, preferred oversampling in RF 4x}
+00080     \textcolor{comment}{//This set sampling rate for all channels}
+00081     \textcolor{keywordflow}{if} (LMS_SetSampleRate(device, 10e6, 4) != 0)
+00082         error();
+00083 
+00084     \textcolor{comment}{//Set RX gain}
+00085     \textcolor{keywordflow}{if} (LMS_SetNormalizedGain(device, LMS_CH_RX, 0, 0.7) != 0)
+00086         error();
+00087     \textcolor{keywordflow}{if} (LMS_SetNormalizedGain(device, LMS_CH_RX, 1, 0.7) != 0)
+00088         error();
+00089     \textcolor{comment}{//Set TX gain}
+00090     \textcolor{keywordflow}{if} (LMS_SetNormalizedGain(device, LMS_CH_TX, 0, 0.4) != 0)
+00091         error();
+00092     \textcolor{keywordflow}{if} (LMS_SetNormalizedGain(device, LMS_CH_TX, 1, 0.4) != 0)
+00093         error();
+00094 
+00095     \textcolor{comment}{//Enable test signals generation in RX channels}
+00096     \textcolor{comment}{//To receive data from RF, remove these lines or change signal to LMS\_TESTSIG\_NONE}
+00097     \textcolor{keywordflow}{if} (LMS_SetTestSignal(device, LMS_CH_RX, 0, LMS_TESTSIG_NCODIV4, 0, 0) != 0)
+00098         error();
+00099     \textcolor{keywordflow}{if} (LMS_SetTestSignal(device, LMS_CH_RX, 1, LMS_TESTSIG_NCODIV8F, 0, 0) != 0)
+00100         error();
+00101 
+00102     \textcolor{comment}{//Streaming Setup}
+00103 
+00104     \textcolor{keyword}{const} \textcolor{keywordtype}{int} chCount = 2; \textcolor{comment}{//number of RX/TX streams}
+00105     lms_stream_t rx\_streams[chCount];
+00106     lms_stream_t tx\_streams[chCount];
+00107     \textcolor{comment}{//Initialize streams}
+00108     \textcolor{comment}{//All streams setups should be done before starting streams. New streams cannot be set-up if at least
+       stream is running.}
+00109     \textcolor{keywordflow}{for} (\textcolor{keywordtype}{int} i = 0; i < chCount; ++i)
+00110     \{
+00111         rx\_streams[i].channel = i; \textcolor{comment}{//channel number}
+00112         rx\_streams[i].fifoSize = 1024 * 1024; \textcolor{comment}{//fifo size in samples}
+00113         rx\_streams[i].throughputVsLatency = 0.5; \textcolor{comment}{//some middle ground}
+00114         rx\_streams[i].isTx = \textcolor{keyword}{false}; \textcolor{comment}{//RX channel}
+00115         rx\_streams[i].dataFmt = lms_stream_t::LMS_FMT_I12; \textcolor{comment}{//12-bit integers}
+00116         \textcolor{keywordflow}{if} (LMS_SetupStream(device, &rx\_streams[i]) != 0)
+00117             error();
+00118         tx\_streams[i].channel = i; \textcolor{comment}{//channel number}
+00119         tx\_streams[i].fifoSize = 1024 * 1024; \textcolor{comment}{//fifo size in samples}
+00120         tx\_streams[i].throughputVsLatency = 0.5; \textcolor{comment}{//some middle ground}
+00121         tx\_streams[i].isTx = \textcolor{keyword}{true}; \textcolor{comment}{//TX channel}
+00122         tx\_streams[i].dataFmt = lms_stream_t::LMS_FMT_I12; \textcolor{comment}{//12-bit integers}
+00123         \textcolor{keywordflow}{if} (LMS_SetupStream(device, &tx\_streams[i]) != 0)
+00124             error();
+00125     \}
+00126 
+00127     \textcolor{comment}{//Initialize data buffers}
+00128     \textcolor{keyword}{const} \textcolor{keywordtype}{int} bufersize = 1024 * 8; \textcolor{comment}{//complex samples per buffer}
+00129     int16\_t * buffers[chCount];
+00130     \textcolor{keywordflow}{for} (\textcolor{keywordtype}{int} i = 0; i < chCount; ++i)
+00131     \{
+00132         buffers[i] = \textcolor{keyword}{new} int16\_t[bufersize * 2]; \textcolor{comment}{//buffer to hold complex values (2*samples))}
+00133     \}
+00134 
+00135     \textcolor{comment}{//Start streaming}
+00136     \textcolor{keywordflow}{for} (\textcolor{keywordtype}{int} i = 0; i < chCount; ++i)
+00137     \{
+00138         LMS_StartStream(&rx\_streams[i]);
+00139         LMS_StartStream(&tx\_streams[i]);
+00140     \}
+00141 
+00142     \textcolor{comment}{//Streaming}
+00143 
+00144     lms_stream_meta_t rx\_metadata; \textcolor{comment}{//Use metadata for additional control over sample receive function
+       behavior}
+00145     rx\_metadata.flushPartialPacket = \textcolor{keyword}{false}; \textcolor{comment}{//currently has no effect in RX}
+00146     rx\_metadata.waitForTimestamp = \textcolor{keyword}{false}; \textcolor{comment}{//currently has no effect in RX}
+00147 
+00148     lms_stream_meta_t tx\_metadata; \textcolor{comment}{//Use metadata for additional control over sample send function behavior}
+00149     tx\_metadata.flushPartialPacket = \textcolor{keyword}{false}; \textcolor{comment}{//do not force sending of incomplete packet}
+00150     tx\_metadata.waitForTimestamp = \textcolor{keyword}{true}; \textcolor{comment}{//Enable synchronization to HW timestamp}
+00151 
+00152 \textcolor{preprocessor}{#ifdef USE\_GNU\_PLOT}
+00153     GNUPlotPipe gp;
+00154     gp.write(\textcolor{stringliteral}{"set size square\(\backslash\)n set xrange[-2050:2050]\(\backslash\)n set yrange[-2050:2050]\(\backslash\)n"});
+00155 \textcolor{preprocessor}{#endif}
+00156     \textcolor{keyword}{auto} t1 = chrono::high\_resolution\_clock::now();
+00157     \textcolor{keyword}{auto} t2 = t1;
+00158 
+00159     \textcolor{keywordflow}{while} (chrono::high\_resolution\_clock::now() - t1 < chrono::seconds(10)) \textcolor{comment}{//run for 10 seconds}
+00160     \{
+00161         \textcolor{keywordflow}{for} (\textcolor{keywordtype}{int} i = 0; i < chCount; ++i)
+00162         \{
+00163             \textcolor{keywordtype}{int} samplesRead;
+00164             \textcolor{comment}{//Receive samples}
+00165             samplesRead = LMS_RecvStream(&rx\_streams[i], buffers[i], bufersize, &rx\_metadata, 1000);
+00166             \textcolor{comment}{//Send samples with 1024*256 sample delay from RX (waitForTimestamp is enabled)}
+00167             tx\_metadata.timestamp = rx\_metadata.timestamp + 1024 * 256;
+00168             LMS_SendStream(&tx\_streams[i], buffers[i], samplesRead, &tx\_metadata, 1000);
+00169         \}
+00170 
+00171         \textcolor{comment}{//Print stats every 1s}
+00172         \textcolor{keywordflow}{if} (chrono::high\_resolution\_clock::now() - t2 > chrono::seconds(1))
+00173         \{
+00174             t2 = chrono::high\_resolution\_clock::now();
+00175 \textcolor{preprocessor}{#ifdef USE\_GNU\_PLOT}
+00176             \textcolor{comment}{//Plot samples}
+00177             gp.write(\textcolor{stringliteral}{"plot '-' with points title 'ch 0'"});
+00178             \textcolor{keywordflow}{for} (\textcolor{keywordtype}{int} i = 1; i < chCount; ++i)
+00179                 gp.write(\textcolor{stringliteral}{", '-' with points title 'ch 1'\(\backslash\)n"});
+00180             \textcolor{keywordflow}{for} (\textcolor{keywordtype}{int} i = 0; i < chCount; ++i)
+00181             \{
+00182                 \textcolor{keywordflow}{for} (uint32\_t j = 0; j < bufersize / 8; ++j)
+00183                     gp.writef(\textcolor{stringliteral}{"%i %i\(\backslash\)n"}, buffers[i][2 * j], buffers[i][2 * j + 1]);
+00184                 gp.write(\textcolor{stringliteral}{"e\(\backslash\)n"});
+00185                 gp.flush();
+00186             \}
+00187 \textcolor{preprocessor}{#endif}
+00188             \textcolor{comment}{//Print stats}
+00189             lms_stream_status_t status;
+00190             LMS_GetStreamStatus(rx\_streams, &status); \textcolor{comment}{//Obtain RX stream stats}
+00191             cout << \textcolor{stringliteral}{"RX rate: "} << status.linkRate / 1e6 << \textcolor{stringliteral}{" MB/s\(\backslash\)n"}; \textcolor{comment}{//link data rate (both channels))}
+00192             cout << \textcolor{stringliteral}{"RX 0 FIFO: "} << 100 * status.fifoFilledCount / status.
+      fifoSize << \textcolor{stringliteral}{"%"} << endl; \textcolor{comment}{//percentage of RX 0 fifo filled}
+00193 
+00194             LMS_GetStreamStatus(tx\_streams, &status); \textcolor{comment}{//Obtain TX stream stats}
+00195             cout << \textcolor{stringliteral}{"TX rate: "} << status.linkRate / 1e6 << \textcolor{stringliteral}{" MB/s\(\backslash\)n"}; \textcolor{comment}{//link data rate (both channels))}
+00196             cout << \textcolor{stringliteral}{"TX 0 FIFO: "} << 100 * status.fifoFilledCount / status.
+      fifoSize << \textcolor{stringliteral}{"%"} << endl; \textcolor{comment}{//percentage of TX 0 fifo filled}
+00197         \}
+00198     \}
+00199 
+00200     \textcolor{comment}{//Stop streaming}
+00201     \textcolor{keywordflow}{for} (\textcolor{keywordtype}{int} i = 0; i < chCount; ++i)
+00202     \{
+00203         LMS_StopStream(&rx\_streams[i]); \textcolor{comment}{//stream is stopped but can be started again with LMS\_StartStream()}
+00204         LMS_StopStream(&tx\_streams[i]);
+00205     \}
+00206     \textcolor{keywordflow}{for} (\textcolor{keywordtype}{int} i = 0; i < chCount; ++i)
+00207     \{
+00208         LMS_DestroyStream(device, &rx\_streams[i]); \textcolor{comment}{//stream is deallocated and can no longer be used}
+00209         LMS_DestroyStream(device, &tx\_streams[i]);
+00210         \textcolor{keyword}{delete}[] buffers[i];
+00211     \}
+00212 
+00213     \textcolor{comment}{//Close device}
+00214     LMS_Close(device);
+00215 
+00216     \textcolor{keywordflow}{return} 0;
+00217 \}
+00218 
+\end{DoxyCode}

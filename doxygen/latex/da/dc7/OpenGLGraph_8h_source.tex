@@ -1,0 +1,410 @@
+\subsection{Open\+G\+L\+Graph.\+h}
+\label{OpenGLGraph_8h_source}\index{/home/erik/prefix/default/src/limesuite-\/dev/src/ogl\+Graph/\+Open\+G\+L\+Graph.\+h@{/home/erik/prefix/default/src/limesuite-\/dev/src/ogl\+Graph/\+Open\+G\+L\+Graph.\+h}}
+
+\begin{DoxyCode}
+00001 
+00007 \textcolor{preprocessor}{#ifndef OPENGL\_GRAPH}
+00008 \textcolor{preprocessor}{#define OPENGL\_GRAPH}
+00009 
+00010 \textcolor{preprocessor}{#include "glew/GL/glew.h"}
+00011 \textcolor{preprocessor}{#if defined(\_\_APPLE\_\_)}
+00012 \textcolor{preprocessor}{#include <OpenGL/gl.h>}
+00013 \textcolor{preprocessor}{#else}
+00014 \textcolor{preprocessor}{#include <GL/gl.h>}
+00015 \textcolor{preprocessor}{#endif}
+00016 \textcolor{preprocessor}{#include <wx/wx.h>}
+00017 \textcolor{preprocessor}{#include <wx/glcanvas.h>}
+00018 \textcolor{preprocessor}{#include <wx/timer.h>}
+00019 
+00020 \textcolor{preprocessor}{#include <string>}
+00021 \textcolor{preprocessor}{#include <vector>}
+00022 \textcolor{preprocessor}{#include "string.h"}
+00023 
+00024 \textcolor{keyword}{enum} eOGLGMouseButton
+00025 \{
+00026     OGLG_LEFT,
+00027     OGLG_RIGHT,
+00028     OGLG_MIDDLE
+00029 \};
+00030 
+00031 \textcolor{keyword}{enum} eOGLGActionState
+00032 \{
+00033     OGLG_IDLE,
+00034     OGLG_ZOOMIN,
+00035     OGLG_PAN,
+00036     OGLG_SCALE,
+00037     OGLG_ADD_MARKER,
+00038     OGLG_MOVE_MARKER,
+00039     OGLG_REMOVE_MARKER,
+00040     OGLG_SEARCH_PEAK
+00041 \};
+00042 
+00043 \textcolor{keyword}{enum}
+00044 \{
+00045     OGLG_FIT = 3000,
+00046     OGLG_LOCKASPECT,
+00047     OGLG_HELP_MOUSE,
+00048     OGLG_ADD_MARK,
+00049     OGLG_SHOW_MARKERS_MENU,
+00050     OGLG_RESET
+00051 \};
+00052 
+00053 \textcolor{keyword}{enum} eDrawingMode
+00054 \{
+00055     GLG_POINTS = 0,
+00056     GLG_LINE
+00057 \};
+00058 
+00059 \textcolor{keyword}{template}<\textcolor{keyword}{class} T>
+00060 \textcolor{keyword}{struct }sRect
+00061 \{
+00062     sRect(T X1, T X2, T Y1, T Y2)
+00063     \{
+00064         x1 = X1;
+00065         x2 = X2;
+00066         y1 = Y1;
+00067         y2 = Y2;
+00068     \}
+00069     T x1,x2,y1,y2;
+00070     \textcolor{keywordtype}{void} \textcolor{keyword}{set}(T X1, T X2, T Y1, T Y2)
+00071     \{
+00072         x1 = X1;
+00073         x2 = X2;
+00074         y1 = Y1;
+00075         y2 = Y2;
+00076     \}
+00077 \};
+00078 
+00079 \textcolor{keyword}{struct }GLG_color
+00080 \{
+00081     GLG_color(\textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{int} rgba)
+00082     \{
+00083         red = (rgba >> 24)  / 255.0;
+00084         green = ((rgba >> 16) & 0xFF) / 255.0;
+00085         blue = ((rgba >> 8) & 0xFF) / 255.0;
+00086         alpha = (rgba & 0xFF) / 255.0;
+00087     \}
+00088     GLG_color() : red(0.5), green(0.5), blue(0.5), alpha(1.0)
+00089     \{\}
+00090 
+00091     \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{int} getColor4b()
+00092     \{
+00093         \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{int} color = 0;
+00094         color |= (\textcolor{keywordtype}{unsigned} int)(255*red) << 24;
+00095         color |= (\textcolor{keywordtype}{unsigned} int)(255*green) << 16;
+00096         color |= (\textcolor{keywordtype}{unsigned} int)(255*blue) << 8;
+00097         color |= (\textcolor{keywordtype}{unsigned} int)(255*alpha);
+00098         \textcolor{keywordflow}{return} color;
+00099     \}
+00100 
+00101     \textcolor{keywordtype}{float} red;
+00102     \textcolor{keywordtype}{float} green;
+00103     \textcolor{keywordtype}{float} blue;
+00104     \textcolor{keywordtype}{float} alpha;
+00105 \};
+00106 
+00107 \textcolor{keyword}{class }cDataSerie
+00108 \{
+00109 \textcolor{keyword}{public}:
+00110     cDataSerie() : size(0), allocatedSize(0), vboIndex(0), visible(true), modified(true), values(NULL)
+00111     \{
+00112         color = 0x000000FF;
+00113         Initialize(10);
+00114     \};
+00115 
+00116     ~cDataSerie()
+00117     \{
+00118         \textcolor{keywordflow}{if}(values)
+00119             \textcolor{keyword}{delete} []values;
+00120     \};
+00121 
+00122     \textcolor{keywordtype}{void} AssignValues(\textcolor{keywordtype}{float} *xserie, \textcolor{keywordtype}{float} *yserie, \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{int} count)
+00123     \{
+00124         \textcolor{keywordflow}{if}(2*count > allocatedSize && count > 0)
+00125             Initialize(2*count);
+00126         \textcolor{keywordflow}{if}(xserie && yserie)
+00127         \{
+00128             \textcolor{keywordtype}{int} index = 0;
+00129             \textcolor{keywordflow}{for}(\textcolor{keywordtype}{unsigned} i=0; i<count; ++i)
+00130             \{
+00131                 values[index] = xserie[i];
+00132                 ++index;
+00133                 values[index] = yserie[i];
+00134                 ++index;
+00135             \}
+00136         \}
+00137         modified = \textcolor{keyword}{true};
+00138         size = count;
+00139     \}
+00140     \textcolor{keywordtype}{void} AssignValues(\textcolor{keywordtype}{float} *valuesXY, \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{int} length)
+00141     \{
+00142         \textcolor{keywordflow}{if}(length > allocatedSize && length > 0)
+00143             Initialize(length);
+00144         \textcolor{keywordflow}{if}(valuesXY)
+00145             memcpy(values, valuesXY, (length)*\textcolor{keyword}{sizeof}(\textcolor{keywordtype}{float}));
+00146         modified = \textcolor{keyword}{true};
+00147         size = length/2;
+00148     \}
+00149 
+00150     \textcolor{keywordtype}{void} Clear()
+00151     \{
+00152         \textcolor{keywordflow}{if}(values)
+00153             \textcolor{keyword}{delete} []values;
+00154         values = NULL;
+00155         size = 0;
+00156         allocatedSize = 0;
+00157         modified = \textcolor{keyword}{true};
+00158     \}
+00159     \textcolor{keywordtype}{void} Initialize(\textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{int} count)
+00160     \{
+00161         Clear();
+00162         size = count;
+00163         values = \textcolor{keyword}{new} \textcolor{keywordtype}{float}[2*count];
+00164         memset(values, 0, \textcolor{keyword}{sizeof}(\textcolor{keywordtype}{float})*2*count);
+00165         allocatedSize = count;
+00166     \}
+00167     \textcolor{keywordtype}{void} AddXY(\textcolor{keywordtype}{float} x, \textcolor{keywordtype}{float} y)
+00168     \{
+00169         \textcolor{keywordflow}{if}(size < allocatedSize)
+00170         \{
+00171             values[2*size] = x;
+00172             values[2*size+1] = y;
+00173             ++size;
+00174         \}
+00175         \textcolor{keywordflow}{else}
+00176         \{
+00177             \textcolor{keywordtype}{float} *newVal = \textcolor{keyword}{new} \textcolor{keywordtype}{float} [size*2];
+00178             allocatedSize = size*2;
+00179             memcpy(newVal, values, \textcolor{keyword}{sizeof}(\textcolor{keywordtype}{float})*size*2);
+00180             \textcolor{keyword}{delete} []values;
+00181             values = newVal;
+00182             values[2*size] = x;
+00183             values[2*size+1] = y;
+00184             ++size;
+00185         \}
+00186         modified = \textcolor{keyword}{true};
+00187     \}
+00188 
+00189     \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{int} size;
+00190     \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{int} allocatedSize;
+00191     \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{int} vboIndex;
+00192     GLG_color color;
+00193     \textcolor{keywordtype}{bool} visible;
+00194     \textcolor{keywordtype}{bool} modified;
+00195 
+00196     \textcolor{keywordtype}{float} *values;
+00197 \};
+00198 
+00199 \textcolor{keyword}{struct }GLG_settings
+00200 \{
+00201     GLG_settings();
+00202     std::string title;
+00203     std::string titleXaxis;
+00204     std::string titleYaxis;
+00205 
+00206     std::string xUnits;
+00207     std::string yUnits;
+00208 
+00209     \textcolor{keywordtype}{bool} drawGridX;
+00210     \textcolor{keywordtype}{bool} drawGridY;
+00211     \textcolor{keywordtype}{bool} drawTitle;
+00212     \textcolor{keywordtype}{bool} drawTitleX;
+00213     \textcolor{keywordtype}{bool} drawTitleY;
+00214 
+00215     \textcolor{keywordtype}{int} windowWidth;
+00216     \textcolor{keywordtype}{int} windowHeight;
+00217     \textcolor{keywordtype}{int} dataViewWidth;
+00218     \textcolor{keywordtype}{int} dataViewHeight;
+00219 
+00220     \textcolor{keywordtype}{int} marginTop;
+00221     \textcolor{keywordtype}{int} marginBottom;
+00222     \textcolor{keywordtype}{int} marginLeft;
+00223     \textcolor{keywordtype}{int} marginRight;
+00224     \textcolor{keywordtype}{bool} useVBO;
+00225 
+00226     GLG_color backgroundColor;
+00227     GLG_color titlesColor;
+00228     GLG_color dataViewBackgroundColor;
+00229     GLG_color dataViewPerimeterColor;
+00230     GLG_color gridColor;
+00231     eDrawingMode graphType;
+00232 
+00233     sRect<double> visibleArea;
+00234 
+00235     \textcolor{keywordtype}{float} gridXstart;
+00236     \textcolor{keywordtype}{float} gridYstart;
+00237     \textcolor{keywordtype}{float} gridXspacing;
+00238     \textcolor{keywordtype}{float} gridYspacing;
+00239     \textcolor{keywordtype}{int} gridXlines;
+00240     \textcolor{keywordtype}{int} gridYlines;
+00241     \textcolor{keywordtype}{int} gridXprec;
+00242     \textcolor{keywordtype}{int} gridYprec;
+00243     \textcolor{keywordtype}{int} gridValuesHeight;
+00244 
+00245     \textcolor{keywordtype}{float} pointsSize;
+00246     \textcolor{keywordtype}{float} fontSize;
+00247 
+00248     \textcolor{keywordtype}{bool} staticGrid;
+00249     \textcolor{keywordtype}{bool} lock_aspect;
+00250     \textcolor{keywordtype}{bool} markersEnabled;
+00251     \textcolor{keywordtype}{float} gridXoffset;
+00252 \};
+00253 
+00254 \textcolor{keyword}{struct }OGLMarker
+00255 \{
+00256     OGLMarker() : color(0x007F00FF)
+00257     \{
+00258         used = \textcolor{keyword}{false};
+00259         posX = 0;
+00260         posY = 0;
+00261         size = 10;
+00262         iposX = 0;
+00263         iposY = 0;
+00264         dataValueIndex = 0;
+00265         \textcolor{keywordtype}{id} = 0;
+00266         show = \textcolor{keyword}{true};
+00267     \}
+00268     \textcolor{keywordtype}{float} posX, posY; \textcolor{comment}{//data view position}
+00269     \textcolor{keywordtype}{int} iposX, iposY; \textcolor{comment}{//window position}
+00270     \textcolor{keywordtype}{float} size;
+00271     GLG_color color;
+00272     \textcolor{keywordtype}{int} dataValueIndex;
+00273     \textcolor{keywordtype}{int} id;
+00274     \textcolor{keywordtype}{bool} used;
+00275     \textcolor{keywordtype}{bool} show;
+00276 \};
+00277 
+00278 \textcolor{keyword}{class }GLFont;
+00279 \textcolor{keyword}{class }dlgMarkers;
+00280 
+00281 \textcolor{keyword}{class }OpenGLGraph : \textcolor{keyword}{public} wxGLCanvas
+00282 \{
+00283 \textcolor{keyword}{friend} \textcolor{keyword}{class }dlgMarkers;
+00284 \textcolor{keyword}{public}:
+00285     \textcolor{keyword}{static} \textcolor{keyword}{const} \textcolor{keywordtype}{int} GLCanvasAttributes[8];
+00286 
+00287     OpenGLGraph(wxWindow* parent,  wxWindowID \textcolor{keywordtype}{id}, \textcolor{keyword}{const} wxPoint& pos, \textcolor{keyword}{const} wxSize& 
+      size, \textcolor{keywordtype}{long} style, \textcolor{keyword}{const} wxString& name = wxEmptyString, \textcolor{keyword}{const} \textcolor{keywordtype}{int}* args = GLCanvasAttributes);
+00288     \textcolor{keyword}{virtual} ~OpenGLGraph();
+00289 
+00290     \textcolor{keywordtype}{bool} Initialize(\textcolor{keywordtype}{int} width, \textcolor{keywordtype}{int} height);
+00291     \textcolor{keywordtype}{void} Resize(\textcolor{keywordtype}{int} w, \textcolor{keywordtype}{int} h);
+00292 
+00293     \textcolor{keywordtype}{void} AddSerie(cDataSerie* serie);
+00294     \textcolor{keywordtype}{void} RemoveSeries(\textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{int} i);
+00295 
+00296     \textcolor{keywordtype}{void} SetInitialDisplayArea(\textcolor{keywordtype}{float} minx, \textcolor{keywordtype}{float} maxx, \textcolor{keywordtype}{float} miny, \textcolor{keywordtype}{float} maxy);
+00297     \textcolor{keywordtype}{void} SetDisplayArea(\textcolor{keywordtype}{float} minx, \textcolor{keywordtype}{float} maxx, \textcolor{keywordtype}{float} miny, \textcolor{keywordtype}{float} maxy);
+00298     \textcolor{keywordtype}{void} ZoomY( \textcolor{keywordtype}{float} centerY, \textcolor{keywordtype}{float} spanY);
+00299     \textcolor{keywordtype}{void} ZoomX( \textcolor{keywordtype}{float} centerX, \textcolor{keywordtype}{float} spanX);
+00300     \textcolor{keywordtype}{void} Zoom( \textcolor{keywordtype}{float} centerX, \textcolor{keywordtype}{float} centerY, \textcolor{keywordtype}{float} spanX, \textcolor{keywordtype}{float} spanY);
+00301     \textcolor{keywordtype}{void} ZoomRect( \textcolor{keywordtype}{int} x1, \textcolor{keywordtype}{int} x2, \textcolor{keywordtype}{int} y1, \textcolor{keywordtype}{int} y2);
+00302     \textcolor{keywordtype}{void} Pan( \textcolor{keywordtype}{float} dx, \textcolor{keywordtype}{float} dy);
+00303 
+00304     \textcolor{keywordtype}{void} SetDrawingMode( eDrawingMode mode );
+00305     \textcolor{keywordtype}{void} Draw();
+00306 
+00307     \textcolor{keywordtype}{bool} SaveConfig(\textcolor{keywordtype}{char} *file);
+00308     \textcolor{keywordtype}{bool} LoadConfig(\textcolor{keywordtype}{char} *file);
+00309 
+00310     std::vector<cDataSerie*> series;
+00311 
+00312     GLG_settings settings;
+00313     \textcolor{keywordtype}{void} SettingsChanged();
+00314 
+00315     \textcolor{keywordtype}{void} OnMouseDown(\textcolor{keywordtype}{int} mouseButton, \textcolor{keywordtype}{int} X, \textcolor{keywordtype}{int} Y);
+00316     \textcolor{keywordtype}{void} OnMouseUp(\textcolor{keywordtype}{int} mouseButton, \textcolor{keywordtype}{int} X, \textcolor{keywordtype}{int} Y);
+00317     \textcolor{keywordtype}{void} OnMouseMove(\textcolor{keywordtype}{int} X, \textcolor{keywordtype}{int} Y);
+00318     \textcolor{keywordtype}{void} ResetView();
+00319     \textcolor{keywordtype}{void} Fit();
+00320 
+00321     \textcolor{keywordtype}{void} SetMarker(\textcolor{keywordtype}{int} \textcolor{keywordtype}{id}, \textcolor{keywordtype}{float} xValue, \textcolor{keywordtype}{bool} enabled, \textcolor{keywordtype}{bool} show);
+00322     \textcolor{keywordtype}{void} GetMarker(\textcolor{keywordtype}{int} \textcolor{keywordtype}{id}, \textcolor{keywordtype}{float} &xValue, \textcolor{keywordtype}{float} &yValue, \textcolor{keywordtype}{bool} &enabled, \textcolor{keywordtype}{bool} &show);
+00323     \textcolor{keywordtype}{int} AddMarker(\textcolor{keywordtype}{int} posX);
+00324     \textcolor{keywordtype}{int} AddMarkerAtValue(\textcolor{keywordtype}{float} xValue);
+00325     \textcolor{keywordtype}{void} RemoveMarker();
+00326     \textcolor{keywordtype}{void} RemoveMarker(\textcolor{keywordtype}{int} \textcolor{keywordtype}{id});
+00327     \textcolor{keywordtype}{void} MoveMarker(\textcolor{keywordtype}{int} markerID, \textcolor{keywordtype}{int} posX);
+00328     \textcolor{keywordtype}{void} ChangeMarker(\textcolor{keywordtype}{int} markerID, \textcolor{keywordtype}{float} xValue);
+00329     \textcolor{keywordtype}{bool} SearchPeak();
+00330 
+00331     \textcolor{keywordtype}{void} SetInfoMessage(\textcolor{keyword}{const} \textcolor{keywordtype}{char}* msg, \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{int} index);
+00332 
+00333     \textcolor{comment}{// events}
+00334     \textcolor{keywordtype}{void} render(wxPaintEvent& evt);
+00335     \textcolor{keywordtype}{void} resized(wxSizeEvent& evt);
+00336     \textcolor{keywordtype}{void} mouseMoved(wxMouseEvent& event);
+00337     \textcolor{keywordtype}{void} mouseWheelMoved(wxMouseEvent& event);
+00338     \textcolor{keywordtype}{void} mouseReleased(wxMouseEvent& event);
+00339     \textcolor{keywordtype}{void} rightClick(wxMouseEvent& event);
+00340     \textcolor{keywordtype}{void} leftClick(wxMouseEvent& event);
+00341     \textcolor{keywordtype}{void} middleClick(wxMouseEvent& event);
+00342     \textcolor{keywordtype}{void} mouseLeftWindow(wxMouseEvent& event);
+00343     \textcolor{keywordtype}{void} keyPressed(wxKeyEvent& event);
+00344     \textcolor{keywordtype}{void} keyReleased(wxKeyEvent& event);
+00345     \textcolor{keywordtype}{void} onFit(wxCommandEvent& event);
+00346     \textcolor{keywordtype}{void} onMouseHelp(wxCommandEvent& event);
+00347     \textcolor{keywordtype}{void} onAddMarker(wxCommandEvent& event);
+00348     \textcolor{keywordtype}{void} onRemoveMarker(wxCommandEvent& event);
+00349     \textcolor{keywordtype}{void} onShowMarkersMenu(wxCommandEvent& event);
+00350     \textcolor{keywordtype}{void} onLockAspect(wxCommandEvent& event);
+00351     \textcolor{keywordtype}{void} onSearchPeak(wxCommandEvent& event);
+00352     \textcolor{keywordtype}{void} OnTimer(wxTimerEvent& event);
+00353     \textcolor{keywordtype}{void} onReset(wxCommandEvent& event);
+00354     DECLARE\_EVENT\_TABLE()
+00355 
+00356 private:
+00357     \textcolor{keywordtype}{bool} oglOk;
+00358     \textcolor{keywordtype}{bool} glInitialized;
+00359     \textcolor{keywordtype}{void} UpdateInfoDisplay();
+00360     std::vector<std::\textcolor{keywordtype}{string}> info\_msg;
+00361     std::vector<std::\textcolor{keywordtype}{string}> info\_msg\_toDisplay;
+00362     static const \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{int} mMarkerColors[];
+00363 
+00364     dlgMarkers* mMarkersDlg;
+00365     \textcolor{keywordtype}{void} ShowMenu(\textcolor{keywordtype}{int} x, \textcolor{keywordtype}{int} y);
+00366     wxMenu m\_popmenu;
+00367     \textcolor{keywordtype}{void} setupViewport(\textcolor{keywordtype}{int} w, \textcolor{keywordtype}{int} h);
+00368     wxGLContext *m\_DrawingContext;
+00369     eOGLGActionState m\_actionState;
+00370 
+00371     \textcolor{keywordtype}{bool} viewChanged;
+00372     \textcolor{keywordtype}{bool} initialized;
+00373     sRect<\textcolor{keywordtype}{float}> initialDisplayArea;
+00374     sRect<\textcolor{keywordtype}{int}> m\_MouseCoord;
+00375     \textcolor{keywordtype}{float} m\_lastSpanX;
+00376     \textcolor{keywordtype}{float} m\_lastSpanY;
+00377 
+00378     \textcolor{keywordtype}{bool} isInsideDataView(\textcolor{keywordtype}{int} X, \textcolor{keywordtype}{int} Y);
+00379     \textcolor{keywordtype}{void} dataViewPixelToValue(\textcolor{keywordtype}{int} x, \textcolor{keywordtype}{int} y, \textcolor{keywordtype}{float} &valX, \textcolor{keywordtype}{float} &valY);
+00380 
+00381     \textcolor{keywordtype}{void} DrawStaticElements();
+00382     \textcolor{keywordtype}{void} DrawMarkers();
+00383     \textcolor{keywordtype}{void} CalculateGrid();
+00384 
+00385     \textcolor{keywordtype}{void} switchToWindowView();
+00386     \textcolor{keywordtype}{void} switchToDataView();
+00387 
+00388     GLvoid glRenderText(\textcolor{keywordtype}{float} posx, \textcolor{keywordtype}{float} posy, \textcolor{keywordtype}{float} angle, \textcolor{keywordtype}{float} scale, \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{int} rgba, const \textcolor{keywordtype}{char} *
+      fmt, ...);
+00389     \textcolor{keywordtype}{int} TextWidthInPixels(const \textcolor{keywordtype}{char} *str);
+00390     \textcolor{keywordtype}{int} NumberWidthInPixels(\textcolor{keywordtype}{float} num, \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{int} prec = 0);
+00391     \textcolor{keywordtype}{int} LineHeight();
+00392 
+00393     \textcolor{keywordtype}{float} calcAxisGrid(GLG_settings st, \textcolor{keywordtype}{bool} xAxis);
+00394 
+00395     GLFont *m\_font;
+00396 
+00397     std::vector<OGLMarker> markers;
+00398     \textcolor{keywordtype}{int} m\_selectedMarker;
+00399     \textcolor{keywordtype}{unsigned} m\_maxMarkers;
+00400     \textcolor{keywordtype}{int} clickedOnMarker(\textcolor{keywordtype}{int} X, \textcolor{keywordtype}{int} Y);
+00401 
+00402     \textcolor{keywordtype}{bool} m\_currentlyDrawing;
+00403     wxTimer* m\_timer;
+00404     wxGLContext *m\_glContext;
+00405 
+00406 \};
+00407 
+00408 \textcolor{preprocessor}{#endif}
+\end{DoxyCode}

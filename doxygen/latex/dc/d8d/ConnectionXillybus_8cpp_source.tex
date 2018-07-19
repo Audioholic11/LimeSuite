@@ -1,0 +1,625 @@
+\subsection{Connection\+Xillybus.\+cpp}
+\label{ConnectionXillybus_8cpp_source}\index{/home/erik/prefix/default/src/limesuite-\/dev/src/\+Connection\+Xillybus/\+Connection\+Xillybus.\+cpp@{/home/erik/prefix/default/src/limesuite-\/dev/src/\+Connection\+Xillybus/\+Connection\+Xillybus.\+cpp}}
+
+\begin{DoxyCode}
+00001 
+00007 \textcolor{preprocessor}{#include "ConnectionXillybus.h"}
+00008 \textcolor{preprocessor}{#ifndef \_\_unix\_\_}
+00009 \textcolor{preprocessor}{#include "Windows.h"}
+00010 \textcolor{preprocessor}{#else}
+00011 \textcolor{preprocessor}{#include <unistd.h>}
+00012 \textcolor{preprocessor}{#endif}
+00013 \textcolor{preprocessor}{#include <sys/types.h>}
+00014 \textcolor{preprocessor}{#include <sys/stat.h>}
+00015 \textcolor{preprocessor}{#include <fcntl.h>}
+00016 \textcolor{preprocessor}{#include <cstring>}
+00017 \textcolor{preprocessor}{#include <iostream>}
+00018 \textcolor{preprocessor}{#include "Si5351C.h"}
+00019 \textcolor{preprocessor}{#include <FPGA_common.h>}
+00020 \textcolor{preprocessor}{#include <LMS7002M.h>}
+00021 \textcolor{preprocessor}{#include <ciso646>}
+00022 \textcolor{preprocessor}{#include "Logger.h"}
+00023 
+00024 \textcolor{preprocessor}{#include <thread>}
+00025 \textcolor{preprocessor}{#include <chrono>}
+00026 
+00027 \textcolor{keyword}{using namespace }std;
+00028 
+00029 \textcolor{keyword}{using namespace }lime;
+00030 
+00031 \textcolor{keyword}{const} ConnectionXillybus::EPConfig ConnectionXillybus::deviceConfigs[] = \{
+00032 \textcolor{preprocessor}{#ifndef \_\_unix\_\_}
+00033     \{
+00034         \textcolor{stringliteral}{"\(\backslash\)\(\backslash\)\(\backslash\)\(\backslash\).\(\backslash\)\(\backslash\)xillybus\_read\_8"},
+00035         \textcolor{stringliteral}{"\(\backslash\)\(\backslash\)\(\backslash\)\(\backslash\).\(\backslash\)\(\backslash\)xillybus\_write\_8"},
+00036         \{\textcolor{stringliteral}{"\(\backslash\)\(\backslash\)\(\backslash\)\(\backslash\).\(\backslash\)\(\backslash\)xillybus\_read\_32"}, \textcolor{stringliteral}{"\(\backslash\)\(\backslash\)\(\backslash\)\(\backslash\).\(\backslash\)\(\backslash\)xillybus\_read\_32"}, \textcolor{stringliteral}{"\(\backslash\)\(\backslash\)\(\backslash\)\(\backslash\).\(\backslash\)\(\backslash\)xillybus\_read\_32"}\},
+00037         \{\textcolor{stringliteral}{"\(\backslash\)\(\backslash\)\(\backslash\)\(\backslash\).\(\backslash\)\(\backslash\)xillybus\_write\_32"}, \textcolor{stringliteral}{"\(\backslash\)\(\backslash\)\(\backslash\)\(\backslash\).\(\backslash\)\(\backslash\)xillybus\_write\_32"}, \textcolor{stringliteral}{"\(\backslash\)\(\backslash\)\(\backslash\)\(\backslash\).\(\backslash\)\(\backslash\)xillybus\_write\_32"}\}
+00038     \},
+00039     \{
+00040         \textcolor{stringliteral}{"\(\backslash\)\(\backslash\)\(\backslash\)\(\backslash\).\(\backslash\)\(\backslash\)xillybus\_control0\_read\_32"},
+00041         \textcolor{stringliteral}{"\(\backslash\)\(\backslash\)\(\backslash\)\(\backslash\).\(\backslash\)\(\backslash\)xillybus\_control0\_write\_32"},
+00042         \{\textcolor{stringliteral}{"\(\backslash\)\(\backslash\)\(\backslash\)\(\backslash\).\(\backslash\)\(\backslash\)xillybus\_stream0\_read\_32"}, \textcolor{stringliteral}{"\(\backslash\)\(\backslash\)\(\backslash\)\(\backslash\).\(\backslash\)\(\backslash\)xillybus\_stream1\_read\_32"}, \textcolor{stringliteral}{"\(\backslash\)\(\backslash\)\(\backslash\)\(\backslash\).\(\backslash\)\(\backslash\)
+      xillybus\_stream2\_read\_32"}\},
+00043         \{\textcolor{stringliteral}{"\(\backslash\)\(\backslash\)\(\backslash\)\(\backslash\).\(\backslash\)\(\backslash\)xillybus\_stream0\_write\_32"}, \textcolor{stringliteral}{"\(\backslash\)\(\backslash\)\(\backslash\)\(\backslash\).\(\backslash\)\(\backslash\)xillybus\_stream1\_write\_32"}, \textcolor{stringliteral}{"\(\backslash\)\(\backslash\)\(\backslash\)\(\backslash\).\(\backslash\)\(\backslash\)
+      xillybus\_stream2\_write\_32"}\}
+00044     \}
+00045 \textcolor{preprocessor}{#else}
+00046     \{
+00047         \textcolor{stringliteral}{"/dev/xillybus\_read\_8"},
+00048         \textcolor{stringliteral}{"/dev/xillybus\_write\_8"},
+00049         \{\textcolor{stringliteral}{"/dev/xillybus\_read\_32"}, \textcolor{stringliteral}{"/dev/xillybus\_read\_32"}, \textcolor{stringliteral}{"/dev/xillybus\_read\_32"}\},
+00050         \{\textcolor{stringliteral}{"/dev/xillybus\_write\_32"}, \textcolor{stringliteral}{"/dev/xillybus\_write\_32"}, \textcolor{stringliteral}{"/dev/xillybus\_write\_32"}\}
+00051     \},
+00052     \{
+00053         \textcolor{stringliteral}{"/dev/xillybus\_control0\_read\_32"},
+00054         \textcolor{stringliteral}{"/dev/xillybus\_control0\_write\_32"},
+00055         \{\textcolor{stringliteral}{"/dev/xillybus\_stream0\_read\_32"}, \textcolor{stringliteral}{"/dev/xillybus\_stream1\_read\_32"}, \textcolor{stringliteral}{"/dev/xillybus\_stream2\_read\_32"}\}
+      ,
+00056         \{\textcolor{stringliteral}{"/dev/xillybus\_stream0\_write\_32"}, \textcolor{stringliteral}{"/dev/xillybus\_stream1\_write\_32"}, \textcolor{stringliteral}{"
+      /dev/xillybus\_stream2\_write\_32"}\}
+00057     \}
+00058 \textcolor{preprocessor}{#endif}
+00059 \};
+00060 
+00063 ConnectionXillybus::ConnectionXillybus(\textcolor{keyword}{const} \textcolor{keywordtype}{unsigned} index)
+00064 \{
+00065     m\_hardwareName = \textcolor{stringliteral}{""};
+00066 \textcolor{preprocessor}{#ifndef \_\_unix\_\_}
+00067     hWrite = INVALID\_HANDLE\_VALUE;
+00068     hRead = INVALID\_HANDLE\_VALUE;
+00069     \textcolor{keywordflow}{for} (\textcolor{keywordtype}{int} i = 0; i < MAX\_EP\_CNT; i++)
+00070         hWriteStream[i] = hReadStream[i] = INVALID\_HANDLE\_VALUE;
+00071 \textcolor{preprocessor}{#else}
+00072     hWrite = -1;
+00073     hRead = -1;
+00074     \textcolor{keywordflow}{for} (\textcolor{keywordtype}{int} i = 0; i < MAX\_EP\_CNT; i++)
+00075         hWriteStream[i] = hReadStream[i] = -1;
+00076 \textcolor{preprocessor}{#endif}
+00077     Open(index);
+00078     isConnected = \textcolor{keyword}{true};
+00079 
+00080     std::shared\_ptr<Si5351C> si5351module(\textcolor{keyword}{new} Si5351C());
+00081     si5351module->Initialize(\textcolor{keyword}{this});
+00082     si5351module->SetPLL(0, 25000000, 0);
+00083     si5351module->SetPLL(1, 25000000, 0);
+00084     si5351module->SetClock(0, 27000000, \textcolor{keyword}{true}, \textcolor{keyword}{false});
+00085     si5351module->SetClock(1, 27000000, \textcolor{keyword}{true}, \textcolor{keyword}{false});
+00086     \textcolor{keywordflow}{for} (\textcolor{keywordtype}{int} i = 2; i < 8; ++i)
+00087         si5351module->SetClock(i, 27000000, \textcolor{keyword}{false}, \textcolor{keyword}{false});
+00088     Si5351C::Status status = si5351module->ConfigureClocks();
+00089     \textcolor{keywordflow}{if} (status != Si5351C::SUCCESS)
+00090     \{
+00091         lime::warning(\textcolor{stringliteral}{"Failed to configure Si5351C"});
+00092         \textcolor{keywordflow}{return};
+00093     \}
+00094     status = si5351module->UploadConfiguration();
+00095     \textcolor{keywordflow}{if} (status != Si5351C::SUCCESS)
+00096         lime::warning(\textcolor{stringliteral}{"Failed to configure Si5351C"});
+00097     std::this\_thread::sleep\_for(std::chrono::milliseconds(10)); \textcolor{comment}{//some settle time}
+00098 \}
+00099 
+00102 ConnectionXillybus::~ConnectionXillybus()
+00103 \{
+00104     Close();
+00105 \}
+00106 
+00110 \textcolor{keywordtype}{int} ConnectionXillybus::Open(\textcolor{keyword}{const} \textcolor{keywordtype}{unsigned} index)
+00111 \{
+00112     Close();
+00113     writeCtrlPort = deviceConfigs[index].ctrlWrite;
+00114     readCtrlPort = deviceConfigs[index].ctrlRead;
+00115 \textcolor{preprocessor}{#ifndef \_\_unix\_\_}
+00116     hWrite = CreateFileA(writeCtrlPort.c\_str(), GENERIC\_WRITE, 0, 0, OPEN\_EXISTING, FILE\_ATTRIBUTE\_NORMAL |
+       FILE\_FLAG\_OVERLAPPED, 0);
+00117     hRead = CreateFileA(readCtrlPort.c\_str(), GENERIC\_READ, 0, 0, OPEN\_EXISTING, FILE\_ATTRIBUTE\_NORMAL | 
+      FILE\_FLAG\_OVERLAPPED, 0);
+00118     \textcolor{keywordflow}{if} (hWrite == INVALID\_HANDLE\_VALUE || hRead == INVALID\_HANDLE\_VALUE)
+00119     \{
+00120         ReportError(\textcolor{stringliteral}{"Unable to access control port"});
+00121         CloseHandle(hWrite);
+00122         CloseHandle(hRead);
+00123         hWrite = INVALID\_HANDLE\_VALUE;
+00124         hRead = INVALID\_HANDLE\_VALUE;
+00125         \textcolor{keywordflow}{return} -1;
+00126     \}
+00127 \textcolor{preprocessor}{#endif}
+00128     isConnected = \textcolor{keyword}{true};
+00129     \textcolor{keywordflow}{for} (\textcolor{keywordtype}{int} i = 0; i < MAX\_EP\_CNT; i++)
+00130     \{
+00131         readStreamPort[i] = deviceConfigs[index].streamRead[i];
+00132         writeStreamPort[i] = deviceConfigs[index].streamWrite[i];
+00133     \}
+00134     \textcolor{keywordflow}{return} 0;
+00135 \}
+00136 
+00139 \textcolor{keywordtype}{void} ConnectionXillybus::Close()
+00140 \{
+00141     isConnected = \textcolor{keyword}{false};
+00142 \textcolor{preprocessor}{#ifndef \_\_unix\_\_}
+00143     \textcolor{keywordflow}{if} (hWrite != INVALID\_HANDLE\_VALUE)
+00144         CloseHandle(hWrite);
+00145     hWrite = INVALID\_HANDLE\_VALUE;
+00146     \textcolor{keywordflow}{if} (hRead != INVALID\_HANDLE\_VALUE)
+00147         CloseHandle(hRead);
+00148     hRead = INVALID\_HANDLE\_VALUE;
+00149     \textcolor{keywordflow}{for} (\textcolor{keywordtype}{int} i = 0; i < MAX\_EP\_CNT; i++)
+00150     \{
+00151         \textcolor{keywordflow}{if} (hWriteStream[i] != INVALID\_HANDLE\_VALUE)
+00152             CloseHandle(hWriteStream[i]);
+00153         hWriteStream[i] = INVALID\_HANDLE\_VALUE;
+00154         \textcolor{keywordflow}{if} (hReadStream[i] != INVALID\_HANDLE\_VALUE)
+00155             CloseHandle(hReadStream[i]);
+00156         hReadStream[i] = INVALID\_HANDLE\_VALUE;
+00157     \}
+00158 \textcolor{preprocessor}{#else}
+00159     CloseControl();
+00160     \textcolor{keywordflow}{for} (\textcolor{keywordtype}{int} i = 0; i < MAX\_EP\_CNT; i++)
+00161     \{
+00162         \textcolor{keywordflow}{if}( hWriteStream[i] >= 0)
+00163             close(hWriteStream[i]);
+00164         hWriteStream[i] = -1;
+00165         \textcolor{keywordflow}{if}( hReadStream[i] >= 0)
+00166             close(hReadStream[i]);
+00167         hReadStream[i] = -1;
+00168     \}
+00169 \textcolor{preprocessor}{#endif}
+00170 \}
+00171 
+00175 \textcolor{keywordtype}{bool} ConnectionXillybus::IsOpen()
+00176 \{
+00177     \textcolor{keywordflow}{return} isConnected;
+00178 \}
+00179 
+00180 \textcolor{preprocessor}{#ifdef \_\_unix\_\_}
+00181 \textcolor{keywordtype}{int} ConnectionXillybus::OpenControl()
+00182 \{
+00183     \textcolor{keywordtype}{int} timeout\_cnt = 100;
+00184     usleep(200);  \textcolor{comment}{//avoids random bad packet(s) that was occurring when performing lots of consecutive
+       transfers ~1000+}
+00185     \textcolor{keywordflow}{while} (--timeout\_cnt)
+00186     \{
+00187        \textcolor{keywordflow}{if} ((hWrite = open(writeCtrlPort.c\_str(), O\_WRONLY | O\_NOCTTY | O\_NONBLOCK))!=-1)
+00188            \textcolor{keywordflow}{break};
+00189        usleep(1000);
+00190     \}
+00191     \textcolor{keywordflow}{while} (timeout\_cnt--)
+00192     \{
+00193        \textcolor{keywordflow}{if} ((hRead = open(readCtrlPort.c\_str(), O\_RDONLY | O\_NOCTTY | O\_NONBLOCK))!=-1)
+00194            \textcolor{keywordflow}{break};
+00195        usleep(1000);
+00196     \}
+00197 
+00198     \textcolor{keywordflow}{if} (hWrite == -1 || hRead ==-1)
+00199         \textcolor{keywordflow}{return} ReportError(errno);
+00200     \textcolor{keywordflow}{return} 0;
+00201 \}
+00202 
+00203 \textcolor{keywordtype}{void} ConnectionXillybus::CloseControl()
+00204 \{
+00205     close(hWrite);
+00206     close(hRead);
+00207     hWrite = -1;
+00208     hRead = -1;
+00209 \}
+00210 
+00211 \textcolor{keywordtype}{int} ConnectionXillybus::TransferPacket(GenericPacket &pkt)
+00212 \{
+00213     \textcolor{keywordtype}{int} status;
+00214     std::lock\_guard<std::mutex> lock(mTransferLock);
+00215     \textcolor{keywordflow}{if} (OpenControl() == 0)
+00216         status = LMS64CProtocol::TransferPacket(pkt);
+00217     \textcolor{keywordflow}{else}
+00218         status = -1;
+00219     CloseControl();
+00220     \textcolor{keywordflow}{return} status;
+00221 \}
+00222 \textcolor{keywordtype}{int} ConnectionXillybus::ProgramWrite(\textcolor{keyword}{const} \textcolor{keywordtype}{char} *data\_src, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} length, \textcolor{keyword}{const} \textcolor{keywordtype}{int} prog\_mode, \textcolor{keyword}{const} \textcolor{keywordtype}{
+      int} device, ProgrammingCallback callback)
+00223 \{
+00224     \textcolor{keywordtype}{int} status;
+00225     std::lock\_guard<std::mutex> lock(mTransferLock);
+00226     \textcolor{keywordflow}{if} (OpenControl() == 0)
+00227         status = LMS64CProtocol::ProgramWrite(data\_src, length, prog\_mode, 
+      device, callback);
+00228     \textcolor{keywordflow}{else}
+00229         status = -1;
+00230     CloseControl();
+00231     \textcolor{keywordflow}{return} status;
+00232 \}
+00233 \textcolor{preprocessor}{#endif}
+00234 
+00240 \textcolor{keywordtype}{int} ConnectionXillybus::Write(\textcolor{keyword}{const} \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{char} *buffer, \textcolor{keyword}{const} \textcolor{keywordtype}{int} length, \textcolor{keywordtype}{int} 
+      timeout_ms)
+00241 \{
+00242 \textcolor{preprocessor}{#ifndef \_\_unix\_\_}
+00243     \textcolor{keywordflow}{if} (hWrite == INVALID\_HANDLE\_VALUE)
+00244         \textcolor{keywordflow}{return} -1;
+00245 \textcolor{preprocessor}{#endif}
+00246     \textcolor{keywordtype}{int} totalBytesWritten = 0;
+00247     \textcolor{keywordtype}{int} bytesToWrite = length;
+00248     \textcolor{keyword}{auto} t1 = chrono::high\_resolution\_clock::now();
+00249 
+00250     \textcolor{keywordflow}{do}
+00251     \{
+00252 \textcolor{preprocessor}{#ifndef \_\_unix\_\_}
+00253         DWORD bytesSent = 0;
+00254         OVERLAPPED  vOverlapped;
+00255         memset(&vOverlapped, 0, \textcolor{keyword}{sizeof}(OVERLAPPED));
+00256         vOverlapped.hEvent = CreateEvent(NULL, \textcolor{keyword}{false}, \textcolor{keyword}{false}, NULL);
+00257         WriteFile(hWrite, buffer + totalBytesWritten, bytesToWrite, &bytesSent, &vOverlapped);
+00258         \textcolor{keywordflow}{if} (::GetLastError() != ERROR\_IO\_PENDING)
+00259         \{
+00260             CloseHandle(vOverlapped.hEvent);
+00261             \textcolor{keywordflow}{return} totalBytesWritten;
+00262         \}
+00263         std::this\_thread::yield();
+00264         DWORD dwRet = WaitForSingleObject(vOverlapped.hEvent, 500);
+00265         \textcolor{keywordflow}{if} (dwRet == WAIT\_OBJECT\_0)
+00266         \{
+00267             \textcolor{keywordflow}{if} (GetOverlappedResult(hWrite, &vOverlapped, &bytesSent, FALSE) == FALSE)
+00268             \{
+00269                 bytesSent = 0;
+00270             \}
+00271         \}
+00272         \textcolor{keywordflow}{else}
+00273         \{
+00274             CancelIo(hWrite);
+00275             bytesSent = 0;
+00276         \}
+00277         CloseHandle(vOverlapped.hEvent);
+00278 \textcolor{preprocessor}{#else}
+00279         \textcolor{keywordtype}{int} bytesSent;
+00280         \textcolor{keywordflow}{if} ((bytesSent  = write(hWrite, buffer+ totalBytesWritten, bytesToWrite))<0)
+00281         \{
+00282             \textcolor{keywordflow}{if}(errno == EINTR || errno == EAGAIN)
+00283                  \textcolor{keywordflow}{continue};
+00284             ReportError(errno);
+00285             \textcolor{keywordflow}{return} totalBytesWritten;
+00286         \}
+00287 \textcolor{preprocessor}{#endif}
+00288         totalBytesWritten += bytesSent;
+00289         \textcolor{keywordflow}{if} (totalBytesWritten < length)
+00290             bytesToWrite -= bytesSent;
+00291         \textcolor{keywordflow}{else}
+00292             \textcolor{keywordflow}{break};
+00293 
+00294     \}\textcolor{keywordflow}{while} (std::chrono::duration\_cast<std::chrono::milliseconds>(chrono::high\_resolution\_clock::now() - 
+      t1).count() < timeout\_ms);
+00295 \textcolor{preprocessor}{#ifdef \_\_unix\_\_}
+00296     \textcolor{comment}{//Flush data to FPGA}
+00297     \textcolor{keywordflow}{while} (write(hWrite, NULL, 0) < 0)
+00298     \{
+00299         \textcolor{keywordflow}{if} (errno == EINTR)
+00300             \textcolor{keywordflow}{continue};
+00301         ReportError(errno);
+00302         \textcolor{keywordflow}{break};
+00303     \}
+00304 \textcolor{preprocessor}{#else}
+00305     \textcolor{keywordflow}{if} (totalBytesWritten != length)
+00306     \{
+00307         CloseHandle(hWrite);
+00308         hWrite = CreateFileA(writeCtrlPort.c\_str(), GENERIC\_WRITE, 0, 0, OPEN\_EXISTING, 
+      FILE\_ATTRIBUTE\_NORMAL | FILE\_FLAG\_OVERLAPPED, 0);
+00309         \textcolor{keywordflow}{if} (hWrite == INVALID\_HANDLE\_VALUE)
+00310         \{
+00311             CloseHandle(hRead);
+00312             hWrite = INVALID\_HANDLE\_VALUE;
+00313         \}
+00314      \}
+00315 \textcolor{preprocessor}{#endif}
+00316     \textcolor{keywordflow}{return} totalBytesWritten;
+00317 \}
+00318 
+00326 \textcolor{keywordtype}{int} ConnectionXillybus::Read(\textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{char} *buffer, \textcolor{keyword}{const} \textcolor{keywordtype}{int} length, \textcolor{keywordtype}{int} 
+      timeout_ms)
+00327 \{
+00328 \textcolor{preprocessor}{#ifndef \_\_unix\_\_}
+00329     \textcolor{keywordflow}{if} (hRead == INVALID\_HANDLE\_VALUE)
+00330         \textcolor{keywordflow}{return} -1;
+00331 \textcolor{preprocessor}{#endif}
+00332     \textcolor{keywordtype}{int} totalBytesReaded = 0;
+00333     \textcolor{keywordtype}{int} bytesToRead = length;
+00334     \textcolor{keyword}{auto} t1 = chrono::high\_resolution\_clock::now();
+00335 
+00336     \textcolor{keywordflow}{do}
+00337     \{
+00338 \textcolor{preprocessor}{ #ifndef \_\_unix\_\_}
+00339         DWORD bytesReceived = 0;
+00340         OVERLAPPED  vOverlapped;
+00341         memset(&vOverlapped, 0, \textcolor{keyword}{sizeof}(OVERLAPPED));
+00342         vOverlapped.hEvent = CreateEvent(NULL, \textcolor{keyword}{false}, \textcolor{keyword}{false}, NULL);
+00343         ReadFile(hRead, buffer + totalBytesReaded, bytesToRead, &bytesReceived, &vOverlapped);
+00344         \textcolor{keywordflow}{if} (::GetLastError() != ERROR\_IO\_PENDING)
+00345         \{
+00346             CloseHandle(vOverlapped.hEvent);
+00347             \textcolor{keywordflow}{return} totalBytesReaded;
+00348         \}
+00349         std::this\_thread::yield();
+00350         DWORD dwRet = WaitForSingleObject(vOverlapped.hEvent, 1000);
+00351         \textcolor{keywordflow}{if} (dwRet == WAIT\_OBJECT\_0)
+00352         \{
+00353             \textcolor{keywordflow}{if} (GetOverlappedResult(hRead, &vOverlapped, &bytesReceived, TRUE) == FALSE)
+00354             \{
+00355                 bytesReceived = 0;
+00356             \}
+00357         \}
+00358         \textcolor{keywordflow}{else}
+00359         \{
+00360             CancelIo(hRead);
+00361             bytesReceived = 0;
+00362         \}
+00363         CloseHandle(vOverlapped.hEvent);
+00364 \textcolor{preprocessor}{#else}
+00365         \textcolor{keywordtype}{int} bytesReceived;
+00366         \textcolor{keywordflow}{if} ((bytesReceived = read(hRead, buffer+ totalBytesReaded, bytesToRead))<0)
+00367         \{
+00368            \textcolor{keywordflow}{if}(errno == EINTR || errno == EAGAIN)
+00369                \textcolor{keywordflow}{continue};
+00370            ReportError(errno);
+00371            \textcolor{keywordflow}{return} totalBytesReaded;
+00372         \}
+00373 \textcolor{preprocessor}{#endif}
+00374         totalBytesReaded += bytesReceived;
+00375         \textcolor{keywordflow}{if} (totalBytesReaded < length)
+00376            bytesToRead -= bytesReceived;
+00377         \textcolor{keywordflow}{else}
+00378            \textcolor{keywordflow}{break};
+00379 
+00380     \}\textcolor{keywordflow}{while} (std::chrono::duration\_cast<std::chrono::milliseconds>(chrono::high\_resolution\_clock::now() - 
+      t1).count() < timeout\_ms);
+00381 
+00382 \textcolor{preprocessor}{#ifndef \_\_unix\_\_}
+00383     \textcolor{keywordflow}{if} (totalBytesReaded != length)
+00384     \{
+00385         CloseHandle(hRead);
+00386         hRead = CreateFileA(readCtrlPort.c\_str(), GENERIC\_READ, 0, 0, OPEN\_EXISTING, FILE\_ATTRIBUTE\_NORMAL 
+      | FILE\_FLAG\_OVERLAPPED, 0);
+00387         \textcolor{keywordflow}{if} (hRead == INVALID\_HANDLE\_VALUE)
+00388         \{
+00389             CloseHandle(hRead);
+00390             hRead = INVALID\_HANDLE\_VALUE;
+00391         \}
+00392     \}
+00393 \textcolor{preprocessor}{#endif}
+00394     \textcolor{keywordflow}{return} totalBytesReaded;
+00395 \}
+00396 
+00397 \textcolor{keywordtype}{int} ConnectionXillybus::GetBuffersCount()\textcolor{keyword}{ const }
+00398 \textcolor{keyword}{}\{
+00399     \textcolor{keywordflow}{return} 1;
+00400 \};
+00401 
+00402 \textcolor{keywordtype}{int} ConnectionXillybus::CheckStreamSize(\textcolor{keywordtype}{int} size)\textcolor{keyword}{ const }
+00403 \textcolor{keyword}{}\{
+00404     \textcolor{keywordflow}{return} size < 4 ? 4 : size;
+00405 \};
+00406 
+00414 \textcolor{keywordtype}{int} ConnectionXillybus::ReceiveData(\textcolor{keywordtype}{char} *buffer, \textcolor{keywordtype}{int} length, \textcolor{keywordtype}{int} epIndex, \textcolor{keywordtype}{int} 
+      timeout_ms)
+00415 \{
+00416 \textcolor{preprocessor}{#ifndef \_\_unix\_\_}
+00417     \textcolor{keywordflow}{if} (hReadStream[epIndex] == INVALID\_HANDLE\_VALUE)
+00418     \{
+00419         hReadStream[epIndex] = CreateFileA(readStreamPort[epIndex].c\_str(), GENERIC\_READ, 0, 0, 
+      OPEN\_EXISTING, FILE\_ATTRIBUTE\_NORMAL | FILE\_FLAG\_OVERLAPPED, 0);
+00420         \textcolor{keywordflow}{if} (hReadStream[epIndex] == INVALID\_HANDLE\_VALUE)
+00421         \{
+00422             ReportError(\textcolor{stringliteral}{"Failed to open Xillybus"});
+00423             \textcolor{keywordflow}{return} -1;
+00424         \}
+00425     \}
+00426 \textcolor{preprocessor}{#else}
+00427     \textcolor{keywordflow}{if} (hReadStream[epIndex] == -1)
+00428     \{
+00429        \textcolor{keywordflow}{if} (( hReadStream[epIndex] = open(readStreamPort[epIndex].c\_str(), O\_RDONLY | O\_NOCTTY | O\_NONBLOCK)
+      )==-1)
+00430        \{
+00431             ReportError(errno);
+00432             \textcolor{keywordflow}{return} -1;
+00433        \}
+00434     \}
+00435 \textcolor{preprocessor}{#endif}
+00436 
+00437     \textcolor{keywordtype}{int} totalBytesReaded = 0;
+00438     \textcolor{keywordtype}{int} bytesToRead = length;
+00439     \textcolor{keyword}{auto} t1 = chrono::high\_resolution\_clock::now();
+00440 
+00441     \textcolor{keywordflow}{do}
+00442     \{
+00443 \textcolor{preprocessor}{ #ifndef \_\_unix\_\_}
+00444         DWORD bytesReceived = 0;
+00445         OVERLAPPED  vOverlapped;
+00446         memset(&vOverlapped, 0, \textcolor{keyword}{sizeof}(OVERLAPPED));
+00447         vOverlapped.hEvent = CreateEvent(NULL, \textcolor{keyword}{false}, \textcolor{keyword}{false}, NULL);
+00448         ReadFile(hReadStream[epIndex], buffer + totalBytesReaded, bytesToRead, &bytesReceived, &vOverlapped
+      );
+00449         \textcolor{keywordflow}{if} (::GetLastError() != ERROR\_IO\_PENDING)
+00450         \{
+00451             CloseHandle(vOverlapped.hEvent);
+00452             \textcolor{keywordflow}{return} totalBytesReaded;
+00453         \}
+00454         DWORD dwRet = WaitForSingleObject(vOverlapped.hEvent, timeout\_ms);
+00455         \textcolor{keywordflow}{if} (dwRet == WAIT\_OBJECT\_0)
+00456         \{
+00457             \textcolor{keywordflow}{if} (GetOverlappedResult(hReadStream[epIndex], &vOverlapped, &bytesReceived, TRUE) == FALSE)
+00458             \{
+00459                 bytesReceived = 0;
+00460             \}
+00461         \}
+00462         \textcolor{keywordflow}{else}
+00463         \{
+00464             CancelIo(hReadStream[epIndex]);
+00465             bytesReceived = 0;
+00466         \}
+00467         CloseHandle(vOverlapped.hEvent);
+00468 \textcolor{preprocessor}{#else}
+00469         \textcolor{keywordtype}{int} bytesReceived;
+00470         \textcolor{keywordflow}{if} ((bytesReceived = read(hReadStream[epIndex], buffer+ totalBytesReaded, bytesToRead))<0)
+00471         \{
+00472             \textcolor{keywordflow}{if}(errno == EINTR || errno == EAGAIN)
+00473                 \textcolor{keywordflow}{continue};
+00474             ReportError(errno);
+00475             \textcolor{keywordflow}{return} totalBytesReaded;
+00476         \}
+00477 \textcolor{preprocessor}{#endif}
+00478         totalBytesReaded += bytesReceived;
+00479         \textcolor{keywordflow}{if} (totalBytesReaded < length)
+00480             bytesToRead -= bytesReceived;
+00481         \textcolor{keywordflow}{else}
+00482             \textcolor{keywordflow}{break};
+00483 
+00484     \}\textcolor{keywordflow}{while} (std::chrono::duration\_cast<std::chrono::milliseconds>(chrono::high\_resolution\_clock::now() - 
+      t1).count() < timeout\_ms);
+00485 
+00486     \textcolor{keywordflow}{return} totalBytesReaded;
+00487 \}
+00488 
+00492 \textcolor{keywordtype}{void} ConnectionXillybus::AbortReading(\textcolor{keywordtype}{int} epIndex)
+00493 \{
+00494 \textcolor{preprocessor}{#ifndef \_\_unix\_\_}
+00495     \textcolor{keywordflow}{if} (hReadStream[epIndex] != INVALID\_HANDLE\_VALUE)
+00496     \{
+00497         CloseHandle(hReadStream[epIndex]);
+00498     hReadStream[epIndex] = INVALID\_HANDLE\_VALUE;
+00499     \}
+00500 \textcolor{preprocessor}{#else}
+00501     \textcolor{keywordflow}{if} (hReadStream[epIndex] >= 0)
+00502     \{
+00503         close(hReadStream[epIndex]);
+00504         hReadStream[epIndex] =-1;
+00505     \}
+00506 \textcolor{preprocessor}{#endif}
+00507 \}
+00508 
+00516 \textcolor{keywordtype}{int} ConnectionXillybus::SendData(\textcolor{keyword}{const} \textcolor{keywordtype}{char} *buffer, \textcolor{keywordtype}{int} length, \textcolor{keywordtype}{int} epIndex, \textcolor{keywordtype}{int} 
+      timeout_ms)
+00517 \{
+00518 \textcolor{preprocessor}{#ifndef \_\_unix\_\_}
+00519     \textcolor{keywordflow}{if} (hWriteStream[epIndex] == INVALID\_HANDLE\_VALUE)
+00520     \{
+00521         hWriteStream[epIndex] = CreateFileA(writeStreamPort[epIndex].c\_str(), GENERIC\_WRITE, 0, 0, 
+      OPEN\_EXISTING, FILE\_ATTRIBUTE\_NORMAL | FILE\_FLAG\_OVERLAPPED, 0);
+00522         \textcolor{keywordflow}{if} (hWriteStream[epIndex] == INVALID\_HANDLE\_VALUE)
+00523         \{
+00524             ReportError(\textcolor{stringliteral}{"Failed to open Xillybus"});
+00525             \textcolor{keywordflow}{return} -1;
+00526         \}
+00527     \}
+00528 \textcolor{preprocessor}{#else}
+00529     \textcolor{keywordflow}{if} (hWriteStream[epIndex] == -1)
+00530     \{
+00531        \textcolor{keywordflow}{if} ((hWriteStream[epIndex] = open(writeStreamPort[epIndex].c\_str(), O\_WRONLY | O\_NOCTTY | O\_NONBLOCK
+      ))==-1)
+00532        \{
+00533             ReportError(errno);
+00534             \textcolor{keywordflow}{return} -1;
+00535        \}
+00536     \}
+00537 \textcolor{preprocessor}{#endif}
+00538     \textcolor{keywordtype}{int} totalBytesWritten = 0;
+00539     \textcolor{keywordtype}{int} bytesToWrite = length;
+00540     \textcolor{keyword}{auto} t1 = chrono::high\_resolution\_clock::now();
+00541 
+00542     \textcolor{keywordflow}{do}
+00543     \{
+00544 \textcolor{preprocessor}{#ifndef \_\_unix\_\_}
+00545         DWORD bytesSent = 0;
+00546         OVERLAPPED  vOverlapped;
+00547         memset(&vOverlapped, 0, \textcolor{keyword}{sizeof}(OVERLAPPED));
+00548         vOverlapped.hEvent = CreateEvent(NULL, \textcolor{keyword}{false}, \textcolor{keyword}{false}, NULL);
+00549         WriteFile(hWriteStream[epIndex], buffer + totalBytesWritten, bytesToWrite, &bytesSent, &vOverlapped
+      );
+00550         \textcolor{keywordflow}{if} (::GetLastError() != ERROR\_IO\_PENDING)
+00551         \{
+00552             CloseHandle(vOverlapped.hEvent);
+00553             \textcolor{keywordflow}{return} totalBytesWritten;
+00554         \}
+00555         DWORD dwRet = WaitForSingleObject(vOverlapped.hEvent, timeout\_ms);
+00556         \textcolor{keywordflow}{if} (dwRet == WAIT\_OBJECT\_0)
+00557         \{
+00558             \textcolor{keywordflow}{if} (GetOverlappedResult(hWriteStream[epIndex], &vOverlapped, &bytesSent, TRUE) == FALSE)
+00559             \{
+00560                 bytesSent = 0;
+00561             \}
+00562         \}
+00563         \textcolor{keywordflow}{else}
+00564         \{
+00565             CancelIo(hWriteStream[epIndex]);
+00566             bytesSent = 0;
+00567         \}
+00568         CloseHandle(vOverlapped.hEvent);
+00569 \textcolor{preprocessor}{#else}
+00570         \textcolor{keywordtype}{int} bytesSent;
+00571         \textcolor{keywordflow}{if} ((bytesSent  = write(hWriteStream[epIndex], buffer+ totalBytesWritten, bytesToWrite))<0)
+00572         \{
+00573             \textcolor{keywordflow}{if}(errno == EINTR || errno == EAGAIN)
+00574                 \textcolor{keywordflow}{continue};
+00575             ReportError(errno);
+00576             \textcolor{keywordflow}{return} totalBytesWritten;
+00577         \}
+00578 \textcolor{preprocessor}{#endif}
+00579         totalBytesWritten += bytesSent;
+00580         \textcolor{keywordflow}{if} (totalBytesWritten < length)
+00581             bytesToWrite -= bytesSent;
+00582         \textcolor{keywordflow}{else}
+00583             \textcolor{keywordflow}{break};
+00584 
+00585     \}\textcolor{keywordflow}{while} (std::chrono::duration\_cast<std::chrono::milliseconds>(chrono::high\_resolution\_clock::now() - 
+      t1).count() < timeout\_ms);
+00586     \textcolor{comment}{//Flush data to FPGA}
+00587 \textcolor{preprocessor}{#ifdef \_\_unix\_\_}
+00588     \textcolor{keywordflow}{while} (write(hWriteStream[epIndex], NULL, 0)<0)
+00589     \{
+00590         \textcolor{keywordflow}{if} (errno == EINTR)
+00591             \textcolor{keywordflow}{continue};
+00592         ReportError(errno);
+00593         \textcolor{keywordflow}{break};
+00594     \}
+00595 \textcolor{preprocessor}{#endif}
+00596     \textcolor{keywordflow}{return} totalBytesWritten;
+00597 \}
+00598 
+00602 \textcolor{keywordtype}{void} ConnectionXillybus::AbortSending(\textcolor{keywordtype}{int} epIndex)
+00603 \{
+00604 \textcolor{preprocessor}{#ifndef \_\_unix\_\_}
+00605     \textcolor{keywordflow}{if} (hWriteStream[epIndex] != INVALID\_HANDLE\_VALUE)
+00606     \{
+00607         CloseHandle(hWriteStream[epIndex]);
+00608         hWriteStream[epIndex] = INVALID\_HANDLE\_VALUE;
+00609     \}
+00610 \textcolor{preprocessor}{#else}
+00611     \textcolor{keywordflow}{if} (hWriteStream[epIndex] >= 0)
+00612     \{
+00613         close(hWriteStream[epIndex]);
+00614         hWriteStream[epIndex] = -1;
+00615     \}
+00616 \textcolor{preprocessor}{#endif}
+00617 \}
+00618 
+00619 \textcolor{keywordtype}{int} ConnectionXillybus::BeginDataReading(\textcolor{keywordtype}{char}* buffer, uint32\_t length, \textcolor{keywordtype}{int} ep) 
+00620 \{
+00621     \textcolor{keywordflow}{return} ep;
+00622 \}
+00623 \textcolor{keywordtype}{bool} ConnectionXillybus::WaitForReading(\textcolor{keywordtype}{int} contextHandle, \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{int} 
+      timeout_ms) 
+00624 \{
+00625     \textcolor{keywordflow}{return} \textcolor{keyword}{true};
+00626 \}
+00627 \textcolor{keywordtype}{int} ConnectionXillybus::FinishDataReading(\textcolor{keywordtype}{char}* buffer, uint32\_t length, \textcolor{keywordtype}{int} contextHandle)
+00628 \{
+00629     \textcolor{keywordflow}{return} ReceiveData(buffer, length, contextHandle, 3000);
+00630 \}
+00631 
+00632 \textcolor{keywordtype}{int} ConnectionXillybus::BeginDataSending(\textcolor{keyword}{const} \textcolor{keywordtype}{char}* buffer, uint32\_t length, \textcolor{keywordtype}{int} ep) 
+00633 \{
+00634     \textcolor{keywordflow}{return} SendData(buffer, length,  ep, 3000);
+00635 \}
+00636 \textcolor{keywordtype}{bool} ConnectionXillybus::WaitForSending(\textcolor{keywordtype}{int} contextHandle, uint32\_t timeout_ms) 
+00637 \{
+00638     \textcolor{keywordflow}{return} \textcolor{keyword}{true};
+00639 \}
+00640 \textcolor{keywordtype}{int} ConnectionXillybus::FinishDataSending(\textcolor{keyword}{const} \textcolor{keywordtype}{char}* buffer, uint32\_t length, \textcolor{keywordtype}{int} contextHandle) 
+00641 \{
+00642     \textcolor{keywordflow}{return} contextHandle;
+00643 \}
+\end{DoxyCode}

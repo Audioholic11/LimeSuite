@@ -1,0 +1,362 @@
+\subsection{L\+M\+S7002\+M.\+h}
+\label{LMS7002M_8h_source}\index{/home/erik/prefix/default/src/limesuite-\/dev/src/lms7002m/\+L\+M\+S7002\+M.\+h@{/home/erik/prefix/default/src/limesuite-\/dev/src/lms7002m/\+L\+M\+S7002\+M.\+h}}
+
+\begin{DoxyCode}
+00001 
+00007 \textcolor{preprocessor}{#ifndef LMS7API\_H}
+00008 \textcolor{preprocessor}{#define LMS7API\_H}
+00009 
+00010 \textcolor{preprocessor}{#include "LimeSuiteConfig.h"}
+00011 \textcolor{preprocessor}{#include "LMS7002M_parameters.h"}
+00012 \textcolor{preprocessor}{#include <cstdint>}
+00013 \textcolor{preprocessor}{#include <sstream>}
+00014 \textcolor{preprocessor}{#include <stdarg.h>}
+00015 \textcolor{preprocessor}{#include <functional>}
+00016 \textcolor{preprocessor}{#include <vector>}
+00017 
+00018 \textcolor{keyword}{namespace }lime\{
+00019 \textcolor{keyword}{class }IConnection;
+00020 \textcolor{keyword}{class }LMS7002M\_RegistersMap;
+00021 \textcolor{keyword}{class }MCU\_BD;
+00022 \textcolor{keyword}{class }BinSearchParam;
+00023 \textcolor{keyword}{class }GridSearchParam;
+00024 
+00025 \textcolor{keyword}{struct }RSSI_measurements
+00026 \{
+00027     \textcolor{keywordtype}{void} clear()
+00028     \{
+00029         amplitudeFFT.clear();
+00030         amplitudeGeortzelF.clear();
+00031         amplitudeGeortzelFPGA.clear();
+00032     \}
+00033 
+00034     std::vector<float> amplitudeFFT;
+00035     std::vector<float> amplitudeGeortzelF;
+00036     std::vector<float> amplitudeGeortzelFPGA;
+00037 \};
+00038 
+00039 \textcolor{keyword}{typedef} \textcolor{keywordtype}{double} float_type;
+00040 
+00041 \textcolor{keyword}{class }LIME_API LMS7002M
+00042 \{
+00043 \textcolor{keyword}{public}:
+00044     \textcolor{keyword}{enum}
+00045     \{
+00046         Rx, Tx
+00047     \};
+00048 
+00049     \textcolor{keyword}{struct }CGEN_details
+00050     \{
+00051         float\_type frequency;
+00052         float\_type frequencyVCO;
+00053         float\_type referenceClock;
+00054         uint32\_t INT;
+00055         uint32\_t FRAC;
+00056         uint8\_t div_outch_cgen;
+00057         uint16\_t csw;
+00058         \textcolor{keywordtype}{bool} success;
+00059     \};
+00060     \textcolor{keyword}{struct }SX_details
+00061     \{
+00062         float\_type frequency;
+00063         float\_type frequencyVCO;
+00064         float\_type referenceClock;
+00065         uint32\_t INT;
+00066         uint32\_t FRAC;
+00067         uint8\_t div_loch;
+00068         \textcolor{keywordtype}{bool} en_div2_divprog;
+00069         uint16\_t sel_vco;
+00070         uint16\_t csw;
+00071         \textcolor{keywordtype}{bool} success;
+00072     \};
+00073 
+00074     LMS7002M();
+00075 
+00082     \textcolor{keywordtype}{void} SetConnection(IConnection* port, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} devIndex = 0);
+00083 
+00084     IConnection *GetConnection(\textcolor{keywordtype}{void})\textcolor{keyword}{ const}
+00085 \textcolor{keyword}{    }\{
+00086         \textcolor{keywordflow}{return} controlPort;
+00087     \}
+00088 
+00089     \textcolor{keyword}{virtual} ~LMS7002M();
+00090 
+00095     \textcolor{keyword}{enum} Channel
+00096     \{
+00097         ChA = 1,
+00098         ChB = 2,
+00099         ChAB = 3,
+00100         ChSXR = 1, \textcolor{comment}{//SXR register space}
+00101         ChSXT = 2, \textcolor{comment}{//SXT register space}
+00102     \};
+00103 
+00108     \textcolor{keywordtype}{void} SetActiveChannel(\textcolor{keyword}{const} Channel ch);
+00109 
+00114     Channel GetActiveChannel(\textcolor{keywordtype}{bool} fromChip = \textcolor{keyword}{true});
+00115 
+00121     \textcolor{keywordtype}{size\_t} GetActiveChannelIndex(\textcolor{keywordtype}{bool} fromChip = \textcolor{keyword}{true});
+00122 
+00130     \textcolor{keywordtype}{int} EnableChannel(\textcolor{keyword}{const} \textcolor{keywordtype}{bool} isTx, \textcolor{keyword}{const} \textcolor{keywordtype}{bool} enable);
+00131 
+00133     \textcolor{keywordtype}{int} UploadAll();
+00134     \textcolor{keywordtype}{int} DownloadAll();
+00135     \textcolor{keywordtype}{bool} IsSynced();
+00136     \textcolor{keywordtype}{int} CopyChannelRegisters(\textcolor{keyword}{const} Channel src, \textcolor{keyword}{const} Channel dest, \textcolor{keywordtype}{bool} copySX);
+00137 
+00138     \textcolor{keywordtype}{int} ResetChip();
+00139 
+00143     \textcolor{keywordtype}{int} SoftReset();
+00144 
+00145     \textcolor{keywordtype}{int} LoadConfig(\textcolor{keyword}{const} \textcolor{keywordtype}{char}* filename);
+00146     \textcolor{keywordtype}{int} SaveConfig(\textcolor{keyword}{const} \textcolor{keywordtype}{char}* filename);
+00148 
+00150     uint16\_t Get_SPI_Reg_bits(\textcolor{keyword}{const} LMS7Parameter &param, \textcolor{keywordtype}{bool} fromChip = \textcolor{keyword}{false});
+00151     uint16\_t Get_SPI_Reg_bits(uint16\_t address, uint8\_t msb, uint8\_t lsb, \textcolor{keywordtype}{bool} fromChip = \textcolor{keyword}{false});
+00152     \textcolor{keywordtype}{int} Modify_SPI_Reg_bits(\textcolor{keyword}{const} LMS7Parameter &param, \textcolor{keyword}{const} uint16\_t value, \textcolor{keywordtype}{bool} fromChip = \textcolor{keyword}{false});
+00153     \textcolor{keywordtype}{int} Modify_SPI_Reg_bits(uint16\_t address, uint8\_t msb, uint8\_t lsb, uint16\_t value, \textcolor{keywordtype}{bool} fromChip = \textcolor{keyword}{
+      false});
+00154     \textcolor{keywordtype}{int} SPI_write(uint16\_t address, uint16\_t data, \textcolor{keywordtype}{bool} toChip = \textcolor{keyword}{false});
+00155     uint16\_t SPI_read(uint16\_t address, \textcolor{keywordtype}{bool} fromChip = \textcolor{keyword}{false}, \textcolor{keywordtype}{int} *status = 0);
+00156     \textcolor{keywordtype}{int} RegistersTest(\textcolor{keyword}{const} \textcolor{keywordtype}{char}* fileName = \textcolor{stringliteral}{"registersTest.txt"});
+00157     \textcolor{keyword}{static} \textcolor{keyword}{const} LMS7Parameter* GetParam(\textcolor{keyword}{const} std::string &name);
+00159 
+00161     \textcolor{keywordtype}{int} CalibrateRx(float\_type bandwidth, \textcolor{keyword}{const} \textcolor{keywordtype}{bool} useExtLoopback = \textcolor{keyword}{false});
+00162     \textcolor{keywordtype}{int} CalibrateTx(float\_type bandwidth, \textcolor{keyword}{const} \textcolor{keywordtype}{bool} useExtLoopback = \textcolor{keyword}{false});
+00164 
+00166     \textcolor{keywordtype}{int} TuneTxFilter(\textcolor{keyword}{const} float\_type bandwidth);
+00167     \textcolor{keywordtype}{int} TuneRxFilter(\textcolor{keyword}{const} float\_type rx\_lpf\_freq\_RF);
+00168     \textcolor{keywordtype}{int} TuneTxFilterWithCaching(\textcolor{keyword}{const} float\_type bandwidth);
+00169     \textcolor{keywordtype}{int} TuneRxFilterWithCaching(\textcolor{keyword}{const} float\_type rx\_lpf\_freq\_RF);
+00171 
+00173     \textcolor{keywordtype}{int} CalibrateInternalADC(\textcolor{keywordtype}{int} clkDiv = 32);
+00174     \textcolor{keywordtype}{int} CalibrateRP\_BIAS();
+00175     \textcolor{keywordtype}{int} CalibrateTxGain(\textcolor{keywordtype}{float} maxGainOffset\_dBFS, \textcolor{keywordtype}{float} *actualGain\_dBFS);
+00176     \textcolor{keywordtype}{int} CalibrateAnalogRSSI\_DC\_Offset();
+00177 
+00179 
+00185     \textcolor{keywordtype}{int} SetRBBPGA\_dB(\textcolor{keyword}{const} float\_type gain);
+00186 
+00188     float\_type GetRBBPGA\_dB(\textcolor{keywordtype}{void});
+00189 
+00195     \textcolor{keywordtype}{int} SetRFELNA\_dB(\textcolor{keyword}{const} float\_type gain);
+00196 
+00198     float\_type GetRFELNA\_dB(\textcolor{keywordtype}{void});
+00199 
+00205     \textcolor{keywordtype}{int} SetRFELoopbackLNA\_dB(\textcolor{keyword}{const} float\_type gain);
+00206 
+00208     float\_type GetRFELoopbackLNA\_dB(\textcolor{keywordtype}{void});
+00209 
+00215     \textcolor{keywordtype}{int} SetRFETIA\_dB(\textcolor{keyword}{const} float\_type gain);
+00216 
+00218     float\_type GetRFETIA\_dB(\textcolor{keywordtype}{void});
+00219 
+00225     \textcolor{keywordtype}{int} SetTRFPAD\_dB(\textcolor{keyword}{const} float\_type gain);
+00226 
+00228     float\_type GetTRFPAD\_dB(\textcolor{keywordtype}{void});
+00229     
+00235     \textcolor{keywordtype}{int} SetTBBIAMP\_dB(\textcolor{keyword}{const} float\_type gain);
+00236 
+00238     float\_type GetTBBIAMP\_dB(\textcolor{keywordtype}{void});
+00239 
+00245     \textcolor{keywordtype}{int} SetTRFLoopbackPAD\_dB(\textcolor{keyword}{const} float\_type gain);
+00246 
+00248     float\_type GetTRFLoopbackPAD\_dB(\textcolor{keywordtype}{void});
+00249 
+00251 
+00253     \textcolor{keyword}{enum} PathRFE
+00254     \{
+00255         PATH\_RFE\_NONE = 0,
+00256         PATH_RFE_LNAH,
+00257         PATH_RFE_LNAL,
+00258         PATH_RFE_LNAW,
+00259         PATH_RFE_LB1,
+00260         PATH_RFE_LB2,
+00261     \};
+00262 
+00264     \textcolor{keywordtype}{int} SetPathRFE(PathRFE path);
+00265 
+00267     PathRFE GetPathRFE(\textcolor{keywordtype}{void});
+00268 
+00273     \textcolor{keywordtype}{int} SetBandTRF(\textcolor{keyword}{const} \textcolor{keywordtype}{int} band);
+00274 
+00279     \textcolor{keywordtype}{int} GetBandTRF(\textcolor{keywordtype}{void});
+00280 
+00282 
+00284     \textcolor{keywordtype}{int} SetReferenceClk\_SX(\textcolor{keywordtype}{bool} tx, float\_type freq\_Hz);
+00285     float\_type GetReferenceClk\_SX(\textcolor{keywordtype}{bool} tx);
+00286     float\_type GetFrequencyCGEN();
+00287     \textcolor{keywordtype}{int} SetFrequencyCGEN(float\_type freq\_Hz, \textcolor{keyword}{const} \textcolor{keywordtype}{bool} retainNCOfrequencies = \textcolor{keyword}{false}, 
+      CGEN_details* output = \textcolor{keyword}{nullptr});
+00288     \textcolor{keywordtype}{bool} GetCGENLocked(\textcolor{keywordtype}{void});
+00289     float\_type GetFrequencySX(\textcolor{keywordtype}{bool} tx);
+00290     \textcolor{keywordtype}{int} SetFrequencySX(\textcolor{keywordtype}{bool} tx, float\_type freq\_Hz, SX_details* output = \textcolor{keyword}{nullptr});
+00291     \textcolor{keywordtype}{int} SetFrequencySXWithSpurCancelation(\textcolor{keywordtype}{bool} tx, float\_type freq\_Hz, float\_type BW);
+00292     \textcolor{keywordtype}{bool} GetSXLocked(\textcolor{keywordtype}{bool} tx);
+00294     \textcolor{keyword}{enum} VCO_Module
+00295     \{
+00296         VCO_CGEN, VCO_SXR, VCO_SXT
+00297     \};
+00298     \textcolor{keywordtype}{int} TuneCGENVCO();
+00299     \textcolor{keywordtype}{int} TuneVCO(VCO_Module module);
+00301 
+00303     \textcolor{keywordtype}{int} LoadDC\_REG\_IQ(\textcolor{keywordtype}{bool} tx, int16\_t I, int16\_t Q);
+00304     \textcolor{keywordtype}{int} SetNCOFrequency(\textcolor{keywordtype}{bool} tx, uint8\_t index, float\_type freq\_Hz);
+00305     float\_type GetNCOFrequency(\textcolor{keywordtype}{bool} tx, uint8\_t index, \textcolor{keywordtype}{bool} fromChip = \textcolor{keyword}{true});
+00306     \textcolor{keywordtype}{int} SetNCOPhaseOffsetForMode0(\textcolor{keywordtype}{bool} tx, float\_type angle\_Deg);
+00307     \textcolor{keywordtype}{int} SetNCOPhaseOffset(\textcolor{keywordtype}{bool} tx, uint8\_t index, float\_type angle\_Deg);
+00308     float\_type GetNCOPhaseOffset\_Deg(\textcolor{keywordtype}{bool} tx, uint8\_t index);
+00309     \textcolor{keywordtype}{int} SetGFIRCoefficients(\textcolor{keywordtype}{bool} tx, uint8\_t GFIR\_index, \textcolor{keyword}{const} int16\_t *coef, uint8\_t coefCount);
+00310     \textcolor{keywordtype}{int} GetGFIRCoefficients(\textcolor{keywordtype}{bool} tx, uint8\_t GFIR\_index, int16\_t *coef, uint8\_t coefCount);
+00311     float\_type GetReferenceClk\_TSP(\textcolor{keywordtype}{bool} tx);
+00313 
+00314     \textcolor{keywordtype}{int} SetInterfaceFrequency(float\_type cgen\_freq\_Hz, \textcolor{keyword}{const} uint8\_t interpolation, \textcolor{keyword}{const} uint8\_t 
+      decimation);
+00315 
+00317     float\_type GetSampleRate(\textcolor{keywordtype}{bool} tx, Channel ch);
+00318 
+00320     \textcolor{keyword}{enum} LMLSampleSource
+00321     \{
+00322         AI = 0,
+00323         AQ = 1,
+00324         BI = 2,
+00325         BQ = 3,
+00326     \};
+00327 
+00331     \textcolor{keywordtype}{void} ConfigureLML\_RF2BB(
+00332         \textcolor{keyword}{const} LMLSampleSource s0,
+00333         \textcolor{keyword}{const} LMLSampleSource s1,
+00334         \textcolor{keyword}{const} LMLSampleSource s2,
+00335         \textcolor{keyword}{const} LMLSampleSource s3);
+00336 
+00340     \textcolor{keywordtype}{void} ConfigureLML\_BB2RF(
+00341         \textcolor{keyword}{const} LMLSampleSource s0,
+00342         \textcolor{keyword}{const} LMLSampleSource s1,
+00343         \textcolor{keyword}{const} LMLSampleSource s2,
+00344         \textcolor{keyword}{const} LMLSampleSource s3);
+00346 
+00352     \textcolor{keywordtype}{int} SetRxDCRemoval(\textcolor{keyword}{const} \textcolor{keywordtype}{bool} enable);
+00353 
+00357     \textcolor{keywordtype}{bool} GetRxDCRemoval(\textcolor{keywordtype}{void});
+00358     
+00364     \textcolor{keywordtype}{int} EnableSXTDD(\textcolor{keywordtype}{bool} enable);
+00365 
+00372     \textcolor{keywordtype}{int} SetTxDCOffset(\textcolor{keyword}{const} float\_type I, \textcolor{keyword}{const} float\_type Q);
+00373 
+00379     \textcolor{keywordtype}{void} GetTxDCOffset(float\_type &I, float\_type &Q);
+00380 
+00388     \textcolor{keywordtype}{int} SetIQBalance(\textcolor{keyword}{const} \textcolor{keywordtype}{bool} tx, \textcolor{keyword}{const} float\_type phase, \textcolor{keyword}{const} float\_type gainI, \textcolor{keyword}{const} float\_type gainQ)
+      ;
+00389 
+00397     \textcolor{keywordtype}{void} GetIQBalance(\textcolor{keyword}{const} \textcolor{keywordtype}{bool} tx, float\_type &phase, float\_type &gainI, float\_type &gainQ);
+00398 
+00400     \textcolor{keyword}{enum} MemorySection
+00401     \{
+00402         LimeLight = 0, EN\_DIR, AFE, BIAS, XBUF, CGEN, LDO, BIST, CDS,
+00403         TRF, TBB, RFE, RBB, SX, TRX\_GAIN, TxTSP,
+00404         TxNCO, TxGFIR1, TxGFIR2, TxGFIR3a, TxGFIR3b, TxGFIR3c,
+00405         RxTSP, RxNCO, RxGFIR1, RxGFIR2, RxGFIR3a, RxGFIR3b, RxGFIR3c,
+00406         RSSI\_DC\_CALIBRATION, RSSI_PDET_TEMP_CONFIG, RSSI\_DC\_CONFIG,
+00407         MEMORY\_SECTIONS\_COUNT
+00408     \};
+00409     \textcolor{keyword}{virtual} \textcolor{keywordtype}{int} SetDefaults(MemorySection module);
+00410 
+00411     \textcolor{keyword}{static} float\_type gVCO\_frequency\_table[3][2];
+00412     \textcolor{keyword}{static} float\_type gCGEN\_VCO\_frequencies[2];
+00413 
+00414     \textcolor{keywordtype}{void} EnableValuesCache(\textcolor{keywordtype}{bool} enabled = \textcolor{keyword}{true});
+00415     \textcolor{keywordtype}{bool} IsValuesCacheEnabled();
+00416     MCU_BD* GetMCUControls() \textcolor{keyword}{const};
+00417     \textcolor{keywordtype}{void} EnableCalibrationByMCU(\textcolor{keywordtype}{bool} enabled);
+00418     float\_type GetTemperature();
+00419 
+00420     \textcolor{keyword}{enum} LogType
+00421     \{
+00422         LOG_INFO,
+00423         LOG_WARNING,
+00424         LOG_ERROR,
+00425         LOG\_DATA
+00426     \};
+00427     \textcolor{keywordtype}{void} SetLogCallback(std::function<\textcolor{keywordtype}{void}(\textcolor{keyword}{const} \textcolor{keywordtype}{char}*, \textcolor{keywordtype}{int})> callback);
+00428     LMS7002M_RegistersMap *BackupRegisterMap(\textcolor{keywordtype}{void});
+00429     \textcolor{keywordtype}{void} RestoreRegisterMap(LMS7002M_RegistersMap *backup);
+00430 
+00431 \textcolor{keyword}{protected}:
+00432     \textcolor{keywordtype}{bool} mCalibrationByMCU;
+00433     MCU_BD *mcuControl;
+00434     \textcolor{keywordtype}{bool} useCache;
+00435     LMS7002M_RegistersMap *mRegistersMap;
+00436 
+00437     \textcolor{keyword}{static} \textcolor{keyword}{const} uint16\_t readOnlyRegisters[];
+00438     \textcolor{keyword}{static} \textcolor{keyword}{const} uint16\_t readOnlyRegistersMasks[];
+00439 
+00440 
+00441     uint16\_t MemorySectionAddresses[MEMORY\_SECTIONS\_COUNT][2];
+00443     \textcolor{keywordtype}{void} BackupAllRegisters();
+00444     \textcolor{keywordtype}{void} RestoreAllRegisters();
+00445     
+00446     uint32\_t GetRSSI(RSSI_measurements *measurements = \textcolor{keyword}{nullptr});
+00447     uint32\_t GetAvgRSSI(\textcolor{keyword}{const} \textcolor{keywordtype}{int} avgCount);
+00448     \textcolor{keywordtype}{void} SetRxDCOFF(int8\_t offsetI, int8\_t offsetQ);
+00449     \textcolor{keywordtype}{void} CalibrateRxDC();
+00450     \textcolor{keywordtype}{void} AdjustAutoDC(\textcolor{keyword}{const} uint16\_t address, \textcolor{keywordtype}{bool} tx);
+00451     \textcolor{keywordtype}{void} CalibrateRxDCAuto();
+00452     \textcolor{keywordtype}{void} CalibrateTxDCAuto();
+00453     \textcolor{keywordtype}{void} CalibrateTxDC(int16\_t *dccorri, int16\_t *dccorrq);
+00454     \textcolor{keywordtype}{void} CalibrateIQImbalance(\textcolor{keyword}{const} \textcolor{keywordtype}{bool} tx, uint16\_t *gainI=\textcolor{keyword}{nullptr}, uint16\_t *gainQ=\textcolor{keyword}{nullptr}, int16\_t *
+      phase=\textcolor{keyword}{nullptr});
+00455 
+00456     \textcolor{keywordtype}{int} CalibrateTxSetup(\textcolor{keyword}{const} float\_type bandwidth\_Hz, \textcolor{keyword}{const} \textcolor{keywordtype}{bool} useExtLoopback);
+00457     \textcolor{keywordtype}{int} CalibrateRxSetup(\textcolor{keyword}{const} float\_type bandwidth\_Hz, \textcolor{keyword}{const} \textcolor{keywordtype}{bool} useExtLoopback);
+00458     \textcolor{keywordtype}{int} CheckSaturationRx(\textcolor{keyword}{const} float\_type bandwidth\_Hz, \textcolor{keyword}{const} \textcolor{keywordtype}{bool} useExtLoopback);
+00459     \textcolor{keywordtype}{int} CheckSaturationTxRx(\textcolor{keyword}{const} float\_type bandwidth\_Hz, \textcolor{keyword}{const} \textcolor{keywordtype}{bool} useExtLoopback);
+00460 
+00461     \textcolor{keywordtype}{int} CalibrateTxGainSetup();
+00462 
+00463     \textcolor{keywordtype}{void} BinarySearch(BinSearchParam* args);
+00464     \textcolor{keywordtype}{void} TxDcBinarySearch(BinSearchParam* args);
+00465     \textcolor{keywordtype}{void} GridSearch(GridSearchParam* args);
+00466     \textcolor{keywordtype}{void} CoarseSearch(\textcolor{keyword}{const} uint16\_t addr, \textcolor{keyword}{const} uint8\_t msb, \textcolor{keyword}{const} uint8\_t lsb, int16\_t &value, \textcolor{keyword}{const} 
+      uint8\_t maxIterations);
+00467     \textcolor{keywordtype}{void} FineSearch(\textcolor{keyword}{const} uint16\_t addrI, \textcolor{keyword}{const} uint8\_t msbI, \textcolor{keyword}{const} uint8\_t lsbI, int16\_t &valueI, \textcolor{keyword}{const} 
+      uint16\_t addrQ, \textcolor{keyword}{const} uint8\_t msbQ, \textcolor{keyword}{const} uint8\_t lsbQ, int16\_t &valueQ, \textcolor{keyword}{const} uint8\_t fieldSize);
+00468     \textcolor{keywordtype}{int} RxFilterSearch(\textcolor{keyword}{const} LMS7Parameter &param, \textcolor{keyword}{const} uint32\_t rssi\_3dB, uint8\_t rssiAvgCnt, \textcolor{keyword}{const} \textcolor{keywordtype}{int} 
+      stepLimit);
+00469     \textcolor{keywordtype}{int} TxFilterSearch(\textcolor{keyword}{const} LMS7Parameter &param, \textcolor{keyword}{const} uint32\_t rssi\_3dB, uint8\_t rssiAvgCnt, \textcolor{keyword}{const} \textcolor{keywordtype}{int} 
+      stepLimit);
+00470     \textcolor{keywordtype}{int} TxFilterSearch\_S5(\textcolor{keyword}{const} LMS7Parameter &param, \textcolor{keyword}{const} uint32\_t rssi\_3dB, uint8\_t rssiAvgCnt, \textcolor{keyword}{const} \textcolor{keywordtype}{
+      int} stepLimit);
+00471 
+00472     \textcolor{keywordtype}{int} TuneRxFilterSetup(\textcolor{keyword}{const} float\_type rx\_lpf\_IF);
+00473     \textcolor{keywordtype}{int} TuneTxFilterSetup(\textcolor{keyword}{const} float\_type tx\_lpf\_IF);
+00474 
+00475     \textcolor{keywordtype}{int} RegistersTestInterval(uint16\_t startAddr, uint16\_t endAddr, uint16\_t pattern, std::stringstream &ss
+      );
+00476     \textcolor{keywordtype}{int} SPI_write_batch(\textcolor{keyword}{const} uint16\_t* spiAddr, \textcolor{keyword}{const} uint16\_t* spiData, uint16\_t cnt, \textcolor{keywordtype}{bool} 
+      toChip = \textcolor{keyword}{false});
+00477     \textcolor{keywordtype}{int} SPI_read_batch(\textcolor{keyword}{const} uint16\_t* spiAddr, uint16\_t* spiData, uint16\_t cnt);
+00478     \textcolor{keywordtype}{int} Modify_SPI_Reg_mask(\textcolor{keyword}{const} uint16\_t *addr, \textcolor{keyword}{const} uint16\_t *masks, \textcolor{keyword}{const} uint16\_t *values, uint8\_t 
+      start, uint8\_t stop);
+00480 
+00481     \textcolor{keyword}{virtual} \textcolor{keywordtype}{void} Log(\textcolor{keyword}{const} \textcolor{keywordtype}{char}* text, LogType type);
+00482 
+00483     \textcolor{keywordtype}{void} Log(LogType type, \textcolor{keyword}{const} \textcolor{keywordtype}{char} *format, ...)
+00484     \{
+00485         va\_list argList;
+00486         va\_start(argList, format);
+00487         Log(type, format, argList);
+00488         va\_end(argList);
+00489     \}
+00490 
+00491     std::function<void(const char*, int)> log_callback;
+00492     \textcolor{keywordtype}{void} Log(LogType type, \textcolor{keyword}{const} \textcolor{keywordtype}{char} *format, va\_list argList);
+00493 
+00495     IConnection* controlPort;
+00496     \textcolor{keywordtype}{unsigned} mdevIndex;
+00497     \textcolor{keywordtype}{size\_t} mSelfCalDepth;
+00498     \textcolor{keywordtype}{int} opt\_gain\_tbb[2];
+00499     \textcolor{keywordtype}{double} _cachedRefClockRate;
+00500     \textcolor{keywordtype}{int} LoadConfigLegacyFile(\textcolor{keyword}{const} \textcolor{keywordtype}{char}* filename);
+00501 \};
+00502 \}
+00503 \textcolor{preprocessor}{#endif}
+\end{DoxyCode}

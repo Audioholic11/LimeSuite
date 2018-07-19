@@ -1,0 +1,546 @@
+\subsection{lms7002\+\_\+pnl\+Tx\+T\+S\+P\+\_\+view.\+cpp}
+\label{lms7002__pnlTxTSP__view_8cpp_source}\index{/home/erik/prefix/default/src/limesuite-\/dev/src/lms7002\+\_\+wxgui/lms7002\+\_\+pnl\+Tx\+T\+S\+P\+\_\+view.\+cpp@{/home/erik/prefix/default/src/limesuite-\/dev/src/lms7002\+\_\+wxgui/lms7002\+\_\+pnl\+Tx\+T\+S\+P\+\_\+view.\+cpp}}
+
+\begin{DoxyCode}
+00001 \textcolor{preprocessor}{#include "lms7002_pnlTxTSP_view.h"}
+00002 \textcolor{preprocessor}{#include "lms7002_gui_utilities.h"}
+00003 \textcolor{preprocessor}{#include "numericSlider.h"}
+00004 \textcolor{preprocessor}{#include "lms7002_dlgGFIR_Coefficients.h"}
+00005 \textcolor{preprocessor}{#include "lms7suiteAppFrame.h"}
+00006 
+00007 \textcolor{keyword}{using namespace }lime;
+00008 \textcolor{keyword}{using namespace }LMS7002_WXGUI;
+00009 
+00010 indexValueMap hbi_ovr_txtsp_IndexValuePairs;
+00011 indexValueMap tsgfcw_txtsp_IndexValuePairs;
+00012 indexValueMap cmix_gain_txtsp_IndexValuePairs;
+00013 
+00014 lms7002_pnlTxTSP_view::lms7002_pnlTxTSP_view( wxWindow* parent )
+00015 :
+00016 pnlTxTSP_view( parent )
+00017 \{
+00018 
+00019 \}
+00020 
+00021 lms7002_pnlTxTSP_view::lms7002_pnlTxTSP_view( wxWindow* parent, wxWindowID \textcolor{keywordtype}{id}, \textcolor{keyword}{const} wxPoint& pos, \textcolor{keyword}{const} 
+      wxSize& size, \textcolor{keywordtype}{long} style )
+00022     : pnlTxTSP_view(parent, id, pos, size, style), lmsControl(nullptr)
+00023 \{
+00024     wndId2Enum[rgrMODE_TX] = LMS7param(MODE_TX);
+00025     wndId2Enum[chkBSTART_TXTSP] = LMS7param(BSTART_TXTSP);
+00026     wndId2Enum[chkCMIX_BYP_TXTSP] = LMS7param(CMIX_BYP_TXTSP);
+00027     wndId2Enum[cmbCMIX_GAIN_TXTSP] = LMS7param(CMIX_GAIN_TXTSP);
+00028     wndId2Enum[cmbDCCORRI_TXTSP] = LMS7param(DCCORRI_TXTSP);
+00029     wndId2Enum[cmbDCCORRQ_TXTSP] = LMS7param(DCCORRQ_TXTSP);
+00030     wndId2Enum[chkDC_BYP_TXTSP] = LMS7param(DC_BYP_TXTSP);
+00031     wndId2Enum[chkEN_TXTSP] = LMS7param(EN_TXTSP);
+00032     wndId2Enum[cmbGCORRI_TXTSP] = LMS7param(GCORRI_TXTSP);
+00033     wndId2Enum[cmbGCORRQ_TXTSP] = LMS7param(GCORRQ_TXTSP);
+00034     wndId2Enum[chkGC_BYP_TXTSP] = LMS7param(GC_BYP_TXTSP);
+00035     wndId2Enum[chkGFIR1_BYP_TXTSP] = LMS7param(GFIR1_BYP_TXTSP);
+00036     wndId2Enum[cmbGFIR1_L_TXTSP] = LMS7param(GFIR1_L_TXTSP);
+00037     wndId2Enum[cmbGFIR1_N_TXTSP] = LMS7param(GFIR1_N_TXTSP);
+00038     wndId2Enum[chkGFIR2_BYP_TXTSP] = LMS7param(GFIR2_BYP_TXTSP);
+00039     wndId2Enum[cmbGFIR2_L_TXTSP] = LMS7param(GFIR2_L_TXTSP);
+00040     wndId2Enum[cmbGFIR2_N_TXTSP] = LMS7param(GFIR2_N_TXTSP);
+00041     wndId2Enum[chkGFIR3_BYP_TXTSP] = LMS7param(GFIR3_BYP_TXTSP);
+00042     wndId2Enum[cmbGFIR3_L_TXTSP] = LMS7param(GFIR3_L_TXTSP);
+00043     wndId2Enum[cmbGFIR3_N_TXTSP] = LMS7param(GFIR3_N_TXTSP);
+00044     wndId2Enum[cmbHBI_OVR_TXTSP] = LMS7param(HBI_OVR_TXTSP);
+00045     wndId2Enum[cmbIQCORR_TXTSP] = LMS7param(IQCORR_TXTSP);
+00046     wndId2Enum[chkISINC_BYP_TXTSP] = LMS7param(ISINC_BYP_TXTSP);
+00047     wndId2Enum[chkPH_BYP_TXTSP] = LMS7param(PH_BYP_TXTSP);
+00048     wndId2Enum[cmbCMIX_SC_TXTSP] = LMS7param(CMIX_SC_TXTSP);
+00049 
+00050     wndId2Enum[rgrTSGFCW_TXTSP] = LMS7param(TSGFCW_TXTSP);
+00051     wndId2Enum[chkTSGSWAPIQ_TXTSP] = LMS7param(TSGSWAPIQ_TXTSP);
+00052     wndId2Enum[rgrTSGMODE_TXTSP] = LMS7param(TSGMODE_TXTSP);
+00053     wndId2Enum[rgrINSEL_TXTSP] = LMS7param(INSEL_TXTSP);
+00054     wndId2Enum[rgrTSGFC_TXTSP] = LMS7param(TSGFC_TXTSP);
+00055     wndId2Enum[cmbDTHBIT_TX] = LMS7param(DTHBIT_TX);
+00056 
+00057     wndId2Enum[rgrSEL0] = LMS7param(SEL_TX);
+00058     wndId2Enum[rgrSEL01] = LMS7param(SEL_TX);
+00059     wndId2Enum[rgrSEL02] = LMS7param(SEL_TX);
+00060     wndId2Enum[rgrSEL03] = LMS7param(SEL_TX);
+00061     wndId2Enum[rgrSEL04] = LMS7param(SEL_TX);
+00062     wndId2Enum[rgrSEL05] = LMS7param(SEL_TX);
+00063     wndId2Enum[rgrSEL06] = LMS7param(SEL_TX);
+00064     wndId2Enum[rgrSEL07] = LMS7param(SEL_TX);
+00065     wndId2Enum[rgrSEL08] = LMS7param(SEL_TX);
+00066     wndId2Enum[rgrSEL09] = LMS7param(SEL_TX);
+00067     wndId2Enum[rgrSEL10] = LMS7param(SEL_TX);
+00068     wndId2Enum[rgrSEL11] = LMS7param(SEL_TX);
+00069     wndId2Enum[rgrSEL12] = LMS7param(SEL_TX);
+00070     wndId2Enum[rgrSEL13] = LMS7param(SEL_TX);
+00071     wndId2Enum[rgrSEL14] = LMS7param(SEL_TX);
+00072     wndId2Enum[rgrSEL15] = LMS7param(SEL_TX);
+00073 
+00074     lblNCOangles.push\_back(txtAnglePHO0);
+00075     lblNCOangles.push\_back(txtAnglePHO01);
+00076     lblNCOangles.push\_back(txtAnglePHO02);
+00077     lblNCOangles.push\_back(txtAnglePHO03);
+00078     lblNCOangles.push\_back(txtAnglePHO04);
+00079     lblNCOangles.push\_back(txtAnglePHO05);
+00080     lblNCOangles.push\_back(txtAnglePHO06);
+00081     lblNCOangles.push\_back(txtAnglePHO07);
+00082     lblNCOangles.push\_back(txtAnglePHO08);
+00083     lblNCOangles.push\_back(txtAnglePHO09);
+00084     lblNCOangles.push\_back(txtAnglePHO10);
+00085     lblNCOangles.push\_back(txtAnglePHO11);
+00086     lblNCOangles.push\_back(txtAnglePHO12);
+00087     lblNCOangles.push\_back(txtAnglePHO13);
+00088     lblNCOangles.push\_back(txtAnglePHO14);
+00089     lblNCOangles.push\_back(txtAnglePHO15);
+00090 
+00091     rgrNCOselections.push\_back(rgrSEL0);
+00092     rgrNCOselections.push\_back(rgrSEL01);
+00093     rgrNCOselections.push\_back(rgrSEL02);
+00094     rgrNCOselections.push\_back(rgrSEL03);
+00095     rgrNCOselections.push\_back(rgrSEL04);
+00096     rgrNCOselections.push\_back(rgrSEL05);
+00097     rgrNCOselections.push\_back(rgrSEL06);
+00098     rgrNCOselections.push\_back(rgrSEL07);
+00099     rgrNCOselections.push\_back(rgrSEL08);
+00100     rgrNCOselections.push\_back(rgrSEL09);
+00101     rgrNCOselections.push\_back(rgrSEL10);
+00102     rgrNCOselections.push\_back(rgrSEL11);
+00103     rgrNCOselections.push\_back(rgrSEL12);
+00104     rgrNCOselections.push\_back(rgrSEL13);
+00105     rgrNCOselections.push\_back(rgrSEL14);
+00106     rgrNCOselections.push\_back(rgrSEL15);
+00107 
+00108     txtNCOinputs.push\_back(txtFCWPHO0);
+00109     txtNCOinputs.push\_back(txtFCWPHO01);
+00110     txtNCOinputs.push\_back(txtFCWPHO02);
+00111     txtNCOinputs.push\_back(txtFCWPHO03);
+00112     txtNCOinputs.push\_back(txtFCWPHO04);
+00113     txtNCOinputs.push\_back(txtFCWPHO05);
+00114     txtNCOinputs.push\_back(txtFCWPHO06);
+00115     txtNCOinputs.push\_back(txtFCWPHO07);
+00116     txtNCOinputs.push\_back(txtFCWPHO08);
+00117     txtNCOinputs.push\_back(txtFCWPHO09);
+00118     txtNCOinputs.push\_back(txtFCWPHO10);
+00119     txtNCOinputs.push\_back(txtFCWPHO11);
+00120     txtNCOinputs.push\_back(txtFCWPHO12);
+00121     txtNCOinputs.push\_back(txtFCWPHO13);
+00122     txtNCOinputs.push\_back(txtFCWPHO14);
+00123     txtNCOinputs.push\_back(txtFCWPHO15);
+00124 
+00125     wxArrayString temp;
+00126 
+00127     temp.clear();
+00128     \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} i=0; i<8; ++i)
+00129         temp.push\_back(wxString::Format(\_(\textcolor{stringliteral}{"%i"}), i));
+00130     cmbGFIR1_L_TXTSP->Set(temp);
+00131     cmbGFIR2_L_TXTSP->Set(temp);
+00132     cmbGFIR3_L_TXTSP->Set(temp);
+00133 
+00134     temp.clear();
+00135     \textcolor{keywordflow}{for} (\textcolor{keywordtype}{int} i = 0; i<16; ++i)
+00136         temp.push\_back(wxString::Format(\_(\textcolor{stringliteral}{"%i"}), i));
+00137     cmbDTHBIT_TX->Set(temp);
+00138 
+00139     temp.clear();
+00140     temp.push\_back(\textcolor{stringliteral}{"2^1"});
+00141     temp.push\_back(\textcolor{stringliteral}{"2^2"});
+00142     temp.push\_back(\textcolor{stringliteral}{"2^3"});
+00143     temp.push\_back(\textcolor{stringliteral}{"2^4"});
+00144     temp.push\_back(\textcolor{stringliteral}{"2^5"});
+00145     temp.push\_back(\textcolor{stringliteral}{"Bypass"});
+00146     hbi_ovr_txtsp_IndexValuePairs.push\_back(indexValuePair(0, 0));
+00147     hbi_ovr_txtsp_IndexValuePairs.push\_back(indexValuePair(1, 1));
+00148     hbi_ovr_txtsp_IndexValuePairs.push\_back(indexValuePair(2, 2));
+00149     hbi_ovr_txtsp_IndexValuePairs.push\_back(indexValuePair(3, 3));
+00150     hbi_ovr_txtsp_IndexValuePairs.push\_back(indexValuePair(4, 4));
+00151     hbi_ovr_txtsp_IndexValuePairs.push\_back(indexValuePair(5, 7));
+00152     cmbHBI_OVR_TXTSP->Set(temp);
+00153 
+00154     tsgfcw_txtsp_IndexValuePairs.push\_back(indexValuePair(0, 1));
+00155     tsgfcw_txtsp_IndexValuePairs.push\_back(indexValuePair(1, 2));
+00156 
+00157     cmix_gain_txtsp_IndexValuePairs.push\_back(indexValuePair(0, 2));
+00158     cmix_gain_txtsp_IndexValuePairs.push\_back(indexValuePair(1, 2));
+00159     cmix_gain_txtsp_IndexValuePairs.push\_back(indexValuePair(2, 0));
+00160     cmix_gain_txtsp_IndexValuePairs.push\_back(indexValuePair(3, 0));
+00161     cmix_gain_txtsp_IndexValuePairs.push\_back(indexValuePair(4, 1));
+00162 
+00163     LMS7002_WXGUI::UpdateTooltips(wndId2Enum, \textcolor{keyword}{true});
+00164 \}
+00165 
+00166 \textcolor{keywordtype}{void} lms7002_pnlTxTSP_view::Initialize(lms_device_t* pControl)
+00167 \{
+00168     lmsControl = pControl;
+00169     assert(lmsControl != \textcolor{keyword}{nullptr});
+00170     uint16\_t value;
+00171     \textcolor{keywordflow}{if} (LMS_ReadParam(lmsControl,LMS7param(MASK),&value)!=0  || value != 0)
+00172          value = 1;
+00173     wxArrayString temp;
+00174     temp.clear();
+00175     temp.push\_back(\textcolor{stringliteral}{"-6 dB"});
+00176     temp.push\_back(value ? \textcolor{stringliteral}{"-3 dB"}:\textcolor{stringliteral}{"-6 dB"});
+00177     temp.push\_back(\textcolor{stringliteral}{"0 dB"});
+00178     temp.push\_back(value ? \textcolor{stringliteral}{"+3 dB"}:\textcolor{stringliteral}{"+6 dB"});
+00179     temp.push\_back(\textcolor{stringliteral}{"+6 dB"});
+00180     cmbCMIX_GAIN_TXTSP->Set(temp);
+00181 \}
+00182 
+00183 \textcolor{keywordtype}{void} lms7002_pnlTxTSP_view::ParameterChangeHandler(wxSpinEvent& event)
+00184 \{
+00185     wxCommandEvent evt;
+00186     evt.SetInt(event.GetInt());
+00187     evt.SetId(event.GetId());
+00188     evt.SetEventObject(event.GetEventObject());
+00189     ParameterChangeHandler(evt);
+00190 \}
+00191 
+00192 \textcolor{keywordtype}{void} lms7002_pnlTxTSP_view::ParameterChangeHandler( wxCommandEvent& event )
+00193 \{
+00194     assert(lmsControl != \textcolor{keyword}{nullptr});
+00195     LMS7Parameter parameter;
+00196     \textcolor{keywordflow}{try}
+00197     \{
+00198         parameter = wndId2Enum.at(reinterpret\_cast<wxWindow*>(event.GetEventObject()));
+00199     \}
+00200     \textcolor{keywordflow}{catch} (std::exception & e)
+00201     \{
+00202         std::cout << \textcolor{stringliteral}{"Control element(ID = "} << \textcolor{keyword}{event}.GetId() << \textcolor{stringliteral}{") don't have assigned LMS parameter."} << 
+      std::endl;
+00203         \textcolor{keywordflow}{return};
+00204     \}
+00205     \textcolor{keywordtype}{long} value = \textcolor{keyword}{event}.GetInt();
+00206     \textcolor{keywordflow}{if}(event.GetEventObject() == cmbIQCORR_TXTSP)
+00207     \{
+00208         \textcolor{keywordtype}{float} angle = atan(value / 2048.0) * 180 / 3.141596;
+00209         txtPhaseAlpha->SetLabel(wxString::Format(\textcolor{stringliteral}{"%.3f"}, angle));
+00210     \}
+00211     \textcolor{keywordflow}{else} \textcolor{keywordflow}{if} (event.GetEventObject() == rgrTSGFCW_TXTSP)
+00212     \{
+00213         value = index2value(value, tsgfcw_txtsp_IndexValuePairs);
+00214     \}
+00215     \textcolor{keywordflow}{else} \textcolor{keywordflow}{if} (event.GetEventObject() == cmbHBI_OVR_TXTSP)
+00216     \{
+00217         value = index2value(value, hbi_ovr_txtsp_IndexValuePairs);
+00218     \}
+00219     \textcolor{keywordflow}{else} \textcolor{keywordflow}{if}(event.GetEventObject() == cmbCMIX_GAIN_TXTSP)
+00220     \{
+00221         LMS_WriteParam(lmsControl, LMS7_CMIX_GAIN_TXTSP_R3, value % 0x2);
+00222         value = index2value(value, cmix_gain_txtsp_IndexValuePairs);
+00223     \}
+00224 
+00225     LMS_WriteParam(lmsControl,parameter,value);
+00226 
+00227     \textcolor{keywordflow}{if}(event.GetEventObject() == rgrMODE_TX)
+00228         UpdateNCOinputs();
+00229 \}
+00230 
+00231 \textcolor{keywordtype}{void} lms7002_pnlTxTSP_view::OnNCOSelectionChange(wxCommandEvent& event)
+00232 \{
+00233     wxRadioButton* btn = \textcolor{keyword}{reinterpret\_cast<}wxRadioButton*\textcolor{keyword}{>}(\textcolor{keyword}{event}.GetEventObject());
+00234     \textcolor{keywordtype}{int} value = 0;
+00235     \textcolor{keywordflow}{for} (\textcolor{keywordtype}{size\_t} i = 0; i < rgrNCOselections.size(); ++i)
+00236         \textcolor{keywordflow}{if} (btn == rgrNCOselections[i])
+00237         \{
+00238             value = i;
+00239             \textcolor{keywordflow}{break};
+00240         \}
+00241     LMS_WriteParam(lmsControl,LMS7param(SEL_TX),value);
+00242 \}
+00243 
+00244 \textcolor{keywordtype}{void} lms7002_pnlTxTSP_view::onbtnReadBISTSignature( wxCommandEvent& event )
+00245 \{
+00246     uint16\_t value;
+00247     LMS_ReadParam(lmsControl,LMS7param(BSTATE_TXTSP),&value);
+00248     lblBSTATE_TXTSP->SetLabel(wxString::Format(\textcolor{stringliteral}{"%i"}, value));
+00249     LMS_ReadParam(lmsControl,LMS7param(BSIGI_TXTSP),&value);
+00250     lblBSIGI_TXTSP->SetLabel(wxString::Format(\textcolor{stringliteral}{"0x%0.6X"}, value));
+00251     LMS_ReadParam(lmsControl,LMS7param(BSIGQ_TXTSP),&value);
+00252     lblBSIGQ_TXTSP->SetLabel(wxString::Format(\textcolor{stringliteral}{"0x%0.6X"}, value));
+00253 \}
+00254 
+00255 \textcolor{keywordtype}{void} lms7002_pnlTxTSP_view::OnbtnLoadDCIClick( wxCommandEvent& event )
+00256 \{
+00257     \textcolor{keywordtype}{long} value = 0;
+00258     txtDC_REG_TXTSP->GetValue().ToLong(&value, 16);
+00259     LMS_WriteParam(lmsControl,LMS7param(DC_REG_TXTSP),value);
+00260     LMS_WriteParam(lmsControl,LMS7param(TSGDCLDI_TXTSP),0);
+00261     LMS_WriteParam(lmsControl,LMS7param(TSGDCLDI_TXTSP),1);
+00262     LMS_WriteParam(lmsControl,LMS7param(TSGDCLDI_TXTSP),0);
+00263 \}
+00264 
+00265 \textcolor{keywordtype}{void} lms7002_pnlTxTSP_view::OnbtnLoadDCQClick( wxCommandEvent& event )
+00266 \{
+00267     \textcolor{keywordtype}{long} value = 0;
+00268     txtDC_REG_TXTSP->GetValue().ToLong(&value, 16);
+00269     LMS_WriteParam(lmsControl,LMS7param(DC_REG_TXTSP),value);
+00270     LMS_WriteParam(lmsControl,LMS7param(TSGDCLDQ_TXTSP),0);
+00271     LMS_WriteParam(lmsControl,LMS7param(TSGDCLDQ_TXTSP),1);
+00272     LMS_WriteParam(lmsControl,LMS7param(TSGDCLDQ_TXTSP),0);
+00273 \}
+00274 
+00275 \textcolor{keywordtype}{void} lms7002_pnlTxTSP_view::onbtnGFIR1Coef( wxCommandEvent& event )
+00276 \{
+00277     lms7002_dlgGFIR_Coefficients *dlg = \textcolor{keyword}{new} lms7002_dlgGFIR_Coefficients(\textcolor{keyword}{this});
+00278     std::vector<double> coefficients;
+00279     \textcolor{keyword}{const} \textcolor{keywordtype}{int} maxCoefCount = 40;
+00280     coefficients.resize(maxCoefCount, 0);
+00281     uint16\_t ch;
+00282     LMS_ReadParam(lmsControl,LMS7param(MAC),&ch);
+00283     ch = (ch == 2) ? 1 : 0;
+00284     ch += 2*LMS7SuiteAppFrame::m_lmsSelection;
+00285     \textcolor{keywordtype}{int} status =  LMS_GetGFIRCoeff(lmsControl, LMS_CH_TX, ch, LMS_GFIR1, &coefficients[0]);
+00286     \textcolor{keywordflow}{if} (status < 0)
+00287     \{
+00288         wxMessageBox(\_(\textcolor{stringliteral}{"Failed to read GFIR coefficients"}), \_(\textcolor{stringliteral}{"ERROR"}), wxICON\_ERROR | wxOK);
+00289         dlg->Destroy();
+00290         \textcolor{keywordflow}{return};
+00291     \}
+00292 
+00293     dlg->SetCoefficients(coefficients);
+00294     \textcolor{keywordflow}{if} (dlg->ShowModal() == wxID\_OK)
+00295     \{
+00296         coefficients = dlg->GetCoefficients();
+00297         status = LMS_SetGFIRCoeff(lmsControl, LMS_CH_TX, ch, LMS_GFIR1, &coefficients[0],coefficients.size(
+      ));
+00298         \textcolor{keywordflow}{if} (status != 0)
+00299             wxMessageBox(\_(\textcolor{stringliteral}{"Failed to set GFIR coefficients"}), \_(\textcolor{stringliteral}{"ERROR"}), wxICON\_ERROR | wxOK);
+00300     \}
+00301     dlg->Destroy();
+00302     UpdateGUI();
+00303 \}
+00304 
+00305 \textcolor{keywordtype}{void} lms7002_pnlTxTSP_view::onbtnGFIR2Coef( wxCommandEvent& event )
+00306 \{
+00307     lms7002_dlgGFIR_Coefficients *dlg = \textcolor{keyword}{new} lms7002_dlgGFIR_Coefficients(\textcolor{keyword}{this});
+00308     std::vector<double> coefficients;
+00309     \textcolor{keyword}{const} \textcolor{keywordtype}{int} maxCoefCount = 40;
+00310     coefficients.resize(maxCoefCount, 0);
+00311     uint16\_t ch;
+00312     LMS_ReadParam(lmsControl,LMS7param(MAC),&ch);
+00313     ch = (ch == 2) ? 1 : 0;
+00314     ch += 2*LMS7SuiteAppFrame::m_lmsSelection;
+00315     \textcolor{keywordtype}{int} status =  LMS_GetGFIRCoeff(lmsControl, LMS_CH_TX, ch, LMS_GFIR2, &coefficients[0]);
+00316     \textcolor{keywordflow}{if} (status < 0)
+00317     \{
+00318         wxMessageBox(\_(\textcolor{stringliteral}{"Failed to read GFIR coefficients"}), \_(\textcolor{stringliteral}{"ERROR"}), wxICON\_ERROR | wxOK);
+00319         dlg->Destroy();
+00320         \textcolor{keywordflow}{return};
+00321     \}
+00322     dlg->SetCoefficients(coefficients);
+00323     \textcolor{keywordflow}{if} (dlg->ShowModal() == wxID\_OK)
+00324     \{
+00325         coefficients = dlg->GetCoefficients();
+00326         status = LMS_SetGFIRCoeff(lmsControl, LMS_CH_TX, ch, LMS_GFIR2, &coefficients[0],coefficients.size(
+      ));
+00327         \textcolor{keywordflow}{if} (status != 0)
+00328             wxMessageBox(\_(\textcolor{stringliteral}{"Failed to set GFIR coefficients"}), \_(\textcolor{stringliteral}{"ERROR"}), wxICON\_ERROR | wxOK);
+00329     \}
+00330     dlg->Destroy();
+00331     UpdateGUI();
+00332 \}
+00333 
+00334 \textcolor{keywordtype}{void} lms7002_pnlTxTSP_view::onbtnGFIR3Coef( wxCommandEvent& event )
+00335 \{
+00336     lms7002_dlgGFIR_Coefficients *dlg = \textcolor{keyword}{new} lms7002_dlgGFIR_Coefficients(\textcolor{keyword}{this});
+00337     std::vector<double> coefficients;
+00338     \textcolor{keyword}{const} \textcolor{keywordtype}{int} maxCoefCount = 120;
+00339     coefficients.resize(maxCoefCount, 0);
+00340     uint16\_t ch;
+00341     LMS_ReadParam(lmsControl,LMS7param(MAC),&ch);
+00342     ch = (ch == 2) ? 1 : 0;
+00343     ch += 2*LMS7SuiteAppFrame::m_lmsSelection;
+00344     \textcolor{keywordtype}{int} status =  LMS_GetGFIRCoeff(lmsControl, LMS_CH_TX, ch, LMS_GFIR3, &coefficients[0]);
+00345     \textcolor{keywordflow}{if} (status < 0)
+00346     \{
+00347         wxMessageBox(\_(\textcolor{stringliteral}{"Failed to read GFIR coefficients"}), \_(\textcolor{stringliteral}{"ERROR"}), wxICON\_ERROR | wxOK);
+00348         dlg->Destroy();
+00349         \textcolor{keywordflow}{return};
+00350     \}
+00351     dlg->SetCoefficients(coefficients);
+00352     \textcolor{keywordflow}{if} (dlg->ShowModal() == wxID\_OK)
+00353     \{
+00354         coefficients = dlg->GetCoefficients();
+00355         status = LMS_SetGFIRCoeff(lmsControl, LMS_CH_TX, ch, LMS_GFIR3, &coefficients[0],coefficients.size(
+      ));
+00356         \textcolor{keywordflow}{if} (status != 0)
+00357             wxMessageBox(\_(\textcolor{stringliteral}{"Failed to set GFIR coefficients"}), \_(\textcolor{stringliteral}{"ERROR"}), wxICON\_ERROR | wxOK);
+00358     \}
+00359     dlg->Destroy();
+00360     UpdateGUI();
+00361 \}
+00362 
+00363 \textcolor{keywordtype}{void} lms7002_pnlTxTSP_view::OnbtnUploadNCOClick( wxCommandEvent& event )
+00364 \{
+00365     LMS_WriteParam(lmsControl,LMS7param(MODE_TX),rgrMODE_TX->GetSelection());
+00366     assert(txtNCOinputs.size() == 16);
+00367     uint16\_t ch;
+00368     LMS_ReadParam(lmsControl,LMS7param(MAC),&ch);
+00369     ch = (ch == 2) ? 1 : 0;
+00370     ch += 2*LMS7SuiteAppFrame::m_lmsSelection;
+00371     \textcolor{keywordflow}{if} (rgrMODE_TX->GetSelection() == 0)
+00372     \{
+00373         float_type nco\_freq[16];
+00374         \textcolor{keywordflow}{for} (\textcolor{keywordtype}{int} i = 0; i < 16; ++i)
+00375         \{
+00376             txtNCOinputs[i]->GetValue().ToDouble(&nco\_freq[i]);
+00377             nco\_freq[i] *= 1e6;
+00378         \}
+00379         \textcolor{keywordtype}{long} value;
+00380         txtFCWPHOmodeAdditional->GetValue().ToLong(&value);
+00381         LMS_SetNCOFrequency(lmsControl,LMS_CH_TX,ch,nco\_freq,value);
+00382     \}
+00383     \textcolor{keywordflow}{else} \textcolor{comment}{//PHO mode}
+00384     \{
+00385         float_type nco\_phase[16];
+00386         \textcolor{keywordflow}{for} (\textcolor{keywordtype}{int} i = 0; i < 16; ++i)
+00387         \{
+00388             txtNCOinputs[i]->GetValue().ToDouble(&nco\_phase[i]);
+00389         \}
+00390         \textcolor{keywordtype}{double} freq\_MHz;
+00391         txtFCWPHOmodeAdditional->GetValue().ToDouble(&freq\_MHz);
+00392         LMS_SetNCOPhase(lmsControl, LMS_CH_TX, ch-1, nco\_phase, freq\_MHz);
+00393     \}
+00394     UpdateGUI();\textcolor{comment}{// API changes nco selection}
+00395 \}
+00396 
+00397 \textcolor{keywordtype}{void} lms7002_pnlTxTSP_view::UpdateNCOinputs()
+00398 \{
+00399     assert(txtNCOinputs.size() == 16);
+00400     uint16\_t ch;
+00401     LMS_ReadParam(lmsControl,LMS7param(MAC),&ch);
+00402     ch = (ch == 2) ? 1 : 0;
+00403     ch += 2*LMS7SuiteAppFrame::m_lmsSelection;
+00404     \textcolor{keywordflow}{if} (rgrMODE_TX->GetSelection() == 0) \textcolor{comment}{//FCW mode}
+00405     \{
+00406         float_type freq[16] = \{ 0 \};
+00407         float_type pho=0;
+00408         LMS_GetNCOFrequency(lmsControl, LMS_CH_TX, ch, freq, &pho);
+00409         \textcolor{keywordflow}{for} (\textcolor{keywordtype}{size\_t} i = 0; i < txtNCOinputs.size(); ++i)
+00410         \{
+00411             txtNCOinputs[i]->SetValue(wxString::Format(\_(\textcolor{stringliteral}{"%.6f"}), freq[i]/1e6));
+00412         \}
+00413         txtFCWPHOmodeAdditional->SetValue(wxString::Format(\_(\textcolor{stringliteral}{"%3.3f"}), pho));
+00414         lblFCWPHOmodeName->SetLabel(\_(\textcolor{stringliteral}{"PHO (deg)"}));
+00415         tableTitleCol1->SetLabel(\_(\textcolor{stringliteral}{"FCW (MHz)"}));
+00416         tableTitleCol2->SetLabel(\_(\textcolor{stringliteral}{"PHO (deg)"}));
+00417     \}
+00418     \textcolor{keywordflow}{else} \textcolor{comment}{//PHO mode}
+00419     \{
+00420         float_type phase[16] = \{ 0 \};
+00421         float_type fcw = 0;
+00422         LMS_GetNCOPhase(lmsControl, LMS_CH_TX, ch, phase, &fcw);
+00423         \textcolor{keywordflow}{for} (\textcolor{keywordtype}{size\_t} i = 0; i < txtNCOinputs.size(); ++i)
+00424         \{
+00425             txtNCOinputs[i]->SetValue(wxString::Format(\_(\textcolor{stringliteral}{"%.3f"}), phase[i]));
+00426         \}
+00427         txtFCWPHOmodeAdditional->SetValue(wxString::Format(\_(\textcolor{stringliteral}{"%.6f"}), fcw/1e6));
+00428         lblFCWPHOmodeName->SetLabel(\_(\textcolor{stringliteral}{"FCW (MHz)"}));
+00429         tableTitleCol2->SetLabel(\_(\textcolor{stringliteral}{"FCW (MHz)"}));
+00430         tableTitleCol1->SetLabel(\_(\textcolor{stringliteral}{"PHO (deg)"}));
+00431     \}
+00432 \}
+00433 
+00434 \textcolor{keywordtype}{void} lms7002_pnlTxTSP_view::UpdateGUI()
+00435 \{
+00436     LMS7002_WXGUI::UpdateControlsByMap(\textcolor{keyword}{this}, lmsControl, wndId2Enum);
+00437     float_type freq;
+00438     LMS_GetClockFreq(lmsControl,LMS_CLOCK_TXTSP,&freq);
+00439     lblRefClk->SetLabel(wxString::Format(\_(\textcolor{stringliteral}{"%3.3f"}), freq/1e6));
+00440 
+00441     uint16\_t hbi;
+00442     LMS_ReadParam(lmsControl,LMS7param(HBI_OVR_TXTSP),&hbi);
+00443     cmbHBI_OVR_TXTSP->SetSelection(value2index(hbi, 
+      hbi_ovr_txtsp_IndexValuePairs));
+00444 
+00445     int16\_t value;
+00446     LMS_ReadParam(lmsControl,LMS7param(TSGFCW_TXTSP),(uint16\_t*)&value);
+00447 
+00448     rgrTSGFCW_TXTSP->SetSelection(value2index(value, 
+      tsgfcw_txtsp_IndexValuePairs));
+00449 
+00450     LMS_ReadParam(lmsControl,LMS7param(IQCORR_TXTSP),(uint16\_t*)&value);
+00451     \textcolor{keywordtype}{int} bitsToShift = (15 - LMS7param(IQCORR_TXTSP).msb - LMS7param(IQCORR_TXTSP).lsb);
+00452     value = value << bitsToShift;
+00453     value = value >> bitsToShift;
+00454     cmbIQCORR_TXTSP->SetValue(value);
+00455 
+00456     LMS_ReadParam(lmsControl,LMS7param(SEL_TX),(uint16\_t*)&value);
+00457     assert(rgrNCOselections.size() == 16);
+00458     rgrNCOselections[value & 0xF]->SetValue(\textcolor{keyword}{true});
+00459     UpdateNCOinputs();
+00460 
+00461     LMS_ReadParam(lmsControl,LMS7param(DCCORRI_TXTSP),(uint16\_t*)&value);
+00462     int8\_t dccorr = value;
+00463     cmbDCCORRI_TXTSP->SetValue(dccorr);
+00464     LMS_ReadParam(lmsControl,LMS7param(DCCORRQ_TXTSP),(uint16\_t*)&value);
+00465     dccorr = value;
+00466     cmbDCCORRQ_TXTSP->SetValue(dccorr);
+00467 
+00468     uint16\_t g\_cmix;
+00469     LMS_ReadParam(lmsControl,LMS7param(CMIX_GAIN_TXTSP),&g\_cmix);
+00470     value = value2index(g\_cmix, cmix_gain_txtsp_IndexValuePairs);
+00471     LMS_ReadParam(lmsControl,LMS7param(CMIX_GAIN_TXTSP_R3),&g\_cmix);
+00472     \textcolor{keywordflow}{if} (g\_cmix)
+00473         value |= 1;
+00474     \textcolor{keywordflow}{else}
+00475         value &= ~1;
+00476     cmbCMIX_GAIN_TXTSP->SetSelection(value);
+00477 
+00478     \textcolor{comment}{//check if B channel is enabled}
+00479     LMS_ReadParam(lmsControl,LMS7param(MAC),(uint16\_t*)&value);
+00480     \textcolor{keywordflow}{if} (value >= 2)
+00481     \{
+00482         LMS_ReadParam(lmsControl,LMS7param(MIMO_SISO),(uint16\_t*)&value);
+00483         \textcolor{keywordflow}{if} (value != 0)
+00484             wxMessageBox(\_(\textcolor{stringliteral}{"MIMO channel B is disabled"}), \_(\textcolor{stringliteral}{"Warning"}));
+00485     \}
+00486 \}
+00487 
+00488 \textcolor{keywordtype}{void} lms7002_pnlTxTSP_view::PHOinputChanged(wxCommandEvent& event)
+00489 \{
+00490     uint16\_t ch;
+00491     LMS_ReadParam(lmsControl,LMS7param(MAC),&ch);
+00492     ch = (ch == 2) ? 1 : 0;
+00493     ch += 2*LMS7SuiteAppFrame::m_lmsSelection;
+00494     \textcolor{comment}{// Write values for NCO phase or frequency each time they change - to ease the tuning of these values
+       in measurements}
+00495     \textcolor{keywordflow}{if} (rgrMODE_TX->GetSelection() == 0)
+00496     \{
+00497         \textcolor{keywordtype}{double} angle;
+00498         txtFCWPHOmodeAdditional->GetValue().ToDouble(&angle);
+00499         LMS_SetNCOFrequency(lmsControl,LMS_CH_TX,ch,\textcolor{keyword}{nullptr},angle);
+00500     \}
+00501     \textcolor{keywordflow}{else} \textcolor{comment}{//PHO mode}
+00502     \{
+00503         \textcolor{keywordtype}{double} freq;
+00504         txtFCWPHOmodeAdditional->GetValue().ToDouble(&freq);
+00505         LMS_SetNCOPhase(lmsControl, LMS_CH_TX, ch, \textcolor{keyword}{nullptr}, freq*1e6);
+00506     \}
+00507 
+00508     assert(lblNCOangles.size() == 16);
+00509     \textcolor{keywordflow}{if} (rgrMODE_TX->GetSelection() == 1)
+00510     \{
+00511         \textcolor{keywordtype}{double} freq;
+00512         txtFCWPHOmodeAdditional->GetValue().ToDouble(&freq);
+00513         \textcolor{keywordflow}{for} (\textcolor{keywordtype}{int} i = 0; i < 16; ++i)\{
+00514             lblNCOangles[i]->SetLabel(wxString::Format(\textcolor{stringliteral}{"%3.3f"}, freq));
+00515         \}
+00516     \}
+00517     \textcolor{keywordflow}{else}
+00518     \{
+00519         \textcolor{keywordtype}{double} angle;
+00520         txtFCWPHOmodeAdditional->GetValue().ToDouble(&angle);
+00521         \textcolor{keywordflow}{for} (\textcolor{keywordtype}{int} i = 0; i < 16; ++i)\{
+00522             lblNCOangles[i]->SetLabel(wxString::Format(\textcolor{stringliteral}{"%3.3f"}, angle));
+00523         \}
+00524     \}
+00525 \}
+00526 
+00527 \textcolor{keywordtype}{void} lms7002_pnlTxTSP_view::txtFCWPHOmodeAdditional_OnMouseWheel(wxMouseEvent& event)\{
+00528     \textcolor{keywordtype}{double} angle = 0;
+00529     txtFCWPHOmodeAdditional->GetValue().ToDouble(&angle);
+00530     \textcolor{keywordtype}{int} change = \textcolor{keyword}{event}.GetWheelRotation()/120;
+00531     angle += change*0.1;
+00532     txtFCWPHOmodeAdditional->SetValue(wxString::Format(\_(\textcolor{stringliteral}{"%.1f"}), angle > 0 ? angle : 0));
+00533 \}
+\end{DoxyCode}

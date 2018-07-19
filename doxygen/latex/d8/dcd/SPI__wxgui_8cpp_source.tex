@@ -1,0 +1,199 @@
+\subsection{S\+P\+I\+\_\+wxgui.\+cpp}
+\label{SPI__wxgui_8cpp_source}\index{/home/erik/prefix/default/src/limesuite-\/dev/src/utilities\+\_\+gui/\+S\+P\+I\+\_\+wxgui.\+cpp@{/home/erik/prefix/default/src/limesuite-\/dev/src/utilities\+\_\+gui/\+S\+P\+I\+\_\+wxgui.\+cpp}}
+
+\begin{DoxyCode}
+00001 \textcolor{preprocessor}{#include "SPI_wxgui.h"}
+00002 \textcolor{preprocessor}{#include <vector>}
+00003 
+00004 
+00005 SPI_wxgui::SPI_wxgui(wxWindow* parent, wxWindowID \textcolor{keywordtype}{id}, \textcolor{keyword}{const} wxString &title, \textcolor{keyword}{const} wxPoint& pos, \textcolor{keyword}{const} 
+      wxSize& size, \textcolor{keywordtype}{long} styles)
+00006 :
+00007 SPI_view( parent )
+00008 \{
+00009     ctrPort = \textcolor{keyword}{nullptr};
+00010 \}
+00011 
+00012 \textcolor{keywordtype}{void} SPI_wxgui::Initialize(lms_device_t* pCtrPort, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} devIndex)
+00013 \{
+00014     ctrPort = pCtrPort;
+00015     \textcolor{keywordflow}{if} (ctrPort != \textcolor{keyword}{nullptr})
+00016     \{
+00017         \textcolor{comment}{//m\_rficSpiAddr = ctrPort->GetDeviceInfo().addrsLMS7002M.at(devIndex);}
+00018     \}
+00019 \}
+00020 
+00021 \textcolor{keywordtype}{void} SPI_wxgui::onLMSwrite( wxCommandEvent& event )
+00022 \{
+00023     \textcolor{keyword}{const} std::vector<wxObject*> wrbtn = \{ btnLMSwrite, btnLMSwrite1, 
+      btnLMSwrite2, btnLMSwrite3,
+00024                                             btnLMSwrite4, btnLMSwrite5, 
+      btnLMSwrite6, btnLMSwrite7 \};
+00025     \textcolor{keyword}{const} std::vector<wxTextCtrl*> wrAddr = \{ txtLMSwriteAddr, txtLMSwriteAddr1, 
+      txtLMSwriteAddr2, txtLMSwriteAddr3,
+00026                                                 txtLMSwriteAddr4, 
+      txtLMSwriteAddr5, txtLMSwriteAddr6, txtLMSwriteAddr7 \};
+00027     \textcolor{keyword}{const} std::vector<wxTextCtrl*> wrVal = \{ txtLMSwriteValue, txtLMSwriteValue1, 
+      txtLMSwriteValue2, txtLMSwriteValue3,
+00028                                              txtLMSwriteValue4, 
+      txtLMSwriteValue5, txtLMSwriteValue6, txtLMSwriteValue7 \};
+00029     \textcolor{keyword}{const} std::vector<wxStaticText*> wrStatus = \{ lblLMSwriteStatus, 
+      lblLMSwriteStatus1, lblLMSwriteStatus2, lblLMSwriteStatus3,
+00030                                                 lblLMSwriteStatus4, 
+      lblLMSwriteStatus5, lblLMSwriteStatus6, lblLMSwriteStatus7\};
+00031     \textcolor{keyword}{auto} \textcolor{keywordtype}{object} = \textcolor{keyword}{event}.GetEventObject();
+00032     \textcolor{keywordtype}{int} index;
+00033     \textcolor{keywordflow}{for} (index = 0; index < wrbtn.size(); index++)
+00034         \textcolor{keywordflow}{if} (\textcolor{keywordtype}{object} == wrbtn[index])
+00035             \textcolor{keywordflow}{break};
+00036     wxString address = wrAddr[index]->GetValue();
+00037     \textcolor{keywordtype}{long} addr = 0;
+00038     address.ToLong(&addr, 16);
+00039     wxString value = wrVal[index]->GetValue();
+00040     \textcolor{keywordtype}{long} data = 0;
+00041     value.ToLong(&data, 16);
+00042 
+00043     \textcolor{keywordflow}{if} (ctrPort == \textcolor{keyword}{nullptr})
+00044         \textcolor{keywordflow}{return};
+00045 
+00046     \textcolor{keywordtype}{int} status;
+00047     status = LMS_WriteLMSReg(ctrPort,addr,data);
+00048 
+00049     \textcolor{keywordflow}{if} (status == 0)
+00050         wrStatus[index]->SetLabel(\_(\textcolor{stringliteral}{"Write success"}));
+00051     \textcolor{keywordflow}{else}
+00052         wrStatus[index]->SetLabel(\_(\textcolor{stringliteral}{"Write failed"}));
+00053 \}
+00054 
+00055 \textcolor{keywordtype}{void} SPI_wxgui::onLMSread( wxCommandEvent& event )
+00056 \{
+00057     \textcolor{keyword}{const} std::vector<wxObject*> rdbtn = \{ btnLMSread, btnLMSread1, btnLMSread2, 
+      btnLMSread3,
+00058         btnLMSread4, btnLMSread5, btnLMSread6, btnLMSread7 \};
+00059     \textcolor{keyword}{const} std::vector<wxTextCtrl*> rdAddr = \{ txtLMSwriteAddr, txtLMSwriteAddr1, 
+      txtLMSwriteAddr2, txtLMSwriteAddr3,
+00060         txtLMSwriteAddr4, txtLMSwriteAddr5, txtLMSwriteAddr6, txtLMSwriteAddr7 \};
+00061     \textcolor{keyword}{const} std::vector<wxTextCtrl*> rdVal = \{ txtLMSwriteValue, txtLMSwriteValue1, 
+      txtLMSwriteValue2, txtLMSwriteValue3,
+00062         txtLMSwriteValue4, txtLMSwriteValue5, txtLMSwriteValue6, 
+      txtLMSwriteValue7 \};
+00063     \textcolor{keyword}{const} std::vector<wxStaticText*> rdStatus = \{ lblLMSwriteStatus, 
+      lblLMSwriteStatus1, lblLMSwriteStatus2, lblLMSwriteStatus3,
+00064         lblLMSwriteStatus4, lblLMSwriteStatus5, lblLMSwriteStatus6, 
+      lblLMSwriteStatus7 \};
+00065     \textcolor{keyword}{auto} \textcolor{keywordtype}{object} = \textcolor{keyword}{event}.GetEventObject();
+00066     \textcolor{keywordtype}{int} index;
+00067     \textcolor{keywordflow}{for} (index = 0; index < rdbtn.size(); index++)
+00068         \textcolor{keywordflow}{if} (\textcolor{keywordtype}{object} == rdbtn[index])
+00069             \textcolor{keywordflow}{break};
+00070     
+00071     wxString address = rdAddr[index]->GetValue();
+00072     \textcolor{keywordtype}{long} addr = 0;
+00073     address.ToLong(&addr, 16);
+00074 
+00075     \textcolor{keywordflow}{if} (ctrPort == \textcolor{keyword}{nullptr})
+00076         \textcolor{keywordflow}{return};
+00077 
+00078     uint16\_t dataRd = 0;
+00079     \textcolor{keywordtype}{int} status;
+00080     status = LMS_ReadLMSReg(ctrPort,addr,&dataRd);
+00081 
+00082     \textcolor{keywordflow}{if} (status == 0)
+00083     \{
+00084         rdStatus[index]->SetLabel(\_(\textcolor{stringliteral}{"Read success"}));
+00085         \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{short} value = dataRd & 0xFFFF;
+00086         rdVal[index]->SetValue(wxString::Format(\_(\textcolor{stringliteral}{"%04X"}), value));
+00087     \}
+00088     \textcolor{keywordflow}{else}
+00089         rdStatus[index]->SetLabel(\_(\textcolor{stringliteral}{"Read failed"}));
+00090 \}
+00091 
+00092 \textcolor{keywordtype}{void} SPI_wxgui::onBoardWrite( wxCommandEvent& event )
+00093 \{
+00094     \textcolor{keyword}{const} std::vector<wxObject*> wrbtn = \{ ID_BUTTON24, ID_BUTTON241, 
+      ID_BUTTON242, ID_BUTTON243,
+00095         ID_BUTTON244, ID_BUTTON245, ID_BUTTON246, ID_BUTTON247 \};
+00096     \textcolor{keyword}{const} std::vector<wxTextCtrl*> wrAddr = \{ txtBoardwriteAddr, 
+      txtBoardwriteAddr1, txtBoardwriteAddr2, txtBoardwriteAddr3,
+00097         txtBoardwriteAddr4, txtBoardwriteAddr5, txtBoardwriteAddr6, 
+      txtBoardwriteAddr7 \};
+00098     \textcolor{keyword}{const} std::vector<wxTextCtrl*> wrVal = \{ txtBoardwriteValue, 
+      txtBoardwriteValue1, txtBoardwriteValue2, txtBoardwriteValue3,
+00099         txtBoardwriteValue4, txtBoardwriteValue5, txtBoardwriteValue6, 
+      txtBoardwriteValue7 \};
+00100     \textcolor{keyword}{const} std::vector<wxStaticText*> wrStatus = \{ lblBoardwriteStatus, 
+      lblBoardwriteStatus1, lblBoardwriteStatus2, lblBoardwriteStatus3,
+00101         lblBoardwriteStatus4, lblBoardwriteStatus5, lblBoardwriteStatus6, 
+      lblBoardwriteStatus7 \};
+00102 
+00103     \textcolor{keyword}{auto} \textcolor{keywordtype}{object} = \textcolor{keyword}{event}.GetEventObject();
+00104     \textcolor{keywordtype}{int} index;
+00105     \textcolor{keywordflow}{for} (index = 0; index < wrbtn.size(); index++)
+00106         \textcolor{keywordflow}{if} (\textcolor{keywordtype}{object} == wrbtn[index])
+00107             \textcolor{keywordflow}{break};
+00108 
+00109     wxString address = wrAddr[index]->GetValue();
+00110     \textcolor{keywordtype}{long} addr = 0;
+00111     address.ToLong(&addr, 16);
+00112     wxString value = wrVal[index]->GetValue();
+00113     \textcolor{keywordtype}{long} data = 0;
+00114     value.ToLong(&data, 16);
+00115 
+00116     assert(ctrPort != \textcolor{keyword}{nullptr});
+00117     \textcolor{keywordflow}{if} (ctrPort == \textcolor{keyword}{nullptr})
+00118         \textcolor{keywordflow}{return};
+00119 
+00120     \textcolor{keywordtype}{int} status;
+00121     status = LMS_WriteFPGAReg(ctrPort,addr,data);
+00122 
+00123     \textcolor{keywordflow}{if} (status == 0)
+00124         wrStatus[index]->SetLabel(\_(\textcolor{stringliteral}{"Write success"}));
+00125     \textcolor{keywordflow}{else}
+00126         wrStatus[index]->SetLabel(\_(\textcolor{stringliteral}{"Write failed"}));
+00127 \}
+00128 
+00129 \textcolor{keywordtype}{void} SPI_wxgui::OnBoardRead( wxCommandEvent& event )
+00130 \{
+00131     \textcolor{keyword}{const} std::vector<wxObject*> rdbtn = \{ ID_BUTTON25, ID_BUTTON251, 
+      ID_BUTTON252, ID_BUTTON253,
+00132         ID_BUTTON254, ID_BUTTON255, ID_BUTTON256, ID_BUTTON257 \};
+00133     \textcolor{keyword}{const} std::vector<wxTextCtrl*> rdAddr = \{ txtBoardwriteAddr, 
+      txtBoardwriteAddr1, txtBoardwriteAddr2, txtBoardwriteAddr3,
+00134         txtBoardwriteAddr4, txtBoardwriteAddr5, txtBoardwriteAddr6, 
+      txtBoardwriteAddr7 \};
+00135     \textcolor{keyword}{const} std::vector<wxTextCtrl*> rdVal = \{ txtBoardwriteValue, 
+      txtBoardwriteValue1, txtBoardwriteValue2, txtBoardwriteValue3,
+00136         txtBoardwriteValue4, txtBoardwriteValue5, txtBoardwriteValue6, 
+      txtBoardwriteValue7 \};
+00137     \textcolor{keyword}{const} std::vector<wxStaticText*> rdStatus = \{ lblBoardwriteStatus, 
+      lblBoardwriteStatus1, lblBoardwriteStatus2, lblBoardwriteStatus3,
+00138         lblBoardwriteStatus4, lblBoardwriteStatus5, lblBoardwriteStatus6, 
+      lblBoardwriteStatus7 \};
+00139 
+00140     \textcolor{keyword}{auto} \textcolor{keywordtype}{object} = \textcolor{keyword}{event}.GetEventObject();
+00141     \textcolor{keywordtype}{int} index;
+00142     \textcolor{keywordflow}{for} (index = 0; index < rdbtn.size(); index++)
+00143         \textcolor{keywordflow}{if} (\textcolor{keywordtype}{object} == rdbtn[index])
+00144             \textcolor{keywordflow}{break};
+00145 
+00146     wxString address = rdAddr[index]->GetValue();
+00147     \textcolor{keywordtype}{long} addr = 0;
+00148     address.ToLong(&addr, 16);
+00149 
+00150     assert(ctrPort != \textcolor{keyword}{nullptr});
+00151     \textcolor{keywordflow}{if} (ctrPort == \textcolor{keyword}{nullptr})
+00152         \textcolor{keywordflow}{return};
+00153 
+00154     uint16\_t dataRd = 0;
+00155     \textcolor{keywordtype}{int} status = LMS_ReadFPGAReg(ctrPort,addr,&dataRd);
+00156 
+00157     \textcolor{keywordflow}{if} (status == 0)
+00158     \{
+00159         rdStatus[index]->SetLabel(\_(\textcolor{stringliteral}{"Read success"}));
+00160         \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{short} value = dataRd & 0xFFFF;
+00161         rdVal[index]->SetValue(wxString::Format(\_(\textcolor{stringliteral}{"%04X"}), value));
+00162     \}
+00163     \textcolor{keywordflow}{else}
+00164         rdStatus[index]->SetLabel(\_(\textcolor{stringliteral}{"Read failed"}));
+00165 \}
+\end{DoxyCode}

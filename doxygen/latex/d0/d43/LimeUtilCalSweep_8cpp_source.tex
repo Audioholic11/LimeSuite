@@ -1,0 +1,126 @@
+\subsection{Lime\+Util\+Cal\+Sweep.\+cpp}
+\label{LimeUtilCalSweep_8cpp_source}\index{/home/erik/prefix/default/src/limesuite-\/dev/\+Lime\+Util/\+Lime\+Util\+Cal\+Sweep.\+cpp@{/home/erik/prefix/default/src/limesuite-\/dev/\+Lime\+Util/\+Lime\+Util\+Cal\+Sweep.\+cpp}}
+
+\begin{DoxyCode}
+00001 
+00007 \textcolor{preprocessor}{#include "lime/LimeSuite.h"}
+00008 \textcolor{preprocessor}{#include <iostream>}
+00009 \textcolor{preprocessor}{#include <cstdlib>}
+00010 \textcolor{preprocessor}{#include <cstddef>}
+00011 \textcolor{preprocessor}{#include <string>}
+00012 \textcolor{preprocessor}{#include <vector>}
+00013 
+00014 \textcolor{keywordtype}{int} deviceCalSweep(
+00015     \textcolor{keyword}{const} std::string &argStr,
+00016     \textcolor{keyword}{const} \textcolor{keywordtype}{double} start,
+00017     \textcolor{keyword}{const} \textcolor{keywordtype}{double} stop,
+00018     \textcolor{keyword}{const} \textcolor{keywordtype}{double} step,
+00019     \textcolor{keyword}{const} \textcolor{keywordtype}{double} bw,
+00020     \textcolor{keyword}{const} std::string &dirStr,
+00021     \textcolor{keyword}{const} std::string &chansStr)
+00022 \{
+00023     \textcolor{comment}{//check the frequency range}
+00024     \textcolor{keywordflow}{if} (start == 0.0 || stop == 0.0 || step == 0.0)
+00025     \{
+00026         std::cerr << \textcolor{stringliteral}{"Unspecified range --start, stop, step!"} << std::endl;
+00027         \textcolor{keywordflow}{return} EXIT\_FAILURE;
+00028     \}
+00029 
+00030     \textcolor{comment}{//get a list of the directions to calibrate over}
+00031     std::vector<bool> dirs;
+00032     \textcolor{keywordflow}{if} (dirStr == \textcolor{stringliteral}{"RX"}) dirs.push\_back(LMS_CH_RX);
+00033     \textcolor{keywordflow}{else} \textcolor{keywordflow}{if} (dirStr == \textcolor{stringliteral}{"TX"}) dirs.push\_back(LMS_CH_TX);
+00034     \textcolor{keywordflow}{else} \textcolor{keywordflow}{if} (dirStr == \textcolor{stringliteral}{"BOTH"})
+00035     \{
+00036         dirs.push\_back(LMS_CH_RX);
+00037         dirs.push\_back(LMS_CH_TX);
+00038     \}
+00039     \textcolor{keywordflow}{else}
+00040     \{
+00041         std::cerr << \textcolor{stringliteral}{"Unknown directions --dir="} << dirStr << std::endl;
+00042         \textcolor{keywordflow}{return} EXIT\_FAILURE;
+00043     \}
+00044 
+00045     \textcolor{comment}{//open the device}
+00046     lms_device_t *device(\textcolor{keyword}{nullptr});
+00047     \textcolor{keywordflow}{if} (LMS_Open(&device, argStr.empty()?\textcolor{keyword}{nullptr}:argStr.c\_str(), \textcolor{keyword}{nullptr}) != 0)
+00048     \{
+00049         std::cerr << \textcolor{stringliteral}{"Failed to open: "} << LMS_GetLastErrorMessage() << std::endl;
+00050         \textcolor{keywordflow}{return} EXIT\_FAILURE;
+00051     \}
+00052 
+00053     \textcolor{keywordflow}{if} (LMS_EnableCalibCache(device, \textcolor{keyword}{true}) != 0)
+00054     \{
+00055         std::cerr << \textcolor{stringliteral}{"Failed to enable cal cache: "} << LMS_GetLastErrorMessage() << std::endl;
+00056         \textcolor{keywordflow}{return} EXIT\_FAILURE;
+00057     \}
+00058 
+00059     \textcolor{comment}{//get a list of the channels to calibrate over}
+00060     std::vector<std::pair<bool, size\_t>> channelMatrix;
+00061     \textcolor{keywordflow}{for} (\textcolor{keyword}{const} \textcolor{keyword}{auto} &dir_tx : dirs)
+00062     \{
+00063         \textcolor{keywordflow}{if} (chansStr == \textcolor{stringliteral}{"ALL"})
+00064         \{
+00065             \textcolor{keywordflow}{for} (\textcolor{keywordtype}{int} i = 0; i < LMS_GetNumChannels(device, dir_tx); i++)
+00066             \{
+00067                 channelMatrix.emplace\_back(dir_tx, \textcolor{keywordtype}{size\_t}(i));
+00068             \}
+00069         \}
+00070         \textcolor{keywordflow}{else}
+00071         \{
+00072             channelMatrix.emplace\_back(dir_tx, std::stoi(chansStr));
+00073         \}
+00074     \}
+00075 
+00076     \textcolor{comment}{//enable all channels in the matrix and set to the first antenna}
+00077     \textcolor{keywordflow}{for} (\textcolor{keyword}{const} \textcolor{keyword}{auto} chanConfig : channelMatrix)
+00078     \{
+00079         LMS_EnableChannel(device, chanConfig.first, chanConfig.second, \textcolor{keyword}{true});
+00080     \}
+00081 
+00082     \textcolor{comment}{//summary}
+00083     std::cout << \textcolor{stringliteral}{"Cal sweep over ["} << start/1e6 << \textcolor{stringliteral}{", "} << stop/1e6 << \textcolor{stringliteral}{", "} << step/1e6 << \textcolor{stringliteral}{"] MHz,
+       channels="} << chansStr << \textcolor{stringliteral}{", dir="} << dirStr << std::endl;
+00084 
+00085     \textcolor{keywordflow}{for} (\textcolor{keywordtype}{double} freq = start; freq <= stop; freq += step)
+00086     \{
+00087         std::cout << \textcolor{stringliteral}{"@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@"} << std::endl;
+00088         std::cout << \textcolor{stringliteral}{"@@  Calibrating for freq = "} << freq/1e6 << \textcolor{stringliteral}{" MHz"} << std::endl;
+00089         std::cout << \textcolor{stringliteral}{"@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@"} << std::endl;
+00090         std::cout << std::endl;
+00091 
+00092         \textcolor{keywordflow}{for} (\textcolor{keywordtype}{int} path = 1; path < 3; path++)
+00093         \{
+00094             \textcolor{comment}{//apply identical paths across channels}
+00095             \textcolor{comment}{//(BAND1/BAND2 for Tx) (LNAL, LNAW for Rx)}
+00096             \textcolor{keywordflow}{for} (\textcolor{keywordtype}{int} i = 0; i < LMS_GetNumChannels(device, LMS_CH_RX); i++)
+00097                 LMS_SetAntenna(device, LMS_CH_RX, i, path+1);
+00098             \textcolor{keywordflow}{for} (\textcolor{keywordtype}{int} i = 0; i < LMS_GetNumChannels(device, LMS_CH_TX); i++)
+00099                 LMS_SetAntenna(device, LMS_CH_TX, i, path);
+00100 
+00101             \textcolor{comment}{//iterate through the matrix of channel options}
+00102             \textcolor{keywordflow}{for} (\textcolor{keyword}{const} \textcolor{keyword}{auto} chanConfig : channelMatrix)
+00103             \{
+00104                 \textcolor{keywordflow}{if} (LMS_SetLOFrequency(device, chanConfig.first, chanConfig.second, 
+      freq) != 0)
+00105                 \{
+00106                     std::cerr << \textcolor{stringliteral}{"Error tuning (skipping): "} << 
+      LMS_GetLastErrorMessage() << std::endl;
+00107                     \textcolor{keywordflow}{continue};
+00108                 \}
+00109                 \textcolor{keywordflow}{if} (LMS_Calibrate(device, chanConfig.first, chanConfig.second, bw, 0) != 0)
+00110                 \{
+00111                     std::cerr << \textcolor{stringliteral}{"Error calibrating (skipping): "} << 
+      LMS_GetLastErrorMessage() << std::endl;
+00112                     \textcolor{keywordflow}{continue};
+00113                 \}
+00114             \}
+00115         \}
+00116         std::cout << std::endl;
+00117     \}
+00118 
+00119     std::cout << \textcolor{stringliteral}{"Cleanup..."} << std::endl;
+00120     LMS_Close(device);
+00121     \textcolor{keywordflow}{return} EXIT\_SUCCESS;
+00122 \}
+\end{DoxyCode}

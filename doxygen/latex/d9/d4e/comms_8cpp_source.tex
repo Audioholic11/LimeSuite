@@ -1,0 +1,74 @@
+\subsection{comms.\+cpp}
+\label{comms_8cpp_source}\index{/home/erik/prefix/default/src/limesuite-\/dev/src/tests/comms.\+cpp@{/home/erik/prefix/default/src/limesuite-\/dev/src/tests/comms.\+cpp}}
+
+\begin{DoxyCode}
+00001 \textcolor{preprocessor}{#include "gtest/gtest.h"}
+00002 \textcolor{preprocessor}{#include <chrono>}
+00003 
+00004 \textcolor{preprocessor}{#include "IConnection.h"}
+00005 \textcolor{preprocessor}{#include "ConnectionRegistry.h"}
+00006 
+00007 \textcolor{keyword}{using namespace }std;
+00008 \textcolor{keyword}{using namespace }lime;
+00009 
+00010 TEST(Comms, TransferSPI)
+00011 \{
+00012     \textcolor{comment}{// TODO get chip address dynamically}
+00013     \textcolor{keyword}{const} uint8\_t chipAddr = 0x10;
+00014     \textcolor{keyword}{auto} handles = ConnectionRegistry::findConnections();
+00015     ASSERT\_NE(handles.size(), 0);
+00016     \textcolor{keyword}{auto} conn = ConnectionRegistry::makeConnection(handles[0]);
+00017 
+00018     std::vector<uint32\_t> addr (14, 0x002f << 16);
+00019     std::vector<uint32\_t> data (14, 0);
+00020 
+00021     \textcolor{keywordtype}{int} status = 0;
+00022     \textcolor{keyword}{const} \textcolor{keywordtype}{int} tryCount = 1000;
+00023     printf(\textcolor{stringliteral}{"Try count = %i\(\backslash\)n"}, tryCount);
+00024     \textcolor{keywordtype}{float} AvgResult = 0;
+00025     \textcolor{keyword}{auto} startT = std::chrono::high\_resolution\_clock::now();
+00026     \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} i=0; i<tryCount ; ++i)
+00027         conn->GetDeviceInfo();
+00028     \textcolor{keyword}{auto} endT = std::chrono::high\_resolution\_clock::now();
+00029     AvgResult = chrono::duration\_cast<chrono::milliseconds>(endT-startT).count()/float(tryCount);
+00030     printf(\textcolor{stringliteral}{"Avg GetInfo: %.3f ms\(\backslash\)n"}, AvgResult);
+00031 
+00032     \textcolor{comment}{//generates packet without SPI write/read}
+00033     startT = std::chrono::high\_resolution\_clock::now();
+00034     \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} i=0; i<tryCount && status == 0; ++i)
+00035         status = conn->TransactSPI(chipAddr, addr.data(), data.data(), 0);
+00036     endT = std::chrono::high\_resolution\_clock::now();
+00037     AvgResult = chrono::duration\_cast<chrono::milliseconds>(endT-startT).count()/float(tryCount);
+00038     printf(\textcolor{stringliteral}{"Avg communication roundtrip: %.3f ms\(\backslash\)n"}, AvgResult);
+00039 
+00040     startT = std::chrono::high\_resolution\_clock::now();
+00041     \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} i=0; i<tryCount && status == 0; ++i)
+00042         status = conn->TransactSPI(chipAddr, addr.data(), data.data(), 1);
+00043     endT = std::chrono::high\_resolution\_clock::now();
+00044     AvgResult = chrono::duration\_cast<chrono::milliseconds>(endT-startT).count()/float(tryCount);
+00045     printf(\textcolor{stringliteral}{"Avg Single register read: %.3f ms\(\backslash\)n"}, AvgResult);
+00046 
+00047     startT = std::chrono::high\_resolution\_clock::now();
+00048     \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} i=0; i<tryCount && status == 0; ++i)
+00049         status = conn->TransactSPI(chipAddr, addr.data(), data.data(), addr.size());
+00050     endT = std::chrono::high\_resolution\_clock::now();
+00051     AvgResult = chrono::duration\_cast<chrono::milliseconds>(endT-startT).count()/float(tryCount);
+00052     printf(\textcolor{stringliteral}{"Avg Single batch read(%li registers): %.3f ms, \(\backslash\)n"}, addr.size(), AvgResult);
+00053 
+00054     startT = std::chrono::high\_resolution\_clock::now();
+00055     \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} i=0; i<tryCount && status == 0; ++i)
+00056         status = conn->ReadRegisters(addr.data(), data.data(), 0);
+00057     endT = std::chrono::high\_resolution\_clock::now();
+00058     AvgResult = chrono::duration\_cast<chrono::milliseconds>(endT-startT).count()/float(tryCount);
+00059     printf(\textcolor{stringliteral}{"FPGA Avg Single register read: %.3f ms\(\backslash\)n"}, AvgResult);
+00060 
+00061     startT = std::chrono::high\_resolution\_clock::now();
+00062     \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} i=0; i<tryCount && status == 0; ++i)
+00063         status = conn->ReadRegisters(addr.data(), data.data(), addr.size());
+00064     endT = std::chrono::high\_resolution\_clock::now();
+00065     AvgResult = chrono::duration\_cast<chrono::milliseconds>(endT-startT).count()/float(tryCount);
+00066     printf(\textcolor{stringliteral}{"FPGA Avg Single batch read(%li registers): %.3f ms\(\backslash\)n"}, addr.size(), AvgResult);
+00067 
+00068     ConnectionRegistry::freeConnection(conn);
+00069 \}
+\end{DoxyCode}

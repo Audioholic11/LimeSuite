@@ -1,0 +1,96 @@
+\subsection{L\+M\+S64\+C\+Commands.\+h}
+\label{LMS64CCommands_8h_source}\index{/home/erik/prefix/default/src/limesuite-\/dev/src/protocols/\+L\+M\+S64\+C\+Commands.\+h@{/home/erik/prefix/default/src/limesuite-\/dev/src/protocols/\+L\+M\+S64\+C\+Commands.\+h}}
+
+\begin{DoxyCode}
+00001 
+00006 \textcolor{preprocessor}{#pragma once}
+00007 
+00008 \textcolor{keyword}{namespace }lime \{
+00009 
+00010 \textcolor{keyword}{enum} eCMD_LMS
+00011 \{
+00012     CMD_GET_INFO = 0x00,
+00013     CMD_LMS6002_RST = 0x10,
+00015     CMD_SI5356_WR = 0x11,
+00017     CMD_SI5356_RD = 0x12,
+00019     CMD_SI5351_WR = 0x13,
+00021     CMD_SI5351_RD = 0x14,
+00023     CMD_TFP410_WR = 0x15,
+00025     CMD_TFP410_RD = 0x16,
+00027     CMD_LMS7002_RST = 0x20,
+00029     CMD_LMS7002_WR = 0x21,
+00031     CMD_LMS7002_RD = 0x22,
+00033     CMD_LMS6002_WR = 0x23,
+00035     CMD_LMS6002_RD = 0x24,
+00036 
+00037     CMD_LMS_LNA = 0x2A,
+00038     CMD_LMS_PA = 0x2B,
+00039 
+00040     CMD_PROG_MCU = 0x2C,
+00042     CMD_ADF4002_WR = 0x31,
+00043 
+00044     CMD_USB_FIFO_RST = 0x40,
+00045     CMD_PE636040_WR = 0x41,
+00046     CMD_PE636040_RD = 0x42,
+00047 
+00048     CMD_GPIO_DIR_WR = 0x4F,
+00049     CMD_GPIO_DIR_RD = 0x50,
+00050     CMD_GPIO_WR = 0x51,
+00051     CMD_GPIO_RD = 0x52,
+00052 
+00053     CMD_ALTERA_FPGA_GW_WR = 0x53,
+00054     CMD_ALTERA_FPGA_GW_RD = 0x54,
+00055 
+00056     CMD_BRDSPI_WR = 0x55,\textcolor{comment}{//16 bit spi for stream, dataspark control}
+00057     CMD_BRDSPI_RD = 0x56,\textcolor{comment}{//16 bit spi for stream, dataspark control}
+00058     CMD_BRDSPI8_WR = 0x57, \textcolor{comment}{//8 + 8 bit spi for stream, dataspark control}
+00059     CMD_BRDSPI8_RD = 0x58, \textcolor{comment}{//8 + 8 bit spi for stream, dataspark control}
+00060 
+00061     CMD_BRDCONF_WR = 0x5D, \textcolor{comment}{//write config data to board}
+00062     CMD_BRDCONF_RD = 0x5E, \textcolor{comment}{//read config data from board}
+00063 
+00064     CMD_ANALOG_VAL_WR = 0x61, \textcolor{comment}{//write analog value}
+00065     CMD_ANALOG_VAL_RD = 0x62, \textcolor{comment}{//read analog value}
+00066 
+00067     CMD_MYRIAD_RST = 0x80,
+00068     CMD_MYRIAD_WR = 0x81,
+00069     CMD_MYRIAD_RD = 0x82,
+00070     CMD_MEMORY_WR = 0x8C,
+00071     CMD_MEMORY_RD = 0x8D
+00072 \};
+00073 
+00074 \textcolor{keyword}{enum} eCMD_STATUS
+00075 \{
+00076     STATUS_UNDEFINED,
+00077     STATUS_COMPLETED_CMD,
+00078     STATUS_UNKNOWN_CMD,
+00079     STATUS_BUSY_CMD,
+00080     STATUS_MANY_BLOCKS_CMD,
+00081     STATUS_ERROR_CMD,
+00082     STATUS_WRONG_ORDER_CMD,
+00083     STATUS_RESOURCE_DENIED_CMD,
+00084     STATUS_COUNT
+00085 \};
+00086 
+00087 \textcolor{keyword}{static} \textcolor{keyword}{const} \textcolor{keywordtype}{char}  status_text[][32]=
+00088 \{
+00089     \textcolor{stringliteral}{"Undefined/Failure"},
+00090     \textcolor{stringliteral}{"Completed"},
+00091     \textcolor{stringliteral}{"Unknown command"},
+00092     \textcolor{stringliteral}{"Busy"},
+00093     \textcolor{stringliteral}{"Too many blocks"},
+00094     \textcolor{stringliteral}{"Error"},
+00095     \textcolor{stringliteral}{"Wrong order"},
+00096     \textcolor{stringliteral}{"Resource denied"}
+00097 \};
+00098 
+00099 \textcolor{keyword}{static} \textcolor{keyword}{inline} \textcolor{keyword}{const} \textcolor{keywordtype}{char}* status2string(\textcolor{keyword}{const} \textcolor{keywordtype}{int} status)
+00100 \{
+00101     \textcolor{keywordflow}{if}(status >= 0 && status < STATUS_COUNT)
+00102         \textcolor{keywordflow}{return} status\_text[status];
+00103     \textcolor{keywordflow}{else}
+00104         \textcolor{keywordflow}{return} \textcolor{stringliteral}{"Unknown status"};
+00105 \}
+00106 
+00107 \}
+\end{DoxyCode}

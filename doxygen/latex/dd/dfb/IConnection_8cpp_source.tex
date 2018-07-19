@@ -1,0 +1,223 @@
+\subsection{I\+Connection.\+cpp}
+\label{IConnection_8cpp_source}\index{/home/erik/prefix/default/src/limesuite-\/dev/src/\+Connection\+Registry/\+I\+Connection.\+cpp@{/home/erik/prefix/default/src/limesuite-\/dev/src/\+Connection\+Registry/\+I\+Connection.\+cpp}}
+
+\begin{DoxyCode}
+00001 
+00007 \textcolor{preprocessor}{#include "IConnection.h"}
+00008 \textcolor{preprocessor}{#include "Logger.h"}
+00009 \textcolor{preprocessor}{#include "LMSBoards.h"}
+00010 
+00011 \textcolor{keyword}{using namespace }lime;
+00012 
+00013 IConnection::IConnection(\textcolor{keywordtype}{void})
+00014 \{
+00015     callback_logData = \textcolor{keyword}{nullptr};;
+00016 \}
+00017 
+00018 IConnection::~IConnection(\textcolor{keywordtype}{void})
+00019 \{
+00020     \textcolor{keywordflow}{return};
+00021 \}
+00022 
+00023 \textcolor{keyword}{const} ConnectionHandle &IConnection::GetHandle(\textcolor{keywordtype}{void})\textcolor{keyword}{ const}
+00024 \textcolor{keyword}{}\{
+00025     \textcolor{keywordflow}{return} _handle;
+00026 \}
+00027 
+00028 \textcolor{keywordtype}{bool} IConnection::IsOpen(\textcolor{keywordtype}{void})
+00029 \{
+00030     \textcolor{keywordflow}{return} \textcolor{keyword}{false};
+00031 \}
+00032 
+00033 DeviceInfo IConnection::GetDeviceInfo(\textcolor{keywordtype}{void})
+00034 \{
+00035     DeviceInfo info;
+00036     \textcolor{comment}{//initialize to UNKNOWN board type}
+00037     \textcolor{comment}{//causes lms7\_device::CreateDevice() to use LMS7\_Generic}
+00038     info.deviceName = GetDeviceName(LMS_DEV_UNKNOWN);
+00039     info.expansionName = GetExpansionBoardName(EXP_BOARD_UNKNOWN);
+00040     \textcolor{keywordflow}{return} info;
+00041 \}
+00042 
+00043 \textcolor{comment}{/***********************************************************************}
+00044 \textcolor{comment}{ * Serial API}
+00045 \textcolor{comment}{ **********************************************************************/}
+00046 
+00047 \textcolor{keywordtype}{int} IConnection::TransactSPI(\textcolor{keyword}{const} \textcolor{keywordtype}{int} addr, \textcolor{keyword}{const} uint32\_t *writeData, uint32\_t *readData, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} 
+      size)
+00048 \{
+00049     \textcolor{keywordflow}{return} ReportError(\textcolor{stringliteral}{"TransactSPI not supported"});
+00050 \}
+00051 
+00052 \textcolor{keywordtype}{int} IConnection::WriteI2C(\textcolor{keyword}{const} \textcolor{keywordtype}{int} addr, \textcolor{keyword}{const} std::string &data)
+00053 \{
+00054     \textcolor{keywordflow}{return} ReportError(\textcolor{stringliteral}{"WriteI2C not supported"});
+00055 \}
+00056 
+00057 \textcolor{keywordtype}{int} IConnection::ReadI2C(\textcolor{keyword}{const} \textcolor{keywordtype}{int} addr, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} numBytes, std::string &
+      data)
+00058 \{
+00059     \textcolor{keywordflow}{return} ReportError(\textcolor{stringliteral}{"ReadI2C not supported"});
+00060 \}
+00061 
+00062 \textcolor{comment}{/***********************************************************************}
+00063 \textcolor{comment}{ * LMS7002M Driver callbacks}
+00064 \textcolor{comment}{ **********************************************************************/}
+00065 
+00066 \textcolor{keywordtype}{int} IConnection::DeviceReset(\textcolor{keywordtype}{int} ind)
+00067 \{
+00068     \textcolor{keywordflow}{return} ReportError(\textcolor{stringliteral}{"DeviceReset not supported"});
+00069 \}
+00070 
+00071 \textcolor{comment}{/***********************************************************************}
+00072 \textcolor{comment}{ * Stream API}
+00073 \textcolor{comment}{ **********************************************************************/}
+00074 
+00075 \textcolor{keywordtype}{int} IConnection::ReceiveData(\textcolor{keywordtype}{char}* buffer, \textcolor{keywordtype}{int} length, \textcolor{keywordtype}{int} epIndex, \textcolor{keywordtype}{int} timeout)
+00076 \{
+00077     \textcolor{keywordflow}{return} 0;   
+00078 \}
+00079 \textcolor{keywordtype}{int} IConnection::SendData(\textcolor{keyword}{const} \textcolor{keywordtype}{char}* buffer, \textcolor{keywordtype}{int} length, \textcolor{keywordtype}{int} epIndex, \textcolor{keywordtype}{int} timeout)
+00080 \{
+00081     \textcolor{keywordflow}{return} 0;
+00082 \}
+00083 
+00084 \textcolor{keywordtype}{int} IConnection::BeginDataSending(\textcolor{keyword}{const} \textcolor{keywordtype}{char}* buffer, uint32\_t length, \textcolor{keywordtype}{int} ep)
+00085 \{
+00086     \textcolor{keywordflow}{return} 0;
+00087 \}
+00088 \textcolor{keywordtype}{bool} IConnection::WaitForSending(\textcolor{keywordtype}{int} contextHandle, uint32\_t timeout_ms)
+00089 \{
+00090     \textcolor{keywordflow}{return} \textcolor{keyword}{true};
+00091 \}
+00092 \textcolor{keywordtype}{int} IConnection::FinishDataSending(\textcolor{keyword}{const} \textcolor{keywordtype}{char}* buffer, uint32\_t length, \textcolor{keywordtype}{int} contextHandle)
+00093 \{
+00094     \textcolor{keywordflow}{return} 0;
+00095 \}
+00096 
+00097 \textcolor{keywordtype}{int} IConnection::BeginDataReading(\textcolor{keywordtype}{char}* buffer, uint32\_t length, \textcolor{keywordtype}{int} ep)
+00098 \{
+00099     \textcolor{keywordflow}{return} 0;
+00100 \}
+00101 \textcolor{keywordtype}{bool} IConnection::WaitForReading(\textcolor{keywordtype}{int} contextHandle, \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{int} timeout_ms)
+00102 \{
+00103     \textcolor{keywordflow}{return} \textcolor{keyword}{true};
+00104 \}
+00105 \textcolor{keywordtype}{int} IConnection::FinishDataReading(\textcolor{keywordtype}{char}* buffer, uint32\_t length, \textcolor{keywordtype}{int} contextHandle)
+00106 \{
+00107     \textcolor{keywordflow}{return} 0;
+00108 \}
+00109 
+00112 \textcolor{keywordtype}{void} IConnection::SetDataLogCallback(std::function<\textcolor{keywordtype}{void}(\textcolor{keywordtype}{bool}, \textcolor{keyword}{const} \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{char}*, \textcolor{keyword}{const} \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{int})> 
+      callback)
+00113 \{
+00114     callback_logData = callback;
+00115 \}
+00116 
+00117 \textcolor{keywordtype}{int} IConnection::GetBuffersCount()\textcolor{keyword}{const}
+00118 \textcolor{keyword}{}\{
+00119  \textcolor{keywordflow}{return} 0;   
+00120 \}
+00121 
+00122 \textcolor{keywordtype}{int} IConnection::CheckStreamSize(\textcolor{keywordtype}{int} size)\textcolor{keyword}{const}
+00123 \textcolor{keyword}{}\{
+00124     \textcolor{keywordflow}{return} 0;
+00125 \}
+00126 
+00127 \textcolor{keywordtype}{int} IConnection::ResetStreamBuffers()
+00128 \{
+00129     \textcolor{keywordflow}{return} 0;
+00130 \};
+00131 \textcolor{comment}{/***********************************************************************}
+00132 \textcolor{comment}{ * Programming API}
+00133 \textcolor{comment}{ **********************************************************************/}
+00134 
+00135 \textcolor{keywordtype}{int} IConnection::ProgramWrite(\textcolor{keyword}{const} \textcolor{keywordtype}{char} *buffer, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} length, \textcolor{keyword}{const} \textcolor{keywordtype}{int} programmingMode, \textcolor{keyword}{const} \textcolor{keywordtype}{int}
+       index, ProgrammingCallback callback)
+00136 \{
+00137     ReportError(ENOTSUP, \textcolor{stringliteral}{"ProgramWrite not supported"});
+00138     \textcolor{keywordflow}{return} -1;
+00139 \}
+00140 
+00141 \textcolor{keywordtype}{int} IConnection::ProgramMCU(\textcolor{keyword}{const} uint8\_t *buffer, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} length, \textcolor{keyword}{const} 
+      MCU_PROG_MODE mode, ProgrammingCallback callback)
+00142 \{
+00143     ReportError(ENOTSUP, \textcolor{stringliteral}{"ProgramMCU not supported"});
+00144     \textcolor{keywordflow}{return} -1;
+00145 \}
+00146 
+00147 \textcolor{keywordtype}{int} IConnection::ProgramUpdate(\textcolor{keyword}{const} \textcolor{keywordtype}{bool} download, ProgrammingCallback callback)
+00148 \{
+00149     ReportError(ENOTSUP, \textcolor{stringliteral}{"ProgramUpdate not supported"});
+00150     \textcolor{keywordflow}{return} -1;
+00151 \}
+00152 
+00153 \textcolor{comment}{/***********************************************************************}
+00154 \textcolor{comment}{ * GPIO API}
+00155 \textcolor{comment}{ **********************************************************************/}
+00156 
+00157 \textcolor{keywordtype}{int} IConnection::GPIOWrite(\textcolor{keyword}{const} uint8\_t *buffer, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} bufLength)
+00158 \{
+00159     ReportError(ENOTSUP, \textcolor{stringliteral}{"GPIOWrite not supported"});
+00160     \textcolor{keywordflow}{return} -1;
+00161 \}
+00162 
+00163 \textcolor{keywordtype}{int} IConnection::GPIORead(uint8\_t *buffer, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} bufLength)
+00164 \{
+00165     ReportError(ENOTSUP, \textcolor{stringliteral}{"GPIORead not supported"});
+00166     \textcolor{keywordflow}{return} -1;
+00167 \}
+00168 
+00169 \textcolor{keywordtype}{int} IConnection::GPIODirWrite(\textcolor{keyword}{const} uint8\_t *buffer, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} bufLength)
+00170 \{
+00171     ReportError(ENOTSUP, \textcolor{stringliteral}{"GPIOWrite not supported"});
+00172     \textcolor{keywordflow}{return} -1;
+00173 \}
+00174 
+00175 \textcolor{keywordtype}{int} IConnection::GPIODirRead(uint8\_t *buffer, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} bufLength)
+00176 \{
+00177     ReportError(ENOTSUP, \textcolor{stringliteral}{"GPIORead not supported"});
+00178     \textcolor{keywordflow}{return} -1;
+00179 \}
+00180 
+00181 \textcolor{comment}{/***********************************************************************}
+00182 \textcolor{comment}{ * Register API}
+00183 \textcolor{comment}{ **********************************************************************/}
+00184 
+00185 \textcolor{keywordtype}{int} IConnection::WriteRegisters(\textcolor{keyword}{const} uint32\_t *addrs, \textcolor{keyword}{const} uint32\_t *data, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} 
+      size)
+00186 \{
+00187     ReportError(ENOTSUP, \textcolor{stringliteral}{"WriteRegisters not supported"});
+00188     \textcolor{keywordflow}{return} -1;
+00189 \}
+00190 
+00191 \textcolor{keywordtype}{int} IConnection::ReadRegisters(\textcolor{keyword}{const} uint32\_t *addrs, uint32\_t *data, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} 
+      size)
+00192 \{
+00193     ReportError(ENOTSUP, \textcolor{stringliteral}{"ReadRegisters not supported"});
+00194     \textcolor{keywordflow}{return} -1;
+00195 \}
+00196 
+00197 \textcolor{keywordtype}{int} IConnection::WriteRegister(\textcolor{keyword}{const} uint32\_t addr, \textcolor{keyword}{const} uint32\_t data)
+00198 \{
+00199     \textcolor{keywordflow}{return} this->WriteRegisters(&addr, &data, 1);
+00200 \}
+00201 
+00202 \textcolor{comment}{/***********************************************************************}
+00203 \textcolor{comment}{ * Aribtrary settings API}
+00204 \textcolor{comment}{ **********************************************************************/}
+00205 
+00206 \textcolor{keywordtype}{int} IConnection::CustomParameterWrite(\textcolor{keyword}{const} uint8\_t *ids, \textcolor{keyword}{const} \textcolor{keywordtype}{double} *values, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} 
+      count, \textcolor{keyword}{const} std::string& units)
+00207 \{
+00208     ReportError(ENOTSUP, \textcolor{stringliteral}{"CustomParameterWrite not supported"});
+00209     \textcolor{keywordflow}{return} -1;
+00210 \}
+00211 
+00212 \textcolor{keywordtype}{int} IConnection::CustomParameterRead(\textcolor{keyword}{const} uint8\_t *ids, \textcolor{keywordtype}{double} *values, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} 
+      count, std::string* units)
+00213 \{
+00214     ReportError(ENOTSUP, \textcolor{stringliteral}{"CustomParameterRead not supported"});
+00215     \textcolor{keywordflow}{return} -1;
+00216 \}
+\end{DoxyCode}

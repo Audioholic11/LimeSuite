@@ -1,0 +1,126 @@
+\subsection{numeric\+Slider.\+cpp}
+\label{numericSlider_8cpp_source}\index{/home/erik/prefix/default/src/limesuite-\/dev/src/numeric\+Slider/numeric\+Slider.\+cpp@{/home/erik/prefix/default/src/limesuite-\/dev/src/numeric\+Slider/numeric\+Slider.\+cpp}}
+
+\begin{DoxyCode}
+00001 
+00007 \textcolor{preprocessor}{#include "numericSlider.h"}
+00008 \textcolor{preprocessor}{#include <wx/event.h>}
+00009 \textcolor{preprocessor}{#include <wx/spinctrl.h>}
+00010 
+00011 IMPLEMENT\_DYNAMIC\_CLASS(NumericSlider, wxPanel)
+00012 
+00013 NumericSlider::NumericSlider()
+00014 \{
+00015 \}
+00016 
+00017 NumericSlider::NumericSlider(
+00018         wxWindow* parent,
+00019         wxWindowID \textcolor{keywordtype}{id},
+00020         \textcolor{keyword}{const} wxString &value,
+00021         \textcolor{keyword}{const} wxPoint &pos,
+00022         \textcolor{keyword}{const} wxSize &size,
+00023         \textcolor{keywordtype}{long} style,
+00024         \textcolor{keywordtype}{int} min,
+00025         \textcolor{keywordtype}{int} max,
+00026         \textcolor{keywordtype}{int} initial,
+00027         \textcolor{keyword}{const} wxString &name
+00028     )
+00029 \{
+00030     Create(parent, \textcolor{keywordtype}{id}, pos, size, style);
+00031 
+00032     wxFlexGridSizer* mainSizer;
+00033     mainSizer = \textcolor{keyword}{new} wxFlexGridSizer(0, 2, 0, 0);
+00034     mainSizer->AddGrowableCol(0);
+00035     mainSizer->AddGrowableRow(0);
+00036     mainSizer->SetFlexibleDirection(wxBOTH);
+00037 
+00038     mScroll = \textcolor{keyword}{new} wxScrollBar(\textcolor{keyword}{this}, wxNewId(), wxDefaultPosition, wxDefaultSize, wxSB\_HORIZONTAL);
+00039     mScroll->SetMinSize(wxSize(128, -1));
+00040     mainSizer->Add(mScroll, 0, wxEXPAND | wxALIGN\_RIGHT | wxALIGN\_CENTER\_VERTICAL, 0);
+00041     \textcolor{keywordtype}{int} sliderStep = (max - min) / 20;
+00042     \textcolor{keywordflow}{if} (sliderStep == 0)
+00043         sliderStep = 1;
+00044     mScroll->SetScrollbar(initial, 1, max - min + 1, sliderStep);
+00045     mScroll->Connect(wxEVT\_SCROLL\_CHANGED, wxScrollEventHandler(
+      NumericSlider::OnScrollChange), NULL, \textcolor{keyword}{this});
+00046 
+00047     mSpinner = \textcolor{keyword}{new} wxSpinCtrl(\textcolor{keyword}{this}, wxNewId(), wxEmptyString, wxDefaultPosition, wxSize(-1, -1), 
+      wxSP\_ARROW\_KEYS | wxTE\_PROCESS\_ENTER, min, max, initial);
+00048     mSpinner->SetMinSize(wxSize(96, -1));
+00049     mainSizer->Add(mSpinner, 0, wxEXPAND |wxALIGN\_RIGHT | wxALIGN\_CENTER\_VERTICAL, 0);
+00050     mSpinner->Connect(wxEVT\_COMMAND\_SPINCTRL\_UPDATED, wxSpinEventHandler(
+      NumericSlider::OnSpinnerChange), NULL, \textcolor{keyword}{this});
+00051     mSpinner->Connect(wxEVT\_TEXT\_ENTER, wxSpinEventHandler(
+      NumericSlider::OnSpinnerChangeEnter), NULL, \textcolor{keyword}{this});
+00052 
+00053     mScroll->SetThumbPosition(mSpinner->GetValue() - mSpinner->GetMin());
+00054 
+00055     this->SetSizer(mainSizer);
+00056     this->Layout();
+00057     mainSizer->Fit(\textcolor{keyword}{this});
+00058 \}
+00059 
+00060 NumericSlider::~NumericSlider()
+00061 \{
+00062 
+00063 \}
+00064 
+00065 \textcolor{keywordtype}{void} NumericSlider::OnSpinnerChangeEnter(wxSpinEvent &event)
+00066 \{
+00067     wxCommandEvent evt(wxEVT\_COMMAND\_SPINCTRL\_UPDATED);
+00068     evt.SetId(this->GetId());
+00069     std::string test = \textcolor{keyword}{event}.GetString().ToStdString();
+00070     \textcolor{keywordtype}{long} value = 0;
+00071     \textcolor{keyword}{event}.GetString().ToLong(&value);
+00072     evt.SetInt(value);
+00073     evt.SetEventObject(\textcolor{keyword}{this});
+00074     mScroll->SetThumbPosition(event.GetInt() - mSpinner->GetMin());
+00075     wxPostEvent(\textcolor{keyword}{this}, evt);
+00076 \}
+00077 
+00078 \textcolor{keywordtype}{void} NumericSlider::OnSpinnerChange(wxSpinEvent &event)
+00079 \{
+00080     wxCommandEvent evt(wxEVT\_COMMAND\_SPINCTRL\_UPDATED);
+00081     evt.SetId(this->GetId());
+00082     evt.SetInt(event.GetInt());
+00083     evt.SetEventObject(\textcolor{keyword}{this});
+00084     mScroll->SetThumbPosition(event.GetInt() - mSpinner->GetMin());
+00085     wxPostEvent(\textcolor{keyword}{this}, evt);
+00086 \}
+00087 
+00088 \textcolor{keywordtype}{void} NumericSlider::OnScrollChange(wxScrollEvent &event)
+00089 \{
+00090     wxCommandEvent evt(wxEVT\_COMMAND\_SPINCTRL\_UPDATED);
+00091     evt.SetId(this->GetId());
+00092     evt.SetEventObject(\textcolor{keyword}{this});
+00093     mSpinner->SetValue(event.GetInt() + mSpinner->GetMin());
+00094     evt.SetInt(event.GetInt() + mSpinner->GetMin());
+00095     wxPostEvent(\textcolor{keyword}{this}, evt);
+00096 \}
+00097 
+00098 \textcolor{keywordtype}{void} NumericSlider::SetValue(\textcolor{keywordtype}{int} integer)
+00099 \{
+00100     \textcolor{keywordflow}{if} (integer < mSpinner->GetMin())
+00101         integer = mSpinner->GetMin();
+00102     \textcolor{keywordflow}{else} \textcolor{keywordflow}{if} (integer > mSpinner->GetMax())
+00103         integer = mSpinner->GetMax();
+00104     mSpinner->SetValue(integer);
+00105     mScroll->SetThumbPosition(integer - mSpinner->GetMin());
+00106 \}
+00107 
+00108 \textcolor{keywordtype}{int} NumericSlider::GetValue()
+00109 \{
+00110     \textcolor{keywordflow}{return} mSpinner->GetValue();
+00111 \}
+00112 
+00113 \textcolor{keywordtype}{void} NumericSlider::SetToolTip(\textcolor{keyword}{const} wxString &tipString)
+00114 \{
+00115     mSpinner->SetToolTip(NULL);
+00116     mSpinner->SetToolTip(tipString);
+00117     mScroll->SetToolTip(tipString);
+00118 \}
+00119 
+00120 BEGIN\_EVENT\_TABLE(NumericSlider, wxPanel)
+00121 END\_EVENT\_TABLE()
+00122 
+\end{DoxyCode}

@@ -1,0 +1,171 @@
+\subsection{lime\+:\+:Connection\+Registry\+Entry Class Reference}
+\label{classlime_1_1ConnectionRegistryEntry}\index{lime\+::\+Connection\+Registry\+Entry@{lime\+::\+Connection\+Registry\+Entry}}
+
+
+{\ttfamily \#include $<$Connection\+Registry.\+h$>$}
+
+
+
+Inheritance diagram for lime\+:\+:Connection\+Registry\+Entry\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{d7/dbc/classlime_1_1ConnectionRegistryEntry__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for lime\+:\+:Connection\+Registry\+Entry\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=227pt]{dc/d92/classlime_1_1ConnectionRegistryEntry__coll__graph}
+\end{center}
+\end{figure}
+\subsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+{\bf Connection\+Registry\+Entry} (const std\+::string \&{\bf name})
+\item 
+virtual {\bf $\sim$\+Connection\+Registry\+Entry} ({\bf void})
+\begin{DoxyCompactList}\small\item\em Unregister a connection type. \end{DoxyCompactList}\item 
+virtual {\bf std\+::vector}$<$ {\bf Connection\+Handle} $>$ {\bf enumerate} (const {\bf Connection\+Handle} \&hint)=0
+\item 
+virtual {\bf I\+Connection} $\ast$ {\bf make} (const {\bf Connection\+Handle} \&handle)=0
+\end{DoxyCompactItemize}
+\subsubsection*{Private Attributes}
+\begin{DoxyCompactItemize}
+\item 
+std\+::string {\bf \+\_\+name}
+\end{DoxyCompactItemize}
+
+
+\subsubsection{Detailed Description}
+Create an overloaded instance of a \doxyref{Connection\+Registry\+Entry}{p.}{d2/d45/classlime_1_1ConnectionRegistryEntry} to register discovery and factory functions into the system. The \doxyref{Connection\+Registry\+Entry}{p.}{d2/d45/classlime_1_1ConnectionRegistryEntry} should be created prior to discovering and instantiating connections. One recommended use is at static initialization time. 
+
+Definition at line {\bf 65} of file {\bf Connection\+Registry.\+h}.
+
+
+
+\subsubsection{Constructor \& Destructor Documentation}
+\index{lime\+::\+Connection\+Registry\+Entry@{lime\+::\+Connection\+Registry\+Entry}!Connection\+Registry\+Entry@{Connection\+Registry\+Entry}}
+\index{Connection\+Registry\+Entry@{Connection\+Registry\+Entry}!lime\+::\+Connection\+Registry\+Entry@{lime\+::\+Connection\+Registry\+Entry}}
+\paragraph[{Connection\+Registry\+Entry(const std\+::string \&name)}]{\setlength{\rightskip}{0pt plus 5cm}Connection\+Registry\+Entry\+::\+Connection\+Registry\+Entry (
+\begin{DoxyParamCaption}
+\item[{const std\+::string \&}]{name}
+\end{DoxyParamCaption}
+)}\label{classlime_1_1ConnectionRegistryEntry_a22d8603941b5bb9309765a48fdbdd4b8}
+Instantiating the \doxyref{Connection\+Registry\+Entry}{p.}{d2/d45/classlime_1_1ConnectionRegistryEntry} registers it into the connection registry. The name describes the type of connection, that should be unique to the entry instance. 
+
+Definition at line {\bf 104} of file {\bf Connection\+Registry.\+cpp}.
+
+
+
+References {\bf \+\_\+name}, and {\bf registry\+Mutex()}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=347pt]{d2/d45/classlime_1_1ConnectionRegistryEntry_a22d8603941b5bb9309765a48fdbdd4b8_cgraph}
+\end{center}
+\end{figure}
+
+
+\index{lime\+::\+Connection\+Registry\+Entry@{lime\+::\+Connection\+Registry\+Entry}!````~Connection\+Registry\+Entry@{$\sim$\+Connection\+Registry\+Entry}}
+\index{````~Connection\+Registry\+Entry@{$\sim$\+Connection\+Registry\+Entry}!lime\+::\+Connection\+Registry\+Entry@{lime\+::\+Connection\+Registry\+Entry}}
+\paragraph[{$\sim$\+Connection\+Registry\+Entry(void)}]{\setlength{\rightskip}{0pt plus 5cm}Connection\+Registry\+Entry\+::$\sim$\+Connection\+Registry\+Entry (
+\begin{DoxyParamCaption}
+\item[{{\bf void}}]{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [virtual]}}\label{classlime_1_1ConnectionRegistryEntry_a68898571c2b0b97b973e711e2a757a32}
+
+
+Unregister a connection type. 
+
+
+
+Definition at line {\bf 111} of file {\bf Connection\+Registry.\+cpp}.
+
+
+
+References {\bf \+\_\+name}, and {\bf registry\+Mutex()}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{d2/d45/classlime_1_1ConnectionRegistryEntry_a68898571c2b0b97b973e711e2a757a32_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+\subsubsection{Member Function Documentation}
+\index{lime\+::\+Connection\+Registry\+Entry@{lime\+::\+Connection\+Registry\+Entry}!enumerate@{enumerate}}
+\index{enumerate@{enumerate}!lime\+::\+Connection\+Registry\+Entry@{lime\+::\+Connection\+Registry\+Entry}}
+\paragraph[{enumerate(const Connection\+Handle \&hint)=0}]{\setlength{\rightskip}{0pt plus 5cm}virtual {\bf std\+::vector}$<${\bf Connection\+Handle}$>$ lime\+::\+Connection\+Registry\+Entry\+::enumerate (
+\begin{DoxyParamCaption}
+\item[{const {\bf Connection\+Handle} \&}]{hint}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [pure virtual]}}\label{classlime_1_1ConnectionRegistryEntry_a6ebcf67744be4aa0c40b350e0bec8475}
+A discovery function takes a connection handle hint and returns a list of identifiers that can be used to create connection with make\+Connection(). 
+\begin{DoxyParams}{Parameters}
+{\em hint} & an optional connection handle with some fields filled-\/in \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+a list of handles which can be used to make a connection 
+\end{DoxyReturn}
+
+
+Implemented in {\bf lime\+::\+Connection\+F\+X3\+Entry} \doxyref{}{p.}{d5/d2d/classlime_1_1ConnectionFX3Entry_a2629d151c49be6a6740643bc418be3f2}, {\bf lime\+::\+Connection\+F\+T601\+Entry} \doxyref{}{p.}{d0/d4b/classlime_1_1ConnectionFT601Entry_ae3422fa715dd76cbb30137cc18af1e56}, {\bf lime\+::\+Connection\+Novena\+R\+F7\+Entry} \doxyref{}{p.}{df/df1/classlime_1_1ConnectionNovenaRF7Entry_ae5aee7e93513676d018416f5ad7e6860}, {\bf lime\+::\+Connection\+Xillybus\+Entry} \doxyref{}{p.}{d0/d65/classlime_1_1ConnectionXillybusEntry_a89606c271141d897ca499742f747c1fd}, {\bf lime\+::\+Connection\+E\+V\+B7\+C\+O\+M\+Entry} \doxyref{}{p.}{df/dda/classlime_1_1ConnectionEVB7COMEntry_a2d7b7aefd7ee4e641eb020eeccbe7f37}, and {\bf lime\+::\+Connection\+S\+T\+R\+E\+A\+M\+\_\+\+U\+N\+I\+T\+E\+Entry} \doxyref{}{p.}{d2/df3/classlime_1_1ConnectionSTREAM__UNITEEntry_a1701d05112f23d6ff875b6e92d7991cb}.
+
+\index{lime\+::\+Connection\+Registry\+Entry@{lime\+::\+Connection\+Registry\+Entry}!make@{make}}
+\index{make@{make}!lime\+::\+Connection\+Registry\+Entry@{lime\+::\+Connection\+Registry\+Entry}}
+\paragraph[{make(const Connection\+Handle \&handle)=0}]{\setlength{\rightskip}{0pt plus 5cm}virtual {\bf I\+Connection}$\ast$ lime\+::\+Connection\+Registry\+Entry\+::make (
+\begin{DoxyParamCaption}
+\item[{const {\bf Connection\+Handle} \&}]{handle}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [pure virtual]}}\label{classlime_1_1ConnectionRegistryEntry_ac708b3f4bc8e85bad5e1a64d6e22f092}
+A factory function creates a connection from a connection handle. 
+\begin{DoxyParams}{Parameters}
+{\em handle} & a connection handle with fields filled-\/in \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+a pointer to a connection instance 
+\end{DoxyReturn}
+
+
+Implemented in {\bf lime\+::\+Connection\+F\+X3\+Entry} \doxyref{}{p.}{d5/d2d/classlime_1_1ConnectionFX3Entry_a6e533f3ba206f011df10a28e6406829b}, {\bf lime\+::\+Connection\+F\+T601\+Entry} \doxyref{}{p.}{d0/d4b/classlime_1_1ConnectionFT601Entry_a8966feba795e1dafbe3ae4a00a544857}, {\bf lime\+::\+Connection\+Novena\+R\+F7\+Entry} \doxyref{}{p.}{df/df1/classlime_1_1ConnectionNovenaRF7Entry_a89bce265e75a0b3d3065fb2e22678cb5}, {\bf lime\+::\+Connection\+Xillybus\+Entry} \doxyref{}{p.}{d0/d65/classlime_1_1ConnectionXillybusEntry_ab91910fc0ee25e65b4856891cd9133c3}, {\bf lime\+::\+Connection\+E\+V\+B7\+C\+O\+M\+Entry} \doxyref{}{p.}{df/dda/classlime_1_1ConnectionEVB7COMEntry_a7a70b218bc602d96439ceafccf16c494}, and {\bf lime\+::\+Connection\+S\+T\+R\+E\+A\+M\+\_\+\+U\+N\+I\+T\+E\+Entry} \doxyref{}{p.}{d2/df3/classlime_1_1ConnectionSTREAM__UNITEEntry_a9276413e68f466d8d9dde980dd9f2ad8}.
+
+
+
+\subsubsection{Member Data Documentation}
+\index{lime\+::\+Connection\+Registry\+Entry@{lime\+::\+Connection\+Registry\+Entry}!\+\_\+name@{\+\_\+name}}
+\index{\+\_\+name@{\+\_\+name}!lime\+::\+Connection\+Registry\+Entry@{lime\+::\+Connection\+Registry\+Entry}}
+\paragraph[{\+\_\+name}]{\setlength{\rightskip}{0pt plus 5cm}std\+::string lime\+::\+Connection\+Registry\+Entry\+::\+\_\+name\hspace{0.3cm}{\ttfamily [private]}}\label{classlime_1_1ConnectionRegistryEntry_acc78d6e4b61d0086effe68268a37747b}
+
+
+Definition at line {\bf 97} of file {\bf Connection\+Registry.\+h}.
+
+
+
+Referenced by {\bf Connection\+Registry\+Entry()}, and {\bf $\sim$\+Connection\+Registry\+Entry()}.
+
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+/home/erik/prefix/default/src/limesuite-\/dev/src/\+Connection\+Registry/{\bf Connection\+Registry.\+h}\item 
+/home/erik/prefix/default/src/limesuite-\/dev/src/\+Connection\+Registry/{\bf Connection\+Registry.\+cpp}\end{DoxyCompactItemize}

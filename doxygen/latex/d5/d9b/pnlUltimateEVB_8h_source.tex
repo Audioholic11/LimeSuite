@@ -1,0 +1,56 @@
+\subsection{pnl\+Ultimate\+E\+V\+B.\+h}
+\label{pnlUltimateEVB_8h_source}\index{/home/erik/prefix/default/src/limesuite-\/dev/src/boards\+\_\+wxgui/pnl\+Ultimate\+E\+V\+B.\+h@{/home/erik/prefix/default/src/limesuite-\/dev/src/boards\+\_\+wxgui/pnl\+Ultimate\+E\+V\+B.\+h}}
+
+\begin{DoxyCode}
+00001 \textcolor{preprocessor}{#ifndef PNL\_ULTIMATEEVB\_H}
+00002 \textcolor{preprocessor}{#define PNL\_ULTIMATEEVB\_H}
+00003 
+00004 \textcolor{preprocessor}{#include "lime/LimeSuite.h"}
+00005 \textcolor{preprocessor}{#include <map>}
+00006 \textcolor{preprocessor}{#include <vector>}
+00007 \textcolor{preprocessor}{#include <wx/panel.h>}
+00008 \textcolor{preprocessor}{#include <wx/stattext.h>}
+00009 
+00010 \textcolor{keyword}{class }wxStaticText;
+00011 \textcolor{keyword}{class }wxFlexGridSizer;
+00012 \textcolor{keyword}{class }wxCheckBox;
+00013 
+00014 \textcolor{keyword}{class }pnlUltimateEVB : \textcolor{keyword}{public} wxPanel
+00015 \{
+00016     \textcolor{keyword}{class }ADCparam
+00017     \{
+00018     \textcolor{keyword}{public}:
+00019         ADCparam(\textcolor{keywordtype}{int} ch, std::string nm = \textcolor{stringliteral}{""}): title(nullptr), value(nullptr)
+00020         \{
+00021             channel = ch;
+00022             name = nm;
+00023         \};
+00024         ~ADCparam()
+00025         \{
+00026             \textcolor{keywordflow}{if} (title) title->Destroy();
+00027             \textcolor{keywordflow}{if} (value) value->Destroy();
+00028         \}
+00029         \textcolor{keywordtype}{int} channel;
+00030         std::string name;
+00031         wxStaticText* title;
+00032         wxStaticText* value;
+00033     \};
+00034 \textcolor{keyword}{public}:
+00035     pnlUltimateEVB(wxWindow* parent, wxWindowID \textcolor{keywordtype}{id} = wxID\_ANY, \textcolor{keyword}{const} wxPoint& pos = wxDefaultPosition, \textcolor{keyword}{
+      const} wxSize& size = wxDefaultSize, \textcolor{keywordtype}{int} style = 0, wxString name = wxEmptyString);
+00036     \textcolor{keywordtype}{void} Initialize(lms_device_t *pControl);
+00037     \textcolor{keyword}{virtual} ~pnlUltimateEVB();
+00038 
+00039     \textcolor{keywordtype}{void} OnReadAll(wxCommandEvent &event);
+00040     \textcolor{keywordtype}{void} OnWriteAll(wxCommandEvent &event);
+00041 
+00042 \textcolor{keyword}{protected}:
+00043     std::vector<ADCparam> pwrParams;
+00044     std::vector<ADCparam> vltgParams;
+00045     wxStaticText* totalPwr;
+00046     lms_device_t *lmsControl;
+00047     DECLARE\_EVENT\_TABLE()
+00048 \};
+00049 
+00050 \textcolor{preprocessor}{#endif}
+\end{DoxyCode}

@@ -1,0 +1,1390 @@
+\subsection{lms7002m\+\_\+calibrations.\+c}
+\label{lms7002m__calibrations_8c_source}\index{/home/erik/prefix/default/src/limesuite-\/dev/mcu\+\_\+program/common\+\_\+src/lms7002m\+\_\+calibrations.\+c@{/home/erik/prefix/default/src/limesuite-\/dev/mcu\+\_\+program/common\+\_\+src/lms7002m\+\_\+calibrations.\+c}}
+
+\begin{DoxyCode}
+00001 \textcolor{preprocessor}{#include "lms7002m_calibrations.h"}
+00002 \textcolor{preprocessor}{#include "LMS7002M_parameters_compact.h"}
+00003 \textcolor{preprocessor}{#include "spi.h"}
+00004 \textcolor{preprocessor}{#include "lms7002m_controls.h"}
+00005 \textcolor{preprocessor}{#include <math.h>}
+00006 \textcolor{preprocessor}{#include "mcu_defines.h"}
+00007 
+00008 \textcolor{preprocessor}{#ifndef \_\_cplusplus}
+00009 \textcolor{preprocessor}{#include "lms7002\_regx51.h"} \textcolor{comment}{//MCU timer sfr}
+00010 \textcolor{preprocessor}{#endif}
+00011 
+00012 \textcolor{preprocessor}{#define ENABLE\_EXTERNAL\_LOOPBACK 1}
+00013 
+00014 \textcolor{preprocessor}{#ifdef \_\_cplusplus}
+00015 \textcolor{preprocessor}{#include <cstdlib>}
+00016 \textcolor{preprocessor}{#define VERBOSE 1}
+00017 \textcolor{preprocessor}{#define DRAW\_GNU\_PLOTS}
+00018 
+00019 \textcolor{preprocessor}{#include <thread>}
+00020 \textcolor{preprocessor}{#include <vector>}
+00021 \textcolor{preprocessor}{#include <chrono>}
+00022 \textcolor{preprocessor}{#include <stdio.h>}
+00023 \textcolor{preprocessor}{#include <sstream>}
+00024 
+00025 \textcolor{preprocessor}{#define PUSH\_GMEASUREMENT\_VALUES(value, rssi) gMeasurements.push\_back(\{value, rssi\})}
+00026 
+00027 \textcolor{preprocessor}{#include <gnuPlotPipe.h>}
+00028 GNUPlotPipe saturationPlot;
+00029 GNUPlotPipe IQImbalancePlot;
+00030 GNUPlotPipe txDCPlot;
+00031 
+00032 \textcolor{keyword}{typedef} std::vector< std::pair<float, float> > MeasurementsVector;
+00033 MeasurementsVector gMeasurements;
+00034 
+00035 \textcolor{keywordtype}{void} SortMeasurements(MeasurementsVector &vec)
+00036 \{
+00037     \textcolor{keywordflow}{for}(\textcolor{keywordtype}{size\_t} i=0; i<vec.size(); ++i)
+00038         \textcolor{keywordflow}{for}(\textcolor{keywordtype}{size\_t} j=i; j<vec.size(); ++j)
+00039             \textcolor{keywordflow}{if}(vec[i].first > vec[j].first)
+00040             \{
+00041                 \textcolor{keyword}{auto} temp = vec[i];
+00042                 vec[i] = vec[j];
+00043                 vec[j] = temp;
+00044             \}
+00045 \}
+00046 
+00047 \textcolor{keywordtype}{void} DrawMeasurement(GNUPlotPipe &gp, \textcolor{keyword}{const} MeasurementsVector& vec)
+00048 \{
+00049     \textcolor{keywordflow}{for}(\textcolor{keyword}{auto} i : vec)
+00050         gp.writef(\textcolor{stringliteral}{"%f %f\(\backslash\)n"}, i.first, i.second);
+00051     gp.write(\textcolor{stringliteral}{"e\(\backslash\)n"});
+00052 \}
+00053 
+00055 \textcolor{keywordtype}{float} ChipRSSI\_2\_dBFS(uint32\_t rssi)
+00056 \{
+00057     uint32\_t maxRSSI = 0x15FF4;
+00058     \textcolor{keywordflow}{if}(rssi == 0)
+00059         rssi = 1;
+00060     \textcolor{keywordflow}{return} 20*log10((\textcolor{keywordtype}{float})(rssi)/maxRSSI);
+00061 \}
+00062 
+00063 int16\_t toSigned(int16\_t val, uint8\_t msblsb)
+00064 \{
+00065     val <<= 15-((msblsb >> 4) & 0xF);
+00066     val >>= 15-((msblsb >> 4) & 0xF);
+00067     \textcolor{keywordflow}{return} val;
+00068 \}
+00069 \textcolor{preprocessor}{#else}
+00070 \textcolor{preprocessor}{#define VERBOSE 0}
+00071 \textcolor{preprocessor}{#define PUSH\_GMEASUREMENT\_VALUES(value, rssi)}
+00072 \textcolor{preprocessor}{#endif // \_\_cplusplus}
+00073 
+00074 \textcolor{keywordtype}{float} bandwidthRF = 5e6; \textcolor{comment}{//Calibration bandwidth}
+00075 uint16\_t RSSIDelayCounter = 1; \textcolor{comment}{// MCU timer delay between RSSI measurements}
+00076 \textcolor{preprocessor}{#define calibrationSXOffset\_Hz 1e6}
+00077 \textcolor{preprocessor}{#define offsetNCO 0.1e6}
+00078 \textcolor{preprocessor}{#define calibUserBwDivider 5}
+00079 
+00080 \textcolor{comment}{// external loopback selection}
+00081 \textcolor{comment}{// [2] tx band, when calibrating Rx, 0-band1, 1-band2}
+00082 \textcolor{comment}{// [1:0] SEL\_PATH\_RFE, when calibrating Tx}
+00083 uint8\_t extLoopbackPair = 0;
+00084 
+00085 int16\_t clamp(int16\_t value, int16\_t minBound, int16\_t maxBound)
+00086 \{
+00087     \textcolor{keywordflow}{if}(value < minBound)
+00088         \textcolor{keywordflow}{return} minBound;
+00089     \textcolor{keywordflow}{if}(value > maxBound)
+00090         \textcolor{keywordflow}{return} maxBound;
+00091     \textcolor{keywordflow}{return} value;
+00092 \}
+00093 
+00094 \textcolor{keyword}{static} \textcolor{keywordtype}{void} FlipRisingEdge(\textcolor{keyword}{const} uint16\_t addr, \textcolor{keyword}{const} uint8\_t bits)
+00095 \{
+00096     Modify_SPI_Reg_bits(addr, bits, 0);
+00097     Modify_SPI_Reg_bits(addr, bits, 1);
+00098 \}
+00099 
+00100 \textcolor{keyword}{static} \textcolor{keywordtype}{bool} IsPLLTuned()
+00101 \{
+00102     \textcolor{keywordflow}{if}( Get_SPI_Reg_bits(0x0123, MSB_LSB(13, 12)) == 2 )
+00103         \textcolor{keywordflow}{return} \textcolor{keyword}{true};
+00104     \textcolor{keywordflow}{return} TuneVCO(\textcolor{keyword}{true}) == MCU_NO_ERROR;
+00105 \}
+00106 
+00107 \textcolor{keywordtype}{void} LoadDC_REG_TX_IQ()
+00108 \{
+00109     SPI_write(0x020C, 0x7FFF);
+00110     FlipRisingEdge(TSGDCLDI_TXTSP);
+00111     SPI_write(0x020C, 0x8000);
+00112     FlipRisingEdge(TSGDCLDQ_TXTSP);
+00113 \}
+00114 
+00115 
+00116 \textcolor{keyword}{extern} float_type RefClk;
+00117 \textcolor{keywordtype}{void} UpdateRSSIDelay()
+00118 \{
+00119     \textcolor{keyword}{const} uint16\_t sampleCount = (2 << 7) << Get_SPI_Reg_bits(AGC_AVG_RXTSP);
+00120     uint8\_t decimation = Get_SPI_Reg_bits(HBD_OVR_RXTSP);
+00121     \textcolor{keywordflow}{if}(decimation < 6)
+00122         decimation = (2 << decimation);
+00123     \textcolor{keywordflow}{else}
+00124         decimation = 1; \textcolor{comment}{//bypass}
+00125     \{
+00126     \textcolor{keywordtype}{float} waitTime = sampleCount/((GetReferenceClk_TSP_MHz(\textcolor{keyword}{false})/2) / decimation );
+00127     RSSIDelayCounter = (0xFFFF) - (uint16\_t)(waitTime*RefClk/12);
+00128     \}
+00129 \}
+00130 
+00131 uint32\_t GetRSSI()
+00132 \{
+00133     uint32\_t rssi;
+00134 \textcolor{preprocessor}{#ifdef \_\_cplusplus}
+00135     \textcolor{keywordtype}{int} waitTime = 1000000.0*(0xFFFF - RSSIDelayCounter)*12/RefClk;
+00136     std::this\_thread::sleep\_for(std::chrono::microseconds(waitTime));
+00137 \textcolor{preprocessor}{#else}
+00138     TR0 = 0; \textcolor{comment}{//stop timer 0}
+00139     TH0 = (RSSIDelayCounter >> 8);
+00140     TL0 = (RSSIDelayCounter & 0xFF);
+00141     TF0 = 0; \textcolor{comment}{// clear overflow}
+00142     TR0 = 1; \textcolor{comment}{//start timer 0}
+00143     \textcolor{keywordflow}{while}( !TF0 ); \textcolor{comment}{// wait for timer overflow}
+00144 \textcolor{preprocessor}{#endif}
+00145     FlipRisingEdge(CAPTURE);
+00146     rssi = SPI_read(0x040F);
+00147     \textcolor{keywordflow}{return} (rssi << 2 | (SPI_read(0x040E) & 0x3));
+00148 \}
+00149 
+00150 \textcolor{keyword}{static} \textcolor{keywordtype}{void} SetRxGFIR3Coefficients()
+00151 \{
+00152     \textcolor{comment}{//FIR coefficients symmetrical, storing only one half}
+00153     ROM \textcolor{keyword}{const} int16\_t firCoefs[] =
+00154     \{
+00155         8,4,0,-6,-11,-16,-20,-22,-22,-20,-14,-5,6,20,34,46,
+00156         56,61,58,48,29,3,-29,-63,-96,-123,-140,-142,-128,-94,-44,20,
+00157         93,167,232,280,302,291,244,159,41,-102,-258,-409,-539,-628,-658,-614,
+00158         -486,-269,34,413,852,1328,1814,2280,2697,3038,3277,3401,
+00159     \};
+00160     uint8\_t index = 0;
+00161     \textcolor{keywordflow}{for} (; index < \textcolor{keyword}{sizeof}(firCoefs)/\textcolor{keyword}{sizeof}(int16\_t); ++index)
+00162         SPI_write(0x0500 + index + 24 * (index / 40), firCoefs[index]);
+00163     \textcolor{keywordflow}{for} (; index < \textcolor{keyword}{sizeof}(firCoefs)/\textcolor{keyword}{sizeof}(int16\_t)*2; ++index)
+00164         SPI_write(0x0500 + index + 24 * (index / 40), firCoefs[119-index]);
+00165 \}
+00166 
+00167 \textcolor{keywordtype}{int} CheckSaturationTxRx(\textcolor{keywordtype}{bool} extLoopback)
+00168 \{
+00169     \textcolor{keyword}{const} uint16\_t saturationLevel = 0x05000; \textcolor{comment}{//-3dBFS}
+00170     uint8\_t g\_pga;
+00171     uint8\_t g\_rfe;
+00172     uint16\_t rssi;
+00173 \textcolor{preprocessor}{#ifdef DRAW\_GNU\_PLOTS}
+00174     \textcolor{keywordtype}{int} index = 0;
+00175     GNUPlotPipe &gp = saturationPlot;
+00176     gp.write(\textcolor{stringliteral}{"set yrange [:0]\(\backslash\)n"});
+00177     gp.write(\textcolor{stringliteral}{"set title 'Rx gains search'\(\backslash\)n"});
+00178     gp.write(\textcolor{stringliteral}{"set key right bottom\(\backslash\)n"});
+00179     gp.write(\textcolor{stringliteral}{"set xlabel 'measurement index'\(\backslash\)n"});
+00180     gp.write(\textcolor{stringliteral}{"set ylabel 'RSSI dbFS'\(\backslash\)n"});
+00181     gp.write(\textcolor{stringliteral}{"set grid xtics ytics\(\backslash\)n"});
+00182     gp.writef(\textcolor{stringliteral}{"plot\(\backslash\)}
+00183 \textcolor{stringliteral}{'-' u 1:2 with lines title 'target Level',\(\backslash\)}
+00184 \textcolor{stringliteral}{'-' u 1:2 with lines title '%s',\(\backslash\)}
+00185 \textcolor{stringliteral}{'-' u 1:2 with lines title 'PGA'\(\backslash\)n"}, (extLoopback ? \textcolor{stringliteral}{"LNA"}:\textcolor{stringliteral}{"RXLOOPB"}));
+00186     gp.writef(\textcolor{stringliteral}{"%i %f\(\backslash\)n%i %f\(\backslash\)ne\(\backslash\)n"}, 0, ChipRSSI\_2\_dBFS(saturationLevel),
+00187                               20, ChipRSSI\_2\_dBFS(saturationLevel));
+00188     gMeasurements.clear();
+00189 \textcolor{preprocessor}{#endif}
+00190     Modify_SPI_Reg_bits(DC_BYP_RXTSP, 0);
+00191     Modify_SPI_Reg_bits(CMIX_BYP_RXTSP, 0);
+00192     SetNCOFrequency(LMS7002M_Rx, calibrationSXOffset_Hz - offsetNCO + (
+      bandwidthRF / calibUserBwDivider) * 2, 0);
+00193 
+00194     g\_pga = (uint8\_t)Get_SPI_Reg_bits(G_PGA_RBB);
+00195 \textcolor{preprocessor}{#if ENABLE\_EXTERNAL\_LOOPBACK}
+00196     \textcolor{keywordflow}{if}(extLoopback)
+00197     \{
+00198         g\_rfe = 0;
+00199         Modify_SPI_Reg_bits(G_LNA_RFE, g\_rfe);
+00200     \}
+00201     \textcolor{keywordflow}{else}
+00202 \textcolor{preprocessor}{#endif}
+00203         g\_rfe = (uint8\_t)Get_SPI_Reg_bits(G_RXLOOPB_RFE);
+00204     rssi = GetRSSI();
+00205     PUSH_GMEASUREMENT_VALUES(index, ChipRSSI\_2\_dBFS(rssi));
+00206 
+00207 \textcolor{preprocessor}{#if VERBOSE}
+00208     printf(\textcolor{stringliteral}{"Receiver saturation search, target level: %i (%2.3f dBFS)\(\backslash\)n"}, saturationLevel, ChipRSSI\_2\_dBFS(
+      saturationLevel));
+00209     printf(\textcolor{stringliteral}{"initial  PGA: %2i, %s: %2i, %3.2f dbFS\(\backslash\)n"}, g\_pga, (extLoopback ? \textcolor{stringliteral}{"LNA"}:\textcolor{stringliteral}{"RXLOOPB"}), g\_rfe, 
+      ChipRSSI\_2\_dBFS(rssi));
+00210 \textcolor{preprocessor}{#endif}
+00211     \textcolor{keywordflow}{while}(rssi < saturationLevel)
+00212     \{
+00213         \textcolor{keywordflow}{if}(g\_rfe < 15)
+00214             ++g\_rfe;
+00215         \textcolor{keywordflow}{else}
+00216             \textcolor{keywordflow}{break};
+00217 \textcolor{preprocessor}{#if ENABLE\_EXTERNAL\_LOOPBACK}
+00218         \textcolor{keywordflow}{if}(extLoopback)
+00219             Modify_SPI_Reg_bits(G_LNA_RFE, g\_rfe);
+00220         \textcolor{keywordflow}{else}
+00221 \textcolor{preprocessor}{#endif}
+00222             Modify_SPI_Reg_bits(G_RXLOOPB_RFE, g\_rfe);
+00223         rssi = GetRSSI();
+00224         PUSH_GMEASUREMENT_VALUES(++index, ChipRSSI\_2\_dBFS(rssi));
+00225     \}
+00226 \textcolor{preprocessor}{#ifdef DRAW\_GNU\_PLOTS}
+00227     DrawMeasurement(gp, gMeasurements);
+00228     gMeasurements.clear();
+00229 \textcolor{preprocessor}{#endif // DRAW\_GNU\_PLOTS}
+00230 
+00231     PUSH_GMEASUREMENT_VALUES(index, ChipRSSI\_2\_dBFS(rssi));
+00232     \{
+00233     uint16\_t rssi\_prev = rssi;
+00234     \textcolor{keywordflow}{while}(g\_pga < 25 && g\_rfe == 15 && rssi < saturationLevel)
+00235     \{
+00236         \textcolor{keywordflow}{if}(g\_pga < 25)
+00237             ++g\_pga;
+00238         \textcolor{keywordflow}{else}
+00239             \textcolor{keywordflow}{break};
+00240         Modify_SPI_Reg_bits(G_PGA_RBB, g\_pga);
+00241         rssi = GetRSSI();
+00242         \textcolor{keywordflow}{if}((\textcolor{keywordtype}{float})rssi/rssi\_prev < 1.05) \textcolor{comment}{// pga should give ~1dB change}
+00243             \textcolor{keywordflow}{break};
+00244         rssi\_prev = rssi;
+00245         PUSH_GMEASUREMENT_VALUES(++index, ChipRSSI\_2\_dBFS(rssi));
+00246     \}
+00247     \}
+00248 \textcolor{preprocessor}{#ifdef DRAW\_GNU\_PLOTS}
+00249     DrawMeasurement(gp, gMeasurements);
+00250     gp.flush();
+00251 \textcolor{preprocessor}{#endif // DRAW\_GNU\_PLOTS}
+00252 \textcolor{preprocessor}{#if VERBOSE}
+00253     printf(\textcolor{stringliteral}{"adjusted PGA: %2i, %s: %2i, %3.2f dbFS\(\backslash\)n"}, Get_SPI_Reg_bits(
+      G_PGA_RBB), (extLoopback ? \textcolor{stringliteral}{"LNA"}:\textcolor{stringliteral}{"RXLOOPB"}), g\_rfe, ChipRSSI\_2\_dBFS(rssi));
+00254 \textcolor{preprocessor}{#endif}
+00255     \textcolor{keywordflow}{if}( rssi < 0xB21 ) \textcolor{comment}{// ~(-30 dbFS)}
+00256     \{
+00257 \textcolor{preprocessor}{#if VERBOSE}
+00258         printf(\textcolor{stringliteral}{"Signal strength (%3.1f dBFS) very low, loopback not working?\(\backslash\)n"}, ChipRSSI\_2\_dBFS(rssi));
+00259 \textcolor{preprocessor}{#endif // VERBOSE}
+00260         \textcolor{keywordflow}{return} MCU_LOOPBACK_SIGNAL_WEAK;
+00261     \}
+00262     Modify_SPI_Reg_bits(CMIX_BYP_RXTSP, 1);
+00263     Modify_SPI_Reg_bits(DC_BYP_RXTSP, 1);
+00264     \textcolor{keywordflow}{return} MCU_NO_ERROR;
+00265 \}
+00266 
+00267 \textcolor{keyword}{typedef} \textcolor{keyword}{struct}
+00268 \{
+00269     LMS7Parameter param;
+00270     int16\_t result;
+00271     int16\_t minValue;
+00272     int16\_t maxValue;
+00273 \} BinSearchParam;
+00274 
+00275 \textcolor{keywordtype}{void} BinarySearch(BinSearchParam bdata* args)
+00276 \{
+00277     uint16\_t rssiLeft = ~0;
+00278     uint16\_t rssiRight;
+00279     int16\_t left = args->minValue;
+00280     int16\_t right = args->maxValue;
+00281     int16\_t step;
+00282     \textcolor{keyword}{const} uint16\_t addr = args->param.address;
+00283     \textcolor{keyword}{const} uint8\_t msblsb = args->param.msblsb;
+00284 
+00285     Modify_SPI_Reg_bits(addr, msblsb, right);
+00286     rssiRight = GetRSSI();
+00287     PUSH_GMEASUREMENT_VALUES(right, ChipRSSI\_2\_dBFS(rssiRight));
+00288     \textcolor{keywordflow}{while}(right-left >= 1)
+00289     \{
+00290         step = (right-left)/2;
+00291         \textcolor{keywordflow}{if}(rssiLeft < rssiRight)
+00292         \{
+00293             Modify_SPI_Reg_bits(addr, msblsb, right);
+00294             rssiRight = GetRSSI();
+00295             PUSH_GMEASUREMENT_VALUES(right, ChipRSSI\_2\_dBFS(rssiRight));
+00296         \}
+00297         \textcolor{keywordflow}{else}
+00298         \{
+00299             Modify_SPI_Reg_bits(addr, msblsb, left);
+00300             rssiLeft = GetRSSI();
+00301             PUSH_GMEASUREMENT_VALUES(left, ChipRSSI\_2\_dBFS(rssiLeft));
+00302         \}
+00303         \textcolor{keywordflow}{if}(step <= 0)
+00304             \textcolor{keywordflow}{break};
+00305         \textcolor{keywordflow}{if}(rssiLeft < rssiRight)
+00306             right -= step;
+00307         \textcolor{keywordflow}{else}
+00308             left += step;
+00309     \}
+00310     args->result = rssiLeft < rssiRight ? left : right;
+00311     Modify_SPI_Reg_bits(addr, msblsb, args->result);
+00312 \}
+00313 
+00314 int16\_t ReadAnalogDC(\textcolor{keyword}{const} uint16\_t addr)
+00315 \{
+00316     \textcolor{keyword}{const} uint16\_t mask = addr < 0x05C7 ? 0x03FF : 0x003F;
+00317     uint16\_t value;
+00318     int16\_t result;
+00319     SPI_write(addr, 0);
+00320     SPI_write(addr, 0x4000);
+00321     value = SPI_read(addr);
+00322     SPI_write(addr, value & ~0xC000);
+00323     result = (value & mask);
+00324     \textcolor{keywordflow}{if}(value & (mask+1))
+00325         result *= -1;
+00326     \textcolor{keywordflow}{return} result;
+00327 \}
+00328 
+00329 \textcolor{keyword}{static} \textcolor{keywordtype}{void} WriteAnalogDC(\textcolor{keyword}{const} uint16\_t addr, int16\_t value)
+00330 \{
+00331     \textcolor{keyword}{const} uint16\_t mask = addr < 0x05C7 ? 0x03FF : 0x003F;
+00332     int16\_t regValue = 0;
+00333     \textcolor{keywordflow}{if}(value < 0)
+00334     \{
+00335         regValue |= (mask+1);
+00336         regValue |= (abs(value+mask) & mask);
+00337     \}
+00338     \textcolor{keywordflow}{else}
+00339         regValue |= (abs(value+mask+1) & mask);
+00340     SPI_write(addr, regValue);
+00341     SPI_write(addr, regValue | 0x8000);
+00342 \}
+00343 
+00344 \textcolor{keyword}{static} \textcolor{keywordtype}{void} TxDcBinarySearch(BinSearchParam* args)
+00345 \{
+00346     uint16\_t rssiLeft = ~0;
+00347     uint16\_t rssiRight;
+00348     int16\_t left = args->minValue;
+00349     int16\_t right = args->maxValue;
+00350     int16\_t step;
+00351 
+00352     WriteAnalogDC(args->param.address, right);
+00353     rssiRight = GetRSSI();
+00354     PUSH_GMEASUREMENT_VALUES(right, ChipRSSI\_2\_dBFS(rssiRight));
+00355 
+00356     \textcolor{keywordflow}{while}(right-left >= 1)
+00357     \{
+00358         step = (right-left)/2;
+00359         \textcolor{keywordflow}{if}(rssiLeft < rssiRight)
+00360         \{
+00361             WriteAnalogDC(args->param.address, right);
+00362             rssiRight = GetRSSI();
+00363             PUSH_GMEASUREMENT_VALUES(right, ChipRSSI\_2\_dBFS(rssiRight));
+00364         \}
+00365         \textcolor{keywordflow}{else}
+00366         \{
+00367             WriteAnalogDC(args->param.address, left);
+00368             rssiLeft = GetRSSI();
+00369             PUSH_GMEASUREMENT_VALUES(left, ChipRSSI\_2\_dBFS(rssiLeft));
+00370         \}
+00371         \textcolor{keywordflow}{if}(step == 0)
+00372             \textcolor{keywordflow}{break};
+00373         \textcolor{keywordflow}{if}(rssiLeft < rssiRight)
+00374             right -= step;
+00375         \textcolor{keywordflow}{else}
+00376             left += step;
+00377     \}
+00378 
+00379     args->result = rssiLeft < rssiRight ? left : right;
+00380     WriteAnalogDC(args->param.address, args->result);
+00381 \}
+00382 
+00383 \textcolor{keywordtype}{void} AdjustAutoDC(\textcolor{keyword}{const} uint16\_t address, \textcolor{keywordtype}{bool} tx)
+00384 \{
+00385     uint8\_t i;
+00386     uint16\_t rssi;
+00387     uint16\_t minRSSI;
+00388     int16\_t minValue;
+00389     int16\_t initVal;
+00390     int8\_t valChange;
+00391     uint16\_t range = tx ? 1023 : 63;
+00392 
+00393     minValue = initVal = ReadAnalogDC(address);
+00394     minRSSI = rssi = GetRSSI();
+00395     WriteAnalogDC(address, clamp(initVal+1, -range, range));
+00396     valChange = GetRSSI() < rssi ? 1 : -1;
+00397 
+00398     \textcolor{keywordflow}{for}(i = 8; i; --i)
+00399     \{
+00400         initVal = clamp(initVal+valChange, -range, range);
+00401         WriteAnalogDC(address, initVal);
+00402         rssi = GetRSSI();
+00403         \textcolor{keywordflow}{if}(rssi < minRSSI)
+00404         \{
+00405             minRSSI = rssi;
+00406             minValue = initVal;
+00407         \}
+00408     \}
+00409     WriteAnalogDC(address, minValue);
+00410 \}
+00411 
+00412 \textcolor{keywordtype}{void} CalibrateRxDCAuto()
+00413 \{
+00414     uint16\_t dcRegAddr = 0x5C7;
+00415     \textcolor{keyword}{const} uint8\_t ch = Get_SPI_Reg_bits(MAC);
+00416     Modify_SPI_Reg_bits(EN_G_TRF, 0);
+00417     Modify_SPI_Reg_bits(DC_BYP_RXTSP, 1);
+00418 
+00419     \textcolor{comment}{//auto calibration}
+00420     Modify_SPI_Reg_bits(DCMODE, 1);
+00421     \textcolor{keywordflow}{if}(ch == 1)
+00422     \{
+00423         Modify_SPI_Reg_bits(PD_DCDAC_RXA, 0);
+00424         Modify_SPI_Reg_bits(PD_DCCMP_RXA, 0);
+00425         SPI_write(0x05C2, 0xFF30);
+00426     \}
+00427     \textcolor{keywordflow}{else}
+00428     \{
+00429         Modify_SPI_Reg_bits(PD_DCDAC_RXB, 0);
+00430         Modify_SPI_Reg_bits(PD_DCCMP_RXB, 0);
+00431         SPI_write(0x05C2, 0xFFC0);
+00432         dcRegAddr += 2;
+00433     \}
+00434 
+00435     \{
+00436         \textcolor{keywordflow}{while}(SPI_read(0x05C1) & 0xF000);
+00437     \}
+00438 \textcolor{preprocessor}{#if VERBOSE}
+00439     \{
+00440         int16\_t dci = ReadAnalogDC(dcRegAddr);
+00441         int16\_t dcq = ReadAnalogDC(dcRegAddr+1);
+00442         uint32\_t rssi = GetRSSI();
+00443         printf(\textcolor{stringliteral}{"Rx DC auto   I: %3i, Q: %3i, %3.1f dBFS\(\backslash\)n"}, dci, dcq, ChipRSSI\_2\_dBFS(rssi));
+00444     \}
+00445 \textcolor{preprocessor}{#endif // VERBOSE}
+00446 
+00447     \textcolor{comment}{//manual adjustments}
+00448     Modify_SPI_Reg_bits(GCORRQ_RXTSP, 0);
+00449     AdjustAutoDC(dcRegAddr, \textcolor{keyword}{false});
+00450     Modify_SPI_Reg_bits(GCORRQ_RXTSP, 2047);
+00451     AdjustAutoDC(dcRegAddr+1, \textcolor{keyword}{false});
+00452 
+00453 \textcolor{preprocessor}{#if VERBOSE}
+00454     \{
+00455         int16\_t dci = ReadAnalogDC(dcRegAddr);
+00456         int16\_t dcq = ReadAnalogDC(dcRegAddr+1);
+00457         uint32\_t rssi = GetRSSI();
+00458         printf(\textcolor{stringliteral}{"Rx DC manual I: %3i, Q: %3i, %3.1f dBFS\(\backslash\)n"}, dci, dcq, ChipRSSI\_2\_dBFS(rssi));
+00459     \}
+00460 \textcolor{preprocessor}{#endif}
+00461 
+00462     Modify_SPI_Reg_bits(DC_BYP_RXTSP, 0); \textcolor{comment}{// DC\_BYP 0}
+00463 \textcolor{preprocessor}{#if VERBOSE}
+00464     printf(\textcolor{stringliteral}{"RxTSP DC corrector enabled %3.1f dBFS\(\backslash\)n"}, ChipRSSI\_2\_dBFS(GetRSSI()));
+00465 \textcolor{preprocessor}{#endif}
+00466     Modify_SPI_Reg_bits(EN_G_TRF, 1);
+00467 \}
+00468 
+00469 \textcolor{keywordtype}{void} CalibrateTxDCAuto()
+00470 \{
+00471 \textcolor{preprocessor}{#ifdef DRAW\_GNU\_PLOTS}
+00472     GNUPlotPipe &gp = txDCPlot;
+00473     std::vector<MeasurementsVector> data;
+00474     gMeasurements.clear();
+00475 \textcolor{preprocessor}{#endif // DRAW\_GNU\_PLOTS}
+00476     BinSearchParam iparams;
+00477     BinSearchParam qparams;
+00478     \textcolor{keyword}{const} uint8\_t ch = Get_SPI_Reg_bits(MAC);
+00479     Modify_SPI_Reg_bits(EN_G_TRF, 1);
+00480     Modify_SPI_Reg_bits(CMIX_BYP_TXTSP, 0);
+00481     Modify_SPI_Reg_bits(CMIX_BYP_RXTSP, 0);
+00482 
+00483     Modify_SPI_Reg_bits(DC_BYP_TXTSP, 1);
+00484     \textcolor{comment}{//auto calibration}
+00485     Modify_SPI_Reg_bits(DCMODE, 1);
+00486     \textcolor{comment}{//Modify\_SPI\_Reg\_bits(GCORRI\_TXTSP.address, GCORRI\_TXTSP.msblsb, 0);}
+00487     \textcolor{comment}{//Modify\_SPI\_Reg\_bits(GCORRQ\_TXTSP.address, GCORRQ\_TXTSP.msblsb, 0);}
+00488     iparams.param.msblsb = 10<<4 | 0;
+00489     qparams.param.msblsb = 10<<4 | 0;
+00490     \textcolor{keywordflow}{if}(ch == 1)
+00491     \{
+00492         iparams.param.address = 0x5C3;\textcolor{comment}{// DC\_TXAI;}
+00493         qparams.param.address = 0x5C4;\textcolor{comment}{// DC\_TXAQ;}
+00494         Modify_SPI_Reg_bits(PD_DCDAC_TXA, 0);
+00495         Modify_SPI_Reg_bits(PD_DCCMP_TXA, 0);
+00496         \textcolor{comment}{//SPI\_write(0x05C2, 0x0F03);}
+00497     \}
+00498     \textcolor{keywordflow}{else}
+00499     \{
+00500         iparams.param.address = 0x5C5;\textcolor{comment}{// DC\_TXBI;}
+00501         qparams.param.address = 0x5C6;\textcolor{comment}{// DC\_TXBQ;}
+00502         Modify_SPI_Reg_bits(PD_DCDAC_TXB, 0);
+00503         Modify_SPI_Reg_bits(PD_DCCMP_TXB, 0);
+00504         \textcolor{comment}{//SPI\_write(0x05C2, 0x0F0C);}
+00505     \}
+00506     WriteAnalogDC(iparams.param.address, 0);
+00507     WriteAnalogDC(qparams.param.address, 0);
+00508 
+00509     \textcolor{comment}{//wait until finished}
+00510     \textcolor{comment}{//while(SPI\_read(0x05C1) & 0x0F00);}
+00511 
+00512     \{
+00513     ROM \textcolor{keyword}{const} int16\_t offset[3] = \{1023, 128, 8\};
+00514     uint8\_t i;
+00515     iparams.result = 0; \textcolor{comment}{//ReadAnalogDC(iparams.param.address);}
+00516     qparams.result = 0; \textcolor{comment}{//ReadAnalogDC(qparams.param.address);}
+00517     \textcolor{keywordflow}{for}(i=0; i<3; ++i)
+00518     \{
+00519         iparams.minValue = clamp(iparams.result-offset[i], -1024, 1023);
+00520         iparams.maxValue = clamp(iparams.result+offset[i], -1024, 1023);
+00521         qparams.minValue = clamp(qparams.result-offset[i], -1024, 1023);
+00522         qparams.maxValue = clamp(qparams.result+offset[i], -1024, 1023);
+00523 
+00524         TxDcBinarySearch(&iparams);
+00525 \textcolor{preprocessor}{#ifdef DRAW\_GNU\_PLOTS}
+00526         data.push\_back(gMeasurements);
+00527         gMeasurements.clear();
+00528 \textcolor{preprocessor}{#endif // DRAW\_GNU\_PLOTS}
+00529         TxDcBinarySearch(&qparams);
+00530 \textcolor{preprocessor}{#ifdef DRAW\_GNU\_PLOTS}
+00531         data.push\_back(gMeasurements);
+00532         gMeasurements.clear();
+00533 \textcolor{preprocessor}{#endif // DRAW\_GNU\_PLOTS}
+00534 \textcolor{preprocessor}{#if VERBOSE}
+00535     \{
+00536         int16\_t dci = ReadAnalogDC(iparams.param.address);
+00537         int16\_t dcq = ReadAnalogDC(qparams.param.address);
+00538         uint32\_t rssi = GetRSSI();
+00539         printf(\textcolor{stringliteral}{"#%i Tx DC manual I: %4i, Q: %4i, %3.1f dBFS\(\backslash\)n"}, i, dci, dcq, ChipRSSI\_2\_dBFS(rssi));
+00540     \}
+00541 \textcolor{preprocessor}{#endif // VERBOSE}
+00542     \}
+00543     \}
+00544 
+00545 \textcolor{preprocessor}{#ifdef DRAW\_GNU\_PLOTS}
+00546     gp.writef(\textcolor{stringliteral}{"set title 'TxDC search'\(\backslash\)n"});
+00547     gp.write(\textcolor{stringliteral}{"set xlabel 'offset'\(\backslash\)n"});
+00548     gp.write(\textcolor{stringliteral}{"set ylabel 'RSSI dBFS'\(\backslash\)n"});
+00549     gp.write(\textcolor{stringliteral}{"set grid ytics xtics\(\backslash\)n"});
+00550     std::stringstream ss;
+00551     \textcolor{keywordflow}{for}(\textcolor{keywordtype}{unsigned} i=0; i<data.size()/2; ++i)
+00552     \{
+00553         \textcolor{keywordflow}{if}(i>0)
+00554             ss << \textcolor{stringliteral}{", "};
+00555         ss << \textcolor{stringliteral}{"'-' w l t '#"} << i << \textcolor{stringliteral}{" I', "};
+00556         ss << \textcolor{stringliteral}{"'-' w l t '#"} << i << \textcolor{stringliteral}{" Q'"};
+00557     \}
+00558     gp.writef(\textcolor{stringliteral}{"plot %s\(\backslash\)n"}, ss.str().c\_str());
+00559     \textcolor{keywordflow}{for}(\textcolor{keyword}{auto} i : data)
+00560     \{
+00561         SortMeasurements(i);
+00562         DrawMeasurement(gp, i);
+00563     \}
+00564 \textcolor{preprocessor}{#endif // DRAW\_GNU\_PLOTS}
+00565 
+00566     \textcolor{comment}{//Modify\_SPI\_Reg\_bits(GCORRI\_TXTSP.address, GCORRI\_TXTSP.msblsb, 2047);}
+00567     \textcolor{comment}{//Modify\_SPI\_Reg\_bits(GCORRQ\_TXTSP.address, GCORRQ\_TXTSP.msblsb, 2047);}
+00568 \}
+00569 
+00570 \textcolor{keywordtype}{void} CalibrateIQImbalance(\textcolor{keywordtype}{bool} tx)
+00571 \{
+00572 \textcolor{preprocessor}{#if defined(VERBOSE) || defined(DRAW\_GNU\_PLOTS)}
+00573     \textcolor{keyword}{const} \textcolor{keywordtype}{char} *dirName = tx ? \textcolor{stringliteral}{"Tx"} : \textcolor{stringliteral}{"Rx"};
+00574 \textcolor{preprocessor}{#endif}
+00575 \textcolor{preprocessor}{#ifdef DRAW\_GNU\_PLOTS}
+00576     GNUPlotPipe &gp = IQImbalancePlot;
+00577     std::vector<MeasurementsVector> data;
+00578     gMeasurements.clear();
+00579     gp.writef(\textcolor{stringliteral}{"set title '%s IQ imbalance'\(\backslash\)n"}, dirName);
+00580     gp.write(\textcolor{stringliteral}{"set xlabel 'parameter value'\(\backslash\)n"});
+00581     gp.write(\textcolor{stringliteral}{"set ylabel 'RSSI dBFS'\(\backslash\)n"});
+00582     gp.write(\textcolor{stringliteral}{"set grid ytics xtics\(\backslash\)n"});
+00583     gp.write(\textcolor{stringliteral}{"plot\(\backslash\)}
+00584 \textcolor{stringliteral}{'-' w l t '#0 phase',\(\backslash\)}
+00585 \textcolor{stringliteral}{'-' w l t '#1 gain',\(\backslash\)}
+00586 \textcolor{stringliteral}{'-' w l t '#2 phase'\(\backslash\)}
+00587 \textcolor{stringliteral}{\(\backslash\)n"});
+00588 \textcolor{preprocessor}{#endif // DRAW\_GNU\_PLOTS}
+00589     uint16\_t gcorriAddress;
+00590     uint16\_t gcorrqAddress;
+00591     BinSearchParam argsPhase;
+00592     BinSearchParam argsGain;
+00593     argsGain.param.msblsb = MSB_LSB(10,0);
+00594     argsPhase.param.msblsb = MSB_LSB(11,0);
+00595     \textcolor{keywordflow}{if}(tx)
+00596     \{
+00597         gcorrqAddress = 0x0201;
+00598         gcorriAddress = 0x0202;
+00599         argsPhase.param.address = 0x0203;
+00600     \}
+00601     \textcolor{keywordflow}{else}
+00602     \{
+00603         gcorrqAddress = 0x0401;
+00604         gcorriAddress = 0x0402;
+00605         argsPhase.param.address = 0x0403;
+00606     \}
+00607 
+00608     argsPhase.maxValue = 128;
+00609     argsPhase.minValue = -128;
+00610     BinarySearch(&argsPhase);
+00611 \textcolor{preprocessor}{#if VERBOSE}
+00612     printf(\textcolor{stringliteral}{"#0 %s IQCORR: %i, %3.1f dBFS\(\backslash\)n"}, dirName, argsPhase.result, ChipRSSI\_2\_dBFS(
+      GetRSSI()));
+00613 \textcolor{preprocessor}{#endif // VERBOSE}
+00614 \textcolor{preprocessor}{#ifdef DRAW\_GNU\_PLOTS}
+00615     SortMeasurements(gMeasurements);
+00616     DrawMeasurement(gp, gMeasurements);
+00617     gMeasurements.clear();
+00618 \textcolor{preprocessor}{#endif}
+00619 
+00620     \textcolor{comment}{//coarse gain}
+00621     \{
+00622         uint16\_t rssiIgain;
+00623         uint16\_t rssiQgain;
+00624         SPI_write(gcorriAddress, 2047 - 64);
+00625         SPI_write(gcorrqAddress, 2047);
+00626         rssiIgain = GetRSSI();
+00627         SPI_write(gcorriAddress, 2047);
+00628         SPI_write(gcorrqAddress, 2047 - 64);
+00629         rssiQgain = GetRSSI();
+00630 
+00631         \textcolor{keywordflow}{if}(rssiIgain < rssiQgain)
+00632             argsGain.param.address = gcorriAddress;
+00633         \textcolor{keywordflow}{else}
+00634             argsGain.param.address = gcorrqAddress;
+00635         SPI_write(gcorrqAddress, 2047);
+00636     \}
+00637     argsGain.maxValue = 2047;
+00638     argsGain.minValue = 2047-512;
+00639     BinarySearch(&argsGain);
+00640 \textcolor{preprocessor}{#if VERBOSE}
+00641     \textcolor{keyword}{const} \textcolor{keywordtype}{char}* chName = (argsGain.param.address == gcorriAddress ? \textcolor{stringliteral}{"I"} : \textcolor{stringliteral}{"Q"});
+00642     printf(\textcolor{stringliteral}{"#1 %s GAIN\_%s: %i, %3.1f dBFS\(\backslash\)n"}, dirName, chName, argsGain.result, ChipRSSI\_2\_dBFS(
+      GetRSSI()));
+00643 \textcolor{preprocessor}{#endif // VERBOSE}
+00644 \textcolor{preprocessor}{#ifdef DRAW\_GNU\_PLOTS}
+00645     SortMeasurements(gMeasurements);
+00646     DrawMeasurement(gp, gMeasurements);
+00647     gMeasurements.clear();
+00648 \textcolor{preprocessor}{#endif}
+00649 
+00650     argsPhase.maxValue = argsPhase.result+16;
+00651     argsPhase.minValue = argsPhase.result-16;
+00652     BinarySearch(&argsPhase);
+00653 \textcolor{preprocessor}{#if VERBOSE}
+00654     printf(\textcolor{stringliteral}{"#2 %s IQCORR: %i, %3.1f dBFS\(\backslash\)n"}, dirName, argsPhase.result, ChipRSSI\_2\_dBFS(
+      GetRSSI()));
+00655 \textcolor{preprocessor}{#endif // VERBOSE}
+00656 \textcolor{preprocessor}{#ifdef DRAW\_GNU\_PLOTS}
+00657     SortMeasurements(gMeasurements);
+00658     DrawMeasurement(gp, gMeasurements);
+00659     gMeasurements.clear();
+00660 \textcolor{preprocessor}{#endif}
+00661     SPI_write(argsGain.param.address, argsGain.result);
+00662     Modify_SPI_Reg_bits(argsPhase.param.address, argsPhase.param.msblsb, argsPhase.
+      result);
+00663 \}
+00664 
+00665 uint8\_t SetupCGEN()
+00666 \{
+00667     uint8\_t cgenMultiplier;
+00668     uint8\_t gfir3n;
+00669     cgenMultiplier = clamp((GetFrequencyCGEN() / 46.08e6) + 0.5, 2, 13);
+00670     gfir3n = 4 * cgenMultiplier;
+00671     \textcolor{keywordflow}{if}(Get_SPI_Reg_bits(EN_ADCCLKH_CLKGN) == 1)
+00672         gfir3n /= pow2(Get_SPI_Reg_bits(CLKH_OV_CLKL_CGEN));
+00673 
+00674     \{ \textcolor{comment}{//gfir3n = pow2((uint8\_t)log2(gfir3n))-1}
+00675         uint8\_t power;
+00676         \textcolor{keywordflow}{for}(power = 0x3F; power; power >>= 1)
+00677         \{
+00678             \textcolor{keywordflow}{if}(gfir3n >= power)
+00679                 \textcolor{keywordflow}{break};
+00680         \}
+00681         Modify_SPI_Reg_bits(GFIR3_N_RXTSP, power);
+00682     \}
+00683     \textcolor{comment}{//CGEN VCO is powered up in SetFrequencyCGEN/Tune}
+00684     \textcolor{keywordflow}{return} SetFrequencyCGEN(46.08e6 * cgenMultiplier);
+00685 \}
+00686 
+00687 uint8\_t CalibrateTxSetup(\textcolor{keywordtype}{bool} extLoopback)
+00688 \{
+00689     uint8\_t status;
+00690     \textcolor{keyword}{const} uint16\_t x0020val = SPI_read(0x0020); \textcolor{comment}{//remember used channel}
+00691     \textcolor{comment}{/*BeginBatch("TxSetup");}
+00692 \textcolor{comment}{    //rfe}
+00693 \textcolor{comment}{    //reset RFE to defaults}
+00694 \textcolor{comment}{    SetDefaults(SECTION\_RFE);}
+00695 \textcolor{comment}{    Modify\_SPI\_Reg\_bits(G\_RXLOOPB\_RFE, 7);}
+00696 \textcolor{comment}{    Modify\_SPI\_Reg\_bits(0x010C, 4 << 4 | 3, 0); //PD\_MXLOBUF\_RFE 0, PD\_QGEN\_RFE 0}
+00697 \textcolor{comment}{    Modify\_SPI\_Reg\_bits(CCOMP\_TIA\_RFE, 4);}
+00698 \textcolor{comment}{    Modify\_SPI\_Reg\_bits(CFB\_TIA\_RFE, 50);}
+00699 \textcolor{comment}{}
+00700 \textcolor{comment}{    //RBB}
+00701 \textcolor{comment}{    //reset RBB to defaults}
+00702 \textcolor{comment}{    SetDefaults(SECTION\_RBB);}
+00703 \textcolor{comment}{    Modify\_SPI\_Reg\_bits(PD\_LPFH\_RBB, 0);}
+00704 \textcolor{comment}{    Modify\_SPI\_Reg\_bits(PD\_LPFL\_RBB, 1);}
+00705 \textcolor{comment}{    Modify\_SPI\_Reg\_bits(G\_PGA\_RBB, 0);}
+00706 \textcolor{comment}{    Modify\_SPI\_Reg\_bits(INPUT\_CTL\_PGA\_RBB, 1);}
+00707 \textcolor{comment}{    Modify\_SPI\_Reg\_bits(ICT\_PGA\_OUT\_RBB, 12);}
+00708 \textcolor{comment}{    Modify\_SPI\_Reg\_bits(ICT\_PGA\_IN\_RBB, 12);}
+00709 \textcolor{comment}{}
+00710 \textcolor{comment}{    //TXTSP}
+00711 \textcolor{comment}{    Modify\_SPI\_Reg\_bits(TSGMODE\_TXTSP, 1);}
+00712 \textcolor{comment}{    Modify\_SPI\_Reg\_bits(INSEL\_TXTSP, 1);}
+00713 \textcolor{comment}{    Modify\_SPI\_Reg\_bits(CMIX\_BYP\_TXTSP, 0);}
+00714 \textcolor{comment}{    Modify\_SPI\_Reg\_bits(DC\_BYP\_TXTSP, 0);}
+00715 \textcolor{comment}{    Modify\_SPI\_Reg\_bits(GC\_BYP\_TXTSP, 0);}
+00716 \textcolor{comment}{    Modify\_SPI\_Reg\_bits(PH\_BYP\_TXTSP, 0);}
+00717 \textcolor{comment}{    Modify\_SPI\_Reg\_bits(GCORRI\_TXTSP.address, GCORRI\_TXTSP.msblsb , 2047);}
+00718 \textcolor{comment}{    Modify\_SPI\_Reg\_bits(GCORRQ\_TXTSP.address, GCORRQ\_TXTSP.msblsb, 2047);}
+00719 \textcolor{comment}{    Modify\_SPI\_Reg\_bits(CMIX\_SC\_TXTSP, 0);}
+00720 \textcolor{comment}{    Modify\_SPI\_Reg\_bits(LMS7param(CMIX\_GAIN\_TXTSP), 0);}
+00721 \textcolor{comment}{    Modify\_SPI\_Reg\_bits(LMS7param(CMIX\_GAIN\_TXTSP\_R3), 0);}
+00722 \textcolor{comment}{}
+00723 \textcolor{comment}{    //RXTSP}
+00724 \textcolor{comment}{    SetDefaults(SECTION\_RxTSP);}
+00725 \textcolor{comment}{    SetDefaults(SECTION\_RxNCO);}
+00726 \textcolor{comment}{    Modify\_SPI\_Reg\_bits(GFIR3\_BYP\_RXTSP, 0);}
+00727 \textcolor{comment}{    Modify\_SPI\_Reg\_bits(GFIR2\_BYP\_RXTSP, 1);}
+00728 \textcolor{comment}{    Modify\_SPI\_Reg\_bits(GFIR1\_BYP\_RXTSP, 1);}
+00729 \textcolor{comment}{    Modify\_SPI\_Reg\_bits(HBD\_OVR\_RXTSP, 4); //Decimation HBD ratio}
+00730 \textcolor{comment}{    Modify\_SPI\_Reg\_bits(CMIX\_SC\_RXTSP, 1);}
+00731 \textcolor{comment}{}
+00732 \textcolor{comment}{}
+00733 \textcolor{comment}{}
+00734 \textcolor{comment}{    Modify\_SPI\_Reg\_bits(AGC\_MODE\_RXTSP, 1);}
+00735 \textcolor{comment}{    Modify\_SPI\_Reg\_bits(CMIX\_BYP\_RXTSP, 1);}
+00736 \textcolor{comment}{    Modify\_SPI\_Reg\_bits(AGC\_AVG\_RXTSP, 0x1);}
+00737 \textcolor{comment}{    Modify\_SPI\_Reg\_bits(GFIR3\_L\_RXTSP, 7);}
+00738 \textcolor{comment}{}
+00739 \textcolor{comment}{}
+00740 \textcolor{comment}{    //AFE}
+00741 \textcolor{comment}{    Modify\_SPI\_Reg\_bits(PD\_RX\_AFE1, 0);}
+00742 \textcolor{comment}{    Modify\_SPI\_Reg\_bits(PD\_RX\_AFE2, 0);}
+00743 \textcolor{comment}{}
+00744 \textcolor{comment}{    //XBUF}
+00745 \textcolor{comment}{    Modify\_SPI\_Reg\_bits(0x0085, 2 << 4 | 0, 1); //PD\_XBUF\_RX 0, PD\_XBUF\_TX 0, EN\_G\_XBUF 1}
+00746 \textcolor{comment}{}
+00747 \textcolor{comment}{    //CDS}
+00748 \textcolor{comment}{    Modify\_SPI\_Reg\_bits(CDS\_TXATSP, 3);}
+00749 \textcolor{comment}{    Modify\_SPI\_Reg\_bits(CDS\_TXBTSP, 3);}
+00750 \textcolor{comment}{}
+00751 \textcolor{comment}{    //TRF}
+00752 \textcolor{comment}{    Modify\_SPI\_Reg\_bits(L\_LOOPB\_TXPAD\_TRF, 0);}
+00753 \textcolor{comment}{    Modify\_SPI\_Reg\_bits(EN\_LOOPB\_TXPAD\_TRF, 1);}
+00754 \textcolor{comment}{}
+00755 \textcolor{comment}{    //BIAS}
+00756 \textcolor{comment}{    \{}
+00757 \textcolor{comment}{        uint16\_t backup = Get\_SPI\_Reg\_bits(RP\_CALIB\_BIAS);}
+00758 \textcolor{comment}{        SetDefaults(SECTION\_BIAS);}
+00759 \textcolor{comment}{        Modify\_SPI\_Reg\_bits(RP\_CALIB\_BIAS, backup);}
+00760 \textcolor{comment}{    \}}
+00761 \textcolor{comment}{}
+00762 \textcolor{comment}{    EndBatch();*/}
+00763     \textcolor{keywordflow}{if}((x0020val & 0x3) == 1)
+00764         Modify_SPI_Reg_bits(PD_RX_AFE1, 0);
+00765     \textcolor{keywordflow}{else}
+00766         Modify_SPI_Reg_bits(PD_RX_AFE2, 0);
+00767     \{
+00768         ROM \textcolor{keyword}{const} uint16\_t TxSetupAddr[] = \{0x0084, 0x0085,0x00AE,0x0101,0x0113,0x0200,0x0201,0x0202,0x0208
+      \};
+00769         ROM \textcolor{keyword}{const} uint16\_t TxSetupData[] = \{0x0400, 0x0001,0xF000,0x0001,0x001C,0x000C,0x07FF,0x07FF,0x0000
+      \};
+00770         ROM \textcolor{keyword}{const} uint16\_t TxSetupMask[] = \{0xF8FF, 0x0007,0xF000,0x1801,0x003C,0x000C,0x07FF,0x07FF,0xF10B
+      \};
+00771         ROM \textcolor{keyword}{const} uint16\_t TxSetupWrOnlyAddr[] = \{0x010C,0x0112,0x0115,0x0116,0x0117,0x0118,0x0119,0x011A,
+      0x0400,0x0401,0x0402,0x0403,0x0404,0x0405,0x0406,0x0407,0x0408,0x0409,0x040A,0x040C,0x0440,0x0442,0x0443, 
+      0x0081\};
+00772         ROM \textcolor{keyword}{const} uint16\_t TxSetupWrOnlyData[] = \{0x88E5,0x4032,0x0005,0x8180,0x280C,0x218C,0x3180,0x2E02,
+      0x0081,0x07FF,0x07FF,0x4000,0x0000,0x0000,0x0000,0x0700,0x0000,0x0000,0x1001,0x2098,0x0020,0x0000,0x0000\};
+00773         ROM \textcolor{keyword}{const} RegisterBatch batch = \{
+00774             TxSetupAddr, TxSetupData, TxSetupMask, \textcolor{keyword}{sizeof}(TxSetupAddr)/\textcolor{keyword}{sizeof}(uint16\_t),
+00775             TxSetupWrOnlyAddr, TxSetupWrOnlyData, \textcolor{keyword}{sizeof}(TxSetupWrOnlyAddr)/\textcolor{keyword}{sizeof}(uint16\_t), \textcolor{keyword}{sizeof}(
+      TxSetupWrOnlyData)/\textcolor{keyword}{sizeof}(uint16\_t)\};
+00776         WriteMaskedRegs(&batch);
+00777     \}
+00778     SetRxGFIR3Coefficients();
+00779     status = SetupCGEN();
+00780     \textcolor{keywordflow}{if}(status != MCU_NO_ERROR)
+00781         \textcolor{keywordflow}{return} status;
+00782     \textcolor{comment}{//SXR}
+00783     Modify_SPI_Reg_bits(MAC, 1); \textcolor{comment}{//switch to ch. A}
+00784     SetDefaultsSX();
+00785     \{
+00786         \textcolor{keyword}{const} float_type SXRfreq = GetFrequencySX(LMS7002M_Tx) - bandwidthRF/ 
+      calibUserBwDivider - calibrationSXOffset_Hz;
+00787         \textcolor{comment}{//SX VCO is powered up in SetFrequencySX/Tune}
+00788         status = SetFrequencySX(LMS7002M_Rx, SXRfreq);
+00789         \textcolor{keywordflow}{if}(status != MCU_NO_ERROR)
+00790         \{
+00791             SPI_write(0x0020, x0020val); \textcolor{comment}{//restore used channel}
+00792             \textcolor{keywordflow}{return} status;
+00793         \}
+00794     \}
+00795 
+00796     \textcolor{comment}{//if calibrating ch. B enable buffers}
+00797     EnableMIMOBuffersIfNecessary();
+00798 
+00799     \textcolor{comment}{//SXT\{}
+00800     Modify_SPI_Reg_bits(MAC, 2); \textcolor{comment}{//switch to ch. B}
+00801     Modify_SPI_Reg_bits(PD_LOCH_T2RBUF, 1);
+00802     \textcolor{comment}{//check if Tx is tuned}
+00803     \textcolor{keywordflow}{if}( !IsPLLTuned() )
+00804     \{
+00805         SPI_write(0x0020, x0020val); \textcolor{comment}{//restore used channel}
+00806         \textcolor{keywordflow}{return} MCU_SXT_TUNE_FAILED;
+00807     \}
+00808 
+00809     SPI_write(0x0020, x0020val); \textcolor{comment}{//restore used channel}
+00810 
+00811     LoadDC_REG_TX_IQ();
+00812     SetNCOFrequency(LMS7002M_Tx, bandwidthRF/ calibUserBwDivider, 0);
+00813     \{
+00814         \textcolor{keyword}{const} uint8\_t sel\_band1\_2\_trf = (uint8\_t)Get_SPI_Reg_bits(0x0103, 
+      MSB_LSB(11, 10));
+00815 \textcolor{preprocessor}{#if ENABLE\_EXTERNAL\_LOOPBACK}
+00816         \textcolor{keywordflow}{if}(extLoopback)
+00817         \{
+00818             uint8\_t lnaPath;
+00819             Modify_SPI_Reg_bits(PD_LNA_RFE, 0);
+00820             \textcolor{keywordflow}{if}(sel\_band1\_2\_trf == 1 || sel\_band1\_2\_trf == 2)
+00821             \{
+00822                 \textcolor{comment}{//activate selected lna path for external loopback}
+00823                 lnaPath = extLoopbackPair & 0x3;
+00824                 Modify_SPI_Reg_bits(SEL_PATH_RFE, lnaPath);
+00825                 Modify_SPI_Reg_bits(0x010D, MSB_LSB(2, 1), ~(lnaPath-1)); \textcolor{comment}{//EN\_INSHSW\_*\_RFE}
+00826 
+00827                 \textcolor{comment}{//check if correct tx band for external loop}
+00828                 \textcolor{keywordflow}{if}(extLoopbackPair >> 2 != !(sel\_band1\_2\_trf-1))
+00829                     \textcolor{keywordflow}{return} MCU_INVALID_TX_BAND;
+00830             \}
+00831             \textcolor{keywordflow}{else}
+00832             \{
+00833 \textcolor{preprocessor}{#if VERBOSE}
+00834                 printf(\textcolor{stringliteral}{"Tx Calibration: external calibration is not supported on selected Tx Band"});
+00835 \textcolor{preprocessor}{#endif}
+00836                 \textcolor{keywordflow}{return} MCU_INVALID_TX_BAND;
+00837             \}
+00838         \}
+00839         \textcolor{keywordflow}{else}
+00840 \textcolor{preprocessor}{#endif}
+00841         \{
+00842             \textcolor{keywordflow}{if}(sel\_band1\_2\_trf != 0x1 && sel\_band1\_2\_trf != 0x2) \textcolor{comment}{//BAND1}
+00843             \{
+00844                 \textcolor{comment}{//printf("Tx Calibration: band not selected");}
+00845                 \textcolor{keywordflow}{return} MCU_INVALID_TX_BAND;
+00846             \}
+00847             Modify_SPI_Reg_bits(SEL_PATH_RFE, sel\_band1\_2\_trf+1);
+00848             \textcolor{comment}{//Modify\_SPI\_Reg\_bits(PD\_RLOOPB\_1\_RFE, 0);}
+00849             \textcolor{comment}{//Modify\_SPI\_Reg\_bits(PD\_RLOOPB\_2\_RFE, 1);}
+00850             Modify_SPI_Reg_bits(0x010C, MSB_LSB(6, 5), sel\_band1\_2\_trf ^ 0x3);
+00851             \textcolor{comment}{//Modify\_SPI\_Reg\_bits(EN\_INSHSW\_LB1\_RFE, 0);}
+00852             \textcolor{comment}{//Modify\_SPI\_Reg\_bits(EN\_INSHSW\_LB2\_RFE, 1);}
+00853             Modify_SPI_Reg_bits(0x010D, MSB_LSB(4, 3), sel\_band1\_2\_trf ^ 0x3);
+00854         \}
+00855     \}
+00856     EnableChannelPowerControls();
+00857     \textcolor{keywordflow}{return} MCU_NO_ERROR;
+00858 \}
+00859 
+00860 uint8\_t CalibrateTx(\textcolor{keywordtype}{bool} extLoopback)
+00861 \{
+00862     \textcolor{keyword}{const} uint16\_t x0020val = SPI_read(0x0020);
+00863 \textcolor{preprocessor}{#ifdef \_\_cplusplus}
+00864     \textcolor{keyword}{auto} beginTime = std::chrono::high\_resolution\_clock::now();
+00865 \textcolor{preprocessor}{#endif}
+00866 \textcolor{preprocessor}{#if VERBOSE}
+00867 
+00868     uint8\_t sel\_band1\_trf = (uint8\_t)Get_SPI_Reg_bits(SEL_BAND1_TRF);
+00869     printf(\textcolor{stringliteral}{"Tx ch.%s , BW: %g MHz, RF output: %s, Gain: %i, loopb: %s\(\backslash\)n"},
+00870            (x0020val & 3) == 0x1 ? \textcolor{stringliteral}{"A"} : \textcolor{stringliteral}{"B"},
+00871            bandwidthRF/1e6,
+00872            sel\_band1\_trf==1 ? \textcolor{stringliteral}{"BAND1"} : \textcolor{stringliteral}{"BAND2"},
+00873            Get_SPI_Reg_bits(CG_IAMP_TBB),
+00874            extLoopback ? \textcolor{stringliteral}{"external"} : \textcolor{stringliteral}{"internal"});
+00875 \textcolor{preprocessor}{#endif}
+00876     uint8\_t status;
+00877 \textcolor{preprocessor}{#if !ENABLE\_EXTERNAL\_LOOPBACK}
+00878     \textcolor{keywordflow}{if}(extLoopback)
+00879         \textcolor{keywordflow}{return} MCU_PROCEDURE_DISABLED;
+00880 \textcolor{preprocessor}{#endif}
+00881     SaveChipState(0);
+00882     status = CalibrateTxSetup(extLoopback);
+00883     \textcolor{keywordflow}{if}(status != MCU_NO_ERROR)
+00884         \textcolor{keywordflow}{goto} TxCalibrationEnd; \textcolor{comment}{//go to ending stage to restore registers}
+00885     UpdateRSSIDelay();
+00886     CalibrateRxDCAuto();
+00887     status = CheckSaturationTxRx(extLoopback);
+00888     \textcolor{keywordflow}{if}(status != MCU_NO_ERROR)
+00889         \textcolor{keywordflow}{goto} TxCalibrationEnd;
+00890     CalibrateRxDCAuto();
+00891 
+00892     SetNCOFrequency(LMS7002M_Rx, calibrationSXOffset_Hz - offsetNCO + (
+      bandwidthRF/ calibUserBwDivider), 0);
+00893     CalibrateTxDCAuto();
+00894     SetNCOFrequency(LMS7002M_Rx, calibrationSXOffset_Hz - offsetNCO, 0);
+00895     CalibrateIQImbalance(LMS7002M_Tx);
+00896 TxCalibrationEnd:
+00897     \{
+00898         \textcolor{comment}{//analog dc is not overwritten by chip state restore}
+00899         uint16\_t gcorri = Get_SPI_Reg_bits(GCORRI_TXTSP);
+00900         uint16\_t gcorrq = Get_SPI_Reg_bits(GCORRQ_TXTSP);
+00901         uint16\_t phaseOffset = Get_SPI_Reg_bits(IQCORR_TXTSP);
+00902         SaveChipState(1);
+00903         SPI_write(0x0020, x0020val);
+00904         \textcolor{keywordflow}{if}(status != MCU_NO_ERROR)
+00905         \{
+00906 \textcolor{preprocessor}{#if VERBOSE}
+00907             printf(\textcolor{stringliteral}{"Tx calibration failed"});
+00908 \textcolor{preprocessor}{#endif}
+00909             \textcolor{keywordflow}{return} status;
+00910         \}
+00911         Modify_SPI_Reg_bits(GCORRI_TXTSP, gcorri);
+00912         Modify_SPI_Reg_bits(GCORRQ_TXTSP, gcorrq);
+00913         Modify_SPI_Reg_bits(IQCORR_TXTSP, phaseOffset);
+00914 \textcolor{preprocessor}{#if VERBOSE}
+00915         int16\_t dcI = ReadAnalogDC((x0020val & 1) ? 0x5C3 : 0x5C5);
+00916         int16\_t dcQ = ReadAnalogDC((x0020val & 1) ? 0x5C4 : 0x5C6);
+00917         printf(\textcolor{stringliteral}{"Tx | DC   | GAIN | PHASE\(\backslash\)n"});
+00918         printf(\textcolor{stringliteral}{"---+------+------+------\(\backslash\)n"});
+00919         printf(\textcolor{stringliteral}{"I: | %4i | %4i | %i\(\backslash\)n"}, dcI, gcorri, toSigned(phaseOffset, 
+      MSB_LSB(11, 0)));
+00920         printf(\textcolor{stringliteral}{"Q: | %4i | %4i |\(\backslash\)n"}, dcQ, gcorrq);
+00921 \textcolor{preprocessor}{#endif}
+00922     \}
+00923 
+00924     Modify_SPI_Reg_bits(DCMODE, 1);
+00925     \textcolor{keywordflow}{if}((x0020val & 1) == 1)
+00926         Modify_SPI_Reg_bits(PD_DCDAC_TXA, 0);
+00927     \textcolor{keywordflow}{else}
+00928         Modify_SPI_Reg_bits(PD_DCDAC_TXB, 0);
+00929     Modify_SPI_Reg_bits(DC_BYP_TXTSP, 1);
+00930     Modify_SPI_Reg_bits(0x0208, 1<<4 | 0, 0); \textcolor{comment}{//GC\_BYP PH\_BYP}
+00931     \textcolor{comment}{//LoadDC\_REG\_TX\_IQ(); //not necessary, just for testing convenience}
+00932 \textcolor{preprocessor}{#if VERBOSE}
+00933     int32\_t duration = std::chrono::duration\_cast<std::chrono::milliseconds>
+00934                        (std::chrono::high\_resolution\_clock::now()-beginTime).
+      count();
+00935     printf(\textcolor{stringliteral}{"Duration: %i ms\(\backslash\)n"}, duration);
+00936 \textcolor{preprocessor}{#endif //LMS\_VERBOSE\_OUTPUT}
+00937     \textcolor{keywordflow}{return} 0;
+00938 \}
+00939 
+00940 uint8\_t CalibrateRxSetup(\textcolor{keywordtype}{bool} extLoopback)
+00941 \{
+00942     uint8\_t status;
+00943     \textcolor{keyword}{const} uint16\_t x0020val = SPI_read(0x0020);
+00944     \textcolor{comment}{//rfe}
+00945     \{
+00946         ROM \textcolor{keyword}{const} uint16\_t RxSetupAddr[] = \{0x0084, 0x0085,0x00AE,0x010C,0x010D,0x0113,0x0115,0x0119\};
+00947         ROM \textcolor{keyword}{const} uint16\_t RxSetupData[] = \{0x0400, 0x0001,0xF000,0x0000,0x0040,0x000C,0x0000,0x0000\};
+00948         ROM \textcolor{keyword}{const} uint16\_t RxSetupMask[] = \{0xF8FF, 0x0007,0xF000,0x001A,0x0040,0x003C,0xC000,0x8000\};
+00949         ROM \textcolor{keyword}{const} uint16\_t RxSetupWrOnlyAddr[] = \{0x0100,0x0101,0x0102,0x0103,0x0104,0x0105,0x0106,0x0107,
+      0x0108,0x0109,0x010A,0x0200,0x0201,0x0202,0x0208,0x0240,0x0400,0x0401,0x0402,0x0403,0x0407,0x040A,0x040C,
+      0x0440,0x05C0,0x05CB,0x0203,0x0204,0x0205,0x0206,0x0207,0x0241,0x0404,0x0405,0x0406,0x0408,0x0409,0x0441,0x05C1,
+      0x05C2,0x05C3,0x05C4,0x05C5,0x05C6,0x05C7,0x05C8,0x05C9,0x05CA,0x05CC, 0x0081\};
+00950         ROM \textcolor{keyword}{const} uint16\_t RxSetupWrOnlyData[] = \{0x3408,0x6001,0x3180,0x0A12,0x0088,0x0007,0x318C,0x318C,
+      0x0426,0x61C1,0x104C,0x008D,0x07FF,0x07FF,0x2070,0x0020,0x0081,0x07FF,0x07FF,0x4000,0x0700,0x1000,0x2098,
+      0x0020,0x00FF,0x2020\};
+00951         ROM \textcolor{keyword}{const} RegisterBatch batch = \{
+00952             RxSetupAddr, RxSetupData, RxSetupMask, \textcolor{keyword}{sizeof}(RxSetupAddr)/\textcolor{keyword}{sizeof}(uint16\_t),
+00953             RxSetupWrOnlyAddr, RxSetupWrOnlyData, \textcolor{keyword}{sizeof}(RxSetupWrOnlyAddr)/\textcolor{keyword}{sizeof}(uint16\_t), \textcolor{keyword}{sizeof}(
+      RxSetupWrOnlyData)/\textcolor{keyword}{sizeof}(uint16\_t)\};
+00954         WriteMaskedRegs(&batch);
+00955     \}
+00956     \textcolor{comment}{/*}
+00957 \textcolor{comment}{    BeginBatch("RxSetup.txt");}
+00958 \textcolor{comment}{    Modify\_SPI\_Reg\_bits(EN\_DCOFF\_RXFE\_RFE, 1);}
+00959 \textcolor{comment}{    Modify\_SPI\_Reg\_bits(G\_RXLOOPB\_RFE, 3);}
+00960 \textcolor{comment}{    Modify\_SPI\_Reg\_bits(0x010C, 4 << 4 | 3, 0); //PD\_MXLOBUF\_RFE 0, PD\_QGEN\_RFE 0}
+00961 \textcolor{comment}{    Modify\_SPI\_Reg\_bits(0x010C, 1 << 4 | 1, 0); //PD\_TIA 0}
+00962 \textcolor{comment}{    if(extLoopback)}
+00963 \textcolor{comment}{        Modify\_SPI\_Reg\_bits(0x010C, 7 << 4 | 7, 0); //PD\_LNA 0}
+00964 \textcolor{comment}{}
+00965 \textcolor{comment}{    //RBB}
+00966 \textcolor{comment}{    Modify\_SPI\_Reg\_bits(0x0115, MSBLSB(15, 14), 0); //Loopback switches disable}
+00967 \textcolor{comment}{    Modify\_SPI\_Reg\_bits(0x0119, MSBLSB(15, 15), 0); //OSW\_PGA 0}
+00968 \textcolor{comment}{}
+00969 \textcolor{comment}{    //TRF}
+00970 \textcolor{comment}{    //reset TRF to defaults}
+00971 \textcolor{comment}{    SetDefaults(SECTION\_TRF);}
+00972 \textcolor{comment}{    Modify\_SPI\_Reg\_bits(L\_LOOPB\_TXPAD\_TRF, 0);}
+00973 \textcolor{comment}{    Modify\_SPI\_Reg\_bits(EN\_LOOPB\_TXPAD\_TRF, 1);}
+00974 \textcolor{comment}{    Modify\_SPI\_Reg\_bits(EN\_G\_TRF, 0);}
+00975 \textcolor{comment}{    if(extLoopback)}
+00976 \textcolor{comment}{    \{}
+00977 \textcolor{comment}{        if(Get\_SPI\_Reg\_bits(SEL\_PATH\_RFE) == 1)}
+00978 \textcolor{comment}{        \{}
+00979 \textcolor{comment}{            Modify\_SPI\_Reg\_bits(SEL\_BAND1\_TRF, 0);}
+00980 \textcolor{comment}{            Modify\_SPI\_Reg\_bits(SEL\_BAND2\_TRF, 1);}
+00981 \textcolor{comment}{        \}}
+00982 \textcolor{comment}{        Modify\_SPI\_Reg\_bits(LOSS\_MAIN\_TXPAD\_TRF, 15);}
+00983 \textcolor{comment}{    \}}
+00984 \textcolor{comment}{}
+00985 \textcolor{comment}{    //TBB}
+00986 \textcolor{comment}{    //reset TBB to defaults}
+00987 \textcolor{comment}{    SetDefaults(SECTION\_TBB);}
+00988 \textcolor{comment}{    Modify\_SPI\_Reg\_bits(CG\_IAMP\_TBB, 1);}
+00989 \textcolor{comment}{    Modify\_SPI\_Reg\_bits(ICT\_IAMP\_FRP\_TBB, 1);}
+00990 \textcolor{comment}{    Modify\_SPI\_Reg\_bits(ICT\_IAMP\_GG\_FRP\_TBB, 6);}
+00991 \textcolor{comment}{}
+00992 \textcolor{comment}{    //XBUF}
+00993 \textcolor{comment}{    Modify\_SPI\_Reg\_bits(0x0085, MSBLSB(2, 0), 1); //PD\_XBUF\_RX 0, PD\_XBUF\_TX 0, EN\_G\_XBUF 1}
+00994 \textcolor{comment}{}
+00995 \textcolor{comment}{    //TXTSP}
+00996 \textcolor{comment}{    SetDefaults(SECTION\_TxTSP);}
+00997 \textcolor{comment}{    SetDefaults(SECTION\_TxNCO);}
+00998 \textcolor{comment}{    Modify\_SPI\_Reg\_bits(TSGFCW\_TXTSP, 1);}
+00999 \textcolor{comment}{    Modify\_SPI\_Reg\_bits(TSGMODE\_TXTSP, 0x1);}
+01000 \textcolor{comment}{    Modify\_SPI\_Reg\_bits(INSEL\_TXTSP, 1);}
+01001 \textcolor{comment}{    Modify\_SPI\_Reg\_bits(0x0208, MSBLSB(6, 4), 0x7); //GFIR3\_BYP 1, GFIR2\_BYP 1, GFIR1\_BYP 1}
+01002 \textcolor{comment}{    Modify\_SPI\_Reg\_bits(CMIX\_GAIN\_TXTSP, 0);}
+01003 \textcolor{comment}{    Modify\_SPI\_Reg\_bits(CMIX\_SC\_TXTSP, 1);}
+01004 \textcolor{comment}{    Modify\_SPI\_Reg\_bits(CMIX\_BYP\_TXTSP, 0);}
+01005 \textcolor{comment}{}
+01006 \textcolor{comment}{    //RXTSP}
+01007 \textcolor{comment}{    SetDefaults(SECTION\_RxTSP);}
+01008 \textcolor{comment}{    SetDefaults(SECTION\_RxNCO);}
+01009 \textcolor{comment}{    Modify\_SPI\_Reg\_bits(0x040C, MSBLSB(5, 3), 0x3); //GFIR2\_BYP, GFIR1\_BYP}
+01010 \textcolor{comment}{    Modify\_SPI\_Reg\_bits(HBD\_OVR\_RXTSP, 4);}
+01011 \textcolor{comment}{}
+01012 \textcolor{comment}{    Modify\_SPI\_Reg\_bits(AGC\_MODE\_RXTSP, 1);}
+01013 \textcolor{comment}{    Modify\_SPI\_Reg\_bits(CMIX\_BYP\_RXTSP, 1);}
+01014 \textcolor{comment}{    Modify\_SPI\_Reg\_bits(CAPSEL, 0);}
+01015 \textcolor{comment}{    Modify\_SPI\_Reg\_bits(AGC\_AVG\_RXTSP, 0);}
+01016 \textcolor{comment}{    Modify\_SPI\_Reg\_bits(CMIX\_GAIN\_RXTSP, 0);}
+01017 \textcolor{comment}{    Modify\_SPI\_Reg\_bits(GFIR3\_L\_RXTSP, 7);}
+01018 \textcolor{comment}{    Modify\_SPI\_Reg\_bits(CMIX\_SC\_RXTSP, 1);}
+01019 \textcolor{comment}{}
+01020 \textcolor{comment}{    //CDS}
+01021 \textcolor{comment}{    Modify\_SPI\_Reg\_bits(CDS\_TXATSP, 3);}
+01022 \textcolor{comment}{    Modify\_SPI\_Reg\_bits(CDS\_TXBTSP, 3);}
+01023 \textcolor{comment}{}
+01024 \textcolor{comment}{    //RSSI\_DC\_CALIBRATION}
+01025 \textcolor{comment}{    SetDefaults(SECTION\_RSSI\_DC\_CALIBRATION);}
+01026 \textcolor{comment}{    EndBatch();}
+01027 \textcolor{comment}{    //BIAS}
+01028 \textcolor{comment}{    \{}
+01029 \textcolor{comment}{        uint16\_t rp\_calib\_bias = Get\_SPI\_Reg\_bits(0x0084, MSBLSB(10, 6));}
+01030 \textcolor{comment}{        SetDefaults(SECTION\_BIAS);}
+01031 \textcolor{comment}{        Modify\_SPI\_Reg\_bits(0x0084, MSBLSB(10, 6), rp\_calib\_bias);}
+01032 \textcolor{comment}{    \}*/}
+01033 
+01034     \textcolor{comment}{/*if(!extLoopback)}
+01035 \textcolor{comment}{    \{}
+01036 \textcolor{comment}{        Modify\_SPI\_Reg\_bits(ICT\_IAMP\_FRP\_TBB, 1);}
+01037 \textcolor{comment}{        Modify\_SPI\_Reg\_bits(ICT\_IAMP\_GG\_FRP\_TBB, 6);}
+01038 \textcolor{comment}{    \}*/}
+01039 
+01040     \textcolor{comment}{//AFE}
+01041     \textcolor{keywordflow}{if}((x0020val & 0x3) == 1)
+01042         Modify_SPI_Reg_bits(PD_TX_AFE1, 0);
+01043     \textcolor{keywordflow}{else}
+01044         Modify_SPI_Reg_bits(PD_TX_AFE2, 0);
+01045 
+01046 \textcolor{preprocessor}{#if ENABLE\_EXTERNAL\_LOOPBACK}
+01047     \textcolor{keywordflow}{if}(extLoopback) \textcolor{comment}{// external looback}
+01048     \{
+01049         \textcolor{keyword}{const} uint8\_t band1\_band2 = 2-((extLoopbackPair >> 2) & 1);
+01050         Modify_SPI_Reg_bits(0x0103, MSB_LSB(11, 10), band1\_band2);
+01051         \textcolor{keywordflow}{if}(Get_SPI_Reg_bits(SEL_PATH_RFE) != (extLoopbackPair&0x3))
+01052             \textcolor{keywordflow}{return} MCU_INVALID_RX_PATH;
+01053     \}
+01054     \textcolor{keywordflow}{else} \textcolor{comment}{//chip internal loopbacks}
+01055 \textcolor{preprocessor}{#endif}
+01056     \{
+01057         \textcolor{keywordflow}{switch}(Get_SPI_Reg_bits(SEL_PATH_RFE))
+01058         \{
+01059         \textcolor{keywordflow}{case} 2: \textcolor{comment}{//LNA\_L}
+01060             \textcolor{comment}{//Modify\_SPI\_Reg\_bits(SEL\_BAND2\_TRF, 1);}
+01061             \textcolor{comment}{//Modify\_SPI\_Reg\_bits(SEL\_BAND1\_TRF, 0);}
+01062             Modify_SPI_Reg_bits(0x0103, MSB_LSB(11, 10), 1);
+01063             \textcolor{keywordflow}{break};
+01064         \textcolor{keywordflow}{case} 3: \textcolor{comment}{//LNA\_W}
+01065         \textcolor{keywordflow}{case} 1: \textcolor{comment}{//LNA\_H}
+01066             \textcolor{comment}{//Modify\_SPI\_Reg\_bits(SEL\_BAND2\_TRF, 0);}
+01067             \textcolor{comment}{//Modify\_SPI\_Reg\_bits(SEL\_BAND1\_TRF, 1);}
+01068             Modify_SPI_Reg_bits(0x0103, MSB_LSB(11, 10), 2);
+01069             \textcolor{keywordflow}{break};
+01070         \textcolor{keywordflow}{default}:
+01071             \textcolor{keywordflow}{return} MCU_INVALID_RX_PATH;
+01072         \}
+01073     \}
+01074 
+01075     Modify_SPI_Reg_bits(MAC, 2); \textcolor{comment}{//Get freq already changes/restores ch}
+01076 
+01077     \textcolor{keywordflow}{if}(Get_SPI_Reg_bits(PD_LOCH_T2RBUF) == 0) \textcolor{comment}{//isTDD}
+01078     \{
+01079         \textcolor{comment}{//in TDD do nothing}
+01080         Modify_SPI_Reg_bits(MAC, 1);
+01081         SetDefaultsSX();
+01082         status = SetFrequencySX(LMS7002M_Rx, GetFrequencySX(LMS7002M_Tx) - 
+      bandwidthRF/ calibUserBwDivider - 9e6);
+01083     \}
+01084     \textcolor{keywordflow}{else}
+01085     \{
+01086         \textcolor{comment}{//SXR}
+01087         float_type SXRfreqHz;
+01088         Modify_SPI_Reg_bits(MAC, 1);
+01089         \textcolor{comment}{//check if Rx is tuned}
+01090         \textcolor{keywordflow}{if}(!IsPLLTuned())
+01091             \textcolor{keywordflow}{return} MCU_SXR_TUNE_FAILED;
+01092         SXRfreqHz = GetFrequencySX(LMS7002M_Rx);
+01093 
+01094         \textcolor{comment}{//SXT}
+01095         Modify_SPI_Reg_bits(MAC, 2);
+01096         SetDefaultsSX();
+01097         status = SetFrequencySX(LMS7002M_Tx, SXRfreqHz + bandwidthRF/ 
+      calibUserBwDivider + 9e6);
+01098     \}
+01099     SPI_write(0x0020, x0020val);
+01100     \textcolor{keywordflow}{if}(status != MCU_NO_ERROR)
+01101         \textcolor{keywordflow}{return} status;
+01102 
+01103     LoadDC_REG_TX_IQ();
+01104 
+01105     \textcolor{comment}{//CGEN}
+01106     status = SetupCGEN();
+01107     \textcolor{keywordflow}{if}(status != MCU_NO_ERROR)
+01108         \textcolor{keywordflow}{return} status;
+01109     SetRxGFIR3Coefficients();
+01110     SetNCOFrequency(LMS7002M_Tx, 9e6, 0);
+01111     SetNCOFrequency(LMS7002M_Rx, bandwidthRF/calibUserBwDivider - offsetNCO, 0);
+01112     \textcolor{comment}{//modifications when calibrating channel B}
+01113     EnableMIMOBuffersIfNecessary();
+01114     EnableChannelPowerControls();
+01115     \textcolor{keywordflow}{return} MCU_NO_ERROR;
+01116 \}
+01117 
+01118 uint8\_t CheckSaturationRx(\textcolor{keyword}{const} float_type bandwidth\_Hz, \textcolor{keywordtype}{bool} extLoopback)
+01119 \{
+01120     ROM \textcolor{keyword}{const} uint16\_t target\_rssi = 0x07000; \textcolor{comment}{//0x0B000 = -3 dBFS}
+01121     uint16\_t rssi;
+01122     uint8\_t cg\_iamp = (uint8\_t)Get_SPI_Reg_bits(CG_IAMP_TBB);
+01123 \textcolor{preprocessor}{#ifdef DRAW\_GNU\_PLOTS}
+01124     \textcolor{keywordtype}{int} index = 0;
+01125     GNUPlotPipe &gp = saturationPlot;
+01126     gp.write(\textcolor{stringliteral}{"set yrange [:0]\(\backslash\)n"});
+01127     gp.write(\textcolor{stringliteral}{"set ylabel 'RSSI dbFS'\(\backslash\)n"});
+01128     gp.write(\textcolor{stringliteral}{"set ylabel 'measurement index'\(\backslash\)n"});
+01129     gp.write(\textcolor{stringliteral}{"set title 'Rx saturation check'\(\backslash\)n"});
+01130     gp.write(\textcolor{stringliteral}{"set key right bottom\(\backslash\)n"});
+01131     gp.write(\textcolor{stringliteral}{"set grid ytics xtics\(\backslash\)n"});
+01132     gp.write(\textcolor{stringliteral}{"plot "});
+01133     gp.writef(
+01134         \textcolor{stringliteral}{"'-' title '%s' with lines\(\backslash\)}
+01135 \textcolor{stringliteral}{, '-' title 'CG IAMP' with lines\(\backslash\)}
+01136 \textcolor{stringliteral}{, '-' title 'target Level' with lines\(\backslash\)n"}, extLoopback?\textcolor{stringliteral}{"LOSS MAIN TXPAD"}:\textcolor{stringliteral}{"G RXLOOPB RFE"});
+01137 \textcolor{preprocessor}{#endif}
+01138     Modify_SPI_Reg_bits(CMIX_SC_RXTSP, 1);
+01139     Modify_SPI_Reg_bits(CMIX_BYP_RXTSP, 0);
+01140     SetNCOFrequency(LMS7002M_Rx, bandwidth\_Hz / calibUserBwDivider - offsetNCO, 0);
+01141 
+01142 \textcolor{preprocessor}{#if ENABLE\_EXTERNAL\_LOOPBACK}
+01143     \textcolor{keywordflow}{if}(extLoopback)
+01144     \{
+01145         int8\_t g\_lossmain = 15;
+01146         Modify_SPI_Reg_bits(LOSS_MAIN_TXPAD_TRF, g\_lossmain);
+01147         rssi = GetRSSI();
+01148         PUSH_GMEASUREMENT_VALUES(++index, ChipRSSI\_2\_dBFS(rssi));
+01149 \textcolor{preprocessor}{#if VERBOSE}
+01150         printf(\textcolor{stringliteral}{"Initial gains:\(\backslash\)tLOSS\_MAIN\_TXPAD: %2i, CG\_IAMP: %2i | %2.3f dbFS\(\backslash\)n"}, g\_lossmain, cg\_iamp, 
+      ChipRSSI\_2\_dBFS(rssi));
+01151 \textcolor{preprocessor}{#endif}
+01152         \textcolor{keywordflow}{while} (rssi < target\_rssi)
+01153         \{
+01154             g\_lossmain -= 1;
+01155             \textcolor{keywordflow}{if}(g\_lossmain < 0)
+01156                 \textcolor{keywordflow}{break};
+01157             Modify_SPI_Reg_bits(LOSS_MAIN_TXPAD_TRF, g\_lossmain);
+01158             rssi = GetRSSI();
+01159             PUSH_GMEASUREMENT_VALUES(++index, ChipRSSI\_2\_dBFS(rssi));
+01160         \}
+01161     \}
+01162     \textcolor{keywordflow}{else}
+01163 \textcolor{preprocessor}{#endif}
+01164     \{
+01165         uint8\_t g\_rxloopb\_rfe = 2;
+01166         Modify_SPI_Reg_bits(G_RXLOOPB_RFE, g\_rxloopb\_rfe);
+01167         rssi = GetRSSI();
+01168         PUSH_GMEASUREMENT_VALUES(++index, ChipRSSI\_2\_dBFS(rssi));
+01169 \textcolor{preprocessor}{#if VERBOSE}
+01170         printf(\textcolor{stringliteral}{"Initial gains:\(\backslash\)tG\_RXLOOPB: %2i, CG\_IAMP: %2i | %2.3f dbFS\(\backslash\)n"}, g\_rxloopb\_rfe, cg\_iamp, 
+      ChipRSSI\_2\_dBFS(rssi));
+01171 \textcolor{preprocessor}{#endif}
+01172         \textcolor{keywordflow}{while} (rssi < target\_rssi)
+01173         \{
+01174             g\_rxloopb\_rfe += 2;
+01175             \textcolor{keywordflow}{if}(g\_rxloopb\_rfe > 15)
+01176                 \textcolor{keywordflow}{break};
+01177             Modify_SPI_Reg_bits(G_RXLOOPB_RFE, g\_rxloopb\_rfe);
+01178             rssi = GetRSSI();
+01179             PUSH_GMEASUREMENT_VALUES(++index, ChipRSSI\_2\_dBFS(rssi));
+01180         \}
+01181     \}
+01182 \textcolor{preprocessor}{#ifdef DRAW\_GNU\_PLOTS}
+01183     DrawMeasurement(gp, gMeasurements);
+01184     gMeasurements.clear();
+01185 \textcolor{preprocessor}{#endif // DRAW\_GNU\_PLOTS}
+01186 
+01187     PUSH_GMEASUREMENT_VALUES(index, ChipRSSI\_2\_dBFS(rssi));
+01188     \textcolor{keywordflow}{while}(rssi < 0x01000)
+01189     \{
+01190         cg\_iamp += 2;
+01191         \textcolor{keywordflow}{if}(cg\_iamp > 63-6)
+01192             \textcolor{keywordflow}{break};
+01193         Modify_SPI_Reg_bits(CG_IAMP_TBB, cg\_iamp);
+01194         rssi = GetRSSI();
+01195         PUSH_GMEASUREMENT_VALUES(++index, ChipRSSI\_2\_dBFS(rssi));
+01196     \}
+01197 
+01198     \textcolor{keywordflow}{while}(rssi < target\_rssi)
+01199     \{
+01200         cg\_iamp += 1;
+01201         \textcolor{keywordflow}{if}(cg\_iamp > 62)
+01202             \textcolor{keywordflow}{break};
+01203         Modify_SPI_Reg_bits(CG_IAMP_TBB, cg\_iamp);
+01204         rssi = GetRSSI();
+01205         PUSH_GMEASUREMENT_VALUES(++index, ChipRSSI\_2\_dBFS(rssi));
+01206     \}
+01207 \textcolor{preprocessor}{#if VERBOSE}
+01208     \textcolor{keywordflow}{if}(extLoopback)
+01209         printf(\textcolor{stringliteral}{"Initial gains:\(\backslash\)tLOSS\_MAIN\_TXPAD: %2i, CG\_IAMP: %2i | %2.3f dbFS\(\backslash\)n"}, 
+      Get_SPI_Reg_bits(LOSS_MAIN_TXPAD_TRF), Get_SPI_Reg_bits(CG_IAMP_TBB), ChipRSSI\_2\_dBFS(rssi));
+01210     \textcolor{keywordflow}{else}
+01211         printf(\textcolor{stringliteral}{"Adjusted gains: G\_RXLOOPB: %2i, CG\_IAMP: %2i | %2.3f dbFS\(\backslash\)n"}, 
+      Get_SPI_Reg_bits(G_RXLOOPB_RFE), Get_SPI_Reg_bits(CG_IAMP_TBB), ChipRSSI\_2\_dBFS(rssi));
+01212 \textcolor{preprocessor}{#endif}
+01213 \textcolor{preprocessor}{#ifdef DRAW\_GNU\_PLOTS}
+01214     DrawMeasurement(gp, gMeasurements);
+01215     gMeasurements.clear();
+01216     gp.writef(\textcolor{stringliteral}{"%i %f\(\backslash\)n%i %f\(\backslash\)ne\(\backslash\)n"}, 0, ChipRSSI\_2\_dBFS(target\_rssi), index, ChipRSSI\_2\_dBFS(target\_rssi));
+01217     gp.flush();
+01218 \textcolor{preprocessor}{#endif}
+01219     \textcolor{keywordflow}{if}( rssi < 0xB21 ) \textcolor{comment}{// ~(-30 dbFS)}
+01220     \{
+01221 \textcolor{preprocessor}{#if VERBOSE}
+01222         printf(\textcolor{stringliteral}{"Signal strength (%3.1f dBFS) very low, loopback not working?\(\backslash\)n"}, ChipRSSI\_2\_dBFS(rssi));
+01223 \textcolor{preprocessor}{#endif // VERBOSE}
+01224         \textcolor{keywordflow}{return} MCU_LOOPBACK_SIGNAL_WEAK;
+01225     \}
+01226     \textcolor{keywordflow}{return} MCU_NO_ERROR;
+01227 \}
+01228 
+01229 uint8\_t CalibrateRx(\textcolor{keywordtype}{bool} extLoopback, \textcolor{keywordtype}{bool} dcOnly)
+01230 \{
+01231 \textcolor{preprocessor}{#ifdef \_\_cplusplus}
+01232     \textcolor{keyword}{auto} beginTime = std::chrono::high\_resolution\_clock::now();
+01233 \textcolor{preprocessor}{#endif}
+01234     uint8\_t status;
+01235     \textcolor{keyword}{const} uint16\_t x0020val = SPI_read(0x0020); \textcolor{comment}{//remember used channel}
+01236 
+01237 \textcolor{preprocessor}{#if !ENABLE\_EXTERNAL\_LOOPBACK}
+01238     \textcolor{keywordflow}{if}(extLoopback)
+01239         \textcolor{keywordflow}{return} MCU_PROCEDURE_DISABLED;
+01240 \textcolor{preprocessor}{#endif}
+01241 \textcolor{preprocessor}{#if VERBOSE}
+01242     \textcolor{keywordtype}{double} rxFreq = GetFrequencySX(LMS7002M_Rx);
+01243     \textcolor{keyword}{const} \textcolor{keywordtype}{char}* lnaName;
+01244     \textcolor{keywordflow}{switch}(Get_SPI_Reg_bits(SEL_PATH_RFE))
+01245     \{
+01246     \textcolor{keywordflow}{case} 0:
+01247         lnaName = \textcolor{stringliteral}{"none"};
+01248         \textcolor{keywordflow}{break};
+01249     \textcolor{keywordflow}{case} 1:
+01250         lnaName = \textcolor{stringliteral}{"LNAH"};
+01251         \textcolor{keywordflow}{break};
+01252     \textcolor{keywordflow}{case} 2:
+01253         lnaName = \textcolor{stringliteral}{"LNAW"};
+01254         \textcolor{keywordflow}{break};
+01255     \textcolor{keywordflow}{case} 3:
+01256         lnaName = \textcolor{stringliteral}{"LNAL"};
+01257         \textcolor{keywordflow}{break};
+01258     \textcolor{keywordflow}{default}:
+01259         lnaName = \textcolor{stringliteral}{"none"};
+01260         \textcolor{keywordflow}{break};
+01261     \}
+01262     printf(\textcolor{stringliteral}{"Rx ch.%s @ %4g MHz, BW: %g MHz, RF input: %s, PGA: %i, LNA: %i, TIA: %i\(\backslash\)n"},
+01263            (x0020val & 0x3) == 1 ? \textcolor{stringliteral}{"A"} : \textcolor{stringliteral}{"B"}, rxFreq/1e6,
+01264            bandwidthRF/1e6, lnaName,
+01265            Get_SPI_Reg_bits(G_PGA_RBB),
+01266            Get_SPI_Reg_bits(G_LNA_RFE),
+01267            Get_SPI_Reg_bits(G_TIA_RFE));
+01268     printf(\textcolor{stringliteral}{"Rx calibration started\(\backslash\)n"});
+01269 \textcolor{preprocessor}{#endif}
+01270     SaveChipState(0);
+01271     status = CalibrateRxSetup(extLoopback);
+01272     \textcolor{keywordflow}{if}(status != 0)
+01273         \textcolor{keywordflow}{goto} RxCalibrationEndStage;
+01274     UpdateRSSIDelay();
+01275     CalibrateRxDCAuto();
+01276     \textcolor{keywordflow}{if}(dcOnly)
+01277         \textcolor{keywordflow}{goto} RxCalibrationEndStage;
+01278     \textcolor{keywordflow}{if}(!extLoopback)
+01279     \{
+01280         \textcolor{keywordflow}{if} ((uint8\_t)Get_SPI_Reg_bits(SEL_PATH_RFE) == 2)
+01281         \{
+01282             Modify_SPI_Reg_bits(PD_RLOOPB_2_RFE, 0);
+01283             Modify_SPI_Reg_bits(EN_INSHSW_LB2_RFE, 0);
+01284         \}
+01285         \textcolor{keywordflow}{else}
+01286         \{
+01287             Modify_SPI_Reg_bits(PD_RLOOPB_1_RFE, 0);
+01288             Modify_SPI_Reg_bits(EN_INSHSW_LB1_RFE, 0);
+01289         \}
+01290     \}
+01291 
+01292     Modify_SPI_Reg_bits(MAC, 2);
+01293     \textcolor{keywordflow}{if} (Get_SPI_Reg_bits(PD_LOCH_T2RBUF) == \textcolor{keyword}{false})
+01294     \{
+01295         Modify_SPI_Reg_bits(PD_LOCH_T2RBUF, 1);
+01296         \textcolor{comment}{//TDD MODE}
+01297         Modify_SPI_Reg_bits(MAC, 1);
+01298         Modify_SPI_Reg_bits(PD_VCO, 0);
+01299     \}
+01300     SPI_write(0x0020, x0020val);
+01301     status = CheckSaturationRx(bandwidthRF, extLoopback);
+01302     \textcolor{keywordflow}{if}(status != MCU_NO_ERROR)
+01303         \textcolor{keywordflow}{goto} RxCalibrationEndStage;
+01304     Modify_SPI_Reg_bits(CMIX_SC_RXTSP, 0);
+01305     Modify_SPI_Reg_bits(CMIX_BYP_RXTSP, 0);
+01306     SetNCOFrequency(LMS7002M_Rx, bandwidthRF/calibUserBwDivider + offsetNCO, 0);
+01307     CalibrateIQImbalance(LMS7002M_Rx);
+01308 RxCalibrationEndStage:
+01309     \{
+01310         uint16\_t gcorri = Get_SPI_Reg_bits(GCORRI_RXTSP);
+01311         uint16\_t gcorrq = Get_SPI_Reg_bits(GCORRQ_RXTSP);
+01312         uint16\_t phaseOffset = Get_SPI_Reg_bits(IQCORR_RXTSP);
+01313         SaveChipState(1);
+01314         SPI_write(0x0020, x0020val);
+01315         \textcolor{keywordflow}{if} (status != MCU_NO_ERROR)
+01316         \{
+01317 \textcolor{preprocessor}{#if VERBOSE}
+01318             printf(\textcolor{stringliteral}{"Rx calibration failed"});
+01319 \textcolor{preprocessor}{#endif}
+01320             \textcolor{keywordflow}{return} status;
+01321         \}
+01322         \textcolor{comment}{// dc corrector values not overwritten by chip state restore}
+01323         \textcolor{keywordflow}{if}(!dcOnly)
+01324         \{
+01325             Modify_SPI_Reg_bits(GCORRI_RXTSP, gcorri);
+01326             Modify_SPI_Reg_bits(GCORRQ_RXTSP, gcorrq);
+01327             Modify_SPI_Reg_bits(IQCORR_RXTSP, phaseOffset);
+01328         \}
+01329 \textcolor{preprocessor}{#if VERBOSE}
+01330         int16\_t dcI = ReadAnalogDC((x0020val & 1) ? 0x5C7 : 0x5C8);
+01331         int16\_t dcQ = ReadAnalogDC((x0020val & 1) ? 0x5C9 : 0x5CA);
+01332         int16\_t phaseSigned = toSigned(phaseOffset, MSB_LSB(11, 0));
+01333         printf(\textcolor{stringliteral}{"Tx | DC   | GAIN | PHASE\(\backslash\)n"});
+01334         printf(\textcolor{stringliteral}{"---+------+------+------\(\backslash\)n"});
+01335         printf(\textcolor{stringliteral}{"I: | %4i | %4i | %i\(\backslash\)n"}, dcI, gcorri, phaseSigned);
+01336         printf(\textcolor{stringliteral}{"Q: | %4i | %4i |\(\backslash\)n"}, dcQ, gcorrq);
+01337 \textcolor{preprocessor}{#endif}
+01338     \}
+01339     Modify_SPI_Reg_bits(DCMODE, 1);
+01340     \textcolor{keywordflow}{if}(x0020val & 0x1)
+01341         Modify_SPI_Reg_bits(PD_DCDAC_RXA, 0);
+01342     \textcolor{keywordflow}{else}
+01343         Modify_SPI_Reg_bits(PD_DCDAC_RXB, 0);
+01344     Modify_SPI_Reg_bits(0x040C, MSB_LSB(2, 0), 0); \textcolor{comment}{//DC\_BYP 0, GC\_BYP 0, PH\_BYP 0}
+01345     Modify_SPI_Reg_bits(0x040C, MSB_LSB(8, 8), 0); \textcolor{comment}{//DCLOOP\_STOP}
+01346     \textcolor{comment}{//Log("Rx calibration finished", LOG\_INFO);}
+01347 \textcolor{preprocessor}{#if VERBOSE}
+01348     int32\_t duration = std::chrono::duration\_cast<std::chrono::milliseconds>
+01349                        (std::chrono::high\_resolution\_clock::now()-beginTime).
+      count();
+01350     printf(\textcolor{stringliteral}{"Duration: %i ms\(\backslash\)n"}, duration);
+01351 \textcolor{preprocessor}{#endif //LMS\_VERBOSE\_OUTPUT}
+01352     \textcolor{keywordflow}{return} MCU_NO_ERROR;
+01353 \}
+\end{DoxyCode}

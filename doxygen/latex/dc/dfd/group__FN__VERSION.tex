@@ -1,0 +1,131 @@
+\subsection{Version and update functions}
+\label{group__FN__VERSION}\index{Version and update functions@{Version and update functions}}
+
+
+The functions in this section provides ability to check device version and perform updates.  
+
+
+Collaboration diagram for Version and update functions\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=330pt]{dc/dfd/group__FN__VERSION}
+\end{center}
+\end{figure}
+\subsubsection*{Modules}
+\begin{DoxyCompactItemize}
+\item 
+{\bf Message logging level}
+\end{DoxyCompactItemize}
+\subsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct {\bf lms\+\_\+dev\+\_\+info\+\_\+t}
+\begin{DoxyCompactList}\small\item\em Device information structure. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsubsection*{Typedefs}
+\begin{DoxyCompactItemize}
+\item 
+typedef bool($\ast$ {\bf lms\+\_\+prog\+\_\+callback\+\_\+t}) ({\bf int} bsent, {\bf int} btotal, const char $\ast$progress\+Msg)
+\begin{DoxyCompactList}\small\item\em Callback from programming processes. \end{DoxyCompactList}\item 
+typedef {\bf void}($\ast$ {\bf L\+M\+S\+\_\+\+Log\+Handler}) ({\bf int} lvl, const char $\ast$msg)
+\begin{DoxyCompactList}\small\item\em Callback function for redirecting A\+PI messages. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsubsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+const char $\ast$ {\bf data}
+\item 
+const char size\+\_\+t {\bf size}
+\item 
+const char size\+\_\+t const {\bf lms\+\_\+name\+\_\+t} {\bf mode}
+\item 
+const char size\+\_\+t const {\bf lms\+\_\+name\+\_\+t} {\bf lms\+\_\+prog\+\_\+callback\+\_\+t} {\bf callback}
+\end{DoxyCompactItemize}
+
+
+\subsubsection{Detailed Description}
+The functions in this section provides ability to check device version and perform updates. 
+
+
+
+\subsubsection{Typedef Documentation}
+\index{Version and update functions@{Version and update functions}!L\+M\+S\+\_\+\+Log\+Handler@{L\+M\+S\+\_\+\+Log\+Handler}}
+\index{L\+M\+S\+\_\+\+Log\+Handler@{L\+M\+S\+\_\+\+Log\+Handler}!Version and update functions@{Version and update functions}}
+\paragraph[{L\+M\+S\+\_\+\+Log\+Handler}]{\setlength{\rightskip}{0pt plus 5cm}typedef {\bf void}($\ast$ L\+M\+S\+\_\+\+Log\+Handler) ({\bf int} lvl, const char $\ast$msg)}\label{group__FN__VERSION_ga93decd7365aeec454350ce3cefa92d35}
+
+
+Callback function for redirecting A\+PI messages. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em lvl} & \doxyref{Message logging level}{p.}{d2/d60/group__LMS__LOG__LEVEL}. \\
+\hline
+{\em msg} & string containing log message text. \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line {\bf 1317} of file {\bf Lime\+Suite.\+h}.
+
+\index{Version and update functions@{Version and update functions}!lms\+\_\+prog\+\_\+callback\+\_\+t@{lms\+\_\+prog\+\_\+callback\+\_\+t}}
+\index{lms\+\_\+prog\+\_\+callback\+\_\+t@{lms\+\_\+prog\+\_\+callback\+\_\+t}!Version and update functions@{Version and update functions}}
+\paragraph[{lms\+\_\+prog\+\_\+callback\+\_\+t}]{\setlength{\rightskip}{0pt plus 5cm}typedef bool($\ast$ lms\+\_\+prog\+\_\+callback\+\_\+t) ({\bf int} bsent, {\bf int} btotal, const char $\ast$progress\+Msg)}\label{group__FN__VERSION_gabf766f231c2fdc3346ab9cd0c6c05a1c}
+
+
+Callback from programming processes. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em bsent} & number of bytes transferred \\
+\hline
+{\em btotal} & total number of bytes to send \\
+\hline
+{\em progress\+Msg} & string describing current progress state \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+0-\/continue programming, 1-\/abort operation 
+\end{DoxyReturn}
+
+
+Definition at line {\bf 1240} of file {\bf Lime\+Suite.\+h}.
+
+
+
+\subsubsection{Variable Documentation}
+\index{Version and update functions@{Version and update functions}!callback@{callback}}
+\index{callback@{callback}!Version and update functions@{Version and update functions}}
+\paragraph[{callback}]{\setlength{\rightskip}{0pt plus 5cm}const char size\+\_\+t const {\bf lms\+\_\+name\+\_\+t} {\bf lms\+\_\+prog\+\_\+callback\+\_\+t} callback}\label{group__FN__VERSION_ga3a56ed692bc6a576bf9d9df2665d39b8}
+
+
+Definition at line {\bf 1253} of file {\bf Lime\+Suite.\+h}.
+
+
+
+Referenced by {\bf lime\+::\+Connection\+Xillybus\+::\+Is\+Open()}, {\bf lime\+::\+M\+C\+U\+\_\+\+B\+D\+::\+M\+C\+U\+\_\+\+B\+D()}, {\bf lime\+::\+L\+M\+S7\+\_\+\+Device\+::\+Program()}, {\bf lime\+::\+M\+C\+U\+\_\+\+B\+D\+::\+Program\+\_\+\+M\+C\+U()}, {\bf lime\+::\+L\+M\+S64\+C\+Protocol\+::\+Program\+M\+C\+U()}, {\bf programming\+Callback\+Stream()}, {\bf lime\+::\+L\+M\+S64\+C\+Protocol\+::\+Program\+Update()}, {\bf lime\+::\+Connection\+F\+T601\+::\+Program\+Write()}, {\bf lime\+::\+L\+M\+S64\+C\+Protocol\+::\+Program\+Write()}, {\bf lime\+::\+I\+Connection\+::\+Set\+Data\+Log\+Callback()}, and {\bf lime\+::\+L\+M\+S7002\+M\+::\+Set\+Log\+Callback()}.
+
+\index{Version and update functions@{Version and update functions}!data@{data}}
+\index{data@{data}!Version and update functions@{Version and update functions}}
+\paragraph[{data}]{\setlength{\rightskip}{0pt plus 5cm}const char$\ast$ {\bf data}}\label{group__FN__VERSION_ga8f64897c7ccc5c13f276d1d07c4e7095}
+
+
+Definition at line {\bf 1253} of file {\bf Lime\+Suite.\+h}.
+
+\index{Version and update functions@{Version and update functions}!mode@{mode}}
+\index{mode@{mode}!Version and update functions@{Version and update functions}}
+\paragraph[{mode}]{\setlength{\rightskip}{0pt plus 5cm}const char size\+\_\+t const {\bf lms\+\_\+name\+\_\+t} mode}\label{group__FN__VERSION_gad19e99d9db930947155130c3e71605e5}
+
+
+Definition at line {\bf 1253} of file {\bf Lime\+Suite.\+h}.
+
+
+
+Referenced by {\bf lime\+::\+L\+M\+S7002\+M\+::\+Load\+Config\+Legacy\+File()}, {\bf lms7002\+\_\+pnl\+M\+C\+U\+\_\+\+B\+D\+\_\+view\+::\+Onbtn\+Start\+Programming\+Click()}, {\bf lime\+::\+Connection\+Novena\+R\+F7\+::\+Open()}, {\bf lime\+::\+M\+C\+U\+\_\+\+B\+D\+::\+Program\+\_\+\+M\+C\+U()}, {\bf Open\+G\+L\+Graph\+::\+Set\+Drawing\+Mode()}, and {\bf lime\+::\+Streamer\+::\+Update\+Threads()}.
+
+\index{Version and update functions@{Version and update functions}!size@{size}}
+\index{size@{size}!Version and update functions@{Version and update functions}}
+\paragraph[{size}]{\setlength{\rightskip}{0pt plus 5cm}const char size\+\_\+t {\bf size}}\label{group__FN__VERSION_ga95789996d14aee93fe32f6d653deb7d0}
+
+
+Definition at line {\bf 1253} of file {\bf Lime\+Suite.\+h}.
+

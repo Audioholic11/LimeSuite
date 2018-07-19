@@ -1,0 +1,32 @@
+\subsection{dlg\+About.\+cpp}
+\label{dlgAbout_8cpp_source}\index{/home/erik/prefix/default/src/limesuite-\/dev/src/dlg\+About.\+cpp@{/home/erik/prefix/default/src/limesuite-\/dev/src/dlg\+About.\+cpp}}
+
+\begin{DoxyCode}
+00001 \textcolor{preprocessor}{#include "dlgAbout.h"}
+00002 \textcolor{preprocessor}{#include "VersionInfo.h"}
+00003 \textcolor{preprocessor}{#include "resources/splash.h"}
+00004 dlgAbout::dlgAbout( wxWindow* parent )
+00005 :
+00006 dlgAbout_view( parent )
+00007 \{
+00008 
+00009 \}
+00010 
+00011 \textcolor{keywordtype}{void} dlgAbout::OnInit( wxInitDialogEvent& event )
+00012 \{
+00013     wxBitmap splashBitmap = wxBITMAP\_PNG\_FROM\_DATA(splash);
+00014     imgLogo->SetBitmap(splashBitmap);
+00015     wxString msg;
+00016     msg << \textcolor{stringliteral}{"Version: "} << lime::GetLibraryVersion() << \textcolor{stringliteral}{"\(\backslash\)n"};
+00017     msg << \textcolor{stringliteral}{"Build date: "} << lime::GetBuildTimestamp();
+00018     txtVersion->SetLabel(msg);
+00019     this->Fit();
+00020     this->Layout();
+00021 \}
+00022 
+00023 \textcolor{keywordtype}{void} dlgAbout::OnbtnClose( wxCommandEvent& event )
+00024 \{
+00025     EndModal(wxID\_OK);
+00026     Destroy();
+00027 \}
+\end{DoxyCode}

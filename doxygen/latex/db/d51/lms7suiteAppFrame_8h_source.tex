@@ -1,0 +1,95 @@
+\subsection{lms7suite\+App\+Frame.\+h}
+\label{lms7suiteAppFrame_8h_source}\index{/home/erik/prefix/default/src/limesuite-\/dev/src/lms7suite\+App\+Frame.\+h@{/home/erik/prefix/default/src/limesuite-\/dev/src/lms7suite\+App\+Frame.\+h}}
+
+\begin{DoxyCode}
+00001 \textcolor{preprocessor}{#ifndef \_\_LMS7SuiteAppFrame\_\_}
+00002 \textcolor{preprocessor}{#define \_\_LMS7SuiteAppFrame\_\_}
+00003 
+00009 \textcolor{preprocessor}{#include "lms7suiteApp_gui.h"}
+00010 \textcolor{preprocessor}{#include "lime/LimeSuite.h"}
+00011 \textcolor{preprocessor}{#include "Logger.h"}
+00012 
+00014 
+00015 \textcolor{keyword}{class }pnlMiniLog;
+00016 \textcolor{keyword}{class }fftviewer_frFFTviewer;
+00017 \textcolor{keyword}{class }ADF4002_wxgui;
+00018 \textcolor{keyword}{class }Si5351C_wxgui;
+00019 \textcolor{keyword}{class }LMS_Programing_wxgui;
+00020 \textcolor{keyword}{class }HPM7_wxgui;
+00021 \textcolor{keyword}{class }FPGAcontrols_wxgui;
+00022 \textcolor{keyword}{class }Myriad7_wxgui;
+00023 \textcolor{keyword}{class }dlgDeviceInfo;
+00024 \textcolor{keyword}{class }SPI_wxgui;
+00025 \textcolor{keyword}{class }pnlBoardControls;
+00026 
+00028 \textcolor{keyword}{class }LMS7SuiteAppFrame : \textcolor{keyword}{public} AppFrame_view
+00029 \{
+00030     \textcolor{keyword}{protected}:
+00031         \textcolor{comment}{// Handlers for AppFrame events.}
+00032         \textcolor{keywordtype}{void} OnClose( wxCloseEvent& event );
+00033         \textcolor{keywordtype}{void} OnQuit( wxCommandEvent& event );
+00034         \textcolor{keywordtype}{void} OnShowConnectionSettings( wxCommandEvent& event );
+00035         \textcolor{keywordtype}{void} OnAbout( wxCommandEvent& event );
+00036         \textcolor{keywordtype}{void} OnControlBoardConnect(wxCommandEvent& event);
+00037         \textcolor{keywordtype}{void} OnDataBoardConnect(wxCommandEvent& event);
+00038         \textcolor{keywordtype}{void} HandleLMSevent(wxCommandEvent& event);
+00039         \textcolor{keywordtype}{void} OnFFTviewerClose(wxCloseEvent& event);
+00040         \textcolor{keywordtype}{void} OnShowFFTviewer(wxCommandEvent& event);
+00041         \textcolor{keywordtype}{void} OnADF4002Close(wxCloseEvent& event);
+00042         \textcolor{keywordtype}{void} OnShowADF4002(wxCommandEvent& event);
+00043         \textcolor{keywordtype}{void} OnSi5351Close(wxCloseEvent& event);
+00044         \textcolor{keywordtype}{void} OnShowSi5351C(wxCommandEvent& event);
+00045         \textcolor{keywordtype}{void} OnProgramingClose(wxCloseEvent& event);
+00046         \textcolor{keywordtype}{void} OnShowPrograming(wxCommandEvent& event);
+00047         \textcolor{keywordtype}{void} OnHPM7Close(wxCloseEvent& event);
+00048         \textcolor{keywordtype}{void} OnShowHPM7(wxCommandEvent& event);
+00049         \textcolor{keywordtype}{void} OnFPGAcontrolsClose(wxCloseEvent& event);
+00050         \textcolor{keywordtype}{void} OnShowFPGAcontrols(wxCommandEvent& event);
+00051         \textcolor{keywordtype}{void} OnMyriad7Close(wxCloseEvent& event);
+00052         \textcolor{keywordtype}{void} OnShowMyriad7(wxCommandEvent& event);
+00053         \textcolor{keywordtype}{void} OnDeviceInfoClose(wxCloseEvent& event);
+00054         \textcolor{keywordtype}{void} OnShowDeviceInfo(wxCommandEvent& event);
+00055         \textcolor{keywordtype}{void} OnSPIClose(wxCloseEvent& event);
+00056         \textcolor{keywordtype}{void} OnShowSPI(wxCommandEvent& event);
+00057         \textcolor{keywordtype}{void} OnBoardControlsClose(wxCloseEvent& event);
+00058         \textcolor{keywordtype}{void} OnShowBoardControls(wxCommandEvent& event);
+00059         \textcolor{keywordtype}{void} OnChangeCacheSettings(wxCommandEvent& event);
+00060         \textcolor{keywordtype}{void} OnLmsChanged(wxCommandEvent& event);
+00061     \textcolor{keyword}{public}:
+00063         LMS7SuiteAppFrame( wxWindow* parent );
+00065         \textcolor{keyword}{virtual} ~LMS7SuiteAppFrame();
+00066         \textcolor{keyword}{static} \textcolor{keywordtype}{int} m_lmsSelection;
+00067 \textcolor{keyword}{protected}:
+00068         \textcolor{keyword}{static} \textcolor{keywordtype}{void} OnGlobalLogEvent(\textcolor{keyword}{const} lime::LogLevel level, \textcolor{keyword}{const} \textcolor{keywordtype}{char} *
+      message);
+00069         \textcolor{keyword}{static} \textcolor{keywordtype}{void} OnLogEvent(\textcolor{keyword}{const} \textcolor{keywordtype}{char}* text, \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{int} type);
+00070         \textcolor{keyword}{static} \textcolor{keywordtype}{void} OnLogDataTransfer(\textcolor{keywordtype}{bool} Tx, \textcolor{keyword}{const} \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{char}* data, \textcolor{keyword}{const} \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{int} 
+      length);
+00071         \textcolor{keywordtype}{void} OnLogMessage(wxCommandEvent &event);
+00072         \textcolor{keyword}{static} \textcolor{keyword}{const} wxString cWindowTitle;
+00073         \textcolor{keyword}{static} \textcolor{keyword}{const} \textcolor{keywordtype}{int} cDeviceInfoCollumn = 1;
+00074         \textcolor{keyword}{static} \textcolor{keyword}{const} \textcolor{keywordtype}{int} cDeviceVerRevMaskCollumn = 2;
+00075         \textcolor{keywordtype}{void} UpdateConnections(lms_device_t* port);
+00076 
+00077         lms_device_t* lmsControl;
+00078         pnlMiniLog* mMiniLog;
+00079         fftviewer_frFFTviewer* fftviewer;
+00080         \textcolor{keyword}{static} LMS7SuiteAppFrame* obj_ptr;
+00081         ADF4002_wxgui* adfGUI;
+00082 
+00083         Si5351C_wxgui* si5351gui;
+00084 
+00085         LMS_Programing_wxgui* programmer;
+00086         HPM7_wxgui* hpm7;
+00087         FPGAcontrols_wxgui* fpgaControls;
+00088         Myriad7_wxgui* myriad7;
+00089         dlgDeviceInfo* deviceInfo;
+00090         SPI_wxgui* spi;
+00091         pnlBoardControls* boardControlsGui;
+00092 
+00093 \};
+00094 
+00095 
+00096 \textcolor{preprocessor}{#endif // \_\_LMS7SuiteAppFrame\_\_}
+00097 
+\end{DoxyCode}

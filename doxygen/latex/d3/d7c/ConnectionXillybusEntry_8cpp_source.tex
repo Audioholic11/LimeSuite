@@ -1,0 +1,78 @@
+\subsection{Connection\+Xillybus\+Entry.\+cpp}
+\label{ConnectionXillybusEntry_8cpp_source}\index{/home/erik/prefix/default/src/limesuite-\/dev/src/\+Connection\+Xillybus/\+Connection\+Xillybus\+Entry.\+cpp@{/home/erik/prefix/default/src/limesuite-\/dev/src/\+Connection\+Xillybus/\+Connection\+Xillybus\+Entry.\+cpp}}
+
+\begin{DoxyCode}
+00001 
+00006 \textcolor{preprocessor}{#ifdef \_\_unix\_\_}
+00007 \textcolor{preprocessor}{#include <unistd.h>}
+00008 \textcolor{preprocessor}{#endif}
+00009 \textcolor{preprocessor}{#include "ConnectionXillybus.h"}
+00010 \textcolor{keyword}{using namespace }lime;
+00011 \textcolor{preprocessor}{#include <fstream>}
+00012 
+00013 
+00015 \textcolor{keywordtype}{void} __loadConnectionXillybusEntry(\textcolor{keywordtype}{void}) \textcolor{comment}{//TODO fixme replace with LoadLibrary/dlopen}
+00016 \{
+00017     \textcolor{keyword}{static} ConnectionXillybusEntry XillybusEntry;
+00018 \}
+00019 
+00020 
+00021 ConnectionXillybusEntry::ConnectionXillybusEntry(\textcolor{keywordtype}{void}):
+00022     ConnectionRegistryEntry(\textcolor{stringliteral}{"PCIEXillybus"})
+00023 \{
+00024 \}
+00025 
+00026 ConnectionXillybusEntry::~ConnectionXillybusEntry(\textcolor{keywordtype}{void})
+00027 \{
+00028 \}
+00029 
+00030 std::vector<ConnectionHandle> ConnectionXillybusEntry::enumerate(\textcolor{keyword}{const} 
+      ConnectionHandle &hint)
+00031 \{
+00032     std::vector<ConnectionHandle> handles;
+00033     ConnectionHandle handle;
+00034     handle.media = \textcolor{stringliteral}{"PCI-E"};
+00035 
+00036 \textcolor{preprocessor}{#ifndef \_\_unix\_\_}
+00037     HANDLE fh = CreateFileA(\textcolor{stringliteral}{"\(\backslash\)\(\backslash\)\(\backslash\)\(\backslash\).\(\backslash\)\(\backslash\)xillybus\_control0\_write\_32"}, GENERIC\_WRITE, 0, NULL, OPEN\_EXISTING, 
+      FILE\_ATTRIBUTE\_NORMAL, NULL);
+00038     \textcolor{keywordflow}{if} (fh != INVALID\_HANDLE\_VALUE || ::GetLastError() == ERROR\_BUSY)
+00039     \{
+00040         handle.name = \textcolor{stringliteral}{"LimeSDR-QPCIe"};
+00041         handle.index = 1;
+00042         handles.push\_back(handle);
+00043         CloseHandle(fh);
+00044     \}
+00045 
+00046     fh = CreateFileA(\textcolor{stringliteral}{"\(\backslash\)\(\backslash\)\(\backslash\)\(\backslash\).\(\backslash\)\(\backslash\)xillybus\_write\_8"}, GENERIC\_WRITE, 0, NULL, OPEN\_EXISTING, 
+      FILE\_ATTRIBUTE\_NORMAL, NULL);
+00047     \textcolor{keywordflow}{if} (fh != INVALID\_HANDLE\_VALUE || ::GetLastError() == ERROR\_BUSY)
+00048     \{
+00049         handle.name = \textcolor{stringliteral}{"LimeSDR-PCIe"};
+00050         handle.index = 0;
+00051         handles.push\_back(handle);
+00052         CloseHandle(fh);
+00053     \}
+00054 \textcolor{preprocessor}{#else}
+00055     \textcolor{keywordflow}{if}( access(\textcolor{stringliteral}{"/dev/xillybus\_control0\_write\_32"}, F\_OK ) != -1 )
+00056     \{
+00057         handle.name = \textcolor{stringliteral}{"LimeSDR-QPCIe"};
+00058         handle.index = 1;
+00059         handles.push\_back(handle);
+00060     \}
+00061 
+00062     \textcolor{keywordflow}{if}( access(\textcolor{stringliteral}{"/dev/xillybus\_write\_8"}, F\_OK ) != -1 )
+00063     \{
+00064         handle.name = \textcolor{stringliteral}{"LimeSDR-PCIe"};
+00065         handle.index = 0;
+00066         handles.push\_back(handle);
+00067     \}
+00068 \textcolor{preprocessor}{#endif}
+00069     \textcolor{keywordflow}{return} handles;
+00070 \}
+00071 
+00072 IConnection *ConnectionXillybusEntry::make(\textcolor{keyword}{const} ConnectionHandle &handle)
+00073 \{
+00074     \textcolor{keywordflow}{return} \textcolor{keyword}{new} ConnectionXillybus(handle.index);
+00075 \}
+\end{DoxyCode}

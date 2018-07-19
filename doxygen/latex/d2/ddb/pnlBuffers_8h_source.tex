@@ -1,0 +1,37 @@
+\subsection{pnl\+Buffers.\+h}
+\label{pnlBuffers_8h_source}\index{/home/erik/prefix/default/src/limesuite-\/dev/src/boards\+\_\+wxgui/pnl\+Buffers.\+h@{/home/erik/prefix/default/src/limesuite-\/dev/src/boards\+\_\+wxgui/pnl\+Buffers.\+h}}
+
+\begin{DoxyCode}
+00001 \textcolor{preprocessor}{#ifndef PNL\_BUFFERS\_H}
+00002 \textcolor{preprocessor}{#define PNL\_BUFFERS\_H}
+00003 
+00004 \textcolor{preprocessor}{#include "lime/LimeSuite.h"}
+00005 \textcolor{preprocessor}{#include <wx/panel.h>}
+00006 \textcolor{keyword}{class }wxCheckBox;
+00007 
+00008 \textcolor{keyword}{class }pnlBuffers : \textcolor{keyword}{public} wxPanel
+00009 \{
+00010 \textcolor{keyword}{public}:
+00011     pnlBuffers(wxWindow* parent, wxWindowID \textcolor{keywordtype}{id} = wxID\_ANY, \textcolor{keyword}{const} wxPoint& pos = wxDefaultPosition, \textcolor{keyword}{const} 
+      wxSize& size = wxDefaultSize, \textcolor{keywordtype}{int} style = 0, wxString name = wxEmptyString);
+00012     \textcolor{keywordtype}{void} Initialize(lms_device_t *pControl);
+00013     \textcolor{keyword}{virtual} ~pnlBuffers();
+00014     \textcolor{keyword}{virtual} \textcolor{keywordtype}{void} UpdatePanel();
+00015     \textcolor{keywordtype}{void} OnGPIOchanged(wxCommandEvent &event);
+00016 
+00017     \textcolor{keywordtype}{void} OnReadAll(wxCommandEvent &event);
+00018     \textcolor{keywordtype}{void} OnWriteAll(wxCommandEvent &event);
+00019 
+00020 \textcolor{keyword}{protected}:
+00021     wxCheckBox* chkDIO_DIR_CTRL1;
+00022     wxCheckBox* chkDIO_DIR_CTRL2;
+00023     wxCheckBox* chkDIO_BUFF_OE;
+00024     wxCheckBox* chkIQ_SEL1_DIR;
+00025     wxCheckBox* chkIQ_SEL2_DIR;
+00026     wxCheckBox* chkG_PWR_DWN;
+00027     lms_device_t *lmsControl;
+00028     DECLARE_EVENT_TABLE();
+00029 \};
+00030 
+00031 \textcolor{preprocessor}{#endif}
+\end{DoxyCode}

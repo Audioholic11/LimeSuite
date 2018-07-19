@@ -1,0 +1,662 @@
+\subsection{lms7suite\+App\+Frame.\+cpp}
+\label{lms7suiteAppFrame_8cpp_source}\index{/home/erik/prefix/default/src/limesuite-\/dev/src/lms7suite\+App\+Frame.\+cpp@{/home/erik/prefix/default/src/limesuite-\/dev/src/lms7suite\+App\+Frame.\+cpp}}
+
+\begin{DoxyCode}
+00001 \textcolor{preprocessor}{#include "wx/wxprec.h"}
+00002 
+00003 \textcolor{preprocessor}{#ifdef \_\_BORLANDC\_\_}
+00004 \textcolor{preprocessor}{#pragma hdrstop}
+00005 \textcolor{preprocessor}{#endif //\_\_BORLANDC\_\_}
+00006 
+00007 \textcolor{preprocessor}{#ifndef WX\_PRECOMP}
+00008 \textcolor{preprocessor}{#include <wx/wx.h>}
+00009 \textcolor{preprocessor}{#endif //WX\_PRECOMP}
+00010 
+00011 \textcolor{preprocessor}{#include "lms7002_mainPanel.h"}
+00012 
+00013 \textcolor{preprocessor}{#include "lms7suiteAppFrame.h"}
+00014 \textcolor{preprocessor}{#include "dlgAbout.h"}
+00015 \textcolor{preprocessor}{#include "dlgConnectionSettings.h"}
+00016 \textcolor{preprocessor}{#include "lms7suiteEvents.h"}
+00017 \textcolor{preprocessor}{#include "fftviewer_frFFTviewer.h"}
+00018 \textcolor{preprocessor}{#include "ADF4002_wxgui.h"}
+00019 \textcolor{preprocessor}{#include "Si5351C_wxgui.h"}
+00020 \textcolor{preprocessor}{#include "LMS_Programing_wxgui.h"}
+00021 \textcolor{preprocessor}{#include "pnlMiniLog.h"}
+00022 \textcolor{preprocessor}{#include "RFSpark_wxgui.h"}
+00023 \textcolor{preprocessor}{#include "HPM7_wxgui.h"}
+00024 \textcolor{preprocessor}{#include "FPGAcontrols_wxgui.h"}
+00025 \textcolor{preprocessor}{#include "myriad7_wxgui.h"}
+00026 \textcolor{preprocessor}{#include "lms7002m_novena_wxgui.h"}
+00027 \textcolor{preprocessor}{#include "SPI_wxgui.h"}
+00028 \textcolor{preprocessor}{#include <wx/string.h>}
+00029 \textcolor{preprocessor}{#include "dlgDeviceInfo.h"}
+00030 \textcolor{preprocessor}{#include <functional>}
+00031 \textcolor{preprocessor}{#include "lms7002_pnlTRF_view.h"}
+00032 \textcolor{preprocessor}{#include "lms7002_pnlRFE_view.h"}
+00033 \textcolor{preprocessor}{#include "lms7002_pnlLimeLightPAD_view.h"}
+00034 \textcolor{preprocessor}{#include "pnlBoardControls.h"}
+00035 \textcolor{preprocessor}{#include <LMSBoards.h>}
+00036 \textcolor{preprocessor}{#include <sstream>}
+00037 \textcolor{preprocessor}{#include <pnlQSpark.h>}
+00038 \textcolor{preprocessor}{#include "lms7_device.h"}
+00039 
+00040 \textcolor{keyword}{using namespace }std;
+00041 \textcolor{keyword}{using namespace }lime;
+00042 
+00044 
+00045 LMS7SuiteAppFrame* LMS7SuiteAppFrame::obj_ptr=\textcolor{keyword}{nullptr};
+00046 
+00047 \textcolor{keyword}{const} wxString LMS7SuiteAppFrame::cWindowTitle = \_(\textcolor{stringliteral}{"LMS7Suite"});
+00048 
+00049 \textcolor{keywordtype}{int} LMS7SuiteAppFrame::m_lmsSelection = 0;
+00050 
+00051 \textcolor{keywordtype}{void} LMS7SuiteAppFrame::HandleLMSevent(wxCommandEvent& event)
+00052 \{
+00053     \textcolor{keywordflow}{if} (event.GetEventType() == CGEN\_FREQUENCY\_CHANGED)
+00054     \{
+00055         \textcolor{keywordflow}{if} (fftviewer)
+00056             fftviewer->SetNyquistFrequency();
+00057     \}
+00058     \textcolor{keywordflow}{else} \textcolor{keywordflow}{if} (event.GetEventType() == SAMPLE\_POS\_CHANGED)
+00059         this->mContent->mTabLimeLight->UpdateGUI();
+00060 \textcolor{comment}{/*}
+00061 \textcolor{comment}{    //in case of Novena board, need to update GPIO}
+00062 \textcolor{comment}{    if (lms7controlPort && lms7controlPort->GetDeviceInfo().deviceName != GetDeviceName(LMS\_DEV\_NOVENA) &&}
+00063 \textcolor{comment}{        (event.GetEventType() == LMS7\_TXBAND\_CHANGED || event.GetEventType() == LMS7\_RXPATH\_CHANGED))}
+00064 \textcolor{comment}{    \{}
+00065 \textcolor{comment}{        //update external band-selection to match}
+00066 \textcolor{comment}{        lmsControl->UpdateExternalBandSelect();}
+00067 \textcolor{comment}{        if (novenaGui)}
+00068 \textcolor{comment}{            novenaGui->UpdatePanel();}
+00069 \textcolor{comment}{    \}}
+00070 \textcolor{comment}{}
+00071 \textcolor{comment}{    if (event.GetEventType() == LMS7\_TXBAND\_CHANGED)}
+00072 \textcolor{comment}{    \{}
+00073 \textcolor{comment}{        const wxObject* eventSource = event.GetEventObject();}
+00074 \textcolor{comment}{        const int bandIndex = event.GetInt();}
+00075 \textcolor{comment}{        //update HPM7 if changes were made outside of it}
+00076 \textcolor{comment}{        if (lms7controlPort && lms7controlPort->GetDeviceInfo().expansionName ==
+       GetExpansionBoardName(EXP\_BOARD\_HPM7) && eventSource != hpm7)}
+00077 \textcolor{comment}{            hpm7->SelectBand(bandIndex);}
+00078 \textcolor{comment}{        if (lms7controlPort && eventSource == hpm7)}
+00079 \textcolor{comment}{        \{}
+00080 \textcolor{comment}{            lmsControl->Modify\_SPI\_Reg\_bits(LMS7param(SEL\_BAND1\_TRF), bandIndex == 0);}
+00081 \textcolor{comment}{            lmsControl->Modify\_SPI\_Reg\_bits(LMS7param(SEL\_BAND2\_TRF), bandIndex == 1);}
+00082 \textcolor{comment}{            mContent->mTabTRF->UpdateGUI();}
+00083 \textcolor{comment}{        \}}
+00084 \textcolor{comment}{    \}}
+00085 \textcolor{comment}{}
+00086 \textcolor{comment}{    if (event.GetEventType() == LMS7\_RXPATH\_CHANGED)}
+00087 \textcolor{comment}{    \{}
+00088 \textcolor{comment}{        const wxObject* eventSource = event.GetEventObject();}
+00089 \textcolor{comment}{        const int pathIndex = event.GetInt();}
+00090 \textcolor{comment}{        //update HPM7 if changes were made outside of it}
+00091 \textcolor{comment}{        if (lms7controlPort && lms7controlPort->GetDeviceInfo().expansionName ==
+       GetExpansionBoardName(EXP\_BOARD\_HPM7) && eventSource != hpm7)}
+00092 \textcolor{comment}{            hpm7->SelectRxPath(pathIndex);}
+00093 \textcolor{comment}{        if (lms7controlPort && eventSource == hpm7)}
+00094 \textcolor{comment}{        \{}
+00095 \textcolor{comment}{            lmsControl->Modify\_SPI\_Reg\_bits(LMS7param(SEL\_PATH\_RFE), pathIndex);}
+00096 \textcolor{comment}{            mContent->mTabRFE->UpdateGUI();}
+00097 \textcolor{comment}{        \}}
+00098 \textcolor{comment}{    \}}
+00099 \textcolor{comment}{ */}
+00100 \}
+00101 
+00102 \textcolor{keywordtype}{void} LMS7SuiteAppFrame::OnGlobalLogEvent(\textcolor{keyword}{const} lime::LogLevel level, \textcolor{keyword}{const} \textcolor{keywordtype}{char} *
+      message)
+00103 \{
+00104     \textcolor{keywordflow}{if} (obj\_ptr == \textcolor{keyword}{nullptr} || obj\_ptr->mMiniLog == \textcolor{keyword}{nullptr})
+00105         \textcolor{keywordflow}{return};
+00106     wxCommandEvent evt;
+00107     evt.SetString(wxString::FromAscii(message));
+00108     evt.SetEventType(LOG\_MESSAGE);
+00109     evt.SetInt(\textcolor{keywordtype}{int}(level));
+00110     wxPostEvent(obj\_ptr, evt);
+00111 \}
+00112 
+00113 \textcolor{keywordtype}{void} LMS7SuiteAppFrame::OnLogEvent(\textcolor{keyword}{const} \textcolor{keywordtype}{char}* text, \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{int} type)
+00114 \{
+00115     \textcolor{keywordflow}{if} (obj\_ptr == \textcolor{keyword}{nullptr} || obj\_ptr->mMiniLog == \textcolor{keyword}{nullptr})
+00116         \textcolor{keywordflow}{return};
+00117     wxCommandEvent evt;
+00118     evt.SetEventType(LOG\_MESSAGE);
+00119     evt.SetInt(lime::LOG_LEVEL_INFO);
+00120     wxString msg;
+00121 
+00122     \textcolor{keywordflow}{switch}(type)
+00123     \{
+00124     \textcolor{keywordflow}{case} 0:
+00125         msg = wxString::Format(\textcolor{stringliteral}{"INFO: %s"}, text);
+00126         \textcolor{keywordflow}{break};
+00127     \textcolor{keywordflow}{case} 1:
+00128         msg = wxString::Format(\textcolor{stringliteral}{"Warning: %s"}, text);
+00129         \textcolor{keywordflow}{break};
+00130     \textcolor{keywordflow}{case} 2:
+00131         msg = wxString::Format(\textcolor{stringliteral}{"ERROR: %s"}, text);
+00132         \textcolor{keywordflow}{break};
+00133     \}
+00134     evt.SetString(msg);
+00135     wxPostEvent(obj\_ptr, evt);
+00136 \}
+00137 
+00138 LMS7SuiteAppFrame::LMS7SuiteAppFrame( wxWindow* parent ) :
+00139     AppFrame_view( parent ), lmsControl(nullptr)
+00140 \{
+00141 \textcolor{preprocessor}{#ifndef \_\_unix\_\_}
+00142     SetIcon(wxIcon(\_(\textcolor{stringliteral}{"aaaaAPPicon"})));
+00143 \textcolor{preprocessor}{#endif}
+00144     programmer = \textcolor{keyword}{nullptr};
+00145     fftviewer = \textcolor{keyword}{nullptr};
+00146     adfGUI = \textcolor{keyword}{nullptr};
+00147     si5351gui = \textcolor{keyword}{nullptr};
+00148     hpm7 = \textcolor{keyword}{nullptr};
+00149     fpgaControls = \textcolor{keyword}{nullptr};
+00150     myriad7 = \textcolor{keyword}{nullptr};
+00151     deviceInfo = \textcolor{keyword}{nullptr};
+00152     spi = \textcolor{keyword}{nullptr};
+00153     boardControlsGui = \textcolor{keyword}{nullptr};
+00154     lmsControl = \textcolor{keyword}{new} LMS7_Device();
+00155 
+00156     lime::registerLogHandler(&LMS7SuiteAppFrame::OnGlobalLogEvent);
+00157 
+00158     Connect(CGEN\_FREQUENCY\_CHANGED, wxCommandEventHandler(
+      LMS7SuiteAppFrame::HandleLMSevent), NULL, \textcolor{keyword}{this});
+00159     Connect(SAMPLE\_POS\_CHANGED, wxCommandEventHandler(
+      LMS7SuiteAppFrame::HandleLMSevent), NULL, \textcolor{keyword}{this});
+00160     Connect(LMS7\_TXBAND\_CHANGED, wxCommandEventHandler(
+      LMS7SuiteAppFrame::HandleLMSevent), NULL, \textcolor{keyword}{this});
+00161     Connect(LMS7\_RXPATH\_CHANGED, wxCommandEventHandler(
+      LMS7SuiteAppFrame::HandleLMSevent), NULL, \textcolor{keyword}{this});
+00162     mMiniLog = \textcolor{keyword}{new} pnlMiniLog(\textcolor{keyword}{this}, wxNewId());
+00163     Connect(LOG\_MESSAGE, wxCommandEventHandler(LMS7SuiteAppFrame::OnLogMessage), 0, \textcolor{keyword}{this});
+00164 
+00165     bSizer6->Add(mMiniLog, 1, wxEXPAND, 5);
+00166     Layout();
+00167     Fit();
+00168     \textcolor{keywordtype}{int} x,y1,y2;
+00169     m_scrolledWindow1->GetVirtualSize(&x,&y1);
+00170     mMiniLog->GetSize(\textcolor{keyword}{nullptr},&y2);
+00171     SetSize(x+8,y1+y2+8);
+00172     m_scrolledWindow1->SetMinSize(wxSize(wxDefaultCoord,160));
+00173     m_scrolledWindow1->SetMaxSize(wxSize(wxDefaultCoord,y1));
+00174     SetMinSize(wxSize(640,320));
+00175     obj_ptr = \textcolor{keyword}{this};
+00176     wxCommandEvent event;
+00177     OnControlBoardConnect(event);
+00178 
+00179     UpdateConnections(lmsControl);
+00180 
+00181     mnuCacheValues->Check(\textcolor{keyword}{false});
+00182     \textcolor{keyword}{const} \textcolor{keywordtype}{int} statusWidths[] = \{-1, -3, -3\};
+00183     statusBar->SetStatusWidths(3, statusWidths);
+00184     Bind(LMS\_CHANGED, wxCommandEventHandler(LMS7SuiteAppFrame::OnLmsChanged), \textcolor{keyword}{this});
+00185 \}
+00186 
+00187 LMS7SuiteAppFrame::~LMS7SuiteAppFrame()
+00188 \{
+00189     wxCloseEvent evt;
+00190     OnFFTviewerClose(evt);
+00191     Disconnect(CGEN\_FREQUENCY\_CHANGED, wxCommandEventHandler(
+      LMS7SuiteAppFrame::HandleLMSevent), NULL, \textcolor{keyword}{this});
+00192     Disconnect(SAMPLE\_POS\_CHANGED, wxCommandEventHandler(
+      LMS7SuiteAppFrame::HandleLMSevent), NULL, \textcolor{keyword}{this});
+00193     LMS_Close(lmsControl);
+00194 \}
+00195 
+00196 \textcolor{keywordtype}{void} LMS7SuiteAppFrame::OnClose( wxCloseEvent& event )
+00197 \{
+00198     Destroy();
+00199 \}
+00200 
+00201 \textcolor{keywordtype}{void} LMS7SuiteAppFrame::OnQuit( wxCommandEvent& event )
+00202 \{
+00203     Destroy();
+00204 \}
+00205 
+00206 \textcolor{keywordtype}{void} LMS7SuiteAppFrame::OnShowConnectionSettings( wxCommandEvent& event )
+00207 \{
+00208     dlgConnectionSettings dlg(\textcolor{keyword}{this});
+00209 
+00210     \textcolor{keywordflow}{if} (fftviewer)
+00211         fftviewer->StopStreaming();
+00212 
+00213     dlg.SetConnectionManagers(&lmsControl);
+00214     Bind(CONTROL\_PORT\_CONNECTED, wxCommandEventHandler(
+      LMS7SuiteAppFrame::OnControlBoardConnect), \textcolor{keyword}{this});
+00215     Bind(DATA\_PORT\_CONNECTED, wxCommandEventHandler(
+      LMS7SuiteAppFrame::OnDataBoardConnect), \textcolor{keyword}{this});
+00216     Bind(CONTROL\_PORT\_DISCONNECTED, wxCommandEventHandler(
+      LMS7SuiteAppFrame::OnControlBoardConnect), \textcolor{keyword}{this});
+00217     Bind(DATA\_PORT\_DISCONNECTED, wxCommandEventHandler(
+      LMS7SuiteAppFrame::OnDataBoardConnect), \textcolor{keyword}{this});
+00218     dlg.ShowModal();
+00219 \}
+00220 
+00221 \textcolor{keywordtype}{void} LMS7SuiteAppFrame::OnAbout( wxCommandEvent& event )
+00222 \{
+00223     dlgAbout dlg(\textcolor{keyword}{this});
+00224     dlg.ShowModal();
+00225 \}
+00226 
+00227 \textcolor{keywordtype}{void} LMS7SuiteAppFrame::UpdateConnections(lms_device_t* lms7controlPort)
+00228 \{
+00229     mContent->Initialize(lmsControl);
+00230     \textcolor{keywordflow}{if}(si5351gui)
+00231         si5351gui->Initialize(lmsControl);
+00232     \textcolor{keywordflow}{if}(fftviewer)
+00233         fftviewer->Initialize(lmsControl);
+00234     \textcolor{keywordflow}{if}(adfGUI)
+00235         adfGUI->Initialize(lmsControl);
+00236     \textcolor{keywordflow}{if}(hpm7)
+00237         hpm7->Initialize(lmsControl);
+00238     \textcolor{keywordflow}{if}(fpgaControls)
+00239         fpgaControls->Initialize(lmsControl);
+00240     \textcolor{keywordflow}{if}(myriad7)
+00241         myriad7->Initialize(lmsControl);
+00242     \textcolor{keywordflow}{if}(deviceInfo)
+00243         deviceInfo->Initialize(lmsControl);
+00244     \textcolor{keywordflow}{if}(spi)
+00245         spi->Initialize(lmsControl);
+00246     \textcolor{keywordflow}{if}(boardControlsGui)
+00247         boardControlsGui->Initialize(lmsControl);
+00248     \textcolor{keywordflow}{if}(programmer)
+00249         programmer->SetConnection(lmsControl);
+00250 \}
+00251 
+00252 
+00253 \textcolor{keywordtype}{void} LMS7SuiteAppFrame::OnControlBoardConnect(wxCommandEvent& event)
+00254 \{
+00255     UpdateConnections(lmsControl);
+00256     \textcolor{keyword}{const} \textcolor{keywordtype}{int} controlCollumn = 1;
+00257     \textcolor{keyword}{auto} conn = ((LMS7_Device*)lmsControl)->GetConnection();
+00258     \textcolor{keywordflow}{if} (conn && conn->IsOpen())
+00259     \{
+00260         \textcolor{comment}{//bind callback for spi data logging}
+00261         obj_ptr = \textcolor{keyword}{this};
+00262         \textcolor{keyword}{const} lms_dev_info_t* info;
+00263         conn->SetDataLogCallback(&LMS7SuiteAppFrame::OnLogDataTransfer);
+00264         \textcolor{keywordflow}{if} ((info = LMS_GetDeviceInfo(lmsControl)) == \textcolor{keyword}{nullptr})
+00265                 \textcolor{keywordflow}{return};
+00266         wxString controlDev = \_(\textcolor{stringliteral}{"Control port: "});
+00267 
+00268         controlDev.Append(info->deviceName);
+00269         LMS7002M* lms = ((LMS7_Device*)lmsControl)->GetLMS();
+00270         \textcolor{keywordtype}{double} refClk = lms->GetReferenceClk_SX(lime::LMS7002M::Rx);
+00271         controlDev.Append(wxString::Format(\_(\textcolor{stringliteral}{" FW:%s HW:%s Protocol:%s GW:%s Ref Clk: %1.2f MHz"}), info->
+      firmwareVersion, info->hardwareVersion, info->protocolVersion, info->
+      gatewareVersion, refClk/1e6));
+00272         statusBar->SetStatusText(controlDev, controlCollumn);
+00273 
+00274         LMS_EnableCalibCache(lmsControl,mnuCacheValues->IsChecked());
+00275 
+00276         wxCommandEvent evt;
+00277         evt.SetEventType(LOG\_MESSAGE);
+00278         evt.SetInt(lime::LOG_LEVEL_INFO);
+00279         evt.SetString(\_(\textcolor{stringliteral}{"Connected "}) + controlDev);
+00280         LMS_WriteParam(lmsControl, LMS7param(MAC), 1);
+00281         wxPostEvent(\textcolor{keyword}{this}, evt);
+00282         \textcolor{keywordflow}{if} (si5351gui)
+00283             si5351gui->ModifyClocksGUI(info->deviceName);
+00284         \textcolor{keywordflow}{if} (boardControlsGui)
+00285             boardControlsGui->SetupControls(info->deviceName);
+00286     \}
+00287     \textcolor{keywordflow}{else}
+00288     \{
+00289         statusBar->SetStatusText(\_(\textcolor{stringliteral}{"Control port: Not Connected"}), controlCollumn);
+00290         wxCommandEvent evt;
+00291         evt.SetEventType(LOG\_MESSAGE);
+00292         evt.SetInt(lime::LOG_LEVEL_INFO);
+00293         evt.SetString(\_(\textcolor{stringliteral}{"Disconnected control port"}));
+00294         wxPostEvent(\textcolor{keyword}{this}, evt);
+00295     \}
+00296 \}
+00297 
+00298 \textcolor{keywordtype}{void} LMS7SuiteAppFrame::OnDataBoardConnect(wxCommandEvent& event)
+00299 \{
+00300    \textcolor{comment}{/* UpdateConnections(lms7controlPort, streamBoardPort);}
+00301 \textcolor{comment}{    const int dataCollumn = 2;}
+00302 \textcolor{comment}{    if (streamBoardPort && streamBoardPort->IsOpen())}
+00303 \textcolor{comment}{    \{}
+00304 \textcolor{comment}{        //bind callback for spi data logging}
+00305 \textcolor{comment}{        streamBoardPort->SetDataLogCallback(bind(&LMS7SuiteAppFrame::OnLogDataTransfer, this,
+       std::placeholders::\_1, std::placeholders::\_2, std::placeholders::\_3));}
+00306 \textcolor{comment}{}
+00307 \textcolor{comment}{        DeviceInfo info = streamBoardPort->GetDeviceInfo();}
+00308 \textcolor{comment}{        wxString controlDev = \_("Data port: ");}
+00309 \textcolor{comment}{        controlDev.Append(info.deviceName);}
+00310 \textcolor{comment}{        controlDev.Append(wxString::Format(\_(" FW:%s HW:%s Protocol:%s GW:%s GW\_rev:%s"),
+       info.firmwareVersion, info.hardwareVersion, info.protocolVersion, info.gatewareVersion, info.gatewareRevision));}
+00311 \textcolor{comment}{        statusBar->SetStatusText(controlDev, dataCollumn);}
+00312 \textcolor{comment}{}
+00313 \textcolor{comment}{        wxCommandEvent evt;}
+00314 \textcolor{comment}{        evt.SetEventType(LOG\_MESSAGE);}
+00315 \textcolor{comment}{        evt.SetString(\_("Connected ") + controlDev);}
+00316 \textcolor{comment}{        wxPostEvent(this, evt);}
+00317 \textcolor{comment}{    \}}
+00318 \textcolor{comment}{    else*/}
+00319     \{
+00320 \textcolor{comment}{//        statusBar->SetStatusText(\_("Data port: Not Connected"), dataCollumn);}
+00321         wxCommandEvent evt;
+00322         evt.SetEventType(LOG\_MESSAGE);
+00323         evt.SetInt(lime::LOG_LEVEL_INFO);
+00324         evt.SetString(\_(\textcolor{stringliteral}{"Disconnected data port"}));
+00325         wxPostEvent(\textcolor{keyword}{this}, evt);
+00326     \}
+00327 \}
+00328 
+00329 \textcolor{keywordtype}{void} LMS7SuiteAppFrame::OnFFTviewerClose(wxCloseEvent& event)
+00330 \{
+00331     \textcolor{keywordflow}{if}(fftviewer)
+00332     \{
+00333         fftviewer->StopStreaming();
+00334         fftviewer->Destroy();
+00335         fftviewer = \textcolor{keyword}{nullptr};
+00336     \}
+00337 \}
+00338 
+00339 \textcolor{keywordtype}{void} LMS7SuiteAppFrame::OnShowFFTviewer(wxCommandEvent& event)
+00340 \{
+00341     \textcolor{keywordflow}{if} (fftviewer) \textcolor{comment}{//it's already opened}
+00342     \{
+00343         fftviewer->Show(\textcolor{keyword}{true});
+00344         fftviewer->Iconize(\textcolor{keyword}{false}); \textcolor{comment}{// restore the window if minimized}
+00345         fftviewer->SetFocus();  \textcolor{comment}{// focus on my window}
+00346         fftviewer->Raise();  \textcolor{comment}{// bring window to front}
+00347     \}
+00348     \textcolor{keywordflow}{else}
+00349     \{
+00350         fftviewer = \textcolor{keyword}{new} fftviewer_frFFTviewer(\textcolor{keyword}{this});
+00351         fftviewer->Connect(wxEVT\_CLOSE\_WINDOW, wxCloseEventHandler(
+      LMS7SuiteAppFrame::OnFFTviewerClose), NULL, \textcolor{keyword}{this});
+00352         fftviewer->Initialize(lmsControl);
+00353         fftviewer->Show(\textcolor{keyword}{true});
+00354     \}
+00355 \}
+00356 
+00357 \textcolor{keywordtype}{void} LMS7SuiteAppFrame::OnLmsChanged(wxCommandEvent& event)
+00358 \{
+00359     \textcolor{keywordflow}{return};
+00360 \}
+00361 
+00362 \textcolor{keywordtype}{void} LMS7SuiteAppFrame::OnADF4002Close(wxCloseEvent& event)
+00363 \{
+00364     adfGUI->Destroy();
+00365     adfGUI = \textcolor{keyword}{nullptr};
+00366 \}
+00367 
+00368 \textcolor{keywordtype}{void} LMS7SuiteAppFrame::OnShowADF4002(wxCommandEvent& event)
+00369 \{
+00370     \textcolor{keywordflow}{if} (adfGUI) \textcolor{comment}{//it's already opened}
+00371     \{
+00372         adfGUI->Show(\textcolor{keyword}{true});
+00373         adfGUI->Iconize(\textcolor{keyword}{false}); \textcolor{comment}{// restore the window if minimized}
+00374         adfGUI->SetFocus();  \textcolor{comment}{// focus on my window}
+00375         adfGUI->Raise();  \textcolor{comment}{// bring window to front}
+00376     \}
+00377     \textcolor{keywordflow}{else}
+00378     \{
+00379         adfGUI = \textcolor{keyword}{new} ADF4002_wxgui(\textcolor{keyword}{this}, wxNewId(), \_(\textcolor{stringliteral}{"ADF4002"}));
+00380         adfGUI->Connect(wxEVT\_CLOSE\_WINDOW, wxCloseEventHandler(
+      LMS7SuiteAppFrame::OnADF4002Close), NULL, \textcolor{keyword}{this});
+00381         adfGUI->Initialize(lmsControl);
+00382         adfGUI->Show();
+00383     \}
+00384 \}
+00385 
+00386 \textcolor{keywordtype}{void} LMS7SuiteAppFrame::OnSi5351Close(wxCloseEvent& event)
+00387 \{
+00388     si5351gui->Destroy();
+00389     si5351gui = \textcolor{keyword}{nullptr};
+00390 \}
+00391 
+00392 \textcolor{keywordtype}{void} LMS7SuiteAppFrame::OnShowSi5351C(wxCommandEvent& event)
+00393 \{
+00394     \textcolor{keywordflow}{if} (si5351gui) \textcolor{comment}{//it's already opened}
+00395     \{
+00396         si5351gui->Show(\textcolor{keyword}{true});
+00397         si5351gui->Iconize(\textcolor{keyword}{false}); \textcolor{comment}{// restore the window if minimized}
+00398         si5351gui->SetFocus();  \textcolor{comment}{// focus on my window}
+00399         si5351gui->Raise();  \textcolor{comment}{// bring window to front}
+00400     \}
+00401     \textcolor{keywordflow}{else}
+00402     \{
+00403         si5351gui = \textcolor{keyword}{new} Si5351C_wxgui(\textcolor{keyword}{this}, wxNewId(), \_(\textcolor{stringliteral}{"Si5351C"}), wxDefaultPosition, wxDefaultSize, 
+      wxDEFAULT\_FRAME\_STYLE);
+00404         si5351gui->Initialize(lmsControl);
+00405         \textcolor{keyword}{const} lms_dev_info_t *info = LMS_GetDeviceInfo(lmsControl);
+00406         si5351gui->ModifyClocksGUI(info ? info->deviceName : \textcolor{stringliteral}{"UNKNOWN"});
+00407         si5351gui->Connect(wxEVT\_CLOSE\_WINDOW, wxCloseEventHandler(
+      LMS7SuiteAppFrame::OnSi5351Close), NULL, \textcolor{keyword}{this});
+00408         si5351gui->Show();
+00409     \}
+00410 \}
+00411 
+00412 \textcolor{keywordtype}{void} LMS7SuiteAppFrame::OnProgramingClose(wxCloseEvent& event)
+00413 \{
+00414     programmer->Destroy();
+00415     programmer = \textcolor{keyword}{nullptr};
+00416 \}
+00417 
+00418 \textcolor{keywordtype}{void} LMS7SuiteAppFrame::OnShowPrograming(wxCommandEvent& event)
+00419 \{
+00420     \textcolor{keywordflow}{if} (programmer) \textcolor{comment}{//it's already opened}
+00421     \{
+00422         programmer->Show(\textcolor{keyword}{true});
+00423         programmer->Iconize(\textcolor{keyword}{false}); \textcolor{comment}{// restore the window if minimized}
+00424         programmer->SetFocus();  \textcolor{comment}{// focus on my window}
+00425         programmer->Raise();  \textcolor{comment}{// bring window to front}
+00426     \}
+00427     \textcolor{keywordflow}{else}
+00428     \{
+00429         programmer = \textcolor{keyword}{new} LMS_Programing_wxgui(\textcolor{keyword}{this}, wxNewId(), \_(\textcolor{stringliteral}{"Programming"}), wxDefaultPosition, 
+      wxDefaultSize, wxDEFAULT\_FRAME\_STYLE);
+00430         programmer->SetConnection(lmsControl);
+00431         programmer->Connect(wxEVT\_CLOSE\_WINDOW, wxCloseEventHandler(
+      LMS7SuiteAppFrame::OnProgramingClose), NULL, \textcolor{keyword}{this});
+00432         programmer->Show();
+00433     \}
+00434 \}
+00435 
+00436 \textcolor{keywordtype}{void} LMS7SuiteAppFrame::OnLogMessage(wxCommandEvent &event)
+00437 \{
+00438     \textcolor{keywordflow}{if} (mMiniLog)
+00439         mMiniLog->HandleMessage(event);
+00440 \}
+00441 
+00442 
+00443 \textcolor{keywordtype}{void} LMS7SuiteAppFrame::OnHPM7Close(wxCloseEvent& event)
+00444 \{
+00445     hpm7->Destroy();
+00446     hpm7 = \textcolor{keyword}{nullptr};
+00447 \}
+00448 \textcolor{keywordtype}{void} LMS7SuiteAppFrame::OnShowHPM7(wxCommandEvent& event)
+00449 \{
+00450     \textcolor{keywordflow}{if} (hpm7) \textcolor{comment}{//it's already opened}
+00451     \{
+00452         hpm7->Show(\textcolor{keyword}{true});
+00453         hpm7->Iconize(\textcolor{keyword}{false}); \textcolor{comment}{// restore the window if minimized}
+00454         hpm7->SetFocus();  \textcolor{comment}{// focus on my window}
+00455         hpm7->Raise();  \textcolor{comment}{// bring window to front}
+00456     \}
+00457     \textcolor{keywordflow}{else}
+00458     \{
+00459         hpm7 = \textcolor{keyword}{new} HPM7_wxgui(\textcolor{keyword}{this}, wxNewId(), \_(\textcolor{stringliteral}{"HPM7"}), wxDefaultPosition, wxDefaultSize, 
+      wxDEFAULT\_FRAME\_STYLE);
+00460         hpm7->Initialize(lmsControl);
+00461         hpm7->Connect(wxEVT\_CLOSE\_WINDOW, wxCloseEventHandler(
+      LMS7SuiteAppFrame::OnHPM7Close), NULL, \textcolor{keyword}{this});
+00462         hpm7->Show();
+00463     \}
+00464 \}
+00465 
+00466 \textcolor{keywordtype}{void} LMS7SuiteAppFrame::OnFPGAcontrolsClose(wxCloseEvent& event)
+00467 \{
+00468     fpgaControls->Destroy();
+00469     fpgaControls = \textcolor{keyword}{nullptr};
+00470 \}
+00471 \textcolor{keywordtype}{void} LMS7SuiteAppFrame::OnShowFPGAcontrols(wxCommandEvent& event)
+00472 \{
+00473     \textcolor{keywordflow}{if} (fpgaControls) \textcolor{comment}{//it's already opened}
+00474     \{
+00475         fpgaControls->Show(\textcolor{keyword}{true});
+00476         fpgaControls->Iconize(\textcolor{keyword}{false}); \textcolor{comment}{// restore the window if minimized}
+00477         fpgaControls->SetFocus();  \textcolor{comment}{// focus on my window}
+00478         fpgaControls->Raise();  \textcolor{comment}{// bring window to front}
+00479     \}
+00480     \textcolor{keywordflow}{else}
+00481     \{
+00482         fpgaControls = \textcolor{keyword}{new} FPGAcontrols_wxgui(\textcolor{keyword}{this}, wxNewId(), \_(\textcolor{stringliteral}{"FPGA Controls"}), wxDefaultPosition, 
+      wxDefaultSize, wxDEFAULT\_FRAME\_STYLE);
+00483         fpgaControls->Initialize(lmsControl);
+00484         fpgaControls->Connect(wxEVT\_CLOSE\_WINDOW, wxCloseEventHandler(
+      LMS7SuiteAppFrame::OnFPGAcontrolsClose), NULL, \textcolor{keyword}{this});
+00485         fpgaControls->Show();
+00486     \}
+00487 \}
+00488 
+00489 \textcolor{keywordtype}{void} LMS7SuiteAppFrame::OnMyriad7Close(wxCloseEvent& event)
+00490 \{
+00491     myriad7->Destroy();
+00492     myriad7 = \textcolor{keyword}{nullptr};
+00493 \}
+00494 \textcolor{keywordtype}{void} LMS7SuiteAppFrame::OnShowMyriad7(wxCommandEvent& event)
+00495 \{
+00496     \textcolor{keywordflow}{if} (myriad7) \textcolor{comment}{//it's already opened}
+00497     \{
+00498         myriad7->Show(\textcolor{keyword}{true});
+00499         myriad7->Iconize(\textcolor{keyword}{false}); \textcolor{comment}{// restore the window if minimized}
+00500         myriad7->SetFocus();  \textcolor{comment}{// focus on my window}
+00501         myriad7->Raise();  \textcolor{comment}{// bring window to front}
+00502     \}
+00503     \textcolor{keywordflow}{else}
+00504     \{
+00505         myriad7 = \textcolor{keyword}{new} Myriad7_wxgui(\textcolor{keyword}{this}, wxNewId(), \_(\textcolor{stringliteral}{"Myriad7"}), wxDefaultPosition, wxDefaultSize, 
+      wxDEFAULT\_FRAME\_STYLE);
+00506         myriad7->Initialize(lmsControl);
+00507         myriad7->Connect(wxEVT\_CLOSE\_WINDOW, wxCloseEventHandler(
+      LMS7SuiteAppFrame::OnMyriad7Close), NULL, \textcolor{keyword}{this});
+00508         myriad7->Show();
+00509     \}
+00510 \}
+00511 
+00512 \textcolor{keywordtype}{void} LMS7SuiteAppFrame::OnDeviceInfoClose(wxCloseEvent& event)
+00513 \{
+00514     deviceInfo->Destroy();
+00515     deviceInfo = \textcolor{keyword}{nullptr};
+00516 \}
+00517 
+00518 \textcolor{keywordtype}{void} LMS7SuiteAppFrame::OnShowDeviceInfo(wxCommandEvent& event)
+00519 \{
+00520     \textcolor{keywordflow}{if} (deviceInfo) \textcolor{comment}{//it's already opened}
+00521     \{
+00522         deviceInfo->Show(\textcolor{keyword}{true});
+00523         deviceInfo->Iconize(\textcolor{keyword}{false}); \textcolor{comment}{// restore the window if minimized}
+00524         deviceInfo->SetFocus();  \textcolor{comment}{// focus on my window}
+00525         deviceInfo->Raise();  \textcolor{comment}{// bring window to front}
+00526     \}
+00527     \textcolor{keywordflow}{else}
+00528     \{
+00529         deviceInfo = \textcolor{keyword}{new} dlgDeviceInfo(\textcolor{keyword}{this}, wxNewId(), \_(\textcolor{stringliteral}{"Device Info"}), wxDefaultPosition, wxDefaultSize,
+       wxDEFAULT\_DIALOG\_STYLE);
+00530         deviceInfo->Initialize(lmsControl);
+00531         deviceInfo->Connect(wxEVT\_CLOSE\_WINDOW, wxCloseEventHandler(
+      LMS7SuiteAppFrame::OnDeviceInfoClose), NULL, \textcolor{keyword}{this});
+00532         deviceInfo->Show();
+00533     \}
+00534 \}
+00535 
+00536 \textcolor{keywordtype}{void} LMS7SuiteAppFrame::OnSPIClose(wxCloseEvent& event)
+00537 \{
+00538     spi->Destroy();
+00539     spi = \textcolor{keyword}{nullptr};
+00540 \}
+00541 
+00542 \textcolor{keywordtype}{void} LMS7SuiteAppFrame::OnShowSPI(wxCommandEvent& event)
+00543 \{
+00544     \textcolor{keywordflow}{if} (spi) \textcolor{comment}{//it's already opened}
+00545     \{
+00546         spi->Show(\textcolor{keyword}{true});
+00547         spi->Iconize(\textcolor{keyword}{false}); \textcolor{comment}{// restore the window if minimized}
+00548         spi->SetFocus();  \textcolor{comment}{// focus on my window}
+00549         spi->Raise();  \textcolor{comment}{// bring window to front}
+00550     \}
+00551     \textcolor{keywordflow}{else}
+00552     \{
+00553         spi = \textcolor{keyword}{new} SPI_wxgui(\textcolor{keyword}{this}, wxNewId(), \_(\textcolor{stringliteral}{"Device Info"}), wxDefaultPosition, wxDefaultSize, 
+      wxDEFAULT\_DIALOG\_STYLE);
+00554         spi->Initialize(lmsControl,0);
+00555         spi->Connect(wxEVT\_CLOSE\_WINDOW, wxCloseEventHandler(
+      LMS7SuiteAppFrame::OnSPIClose), NULL, \textcolor{keyword}{this});
+00556         spi->Show();
+00557     \}
+00558 \}
+00559 
+00560 \textcolor{preprocessor}{#include <iomanip>}
+00561 \textcolor{keywordtype}{void} LMS7SuiteAppFrame::OnLogDataTransfer(\textcolor{keywordtype}{bool} Tx, \textcolor{keyword}{const} \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{char}* data, \textcolor{keyword}{const} \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{int} 
+      length)
+00562 \{
+00563     \textcolor{keywordflow}{if} (obj_ptr->mMiniLog == \textcolor{keyword}{nullptr} || obj_ptr->mMiniLog->chkLogData->IsChecked() == \textcolor{keyword}{false})
+00564         \textcolor{keywordflow}{return};
+00565     std::stringstream ss;
+00566     ss << (Tx ? \textcolor{stringliteral}{"Wr("} : \textcolor{stringliteral}{"Rd("});
+00567     ss << length << \textcolor{stringliteral}{"): "};
+00568     ss << std::hex << std::setfill(\textcolor{charliteral}{'0'});
+00569     \textcolor{keywordtype}{int} repeatedZeros = 0;
+00570     \textcolor{keywordflow}{for} (\textcolor{keywordtype}{int} i = length - 1; i >= 0; --i)
+00571         \textcolor{keywordflow}{if} (data[i] == 0)
+00572             ++repeatedZeros;
+00573         \textcolor{keywordflow}{else}
+00574             \textcolor{keywordflow}{break};
+00575     \textcolor{keywordflow}{if} (repeatedZeros == 2)
+00576         repeatedZeros = 0;
+00577     repeatedZeros = repeatedZeros - (repeatedZeros & 0x1);
+00578     \textcolor{keywordflow}{for} (\textcolor{keywordtype}{size\_t} i = 0; i<length - repeatedZeros; ++i)
+00579         \textcolor{comment}{//casting to short to print as numbers}
+00580         ss << \textcolor{stringliteral}{" "} << std::setw(2) << (\textcolor{keywordtype}{unsigned} short)data[i];
+00581     \textcolor{keywordflow}{if} (repeatedZeros > 2)
+00582         ss << \textcolor{stringliteral}{" (00 x "} << std::dec << repeatedZeros << \textcolor{stringliteral}{" times)"};
+00583     cout << ss.str() << endl;
+00584     wxCommandEvent *evt = \textcolor{keyword}{new} wxCommandEvent();
+00585     evt->SetString(ss.str());
+00586     evt->SetEventObject(obj_ptr);
+00587     evt->SetEventType(LOG\_MESSAGE);
+00588     evt->SetInt(lime::LOG_LEVEL_INFO);
+00589     wxQueueEvent(obj_ptr, evt);
+00590 \}
+00591 
+00592 \textcolor{keywordtype}{void} LMS7SuiteAppFrame::OnShowBoardControls(wxCommandEvent& event)
+00593 \{
+00594     \textcolor{keywordflow}{if} (boardControlsGui) \textcolor{comment}{//it's already opened}
+00595     \{
+00596         boardControlsGui->Show(\textcolor{keyword}{true});
+00597         boardControlsGui->Iconize(\textcolor{keyword}{false}); \textcolor{comment}{// restore the window if minimized}
+00598         boardControlsGui->SetFocus();  \textcolor{comment}{// focus on my window}
+00599         boardControlsGui->Raise();  \textcolor{comment}{// bring window to front}
+00600     \}
+00601     \textcolor{keywordflow}{else}
+00602     \{
+00603         boardControlsGui = \textcolor{keyword}{new} pnlBoardControls(\textcolor{keyword}{this}, wxNewId(), \_(\textcolor{stringliteral}{"Board related controls"}), 
+      wxDefaultPosition, wxDefaultSize, wxDEFAULT\_DIALOG\_STYLE | wxRESIZE\_BORDER);
+00604         boardControlsGui->Initialize(lmsControl);
+00605         boardControlsGui->UpdatePanel();
+00606         boardControlsGui->Connect(wxEVT\_CLOSE\_WINDOW, wxCloseEventHandler(
+      LMS7SuiteAppFrame::OnBoardControlsClose), NULL, \textcolor{keyword}{this});
+00607         boardControlsGui->Show();
+00608     \}
+00609 \}
+00610 
+00611 \textcolor{keywordtype}{void} LMS7SuiteAppFrame::OnBoardControlsClose(wxCloseEvent& event)
+00612 \{
+00613     boardControlsGui->Destroy();
+00614     boardControlsGui = \textcolor{keyword}{nullptr};
+00615 \}
+00616 
+00617 \textcolor{keywordtype}{void} LMS7SuiteAppFrame::OnChangeCacheSettings(wxCommandEvent& event)
+00618 \{
+00619     \textcolor{keywordtype}{int} checked = \textcolor{keyword}{event}.GetInt();
+00620     LMS_EnableCalibCache(lmsControl,checked);
+00621 \}
+00622 
+\end{DoxyCode}

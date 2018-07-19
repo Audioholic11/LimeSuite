@@ -1,0 +1,488 @@
+\subsection{lms7002m\+\_\+controls.\+c}
+\label{lms7002m__controls_8c_source}\index{/home/erik/prefix/default/src/limesuite-\/dev/mcu\+\_\+program/common\+\_\+src/lms7002m\+\_\+controls.\+c@{/home/erik/prefix/default/src/limesuite-\/dev/mcu\+\_\+program/common\+\_\+src/lms7002m\+\_\+controls.\+c}}
+
+\begin{DoxyCode}
+00001 \textcolor{preprocessor}{#include "lms7002m_controls.h"}
+00002 \textcolor{preprocessor}{#include "spi.h"}
+00003 \textcolor{preprocessor}{#include "LMS7002M_parameters_compact.h"}
+00004 \textcolor{preprocessor}{#include "math.h"}
+00005 \textcolor{preprocessor}{#include "typedefs.h"}
+00006 \textcolor{preprocessor}{#include "mcu_defines.h"}
+00007 
+00008 \textcolor{preprocessor}{#ifdef \_\_cplusplus}
+00009 \textcolor{preprocessor}{#include <cmath>}
+00010 \textcolor{preprocessor}{#include <cstdlib>}
+00011 \textcolor{keyword}{using namespace }std;
+00012 \textcolor{preprocessor}{#include <chrono>}
+00013 \textcolor{preprocessor}{#include <thread>}
+00014 \textcolor{preprocessor}{#else}
+00015 \textcolor{preprocessor}{#include "lms7002\_regx51.h"} \textcolor{comment}{//MCU timer sfr}
+00016 uint16\_t gComparatorDelayCounter = 0xFF00; \textcolor{comment}{// ~100us @ ref 30.72MHz}
+00017 \textcolor{preprocessor}{#endif}
+00018 
+00019 \textcolor{preprocessor}{#define VERBOSE 0}
+00020 
+00021 \textcolor{comment}{//TODO add functions to modify reference clock}
+00022 float_type RefClk = 30.72e6; \textcolor{comment}{//board reference clock}
+00023 
+00024 uint16\_t pow2(\textcolor{keyword}{const} uint8\_t power)
+00025 \{
+00026     \textcolor{keywordflow}{return} 1 << power;
+00027 \}
+00028 
+00029 xdata uint16\_t x0020state;
+00030 ROM \textcolor{keyword}{const} uint16\_t chipStateAddr[] = \{
+00031     0x0021, 0x002F, \textcolor{comment}{//LimeLight}
+00032     0x0081, 0x0082, \textcolor{comment}{//EN\_DIR Configuration + AFE}
+00033     SECTION_BIAS,
+00034     SECTION_XBUF,
+00035     SECTION_CGEN,
+00036     SECTION_LDO,
+00037     SECTION_BIST,
+00038     SECTION_CDS,
+00039     SECTION_TRF,
+00040     SECTION_TBB,
+00041     SECTION_RFE,
+00042     SECTION_RBB,
+00043     SECTION_TxTSP,
+00044     SECTION_TxNCO,
+00045     SECTION_RxTSP,
+00046     SECTION_RxNCO,
+00047     0x500, 0x5A7, \textcolor{comment}{//GFIR3}
+00048     0x5C0, 0x5C0 \textcolor{comment}{//DC Calibration Configuration}
+00049 \};
+00050 xdata uint16\_t chipStateData[500];
+00051 
+00052 \textcolor{keywordtype}{void} SaveChipState(\textcolor{keywordtype}{bool} wr)
+00053 \{
+00054     uint16\_t dest=0;
+00055     uint8\_t i;
+00056     uint16\_t addr;
+00057     uint16\_t ch = SPI_read(0x0020);
+00058     \textcolor{keywordflow}{if}(!wr)
+00059         x0020state = ch;
+00060     \textcolor{comment}{//for(i=0; i<sizeof(chipStateAddr)/sizeof(uint16\_t); i+=2)}
+00061     \textcolor{keywordflow}{for}(i = \textcolor{keyword}{sizeof}(chipStateAddr)/\textcolor{keyword}{sizeof}(uint16\_t); i; i-=2)
+00062     \{
+00063         \textcolor{keywordflow}{for}(addr=chipStateAddr[i-2]; addr<=chipStateAddr[i-1]; ++addr)
+00064         \{
+00065             \textcolor{keywordflow}{if}(wr)
+00066                 SPI_write(addr, chipStateData[dest]);
+00067             \textcolor{keywordflow}{else}
+00068                 chipStateData[dest] = SPI_read(addr);
+00069             ++dest;
+00070         \}
+00071     \}
+00072     \textcolor{comment}{//sxr and sxt}
+00073     \textcolor{keywordflow}{for}(i=0; i<2; ++i)
+00074     \{
+00075         SPI_write(0x0020, 0xFFFD+i);
+00076         \textcolor{keywordflow}{for}(addr=0x011C; addr<=0x0123; ++addr)
+00077         \{
+00078             \textcolor{keywordflow}{if}(wr)
+00079                 SPI_write(addr, chipStateData[dest]);
+00080             \textcolor{keywordflow}{else}
+00081                 chipStateData[dest] = SPI_read(addr);
+00082             ++dest;
+00083         \}
+00084     \}
+00085     \textcolor{keywordflow}{if}(wr)
+00086     \{
+00087         ClockLogicResets();
+00088         SPI_write(0x0020, x0020state);
+00089     \}
+00090     \textcolor{keywordflow}{else}
+00091         SPI_write(0x0020, ch);
+00092 \}
+00093 
+00094 \textcolor{preprocessor}{#ifdef \_\_cplusplus}
+00095 \textcolor{preprocessor}{#include <vector>}
+00096 \textcolor{keywordtype}{void} SetDefaults(uint16\_t start, uint16\_t end)
+00097 \{
+00098     ROM \textcolor{keyword}{const} uint16\_t defaultAddrs[] = \{
+00099 0x0020,0x0021,0x0022,0x0023,0x0024,0x0025,0x0026,0x0027,0x0028,0x0029,0x002A,0x002B,0x002C,0x002E,0x002F,
+      0x0081,0x0082,0x0084,0x0085,0x0086,0x0087,0x0088,0x0089,0x008A,0x008B,0x008C,0x0092,0x0093,0x0094,0x0095,
+      0x0096,0x0097,0x0098,0x0099,0x009A,0x009B,0x009C,0x009D,0x009E,0x009F,0x00A0,0x00A1,0x00A2,0x00A3,0x00A4,0x00A5,
+      0x00A6,0x00A7,0x00A8,0x00AA,0x00AB,0x00AD,0x00AE,0x0100,0x0101,0x0102,0x0103,0x0104,0x0105,0x0106,0x0107,
+      0x0108,0x0109,0x010A,0x010B,0x010C,0x010D,0x010E,0x010F,0x0110,0x0111,0x0112,0x0113,0x0114,0x0115,0x0116,0x0117,
+      0x0118,0x0119,0x011A,0x011C,0x011D,0x011E,0x011F,0x0120,0x0121,0x0122,0x0123,0x0124,0x0125,0x0126,0x0200,
+      0x0201,0x0202,0x0203,0x0204,0x0205,0x0206,0x0207,0x0208,0x0209,0x020A,0x020C,0x0240,0x0242,0x0243,0x0244,0x0245
+      ,0x0246,0x0247,0x0248,0x0249,0x024A,0x024B,0x024C,0x024D,0x024E,0x024F,0x0250,0x0251,0x0252,0x0253,0x0254,
+      0x0255,0x0256,0x0257,0x0258,0x0259,0x025A,0x025B,0x025C,0x025D,0x025E,0x025F,0x0260,0x0261,0x0400,0x0401,
+      0x0402,0x0403,0x0404,0x0405,0x0406,0x0407,0x0408,0x0409,0x040A,0x040B,0x040C,0x040E,0x0440,0x0442,0x0443,0x0444,
+      0x0445,0x0446,0x0447,0x0448,0x0449,0x044A,0x044B,0x044C,0x044D,0x044E,0x044F,0x0450,0x0451,0x0452,0x0453,
+      0x0454,0x0455,0x0456,0x0457,0x0458,0x0459,0x045A,0x045B,0x045C,0x045D,0x045E,0x045F,0x0460,0x0461,0x05C0,0x05C1,
+      0x05C2,0x05C3,0x05C4,0x05C5,0x05C6,0x05C7,0x05C8,0x05C9,0x05CA,0x05CB,0x05CC,0x0600,0x0601,0x0602,0x0603,
+      0x0604,0x0605,0x0606,0x0640,0x0641
+00100 \};
+00101     ROM \textcolor{keyword}{const} uint16\_t defaultValues[] = \{
+00102 0xFFFF,0x0E9F,0x07DF,0x5559,0xE4E4,0x0101,0x0101,0xE4E4,0x0101,0x0101,0x0086,0x0010,0xFFFF,0x0000,0x3840,
+      0x0000,0x800B,0x0400,0x0001,0x4901,0x0400,0x0780,0x0020,0x0514,0x2100,0x067B,0x0001,0x0000,0x0000,0x0000,
+      0x0000,0x0000,0x0000,0x6565,0x658C,0x6565,0x658C,0x6565,0x658C,0x658C,0x6565,0x6565,0x6565,0x6565,0x6565,0x6565,
+      0x000F,0x6565,0x0000,0x0000,0x0000,0x03FF,0xF000,0x3409,0x7800,0x3180,0x0A12,0x0088,0x0007,0x318C,0x318C,
+      0x958C,0x61C1,0x104C,0x0000,0x88FD,0x009E,0x2040,0x30C6,0x0994,0x0083,0xC0E6,0x03C3,0x008D,0x0009,0x8180,0x280C,
+      0x018C,0x528B,0x2E02,0xAD43,0x0400,0x0780,0x3640,0xB9FF,0x3404,0x033F,0x067B,0x0000,0x9400,0x12FF,0x0081,
+      0x07FF,0x07FF,0x0000,0x0000,0x0000,0x0000,0x0000,0x0070,0x0000,0x0000,0x0000,0x0020,0x0000,0x0000,0x0000,0x0000
+      ,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,
+      0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0081,0x07FF,
+      0x07FF,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x1000,0x0000,0x0038,0x0000,0x0020,0x0000,0x0000,0x0000,
+      0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,
+      0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x00FF,0x0000,
+      0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x2020,0x0000,0x0F00,0x0000,0x2000,0x0000,
+      0x0000,0x0000,0x0000,0x00A0,0x1020
+00103 \};
+00104 \textcolor{preprocessor}{#ifdef \_\_cplusplus}
+00105     \textcolor{comment}{//int status = 0;}
+00106     std::vector<uint16\_t> addrs;
+00107     std::vector<uint16\_t> values;
+00108     \textcolor{keywordflow}{for}(uint32\_t address = start; address <= end; ++address)
+00109     \{
+00110         \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{int} i=0;
+00111         \textcolor{keywordflow}{for}(i=0; i<\textcolor{keyword}{sizeof}(defaultAddrs)/\textcolor{keyword}{sizeof}(uint16\_t); ++i)
+00112         \{
+00113             \textcolor{keywordflow}{if}(defaultAddrs[i] == address)
+00114             \{
+00115                 addrs.push\_back(defaultAddrs[i]);
+00116                 values.push\_back(defaultValues[i]);
+00117                 \textcolor{keywordflow}{break};
+00118             \}
+00119         \}
+00120     \}
+00121     SPI_write_batch(addrs.data(), values.data(), addrs.size());
+00122 \textcolor{preprocessor}{#else}
+00123 
+00124 \textcolor{preprocessor}{#endif}
+00125 \}
+00126 \textcolor{preprocessor}{#endif}
+00127 \textcolor{keywordtype}{void} SetDefaultsSX()
+00128 \{
+00129     ROM \textcolor{keyword}{const} uint16\_t SXAddr[]=    \{0x011C, 0x011D, 0x011E, 0x011F, 0x0121, 0x0122, 0x0123\};
+00130     ROM \textcolor{keyword}{const} uint16\_t SXdefVals[]= \{0xAD43, 0x0400, 0x0780, 0x3640, 0x3404, 0x033F, 0x067B\};
+00131 
+00132     uint8\_t i;
+00133     \textcolor{keywordflow}{for}(i=\textcolor{keyword}{sizeof}(SXAddr)/\textcolor{keyword}{sizeof}(uint16\_t); i; --i)
+00134         SPI_write(SXAddr[i-1], SXdefVals[i-1]);
+00135     \textcolor{comment}{//keep 0x0120[7:0]ICT\_VCO bias value intact}
+00136     Modify_SPI_Reg_bits(0x0120, MSB_LSB(15, 8), 0xB9FF);
+00137 \}
+00138 
+00139 \textcolor{keywordtype}{void} ClockLogicResets()
+00140 \{
+00141     \textcolor{comment}{//MCLK2 toggle}
+00142     uint16\_t reg = SPI_read(0x002B);
+00143     SPI_write(0x002B, reg ^ (1<<9));
+00144     SPI_write(0x002B, reg);
+00145 
+00146     \textcolor{comment}{//TSP logic reset}
+00147     reg = SPI_read(0x0020);
+00148     SPI_write(0x0020, reg & ~0xAA00);
+00149     SPI_write(0x0020, reg);
+00150 \}
+00151 
+00152 float_type GetFrequencyCGEN()
+00153 \{
+00154     \textcolor{keyword}{const} float_type dMul = (RefClk/2.0)/(Get_SPI_Reg_bits(DIV_OUTCH_CGEN)+1); \textcolor{comment}{//DIV\_OUTCH\_CGEN}
+00155     \textcolor{keyword}{const} uint16\_t gINT = Get_SPI_Reg_bits(0x0088, MSB_LSB(13, 0)); \textcolor{comment}{//read whole register to reduce SPI
+       transfers}
+00156     \textcolor{keyword}{const} uint32\_t gFRAC = ((uint32\_t)(gINT & 0xF) << 16) | Get_SPI_Reg_bits(0x0087, 
+      MSB_LSB(15, 0));
+00157     \textcolor{keywordflow}{return} dMul * (((gINT>>4) + 1 + gFRAC/1048576.0));
+00158 \}
+00159 
+00160 uint8\_t SetFrequencyCGEN(float_type freq)
+00161 \{
+00162     float_type dFvco;
+00163     float_type intpart;
+00164     \textcolor{comment}{//VCO frequency selection according to F\_CLKH}
+00165     \{
+00166         uint8\_t iHdiv\_high = (2.94e9/2 / freq)-1;
+00167         uint8\_t iHdiv\_low = (1.93e9/2 / freq);
+00168         uint8\_t iHdiv = (iHdiv\_low + iHdiv\_high)/2;
+00169         dFvco = 2 * (iHdiv+1) * freq;
+00170         Modify_SPI_Reg_bits(DIV_OUTCH_CGEN, iHdiv);
+00171     \}
+00172     \textcolor{comment}{//Integer division}
+00173     intpart = dFvco/RefClk;
+00174     Modify_SPI_Reg_bits(INT_SDM_CGEN, intpart - 1); \textcolor{comment}{//INT\_SDM\_CGEN}
+00175     \textcolor{comment}{//Fractional division}
+00176     \{
+00177         \textcolor{keyword}{const} float_type dFrac = intpart - (uint32\_t)(dFvco/RefClk);
+00178         \textcolor{keyword}{const} uint32\_t gFRAC = (uint32\_t)(dFrac * 1048576);
+00179         Modify_SPI_Reg_bits(0x0087, MSB_LSB(15, 0), gFRAC&0xFFFF); \textcolor{comment}{//INT\_SDM\_CGEN[15:0]}
+00180         Modify_SPI_Reg_bits(0x0088, MSB_LSB(3, 0), gFRAC>>16); \textcolor{comment}{//INT\_SDM\_CGEN[19:16]}
+00181     \}
+00182 
+00183 \textcolor{preprocessor}{#if VERBOSE}
+00184     \textcolor{comment}{//printf("CGEN: Freq=%g MHz, VCO=%g GHz, INT=%i, FRAC=%i, DIV\_OUTCH\_CGEN=%i\(\backslash\)n", freq/1e6, dFvco/1e9,
+       gINT, gFRAC, iHdiv);}
+00185 \textcolor{preprocessor}{#endif // NDEBUG}
+00186     \textcolor{keywordflow}{if}(TuneVCO(VCO_CGEN) != 0)
+00187         \textcolor{keywordflow}{return} MCU_CGEN_TUNE_FAILED;
+00188     \textcolor{keywordflow}{return} 0;
+00189 \}
+00190 
+00191 float_type GetReferenceClk_TSP_MHz(\textcolor{keywordtype}{bool} tx)
+00192 \{
+00193     \textcolor{keyword}{const} float_type cgenFreq = GetFrequencyCGEN();
+00194     \textcolor{keyword}{const} float_type clklfreq = cgenFreq/pow2(Get_SPI_Reg_bits(CLKH_OV_CLKL_CGEN));
+00195     \textcolor{keywordflow}{if}(Get_SPI_Reg_bits(EN_ADCCLKH_CLKGN) == 0)
+00196         \textcolor{keywordflow}{return} tx ? clklfreq : cgenFreq/4;
+00197     \textcolor{keywordflow}{else}
+00198         \textcolor{keywordflow}{return} tx ? cgenFreq : clklfreq/4;
+00199 \}
+00200 
+00201 \textcolor{keywordtype}{void} SetNCOFrequency(\textcolor{keyword}{const} \textcolor{keywordtype}{bool} tx, \textcolor{keyword}{const} \textcolor{keywordtype}{float} freq, uint8\_t index)
+00202 \{
+00203     \textcolor{keyword}{const} uint16\_t addr = (tx ? 0x0242 : 0x0442)+index*2;
+00204     \textcolor{keyword}{const} uint32\_t fcw = (uint32\_t)((freq/GetReferenceClk_TSP_MHz(tx))*4294967296.0);
+00205     SPI_write(addr, (fcw >> 16)); \textcolor{comment}{//NCO frequency control word register MSB part.}
+00206     SPI_write(addr+1, fcw); \textcolor{comment}{//NCO frequency control word register LSB part.}
+00207 \}
+00208 
+00209 float_type GetFrequencySX(\textcolor{keyword}{const} \textcolor{keywordtype}{bool} Tx)
+00210 \{
+00211     \textcolor{keyword}{const} uint16\_t ch = SPI_read(0x0020);\textcolor{comment}{//(uint8\_t)Get\_SPI\_Reg\_bits(MAC); //remember previously used
+       channel}
+00212     Modify_SPI_Reg_bits(MAC, Tx ? 2 : 1); \textcolor{comment}{// Rx mac = 1, Tx mac = 2}
+00213     \{
+00214         \textcolor{keyword}{const} uint16\_t gINT = Get_SPI_Reg_bits(0x011E, MSB_LSB(13, 0));    \textcolor{comment}{// read whole register to reduce
+       SPI transfers}
+00215         \textcolor{keyword}{const} uint32\_t gFRAC = ((uint32\_t)(gINT&0xF) << 16) | SPI_read(0x011D);
+00216         \textcolor{keyword}{const} uint8\_t enDiv2 = Get_SPI_Reg_bits(EN_DIV2_DIVPROG)+1;
+00217         \textcolor{keyword}{const} uint8\_t divLoch = Get_SPI_Reg_bits(DIV_LOCH) + 1;
+00218         SPI_write(0x0020, ch);
+00219         \textcolor{comment}{//Calculate real frequency according to the calculated parameters}
+00220         \textcolor{keywordflow}{return} (enDiv2) * (RefClk / pow2(divLoch)) * ((gINT >> 4) + 4 + (gFRAC / 1048576.0));
+00221     \}
+00222 \}
+00223 
+00224 uint8\_t SetFrequencySX(\textcolor{keyword}{const} \textcolor{keywordtype}{bool} tx, \textcolor{keyword}{const} float_type freq\_Hz)
+00225 \{
+00226     \textcolor{keyword}{const} uint16\_t macBck = SPI_read(0x0020);
+00227     \textcolor{keywordtype}{bool} canDeliverFrequency;
+00228     Modify_SPI_Reg_bits(MAC, tx?2:1);
+00229     \textcolor{comment}{//find required VCO frequency}
+00230     \{
+00231         float_type VCOfreq;
+00232         uint32\_t fractionalPart;
+00233         float_type temp;
+00234         \{
+00235             uint8\_t div\_loch;
+00236             \textcolor{keywordflow}{for} (div\_loch = 7; div\_loch; --div\_loch)
+00237             \{
+00238                 VCOfreq = pow2(div\_loch) * freq\_Hz;
+00239                 \textcolor{keywordflow}{if} ((VCOfreq >= 3800e6) && (VCOfreq <= 7714e6))
+00240                     \textcolor{keywordflow}{break};
+00241             \}
+00242             Modify_SPI_Reg_bits(DIV_LOCH, div\_loch-1);
+00243         \}
+00244         \{
+00245             \textcolor{keyword}{const} uint8\_t enDiv2 = (VCOfreq > 5500e6) ? 1 : 0;
+00246             Modify_SPI_Reg_bits(EN_DIV2_DIVPROG, enDiv2); \textcolor{comment}{//EN\_DIV2\_DIVPROG}
+00247             temp = VCOfreq / (RefClk * (1 + enDiv2));
+00248             fractionalPart = (uint32\_t)((temp - (uint32\_t)(temp)) * 1048576);
+00249 
+00250             Modify_SPI_Reg_bits(INT_SDM, (uint16\_t)(temp - 4)); \textcolor{comment}{//INT\_SDM}
+00251             Modify_SPI_Reg_bits(0x011E, MSB_LSB(3, 0), (fractionalPart >> 16)); \textcolor{comment}{//FRAC\_SDM[19:16]}
+00252             SPI_write(0x011D, fractionalPart & 0xFFFF); \textcolor{comment}{//FRAC\_SDM[15:0]}
+00253         \}
+00254     \}
+00255 
+00256     canDeliverFrequency = \textcolor{keyword}{false};
+00257     \{
+00258         uint8\_t sel\_vco, bestVCO, bestCSW;
+00259         uint8\_t bestScore = 255;\textcolor{comment}{// best is closest to 0}
+00260         \textcolor{keywordflow}{for} (sel\_vco = 0; sel\_vco < 3; ++sel\_vco)
+00261         \{
+00262             Modify_SPI_Reg_bits(SEL_VCO, sel\_vco);
+00263             \textcolor{keywordflow}{if}( TuneVCO(1) == MCU_NO_ERROR)
+00264             \{
+00265                 \textcolor{keyword}{const} uint8\_t csw = Get_SPI_Reg_bits(CSW_VCO);
+00266                 \textcolor{keyword}{const} uint8\_t score = abs(csw - 128);
+00267                 \textcolor{keywordflow}{if}(score < bestScore)
+00268                 \{
+00269                     bestScore = score;
+00270                     bestVCO = sel\_vco;
+00271                     bestCSW = csw;
+00272                 \}
+00273                 canDeliverFrequency = \textcolor{keyword}{true};
+00274             \}
+00275         \}
+00276         Modify_SPI_Reg_bits(SEL_VCO, bestVCO);
+00277         Modify_SPI_Reg_bits(CSW_VCO, bestCSW);
+00278     \}
+00279     SPI_write(0x0020, macBck);
+00280     \textcolor{keywordflow}{if} (canDeliverFrequency == \textcolor{keyword}{false})
+00281         \textcolor{keywordflow}{return} tx ? MCU_SXT_TUNE_FAILED : MCU_SXR_TUNE_FAILED;
+00282     \textcolor{keywordflow}{return} MCU_NO_ERROR;
+00283 \}
+00284 
+00289 \textcolor{keyword}{static} uint8\_t ReadCMP(\textcolor{keyword}{const} \textcolor{keywordtype}{bool} SX)
+00290 \{
+00291 \textcolor{preprocessor}{#ifdef \_\_cplusplus}
+00292     std::this\_thread::sleep\_for(std::chrono::microseconds(100));
+00293 \textcolor{preprocessor}{#else}
+00294     TR0 = 0; \textcolor{comment}{//stop timer 0}
+00295     TH0 = (gComparatorDelayCounter >> 8);
+00296     TL0 = (gComparatorDelayCounter & 0xFF);
+00297     TF0 = 0; \textcolor{comment}{// clear overflow}
+00298     TR0 = 1; \textcolor{comment}{//start timer 0}
+00299     \textcolor{keywordflow}{while}( !TF0 ); \textcolor{comment}{// wait for timer overflow}
+00300 \textcolor{preprocessor}{#endif}
+00301     \textcolor{keywordflow}{return} (uint8\_t)Get_SPI_Reg_bits(SX ? 0x0123 : 0x008C, MSB_LSB(13, 12));
+00302 \}
+00303 
+00304 uint8\_t TuneVCO(\textcolor{keywordtype}{bool} SX) \textcolor{comment}{// 0-cgen, 1-SXR, 2-SXT}
+00305 \{
+00306     \textcolor{keyword}{typedef} \textcolor{keyword}{struct}
+00307     \{
+00308         uint8\_t high;
+00309         uint8\_t low;
+00310         uint8\_t hasLock;
+00311     \} CSWInteval;
+00312 
+00313     uint16\_t addrCSW\_VCO;
+00314     uint8\_t msblsb;
+00315 
+00316     CSWInteval cswSearch[2];
+00317     cswSearch[0].high = 0; \textcolor{comment}{//search interval lowest value}
+00318     cswSearch[0].low = 127;
+00319     cswSearch[1].high = 128;
+00320     cswSearch[1].low = 255;
+00321     cswSearch[1].hasLock = cswSearch[0].hasLock = \textcolor{keyword}{false};
+00322 
+00323     \textcolor{keywordflow}{if}(SX)
+00324     \{
+00325         addrCSW\_VCO = 0x0121;
+00326         msblsb = MSB_LSB(10, 3); \textcolor{comment}{//CSW msb lsb}
+00327         \textcolor{comment}{//assuming the active channel is already correct}
+00328         Modify_SPI_Reg_bits(0x011C, MSB_LSB(2, 1), 0); \textcolor{comment}{//activate VCO and comparator}
+00329     \}
+00330     \textcolor{keywordflow}{else} \textcolor{comment}{//CGEN}
+00331     \{
+00332         addrCSW\_VCO = 0x008B;
+00333         msblsb = MSB_LSB(8, 1); \textcolor{comment}{//CSW msb lsb}
+00334         Modify_SPI_Reg_bits(0x0086, MSB_LSB(2, 1), 0); \textcolor{comment}{//activate VCO and comparator}
+00335     \}
+00336 \textcolor{preprocessor}{#ifndef \_\_cplusplus}
+00337     gComparatorDelayCounter = 0xFFFF - (uint16\_t)((0.0003/12)*RefClk); \textcolor{comment}{// ~300us}
+00338 \textcolor{preprocessor}{#endif}
+00339     \textcolor{comment}{//check if lock is within VCO range}
+00340     Modify_SPI_Reg_bits(addrCSW\_VCO, msblsb, 0);
+00341     \textcolor{keywordflow}{if}(ReadCMP(SX) == 3) \textcolor{comment}{//VCO too high}
+00342         \textcolor{keywordflow}{return} MCU_ERROR;
+00343     Modify_SPI_Reg_bits(addrCSW\_VCO, msblsb, 255);
+00344     \textcolor{keywordflow}{if}(ReadCMP(SX) == 0) \textcolor{comment}{//VCO too low}
+00345         \textcolor{keywordflow}{return} MCU_ERROR;
+00346 
+00347     \textcolor{comment}{//search intervals [0-127][128-255]}
+00348     \{
+00349         uint8\_t t;
+00350         \textcolor{keywordflow}{for}(t=0; t<2; ++t)
+00351         \{
+00352             uint8\_t mask;
+00353             \textcolor{keywordflow}{for}(mask = (1 << 6); mask; mask >>= 1)
+00354             \{
+00355                 uint8\_t cmpValue;
+00356                 cswSearch[t].high |= mask; \textcolor{comment}{// CSW\_VCO<i>=1}
+00357                 Modify_SPI_Reg_bits(addrCSW\_VCO, msblsb, cswSearch[t].high);
+00358                 cmpValue = ReadCMP(SX);
+00359                 \textcolor{keywordflow}{if}(cmpValue == 0x03) \textcolor{comment}{// reduce CSW}
+00360                     cswSearch[t].high ^= mask; \textcolor{comment}{// CSW\_VCO<i>=0}
+00361                 \textcolor{keywordflow}{else} \textcolor{keywordflow}{if}(cmpValue == 0x02 && cswSearch[t].high <= cswSearch[t].low)
+00362                 \{
+00363                     cswSearch[t].hasLock = \textcolor{keyword}{true};
+00364                     cswSearch[t].low = cswSearch[t].high;
+00365                 \}
+00366             \}
+00367             \textcolor{keywordflow}{for}(; cswSearch[t].low; --cswSearch[t].low)
+00368             \{
+00369                 Modify_SPI_Reg_bits(addrCSW\_VCO, msblsb, cswSearch[t].low);
+00370                 \textcolor{keywordflow}{if}(ReadCMP(SX) != 0x2)
+00371                 \{
+00372                     \textcolor{keywordflow}{if}(cswSearch[t].low < cswSearch[t].high)
+00373                         ++cswSearch[t].low;
+00374                     \textcolor{keywordflow}{break};
+00375                 \}
+00376             \}
+00377         \}
+00378     \}
+00379     \{
+00380         uint8\_t cswValue;
+00381         \textcolor{comment}{//compare which interval is wider}
+00382         \{
+00383             \textcolor{keywordflow}{if}(cswSearch[1].hasLock && (cswSearch[1].high-cswSearch[1].low >= cswSearch[0].high-cswSearch[0
+      ].low))
+00384                 cswValue = cswSearch[1].low +((cswSearch[1].high-cswSearch[1].low) >> 1);
+00385             \textcolor{keywordflow}{else}
+00386                 cswValue = cswSearch[0].low +((cswSearch[0].high-cswSearch[0].low) >> 1);
+00387         \}
+00388 
+00389         Modify_SPI_Reg_bits(addrCSW\_VCO, msblsb, cswValue);
+00390         \textcolor{keywordflow}{if}(ReadCMP(SX) != 0x2) \textcolor{comment}{//just in case high-low==1, if low fails, check if high locks}
+00391             Modify_SPI_Reg_bits(addrCSW\_VCO, msblsb, ++cswValue);
+00392     \}
+00393     \textcolor{keywordflow}{if}(ReadCMP(SX) == 0x2)
+00394         \textcolor{keywordflow}{return} MCU_NO_ERROR;
+00395     \textcolor{keywordflow}{return} MCU_ERROR;
+00396 \}
+00397 
+00398 \textcolor{keywordtype}{void} WriteMaskedRegs(\textcolor{keyword}{const} RegisterBatch ROM* regs)
+00399 \{
+00400     uint8\_t i;
+00401     uint8\_t index;
+00402     \textcolor{keywordflow}{for}(i=regs->cnt; i; --i)
+00403     \{
+00404         index = i-1;
+00405         SPI_write(regs->addr[index], ( SPI_read(regs->addr[index]) & ~regs->mask[index] ) | regs->val[index
+      ]);
+00406     \}
+00407     \textcolor{keywordflow}{for}(i=regs->wrOnlyAddrCnt; i; --i)
+00408     \{
+00409         index = i-1;
+00410         SPI_write(regs->wrOnlyAddr[index], i > regs->wrOnlyDataCnt ? 0 : regs->wrOnlyData[index]);
+00411     \}
+00412 \}
+00413 
+00414 uint8\_t GetValueOf_c_ctl_pga_rbb(uint8\_t g\_pga\_rbb)
+00415 \{
+00416     \textcolor{keywordflow}{if}(g\_pga\_rbb < 21)
+00417         \textcolor{keywordflow}{return} 1;
+00418     \textcolor{keywordflow}{if}(g\_pga\_rbb < 13)
+00419         \textcolor{keywordflow}{return} 2;
+00420     \textcolor{keywordflow}{if}(g\_pga\_rbb < 8)
+00421         \textcolor{keywordflow}{return} 3;
+00422     \textcolor{keywordflow}{return} 0;
+00423 \}
+00424 
+00425 \textcolor{keywordtype}{void} EnableChannelPowerControls()
+00426 \{
+00427     uint16\_t afe = SPI_read(0x0082);
+00428     uint16\_t value = SPI_read(0x0020);
+00429     \textcolor{keywordflow}{if}((value & 3) == 1)
+00430     \{
+00431         value = value | 0x0014;
+00432         afe &= ~0x14;
+00433     \}
+00434     \textcolor{keywordflow}{else}
+00435     \{
+00436         value = value | 0x0028;
+00437         afe &= ~0x0A;
+00438     \}
+00439     SPI_write(0x0020, value);
+00440     SPI_write(0x0082, afe);
+00441 \}
+00442 
+00443 \textcolor{keywordtype}{void} EnableMIMOBuffersIfNecessary()
+00444 \{
+00445 \textcolor{comment}{//modifications when calibrating channel B}
+00446     uint16\_t x0020val = SPI_read(0x0020);
+00447     \textcolor{keywordflow}{if}( (x0020val&0x3) == 2)
+00448     \{
+00449         Modify_SPI_Reg_bits(MAC, 1);
+00450         Modify_SPI_Reg_bits(EN_NEXTRX_RFE, 1);
+00451         Modify_SPI_Reg_bits(EN_NEXTTX_TRF, 1);
+00452         SPI_write(0x0020, x0020val);
+00453     \}
+00454 \}
+\end{DoxyCode}

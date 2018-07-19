@@ -1,0 +1,40 @@
+\subsection{pnlu\+Lime\+S\+D\+R.\+h}
+\label{pnluLimeSDR_8h_source}\index{/home/erik/prefix/default/src/limesuite-\/dev/src/boards\+\_\+wxgui/pnlu\+Lime\+S\+D\+R.\+h@{/home/erik/prefix/default/src/limesuite-\/dev/src/boards\+\_\+wxgui/pnlu\+Lime\+S\+D\+R.\+h}}
+
+\begin{DoxyCode}
+00001 \textcolor{preprocessor}{#ifndef PNL\_ULIMESDR\_H}
+00002 \textcolor{preprocessor}{#define PNL\_ULIMESDR\_H}
+00003 
+00004 \textcolor{preprocessor}{#include "lime/LimeSuite.h"}
+00005 \textcolor{preprocessor}{#include <map>}
+00006 \textcolor{preprocessor}{#include <wx/panel.h>}
+00007 \textcolor{preprocessor}{#include <wx/choice.h>}
+00008 \textcolor{keyword}{class }wxStaticText;
+00009 \textcolor{keyword}{class }wxFlexGridSizer;
+00010 \textcolor{keyword}{class }wxCheckBox;
+00011 
+00012 \textcolor{keyword}{class }pnluLimeSDR : \textcolor{keyword}{public} wxPanel
+00013 \{
+00014 \textcolor{keyword}{public}:
+00015     pnluLimeSDR(wxWindow* parent, wxWindowID \textcolor{keywordtype}{id} = wxID\_ANY, \textcolor{keyword}{const} wxPoint& pos = wxDefaultPosition, \textcolor{keyword}{const} 
+      wxSize& size = wxDefaultSize, \textcolor{keywordtype}{int} style = 0, wxString name = wxEmptyString);
+00016     \textcolor{keywordtype}{void} Initialize(lms_device_t *pControl);
+00017     \textcolor{keyword}{virtual} ~pnluLimeSDR();
+00018     \textcolor{keyword}{virtual} \textcolor{keywordtype}{void} UpdatePanel();
+00019     \textcolor{keywordtype}{void} OnLoopbackChange(wxCommandEvent &event);
+00020 
+00021     \textcolor{keywordtype}{void} OnReadAll(wxCommandEvent &event);
+00022     \textcolor{keywordtype}{void} OnWriteAll(wxCommandEvent &event);
+00023 
+00024 \textcolor{keyword}{protected}:
+00025     wxCheckBox* chkTxLBSH;
+00026     wxCheckBox* chkTxLBAT;
+00027     wxChoice* cmbRxPath;
+00028     wxChoice* cmbTxPath;
+00029     wxStaticText* txtLB;
+00030     lms_device_t *lmsControl;
+00031     DECLARE\_EVENT\_TABLE()
+00032 \};
+00033 
+00034 \textcolor{preprocessor}{#endif}
+\end{DoxyCode}

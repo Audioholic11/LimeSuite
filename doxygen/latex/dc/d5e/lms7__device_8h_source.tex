@@ -1,0 +1,136 @@
+\subsection{lms7\+\_\+device.\+h}
+\label{lms7__device_8h_source}\index{/home/erik/prefix/default/src/limesuite-\/dev/src/\+A\+P\+I/lms7\+\_\+device.\+h@{/home/erik/prefix/default/src/limesuite-\/dev/src/\+A\+P\+I/lms7\+\_\+device.\+h}}
+
+\begin{DoxyCode}
+00001 \textcolor{comment}{/*}
+00002 \textcolor{comment}{ * File:   lms7\_device.h}
+00003 \textcolor{comment}{ * Author: ignas}
+00004 \textcolor{comment}{ *}
+00005 \textcolor{comment}{ * Created on March 9, 2016, 12:54 PM}
+00006 \textcolor{comment}{ */}
+00007 
+00008 \textcolor{preprocessor}{#ifndef LMS7\_DEVICE\_H}
+00009 \textcolor{preprocessor}{#define LMS7\_DEVICE\_H}
+00010 \textcolor{preprocessor}{#include "LMS7002M.h"}
+00011 \textcolor{preprocessor}{#include "lime/LimeSuite.h"}
+00012 \textcolor{preprocessor}{#include <vector>}
+00013 \textcolor{preprocessor}{#include <string>}
+00014 \textcolor{preprocessor}{#include "Streamer.h"}
+00015 \textcolor{preprocessor}{#include "IConnection.h"}
+00016 
+00017 \textcolor{keyword}{namespace }lime
+00018 \{
+00019 \textcolor{keyword}{class }LIME_API LMS7_Device
+00020 \{
+00021 \textcolor{keyword}{public}:
+00022     \textcolor{keyword}{struct }Range \{
+00023         Range(\textcolor{keywordtype}{double} a = 0, \textcolor{keywordtype}{double} b = 0)\{ min = a, max = b; \};
+00024         \textcolor{keywordtype}{double} min;
+00025         \textcolor{keywordtype}{double} max;
+00026     \};
+00027     \textcolor{keyword}{virtual} ~LMS7_Device();
+00028     LMS7_Device(LMS7_Device *obj = \textcolor{keyword}{nullptr});
+00029     lime::IConnection* GetConnection(\textcolor{keywordtype}{unsigned} chan =0);
+00030     lime::FPGA* GetFPGA();
+00031     \textcolor{keyword}{virtual} \textcolor{keywordtype}{int} Init();
+00032     \textcolor{keyword}{virtual} \textcolor{keywordtype}{int} EnableChannel(\textcolor{keywordtype}{bool} dir_tx, \textcolor{keywordtype}{unsigned} chan, \textcolor{keywordtype}{bool} enabled);
+00033     \textcolor{keywordtype}{int} Reset();
+00034     \textcolor{keyword}{virtual} \textcolor{keywordtype}{unsigned} GetNumChannels(\textcolor{keyword}{const} \textcolor{keywordtype}{bool} tx=\textcolor{keyword}{false}) \textcolor{keyword}{const};
+00035     \textcolor{keyword}{virtual} \textcolor{keywordtype}{int} SetRate(\textcolor{keywordtype}{double} f\_MHz, \textcolor{keywordtype}{int} oversample);
+00036     \textcolor{keyword}{virtual} \textcolor{keywordtype}{int} SetRate(\textcolor{keywordtype}{bool} tx, \textcolor{keywordtype}{double} f\_MHz, \textcolor{keywordtype}{unsigned} oversample = 0);
+00037     \textcolor{keyword}{virtual} \textcolor{keywordtype}{int} SetRate(\textcolor{keywordtype}{unsigned} ch, \textcolor{keywordtype}{double} rxRate, \textcolor{keywordtype}{double} txRate, \textcolor{keywordtype}{unsigned} 
+      oversample = 0);
+00038     \textcolor{keywordtype}{int} SetFPGAInterfaceFreq(\textcolor{keywordtype}{int} interp = -1, \textcolor{keywordtype}{int} dec = -1, \textcolor{keywordtype}{double} txPhase = 999, \textcolor{keywordtype}{double} rxPhase = 999);
+00039     \textcolor{keyword}{virtual} \textcolor{keywordtype}{double} GetRate(\textcolor{keywordtype}{bool} tx, \textcolor{keywordtype}{unsigned} chan, \textcolor{keywordtype}{double} *rf\_rate\_Hz = NULL) \textcolor{keyword}{const};
+00040     \textcolor{keyword}{virtual} Range GetRateRange(\textcolor{keywordtype}{bool} dir = \textcolor{keyword}{false}, \textcolor{keywordtype}{unsigned} chan = 0)\textcolor{keyword}{const};
+00041     \textcolor{keyword}{virtual} std::vector<std::string> GetPathNames(\textcolor{keywordtype}{bool} dir_tx, \textcolor{keywordtype}{unsigned} chan = 0) \textcolor{keyword}{const};
+00042     \textcolor{keyword}{virtual} \textcolor{keywordtype}{int} SetPath(\textcolor{keywordtype}{bool} tx,\textcolor{keywordtype}{unsigned} chan, \textcolor{keywordtype}{unsigned} path);
+00043     \textcolor{keywordtype}{int} GetPath(\textcolor{keywordtype}{bool} tx, \textcolor{keywordtype}{unsigned} chan) \textcolor{keyword}{const};
+00044     \textcolor{keyword}{virtual} \textcolor{keywordtype}{int} SetFrequency(\textcolor{keywordtype}{bool} tx, \textcolor{keywordtype}{unsigned} chan, \textcolor{keywordtype}{double} f\_Hz);
+00045     \textcolor{keywordtype}{double} GetFrequency(\textcolor{keywordtype}{bool} tx, \textcolor{keywordtype}{unsigned} chan) \textcolor{keyword}{const};
+00046     \textcolor{keyword}{virtual} Range GetFrequencyRange(\textcolor{keywordtype}{bool} tx) \textcolor{keyword}{const};
+00047     \textcolor{keyword}{virtual} Range GetRxPathBand(\textcolor{keywordtype}{unsigned} path, \textcolor{keywordtype}{unsigned} chan) \textcolor{keyword}{const};
+00048     \textcolor{keyword}{virtual} Range GetTxPathBand(\textcolor{keywordtype}{unsigned} path, \textcolor{keywordtype}{unsigned} chan) \textcolor{keyword}{const};
+00049     \textcolor{keywordtype}{int} SetLPF(\textcolor{keywordtype}{bool} tx, \textcolor{keywordtype}{unsigned} chan, \textcolor{keywordtype}{bool} en, \textcolor{keywordtype}{double} bandwidth=-1);
+00050     \textcolor{keywordtype}{double} GetLPFBW(\textcolor{keywordtype}{bool} tx,\textcolor{keywordtype}{unsigned} chan) \textcolor{keyword}{const};
+00051     Range GetLPFRange(\textcolor{keywordtype}{bool} tx,\textcolor{keywordtype}{unsigned} chan) \textcolor{keyword}{const};
+00052     \textcolor{keywordtype}{int} SetGFIRCoef(\textcolor{keywordtype}{bool} tx, \textcolor{keywordtype}{unsigned} chan, lms_gfir_t filt, \textcolor{keyword}{const} \textcolor{keywordtype}{double}* coef, \textcolor{keywordtype}{unsigned} 
+      count);
+00053     \textcolor{keywordtype}{int} GetGFIRCoef(\textcolor{keywordtype}{bool} tx, \textcolor{keywordtype}{unsigned} chan, lms_gfir_t filt, \textcolor{keywordtype}{double}* coef) \textcolor{keyword}{const};
+00054     \textcolor{keywordtype}{int} SetGFIR(\textcolor{keywordtype}{bool} tx, \textcolor{keywordtype}{unsigned} chan, lms_gfir_t filt, \textcolor{keywordtype}{bool} enabled);
+00055     \textcolor{keywordtype}{int} SetGain(\textcolor{keywordtype}{bool} dir_tx, \textcolor{keywordtype}{unsigned} chan, \textcolor{keywordtype}{double} value, \textcolor{keyword}{const} std::string &
+      name = \textcolor{stringliteral}{""});
+00056     \textcolor{keywordtype}{double} GetGain(\textcolor{keywordtype}{bool} dir_tx, \textcolor{keywordtype}{unsigned} chan, \textcolor{keyword}{const} std::string &name = \textcolor{stringliteral}{""}) \textcolor{keyword}{const};
+00057     Range GetGainRange(\textcolor{keywordtype}{bool} dir_tx, \textcolor{keywordtype}{unsigned} chan, \textcolor{keyword}{const} std::string &name = \textcolor{stringliteral}{""}) \textcolor{keyword}{const};
+00058     \textcolor{keywordtype}{int} SetTestSignal(\textcolor{keywordtype}{bool} dir_tx, \textcolor{keywordtype}{unsigned} chan, lms_testsig_t sig, int16\_t 
+      dc_i = 0, int16\_t dc_q = 0);
+00059     \textcolor{keywordtype}{int} GetTestSignal(\textcolor{keywordtype}{bool} dir_tx, \textcolor{keywordtype}{unsigned} chan) \textcolor{keyword}{const};
+00060     \textcolor{keywordtype}{int} SetNCOFreq(\textcolor{keywordtype}{bool} tx, \textcolor{keywordtype}{unsigned} ch, \textcolor{keywordtype}{int} ind, \textcolor{keywordtype}{double} freq);
+00061     \textcolor{keywordtype}{double} GetNCOFreq(\textcolor{keywordtype}{bool} tx, \textcolor{keywordtype}{unsigned} ch, \textcolor{keywordtype}{int} ind) \textcolor{keyword}{const};
+00062     \textcolor{keywordtype}{int} SetNCOPhase(\textcolor{keywordtype}{bool} tx, \textcolor{keywordtype}{unsigned} ch, \textcolor{keywordtype}{int} ind, \textcolor{keywordtype}{double} phase);
+00063     \textcolor{keywordtype}{double} GetNCOPhase(\textcolor{keywordtype}{bool} tx, \textcolor{keywordtype}{unsigned} ch, \textcolor{keywordtype}{int} ind) \textcolor{keyword}{const};
+00064     \textcolor{keywordtype}{int} Calibrate(\textcolor{keywordtype}{bool} dir_tx, \textcolor{keywordtype}{unsigned} chan, \textcolor{keywordtype}{double} bw, \textcolor{keywordtype}{unsigned} flags);
+00065     \textcolor{keyword}{virtual} std::vector<std::string> GetProgramModes() \textcolor{keyword}{const};
+00066     \textcolor{keyword}{virtual} \textcolor{keywordtype}{int} Program(\textcolor{keyword}{const} std::string& mode, \textcolor{keyword}{const} \textcolor{keywordtype}{char}* data, \textcolor{keywordtype}{size\_t} len, 
+      lime::IConnection::ProgrammingCallback callback) \textcolor{keyword}{const};
+00067     \textcolor{keywordtype}{double} GetClockFreq(\textcolor{keywordtype}{unsigned} clk_id, \textcolor{keywordtype}{int} channel = -1) \textcolor{keyword}{const};
+00068     \textcolor{keywordtype}{int} SetClockFreq(\textcolor{keywordtype}{unsigned} clk_id, \textcolor{keywordtype}{double} freq, \textcolor{keywordtype}{int} channel = -1);
+00069     lms_dev_info_t* GetInfo();
+00070     \textcolor{keywordtype}{int} Synchronize(\textcolor{keywordtype}{bool} toChip) \textcolor{keyword}{const};
+00071     \textcolor{keywordtype}{int} SetLogCallback(\textcolor{keywordtype}{void}(*func)(\textcolor{keyword}{const} \textcolor{keywordtype}{char}* cstr, \textcolor{keyword}{const} \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{int} type));
+00072     \textcolor{keywordtype}{int} EnableCalibCache(\textcolor{keywordtype}{bool} enable);
+00073     \textcolor{keywordtype}{double} GetChipTemperature(\textcolor{keywordtype}{int} ind = -1) \textcolor{keyword}{const};
+00074     \textcolor{keywordtype}{int} LoadConfig(\textcolor{keyword}{const} \textcolor{keywordtype}{char} *filename, \textcolor{keywordtype}{int} ind = -1);
+00075     \textcolor{keywordtype}{int} SaveConfig(\textcolor{keyword}{const} \textcolor{keywordtype}{char} *filename, \textcolor{keywordtype}{int} ind = -1) \textcolor{keyword}{const};
+00076     \textcolor{keywordtype}{int} ReadLMSReg(uint16\_t address, \textcolor{keywordtype}{int} ind = -1) \textcolor{keyword}{const};
+00077     \textcolor{keywordtype}{int} WriteLMSReg(uint16\_t address, uint16\_t val, \textcolor{keywordtype}{int} ind = -1) \textcolor{keyword}{const};
+00078     uint16\_t ReadParam(\textcolor{keyword}{const} \textcolor{keyword}{struct} LMS7Parameter& param, \textcolor{keywordtype}{int} channel = -1, \textcolor{keywordtype}{bool} forceReadFromChip = \textcolor{keyword}{false})
+       \textcolor{keyword}{const};
+00079     \textcolor{keywordtype}{int} ReadParam(\textcolor{keyword}{const} std::string& param, \textcolor{keywordtype}{int} channel = -1, \textcolor{keywordtype}{bool} forceReadFromChip = \textcolor{keyword}{false}) \textcolor{keyword}{const};
+00080     \textcolor{keywordtype}{int} WriteParam(\textcolor{keyword}{const} \textcolor{keyword}{struct} LMS7Parameter& param, uint16\_t val, \textcolor{keywordtype}{int} channel = -1);
+00081     \textcolor{keywordtype}{int} WriteParam(\textcolor{keyword}{const} std::string& param, uint16\_t val, \textcolor{keywordtype}{int} channel = -1);
+00082     \textcolor{keywordtype}{int} SetActiveChip(\textcolor{keywordtype}{unsigned} ind);
+00083     lime::LMS7002M* GetLMS(\textcolor{keywordtype}{int} index = -1) \textcolor{keyword}{const};
+00084     \textcolor{keywordtype}{int} UploadWFM(\textcolor{keyword}{const} \textcolor{keywordtype}{void} **samples, uint8\_t chCount, \textcolor{keywordtype}{int} sample_count, 
+      lime::StreamConfig::StreamDataFormat fmt) \textcolor{keyword}{const};
+00085     \textcolor{keyword}{static} LMS7_Device* CreateDevice(\textcolor{keyword}{const} lime::ConnectionHandle& handle, 
+      LMS7_Device *obj = \textcolor{keyword}{nullptr});
+00086     \textcolor{keyword}{static} std::vector<lime::ConnectionHandle> GetDeviceList();
+00087     \textcolor{keywordtype}{int} ConfigureGFIR(\textcolor{keywordtype}{bool} tx, \textcolor{keywordtype}{unsigned} ch, \textcolor{keywordtype}{bool} enabled, \textcolor{keywordtype}{double} bandwidth);
+00088 
+00089     lime::StreamChannel* SetupStream(\textcolor{keyword}{const} lime::StreamConfig &config);
+00090     \textcolor{keywordtype}{int} DestroyStream(lime::StreamChannel* streamID);
+00091     uint64\_t GetHardwareTimestamp(\textcolor{keywordtype}{void}) \textcolor{keyword}{const};
+00092     \textcolor{keywordtype}{void} SetHardwareTimestamp(\textcolor{keyword}{const} uint64\_t now);
+00093 
+00094     \textcolor{keywordtype}{int} MCU\_AGCStart(uint32\_t wantedRSSI);
+00095     \textcolor{keywordtype}{int} MCU\_AGCStop();
+00096 
+00097 \textcolor{keyword}{protected}:
+00098 
+00099     \textcolor{keyword}{struct }ChannelInfo
+00100     \{
+00101     \textcolor{keyword}{public}:
+00102         ChannelInfo():lpf\_bw(5e6),cF\_offset\_nco(0),sample\_rate(30e6),freq(-1.0)\{\}
+00103         \textcolor{keywordtype}{double} lpf_bw;
+00104         \textcolor{keywordtype}{double} cF_offset_nco;
+00105         \textcolor{keywordtype}{double} sample_rate;
+00106         \textcolor{keywordtype}{double} freq;
+00107     \};
+00108     lms_dev_info_t devInfo;
+00109     std::vector<ChannelInfo> tx_channels;
+00110     std::vector<ChannelInfo> rx_channels;
+00111     lime::IConnection* connection;
+00112     std::vector<lime::LMS7002M*> lms_list;
+00113     lime::LMS7002M* SelectChannel(\textcolor{keywordtype}{unsigned} chan) \textcolor{keyword}{const};
+00114     \textcolor{keywordtype}{int} ConfigureTXLPF(\textcolor{keywordtype}{bool} enabled,\textcolor{keywordtype}{int} ch, \textcolor{keywordtype}{double} bandwidth);
+00115     \textcolor{keywordtype}{unsigned} lms_chip_id;
+00116     std::vector<lime::Streamer*> mStreamers;
+00117     lime::FPGA* fpga;
+00118 \};
+00119 
+00120 \}
+00121 
+00122 \textcolor{preprocessor}{#endif  }\textcolor{comment}{/* LMS7\_DEVICE\_H */}\textcolor{preprocessor}{}
+00123 
+\end{DoxyCode}

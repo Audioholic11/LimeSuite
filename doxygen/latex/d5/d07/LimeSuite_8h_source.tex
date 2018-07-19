@@ -1,0 +1,389 @@
+\subsection{Lime\+Suite.\+h}
+\label{LimeSuite_8h_source}\index{/home/erik/prefix/default/src/limesuite-\/dev/src/lime/\+Lime\+Suite.\+h@{/home/erik/prefix/default/src/limesuite-\/dev/src/lime/\+Lime\+Suite.\+h}}
+
+\begin{DoxyCode}
+00001 
+00021 \textcolor{preprocessor}{#ifndef LMS7\_API\_H}
+00022 \textcolor{preprocessor}{#define LMS7\_API\_H}
+00023 
+00024 \textcolor{preprocessor}{#include <stdint.h>}
+00025 \textcolor{preprocessor}{#include <stdlib.h>}
+00026 \textcolor{preprocessor}{#include "LMS7002M_parameters.h"}
+00027 
+00028 \textcolor{preprocessor}{#ifdef \_\_cplusplus}
+00029 \textcolor{keyword}{extern} \textcolor{stringliteral}{"C"} \{
+00030 \textcolor{preprocessor}{#else}
+00031 \textcolor{comment}{/* stdbool.h is not applicable for C++ programs, as the language inherently}
+00032 \textcolor{comment}{ * provides the bool type.}
+00033 \textcolor{comment}{ *}
+00034 \textcolor{comment}{ * Users of Visual Studio 2012 and earlier will need to supply a stdbool.h}
+00035 \textcolor{comment}{ * implementation, as it is not included with the toolchain. Visual Studio 2013}
+00036 \textcolor{comment}{ * onward supplies this header.}
+00037 \textcolor{comment}{ */}
+00038 \textcolor{preprocessor}{#include <stdbool.h>}
+00039 \textcolor{preprocessor}{#endif}
+00040 
+00041 \textcolor{preprocessor}{#if defined \_WIN32 || defined \_\_CYGWIN\_\_}
+00042 \textcolor{preprocessor}{#   include <windows.h>}
+00043 \textcolor{preprocessor}{#   define CALL\_CONV \_\_cdecl}
+00044 \textcolor{preprocessor}{#   ifdef \_\_GNUC\_\_}
+00045 \textcolor{preprocessor}{#       define API\_EXPORT \_\_attribute\_\_ ((dllexport))}
+00046 \textcolor{preprocessor}{#   else}
+00047 \textcolor{preprocessor}{#       define API\_EXPORT \_\_declspec(dllexport)}
+00048 \textcolor{preprocessor}{#   endif}
+00049 \textcolor{preprocessor}{#elif defined \_DOXYGEN\_ONLY\_}
+00050 
+00052 \textcolor{preprocessor}{#   define API\_EXPORT}
+00053 
+00055 \textcolor{preprocessor}{#   define CALL\_CONV}
+00056 \textcolor{preprocessor}{#else}
+00057 \textcolor{preprocessor}{#   define API\_EXPORT \_\_attribute\_\_ ((visibility ("default")))}
+00058 \textcolor{preprocessor}{#   define CALL\_CONV}
+00059 \textcolor{preprocessor}{#endif}
+00060 
+00062 \textcolor{keyword}{typedef} \textcolor{keywordtype}{double} float_type;
+00063 
+00065 \textcolor{keyword}{static} \textcolor{keyword}{const} \textcolor{keywordtype}{int} LMS_SUCCESS = 0;
+00066 
+00075 \textcolor{keyword}{typedef} \textcolor{keywordtype}{void} lms_device_t;
+00077 
+00079 \textcolor{keyword}{typedef} \textcolor{keywordtype}{char} lms_info_str_t[256];
+00080 
+00088 API_EXPORT \textcolor{keywordtype}{int} CALL_CONV LMS_GetDeviceList(lms\_info\_str\_t *dev\_list);
+00089 
+00104 API_EXPORT \textcolor{keywordtype}{int} CALL_CONV LMS_Open(lms\_device\_t **device, \textcolor{keyword}{const} lms\_info\_str\_t 
+      info,
+00105                                                          \textcolor{keywordtype}{void}* args);
+00106 
+00116 API_EXPORT \textcolor{keywordtype}{int} CALL_CONV LMS_Close(lms\_device\_t *device);
+00117 
+00127 API_EXPORT \textcolor{keywordtype}{int} CALL_CONV LMS_Disconnect(lms\_device\_t *device);
+00128 
+00139 API_EXPORT \textcolor{keywordtype}{bool} CALL_CONV LMS_IsOpen(lms\_device\_t *device, \textcolor{keywordtype}{int} port);
+00140 
+00152 \textcolor{keyword}{static} \textcolor{keyword}{const} \textcolor{keywordtype}{bool} LMS_CH_TX = \textcolor{keyword}{true};   
+00153 \textcolor{keyword}{static} \textcolor{keyword}{const} \textcolor{keywordtype}{bool} LMS_CH_RX = \textcolor{keyword}{false};  
+00154 
+00156 \textcolor{keyword}{typedef} \textcolor{keywordtype}{char} lms_name_t[16];
+00157 
+00159 \textcolor{keyword}{typedef} \textcolor{keyword}{struct}
+00160 \{
+00161     float\_type min;     
+00162     float\_type max;     
+00163     float\_type step;    
+00164 \}lms_range_t;
+00165 
+00167 \textcolor{keyword}{typedef} \textcolor{keyword}{enum}
+00168 \{
+00169     LMS_TESTSIG_NONE=0,     
+00170     LMS_TESTSIG_NCODIV8,    
+00171     LMS_TESTSIG_NCODIV4,    
+00172     LMS_TESTSIG_NCODIV8F,   
+00173     LMS_TESTSIG_NCODIV4F,   
+00174     LMS_TESTSIG_DC          
+00175 \}lms_testsig_t;
+00176 
+00188 API_EXPORT \textcolor{keywordtype}{int} CALL_CONV LMS_Init(lms\_device\_t *device);
+00189 
+00200 API_EXPORT \textcolor{keywordtype}{int} CALL_CONV LMS_GetNumChannels(lms\_device\_t *device, \textcolor{keywordtype}{bool} dir_tx);
+00201 
+00212 API_EXPORT \textcolor{keywordtype}{int} CALL_CONV LMS_EnableChannel(lms\_device\_t *device, \textcolor{keywordtype}{bool} dir_tx,
+00213                                            \textcolor{keywordtype}{size\_t} chan, \textcolor{keywordtype}{bool} enabled);
+00214 
+00228 API_EXPORT \textcolor{keywordtype}{int} CALL_CONV LMS_SetSampleRate(lms\_device\_t *device, float\_type rate,
+00229                                            \textcolor{keywordtype}{size\_t} oversample);
+00230 
+00244 API_EXPORT \textcolor{keywordtype}{int} CALL_CONV LMS_GetSampleRate(lms\_device\_t *device, \textcolor{keywordtype}{bool} dir_tx,
+00245                            \textcolor{keywordtype}{size\_t} chan, float\_type *host_Hz, float\_type *rf_Hz);
+00255 API_EXPORT \textcolor{keywordtype}{int} CALL_CONV LMS_GetSampleRateRange(lms\_device\_t *device, \textcolor{keywordtype}{bool} 
+      dir_tx,
+00256                                                 lms_range_t *range);
+00257 
+00274 API_EXPORT \textcolor{keywordtype}{int} CALL_CONV LMS_SetLOFrequency(lms\_device\_t *device, \textcolor{keywordtype}{bool} dir_tx,
+00275                                             \textcolor{keywordtype}{size\_t} chan, float\_type frequency);
+00276 
+00287 API_EXPORT \textcolor{keywordtype}{int} CALL_CONV LMS_GetLOFrequency(lms\_device\_t *device, \textcolor{keywordtype}{bool} dir_tx,
+00288                                             \textcolor{keywordtype}{size\_t} chan, float\_type *frequency);
+00289 
+00299 API_EXPORT \textcolor{keywordtype}{int} CALL_CONV LMS_GetLOFrequencyRange(lms\_device\_t *device, \textcolor{keywordtype}{bool} 
+      dir_tx,
+00300                                                  lms_range_t *range);
+00301 
+00303 \textcolor{keyword}{enum}
+00304 \{
+00305     LMS_PATH_NONE = 0, 
+00306     LMS_PATH_LNAH = 1, 
+00307     LMS_PATH_LNAL = 2, 
+00308     LMS_PATH_LNAW = 3, 
+00309     LMS_PATH_TX1 = 1,  
+00310     LMS_PATH_TX2 = 2   
+00311 \};
+00312 
+00324 API_EXPORT \textcolor{keywordtype}{int} CALL_CONV LMS_GetAntennaList(lms\_device\_t *dev, \textcolor{keywordtype}{bool} dir_tx,
+00325                                             \textcolor{keywordtype}{size\_t} chan, lms\_name\_t *list);
+00326 
+00337 API_EXPORT \textcolor{keywordtype}{int} CALL_CONV LMS_SetAntenna(lms\_device\_t *dev, \textcolor{keywordtype}{bool} dir_tx,
+00338                                         \textcolor{keywordtype}{size\_t} chan, \textcolor{keywordtype}{size\_t} index);
+00339 
+00349 API_EXPORT \textcolor{keywordtype}{int} CALL_CONV LMS_GetAntenna(lms\_device\_t *dev, \textcolor{keywordtype}{bool} dir_tx,
+00350                                         \textcolor{keywordtype}{size\_t} chan);
+00351 
+00364 API_EXPORT \textcolor{keywordtype}{int} CALL_CONV LMS_GetAntennaBW(lms\_device\_t *dev, \textcolor{keywordtype}{bool} dir_tx,
+00365                                  \textcolor{keywordtype}{size\_t} chan, \textcolor{keywordtype}{size\_t} index, lms_range_t *range);
+00366 
+00382 API_EXPORT \textcolor{keywordtype}{int} CALL_CONV LMS_SetNormalizedGain(lms\_device\_t *device, \textcolor{keywordtype}{bool} dir_tx,
+00383                                                \textcolor{keywordtype}{size\_t} chan,float\_type gain);
+00384 
+00399 API_EXPORT \textcolor{keywordtype}{int} CALL_CONV LMS_SetGaindB(lms\_device\_t *device, \textcolor{keywordtype}{bool} dir_tx,
+00400                                         \textcolor{keywordtype}{size\_t} chan, \textcolor{keywordtype}{unsigned} gain);
+00401 
+00415 API_EXPORT \textcolor{keywordtype}{int} CALL_CONV LMS_GetNormalizedGain(lms\_device\_t *device, \textcolor{keywordtype}{bool} dir_tx,
+00416                                                 \textcolor{keywordtype}{size\_t} chan, float\_type *gain);
+00429 API_EXPORT \textcolor{keywordtype}{int} CALL_CONV LMS_GetGaindB(lms\_device\_t *device, \textcolor{keywordtype}{bool} dir_tx,
+00430                                                 \textcolor{keywordtype}{size\_t} chan, \textcolor{keywordtype}{unsigned} *gain);
+00431 
+00443 API_EXPORT \textcolor{keywordtype}{int} CALL_CONV LMS_SetLPFBW(lms\_device\_t *device, \textcolor{keywordtype}{bool} dir_tx,
+00444                                              \textcolor{keywordtype}{size\_t} chan, float\_type bandwidth);
+00445 
+00458 API_EXPORT \textcolor{keywordtype}{int} CALL_CONV LMS_GetLPFBW(lms\_device\_t *device, \textcolor{keywordtype}{bool} dir_tx,
+00459                                             \textcolor{keywordtype}{size\_t} chan, float\_type *bandwidth);
+00460 
+00470 API_EXPORT \textcolor{keywordtype}{int} CALL_CONV LMS_GetLPFBWRange(lms\_device\_t *device, \textcolor{keywordtype}{bool} dir_tx,
+00471                                             lms_range_t *range);
+00472 
+00483 API_EXPORT \textcolor{keywordtype}{int} CALL_CONV LMS_SetLPF(lms\_device\_t *device, \textcolor{keywordtype}{bool} dir_tx,
+00484                                     \textcolor{keywordtype}{size\_t} chan, \textcolor{keywordtype}{bool} enable);
+00485 
+00500 API_EXPORT \textcolor{keywordtype}{int} CALL_CONV LMS_SetGFIRLPF(lms\_device\_t *device, \textcolor{keywordtype}{bool} dir_tx,
+00501                                \textcolor{keywordtype}{size\_t} chan, \textcolor{keywordtype}{bool} enabled, float\_type bandwidth);
+00502 
+00518 API_EXPORT \textcolor{keywordtype}{int} CALL_CONV LMS_Calibrate(lms\_device\_t *device, \textcolor{keywordtype}{bool} dir_tx,
+00519                                         \textcolor{keywordtype}{size\_t} chan, \textcolor{keywordtype}{double} bw, \textcolor{keywordtype}{unsigned} flags);
+00520 
+00533 API_EXPORT \textcolor{keywordtype}{int} CALL_CONV LMS_LoadConfig(lms\_device\_t *device, \textcolor{keyword}{const} \textcolor{keywordtype}{char} *
+      filename);
+00534 
+00543 API_EXPORT \textcolor{keywordtype}{int} CALL_CONV LMS_SaveConfig(lms\_device\_t *device, \textcolor{keyword}{const} \textcolor{keywordtype}{char} *
+      filename);
+00544 
+00557 API_EXPORT \textcolor{keywordtype}{int} CALL_CONV LMS_SetTestSignal(lms\_device\_t *device, \textcolor{keywordtype}{bool} dir_tx,
+00558                     \textcolor{keywordtype}{size\_t} chan, lms\_testsig\_t sig, int16\_t dc_i, int16\_t dc_q);
+00569 API_EXPORT \textcolor{keywordtype}{int} CALL_CONV LMS_GetTestSignal(lms\_device\_t *device, \textcolor{keywordtype}{bool} dir_tx,
+00570                                                \textcolor{keywordtype}{size\_t} chan, lms\_testsig\_t *sig);
+00571 
+00581 API_EXPORT \textcolor{keywordtype}{int} CALL_CONV LMS_GetChipTemperature(lms\_device\_t *dev, \textcolor{keywordtype}{size\_t} ind,
+00582                                                 float\_type *temp);
+00583 
+00594 \textcolor{keyword}{typedef} \textcolor{keyword}{enum}
+00596 \{
+00597     LMS_GFIR1 = 0,
+00598     LMS_GFIR2,
+00599     LMS_GFIR3
+00600 \}lms_gfir_t;
+00601 
+00603 \textcolor{keyword}{static} \textcolor{keyword}{const} \textcolor{keywordtype}{int} LMS_NCO_VAL_COUNT = 16;
+00604 
+00626 API_EXPORT \textcolor{keywordtype}{int} CALL_CONV LMS_SetSampleRateDir(lms\_device\_t *device, \textcolor{keywordtype}{bool} dir_tx,
+00627                                             float\_type rate, \textcolor{keywordtype}{size\_t} oversample);
+00628 
+00644 API_EXPORT \textcolor{keywordtype}{int} CALL_CONV LMS_SetNCOFrequency(lms\_device\_t *device, \textcolor{keywordtype}{bool} dir_tx,
+00645                      \textcolor{keywordtype}{size\_t} chan, \textcolor{keyword}{const} float\_type *freq, float\_type pho);
+00646 
+00659 API_EXPORT \textcolor{keywordtype}{int} CALL_CONV LMS_GetNCOFrequency(lms\_device\_t *device, \textcolor{keywordtype}{bool} dir_tx,
+00660                           \textcolor{keywordtype}{size\_t} chan, float\_type *freq, float\_type *pho);
+00661 
+00677 API_EXPORT \textcolor{keywordtype}{int} CALL_CONV LMS_SetNCOPhase(lms\_device\_t *device, \textcolor{keywordtype}{bool} dir_tx,
+00678                    \textcolor{keywordtype}{size\_t} chan, \textcolor{keyword}{const} float\_type *phases, float\_type fcw);
+00679 
+00692 API_EXPORT \textcolor{keywordtype}{int} CALL_CONV LMS_GetNCOPhase(lms\_device\_t *device, \textcolor{keywordtype}{bool} dir_tx,
+00693                             \textcolor{keywordtype}{size\_t} chan, float\_type *phases, float\_type *fcw);
+00694 
+00707 API_EXPORT \textcolor{keywordtype}{int} CALL_CONV LMS_SetNCOIndex(lms\_device\_t *device, \textcolor{keywordtype}{bool} dir_tx,
+00708                                     \textcolor{keywordtype}{size\_t} chan, \textcolor{keywordtype}{int} index, \textcolor{keywordtype}{bool} downconv);
+00709 
+00719 API_EXPORT \textcolor{keywordtype}{int} CALL_CONV LMS_GetNCOIndex(lms\_device\_t *device, \textcolor{keywordtype}{bool} dir_tx,
+00720                                         \textcolor{keywordtype}{size\_t} chan);
+00721 
+00735 API_EXPORT \textcolor{keywordtype}{int} CALL_CONV LMS_SetGFIRCoeff(lms\_device\_t * device, \textcolor{keywordtype}{bool} dir_tx,
+00736              \textcolor{keywordtype}{size\_t} chan, lms\_gfir\_t filt, \textcolor{keyword}{const} float\_type* coef,\textcolor{keywordtype}{size\_t} count);
+00737 
+00750 API_EXPORT \textcolor{keywordtype}{int} CALL_CONV LMS_GetGFIRCoeff(lms\_device\_t * device, \textcolor{keywordtype}{bool} dir_tx,
+00751                                 \textcolor{keywordtype}{size\_t} chan, lms\_gfir\_t filt, float\_type* coef);
+00752 
+00764 API_EXPORT \textcolor{keywordtype}{int} CALL_CONV LMS_SetGFIR(lms\_device\_t * device, \textcolor{keywordtype}{bool} dir_tx,
+00765                                     \textcolor{keywordtype}{size\_t} chan, lms\_gfir\_t filt, \textcolor{keywordtype}{bool} enabled);
+00766 
+00775 API_EXPORT \textcolor{keywordtype}{int} CALL_CONV LMS_EnableCalibCache(lms\_device\_t *dev, \textcolor{keywordtype}{bool} enable);
+00776 
+00798 API_EXPORT \textcolor{keywordtype}{int} CALL_CONV LMS_Reset(lms\_device\_t *device);
+00799 
+00809 API_EXPORT \textcolor{keywordtype}{int} CALL_CONV LMS_ReadLMSReg(lms\_device\_t *device, uint32\_t address,
+00810                                         uint16\_t *val);
+00811 
+00821 API_EXPORT \textcolor{keywordtype}{int} CALL_CONV LMS_WriteLMSReg(lms\_device\_t *device, uint32\_t address,
+00822                                         uint16\_t val);
+00823 
+00833 API_EXPORT \textcolor{keywordtype}{int} CALL_CONV LMS_ReadParam(lms\_device\_t *device,
+00834                                      \textcolor{keyword}{struct} LMS7Parameter param, uint16\_t *val);
+00835 
+00845 API_EXPORT \textcolor{keywordtype}{int} CALL_CONV LMS_WriteParam(lms\_device\_t *device,
+00846                                       \textcolor{keyword}{struct} LMS7Parameter param, uint16\_t val);
+00847 
+00857 API_EXPORT \textcolor{keywordtype}{int} CALL_CONV LMS_ReadFPGAReg(lms\_device\_t *device, uint32\_t address,
+00858                                         uint16\_t *val);
+00859 
+00869 API_EXPORT \textcolor{keywordtype}{int} CALL_CONV LMS_WriteFPGAReg(lms\_device\_t *device, uint32\_t address,
+00870                                         uint16\_t val);
+00871 
+00882 API_EXPORT \textcolor{keywordtype}{int} CALL_CONV LMS_ReadCustomBoardParam(lms\_device\_t *device,
+00883                                  uint8\_t \textcolor{keywordtype}{id}, float\_type *val, lms\_name\_t units);
+00884 
+00895 API_EXPORT \textcolor{keywordtype}{int} CALL_CONV LMS_WriteCustomBoardParam(lms\_device\_t *device,
+00896                             uint8\_t \textcolor{keywordtype}{id}, float\_type val, \textcolor{keyword}{const} lms\_name\_t units);
+00897 
+00904 \textcolor{preprocessor}{#define LMS\_CLOCK\_REF    0x0000  }
+00906 \textcolor{preprocessor}{#define LMS\_CLOCK\_SXR    0x0001  }
+00908 \textcolor{preprocessor}{#define LMS\_CLOCK\_SXT    0x0002 }
+00910 \textcolor{preprocessor}{#define LMS\_CLOCK\_CGEN   0x0003  }
+00912 \textcolor{preprocessor}{#define LMS\_CLOCK\_RXTSP  0x0004 }
+00914 \textcolor{preprocessor}{#define LMS\_CLOCK\_TXTSP  0x0005 }
+00916 
+00923 \textcolor{preprocessor}{#define LMS\_CLOCK\_EXTREF 0x0006  }
+00924 
+00936 API_EXPORT \textcolor{keywordtype}{int} CALL_CONV LMS_GetClockFreq(lms\_device\_t *dev, \textcolor{keywordtype}{size\_t} clk_id,
+00937                                          float\_type *freq);
+00938 
+00952 API_EXPORT \textcolor{keywordtype}{int} CALL_CONV LMS_SetClockFreq(lms\_device\_t *dev, \textcolor{keywordtype}{size\_t} clk_id,
+00953                                          float\_type freq);
+00954 
+00965 API_EXPORT \textcolor{keywordtype}{int} CALL_CONV LMS_VCTCXOWrite(lms\_device\_t * dev, uint16\_t val);
+00966 
+00975 API_EXPORT \textcolor{keywordtype}{int} CALL_CONV LMS_VCTCXORead(lms\_device\_t * dev, uint16\_t *val);
+00976 
+00985 API_EXPORT \textcolor{keywordtype}{int} CALL_CONV LMS_Synchronize(lms\_device\_t *dev, \textcolor{keywordtype}{bool} toChip);
+00986 
+00994 API_EXPORT \textcolor{keywordtype}{int} CALL_CONV LMS_GPIORead(lms\_device\_t *dev, uint8\_t* buffer, \textcolor{keywordtype}{size\_t} 
+      len);
+00995 
+01003 API_EXPORT \textcolor{keywordtype}{int} CALL_CONV LMS_GPIOWrite(lms\_device\_t *dev, \textcolor{keyword}{const} uint8\_t* buffer, \textcolor{keywordtype}{size\_t} 
+      len);
+01004 
+01012 API_EXPORT \textcolor{keywordtype}{int} CALL_CONV LMS_GPIODirRead(lms\_device\_t *dev, uint8\_t* buffer, \textcolor{keywordtype}{size\_t} 
+      len);
+01013 
+01021 API_EXPORT \textcolor{keywordtype}{int} CALL_CONV LMS_GPIODirWrite(lms\_device\_t *dev, \textcolor{keyword}{const} uint8\_t* 
+      buffer, \textcolor{keywordtype}{size\_t} len);
+01022 
+01033 \textcolor{keyword}{typedef} \textcolor{keyword}{struct}
+01034 \{
+01040     uint64\_t timestamp;
+01041 
+01046     \textcolor{keywordtype}{bool} waitForTimestamp;
+01047 
+01051     \textcolor{keywordtype}{bool} flushPartialPacket;
+01052 
+01053 \}lms_stream_meta_t;
+01054 
+01056 \textcolor{keyword}{typedef} \textcolor{keyword}{struct}
+01057 \{
+01061     \textcolor{keywordtype}{size\_t} handle;
+01062 
+01064     \textcolor{keywordtype}{bool} isTx;
+01065 
+01067     uint32\_t channel;
+01068 
+01070     uint32\_t fifoSize;
+01071 
+01078     \textcolor{keywordtype}{float} throughputVsLatency;
+01079 
+01081     \textcolor{keyword}{enum}
+01082     \{
+01083         LMS\_FMT\_F32=0,    
+01084         LMS_FMT_I16,      
+01085         LMS\_FMT\_I12       
+01086     \}dataFmt;
+01087 \}lms_stream_t;
+01088 
+01090 \textcolor{keyword}{typedef} \textcolor{keyword}{struct}
+01091 \{
+01093     \textcolor{keywordtype}{bool} active;
+01095     uint32\_t fifoFilledCount;
+01097     uint32\_t fifoSize;
+01099     uint32\_t underrun;
+01101     uint32\_t overrun;
+01103     uint32\_t droppedPackets;
+01105     float\_type sampleRate;
+01107     float\_type linkRate;
+01109     uint64\_t timestamp;
+01110 
+01111 \} lms_stream_status_t;
+01112 
+01122 API_EXPORT \textcolor{keywordtype}{int} CALL_CONV LMS_SetupStream(lms\_device\_t *device, lms_stream_t *
+      stream);
+01123 
+01132 API_EXPORT \textcolor{keywordtype}{int} CALL_CONV LMS_DestroyStream(lms\_device\_t *dev, lms_stream_t *
+      stream);
+01133 
+01141 API_EXPORT \textcolor{keywordtype}{int} CALL_CONV LMS_StartStream(lms_stream_t *stream);
+01142 
+01150 API_EXPORT \textcolor{keywordtype}{int} CALL_CONV LMS_StopStream(lms_stream_t *stream);
+01151 
+01164  API_EXPORT \textcolor{keywordtype}{int} CALL_CONV LMS_RecvStream(lms_stream_t *stream, \textcolor{keywordtype}{void} *samples,
+01165              \textcolor{keywordtype}{size\_t} sample_count, lms_stream_meta_t *meta, \textcolor{keywordtype}{unsigned} timeout_ms);
+01166 
+01175 API_EXPORT \textcolor{keywordtype}{int} CALL_CONV LMS_GetStreamStatus(lms_stream_t *stream, 
+      lms_stream_status_t* status);
+01176 
+01188 API_EXPORT \textcolor{keywordtype}{int} CALL_CONV LMS_SendStream(lms_stream_t *stream,
+01189                             \textcolor{keyword}{const} \textcolor{keywordtype}{void} *samples,\textcolor{keywordtype}{size\_t} sample_count,
+01190                             \textcolor{keyword}{const} lms_stream_meta_t *meta, \textcolor{keywordtype}{unsigned} timeout_ms);
+01191 
+01201 API_EXPORT \textcolor{keywordtype}{int} CALL_CONV LMS_UploadWFM(lms\_device\_t *device, \textcolor{keyword}{const} \textcolor{keywordtype}{void} **
+      samples,
+01202                                 uint8\_t chCount, \textcolor{keywordtype}{size\_t} sample_count, \textcolor{keywordtype}{int} format);
+01203 
+01211 API_EXPORT \textcolor{keywordtype}{int} CALL_CONV LMS_EnableTxWFM(lms\_device\_t *device, \textcolor{keywordtype}{unsigned} chan, \textcolor{keywordtype}{bool} 
+      active);
+01212 
+01231 API_EXPORT \textcolor{keywordtype}{int} CALL_CONV LMS_GetProgramModes(lms\_device\_t *device, lms\_name\_t *
+      list);
+01232 
+01240 \textcolor{keyword}{typedef} bool (*lms_prog_callback_t)(\textcolor{keywordtype}{int} bsent, \textcolor{keywordtype}{int} btotal, \textcolor{keyword}{const} \textcolor{keywordtype}{char}* progressMsg);
+01241 
+01253 API_EXPORT \textcolor{keywordtype}{int} CALL_CONV LMS_Program(lms\_device\_t *device, \textcolor{keyword}{const} \textcolor{keywordtype}{char} *data, 
+01254                 \textcolor{keywordtype}{size\_t} size, \textcolor{keyword}{const} lms\_name\_t mode, lms_prog_callback_t callback);
+01255 
+01257 \textcolor{keyword}{typedef} \textcolor{keyword}{struct}
+01258 \{
+01259     \textcolor{keywordtype}{char} deviceName[32];            
+01260     \textcolor{keywordtype}{char} expansionName[32];         
+01261     \textcolor{keywordtype}{char} firmwareVersion[16];       
+01262     \textcolor{keywordtype}{char} hardwareVersion[16];       
+01263     \textcolor{keywordtype}{char} protocolVersion[16];       
+01264     uint64\_t boardSerialNumber;     
+01265     \textcolor{keywordtype}{char} gatewareVersion[16];       
+01266     \textcolor{keywordtype}{char} gatewareTargetBoard[32];   
+01267 \}lms_dev_info_t;
+01268 
+01280 API_EXPORT \textcolor{keyword}{const} lms_dev_info_t* CALL_CONV LMS_GetDeviceInfo(lms\_device\_t *
+      device);
+01281 
+01285 API_EXPORT \textcolor{keyword}{const} \textcolor{keywordtype}{char}* LMS_GetLibraryVersion();
+01286 
+01294 API_EXPORT \textcolor{keyword}{const} \textcolor{keywordtype}{char} * CALL_CONV LMS_GetLastErrorMessage(\textcolor{keywordtype}{void});
+01295 
+01301 \textcolor{preprocessor}{#define LMS\_LOG\_ERROR    1  }
+01303 \textcolor{preprocessor}{#define LMS\_LOG\_WARNING  2  }
+01305 \textcolor{preprocessor}{#define LMS\_LOG\_INFO     3  }
+01307 \textcolor{preprocessor}{#define LMS\_LOG\_DEBUG    4 }
+01309 
+01317  \textcolor{keyword}{typedef} void (*LMS_LogHandler)(\textcolor{keywordtype}{int} lvl, \textcolor{keyword}{const} \textcolor{keywordtype}{char} *msg);
+01318  
+01325 API_EXPORT \textcolor{keywordtype}{void} LMS_RegisterLogHandler(LMS_LogHandler handler);
+01326 
+01329 \textcolor{preprocessor}{#ifdef \_\_cplusplus}
+01330 \} \textcolor{comment}{//extern "C"}
+01331 \textcolor{preprocessor}{#endif}
+01332 
+01333 \textcolor{preprocessor}{#endif //LMS\_SDR\_INTERFACE\_H}
+\end{DoxyCode}

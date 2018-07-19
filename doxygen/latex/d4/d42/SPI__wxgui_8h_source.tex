@@ -1,0 +1,34 @@
+\subsection{S\+P\+I\+\_\+wxgui.\+h}
+\label{SPI__wxgui_8h_source}\index{/home/erik/prefix/default/src/limesuite-\/dev/src/utilities\+\_\+gui/\+S\+P\+I\+\_\+wxgui.\+h@{/home/erik/prefix/default/src/limesuite-\/dev/src/utilities\+\_\+gui/\+S\+P\+I\+\_\+wxgui.\+h}}
+
+\begin{DoxyCode}
+00001 \textcolor{preprocessor}{#ifndef \_\_SPI\_wxgui\_\_}
+00002 \textcolor{preprocessor}{#define \_\_SPI\_wxgui\_\_}
+00003 
+00009 \textcolor{preprocessor}{#include "utilities_gui.h"}
+00010 \textcolor{preprocessor}{#include "lime/LimeSuite.h"}
+00011 
+00013 
+00015 \textcolor{keyword}{class }SPI_wxgui : \textcolor{keyword}{public} SPI_view
+00016 \{
+00017     \textcolor{keyword}{protected}:
+00018         \textcolor{comment}{// Handlers for SPI\_view events.}
+00019         \textcolor{keywordtype}{void} onLMSwrite( wxCommandEvent& event );
+00020         \textcolor{keywordtype}{void} onLMSread( wxCommandEvent& event );
+00021         \textcolor{keywordtype}{void} onBoardWrite( wxCommandEvent& event );
+00022         \textcolor{keywordtype}{void} OnBoardRead( wxCommandEvent& event );
+00023     \textcolor{keyword}{public}:
+00025         SPI_wxgui( wxWindow* parent );
+00027         SPI_wxgui(wxWindow* parent, wxWindowID \textcolor{keywordtype}{id} = wxID\_ANY, \textcolor{keyword}{const} wxString &title = wxEmptyString, \textcolor{keyword}{const} 
+      wxPoint& pos = wxDefaultPosition, \textcolor{keyword}{const} wxSize& size = wxDefaultSize, \textcolor{keywordtype}{long} styles = 0);
+00028 
+00029         \textcolor{comment}{//devIndex is an RFIC index (0 when only one is present)}
+00030         \textcolor{keyword}{virtual} \textcolor{keywordtype}{void} Initialize(lms_device_t* pCtrPort, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} devIndex = 0);
+00031     \textcolor{keyword}{protected}:
+00032         lms_device_t* ctrPort;
+00033 
+00034         \textcolor{keywordtype}{int} m_rficSpiAddr;
+00035 \};
+00036 
+00037 \textcolor{preprocessor}{#endif // \_\_SPI\_wxgui\_\_}
+\end{DoxyCode}

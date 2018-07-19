@@ -1,0 +1,164 @@
+\subsection{gfir\+\_\+lms.\+c}
+\label{gfir__lms_8c_source}\index{/home/erik/prefix/default/src/limesuite-\/dev/src/\+G\+F\+I\+R/gfir\+\_\+lms.\+c@{/home/erik/prefix/default/src/limesuite-\/dev/src/\+G\+F\+I\+R/gfir\+\_\+lms.\+c}}
+
+\begin{DoxyCode}
+00001 \textcolor{comment}{/* ************************************************************************ }
+00002 \textcolor{comment}{   FILE:        gfir\_lms.c}
+00003 \textcolor{comment}{   COMMENT:     Calculate the coeficients of general FIR filter}
+00004 \textcolor{comment}{            using LMS optimisation. Filter is defined by}
+00005 \textcolor{comment}{            pass band and stop band frequencies (w1, w2, a1, a2).}
+00006 \textcolor{comment}{   CONTENT:}
+00007 \textcolor{comment}{}
+00008 \textcolor{comment}{   AUTHOR:      Lime Microsystems}
+00009 \textcolor{comment}{   DATE:        Feb 11, 2000}
+00010 \textcolor{comment}{   REVISION:        Feb 25, 2000: Adapted for LMS}
+00011 \textcolor{comment}{            Nov 30, 2007: Tiger project}
+00012 \textcolor{comment}{            Apr 21, 2008: Asymethrical number of points in pass/stop bands}
+00013 \textcolor{comment}{   ************************************************************************ */}
+00014 
+00015 \textcolor{preprocessor}{#include <stdlib.h>}
+00016 \textcolor{preprocessor}{#include <stdio.h>}
+00017 \textcolor{preprocessor}{#include "lms.h"}
+00018 \textcolor{preprocessor}{#include "dfilter.h"}
+00019 
+00020 \textcolor{preprocessor}{#define CPREC       16  }\textcolor{comment}{/* Coefficients precision */}\textcolor{preprocessor}{}
+00021 \textcolor{preprocessor}{#define CSDPREC     16  }\textcolor{comment}{/* CSD Coefficients precision */}\textcolor{preprocessor}{}
+00022 
+00023 \textcolor{comment}{/* *********************************************************************** */}
+00024 \textcolor{keywordtype}{int} gfir_lms(hr, hi, hcsd, n, w1, w2, a1, a2, cprec, csdprec, correction)
+00025   struct dfilter *hr, *hi, *hcsd;
+00026 \textcolor{keywordtype}{int} n;
+00027 \textcolor{keywordtype}{double} w1, w2, a1, a2;
+00028 \textcolor{keywordtype}{int} cprec;
+00029 \textcolor{keywordtype}{int} csdprec;
+00030 \textcolor{keywordtype}{double} (*correction)();
+00031 \{
+00032   \textcolor{keywordtype}{double} *weights, *desired, *w;
+00033   \textcolor{keywordtype}{int} i, points;
+00034   \textcolor{keywordtype}{double} deltaw;
+00035 
+00036   \textcolor{keywordtype}{int} **bincode, **csdcode, **csdcoder, **xpx, **xmx, **x;
+00037 
+00038   \textcolor{comment}{/* Points on a frequency grid */}
+00039   points = LMS_POINTS/2;
+00040 
+00041   \textcolor{comment}{/* Allocate memory */}
+00042   weights = (\textcolor{keywordtype}{double} *) calloc(2*points, \textcolor{keyword}{sizeof}(\textcolor{keywordtype}{double}));
+00043   desired = (\textcolor{keywordtype}{double} *) calloc(2*points, \textcolor{keyword}{sizeof}(\textcolor{keywordtype}{double}));
+00044   w = (\textcolor{keywordtype}{double} *) calloc(2*points, \textcolor{keyword}{sizeof}(\textcolor{keywordtype}{double}));
+00045 
+00046   bincode = (\textcolor{keywordtype}{int} **) calloc(n, \textcolor{keyword}{sizeof}(\textcolor{keywordtype}{int} *));
+00047   \textcolor{keywordflow}{for}(i=0; i<n; i++) bincode[i] = (\textcolor{keywordtype}{int} *) calloc(cprec+1, \textcolor{keyword}{sizeof}(\textcolor{keywordtype}{int}));
+00048 
+00049   csdcode = (\textcolor{keywordtype}{int} **) calloc(n, \textcolor{keyword}{sizeof}(\textcolor{keywordtype}{int} *));
+00050   \textcolor{keywordflow}{for}(i=0; i<n; i++) csdcode[i] = (\textcolor{keywordtype}{int} *) calloc(cprec+1, \textcolor{keyword}{sizeof}(\textcolor{keywordtype}{int}));
+00051 
+00052   csdcoder = (\textcolor{keywordtype}{int} **) calloc(n, \textcolor{keyword}{sizeof}(\textcolor{keywordtype}{int} *));
+00053   \textcolor{keywordflow}{for}(i=0; i<n; i++) csdcoder[i] = (\textcolor{keywordtype}{int} *) calloc(cprec+1, \textcolor{keyword}{sizeof}(\textcolor{keywordtype}{int}));
+00054 
+00055   xpx = (\textcolor{keywordtype}{int} **) calloc(n, \textcolor{keyword}{sizeof}(\textcolor{keywordtype}{int} *));
+00056   \textcolor{keywordflow}{for}(i=0; i<n; i++) xpx[i] = (\textcolor{keywordtype}{int} *) calloc(cprec+1, \textcolor{keyword}{sizeof}(\textcolor{keywordtype}{int}));
+00057 
+00058   xmx = (\textcolor{keywordtype}{int} **) calloc(n, \textcolor{keyword}{sizeof}(\textcolor{keywordtype}{int} *));
+00059   \textcolor{keywordflow}{for}(i=0; i<n; i++) xmx[i] = (\textcolor{keywordtype}{int} *) calloc(cprec+1, \textcolor{keyword}{sizeof}(\textcolor{keywordtype}{int}));
+00060 
+00061   x = (\textcolor{keywordtype}{int} **) calloc(n, \textcolor{keyword}{sizeof}(\textcolor{keywordtype}{int} *));
+00062   \textcolor{keywordflow}{for}(i=0; i<n; i++) x[i] = (\textcolor{keywordtype}{int} *) calloc(cprec+1, \textcolor{keyword}{sizeof}(\textcolor{keywordtype}{int}));
+00063 
+00064   \textcolor{comment}{/* Configure the filter with infinite precision coefficients */}
+00065   hr->m = n-1;
+00066   hr->n = 0;
+00067   hr->a = (\textcolor{keywordtype}{double} *) calloc(n, \textcolor{keyword}{sizeof}(\textcolor{keywordtype}{double}));
+00068   hr->b = (\textcolor{keywordtype}{double} *)calloc(1, \textcolor{keyword}{sizeof}(\textcolor{keywordtype}{double}));
+00069   hr->b[0] = 1.0;
+00070   hr->nw = 2*points;
+00071   hr->w = w;
+00072 
+00073   \textcolor{comment}{/* Configure the filter with integer coefficients */}
+00074   hi->m = n-1;
+00075   hi->n = 0;
+00076   hi->a = (\textcolor{keywordtype}{double} *) calloc(n, \textcolor{keyword}{sizeof}(\textcolor{keywordtype}{double}));
+00077   hi->b = (\textcolor{keywordtype}{double} *)calloc(1, \textcolor{keyword}{sizeof}(\textcolor{keywordtype}{double}));
+00078   hi->b[0] = 1.0;
+00079   hi->nw = 2*points;
+00080   hi->w = w;
+00081 
+00082   \textcolor{comment}{/* Configure the filter with CSD coefficients */}
+00083   hcsd->m = n-1;
+00084   hcsd->n = 0;
+00085   hcsd->a = (\textcolor{keywordtype}{double} *) calloc(n, \textcolor{keyword}{sizeof}(\textcolor{keywordtype}{double}));
+00086   hcsd->b = (\textcolor{keywordtype}{double} *)calloc(1, \textcolor{keyword}{sizeof}(\textcolor{keywordtype}{double}));
+00087   hcsd->b[0] = 1.0;
+00088   hcsd->nw = 2*points;
+00089   hcsd->w = w;
+00090 
+00091   \textcolor{keywordflow}{if}(1) \{
+00092     \textcolor{keywordtype}{int} p1, p2;
+00093     \textcolor{comment}{/* Construct grid, desired response and weighting function */}
+00094     \textcolor{comment}{/* 0-w1 band */}
+00095     p1 = points/4;
+00096     deltaw = w1/(double)(p1-1);
+00097     \textcolor{keywordflow}{for}(i=0; i<p1; i++) \{
+00098       w[i] = (double)(i)*deltaw;
+00099       desired[i] = a1*(correction)(w[i]);
+00100       weights[i] =  1.0; \textcolor{comment}{//0.003;}
+00101     \}
+00102     \textcolor{comment}{/* w2-0.5 band */}
+00103     p2 = 2*points - p1;
+00104     deltaw = (0.5-w2)/(\textcolor{keywordtype}{double})(p2-1);
+00105     \textcolor{keywordflow}{for}(i=0; i<p2; i++) \{
+00106       w[i+p1] = w2 + (double)(i)*deltaw;
+00107       desired[i+p1] = a2*(correction)(w[i+p1]);
+00108       weights[i+p1] = 0.0001; \textcolor{comment}{//1.0;}
+00109     \}
+00110   \}
+00111 
+00112   \textcolor{comment}{/* Do LMS optimization */}
+00113   lms(hr->a, hi->a, hcsd->a, n, w, desired, 
+00114       weights, 2*points, cprec, csdprec, POSITIVE,
+00115       bincode, csdcode, csdcoder);
+00116 
+00117 \textcolor{preprocessor}{#if 0}
+00118   \textcolor{comment}{/* Print the results */}
+00119   printf(\textcolor{stringliteral}{" ****************** Filter Design Results ******************* \(\backslash\)n"});
+00120   printf(\textcolor{stringliteral}{"Filter type:            GENERAL FIR\(\backslash\)n"});
+00121   printf(\textcolor{stringliteral}{"Number of taps:         %d\(\backslash\)n"}, n);
+00122   printf(\textcolor{stringliteral}{"Bands:                  0.0-%g, and %g-0.5\(\backslash\)n"}, w1, w2);
+00123   printf(\textcolor{stringliteral}{"Desired amplitude:      %g for band 1 and %g for band 2.\(\backslash\)n"}, a1, a2);
+00124   printf(\textcolor{stringliteral}{"Coefficients precision: %d\(\backslash\)n"}, cprec);
+00125   printf(\textcolor{stringliteral}{"CSD precision:          %d\(\backslash\)n\(\backslash\)n"}, csdprec);
+00126 
+00127   printf(\textcolor{stringliteral}{"Impulse response with the CSD coefficients:\(\backslash\)n"});
+00128   \textcolor{keywordflow}{for}(i=0; i<n/2; i++) 
+00129     printf(\textcolor{stringliteral}{"\(\backslash\)th(%2d) = %-10g \(\backslash\)t h(%2d) = %-10g\(\backslash\)n"}, 
+00130        i, hcsd->a[i], n-i-1, hcsd->a[n-i-1]);
+00131   \textcolor{keywordflow}{if}(n%2) printf(\textcolor{stringliteral}{"\(\backslash\)th(%2d) = %-10g\(\backslash\)n"}, n/2, hcsd->a[n/2]);
+00132 \textcolor{preprocessor}{#endif}
+00133 
+00134 
+00135   \textcolor{comment}{/* Ready to exit */}
+00136   free(weights);
+00137   free(desired);
+00138   free(w);
+00139   \textcolor{keywordflow}{for}(i=0; i<n; i++) \{ free(bincode[i]); \} free(bincode);
+00140   \textcolor{keywordflow}{for}(i=0; i<n; i++) \{ free(csdcode[i]); \} free(csdcode);
+00141   \textcolor{keywordflow}{for}(i=0; i<n; i++) \{ free(csdcoder[i]); \} free(csdcoder);
+00142   \textcolor{keywordflow}{for}(i=0; i<n; i++) \{ free(xpx[i]); \} free(xpx);
+00143   \textcolor{keywordflow}{for}(i=0; i<n; i++) \{ free(xmx[i]); \} free(xmx);
+00144   \textcolor{keywordflow}{for}(i=0; i<n; i++) \{ free(x[i]); \} free(x);
+00145 
+00146   \textcolor{keywordflow}{return} 0; 
+00147 \}
+00148 
+00149 
+00150 \textcolor{keywordtype}{void} GenerateFilter(\textcolor{keywordtype}{int} n, \textcolor{keywordtype}{double} w1, \textcolor{keywordtype}{double} w2, \textcolor{keywordtype}{double} a1, \textcolor{keywordtype}{double} a2, \textcolor{keywordtype}{double} *coefs)
+00151 \{
+00152     \textcolor{keywordtype}{int} i;
+00153     \textcolor{keyword}{struct }dfilter hr, hi, hcsd;    \textcolor{comment}{/* Filter transfer functions */}
+00154     \textcolor{comment}{/* Find the filter coefficients */}
+00155     gfir_lms (&hr, &hi, &hcsd, n, w1, w2, a1, a2, CPREC, CSDPREC, NONE); 
+00156         \textcolor{keywordflow}{for} (i = 0; i < n; i++)
+00157             coefs[i] = hi.a[i];
+00158        
+00159  \}
+\end{DoxyCode}

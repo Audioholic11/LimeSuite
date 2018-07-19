@@ -1,0 +1,37 @@
+\subsection{q\+Lime\+S\+D\+R.\+h}
+\label{qLimeSDR_8h_source}\index{/home/erik/prefix/default/src/limesuite-\/dev/src/\+A\+P\+I/q\+Lime\+S\+D\+R.\+h@{/home/erik/prefix/default/src/limesuite-\/dev/src/\+A\+P\+I/q\+Lime\+S\+D\+R.\+h}}
+
+\begin{DoxyCode}
+00001 \textcolor{comment}{/*}
+00002 \textcolor{comment}{ * File:   qLimeSDR.h}
+00003 \textcolor{comment}{ * Author: Ignas J}
+00004 \textcolor{comment}{ *}
+00005 \textcolor{comment}{ * Created on April 27, 2018}
+00006 \textcolor{comment}{ */}
+00007 
+00008 \textcolor{preprocessor}{#ifndef QLIMESDR\_H}
+00009 \textcolor{preprocessor}{#define QLIMESDR\_H}
+00010 \textcolor{preprocessor}{#include "lms7_device.h"}
+00011 
+00012 \textcolor{keyword}{namespace }lime
+00013 
+00014 \{
+00015 
+00016 \textcolor{keyword}{class }LMS7_qLimeSDR : \textcolor{keyword}{public} LMS7_Device
+00017 \{
+00018 \textcolor{keyword}{public}:
+00019     LMS7_qLimeSDR(lime::IConnection* conn, LMS7_Device *obj = \textcolor{keyword}{nullptr});
+00020     \textcolor{keywordtype}{unsigned} GetNumChannels(\textcolor{keyword}{const} \textcolor{keywordtype}{bool} tx = \textcolor{keyword}{false}) \textcolor{keyword}{const override};
+00021     \textcolor{keywordtype}{int} EnableChannel(\textcolor{keywordtype}{bool} dir_tx, \textcolor{keywordtype}{unsigned} chan, \textcolor{keywordtype}{bool} enabled) \textcolor{keyword}{override};
+00022     \textcolor{keywordtype}{double} GetRate(\textcolor{keywordtype}{bool} tx, \textcolor{keywordtype}{unsigned} chan, \textcolor{keywordtype}{double} *rf\_rate\_Hz = NULL) \textcolor{keyword}{const override};
+00023     \textcolor{keywordtype}{int} SetRate(\textcolor{keywordtype}{unsigned} ch, \textcolor{keywordtype}{double} rxRate, \textcolor{keywordtype}{double} txRate, \textcolor{keywordtype}{unsigned} oversample = 0) \textcolor{keyword}{override};
+00024 \textcolor{keyword}{private}:
+00025     \textcolor{keywordtype}{double} dacRate;
+00026     \textcolor{keywordtype}{double} adcRate;
+00027 \};
+00028 
+00029 \}
+00030 
+00031 \textcolor{preprocessor}{#endif  }\textcolor{comment}{/* QLIMESDR\_H */}\textcolor{preprocessor}{}
+00032 
+\end{DoxyCode}

@@ -1,0 +1,336 @@
+\subsection{Connection\+E\+V\+B7\+C\+O\+M.\+cpp}
+\label{ConnectionEVB7COM_8cpp_source}\index{/home/erik/prefix/default/src/limesuite-\/dev/src/\+Connection\+E\+V\+B7\+C\+O\+M/\+Connection\+E\+V\+B7\+C\+O\+M.\+cpp@{/home/erik/prefix/default/src/limesuite-\/dev/src/\+Connection\+E\+V\+B7\+C\+O\+M/\+Connection\+E\+V\+B7\+C\+O\+M.\+cpp}}
+
+\begin{DoxyCode}
+00001 
+00007 \textcolor{preprocessor}{#include "ConnectionEVB7COM.h"}
+00008 \textcolor{preprocessor}{#include "Logger.h"}
+00009 
+00010 \textcolor{preprocessor}{#include "string.h"}
+00011 \textcolor{preprocessor}{#ifdef \_\_unix\_\_}
+00012 \textcolor{preprocessor}{#include <fstream>}
+00013 \textcolor{preprocessor}{#include <errno.h>}
+00014 \textcolor{preprocessor}{#include <unistd.h>}
+00015 \textcolor{preprocessor}{#include <termios.h>}
+00016 \textcolor{preprocessor}{#include <sys/types.h>}
+00017 \textcolor{preprocessor}{#include <sys/stat.h>}
+00018 \textcolor{preprocessor}{#include <fcntl.h>}
+00019 \textcolor{preprocessor}{#include <stdlib.h>}
+00020 \textcolor{preprocessor}{#include <iostream>}
+00021 \textcolor{preprocessor}{#include <stdio.h>}
+00022 \textcolor{preprocessor}{#include "Logger.h"}
+00023 \textcolor{preprocessor}{#endif // LINUX}
+00024 
+00025 \textcolor{keyword}{static} \textcolor{keyword}{const} \textcolor{keywordtype}{int} COM_RETRY_INTERVAL = 20; \textcolor{comment}{//ms}
+00026 \textcolor{keyword}{static} \textcolor{keyword}{const} \textcolor{keywordtype}{int} COM_TOTAL_TIMEOUT = 300; \textcolor{comment}{//ms}
+00027 \textcolor{keyword}{static} \textcolor{keyword}{const} \textcolor{keywordtype}{int} COM_BUFFER_LENGTH = 1024; \textcolor{comment}{//max buffer size for data}
+00028 
+00029 \textcolor{keyword}{using namespace }lime;
+00030 
+00031 ConnectionEVB7COM::ConnectionEVB7COM(\textcolor{keyword}{const} \textcolor{keywordtype}{char} *comName, \textcolor{keywordtype}{int} baudrate)
+00032 \{
+00033 \textcolor{preprocessor}{#ifndef \_\_unix\_\_}
+00034     hComm = INVALID\_HANDLE\_VALUE;
+00035 \textcolor{preprocessor}{#else}
+00036     hComm = -1;
+00037 \textcolor{preprocessor}{#endif}
+00038 
+00039     \textcolor{keywordflow}{if} (this->Open(comName, baudrate) != 0)
+00040     \{
+00041         this->Close();
+00042         lime::error(\textcolor{stringliteral}{"Failed to open COM port"});
+00043     \}
+00044 \}
+00045 
+00046 ConnectionEVB7COM::~ConnectionEVB7COM(\textcolor{keywordtype}{void})
+00047 \{
+00048     this->Close();
+00049 \}
+00050 
+00051 \textcolor{keywordtype}{void} ConnectionEVB7COM::Close(\textcolor{keywordtype}{void})
+00052 \{
+00053 \textcolor{preprocessor}{#ifndef \_\_unix\_\_}
+00054     \textcolor{keywordflow}{if} (hComm != INVALID\_HANDLE\_VALUE)
+00055     \{
+00056         SetCommTimeouts(hComm, &m_ctmoOld);
+00057         CloseHandle(hComm);
+00058     \}
+00059     hComm = INVALID\_HANDLE\_VALUE;
+00060 \textcolor{preprocessor}{#else}
+00061     \textcolor{keywordflow}{if}( hComm >= 0)
+00062     \{
+00063         close(hComm);
+00064     \}
+00065     hComm = -1;
+00066 \textcolor{preprocessor}{#endif}
+00067 \}
+00068 
+00069 \textcolor{keywordtype}{bool} ConnectionEVB7COM::IsOpen(\textcolor{keywordtype}{void})
+00070 \{
+00071 \textcolor{preprocessor}{#ifndef \_\_unix\_\_}
+00072     \textcolor{keywordflow}{if} (hComm != INVALID\_HANDLE\_VALUE)
+00073         \textcolor{keywordflow}{return} \textcolor{keyword}{true};
+00074 \textcolor{preprocessor}{#else}
+00075     \textcolor{keywordflow}{if} (hComm != -1)
+00076         \textcolor{keywordflow}{return} \textcolor{keyword}{true};
+00077 \textcolor{preprocessor}{#endif}
+00078     \textcolor{keywordflow}{return} \textcolor{keyword}{false};
+00079 \}
+00080 
+00081 \textcolor{keywordtype}{int} ConnectionEVB7COM::Open(\textcolor{keyword}{const} \textcolor{keywordtype}{char} *comName, \textcolor{keywordtype}{int} baudrate)
+00082 \{
+00083 
+00084     \textcolor{keywordflow}{if} (strlen(comName) == 0) \textcolor{keywordflow}{return} ReportError(\textcolor{stringliteral}{"empty comm name"});
+00085 \textcolor{preprocessor}{#ifndef \_\_unix\_\_}
+00086     \textcolor{keywordtype}{int} errorCode = 0;
+00087     \textcolor{comment}{// Initialize Overlap structures}
+00088     m_osROverlap.Internal = 0;
+00089     m_osROverlap.InternalHigh = 0;
+00090     m_osROverlap.Offset = 0;
+00091     m_osROverlap.OffsetHigh = 0;
+00092     m_osROverlap.hEvent = CreateEvent(NULL, \textcolor{keyword}{false}, \textcolor{keyword}{false}, NULL);
+00093 
+00094     m_osWOverlap.Internal = 0;
+00095     m_osWOverlap.InternalHigh = 0;
+00096     m_osWOverlap.Offset = 0;
+00097     m_osWOverlap.OffsetHigh = 0;
+00098     m_osWOverlap.hEvent = CreateEvent(NULL, \textcolor{keyword}{false}, \textcolor{keyword}{false}, NULL);
+00099 
+00100     \textcolor{comment}{// Initialize DSB structure}
+00101     memset(&m_dcbCommPort, 0, \textcolor{keyword}{sizeof}(m_dcbCommPort));
+00102 
+00103     m_dcbCommPort.BaudRate = 9600;
+00104     m_dcbCommPort.fBinary = 1;
+00105     m_dcbCommPort.fParity = 0;
+00106     m_dcbCommPort.fOutxCtsFlow = 0;
+00107     m_dcbCommPort.fOutxDsrFlow = 0;
+00108     m_dcbCommPort.fDtrControl = 0;
+00109     m_dcbCommPort.fDsrSensitivity = 0;
+00110     m_dcbCommPort.fTXContinueOnXoff = 0;
+00111     m_dcbCommPort.fOutX = 0;
+00112     m_dcbCommPort.fInX = 0;
+00113     m_dcbCommPort.fErrorChar = 0;
+00114     m_dcbCommPort.fNull = 0;
+00115     m_dcbCommPort.fRtsControl = 0;
+00116     m_dcbCommPort.fAbortOnError = 0;
+00117     m_dcbCommPort.fDummy2 = 0;
+00118     \textcolor{comment}{// m\_dcbCommPort.wReserved = 0;}
+00119     m_dcbCommPort.XonLim = 512;
+00120     m_dcbCommPort.XoffLim = 512;
+00121     m_dcbCommPort.ByteSize = 8;
+00122     m_dcbCommPort.Parity = 0;
+00123     m_dcbCommPort.StopBits = 0;
+00124     \textcolor{comment}{//m\_dcbCommPort.StopBits = 1;}
+00125     m_dcbCommPort.XonChar = 17;
+00126     m_dcbCommPort.XoffChar = 19;
+00127     m_dcbCommPort.ErrorChar = 0;
+00128     m_dcbCommPort.EofChar = 26;
+00129     m_dcbCommPort.EvtChar = 0;
+00130     m_dcbCommPort.wReserved1 = 0;
+00131     m_dcbCommPort.DCBlength = \textcolor{keyword}{sizeof}(DCB);
+00132 
+00133     \textcolor{comment}{// Initialize Timeout's}
+00134     m_ctmoNew.ReadIntervalTimeout = 50;
+00135     m_ctmoNew.ReadTotalTimeoutMultiplier = 0;
+00136     m_ctmoNew.ReadTotalTimeoutConstant = 100; \textcolor{comment}{// 1;}
+00137     m_ctmoNew.WriteTotalTimeoutMultiplier = 0;
+00138     m_ctmoNew.WriteTotalTimeoutConstant = 100;
+00139 
+00140     \textcolor{comment}{// Open COM port}
+00141     std::string stmp;
+00142     stmp = \textcolor{stringliteral}{"\(\backslash\)\(\backslash\)\(\backslash\)\(\backslash\).\(\backslash\)\(\backslash\)"};
+00143     stmp.append(comName);
+00144     hComm = CreateFileA(stmp.c\_str(), GENERIC\_READ | GENERIC\_WRITE, 0, 0, OPEN\_EXISTING, 
+      FILE\_ATTRIBUTE\_NORMAL, 0);
+00145 
+00146     \textcolor{keywordflow}{if} (hComm != INVALID\_HANDLE\_VALUE)
+00147     \{
+00148         \textcolor{comment}{// Set Events}
+00149         \textcolor{keywordflow}{if} (!SetCommMask(hComm, 0))
+00150             errorCode = GetLastError();
+00151 
+00152         \textcolor{comment}{// Set Timeouts}
+00153         GetCommTimeouts(hComm, &m_ctmoOld);
+00154         \textcolor{keywordflow}{if} (!SetCommTimeouts(hComm, &m_ctmoNew))
+00155             errorCode = GetLastError();
+00156 
+00157         \textcolor{comment}{// Set DCB}
+00158         \textcolor{keywordflow}{if} (!SetCommState(hComm, &m_dcbCommPort))
+00159             errorCode = GetLastError();
+00160     \}
+00161     \textcolor{keywordflow}{else}
+00162     \{
+00163         errorCode = GetLastError();
+00164     \};
+00165 
+00166     \textcolor{comment}{// Check the results}
+00167     \textcolor{keywordflow}{if}(errorCode != NOERROR)
+00168     \{
+00169         \textcolor{comment}{//unsigned long err = GetLastError();}
+00170         CloseHandle(hComm);
+00171         hComm = INVALID\_HANDLE\_VALUE;
+00172         \textcolor{keywordflow}{return} ReportError(errorCode, \textcolor{stringliteral}{"Error setting up COM connection"});
+00173     \}
+00174     \textcolor{keywordflow}{else}
+00175     \{
+00176         PurgeComm(hComm, PURGE\_TXCLEAR | PURGE\_RXCLEAR);
+00177         \textcolor{keywordflow}{return} NOERROR;
+00178     \}
+00179 \textcolor{preprocessor}{#else}
+00180     hComm = open(comName, O\_RDWR | O\_NOCTTY | O\_SYNC);
+00181     \textcolor{keywordflow}{if}(hComm < 0)
+00182     \{
+00183         \textcolor{keywordflow}{return} ReportError(\textcolor{stringliteral}{"failed opening COM port"});
+00184     \}
+00185 
+00186     \textcolor{keyword}{struct }termios tty;
+00187     memset(&tty, 0, \textcolor{keyword}{sizeof}(tty));
+00188     \textcolor{keywordflow}{if}( tcgetattr(hComm, &tty) != 0)
+00189     \{
+00190 \textcolor{comment}{//        MessageLog::getInstance()->write("Connection Manager: error from tcgetattr\(\backslash\)n", LOG\_ERROR);}
+00191         \textcolor{keywordflow}{return} ReportError(errno, \textcolor{stringliteral}{"error from tcgetattr"});
+00192     \}
+00193     \textcolor{keywordtype}{int} speed = B9600;
+00194     cfsetospeed(&tty, speed);
+00195     cfsetispeed(&tty, speed);
+00196 
+00197     tty.c\_cflag = (tty.c\_cflag & ~CSIZE) | CS8;
+00198     tty.c\_iflag &= ~IGNBRK;
+00199     tty.c\_iflag &= ~ICRNL;
+00200     tty.c\_lflag = 0;
+00201     tty.c\_oflag = 0;
+00202     tty.c\_cc[VMIN] = 0; \textcolor{comment}{// read non blocking}
+00203     tty.c\_cc[VTIME] = 5; \textcolor{comment}{// 0.5 seconds read timeout}
+00204 
+00205     tty.c\_iflag &= ~(IXON | IXOFF | IXANY);
+00206     tty.c\_cflag |= (CLOCAL | CREAD);
+00207 
+00208     \textcolor{keywordflow}{if}(tcsetattr(hComm, TCSANOW, &tty) != 0)
+00209     \{
+00210 \textcolor{comment}{//        MessageLog::getInstance()->write("Connection manager: error from tcsetattr\(\backslash\)n", LOG\_ERROR);}
+00211         \textcolor{keywordflow}{return} ReportError(errno, \textcolor{stringliteral}{"error from tcgetattr"});
+00212     \}
+00213 \textcolor{preprocessor}{#endif}
+00214     \textcolor{keywordflow}{return} 0;
+00215 \}
+00216 
+00223 \textcolor{keywordtype}{int} ConnectionEVB7COM::Write(\textcolor{keyword}{const} \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{char} *buffer, \textcolor{keywordtype}{int} length, \textcolor{keywordtype}{int} 
+      timeout_ms)
+00224 \{
+00225     \textcolor{keywordflow}{if}(timeout\_ms == 0)
+00226     \{
+00227         timeout\_ms = COM_TOTAL_TIMEOUT;
+00228     \}
+00229     \textcolor{keywordtype}{int} retryCount = 0;
+00230     \textcolor{keyword}{const} \textcolor{keywordtype}{int} maxRetries = (timeout\_ms/COM_RETRY_INTERVAL) > 1 ? (timeout\_ms/
+      COM_RETRY_INTERVAL) : 1;
+00231     \textcolor{keywordtype}{bool} status = \textcolor{keyword}{false};
+00232 \textcolor{preprocessor}{#ifndef \_\_unix\_\_}
+00233     \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{long} bytesWriten = 0;
+00234     m_osWOverlap.InternalHigh = 0;
+00235 
+00236     \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} i = 0; i<maxRetries && status == \textcolor{keyword}{false}; ++i)
+00237     \{
+00238         \textcolor{keywordflow}{if} (!WriteFile(hComm, buffer, length , &bytesWriten, NULL))
+00239         \{
+00240             status = \textcolor{keyword}{false};
+00241         \}
+00242         \textcolor{keywordflow}{else}
+00243             status = \textcolor{keyword}{true};
+00244         ++retryCount;
+00245     \}
+00246 \textcolor{preprocessor}{#else}
+00247     \textcolor{keywordtype}{long} bytesWriten = 0;
+00248     \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} i = 0; i<maxRetries && bytesWriten == 0; ++i)
+00249     \{
+00250         bytesWriten = write(hComm, buffer, length);
+00251         \textcolor{keywordflow}{if}(bytesWriten <= 0)
+00252         \{
+00253 \textcolor{comment}{//            if(bytesWriten < 0)}
+00254 \textcolor{comment}{//                MessageLog::getInstance()->write("COM PORT: error writing data\(\backslash\)n", LOG\_ERROR);}
+00255 \textcolor{comment}{//            if(bytesWriten == 0)}
+00256 \textcolor{comment}{//                MessageLog::getInstance()->write("COM PORT: data bytes sent 0\(\backslash\)n", LOG\_WARNING);}
+00257             status = \textcolor{keyword}{false};
+00258         \}
+00259         \textcolor{keywordflow}{else}
+00260             status = \textcolor{keyword}{true};
+00261         ++retryCount;
+00262     \}
+00263 \textcolor{preprocessor}{#endif}
+00264     \textcolor{keywordflow}{if}(bytesWriten == length)
+00265         status = \textcolor{keyword}{true};
+00266     \textcolor{keywordflow}{if}(status == \textcolor{keyword}{false});
+00267         ReportError(EIO, \textcolor{stringliteral}{"Failed to write data"});
+00268 
+00269     \textcolor{keywordflow}{return} bytesWriten;
+00270 \}
+00271 
+00278 \textcolor{keywordtype}{int} ConnectionEVB7COM::Read(\textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{char} *buffer, \textcolor{keywordtype}{int} length, \textcolor{keywordtype}{int} timeout_ms)
+00279 \{
+00280     \textcolor{keywordflow}{if}(timeout\_ms == 0)
+00281     \{
+00282         timeout\_ms = COM_TOTAL_TIMEOUT;
+00283     \}
+00284     \textcolor{keywordtype}{int} retryCount = 0;
+00285     \textcolor{keyword}{const} \textcolor{keywordtype}{int} maxRetries = (timeout\_ms/COM_RETRY_INTERVAL) > 1 ? (timeout\_ms/
+      COM_RETRY_INTERVAL) : 1;
+00286     \textcolor{keywordtype}{bool} status = \textcolor{keyword}{false};
+00287 
+00288     memset(buffer, 0, length);
+00289     \textcolor{keywordtype}{long} bytesReaded = 0;
+00290     \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{long} totalBytesReaded = 0;
+00291     \textcolor{keywordtype}{char} cRawData[COM_BUFFER_LENGTH];
+00292     \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{long} bytesToRead = length;
+00293 
+00294     memset(cRawData, \textcolor{charliteral}{'\(\backslash\)0'}, \textcolor{keyword}{sizeof}(cRawData[0])*COM_BUFFER_LENGTH);
+00295 
+00296     \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} i=0; i<maxRetries && status == \textcolor{keyword}{false}; ++i)
+00297     \{
+00298         memset(cRawData, \textcolor{charliteral}{'\(\backslash\)0'}, \textcolor{keyword}{sizeof}(cRawData[0])*COM\_BUFFER\_LENGTH);
+00299 \textcolor{preprocessor}{#ifndef \_\_unix\_\_}
+00300 
+00301         DWORD bytesReceived = 0;
+00302         \textcolor{keywordflow}{if} ( !ReadFile(hComm, cRawData, bytesToRead, &bytesReceived, NULL) )
+00303         \{
+00304             status = \textcolor{keyword}{false};
+00305         \}
+00306 
+00307         bytesReaded = bytesReceived;
+00308 \textcolor{preprocessor}{#else}
+00309         bytesReaded = read(hComm, cRawData, bytesToRead);
+00310         \textcolor{keywordflow}{if}(bytesReaded <= 0)
+00311         \{
+00312 \textcolor{comment}{//            if(bytesReaded < 0)}
+00313 \textcolor{comment}{//                MessageLog::getInstance()->write("COM PORT: error reading data\(\backslash\)n", LOG\_ERROR);}
+00314 \textcolor{comment}{//            if(bytesReaded == 0)}
+00315 \textcolor{comment}{//                MessageLog::getInstance()->write("COM PORT: reading 0 bytes\(\backslash\)n", LOG\_WARNING);}
+00316             status = \textcolor{keyword}{false};
+00317         \}
+00318 \textcolor{preprocessor}{#endif}
+00319         retryCount++;
+00320 
+00321         \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} j=0; j<bytesReaded; ++j)
+00322         \{
+00323             buffer[totalBytesReaded+j] = cRawData[j];
+00324         \}
+00325 
+00326         totalBytesReaded += bytesReaded;
+00327         \textcolor{keywordflow}{if}(totalBytesReaded == bytesToRead)
+00328             status = \textcolor{keyword}{true};
+00329     \}
+00330 
+00331 \textcolor{comment}{//    ss << " read(" << totalBytesReaded << "): ";}
+00332 \textcolor{comment}{//    for(unsigned int i=0; i<64; ++i)}
+00333 \textcolor{comment}{//        ss << int2hex(buffer[i], 1) << " ";}
+00334 \textcolor{comment}{//    ss <<  " - retries: " << retryCount-1 << endl;}
+00335     \textcolor{comment}{//MessageLog::getInstance()->write(ss.str(), LOG\_DATA);}
+00336 
+00337 \textcolor{comment}{//  if(retryCount == maxRetries)}
+00338 \textcolor{comment}{//        MessageLog::getInstance()->write("COM PORT: read data timeout\(\backslash\)n", LOG\_WARNING);}
+00339 \textcolor{comment}{//}
+00340 \textcolor{comment}{//    if(totalBytesReaded > length)}
+00341 \textcolor{comment}{//        MessageLog::getInstance()->write("COM PORT: read data corrupted, received length > requested
+       length\(\backslash\)n", LOG\_ERROR);}
+00342     \textcolor{keywordflow}{return} totalBytesReaded;
+00343 \}
+\end{DoxyCode}

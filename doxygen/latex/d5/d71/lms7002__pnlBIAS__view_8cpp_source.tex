@@ -1,0 +1,81 @@
+\subsection{lms7002\+\_\+pnl\+B\+I\+A\+S\+\_\+view.\+cpp}
+\label{lms7002__pnlBIAS__view_8cpp_source}\index{/home/erik/prefix/default/src/limesuite-\/dev/src/lms7002\+\_\+wxgui/lms7002\+\_\+pnl\+B\+I\+A\+S\+\_\+view.\+cpp@{/home/erik/prefix/default/src/limesuite-\/dev/src/lms7002\+\_\+wxgui/lms7002\+\_\+pnl\+B\+I\+A\+S\+\_\+view.\+cpp}}
+
+\begin{DoxyCode}
+00001 \textcolor{preprocessor}{#include "lms7002_pnlBIAS_view.h"}
+00002 \textcolor{preprocessor}{#include <map>}
+00003 \textcolor{preprocessor}{#include "lms7002_gui_utilities.h"}
+00004 \textcolor{preprocessor}{#include "lms7_device.h"}
+00005 \textcolor{keyword}{using namespace }lime;
+00006 
+00007 lms7002_pnlBIAS_view::lms7002_pnlBIAS_view( wxWindow* parent )
+00008 :
+00009 pnlBIAS_view( parent )
+00010 \{
+00011 
+00012 \}
+00013 
+00014 lms7002_pnlBIAS_view::lms7002_pnlBIAS_view( wxWindow* parent, wxWindowID \textcolor{keywordtype}{id}, \textcolor{keyword}{const} wxPoint& pos, \textcolor{keyword}{const} 
+      wxSize& size, \textcolor{keywordtype}{long} style )
+00015     : pnlBIAS_view(parent, id, pos, size, style), lmsControl(nullptr)
+00016 \{
+00017     wndId2Enum[chkPD_BIAS_MASTER] = LMS7param(PD_BIAS_MASTER);
+00018     wndId2Enum[cmbMUX_BIAS_OUT] = LMS7param(MUX_BIAS_OUT);
+00019     wndId2Enum[chkPD_FRP_BIAS] = LMS7param(PD_FRP_BIAS);
+00020     wndId2Enum[chkPD_F_BIAS] = LMS7param(PD_F_BIAS);
+00021     wndId2Enum[chkPD_PTRP_BIAS] = LMS7param(PD_PTRP_BIAS);
+00022     wndId2Enum[chkPD_PT_BIAS] = LMS7param(PD_PT_BIAS);
+00023     wndId2Enum[cmbRP_CALIB_BIAS] = LMS7param(RP_CALIB_BIAS);
+00024 
+00025     wxArrayString temp;
+00026     temp.clear();
+00027     temp.push\_back(\_(\textcolor{stringliteral}{"NO test mode"}));
+00028     temp.push\_back(\_(\textcolor{stringliteral}{"vr\_ext\_bak and vr\_cal\_ref=600mV passed to ADC input MUX"}));
+00029     temp.push\_back(\_(\textcolor{stringliteral}{"BIAS\_TOP test outputs will be connected to ADC channel 1 input"}));
+00030     temp.push\_back(\_(\textcolor{stringliteral}{"RSSI 1 output will be connected to ADC 1 input"}));
+00031     cmbMUX_BIAS_OUT->Set(temp);
+00032 
+00033     temp.clear();
+00034     \textcolor{keywordflow}{for} (\textcolor{keywordtype}{int} i = 0; i<32; ++i)
+00035     \{
+00036         temp.push\_back(wxString::Format(\_(\textcolor{stringliteral}{"%i"}), i));
+00037     \}
+00038     cmbRP_CALIB_BIAS->Set(temp);
+00039     LMS7002_WXGUI::UpdateTooltips(wndId2Enum, \textcolor{keyword}{true});
+00040 \}
+00041 
+00042 \textcolor{keywordtype}{void} lms7002_pnlBIAS_view::Initialize(lms_device_t* pControl)
+00043 \{
+00044     lmsControl = pControl;
+00045     assert(lmsControl != \textcolor{keyword}{nullptr});
+00046 \}
+00047 
+00048 \textcolor{keywordtype}{void} lms7002_pnlBIAS_view::ParameterChangeHandler(wxCommandEvent& event)
+00049 \{
+00050     assert(lmsControl != \textcolor{keyword}{nullptr});
+00051     LMS7Parameter parameter;
+00052     \textcolor{keywordflow}{try}
+00053     \{
+00054         parameter = wndId2Enum.at(reinterpret\_cast<wxWindow*>(event.GetEventObject()));
+00055     \}
+00056     \textcolor{keywordflow}{catch} (std::exception & e)
+00057     \{
+00058         std::cout << \textcolor{stringliteral}{"Control element(ID = "} << \textcolor{keyword}{event}.GetId() << \textcolor{stringliteral}{") don't have assigned LMS parameter."} << 
+      std::endl;
+00059         \textcolor{keywordflow}{return};
+00060     \}
+00061     LMS_WriteParam(lmsControl,parameter,event.GetInt());
+00062 \}
+00063 
+00064 \textcolor{keywordtype}{void} lms7002_pnlBIAS_view::UpdateGUI()
+00065 \{
+00066     LMS7002_WXGUI::UpdateControlsByMap(\textcolor{keyword}{this}, lmsControl, wndId2Enum);
+00067 \}
+00068 
+00069 \textcolor{keywordtype}{void} lms7002_pnlBIAS_view::OnCalibrateRP_BIAS( wxCommandEvent& event )
+00070 \{
+00071     LMS7002M* lms = ((LMS7_Device*)lmsControl)->GetLMS();
+00072     lms->CalibrateRP_BIAS();
+00073     UpdateGUI();
+00074 \}
+\end{DoxyCode}

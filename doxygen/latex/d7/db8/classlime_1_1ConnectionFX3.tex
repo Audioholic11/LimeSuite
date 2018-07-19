@@ -1,0 +1,1000 @@
+\subsection{lime\+:\+:Connection\+F\+X3 Class Reference}
+\label{classlime_1_1ConnectionFX3}\index{lime\+::\+Connection\+F\+X3@{lime\+::\+Connection\+F\+X3}}
+
+
+{\ttfamily \#include $<$Connection\+F\+X3.\+h$>$}
+
+
+
+Inheritance diagram for lime\+:\+:Connection\+F\+X3\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=550pt]{dc/d15/classlime_1_1ConnectionFX3__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for lime\+:\+:Connection\+F\+X3\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=550pt]{d8/d19/classlime_1_1ConnectionFX3__coll__graph}
+\end{center}
+\end{figure}
+\subsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+{\bf Connection\+F\+X3} ({\bf void} $\ast$arg, const std\+::string \&vidpid, const std\+::string \&serial, const unsigned {\bf index})
+\begin{DoxyCompactList}\small\item\em Initializes port type and object necessary to communicate to usb device. \end{DoxyCompactList}\item 
+{\bf $\sim$\+Connection\+F\+X3} ({\bf void})
+\begin{DoxyCompactList}\small\item\em Closes connection to chip and deallocates used memory. \end{DoxyCompactList}\item 
+{\bf int} {\bf Open} (const std\+::string \&vidpid, const std\+::string \&serial, const unsigned {\bf index})
+\begin{DoxyCompactList}\small\item\em Tries to open connected U\+SB device and find communication endpoints. \end{DoxyCompactList}\item 
+{\bf void} {\bf Close} ()
+\begin{DoxyCompactList}\small\item\em Closes communication to device. \end{DoxyCompactList}\item 
+bool {\bf Is\+Open} ()
+\begin{DoxyCompactList}\small\item\em Returns connection status. \end{DoxyCompactList}\item 
+{\bf int} {\bf Get\+Opened\+Index} ()
+\item 
+{\bf int} {\bf Write} (const unsigned char $\ast${\bf buffer}, {\bf int} {\bf length}, {\bf int} {\bf timeout\+\_\+ms}=100) override
+\begin{DoxyCompactList}\small\item\em Sends given data buffer to chip through U\+SB port. \end{DoxyCompactList}\item 
+{\bf int} {\bf Read} (unsigned char $\ast${\bf buffer}, {\bf int} {\bf length}, {\bf int} {\bf timeout\+\_\+ms}=100) override
+\begin{DoxyCompactList}\small\item\em Reads data coming from the chip through U\+SB port. \end{DoxyCompactList}\item 
+{\bf int} {\bf Program\+Write} (const char $\ast${\bf buffer}, const size\+\_\+t {\bf length}, const {\bf int} programming\+Mode, const {\bf int} {\bf device}, {\bf Programming\+Callback} {\bf callback}) override
+\begin{DoxyCompactList}\small\item\em Uploads program to selected device. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsubsection*{Protected Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+{\bf int} {\bf Get\+Buffers\+Count} () const 
+\item 
+{\bf int} {\bf Check\+Stream\+Size} ({\bf int} {\bf size}) const 
+\item 
+{\bf int} {\bf Send\+Data} (const char $\ast${\bf buffer}, {\bf int} {\bf length}, {\bf int} ep\+Index=0, {\bf int} timeout=100) override
+\item 
+{\bf int} {\bf Receive\+Data} (char $\ast${\bf buffer}, {\bf int} {\bf length}, {\bf int} ep\+Index=0, {\bf int} timeout=100) override
+\item 
+{\bf int} {\bf Begin\+Data\+Reading} (char $\ast${\bf buffer}, uint32\+\_\+t {\bf length}, {\bf int} ep) override
+\begin{DoxyCompactList}\small\item\em Starts asynchronous data reading from board. \end{DoxyCompactList}\item 
+bool {\bf Wait\+For\+Reading} ({\bf int} context\+Handle, unsigned {\bf int} {\bf timeout\+\_\+ms}) override
+\begin{DoxyCompactList}\small\item\em Waits for asynchronous data reception. \end{DoxyCompactList}\item 
+{\bf int} {\bf Finish\+Data\+Reading} (char $\ast${\bf buffer}, uint32\+\_\+t {\bf length}, {\bf int} context\+Handle) override
+\begin{DoxyCompactList}\small\item\em Finishes asynchronous data reading from board. \end{DoxyCompactList}\item 
+{\bf void} {\bf Abort\+Reading} ({\bf int} ep) override
+\begin{DoxyCompactList}\small\item\em Aborts reading operations. \end{DoxyCompactList}\item 
+{\bf int} {\bf Begin\+Data\+Sending} (const char $\ast${\bf buffer}, uint32\+\_\+t {\bf length}, {\bf int} ep) override
+\begin{DoxyCompactList}\small\item\em Starts asynchronous data Sending to board. \end{DoxyCompactList}\item 
+bool {\bf Wait\+For\+Sending} ({\bf int} context\+Handle, uint32\+\_\+t {\bf timeout\+\_\+ms}) override
+\begin{DoxyCompactList}\small\item\em Waits for asynchronous data sending. \end{DoxyCompactList}\item 
+{\bf int} {\bf Finish\+Data\+Sending} (const char $\ast${\bf buffer}, uint32\+\_\+t {\bf length}, {\bf int} context\+Handle) override
+\begin{DoxyCompactList}\small\item\em Finishes asynchronous data sending to board. \end{DoxyCompactList}\item 
+{\bf void} {\bf Abort\+Sending} ({\bf int} ep) override
+\begin{DoxyCompactList}\small\item\em Aborts sending operations. \end{DoxyCompactList}\item 
+{\bf int} {\bf Reset\+Stream\+Buffers} () override
+\begin{DoxyCompactList}\small\item\em Read raw stream data from device streaming port. \end{DoxyCompactList}\item 
+{\bf e\+Connection\+Type} {\bf Get\+Type} ({\bf void})
+\begin{DoxyCompactList}\small\item\em implement in base class \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsubsection*{Protected Attributes}
+\begin{DoxyCompactItemize}
+\item 
+{\bf U\+S\+B\+Transfer\+Context} {\bf contexts} [{\bf U\+S\+B\+\_\+\+M\+A\+X\+\_\+\+C\+O\+N\+T\+E\+X\+TS}]
+\item 
+{\bf U\+S\+B\+Transfer\+Context} {\bf contexts\+To\+Send} [{\bf U\+S\+B\+\_\+\+M\+A\+X\+\_\+\+C\+O\+N\+T\+E\+X\+TS}]
+\item 
+bool {\bf is\+Connected}
+\item 
+C\+Cy\+F\+X3\+Device $\ast$ {\bf U\+S\+B\+Device\+Primary}
+\item 
+C\+Cy\+Control\+End\+Point $\ast$ {\bf In\+Ctrl\+End\+Pt3}
+\item 
+C\+Cy\+Control\+End\+Point $\ast$ {\bf Out\+Ctrl\+End\+Pt3}
+\item 
+C\+Cy\+U\+S\+B\+End\+Point $\ast$ {\bf In\+End\+Pt} [{\bf M\+A\+X\+\_\+\+E\+P\+\_\+\+C\+NT}]
+\item 
+C\+Cy\+U\+S\+B\+End\+Point $\ast$ {\bf Out\+End\+Pt} [{\bf M\+A\+X\+\_\+\+E\+P\+\_\+\+C\+NT}]
+\item 
+C\+Cy\+U\+S\+B\+End\+Point $\ast$ {\bf In\+Ctrl\+Bulk\+End\+Pt}
+\item 
+C\+Cy\+U\+S\+B\+End\+Point $\ast$ {\bf Out\+Ctrl\+Bulk\+End\+Pt}
+\item 
+{\bf std\+::set}$<$ uint8\+\_\+t $>$ {\bf commands\+To\+Bulk\+Ctrl}
+\item 
+bool {\bf bulk\+Ctrl\+In\+Progress}
+\item 
+bool {\bf bulk\+Ctrl\+Available}
+\item 
+std\+::mutex {\bf m\+Extra\+Usb\+Mutex}
+\end{DoxyCompactItemize}
+\subsubsection*{Static Protected Attributes}
+\begin{DoxyCompactItemize}
+\item 
+static const {\bf int} {\bf U\+S\+B\+\_\+\+M\+A\+X\+\_\+\+C\+O\+N\+T\+E\+X\+TS} = 16
+\item 
+static const {\bf int} {\bf M\+A\+X\+\_\+\+E\+P\+\_\+\+C\+NT} = 16
+\item 
+static const uint8\+\_\+t {\bf ctrl\+Bulk\+Out\+Addr} = 0x0F
+\item 
+static const uint8\+\_\+t {\bf ctrl\+Bulk\+In\+Addr} = 0x8F
+\item 
+static const {\bf std\+::set}$<$ uint8\+\_\+t $>$ {\bf commands\+To\+Bulk\+Ctrl\+Hw1}
+\item 
+static const {\bf std\+::set}$<$ uint8\+\_\+t $>$ {\bf commands\+To\+Bulk\+Ctrl\+Hw2}
+\end{DoxyCompactItemize}
+\subsubsection*{Additional Inherited Members}
+
+
+\subsubsection{Detailed Description}
+
+
+Definition at line {\bf 85} of file {\bf Connection\+F\+X3.\+h}.
+
+
+
+\subsubsection{Constructor \& Destructor Documentation}
+\index{lime\+::\+Connection\+F\+X3@{lime\+::\+Connection\+F\+X3}!Connection\+F\+X3@{Connection\+F\+X3}}
+\index{Connection\+F\+X3@{Connection\+F\+X3}!lime\+::\+Connection\+F\+X3@{lime\+::\+Connection\+F\+X3}}
+\paragraph[{Connection\+F\+X3(void $\ast$arg, const std\+::string \&vidpid, const std\+::string \&serial, const unsigned index)}]{\setlength{\rightskip}{0pt plus 5cm}Connection\+F\+X3\+::\+Connection\+F\+X3 (
+\begin{DoxyParamCaption}
+\item[{{\bf void} $\ast$}]{arg, }
+\item[{const std\+::string \&}]{vidpid, }
+\item[{const std\+::string \&}]{serial, }
+\item[{const unsigned}]{index}
+\end{DoxyParamCaption}
+)}\label{classlime_1_1ConnectionFX3_a509d491ad5ce2f260e23ef367c780d38}
+
+
+Initializes port type and object necessary to communicate to usb device. 
+
+
+
+Definition at line {\bf 54} of file {\bf Connection\+F\+X3.\+cpp}.
+
+
+
+References {\bf lime\+::\+L\+M\+S64\+C\+Protocol\+::\+L\+M\+Sinfo\+::device}, {\bf lime\+::error()}, {\bf lime\+::\+L\+M\+S64\+C\+Protocol\+::\+L\+M\+Sinfo\+::hardware}, {\bf i}, {\bf info}, {\bf lime\+::\+L\+M\+S\+\_\+\+D\+E\+V\+\_\+\+L\+I\+M\+E\+S\+DR}, {\bf status}, and {\bf lime\+::warning()}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{d7/db8/classlime_1_1ConnectionFX3_a509d491ad5ce2f260e23ef367c780d38_cgraph}
+\end{center}
+\end{figure}
+
+
+\index{lime\+::\+Connection\+F\+X3@{lime\+::\+Connection\+F\+X3}!````~Connection\+F\+X3@{$\sim$\+Connection\+F\+X3}}
+\index{````~Connection\+F\+X3@{$\sim$\+Connection\+F\+X3}!lime\+::\+Connection\+F\+X3@{lime\+::\+Connection\+F\+X3}}
+\paragraph[{$\sim$\+Connection\+F\+X3(void)}]{\setlength{\rightskip}{0pt plus 5cm}Connection\+F\+X3\+::$\sim$\+Connection\+F\+X3 (
+\begin{DoxyParamCaption}
+\item[{{\bf void}}]{}
+\end{DoxyParamCaption}
+)}\label{classlime_1_1ConnectionFX3_a38d29f8103d13b961e50acb4f9502f02}
+
+
+Closes connection to chip and deallocates used memory. 
+
+
+
+Definition at line {\bf 115} of file {\bf Connection\+F\+X3.\+cpp}.
+
+
+
+\subsubsection{Member Function Documentation}
+\index{lime\+::\+Connection\+F\+X3@{lime\+::\+Connection\+F\+X3}!Abort\+Reading@{Abort\+Reading}}
+\index{Abort\+Reading@{Abort\+Reading}!lime\+::\+Connection\+F\+X3@{lime\+::\+Connection\+F\+X3}}
+\paragraph[{Abort\+Reading(int ep) override}]{\setlength{\rightskip}{0pt plus 5cm}{\bf void} Connection\+F\+X3\+::\+Abort\+Reading (
+\begin{DoxyParamCaption}
+\item[{{\bf int}}]{ep}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [protected]}, {\ttfamily [virtual]}}\label{classlime_1_1ConnectionFX3_a982efa3c389cf4964045ba0f5b3e5dc1}
+
+
+Aborts reading operations. 
+
+
+
+Reimplemented from {\bf lime\+::\+I\+Connection} \doxyref{}{p.}{d2/de5/classlime_1_1IConnection_ae6bc7a7556e13862df14e98ccf4b9409}.
+
+
+
+Definition at line {\bf 561} of file {\bf Connection\+F\+X3.\+cpp}.
+
+
+
+References {\bf i}.
+
+\index{lime\+::\+Connection\+F\+X3@{lime\+::\+Connection\+F\+X3}!Abort\+Sending@{Abort\+Sending}}
+\index{Abort\+Sending@{Abort\+Sending}!lime\+::\+Connection\+F\+X3@{lime\+::\+Connection\+F\+X3}}
+\paragraph[{Abort\+Sending(int ep) override}]{\setlength{\rightskip}{0pt plus 5cm}{\bf void} Connection\+F\+X3\+::\+Abort\+Sending (
+\begin{DoxyParamCaption}
+\item[{{\bf int}}]{ep}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [protected]}, {\ttfamily [virtual]}}\label{classlime_1_1ConnectionFX3_a407a8eb6443a89c76c4a0fec1b34aeff}
+
+
+Aborts sending operations. 
+
+
+
+Reimplemented from {\bf lime\+::\+I\+Connection} \doxyref{}{p.}{d2/de5/classlime_1_1IConnection_a36928cc55493e86385e4ff582ef2c02b}.
+
+
+
+Definition at line {\bf 694} of file {\bf Connection\+F\+X3.\+cpp}.
+
+
+
+References {\bf i}.
+
+\index{lime\+::\+Connection\+F\+X3@{lime\+::\+Connection\+F\+X3}!Begin\+Data\+Reading@{Begin\+Data\+Reading}}
+\index{Begin\+Data\+Reading@{Begin\+Data\+Reading}!lime\+::\+Connection\+F\+X3@{lime\+::\+Connection\+F\+X3}}
+\paragraph[{Begin\+Data\+Reading(char $\ast$buffer, uint32\+\_\+t length, int ep) override}]{\setlength{\rightskip}{0pt plus 5cm}{\bf int} Connection\+F\+X3\+::\+Begin\+Data\+Reading (
+\begin{DoxyParamCaption}
+\item[{char $\ast$}]{buffer, }
+\item[{uint32\+\_\+t}]{length, }
+\item[{{\bf int}}]{ep}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [protected]}, {\ttfamily [virtual]}}\label{classlime_1_1ConnectionFX3_a095dfc0be5abe09860653e31b8f22ac9}
+
+
+Starts asynchronous data reading from board. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em $\ast$buffer} & buffer where to store received data \\
+\hline
+{\em length} & number of bytes to read \\
+\hline
+{\em stream\+Bulk\+In\+Addr} & endpoint index? \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+handle of transfer context 
+\end{DoxyReturn}
+
+
+Reimplemented from {\bf lime\+::\+I\+Connection} \doxyref{}{p.}{d2/de5/classlime_1_1IConnection_ac9ec0b2a4288d7732d7e2e03f5606401}.
+
+
+
+Definition at line {\bf 454} of file {\bf Connection\+F\+X3.\+cpp}.
+
+
+
+References {\bf lime\+::error()}, {\bf i}, and {\bf status}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{d7/db8/classlime_1_1ConnectionFX3_a095dfc0be5abe09860653e31b8f22ac9_cgraph}
+\end{center}
+\end{figure}
+
+
+\index{lime\+::\+Connection\+F\+X3@{lime\+::\+Connection\+F\+X3}!Begin\+Data\+Sending@{Begin\+Data\+Sending}}
+\index{Begin\+Data\+Sending@{Begin\+Data\+Sending}!lime\+::\+Connection\+F\+X3@{lime\+::\+Connection\+F\+X3}}
+\paragraph[{Begin\+Data\+Sending(const char $\ast$buffer, uint32\+\_\+t length, int ep) override}]{\setlength{\rightskip}{0pt plus 5cm}{\bf int} Connection\+F\+X3\+::\+Begin\+Data\+Sending (
+\begin{DoxyParamCaption}
+\item[{const char $\ast$}]{buffer, }
+\item[{uint32\+\_\+t}]{length, }
+\item[{{\bf int}}]{ep}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [protected]}, {\ttfamily [virtual]}}\label{classlime_1_1ConnectionFX3_a1674541366642d9393cbc71357cfa160}
+
+
+Starts asynchronous data Sending to board. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em $\ast$buffer} & buffer to send \\
+\hline
+{\em length} & number of bytes to send \\
+\hline
+{\em stream\+Bulk\+Out\+Addr} & endpoint index? \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+handle of transfer context 
+\end{DoxyReturn}
+
+
+Reimplemented from {\bf lime\+::\+I\+Connection} \doxyref{}{p.}{d2/de5/classlime_1_1IConnection_afdfa152ab699f516cd0fb479ec98bcc8}.
+
+
+
+Definition at line {\bf 592} of file {\bf Connection\+F\+X3.\+cpp}.
+
+
+
+References {\bf lime\+::error()}, {\bf i}, and {\bf status}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{d7/db8/classlime_1_1ConnectionFX3_a1674541366642d9393cbc71357cfa160_cgraph}
+\end{center}
+\end{figure}
+
+
+\index{lime\+::\+Connection\+F\+X3@{lime\+::\+Connection\+F\+X3}!Check\+Stream\+Size@{Check\+Stream\+Size}}
+\index{Check\+Stream\+Size@{Check\+Stream\+Size}!lime\+::\+Connection\+F\+X3@{lime\+::\+Connection\+F\+X3}}
+\paragraph[{Check\+Stream\+Size(int size) const }]{\setlength{\rightskip}{0pt plus 5cm}{\bf int} Connection\+F\+X3\+::\+Check\+Stream\+Size (
+\begin{DoxyParamCaption}
+\item[{{\bf int}}]{size}
+\end{DoxyParamCaption}
+) const\hspace{0.3cm}{\ttfamily [protected]}, {\ttfamily [virtual]}}\label{classlime_1_1ConnectionFX3_a135a1bc5e657f9d6b6d239112035d1b8}
+
+
+Reimplemented from {\bf lime\+::\+I\+Connection} \doxyref{}{p.}{d2/de5/classlime_1_1IConnection_a533ff580f219bbec2b556b265c1e1355}.
+
+
+
+Definition at line {\bf 723} of file {\bf Connection\+F\+X3.\+cpp}.
+
+\index{lime\+::\+Connection\+F\+X3@{lime\+::\+Connection\+F\+X3}!Close@{Close}}
+\index{Close@{Close}!lime\+::\+Connection\+F\+X3@{lime\+::\+Connection\+F\+X3}}
+\paragraph[{Close()}]{\setlength{\rightskip}{0pt plus 5cm}{\bf void} Connection\+F\+X3\+::\+Close (
+\begin{DoxyParamCaption}
+\item[{{\bf void}}]{}
+\end{DoxyParamCaption}
+)}\label{classlime_1_1ConnectionFX3_a9a2ad920a8d756961bc02784c511325e}
+
+
+Closes communication to device. 
+
+
+
+Definition at line {\bf 284} of file {\bf Connection\+F\+X3.\+cpp}.
+
+
+
+References {\bf i}.
+
+\index{lime\+::\+Connection\+F\+X3@{lime\+::\+Connection\+F\+X3}!Finish\+Data\+Reading@{Finish\+Data\+Reading}}
+\index{Finish\+Data\+Reading@{Finish\+Data\+Reading}!lime\+::\+Connection\+F\+X3@{lime\+::\+Connection\+F\+X3}}
+\paragraph[{Finish\+Data\+Reading(char $\ast$buffer, uint32\+\_\+t length, int context\+Handle) override}]{\setlength{\rightskip}{0pt plus 5cm}{\bf int} Connection\+F\+X3\+::\+Finish\+Data\+Reading (
+\begin{DoxyParamCaption}
+\item[{char $\ast$}]{buffer, }
+\item[{uint32\+\_\+t}]{length, }
+\item[{{\bf int}}]{context\+Handle}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [protected]}, {\ttfamily [virtual]}}\label{classlime_1_1ConnectionFX3_ae0400bd216c3d22283df97562196734e}
+
+
+Finishes asynchronous data reading from board. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em buffer} & array where to store received data \\
+\hline
+{\em length} & number of bytes to read \\
+\hline
+{\em context\+Handle} & handle of which context to finish \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+negative values failure, positive number of bytes received 
+\end{DoxyReturn}
+
+
+Reimplemented from {\bf lime\+::\+I\+Connection} \doxyref{}{p.}{d2/de5/classlime_1_1IConnection_a900a18a24b131295005bd5bf88856840}.
+
+
+
+Definition at line {\bf 536} of file {\bf Connection\+F\+X3.\+cpp}.
+
+
+
+References {\bf len}, and {\bf status}.
+
+\index{lime\+::\+Connection\+F\+X3@{lime\+::\+Connection\+F\+X3}!Finish\+Data\+Sending@{Finish\+Data\+Sending}}
+\index{Finish\+Data\+Sending@{Finish\+Data\+Sending}!lime\+::\+Connection\+F\+X3@{lime\+::\+Connection\+F\+X3}}
+\paragraph[{Finish\+Data\+Sending(const char $\ast$buffer, uint32\+\_\+t length, int context\+Handle) override}]{\setlength{\rightskip}{0pt plus 5cm}{\bf int} Connection\+F\+X3\+::\+Finish\+Data\+Sending (
+\begin{DoxyParamCaption}
+\item[{const char $\ast$}]{buffer, }
+\item[{uint32\+\_\+t}]{length, }
+\item[{{\bf int}}]{context\+Handle}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [protected]}, {\ttfamily [virtual]}}\label{classlime_1_1ConnectionFX3_a4b3e4f88e76fd85b805561588158aeae}
+
+
+Finishes asynchronous data sending to board. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em buffer} & array where to store received data \\
+\hline
+{\em length} & number of bytes to read, function changes this value to number of bytes acctually received \\
+\hline
+{\em context\+Handle} & handle of which context to finish \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+false failure, true number of bytes sent 
+\end{DoxyReturn}
+
+
+Reimplemented from {\bf lime\+::\+I\+Connection} \doxyref{}{p.}{d2/de5/classlime_1_1IConnection_a7039b9d4f3b8fc03be3272dcabc51e09}.
+
+
+
+Definition at line {\bf 670} of file {\bf Connection\+F\+X3.\+cpp}.
+
+
+
+References {\bf len}.
+
+\index{lime\+::\+Connection\+F\+X3@{lime\+::\+Connection\+F\+X3}!Get\+Buffers\+Count@{Get\+Buffers\+Count}}
+\index{Get\+Buffers\+Count@{Get\+Buffers\+Count}!lime\+::\+Connection\+F\+X3@{lime\+::\+Connection\+F\+X3}}
+\paragraph[{Get\+Buffers\+Count() const }]{\setlength{\rightskip}{0pt plus 5cm}{\bf int} Connection\+F\+X3\+::\+Get\+Buffers\+Count (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+) const\hspace{0.3cm}{\ttfamily [protected]}, {\ttfamily [virtual]}}\label{classlime_1_1ConnectionFX3_a0061517c8c692e506e4d626eec4efc87}
+
+
+Reimplemented from {\bf lime\+::\+I\+Connection} \doxyref{}{p.}{d2/de5/classlime_1_1IConnection_a5cf560f39a0b0fa2dc4079ae74f22925}.
+
+
+
+Definition at line {\bf 718} of file {\bf Connection\+F\+X3.\+cpp}.
+
+\index{lime\+::\+Connection\+F\+X3@{lime\+::\+Connection\+F\+X3}!Get\+Opened\+Index@{Get\+Opened\+Index}}
+\index{Get\+Opened\+Index@{Get\+Opened\+Index}!lime\+::\+Connection\+F\+X3@{lime\+::\+Connection\+F\+X3}}
+\paragraph[{Get\+Opened\+Index()}]{\setlength{\rightskip}{0pt plus 5cm}{\bf int} lime\+::\+Connection\+F\+X3\+::\+Get\+Opened\+Index (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}\label{classlime_1_1ConnectionFX3_abe07ec820ab2dd19cf6d80041c3d1fb8}
+\index{lime\+::\+Connection\+F\+X3@{lime\+::\+Connection\+F\+X3}!Get\+Type@{Get\+Type}}
+\index{Get\+Type@{Get\+Type}!lime\+::\+Connection\+F\+X3@{lime\+::\+Connection\+F\+X3}}
+\paragraph[{Get\+Type(void)}]{\setlength{\rightskip}{0pt plus 5cm}{\bf e\+Connection\+Type} lime\+::\+Connection\+F\+X3\+::\+Get\+Type (
+\begin{DoxyParamCaption}
+\item[{{\bf void}}]{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [protected]}, {\ttfamily [virtual]}}\label{classlime_1_1ConnectionFX3_adb8fd73d2cdd6ab7a7dc88a51a462e2d}
+
+
+implement in base class 
+
+
+
+Implements {\bf lime\+::\+L\+M\+S64\+C\+Protocol} \doxyref{}{p.}{de/d46/classlime_1_1LMS64CProtocol_ab766d6322a66164891a296359c2b9019}.
+
+
+
+Definition at line {\bf 118} of file {\bf Connection\+F\+X3.\+h}.
+
+\index{lime\+::\+Connection\+F\+X3@{lime\+::\+Connection\+F\+X3}!Is\+Open@{Is\+Open}}
+\index{Is\+Open@{Is\+Open}!lime\+::\+Connection\+F\+X3@{lime\+::\+Connection\+F\+X3}}
+\paragraph[{Is\+Open()}]{\setlength{\rightskip}{0pt plus 5cm}bool Connection\+F\+X3\+::\+Is\+Open (
+\begin{DoxyParamCaption}
+\item[{{\bf void}}]{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [virtual]}}\label{classlime_1_1ConnectionFX3_a72b6cce51601f2f7f691f97bfd029cd9}
+
+
+Returns connection status. 
+
+\begin{DoxyReturn}{Returns}
+1-\/connection open, 0-\/connection closed. 
+\end{DoxyReturn}
+
+
+Reimplemented from {\bf lime\+::\+I\+Connection} \doxyref{}{p.}{d2/de5/classlime_1_1IConnection_abf1c25c85e31e262ded3e33e65cc58e3}.
+
+
+
+Definition at line {\bf 316} of file {\bf Connection\+F\+X3.\+cpp}.
+
+\index{lime\+::\+Connection\+F\+X3@{lime\+::\+Connection\+F\+X3}!Open@{Open}}
+\index{Open@{Open}!lime\+::\+Connection\+F\+X3@{lime\+::\+Connection\+F\+X3}}
+\paragraph[{Open(const std\+::string \&vidpid, const std\+::string \&serial, const unsigned index)}]{\setlength{\rightskip}{0pt plus 5cm}{\bf int} Connection\+F\+X3\+::\+Open (
+\begin{DoxyParamCaption}
+\item[{const std\+::string \&}]{vidpid, }
+\item[{const std\+::string \&}]{serial, }
+\item[{const unsigned}]{index}
+\end{DoxyParamCaption}
+)}\label{classlime_1_1ConnectionFX3_a3482390fefbaa19f80865069d8d3cc41}
+
+
+Tries to open connected U\+SB device and find communication endpoints. 
+
+\begin{DoxyReturn}{Returns}
+Returns 0-\/\+Success, other-\/\+End\+Points not found or device didn\textquotesingle{}t connect. 
+\end{DoxyReturn}
+
+
+Definition at line {\bf 126} of file {\bf Connection\+F\+X3.\+cpp}.
+
+
+
+References {\bf lime\+::\+L\+M\+S64\+C\+Protocol\+::\+Generic\+Packet\+::cmd}, {\bf lime\+::\+C\+M\+D\+\_\+\+U\+S\+B\+\_\+\+F\+I\+F\+O\+\_\+\+R\+ST}, {\bf C\+T\+R\+\_\+\+R\+\_\+\+I\+N\+D\+EX}, {\bf C\+T\+R\+\_\+\+R\+\_\+\+R\+E\+Q\+C\+O\+DE}, {\bf C\+T\+R\+\_\+\+R\+\_\+\+V\+A\+L\+UE}, {\bf C\+T\+R\+\_\+\+W\+\_\+\+I\+N\+D\+EX}, {\bf C\+T\+R\+\_\+\+W\+\_\+\+R\+E\+Q\+C\+O\+DE}, {\bf C\+T\+R\+\_\+\+W\+\_\+\+V\+A\+L\+UE}, {\bf device}, {\bf lime\+::error()}, {\bf i}, {\bf lime\+::info()}, {\bf len}, {\bf lime\+::\+L\+M\+S64\+C\+Protocol\+::\+Generic\+Packet\+::out\+Buffer}, and {\bf lime\+::\+Report\+Error()}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{d7/db8/classlime_1_1ConnectionFX3_a3482390fefbaa19f80865069d8d3cc41_cgraph}
+\end{center}
+\end{figure}
+
+
+\index{lime\+::\+Connection\+F\+X3@{lime\+::\+Connection\+F\+X3}!Program\+Write@{Program\+Write}}
+\index{Program\+Write@{Program\+Write}!lime\+::\+Connection\+F\+X3@{lime\+::\+Connection\+F\+X3}}
+\paragraph[{Program\+Write(const char $\ast$buffer, const size\+\_\+t length, const int programming\+Mode, const int device, Programming\+Callback callback) override}]{\setlength{\rightskip}{0pt plus 5cm}{\bf int} Connection\+F\+X3\+::\+Program\+Write (
+\begin{DoxyParamCaption}
+\item[{const char $\ast$}]{buffer, }
+\item[{const size\+\_\+t}]{length, }
+\item[{const {\bf int}}]{programming\+Mode, }
+\item[{const {\bf int}}]{index, }
+\item[{{\bf Programming\+Callback}}]{callback}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [virtual]}}\label{classlime_1_1ConnectionFX3_a496c66d0f286d3749a7762635d8ecab1}
+
+
+Uploads program to selected device. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em buffer} & binary program data \\
+\hline
+{\em length} & buffer length \\
+\hline
+{\em programming\+Mode} & to R\+AM, to F\+L\+A\+SH, to E\+E\+P\+R\+OM, etc.. \\
+\hline
+{\em index} & target device number \\
+\hline
+{\em callback} & callback for progress reporting or early termination \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+the operation success state
+\end{DoxyReturn}
+Can be used to program M\+CU, \doxyref{F\+P\+GA}{p.}{db/dcf/classlime_1_1FPGA}, write external on board memory. This could be a quite long operation, use callback to get progress info or to terminate early 
+
+Reimplemented from {\bf lime\+::\+L\+M\+S64\+C\+Protocol} \doxyref{}{p.}{de/d46/classlime_1_1LMS64CProtocol_a286c211f73249bddb8a39da39c1b7f7a}.
+
+
+
+Definition at line {\bf 746} of file {\bf Connection\+F\+X3.\+cpp}.
+
+
+
+References {\bf lime\+::error()}, {\bf filename}, {\bf R\+AM}, and {\bf lime\+::\+Report\+Error()}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{d7/db8/classlime_1_1ConnectionFX3_a496c66d0f286d3749a7762635d8ecab1_cgraph}
+\end{center}
+\end{figure}
+
+
+\index{lime\+::\+Connection\+F\+X3@{lime\+::\+Connection\+F\+X3}!Read@{Read}}
+\index{Read@{Read}!lime\+::\+Connection\+F\+X3@{lime\+::\+Connection\+F\+X3}}
+\paragraph[{Read(unsigned char $\ast$buffer, int length, int timeout\+\_\+ms=100) override}]{\setlength{\rightskip}{0pt plus 5cm}{\bf int} Connection\+F\+X3\+::\+Read (
+\begin{DoxyParamCaption}
+\item[{unsigned char $\ast$}]{buffer, }
+\item[{{\bf int}}]{length, }
+\item[{{\bf int}}]{timeout\+\_\+ms = {\ttfamily 100}}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [virtual]}}\label{classlime_1_1ConnectionFX3_a9bbaf28c97a3ae7626d6190ebfc5a7bb}
+
+
+Reads data coming from the chip through U\+SB port. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em buffer} & pointer to array where received data will be copied, array must be big enough to fit received data. \\
+\hline
+{\em length} & number of bytes to read from chip. \\
+\hline
+{\em timeout\+\_\+ms} & timeout limit for operation in milliseconds \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+number of bytes received. 
+\end{DoxyReturn}
+
+
+Implements {\bf lime\+::\+L\+M\+S64\+C\+Protocol} \doxyref{}{p.}{de/d46/classlime_1_1LMS64CProtocol_ab9e954443ee121eff8e1e6d4f8de3d4b}.
+
+
+
+Definition at line {\bf 375} of file {\bf Connection\+F\+X3.\+cpp}.
+
+
+
+References {\bf C\+T\+R\+\_\+\+R\+\_\+\+I\+N\+D\+EX}, {\bf C\+T\+R\+\_\+\+R\+\_\+\+R\+E\+Q\+C\+O\+DE}, {\bf C\+T\+R\+\_\+\+R\+\_\+\+V\+A\+L\+UE}, {\bf lime\+::error()}, and {\bf len}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{d7/db8/classlime_1_1ConnectionFX3_a9bbaf28c97a3ae7626d6190ebfc5a7bb_cgraph}
+\end{center}
+\end{figure}
+
+
+\index{lime\+::\+Connection\+F\+X3@{lime\+::\+Connection\+F\+X3}!Receive\+Data@{Receive\+Data}}
+\index{Receive\+Data@{Receive\+Data}!lime\+::\+Connection\+F\+X3@{lime\+::\+Connection\+F\+X3}}
+\paragraph[{Receive\+Data(char $\ast$buffer, int length, int ep\+Index=0, int timeout=100) override}]{\setlength{\rightskip}{0pt plus 5cm}{\bf int} Connection\+F\+X3\+::\+Receive\+Data (
+\begin{DoxyParamCaption}
+\item[{char $\ast$}]{buffer, }
+\item[{{\bf int}}]{length, }
+\item[{{\bf int}}]{ep\+Index = {\ttfamily 0}, }
+\item[{{\bf int}}]{timeout = {\ttfamily 100}}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [protected]}, {\ttfamily [virtual]}}\label{classlime_1_1ConnectionFX3_abf4f8303337f86df200147363606a0a6}
+
+
+Reimplemented from {\bf lime\+::\+I\+Connection} \doxyref{}{p.}{d2/de5/classlime_1_1IConnection_aaa0410a9c772fed64cd37bf8803f40a4}.
+
+
+
+Definition at line {\bf 737} of file {\bf Connection\+F\+X3.\+cpp}.
+
+\index{lime\+::\+Connection\+F\+X3@{lime\+::\+Connection\+F\+X3}!Reset\+Stream\+Buffers@{Reset\+Stream\+Buffers}}
+\index{Reset\+Stream\+Buffers@{Reset\+Stream\+Buffers}!lime\+::\+Connection\+F\+X3@{lime\+::\+Connection\+F\+X3}}
+\paragraph[{Reset\+Stream\+Buffers() override}]{\setlength{\rightskip}{0pt plus 5cm}{\bf int} Connection\+F\+X3\+::\+Reset\+Stream\+Buffers (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [protected]}, {\ttfamily [virtual]}}\label{classlime_1_1ConnectionFX3_a205d8881019e475bf0766caf02de7e2c}
+
+
+Read raw stream data from device streaming port. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em buffer} & read buffer pointer \\
+\hline
+{\em length} & number of bytes to read \\
+\hline
+{\em ep\+Index} & endpoint identifier? \\
+\hline
+{\em timeout\+\_\+ms} & timeout in milliseconds \\
+\hline
+\end{DoxyParams}
+
+
+Reimplemented from {\bf lime\+::\+I\+Connection} \doxyref{}{p.}{d2/de5/classlime_1_1IConnection_a9be4843aa2121bac2d49eb60d0f45781}.
+
+
+
+Definition at line {\bf 798} of file {\bf Connection\+F\+X3.\+cpp}.
+
+
+
+References {\bf address}, {\bf lime\+::\+L\+M\+S64\+C\+Protocol\+::\+Generic\+Packet\+::cmd}, {\bf lime\+::\+C\+M\+D\+\_\+\+U\+S\+B\+\_\+\+F\+I\+F\+O\+\_\+\+R\+ST}, {\bf lime\+::error()}, {\bf i}, {\bf index}, {\bf len}, {\bf lime\+::\+L\+M\+S64\+C\+Protocol\+::\+Generic\+Packet\+::out\+Buffer}, and {\bf lime\+::\+Report\+Error()}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{d7/db8/classlime_1_1ConnectionFX3_a205d8881019e475bf0766caf02de7e2c_cgraph}
+\end{center}
+\end{figure}
+
+
+\index{lime\+::\+Connection\+F\+X3@{lime\+::\+Connection\+F\+X3}!Send\+Data@{Send\+Data}}
+\index{Send\+Data@{Send\+Data}!lime\+::\+Connection\+F\+X3@{lime\+::\+Connection\+F\+X3}}
+\paragraph[{Send\+Data(const char $\ast$buffer, int length, int ep\+Index=0, int timeout=100) override}]{\setlength{\rightskip}{0pt plus 5cm}{\bf int} Connection\+F\+X3\+::\+Send\+Data (
+\begin{DoxyParamCaption}
+\item[{const char $\ast$}]{buffer, }
+\item[{{\bf int}}]{length, }
+\item[{{\bf int}}]{ep\+Index = {\ttfamily 0}, }
+\item[{{\bf int}}]{timeout = {\ttfamily 100}}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [protected]}, {\ttfamily [virtual]}}\label{classlime_1_1ConnectionFX3_a55763f712bcbb561ef8f57a4a8096cce}
+
+
+Reimplemented from {\bf lime\+::\+I\+Connection} \doxyref{}{p.}{d2/de5/classlime_1_1IConnection_a3f6aeab1032832330881d8c3401f86a5}.
+
+
+
+Definition at line {\bf 728} of file {\bf Connection\+F\+X3.\+cpp}.
+
+\index{lime\+::\+Connection\+F\+X3@{lime\+::\+Connection\+F\+X3}!Wait\+For\+Reading@{Wait\+For\+Reading}}
+\index{Wait\+For\+Reading@{Wait\+For\+Reading}!lime\+::\+Connection\+F\+X3@{lime\+::\+Connection\+F\+X3}}
+\paragraph[{Wait\+For\+Reading(int context\+Handle, unsigned int timeout\+\_\+ms) override}]{\setlength{\rightskip}{0pt plus 5cm}bool Connection\+F\+X3\+::\+Wait\+For\+Reading (
+\begin{DoxyParamCaption}
+\item[{{\bf int}}]{context\+Handle, }
+\item[{unsigned {\bf int}}]{timeout\+\_\+ms}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [protected]}, {\ttfamily [virtual]}}\label{classlime_1_1ConnectionFX3_a061871f4a168bcb71c57a2f364c4e260}
+
+
+Waits for asynchronous data reception. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em context\+Handle} & handle of which context data to wait \\
+\hline
+{\em timeout\+\_\+ms} & number of miliseconds to wait \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+1-\/data received, 0-\/data not received 
+\end{DoxyReturn}
+
+
+Reimplemented from {\bf lime\+::\+I\+Connection} \doxyref{}{p.}{d2/de5/classlime_1_1IConnection_a5499673a78953387558d5d7ba3c19802}.
+
+
+
+Definition at line {\bf 503} of file {\bf Connection\+F\+X3.\+cpp}.
+
+
+
+References {\bf status}, {\bf t1}, {\bf t2}, and {\bf timeout\+\_\+ms}.
+
+\index{lime\+::\+Connection\+F\+X3@{lime\+::\+Connection\+F\+X3}!Wait\+For\+Sending@{Wait\+For\+Sending}}
+\index{Wait\+For\+Sending@{Wait\+For\+Sending}!lime\+::\+Connection\+F\+X3@{lime\+::\+Connection\+F\+X3}}
+\paragraph[{Wait\+For\+Sending(int context\+Handle, uint32\+\_\+t timeout\+\_\+ms) override}]{\setlength{\rightskip}{0pt plus 5cm}bool Connection\+F\+X3\+::\+Wait\+For\+Sending (
+\begin{DoxyParamCaption}
+\item[{{\bf int}}]{context\+Handle, }
+\item[{uint32\+\_\+t}]{timeout\+\_\+ms}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [protected]}, {\ttfamily [virtual]}}\label{classlime_1_1ConnectionFX3_ad949b89249385f27bfdbd79181f5194e}
+
+
+Waits for asynchronous data sending. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em context\+Handle} & handle of which context data to wait \\
+\hline
+{\em timeout\+\_\+ms} & number of miliseconds to wait \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+1-\/data received, 0-\/data not received 
+\end{DoxyReturn}
+
+
+Reimplemented from {\bf lime\+::\+I\+Connection} \doxyref{}{p.}{d2/de5/classlime_1_1IConnection_aa71b788a3a6735ed7169013dc719ebe2}.
+
+
+
+Definition at line {\bf 638} of file {\bf Connection\+F\+X3.\+cpp}.
+
+
+
+References {\bf status}, {\bf t1}, {\bf t2}, and {\bf timeout\+\_\+ms}.
+
+\index{lime\+::\+Connection\+F\+X3@{lime\+::\+Connection\+F\+X3}!Write@{Write}}
+\index{Write@{Write}!lime\+::\+Connection\+F\+X3@{lime\+::\+Connection\+F\+X3}}
+\paragraph[{Write(const unsigned char $\ast$buffer, int length, int timeout\+\_\+ms=100) override}]{\setlength{\rightskip}{0pt plus 5cm}{\bf int} Connection\+F\+X3\+::\+Write (
+\begin{DoxyParamCaption}
+\item[{const unsigned char $\ast$}]{buffer, }
+\item[{{\bf int}}]{length, }
+\item[{{\bf int}}]{timeout\+\_\+ms = {\ttfamily 100}}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [virtual]}}\label{classlime_1_1ConnectionFX3_a434142cd87db1b1763b83b145229a6d7}
+
+
+Sends given data buffer to chip through U\+SB port. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em buffer} & data buffer, must not be longer than 64 bytes. \\
+\hline
+{\em length} & given buffer size. \\
+\hline
+{\em timeout\+\_\+ms} & timeout limit for operation in milliseconds \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+number of bytes sent. 
+\end{DoxyReturn}
+
+
+Implements {\bf lime\+::\+L\+M\+S64\+C\+Protocol} \doxyref{}{p.}{de/d46/classlime_1_1LMS64CProtocol_aa78b82a017792421b61bc6a99b4c55c0}.
+
+
+
+Definition at line {\bf 331} of file {\bf Connection\+F\+X3.\+cpp}.
+
+
+
+References {\bf C\+T\+R\+\_\+\+W\+\_\+\+I\+N\+D\+EX}, {\bf C\+T\+R\+\_\+\+W\+\_\+\+R\+E\+Q\+C\+O\+DE}, {\bf C\+T\+R\+\_\+\+W\+\_\+\+V\+A\+L\+UE}, and {\bf len}.
+
+
+
+\subsubsection{Member Data Documentation}
+\index{lime\+::\+Connection\+F\+X3@{lime\+::\+Connection\+F\+X3}!bulk\+Ctrl\+Available@{bulk\+Ctrl\+Available}}
+\index{bulk\+Ctrl\+Available@{bulk\+Ctrl\+Available}!lime\+::\+Connection\+F\+X3@{lime\+::\+Connection\+F\+X3}}
+\paragraph[{bulk\+Ctrl\+Available}]{\setlength{\rightskip}{0pt plus 5cm}bool lime\+::\+Connection\+F\+X3\+::bulk\+Ctrl\+Available\hspace{0.3cm}{\ttfamily [protected]}}\label{classlime_1_1ConnectionFX3_aeaafe59839d3b53041ff0ce2a23e8603}
+
+
+Definition at line {\bf 153} of file {\bf Connection\+F\+X3.\+h}.
+
+\index{lime\+::\+Connection\+F\+X3@{lime\+::\+Connection\+F\+X3}!bulk\+Ctrl\+In\+Progress@{bulk\+Ctrl\+In\+Progress}}
+\index{bulk\+Ctrl\+In\+Progress@{bulk\+Ctrl\+In\+Progress}!lime\+::\+Connection\+F\+X3@{lime\+::\+Connection\+F\+X3}}
+\paragraph[{bulk\+Ctrl\+In\+Progress}]{\setlength{\rightskip}{0pt plus 5cm}bool lime\+::\+Connection\+F\+X3\+::bulk\+Ctrl\+In\+Progress\hspace{0.3cm}{\ttfamily [protected]}}\label{classlime_1_1ConnectionFX3_aea2e7d7a7f5c0bfaa1c23c722ee23556}
+
+
+Definition at line {\bf 152} of file {\bf Connection\+F\+X3.\+h}.
+
+\index{lime\+::\+Connection\+F\+X3@{lime\+::\+Connection\+F\+X3}!commands\+To\+Bulk\+Ctrl@{commands\+To\+Bulk\+Ctrl}}
+\index{commands\+To\+Bulk\+Ctrl@{commands\+To\+Bulk\+Ctrl}!lime\+::\+Connection\+F\+X3@{lime\+::\+Connection\+F\+X3}}
+\paragraph[{commands\+To\+Bulk\+Ctrl}]{\setlength{\rightskip}{0pt plus 5cm}{\bf std\+::set}$<$uint8\+\_\+t$>$ lime\+::\+Connection\+F\+X3\+::commands\+To\+Bulk\+Ctrl\hspace{0.3cm}{\ttfamily [protected]}}\label{classlime_1_1ConnectionFX3_ae111fba2cdf1d5159d62e97f732db796}
+
+
+Definition at line {\bf 151} of file {\bf Connection\+F\+X3.\+h}.
+
+\index{lime\+::\+Connection\+F\+X3@{lime\+::\+Connection\+F\+X3}!commands\+To\+Bulk\+Ctrl\+Hw1@{commands\+To\+Bulk\+Ctrl\+Hw1}}
+\index{commands\+To\+Bulk\+Ctrl\+Hw1@{commands\+To\+Bulk\+Ctrl\+Hw1}!lime\+::\+Connection\+F\+X3@{lime\+::\+Connection\+F\+X3}}
+\paragraph[{commands\+To\+Bulk\+Ctrl\+Hw1}]{\setlength{\rightskip}{0pt plus 5cm}const {\bf std\+::set}$<$ uint8\+\_\+t $>$ Connection\+F\+X3\+::commands\+To\+Bulk\+Ctrl\+Hw1\hspace{0.3cm}{\ttfamily [static]}, {\ttfamily [protected]}}\label{classlime_1_1ConnectionFX3_a113af8c73dd6a0910510e2c53b877385}
+{\bfseries Initial value\+:}
+\begin{DoxyCode}
+=
+\{
+    CMD_BRDSPI_WR, CMD_BRDSPI_RD,
+    CMD_LMS7002_WR, CMD_LMS7002_RD,
+    CMD_LMS7002_RST,
+\}
+\end{DoxyCode}
+
+
+Definition at line {\bf 149} of file {\bf Connection\+F\+X3.\+h}.
+
+\index{lime\+::\+Connection\+F\+X3@{lime\+::\+Connection\+F\+X3}!commands\+To\+Bulk\+Ctrl\+Hw2@{commands\+To\+Bulk\+Ctrl\+Hw2}}
+\index{commands\+To\+Bulk\+Ctrl\+Hw2@{commands\+To\+Bulk\+Ctrl\+Hw2}!lime\+::\+Connection\+F\+X3@{lime\+::\+Connection\+F\+X3}}
+\paragraph[{commands\+To\+Bulk\+Ctrl\+Hw2}]{\setlength{\rightskip}{0pt plus 5cm}const {\bf std\+::set}$<$ uint8\+\_\+t $>$ Connection\+F\+X3\+::commands\+To\+Bulk\+Ctrl\+Hw2\hspace{0.3cm}{\ttfamily [static]}, {\ttfamily [protected]}}\label{classlime_1_1ConnectionFX3_a2b0a70be0658574fac75d8c8f0ed4ee2}
+{\bfseries Initial value\+:}
+\begin{DoxyCode}
+=
+\{
+    CMD_BRDSPI_WR, CMD_BRDSPI_RD,
+    CMD_LMS7002_WR, CMD_LMS7002_RD,
+    CMD_ANALOG_VAL_WR, CMD_ANALOG_VAL_RD,
+    CMD_ADF4002_WR,
+    CMD_LMS7002_RST,
+    CMD_GPIO_DIR_WR, CMD_GPIO_DIR_RD,
+    CMD_GPIO_WR, CMD_GPIO_RD,
+\}
+\end{DoxyCode}
+
+
+Definition at line {\bf 150} of file {\bf Connection\+F\+X3.\+h}.
+
+\index{lime\+::\+Connection\+F\+X3@{lime\+::\+Connection\+F\+X3}!contexts@{contexts}}
+\index{contexts@{contexts}!lime\+::\+Connection\+F\+X3@{lime\+::\+Connection\+F\+X3}}
+\paragraph[{contexts}]{\setlength{\rightskip}{0pt plus 5cm}{\bf U\+S\+B\+Transfer\+Context} lime\+::\+Connection\+F\+X3\+::contexts[{\bf U\+S\+B\+\_\+\+M\+A\+X\+\_\+\+C\+O\+N\+T\+E\+X\+TS}]\hspace{0.3cm}{\ttfamily [protected]}}\label{classlime_1_1ConnectionFX3_a4e8d84cd438c89529930eb82511bb2f8}
+
+
+Definition at line {\bf 122} of file {\bf Connection\+F\+X3.\+h}.
+
+\index{lime\+::\+Connection\+F\+X3@{lime\+::\+Connection\+F\+X3}!contexts\+To\+Send@{contexts\+To\+Send}}
+\index{contexts\+To\+Send@{contexts\+To\+Send}!lime\+::\+Connection\+F\+X3@{lime\+::\+Connection\+F\+X3}}
+\paragraph[{contexts\+To\+Send}]{\setlength{\rightskip}{0pt plus 5cm}{\bf U\+S\+B\+Transfer\+Context} lime\+::\+Connection\+F\+X3\+::contexts\+To\+Send[{\bf U\+S\+B\+\_\+\+M\+A\+X\+\_\+\+C\+O\+N\+T\+E\+X\+TS}]\hspace{0.3cm}{\ttfamily [protected]}}\label{classlime_1_1ConnectionFX3_a998a74e81702c43670a02bb884a63773}
+
+
+Definition at line {\bf 123} of file {\bf Connection\+F\+X3.\+h}.
+
+\index{lime\+::\+Connection\+F\+X3@{lime\+::\+Connection\+F\+X3}!ctrl\+Bulk\+In\+Addr@{ctrl\+Bulk\+In\+Addr}}
+\index{ctrl\+Bulk\+In\+Addr@{ctrl\+Bulk\+In\+Addr}!lime\+::\+Connection\+F\+X3@{lime\+::\+Connection\+F\+X3}}
+\paragraph[{ctrl\+Bulk\+In\+Addr}]{\setlength{\rightskip}{0pt plus 5cm}const uint8\+\_\+t Connection\+F\+X3\+::ctrl\+Bulk\+In\+Addr = 0x8F\hspace{0.3cm}{\ttfamily [static]}, {\ttfamily [protected]}}\label{classlime_1_1ConnectionFX3_afed1fd3e6d9172826e53bc798f4a13d3}
+
+
+Definition at line {\bf 148} of file {\bf Connection\+F\+X3.\+h}.
+
+\index{lime\+::\+Connection\+F\+X3@{lime\+::\+Connection\+F\+X3}!ctrl\+Bulk\+Out\+Addr@{ctrl\+Bulk\+Out\+Addr}}
+\index{ctrl\+Bulk\+Out\+Addr@{ctrl\+Bulk\+Out\+Addr}!lime\+::\+Connection\+F\+X3@{lime\+::\+Connection\+F\+X3}}
+\paragraph[{ctrl\+Bulk\+Out\+Addr}]{\setlength{\rightskip}{0pt plus 5cm}const uint8\+\_\+t Connection\+F\+X3\+::ctrl\+Bulk\+Out\+Addr = 0x0F\hspace{0.3cm}{\ttfamily [static]}, {\ttfamily [protected]}}\label{classlime_1_1ConnectionFX3_a4fbbbb12054fa297c0f89285cdd4d95c}
+
+
+Definition at line {\bf 147} of file {\bf Connection\+F\+X3.\+h}.
+
+\index{lime\+::\+Connection\+F\+X3@{lime\+::\+Connection\+F\+X3}!In\+Ctrl\+Bulk\+End\+Pt@{In\+Ctrl\+Bulk\+End\+Pt}}
+\index{In\+Ctrl\+Bulk\+End\+Pt@{In\+Ctrl\+Bulk\+End\+Pt}!lime\+::\+Connection\+F\+X3@{lime\+::\+Connection\+F\+X3}}
+\paragraph[{In\+Ctrl\+Bulk\+End\+Pt}]{\setlength{\rightskip}{0pt plus 5cm}C\+Cy\+U\+S\+B\+End\+Point$\ast$ lime\+::\+Connection\+F\+X3\+::\+In\+Ctrl\+Bulk\+End\+Pt\hspace{0.3cm}{\ttfamily [protected]}}\label{classlime_1_1ConnectionFX3_a0875a7c8d5602764c73e078853b55fa7}
+
+
+Definition at line {\bf 138} of file {\bf Connection\+F\+X3.\+h}.
+
+\index{lime\+::\+Connection\+F\+X3@{lime\+::\+Connection\+F\+X3}!In\+Ctrl\+End\+Pt3@{In\+Ctrl\+End\+Pt3}}
+\index{In\+Ctrl\+End\+Pt3@{In\+Ctrl\+End\+Pt3}!lime\+::\+Connection\+F\+X3@{lime\+::\+Connection\+F\+X3}}
+\paragraph[{In\+Ctrl\+End\+Pt3}]{\setlength{\rightskip}{0pt plus 5cm}C\+Cy\+Control\+End\+Point$\ast$ lime\+::\+Connection\+F\+X3\+::\+In\+Ctrl\+End\+Pt3\hspace{0.3cm}{\ttfamily [protected]}}\label{classlime_1_1ConnectionFX3_a1a9d36022f27a6434dca4147aefde3ff}
+
+
+Definition at line {\bf 131} of file {\bf Connection\+F\+X3.\+h}.
+
+\index{lime\+::\+Connection\+F\+X3@{lime\+::\+Connection\+F\+X3}!In\+End\+Pt@{In\+End\+Pt}}
+\index{In\+End\+Pt@{In\+End\+Pt}!lime\+::\+Connection\+F\+X3@{lime\+::\+Connection\+F\+X3}}
+\paragraph[{In\+End\+Pt}]{\setlength{\rightskip}{0pt plus 5cm}C\+Cy\+U\+S\+B\+End\+Point$\ast$ lime\+::\+Connection\+F\+X3\+::\+In\+End\+Pt[{\bf M\+A\+X\+\_\+\+E\+P\+\_\+\+C\+NT}]\hspace{0.3cm}{\ttfamily [protected]}}\label{classlime_1_1ConnectionFX3_aa7469e023654d6c8ca1bb3a6b0593164}
+
+
+Definition at line {\bf 135} of file {\bf Connection\+F\+X3.\+h}.
+
+\index{lime\+::\+Connection\+F\+X3@{lime\+::\+Connection\+F\+X3}!is\+Connected@{is\+Connected}}
+\index{is\+Connected@{is\+Connected}!lime\+::\+Connection\+F\+X3@{lime\+::\+Connection\+F\+X3}}
+\paragraph[{is\+Connected}]{\setlength{\rightskip}{0pt plus 5cm}bool lime\+::\+Connection\+F\+X3\+::is\+Connected\hspace{0.3cm}{\ttfamily [protected]}}\label{classlime_1_1ConnectionFX3_ad4cbf7b26b19e447a5d84f1749c42ac6}
+
+
+Definition at line {\bf 125} of file {\bf Connection\+F\+X3.\+h}.
+
+\index{lime\+::\+Connection\+F\+X3@{lime\+::\+Connection\+F\+X3}!M\+A\+X\+\_\+\+E\+P\+\_\+\+C\+NT@{M\+A\+X\+\_\+\+E\+P\+\_\+\+C\+NT}}
+\index{M\+A\+X\+\_\+\+E\+P\+\_\+\+C\+NT@{M\+A\+X\+\_\+\+E\+P\+\_\+\+C\+NT}!lime\+::\+Connection\+F\+X3@{lime\+::\+Connection\+F\+X3}}
+\paragraph[{M\+A\+X\+\_\+\+E\+P\+\_\+\+C\+NT}]{\setlength{\rightskip}{0pt plus 5cm}const {\bf int} lime\+::\+Connection\+F\+X3\+::\+M\+A\+X\+\_\+\+E\+P\+\_\+\+C\+NT = 16\hspace{0.3cm}{\ttfamily [static]}, {\ttfamily [protected]}}\label{classlime_1_1ConnectionFX3_aa46775a6dd47015fc18aea9fcd0dbead}
+
+
+Definition at line {\bf 128} of file {\bf Connection\+F\+X3.\+h}.
+
+\index{lime\+::\+Connection\+F\+X3@{lime\+::\+Connection\+F\+X3}!m\+Extra\+Usb\+Mutex@{m\+Extra\+Usb\+Mutex}}
+\index{m\+Extra\+Usb\+Mutex@{m\+Extra\+Usb\+Mutex}!lime\+::\+Connection\+F\+X3@{lime\+::\+Connection\+F\+X3}}
+\paragraph[{m\+Extra\+Usb\+Mutex}]{\setlength{\rightskip}{0pt plus 5cm}std\+::mutex lime\+::\+Connection\+F\+X3\+::m\+Extra\+Usb\+Mutex\hspace{0.3cm}{\ttfamily [protected]}}\label{classlime_1_1ConnectionFX3_abd6521ff6e7a313b8940757c3b2a9b71}
+
+
+Definition at line {\bf 154} of file {\bf Connection\+F\+X3.\+h}.
+
+\index{lime\+::\+Connection\+F\+X3@{lime\+::\+Connection\+F\+X3}!Out\+Ctrl\+Bulk\+End\+Pt@{Out\+Ctrl\+Bulk\+End\+Pt}}
+\index{Out\+Ctrl\+Bulk\+End\+Pt@{Out\+Ctrl\+Bulk\+End\+Pt}!lime\+::\+Connection\+F\+X3@{lime\+::\+Connection\+F\+X3}}
+\paragraph[{Out\+Ctrl\+Bulk\+End\+Pt}]{\setlength{\rightskip}{0pt plus 5cm}C\+Cy\+U\+S\+B\+End\+Point$\ast$ lime\+::\+Connection\+F\+X3\+::\+Out\+Ctrl\+Bulk\+End\+Pt\hspace{0.3cm}{\ttfamily [protected]}}\label{classlime_1_1ConnectionFX3_ad4a99a14a2e9e5ec778821d08687d4dd}
+
+
+Definition at line {\bf 139} of file {\bf Connection\+F\+X3.\+h}.
+
+\index{lime\+::\+Connection\+F\+X3@{lime\+::\+Connection\+F\+X3}!Out\+Ctrl\+End\+Pt3@{Out\+Ctrl\+End\+Pt3}}
+\index{Out\+Ctrl\+End\+Pt3@{Out\+Ctrl\+End\+Pt3}!lime\+::\+Connection\+F\+X3@{lime\+::\+Connection\+F\+X3}}
+\paragraph[{Out\+Ctrl\+End\+Pt3}]{\setlength{\rightskip}{0pt plus 5cm}C\+Cy\+Control\+End\+Point$\ast$ lime\+::\+Connection\+F\+X3\+::\+Out\+Ctrl\+End\+Pt3\hspace{0.3cm}{\ttfamily [protected]}}\label{classlime_1_1ConnectionFX3_a22020e16079ffc21984d8e603435ff49}
+
+
+Definition at line {\bf 132} of file {\bf Connection\+F\+X3.\+h}.
+
+\index{lime\+::\+Connection\+F\+X3@{lime\+::\+Connection\+F\+X3}!Out\+End\+Pt@{Out\+End\+Pt}}
+\index{Out\+End\+Pt@{Out\+End\+Pt}!lime\+::\+Connection\+F\+X3@{lime\+::\+Connection\+F\+X3}}
+\paragraph[{Out\+End\+Pt}]{\setlength{\rightskip}{0pt plus 5cm}C\+Cy\+U\+S\+B\+End\+Point$\ast$ lime\+::\+Connection\+F\+X3\+::\+Out\+End\+Pt[{\bf M\+A\+X\+\_\+\+E\+P\+\_\+\+C\+NT}]\hspace{0.3cm}{\ttfamily [protected]}}\label{classlime_1_1ConnectionFX3_a747110fd0134de66052c9fb3f571c8dd}
+
+
+Definition at line {\bf 136} of file {\bf Connection\+F\+X3.\+h}.
+
+\index{lime\+::\+Connection\+F\+X3@{lime\+::\+Connection\+F\+X3}!U\+S\+B\+\_\+\+M\+A\+X\+\_\+\+C\+O\+N\+T\+E\+X\+TS@{U\+S\+B\+\_\+\+M\+A\+X\+\_\+\+C\+O\+N\+T\+E\+X\+TS}}
+\index{U\+S\+B\+\_\+\+M\+A\+X\+\_\+\+C\+O\+N\+T\+E\+X\+TS@{U\+S\+B\+\_\+\+M\+A\+X\+\_\+\+C\+O\+N\+T\+E\+X\+TS}!lime\+::\+Connection\+F\+X3@{lime\+::\+Connection\+F\+X3}}
+\paragraph[{U\+S\+B\+\_\+\+M\+A\+X\+\_\+\+C\+O\+N\+T\+E\+X\+TS}]{\setlength{\rightskip}{0pt plus 5cm}const {\bf int} lime\+::\+Connection\+F\+X3\+::\+U\+S\+B\+\_\+\+M\+A\+X\+\_\+\+C\+O\+N\+T\+E\+X\+TS = 16\hspace{0.3cm}{\ttfamily [static]}, {\ttfamily [protected]}}\label{classlime_1_1ConnectionFX3_a7c721e08ee0b9f25b322344b711545e2}
+
+
+Definition at line {\bf 120} of file {\bf Connection\+F\+X3.\+h}.
+
+\index{lime\+::\+Connection\+F\+X3@{lime\+::\+Connection\+F\+X3}!U\+S\+B\+Device\+Primary@{U\+S\+B\+Device\+Primary}}
+\index{U\+S\+B\+Device\+Primary@{U\+S\+B\+Device\+Primary}!lime\+::\+Connection\+F\+X3@{lime\+::\+Connection\+F\+X3}}
+\paragraph[{U\+S\+B\+Device\+Primary}]{\setlength{\rightskip}{0pt plus 5cm}C\+Cy\+F\+X3\+Device$\ast$ lime\+::\+Connection\+F\+X3\+::\+U\+S\+B\+Device\+Primary\hspace{0.3cm}{\ttfamily [protected]}}\label{classlime_1_1ConnectionFX3_a8bff8cb2547b9e5b026203bbdae1a63d}
+
+
+Definition at line {\bf 129} of file {\bf Connection\+F\+X3.\+h}.
+
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+/home/erik/prefix/default/src/limesuite-\/dev/src/\+Connection\+F\+X3/{\bf Connection\+F\+X3.\+h}\item 
+/home/erik/prefix/default/src/limesuite-\/dev/src/\+Connection\+F\+X3/{\bf Connection\+F\+X3.\+cpp}\end{DoxyCompactItemize}

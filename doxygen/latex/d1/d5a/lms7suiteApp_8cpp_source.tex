@@ -1,0 +1,56 @@
+\subsection{lms7suite\+App.\+cpp}
+\label{lms7suiteApp_8cpp_source}\index{/home/erik/prefix/default/src/limesuite-\/dev/src/lms7suite\+App.\+cpp@{/home/erik/prefix/default/src/limesuite-\/dev/src/lms7suite\+App.\+cpp}}
+
+\begin{DoxyCode}
+00001 \textcolor{comment}{/***************************************************************}
+00002 \textcolor{comment}{ * Name:      lms7projectApp.cpp}
+00003 \textcolor{comment}{ * Purpose:   Code for Application Class}
+00004 \textcolor{comment}{ * Author:    Lime Microsystems ()}
+00005 \textcolor{comment}{ * Created:   2015-03-05}
+00006 \textcolor{comment}{ * Copyright: Lime Microsystems (limemicro.com)}
+00007 \textcolor{comment}{ * License:}
+00008 \textcolor{comment}{ **************************************************************/}
+00009 
+00010 \textcolor{preprocessor}{#ifdef WX\_PRECOMP}
+00011 \textcolor{preprocessor}{#include "wx\_pch.h"}
+00012 \textcolor{preprocessor}{#endif}
+00013 
+00014 \textcolor{preprocessor}{#ifdef \_\_BORLANDC\_\_}
+00015 \textcolor{preprocessor}{#pragma hdrstop}
+00016 \textcolor{preprocessor}{#endif //\_\_BORLANDC\_\_}
+00017 
+00018 \textcolor{preprocessor}{#include "lms7suiteApp.h"}
+00019 \textcolor{preprocessor}{#include "lms7suiteAppFrame.h"}
+00020 \textcolor{preprocessor}{#include <wx/time.h>}
+00021 \textcolor{preprocessor}{#include <wx/splash.h>}
+00022 \textcolor{preprocessor}{#include <wx/icon.h>}
+00023 \textcolor{preprocessor}{#include <iostream>}
+00024 \textcolor{preprocessor}{#ifndef NDEBUG}
+00025 IMPLEMENT_APP_CONSOLE(lms7suiteApp);
+00026 \textcolor{preprocessor}{#else}
+00027 IMPLEMENT\_APP(lms7suiteApp);
+00028 \textcolor{preprocessor}{#endif}
+00029 
+00030 \textcolor{preprocessor}{#include "resources/splash.h"}
+00031 \textcolor{preprocessor}{#include "resources/LMS\_ICO.xpm"}
+00032 
+00033 \textcolor{keywordtype}{bool} lms7suiteApp::OnInit()
+00034 \{
+00035     wxInitAllImageHandlers();
+00036     wxBitmap splashBitmap = wxBITMAP\_PNG\_FROM\_DATA(splash);
+00037     wxSplashScreen* splash = \textcolor{keyword}{new} wxSplashScreen(splashBitmap,
+00038         wxSPLASH\_CENTRE\_ON\_SCREEN,
+00039         6000, NULL, -1, wxDefaultPosition, wxDefaultSize,
+00040         wxSIMPLE\_BORDER | wxSTAY\_ON\_TOP);
+00041     wxYield(); \textcolor{comment}{//linux needs this to load splash image}
+00042     LMS7SuiteAppFrame* frame = \textcolor{keyword}{new} LMS7SuiteAppFrame(0L);
+00043 \textcolor{preprocessor}{#ifndef NDEBUG}
+00044     wxLongLong t1 = wxGetUTCTimeMillis(); 
+00045     std::cout << \textcolor{stringliteral}{"Create time "} << (wxGetUTCTimeMillis() - t1).ToString() << \textcolor{stringliteral}{" ms\(\backslash\)n"};
+00046 \textcolor{preprocessor}{#endif}
+00047     splash->Destroy();
+00048     frame->SetIcon(wxICON(LMS\_ICO));
+00049     frame->Show();
+00050     \textcolor{keywordflow}{return} \textcolor{keyword}{true};
+00051 \}
+\end{DoxyCode}

@@ -1,0 +1,255 @@
+\subsection{R\+F\+Spark\+\_\+wxgui.\+cpp}
+\label{RFSpark__wxgui_8cpp_source}\index{/home/erik/prefix/default/src/limesuite-\/dev/src/\+R\+F\+Spark/\+R\+F\+Spark\+\_\+wxgui.\+cpp@{/home/erik/prefix/default/src/limesuite-\/dev/src/\+R\+F\+Spark/\+R\+F\+Spark\+\_\+wxgui.\+cpp}}
+
+\begin{DoxyCode}
+00001 
+00007 \textcolor{preprocessor}{#include <wx/sizer.h>}
+00008 \textcolor{preprocessor}{#include <wx/stattext.h>}
+00009 \textcolor{preprocessor}{#include <wx/button.h>}
+00010 \textcolor{preprocessor}{#include <wx/image.h>}
+00011 \textcolor{preprocessor}{#include <wx/string.h>}
+00012 \textcolor{preprocessor}{#include <wx/combobox.h>}
+00013 \textcolor{preprocessor}{#include <wx/checkbox.h>}
+00014 \textcolor{preprocessor}{#include <wx/msgdlg.h>}
+00015 \textcolor{preprocessor}{#include "lms7suiteEvents.h"}
+00016 
+00017 \textcolor{preprocessor}{#include "RFSpark_wxgui.h"}
+00018 \textcolor{preprocessor}{#include <vector>}
+00019 
+00020 \textcolor{keyword}{const} \textcolor{keywordtype}{long} RFSpark_wxgui::ID_BTNREADADC = wxNewId();
+00021 \textcolor{keyword}{const} \textcolor{keywordtype}{long} RFSpark_wxgui::ID_BTNREADALLADC = wxNewId();
+00022 \textcolor{keyword}{const} \textcolor{keywordtype}{long} RFSpark_wxgui::ID_BTNWRITEGPIO = wxNewId();
+00023 \textcolor{keyword}{const} \textcolor{keywordtype}{long} RFSpark_wxgui::ID_BTNREADGPIO = wxNewId();
+00024 \textcolor{keyword}{const} \textcolor{keywordtype}{long} RFSpark_wxgui::ID_CMBSELECTADC = wxNewId();
+00025 
+00026 BEGIN\_EVENT\_TABLE(RFSpark_wxgui, wxPanel)
+00027 END\_EVENT\_TABLE()
+00028 
+00029 wxString power2unitsString(\textcolor{keywordtype}{char} powerx3)
+00030 \{
+00031     \textcolor{keywordflow}{switch} (powerx3)
+00032     \{
+00033     \textcolor{keywordflow}{case} -8:
+00034         \textcolor{keywordflow}{return} \textcolor{stringliteral}{"y"};
+00035     \textcolor{keywordflow}{case} -7:
+00036         \textcolor{keywordflow}{return} \textcolor{stringliteral}{"z"};
+00037     \textcolor{keywordflow}{case} -6:
+00038         \textcolor{keywordflow}{return} \textcolor{stringliteral}{"a"};
+00039     \textcolor{keywordflow}{case} -5:
+00040         \textcolor{keywordflow}{return} \textcolor{stringliteral}{"f"};
+00041     \textcolor{keywordflow}{case} -4:
+00042         \textcolor{keywordflow}{return} \textcolor{stringliteral}{"p"};
+00043     \textcolor{keywordflow}{case} -3:
+00044         \textcolor{keywordflow}{return} \textcolor{stringliteral}{"n"};
+00045     \textcolor{keywordflow}{case} -2:
+00046         \textcolor{keywordflow}{return} \textcolor{stringliteral}{"u"};
+00047     \textcolor{keywordflow}{case} -1:
+00048         \textcolor{keywordflow}{return} \textcolor{stringliteral}{"m"};
+00049     \textcolor{keywordflow}{case} 0:
+00050         \textcolor{keywordflow}{return} \textcolor{stringliteral}{""};
+00051     \textcolor{keywordflow}{case} 1:
+00052         \textcolor{keywordflow}{return} \textcolor{stringliteral}{"k"};
+00053     \textcolor{keywordflow}{case} 2:
+00054         \textcolor{keywordflow}{return} \textcolor{stringliteral}{"M"};
+00055     \textcolor{keywordflow}{case} 3:
+00056         \textcolor{keywordflow}{return} \textcolor{stringliteral}{"G"};
+00057     \textcolor{keywordflow}{case} 4:
+00058         \textcolor{keywordflow}{return} \textcolor{stringliteral}{"T"};
+00059     \textcolor{keywordflow}{case} 5:
+00060         \textcolor{keywordflow}{return} \textcolor{stringliteral}{"P"};
+00061     \textcolor{keywordflow}{case} 6:
+00062         \textcolor{keywordflow}{return} \textcolor{stringliteral}{"E"};
+00063     \textcolor{keywordflow}{case} 7:
+00064         \textcolor{keywordflow}{return} \textcolor{stringliteral}{"Y"};
+00065     \textcolor{keywordflow}{default}:
+00066         \textcolor{keywordflow}{return} \textcolor{stringliteral}{""};
+00067     \}
+00068 \}
+00069 
+00070 RFSpark_wxgui::RFSpark_wxgui(wxWindow* parent,wxWindowID \textcolor{keywordtype}{id}, \textcolor{keyword}{const} wxString& title, \textcolor{keyword}{const} wxPoint& pos,\textcolor{keyword}{
+      const} wxSize& size, \textcolor{keywordtype}{long} style)
+00071 \{
+00072     lmsControl = \textcolor{keyword}{nullptr};
+00073     Create(parent, \textcolor{keywordtype}{id}, wxDefaultPosition, wxDefaultSize, style, title);
+00074 \textcolor{preprocessor}{#ifdef WIN32}
+00075     SetBackgroundColour(wxSystemSettings::GetColour(wxSYS\_COLOUR\_BTNFACE));
+00076 \textcolor{preprocessor}{#endif}
+00077 
+00078     \textcolor{comment}{//ADC values}
+00079     wxFlexGridSizer* sizerADCs = \textcolor{keyword}{new} wxFlexGridSizer(0, 6, 5, 10);
+00080 
+00081     ADCdataGUI adcElement;
+00082     sizerADCs->Add(\textcolor{keyword}{new} wxStaticText(\textcolor{keyword}{this}, wxNewId(), \_(\textcolor{stringliteral}{"Channel"})), 1, wxALIGN\_LEFT | wxALIGN\_TOP, 0);
+00083     sizerADCs->Add(\textcolor{keyword}{new} wxStaticText(\textcolor{keyword}{this}, wxNewId(), \_(\textcolor{stringliteral}{"Value"})), 1, wxALIGN\_LEFT | wxALIGN\_TOP, 0);
+00084     sizerADCs->Add(\textcolor{keyword}{new} wxStaticText(\textcolor{keyword}{this}, wxNewId(), \_(\textcolor{stringliteral}{"Units"})), 1, wxALIGN\_LEFT | wxALIGN\_TOP, 0);
+00085     sizerADCs->Add(\textcolor{keyword}{new} wxStaticText(\textcolor{keyword}{this}, wxNewId(), \_(\textcolor{stringliteral}{"Channel"})), 1, wxALIGN\_LEFT | wxALIGN\_TOP, 0);
+00086     sizerADCs->Add(\textcolor{keyword}{new} wxStaticText(\textcolor{keyword}{this}, wxNewId(), \_(\textcolor{stringliteral}{"Value"})), 1, wxALIGN\_LEFT | wxALIGN\_TOP, 0);
+00087     sizerADCs->Add(\textcolor{keyword}{new} wxStaticText(\textcolor{keyword}{this}, wxNewId(), \_(\textcolor{stringliteral}{"Units"})), 1, wxALIGN\_LEFT | wxALIGN\_TOP, 0);
+00088     wxArrayString adcList;
+00089     wxString adcNames[] = \{ \textcolor{stringliteral}{"VDD12\_TIA\_RFE"}, \textcolor{stringliteral}{"VDD\_TBB"}, \textcolor{stringliteral}{"VDD14\_RBB"}, \textcolor{stringliteral}{"DVDD\_SXT"}, \textcolor{stringliteral}{"VDD\_DIC\_SXT"}, \textcolor{stringliteral}{"
+      VDD12\_TXBUF"}, \textcolor{stringliteral}{"VDD12\_VCO\_SXT"}, \textcolor{stringliteral}{"VDD14\_LNA\_RFE"},
+00090         \textcolor{stringliteral}{"DVDD\_SXR"}, \textcolor{stringliteral}{"VDD\_DIV\_SXR"}, \textcolor{stringliteral}{"VDD\_CP\_SXR"}, \textcolor{stringliteral}{"VDD18\_SXR"}, \textcolor{stringliteral}{"VD\_MXLOBUF\_RFE"}, \textcolor{stringliteral}{"VDD14\_TIA\_RFE"}, \textcolor{stringliteral}{"
+      VDD12\_LNA\_RFE"}, \textcolor{stringliteral}{"VDD\_TLOBUF\_TRF"},
+00091         \textcolor{stringliteral}{"VDD12\_RXBIF"}, \textcolor{stringliteral}{"VDD\_AFE"}, \textcolor{stringliteral}{"DIGPRVDD1"}, \textcolor{stringliteral}{"VDD\_SPI\_BUF"}, \textcolor{stringliteral}{"VDD18\_TPAD\_TRF"}, \textcolor{stringliteral}{"DVDD\_CGEN"}, \textcolor{stringliteral}{"VDD\_DIV\_CGEN"}
+      , \textcolor{stringliteral}{"VDD\_CP\_CGEN"}, \textcolor{stringliteral}{"VDD12\_DIG"}, \textcolor{stringliteral}{"VDD14\_VCO\_CGEN"},
+00092         \textcolor{stringliteral}{"TSTAO"}, \textcolor{stringliteral}{"TSTDO 0"}, \textcolor{stringliteral}{"TSTDO 1"}, \textcolor{stringliteral}{"3V3"}, \textcolor{stringliteral}{"VDIO"}, \textcolor{stringliteral}{"VDIO\_FMC"} \};
+00093     \textcolor{keywordflow}{for} (\textcolor{keywordtype}{int} i = 0; i < mADCcount; ++i)
+00094     \{
+00095         adcElement.title = \textcolor{keyword}{new} wxStaticText(\textcolor{keyword}{this}, wxNewId(), wxString::Format(\textcolor{stringliteral}{"%s"}, adcNames[
+      i]));
+00096         adcList.push\_back(adcElement.title->GetLabel());
+00097         adcElement.value = \textcolor{keyword}{new} wxStaticText(\textcolor{keyword}{this}, wxNewId(), \_(\textcolor{stringliteral}{"????"}));
+00098         adcElement.units = \textcolor{keyword}{new} wxStaticText(\textcolor{keyword}{this}, wxNewId(), \_(\textcolor{stringliteral}{"????"}));
+00099         sizerADCs->Add(adcElement.title, 1, wxALIGN\_LEFT | wxALIGN\_TOP, 0);
+00100         sizerADCs->Add(adcElement.value, 1, wxALIGN\_LEFT | wxALIGN\_TOP, 0);
+00101         sizerADCs->Add(adcElement.units, 1, wxALIGN\_LEFT | wxALIGN\_TOP, 0);
+00102         mADCgui.push\_back(adcElement);
+00103         ADCdata data;
+00104         data.channel = i;
+00105         \textcolor{comment}{//data.powerOf10coefficient = 0;}
+00106         \textcolor{comment}{//data.units = 0;}
+00107         data.value = 0;
+00108         mADCdata.push\_back(data);
+00109     \}
+00110 
+00111     wxStaticBoxSizer* boxADC = \textcolor{keyword}{new} wxStaticBoxSizer(wxVERTICAL, \textcolor{keyword}{this}, \_T(\textcolor{stringliteral}{"ADC values"}));
+00112     boxADC->Add(sizerADCs, 1, wxALIGN\_LEFT | wxALIGN\_TOP, 0);
+00113 
+00114     wxFlexGridSizer* sizerGPIOs = \textcolor{keyword}{new} wxFlexGridSizer(0, 2, 2, 4);
+00115 
+00116     wxString gpios7\_0[] = \{ \textcolor{stringliteral}{"ADCinQ2\_N 15"}, \textcolor{stringliteral}{"ADCinQ2\_P"}, \textcolor{stringliteral}{"ADCinI2\_N"}, \textcolor{stringliteral}{"ADCinI2\_P"}, \textcolor{stringliteral}{"ADCinQ1\_N"}, \textcolor{stringliteral}{"ADCinQ1\_P"}
+      , \textcolor{stringliteral}{"ADCinI1\_N"}, \textcolor{stringliteral}{"ADCinI1\_P"} \};
+00117     \textcolor{keywordflow}{for} (\textcolor{keywordtype}{int} j = 0; j < 8; ++j)
+00118     \{
+00119         \textcolor{keywordtype}{long} \textcolor{keywordtype}{id} = wxNewId();
+00120         wxCheckBox* chkgpio = \textcolor{keyword}{new} wxCheckBox(\textcolor{keyword}{this}, \textcolor{keywordtype}{id}, wxString::Format(\textcolor{stringliteral}{"%s"}, gpios7\_0[j]));
+00121         this->Connect(\textcolor{keywordtype}{id}, wxEVT\_CHECKBOX, (wxObjectEventFunction)&
+      RFSpark_wxgui::OnWriteGPIO);
+00122         sizerGPIOs->Add(chkgpio, wxALIGN\_LEFT | wxALIGN\_TOP, 0);
+00123         mGPIOboxes.push\_back(chkgpio);
+00124     \}
+00125 
+00126     wxString gpios15\_8[] = \{ \textcolor{stringliteral}{"GPIO 15"}, \textcolor{stringliteral}{"DIG\_RST"}, \textcolor{stringliteral}{"CORE\_LDO\_EN"}, \textcolor{stringliteral}{"IQSELEN2RX\_DIR"}, \textcolor{stringliteral}{"IQSELEN1TX\_DIR"}, \textcolor{stringliteral}{"
+      DIO\_BUF\_OE"}, \textcolor{stringliteral}{"DIQ2RX\_DIR"}, \textcolor{stringliteral}{"DIQ1TX\_DIR"} \};
+00127     \textcolor{keywordflow}{for} (\textcolor{keywordtype}{int} j = 0; j < 8; ++j)
+00128     \{
+00129         \textcolor{keywordtype}{long} \textcolor{keywordtype}{id} = wxNewId();
+00130         wxCheckBox* chkgpio = \textcolor{keyword}{new} wxCheckBox(\textcolor{keyword}{this}, \textcolor{keywordtype}{id}, wxString::Format(\textcolor{stringliteral}{"%s"}, gpios15\_8[j]));
+00131         this->Connect(\textcolor{keywordtype}{id}, wxEVT\_CHECKBOX, (wxObjectEventFunction)&
+      RFSpark_wxgui::OnWriteGPIO);
+00132         sizerGPIOs->Add(chkgpio, wxALIGN\_LEFT | wxALIGN\_TOP, 0);
+00133         mGPIOboxes.push\_back(chkgpio);
+00134     \}
+00135     wxString gpios23\_16[] = \{ \textcolor{stringliteral}{"GPIO 23"}, \textcolor{stringliteral}{"GPIO 22"}, \textcolor{stringliteral}{"GPIO 21"}, \textcolor{stringliteral}{"GPIO 20"}, \textcolor{stringliteral}{"GPIO 19"}, \textcolor{stringliteral}{"GPIO 18"}, \textcolor{stringliteral}{"TXEN\_LMS"},
+       \textcolor{stringliteral}{"RXEN\_LMS"} \};
+00136     \textcolor{keywordflow}{for} (\textcolor{keywordtype}{int} j = 0; j < 8; ++j)
+00137     \{
+00138         \textcolor{keywordtype}{long} \textcolor{keywordtype}{id} = wxNewId();
+00139         wxCheckBox* chkgpio = \textcolor{keyword}{new} wxCheckBox(\textcolor{keyword}{this}, \textcolor{keywordtype}{id}, wxString::Format(\textcolor{stringliteral}{"%s"}, gpios23\_16[j]));
+00140         this->Connect(\textcolor{keywordtype}{id}, wxEVT\_CHECKBOX, (wxObjectEventFunction)&
+      RFSpark_wxgui::OnWriteGPIO);
+00141         sizerGPIOs->Add(chkgpio, wxALIGN\_LEFT | wxALIGN\_TOP, 0);
+00142         mGPIOboxes.push\_back(chkgpio);
+00143     \}
+00144 
+00145     wxFlexGridSizer* sizerBoxGPIO = \textcolor{keyword}{new} wxFlexGridSizer(0, 1, 5, 5);
+00146     sizerBoxGPIO->Add(sizerGPIOs, 1, wxALIGN\_LEFT | wxALIGN\_TOP, 0);
+00147 
+00148     wxStaticBoxSizer* boxGPIO = \textcolor{keyword}{new} wxStaticBoxSizer(wxVERTICAL, \textcolor{keyword}{this}, \_T(\textcolor{stringliteral}{"GPIO states"}));
+00149     boxGPIO->Add(sizerBoxGPIO, 1, wxALIGN\_LEFT | wxALIGN\_TOP, 0);
+00150 
+00151     wxFlexGridSizer* mainGrid = \textcolor{keyword}{new} wxFlexGridSizer(0, 2, 5, 5);
+00152     mainGrid->Add(boxADC, 1, wxALIGN\_LEFT | wxALIGN\_TOP, 0);
+00153     mainGrid->Add(boxGPIO, 1, wxALIGN\_LEFT | wxALIGN\_TOP, 0);
+00154 
+00155     SetSizer(mainGrid);
+00156     mainGrid->Fit(\textcolor{keyword}{this});
+00157     mainGrid->SetSizeHints(\textcolor{keyword}{this});
+00158     Layout();
+00159 
+00160     Bind(READ\_ALL\_VALUES, &RFSpark_wxgui::OnReadAll, \textcolor{keyword}{this}, this->GetId());
+00161     Bind(WRITE\_ALL\_VALUES, &RFSpark_wxgui::OnWriteAll, \textcolor{keyword}{this}, this->GetId());
+00162 \}
+00163 
+00164 \textcolor{keywordtype}{void} RFSpark_wxgui::Initialize(lms_device_t* pSerPort)
+00165 \{
+00166     lmsControl = pSerPort;
+00167     wxCommandEvent evt;
+00168 \}
+00169 
+00170 RFSpark_wxgui::~RFSpark_wxgui()
+00171 \{
+00172 
+00173 \}
+00174 
+00175 \textcolor{keywordtype}{void} RFSpark_wxgui::UpdateADClabels()
+00176 \{
+00177     \textcolor{keywordflow}{for} (\textcolor{keywordtype}{unsigned} i = 0; i < mADCdata.size(); ++i)
+00178     \{
+00179         mADCgui[i].value->SetLabelText(wxString::Format(\textcolor{stringliteral}{"%1.3f"}, mADCdata[i].value));
+00180         mADCgui[i].units->SetLabelText(wxString::Format(\textcolor{stringliteral}{"%s"}, mADCdata[i].units));
+00181     \}
+00182 \}
+00183 
+00184 \textcolor{keywordtype}{void} RFSpark_wxgui::OnRefreshAllADC(wxCommandEvent& event)
+00185 \{
+00186     \textcolor{keywordflow}{for} (\textcolor{keywordtype}{size\_t} i = 0; i < mADCdata.size(); ++i)
+00187     \{
+00188         float_type val;
+00189         lms_name_t units;
+00190         \textcolor{keywordflow}{if} (LMS_ReadCustomBoardParam(lmsControl,i,&val,units)!=0)
+00191         \{
+00192             wxMessageBox(\_(\textcolor{stringliteral}{"Error reading ADC values"}), \_(\textcolor{stringliteral}{"Warning"}));
+00193             \textcolor{keywordflow}{return};
+00194         \}
+00195         mADCdata[i].channel = i;
+00196         mADCdata[i].units = units;
+00197         mADCdata[i].value = val;
+00198     \}
+00199     UpdateADClabels();
+00200 \}
+00201 
+00202 \textcolor{keywordtype}{void} RFSpark_wxgui::OnWriteGPIO(wxCommandEvent& event)
+00203 \{
+00204     std::vector<uint8\_t> values(mGPIOboxes.size()/8, 0);
+00205     \textcolor{keywordtype}{int} gpioIndex = 0;
+00206     \textcolor{keywordflow}{for} (\textcolor{keywordtype}{size\_t} i = 0; i < mGPIOboxes.size()/8; ++i)
+00207     \{
+00208         \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{char} value = 0;
+00209         \textcolor{keywordflow}{for} (\textcolor{keywordtype}{int} j = 7; j >= 0; --j)
+00210             value |= mGPIOboxes[gpioIndex++]->IsChecked() << j;
+00211         values[i] = value;
+00212     \}
+00213     \textcolor{keywordflow}{if} (LMS_GPIOWrite(lmsControl, values.data(), mGPIOboxes.size()/8) != 0)
+00214         wxMessageBox(\_(\textcolor{stringliteral}{"GPIO write failed"}), \_(\textcolor{stringliteral}{"Warning"}));
+00215 \}
+00216 
+00217 \textcolor{keywordtype}{void} RFSpark_wxgui::OnReadGPIO(wxCommandEvent& event)
+00218 \{
+00219     std::vector<uint8\_t> values(mGPIOboxes.size()/8);
+00220     \textcolor{keywordflow}{if} (LMS_GPIORead(lmsControl, values.data(), mGPIOboxes.size()/8) != 0)
+00221     \{
+00222         wxMessageBox(\_(\textcolor{stringliteral}{"GPIO read failed"}), \_(\textcolor{stringliteral}{"Warning"}));
+00223         \textcolor{keywordflow}{return};
+00224     \}
+00225     \textcolor{keywordtype}{size\_t} gpioIndex = 0;
+00226     \textcolor{keywordtype}{int} gpioByte = 0;
+00227     \textcolor{keywordflow}{for} (\textcolor{keywordtype}{size\_t} i = 0; i < mGPIOboxes.size() / 8; ++i)
+00228     \{
+00229         \textcolor{keywordflow}{for} (\textcolor{keywordtype}{int} j = 7; j >= 0 && gpioIndex < mGPIOboxes.size(); --j)
+00230             mGPIOboxes[gpioIndex++]->SetValue( values[gpioByte] & (0x1 << j) );
+00231         ++gpioByte;
+00232     \}
+00233 \}
+00234 
+00235 \textcolor{keywordtype}{void} RFSpark_wxgui::OnReadAll(wxCommandEvent &event)
+00236 \{
+00237     OnReadGPIO(event);
+00238     OnRefreshAllADC(event);
+00239 \}
+00240 
+00241 \textcolor{keywordtype}{void} RFSpark_wxgui::OnWriteAll(wxCommandEvent &event)
+00242 \{
+00243     OnWriteGPIO(event);
+00244 \}
+\end{DoxyCode}

@@ -1,0 +1,546 @@
+\subsection{pnl\+Board\+Controls.\+cpp}
+\label{pnlBoardControls_8cpp_source}\index{/home/erik/prefix/default/src/limesuite-\/dev/src/lms7002\+\_\+wxgui/pnl\+Board\+Controls.\+cpp@{/home/erik/prefix/default/src/limesuite-\/dev/src/lms7002\+\_\+wxgui/pnl\+Board\+Controls.\+cpp}}
+
+\begin{DoxyCode}
+00001 \textcolor{preprocessor}{#include "pnlBoardControls.h"}
+00002 \textcolor{preprocessor}{#include "wx/wxprec.h"}
+00003 \textcolor{preprocessor}{#include "lime/LimeSuite.h"}
+00004 \textcolor{preprocessor}{#ifdef \_\_BORLANDC\_\_}
+00005 \textcolor{preprocessor}{#pragma hdrstop}
+00006 \textcolor{preprocessor}{#endif //\_\_BORLANDC\_\_}
+00007 \textcolor{preprocessor}{#ifndef WX\_PRECOMP}
+00008 \textcolor{preprocessor}{#include <wx/wx.h>}
+00009 \textcolor{preprocessor}{#endif //WX\_PRECOMP}
+00010 
+00011 \textcolor{preprocessor}{#include "pnlUltimateEVB.h"}
+00012 \textcolor{preprocessor}{#include "pnluLimeSDR.h"}
+00013 \textcolor{preprocessor}{#include "pnlLimeSDR.h"}
+00014 \textcolor{preprocessor}{#include "pnlBuffers.h"}
+00015 \textcolor{preprocessor}{#include "lms7002m_novena_wxgui.h"}
+00016 \textcolor{preprocessor}{#include "RFSpark_wxgui.h"}
+00017 \textcolor{preprocessor}{ #include "pnlQSpark.h"}
+00018 \textcolor{preprocessor}{#include <IConnection.h>}
+00019 \textcolor{preprocessor}{#include <LMSBoards.h>}
+00020 \textcolor{preprocessor}{#include <ADCUnits.h>}
+00021 \textcolor{preprocessor}{#include <assert.h>}
+00022 \textcolor{preprocessor}{#include <wx/spinctrl.h>}
+00023 \textcolor{preprocessor}{#include <vector>}
+00024 \textcolor{preprocessor}{#include "lms7suiteEvents.h"}
+00025 
+00026 \textcolor{keyword}{using namespace }std;
+00027 \textcolor{keyword}{using namespace }lime;
+00028 
+00029 \textcolor{keyword}{static} wxString power2unitsString(\textcolor{keywordtype}{char} powerx3)
+00030 \{
+00031     \textcolor{keywordflow}{switch} (powerx3)
+00032     \{
+00033     \textcolor{keywordflow}{case} -8:
+00034         \textcolor{keywordflow}{return} \textcolor{stringliteral}{"y"};
+00035     \textcolor{keywordflow}{case} -7:
+00036         \textcolor{keywordflow}{return} \textcolor{stringliteral}{"z"};
+00037     \textcolor{keywordflow}{case} -6:
+00038         \textcolor{keywordflow}{return} \textcolor{stringliteral}{"a"};
+00039     \textcolor{keywordflow}{case} -5:
+00040         \textcolor{keywordflow}{return} \textcolor{stringliteral}{"f"};
+00041     \textcolor{keywordflow}{case} -4:
+00042         \textcolor{keywordflow}{return} \textcolor{stringliteral}{"p"};
+00043     \textcolor{keywordflow}{case} -3:
+00044         \textcolor{keywordflow}{return} \textcolor{stringliteral}{"n"};
+00045     \textcolor{keywordflow}{case} -2:
+00046         \textcolor{keywordflow}{return} \textcolor{stringliteral}{"u"};
+00047     \textcolor{keywordflow}{case} -1:
+00048         \textcolor{keywordflow}{return} \textcolor{stringliteral}{"m"};
+00049     \textcolor{keywordflow}{case} 0:
+00050         \textcolor{keywordflow}{return} \textcolor{stringliteral}{""};
+00051     \textcolor{keywordflow}{case} 1:
+00052         \textcolor{keywordflow}{return} \textcolor{stringliteral}{"k"};
+00053     \textcolor{keywordflow}{case} 2:
+00054         \textcolor{keywordflow}{return} \textcolor{stringliteral}{"M"};
+00055     \textcolor{keywordflow}{case} 3:
+00056         \textcolor{keywordflow}{return} \textcolor{stringliteral}{"G"};
+00057     \textcolor{keywordflow}{case} 4:
+00058         \textcolor{keywordflow}{return} \textcolor{stringliteral}{"T"};
+00059     \textcolor{keywordflow}{case} 5:
+00060         \textcolor{keywordflow}{return} \textcolor{stringliteral}{"P"};
+00061     \textcolor{keywordflow}{case} 6:
+00062         \textcolor{keywordflow}{return} \textcolor{stringliteral}{"E"};
+00063     \textcolor{keywordflow}{case} 7:
+00064         \textcolor{keywordflow}{return} \textcolor{stringliteral}{"Y"};
+00065     \textcolor{keywordflow}{default}:
+00066         \textcolor{keywordflow}{return} \textcolor{stringliteral}{""};
+00067     \}
+00068 \}
+00069 
+00070 pnlBoardControls::pnlBoardControls(wxWindow* parent, wxWindowID \textcolor{keywordtype}{id}, \textcolor{keyword}{const} wxString &title, \textcolor{keyword}{const} wxPoint& 
+      pos, \textcolor{keyword}{const} wxSize& size, \textcolor{keywordtype}{long} style) : wxFrame(parent, id, title, pos, size, style), 
+      lmsControl(nullptr)
+00071 \{
+00072     additionalControls = \textcolor{keyword}{nullptr};
+00073     SetBackgroundColour(wxSystemSettings::GetColour(wxSYS\_COLOUR\_BTNFACE));
+00074     wxFlexGridSizer* fgSizer247;
+00075     fgSizer247 = \textcolor{keyword}{new} wxFlexGridSizer( 0, 1, 10, 10);
+00076     fgSizer247->AddGrowableCol( 0 );
+00077     fgSizer247->AddGrowableRow( 1 );
+00078     fgSizer247->SetFlexibleDirection( wxBOTH );
+00079     fgSizer247->SetNonFlexibleGrowMode( wxFLEX\_GROWMODE\_SPECIFIED );
+00080 
+00081     wxFlexGridSizer* fgSizer248;
+00082     fgSizer248 = \textcolor{keyword}{new} wxFlexGridSizer( 0, 4, 0, 0 );
+00083     fgSizer248->SetFlexibleDirection( wxBOTH );
+00084     fgSizer248->SetNonFlexibleGrowMode( wxFLEX\_GROWMODE\_SPECIFIED );
+00085 
+00086     btnReadAll = \textcolor{keyword}{new} wxButton( \textcolor{keyword}{this}, wxID\_ANY, wxT(\textcolor{stringliteral}{"Read all"}), wxDefaultPosition, wxDefaultSize, 0 );
+00087     fgSizer248->Add( btnReadAll, 0, wxALL, 5 );
+00088 
+00089     btnWriteAll = \textcolor{keyword}{new} wxButton( \textcolor{keyword}{this}, wxID\_ANY, wxT(\textcolor{stringliteral}{"Write all"}), wxDefaultPosition, wxDefaultSize, 0 );
+00090     fgSizer248->Add( btnWriteAll, 0, wxALL, 5 );
+00091 
+00092     m_staticText349 = \textcolor{keyword}{new} wxStaticText( \textcolor{keyword}{this}, wxID\_ANY, wxT(\textcolor{stringliteral}{"Labels:"}), wxDefaultPosition, wxDefaultSize, 0
+       );
+00093     m_staticText349->Wrap( -1 );
+00094     fgSizer248->Add( m_staticText349, 0, wxALL|wxALIGN\_CENTER\_VERTICAL, 5 );
+00095 
+00096     wxArrayString cmbBoardSelectionChoices;
+00097     cmbBoardSelection = \textcolor{keyword}{new} wxChoice( \textcolor{keyword}{this}, wxNewId(), wxDefaultPosition, wxDefaultSize, 
+      cmbBoardSelectionChoices, 0 );
+00098     cmbBoardSelection->SetSelection( 0 );
+00099     fgSizer248->Add( cmbBoardSelection, 0, wxALL, 5 );
+00100 
+00101     \textcolor{keywordflow}{for} (\textcolor{keywordtype}{int} i = 0; i < LMS_DEV_COUNT; ++i) \{
+00102         cmbBoardSelection->AppendString(wxString::From8BitData(GetDeviceName((
+      eLMS_DEV)i)));
+00103     \}
+00104 
+00105     fgSizer247->Add( fgSizer248, 1, wxEXPAND, 5 );
+00106 
+00107     pnlCustomControls = \textcolor{keyword}{new} wxPanel(\textcolor{keyword}{this}, wxID\_ANY, wxDefaultPosition, wxDefaultSize, 0, \_(\textcolor{stringliteral}{"Custom controls
+      "}));
+00108     wxFlexGridSizer* sizerCustomControls = \textcolor{keyword}{new} wxFlexGridSizer(0, 5, 5, 5);
+00109 
+00110     sizerCustomControls->Add(\textcolor{keyword}{new} wxStaticText(pnlCustomControls, wxID\_ANY, \_(\textcolor{stringliteral}{"ID"})));
+00111     sizerCustomControls->Add(\textcolor{keyword}{new} wxStaticText(pnlCustomControls, wxID\_ANY, \_(\textcolor{stringliteral}{"Value"})));
+00112     sizerCustomControls->Add(\textcolor{keyword}{new} wxStaticText(pnlCustomControls, wxID\_ANY, \_(\textcolor{stringliteral}{"Power"})));
+00113     sizerCustomControls->Add(\textcolor{keyword}{new} wxStaticText(pnlCustomControls, wxID\_ANY, \_(\textcolor{stringliteral}{"Units"})));
+00114     sizerCustomControls->Add(\textcolor{keyword}{new} wxStaticText(pnlCustomControls, wxID\_ANY, \_(\textcolor{stringliteral}{""})));
+00115 
+00116     \textcolor{comment}{//reading}
+00117     spinCustomChannelRd = \textcolor{keyword}{new} wxSpinCtrl(pnlCustomControls, wxNewId(), \_(\textcolor{stringliteral}{"0"}), wxDefaultPosition, 
+      wxDefaultSize, wxSP\_ARROW\_KEYS, 0, 255, 0);
+00118     sizerCustomControls->Add(spinCustomChannelRd, 1, wxLEFT | wxRIGHT | wxALIGN\_CENTER\_VERTICAL, 0);
+00119     txtCustomValueRd = \textcolor{keyword}{new} wxStaticText(pnlCustomControls, wxID\_ANY, \_(\textcolor{stringliteral}{"0"}));
+00120     sizerCustomControls->Add(txtCustomValueRd, 1, wxLEFT | wxRIGHT | wxALIGN\_CENTER\_VERTICAL, 0);
+00121     txtCustomPowerOf10Rd = \textcolor{keyword}{new} wxStaticText(pnlCustomControls, wxID\_ANY, \_(\textcolor{stringliteral}{""}));
+00122     sizerCustomControls->Add(txtCustomPowerOf10Rd, 1, wxLEFT | wxRIGHT | wxALIGN\_CENTER\_VERTICAL, 0);
+00123     txtCustomUnitsRd = \textcolor{keyword}{new} wxStaticText(pnlCustomControls, wxID\_ANY, \_(\textcolor{stringliteral}{""}));
+00124     sizerCustomControls->Add(txtCustomUnitsRd, 1, wxLEFT | wxRIGHT | wxALIGN\_CENTER\_VERTICAL, 0);
+00125     btnCustomRd = \textcolor{keyword}{new} wxButton(pnlCustomControls, wxNewId(), \_(\textcolor{stringliteral}{"Read"}));
+00126     btnCustomRd->Connect(wxEVT\_COMMAND\_BUTTON\_CLICKED, wxCommandEventHandler(
+      pnlBoardControls::OnCustomRead), NULL, \textcolor{keyword}{this});
+00127     sizerCustomControls->Add(btnCustomRd, 1, wxLEFT | wxRIGHT | wxALIGN\_CENTER\_VERTICAL, 0);
+00128 
+00129     \textcolor{comment}{//writing}
+00130     spinCustomChannelWr = \textcolor{keyword}{new} wxSpinCtrl(pnlCustomControls, wxNewId(), \_(\textcolor{stringliteral}{"0"}), wxDefaultPosition, 
+      wxDefaultSize, wxSP\_ARROW\_KEYS | wxTE\_PROCESS\_ENTER, 0, 255, 0);
+00131     sizerCustomControls->Add(spinCustomChannelWr, 1, wxLEFT | wxRIGHT | wxALIGN\_CENTER\_VERTICAL, 0);
+00132     spinCustomValueWr = \textcolor{keyword}{new} wxSpinCtrl(pnlCustomControls, wxNewId(), \_(\textcolor{stringliteral}{""}), wxDefaultPosition, 
+      wxDefaultSize, wxSP\_ARROW\_KEYS | wxTE\_PROCESS\_ENTER, 0, 65535, 0);
+00133     sizerCustomControls->Add(spinCustomValueWr, 1, wxLEFT | wxRIGHT | wxALIGN\_CENTER\_VERTICAL, 0);
+00134     spinCustomValueWr->Connect(wxEVT\_COMMAND\_SPINCTRL\_UPDATED, wxSpinEventHandler(
+      pnlBoardControls::OnSetDACvalues), NULL, \textcolor{keyword}{this});
+00135 
+00136     wxArrayString powerChoices;
+00137     \textcolor{keywordflow}{for} (\textcolor{keywordtype}{int} i = -8; i <= 7; ++i)
+00138         powerChoices.push\_back(power2unitsString(i));
+00139     cmbCustomPowerOf10Wr = \textcolor{keyword}{new} wxChoice(pnlCustomControls, wxNewId(), wxDefaultPosition, wxDefaultSize, 
+      powerChoices, 0);
+00140     cmbCustomPowerOf10Wr->SetSelection(0);
+00141     sizerCustomControls->Add(cmbCustomPowerOf10Wr, 1, wxLEFT | wxRIGHT | wxALIGN\_CENTER\_VERTICAL, 0);
+00142 
+00143     wxArrayString unitChoices;
+00144     \textcolor{keywordflow}{for} (\textcolor{keywordtype}{int} i = 0; i < ADC_UNITS_COUNT; ++i) \textcolor{comment}{//add all defined units}
+00145         unitChoices.push\_back(wxString::From8BitData(adcUnits2string(i)));
+00146     \textcolor{keywordflow}{for} (\textcolor{keywordtype}{int} i = ADC\_UNITS\_COUNT; i < ADC\_UNITS\_COUNT + 4; ++i) \textcolor{comment}{//add some options to use undefined units}
+00147         unitChoices.push\_back(wxString::Format(\_(\textcolor{stringliteral}{"%i"}), i));
+00148     cmbCustomUnitsWr = \textcolor{keyword}{new} wxChoice(pnlCustomControls, wxNewId(), wxDefaultPosition, wxDefaultSize, 
+      unitChoices, 0);
+00149     cmbCustomUnitsWr->SetSelection(0);
+00150     sizerCustomControls->Add(cmbCustomUnitsWr, 1, wxLEFT | wxRIGHT | wxALIGN\_CENTER\_VERTICAL, 0);
+00151 
+00152     btnCustomWr = \textcolor{keyword}{new} wxButton(pnlCustomControls, wxNewId(), \_(\textcolor{stringliteral}{"Write"}));
+00153     btnCustomWr->Connect(wxEVT\_COMMAND\_BUTTON\_CLICKED, wxCommandEventHandler(
+      pnlBoardControls::OnCustomWrite), NULL, \textcolor{keyword}{this});
+00154     sizerCustomControls->Add(btnCustomWr, 1, wxLEFT | wxRIGHT | wxALIGN\_CENTER\_VERTICAL, 0);
+00155 
+00156     pnlCustomControls->SetSizer(sizerCustomControls);
+00157     pnlCustomControls->Fit();
+00158 
+00159     fgSizer247->Add(pnlCustomControls, 1, wxEXPAND, 5);
+00160 
+00161     wxFlexGridSizer* fgSizer249 = \textcolor{keyword}{new} wxFlexGridSizer( 0, 2, 5, 5 );
+00162     fgSizer249->AddGrowableCol( 0 );
+00163     fgSizer249->AddGrowableCol( 1 );
+00164     fgSizer249->SetFlexibleDirection( wxBOTH );
+00165     fgSizer249->SetNonFlexibleGrowMode( wxFLEX\_GROWMODE\_SPECIFIED );
+00166 
+00167     pnlReadControls = \textcolor{keyword}{new} wxPanel(\textcolor{keyword}{this}, wxID\_ANY, wxDefaultPosition, wxDefaultSize, 0, \_(\textcolor{stringliteral}{"General"}));
+00168     wxStaticBoxSizer* sbSizer133 = \textcolor{keyword}{new} wxStaticBoxSizer( \textcolor{keyword}{new} wxStaticBox( 
+      pnlReadControls, wxID\_ANY, wxT(\textcolor{stringliteral}{"General"}) ), wxVERTICAL );
+00169     sizerAnalogRd = \textcolor{keyword}{new} wxFlexGridSizer( 0, 3, 2, 2 );
+00170     sizerAnalogRd->SetFlexibleDirection( wxBOTH );
+00171     sizerAnalogRd->SetNonFlexibleGrowMode( wxFLEX\_GROWMODE\_SPECIFIED );
+00172     sizerAnalogRd->Add(\textcolor{keyword}{new} wxStaticText(pnlReadControls, wxID\_ANY, \_(\textcolor{stringliteral}{"Name"})), 1, wxALL, 5);
+00173     sizerAnalogRd->Add(\textcolor{keyword}{new} wxStaticText(pnlReadControls, wxID\_ANY, \_(\textcolor{stringliteral}{"Value"})), 1, wxALL, 5);
+00174     sizerAnalogRd->Add(\textcolor{keyword}{new} wxStaticText(pnlReadControls, wxID\_ANY, \_(\textcolor{stringliteral}{"Units"})), 1, wxALL, 5);
+00175     sbSizer133->Add( sizerAnalogRd, 1, wxEXPAND, 5 );
+00176     pnlReadControls->SetSizer(sbSizer133);
+00177     pnlReadControls->Fit();
+00178     pnlReadControls->Hide();
+00179     fgSizer249->Add( pnlReadControls, 1, wxEXPAND, 5 );
+00180 
+00181     fgSizer247->Add( fgSizer249, 1, wxEXPAND, 5 );
+00182 
+00183     sizerAdditionalControls = \textcolor{keyword}{new} wxFlexGridSizer(0, 1, 0, 0);
+00184     fgSizer247->Add(sizerAdditionalControls, 1, wxEXPAND, 5);
+00185     this->SetSizer( fgSizer247 );
+00186     this->Layout();
+00187     fgSizer247->Fit( \textcolor{keyword}{this} );
+00188 
+00189     \textcolor{comment}{// Connect Events}
+00190     cmbBoardSelection->Connect(wxEVT\_COMMAND\_CHOICE\_SELECTED, wxCommandEventHandler(
+      pnlBoardControls::OnUserChangedBoardType), NULL, \textcolor{keyword}{this});
+00191     btnReadAll->Connect( wxEVT\_COMMAND\_BUTTON\_CLICKED, wxCommandEventHandler( 
+      pnlBoardControls::OnReadAll ), NULL, \textcolor{keyword}{this} );
+00192     btnWriteAll->Connect( wxEVT\_COMMAND\_BUTTON\_CLICKED, wxCommandEventHandler( 
+      pnlBoardControls::OnWriteAll ), NULL, \textcolor{keyword}{this} );
+00193 
+00194     SetupControls(GetDeviceName(LMS_DEV_UNKNOWN));
+00195 \}
+00196 
+00197 pnlBoardControls::~pnlBoardControls()
+00198 \{
+00199     \textcolor{comment}{// Disconnect Events}
+00200     btnReadAll->Disconnect( wxEVT\_COMMAND\_BUTTON\_CLICKED, wxCommandEventHandler( 
+      pnlBoardControls::OnReadAll ), NULL, \textcolor{keyword}{this} );
+00201     btnWriteAll->Disconnect( wxEVT\_COMMAND\_BUTTON\_CLICKED, wxCommandEventHandler( 
+      pnlBoardControls::OnWriteAll ), NULL, \textcolor{keyword}{this} );
+00202     cmbBoardSelection->Disconnect( wxEVT\_COMMAND\_CHOICE\_SELECTED, wxCommandEventHandler( 
+      pnlBoardControls::OnUserChangedBoardType), NULL, \textcolor{keyword}{this} );
+00203 \}
+00204 
+00205 \textcolor{keywordtype}{void} pnlBoardControls::OnReadAll( wxCommandEvent& event )
+00206 \{
+00207     vector<uint8\_t> ids;
+00208     vector<double> values;
+00209     vector<string> units;
+00210 
+00211     \textcolor{keywordflow}{for} (\textcolor{keyword}{const} \textcolor{keyword}{auto}& param : mParameters)
+00212     \{
+00213         ids.push\_back(param.channel);
+00214         values.push\_back(0);
+00215         units.push\_back(\textcolor{stringliteral}{""});
+00216     \}
+00217 
+00218 
+00219     \textcolor{keywordflow}{for} (\textcolor{keywordtype}{size\_t} i = 0; i < mParameters.size(); ++i)
+00220     \{
+00221         float_type value;
+00222         lms_name_t units;
+00223         \textcolor{keywordtype}{int} status = LMS_ReadCustomBoardParam(lmsControl,mParameters[i].channel,&value,units);
+00224         \textcolor{keywordflow}{if} (status != 0)
+00225         \{
+00226             wxMessageBox(\_(\textcolor{stringliteral}{"Error reading board parameters"}), \_(\textcolor{stringliteral}{"Warning"}));
+00227             \textcolor{keywordflow}{return};
+00228         \}
+00229         mParameters[i].channel = ids[i];
+00230         mParameters[i].units = units;
+00231         mParameters[i].value = value;
+00232     \}
+00233     \textcolor{keywordflow}{if}(additionalControls)
+00234     \{
+00235         wxCommandEvent evt;
+00236         evt.SetEventType(READ\_ALL\_VALUES);
+00237         evt.SetId(additionalControls->GetId());
+00238         wxPostEvent(additionalControls, evt);
+00239     \}
+00240     UpdatePanel();
+00241 \}
+00242 
+00243 \textcolor{keywordtype}{void} pnlBoardControls::OnWriteAll( wxCommandEvent& event )
+00244 \{
+00245     vector<uint8\_t> ids;
+00246     vector<double> values;
+00247 
+00248     \textcolor{keywordflow}{for} (\textcolor{keywordtype}{size\_t} i = 0; i < mParameters.size(); ++i)
+00249     \{
+00250         \textcolor{keywordflow}{if} (!mParameters[i].writable)
+00251             \textcolor{keywordflow}{continue};
+00252         ids.push\_back(mParameters[i].channel);
+00253         values.push\_back(mParameters[i].value);
+00254         \textcolor{keywordtype}{int} status = LMS_WriteCustomBoardParam(lmsControl,mParameters[i].channel,
+      mParameters[i].value,NULL);
+00255         \textcolor{keywordflow}{if} (status != 0)
+00256         \{
+00257             wxMessageBox(\_(\textcolor{stringliteral}{"Failed to write values"}), \_(\textcolor{stringliteral}{"Warning"}));
+00258             \textcolor{keywordflow}{return};
+00259         \}
+00260     \}
+00261 
+00262     \textcolor{keywordflow}{if}(additionalControls)
+00263     \{
+00264         wxCommandEvent evt;
+00265         evt.SetEventType(WRITE\_ALL\_VALUES);
+00266         evt.SetId(additionalControls->GetId());
+00267         wxPostEvent(additionalControls, evt);
+00268     \}
+00269 \}
+00270 
+00271 \textcolor{keywordtype}{void} pnlBoardControls::Initialize(lms_device_t* controlPort)
+00272 \{
+00273     lmsControl = controlPort;
+00274     \textcolor{keyword}{const} lms_dev_info_t* info;
+00275     \textcolor{keywordflow}{if} ((info = LMS_GetDeviceInfo(lmsControl))!=\textcolor{keyword}{nullptr})
+00276     \{
+00277         SetupControls(info->deviceName);
+00278         wxCommandEvent evt;
+00279         OnReadAll(evt);
+00280     \}
+00281 \}
+00282 
+00283 \textcolor{keywordtype}{void} pnlBoardControls::UpdatePanel()
+00284 \{
+00285     assert(mParameters.size() == mGUI_widgets.size());
+00286     \textcolor{keywordflow}{for} (\textcolor{keywordtype}{size\_t} i = 0; i < mParameters.size(); ++i)
+00287     \{
+00288         mGUI_widgets[i]->title->SetLabel(wxString(mParameters[i].name));
+00289         \textcolor{keywordflow}{if} (mGUI_widgets[i]->wValue)
+00290             mGUI_widgets[i]->wValue->SetValue(mParameters[i].value);
+00291         \textcolor{keywordflow}{else}
+00292             mGUI_widgets[i]->rValue->SetLabel(wxString::Format(\_(\textcolor{stringliteral}{"%1.0f"}), 
+      mParameters[i].value));
+00293         mGUI_widgets[i]->units->SetLabelText(wxString::Format(\textcolor{stringliteral}{"%s"}, mParameters[
+      i].units));
+00294     \}
+00295 
+00296     \textcolor{keywordflow}{if}(additionalControls)
+00297     \{
+00298         wxCommandEvent evt;
+00299         evt.SetEventType(READ\_ALL\_VALUES);
+00300         evt.SetId(additionalControls->GetId());
+00301         wxPostEvent(additionalControls, evt);
+00302     \}
+00303 \}
+00304 
+00305 std::vector<pnlBoardControls::ADC\_DAC> pnlBoardControls::getBoardParams(\textcolor{keyword}{const} \textcolor{keywordtype}{string} &boardID)
+00306 \{
+00307     std::vector<ADC\_DAC> paramList;
+00308     \textcolor{keywordflow}{if}(boardID == GetDeviceName(LMS_DEV_LIMESDR)
+00309         || boardID == GetDeviceName(LMS_DEV_LIMESDRMINI)
+00310         || boardID == GetDeviceName(LMS_DEV_LIMESDR_PCIE)
+00311         || boardID == GetDeviceName(LMS_DEV_LIMESDR_QPCIE)
+00312         || boardID == GetDeviceName(LMS_DEV_LIMESDR_USB_SP)
+00313         || boardID == GetDeviceName(LMS_DEV_LMS7002M_ULTIMATE_EVB))
+00314     \{
+00315         \textcolor{keywordflow}{if} (boardID == GetDeviceName(LMS_DEV_LIMESDR_QPCIE))
+00316             paramList.push\_back(ADC_DAC\{ \textcolor{stringliteral}{"VCTCXO DAC"}, \textcolor{keyword}{true}, 0, 0, 
+      adcUnits2string(RAW), 0, 0, 65535 \});
+00317         \textcolor{keywordflow}{else}
+00318             paramList.push\_back(ADC_DAC\{ \textcolor{stringliteral}{"VCTCXO DAC"}, \textcolor{keyword}{true}, 0, 0, 
+      adcUnits2string(RAW), 0, 0, 255 \});
+00319         paramList.push\_back(ADC_DAC\{\textcolor{stringliteral}{"Board Temperature"}, \textcolor{keyword}{false}, 0, 1, 
+      adcUnits2string(TEMPERATURE)\});
+00320     \}
+00321     \textcolor{keywordflow}{return} paramList;
+00322 \}
+00323 
+00324 \textcolor{keywordtype}{void} pnlBoardControls::SetupControls(\textcolor{keyword}{const} std::string &boardID)
+00325 \{
+00326 
+00327     \textcolor{keywordflow}{if}(additionalControls)
+00328     \{
+00329         additionalControls->Destroy();
+00330         additionalControls = \textcolor{keyword}{nullptr};
+00331     \}
+00332 
+00333     \textcolor{keywordflow}{if} (boardID == GetDeviceName(LMS_DEV_UNKNOWN))
+00334         pnlCustomControls->Show();
+00335     \textcolor{keywordflow}{else}
+00336         pnlCustomControls->Hide();
+00337     \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} i=0; i<LMS_DEV_COUNT; ++i)
+00338     \{
+00339         \textcolor{keywordflow}{if}(boardID == GetDeviceName((eLMS_DEV)i))
+00340         \{
+00341             cmbBoardSelection->SetSelection(i);
+00342             \textcolor{keywordflow}{break};
+00343         \}
+00344     \}
+00345 
+00346     \textcolor{keywordflow}{for} (\textcolor{keyword}{auto} &widget : mGUI_widgets)
+00347         \textcolor{keyword}{delete} widget;
+00348     mGUI\_widgets.clear(); \textcolor{comment}{//delete previously existing controls}
+00349     mParameters = getBoardParams(boardID); \textcolor{comment}{//update controls list by board type}
+00350 
+00351     \textcolor{keywordflow}{if} (boardID != GetDeviceName(LMS_DEV_UNKNOWN))
+00352     \{
+00353         \textcolor{keywordflow}{if} (mParameters.size()!=0)
+00354             pnlReadControls->Show();
+00355         \textcolor{keywordflow}{else}
+00356             pnlReadControls->Hide();
+00357 
+00358         \textcolor{keywordflow}{for} (\textcolor{keywordtype}{size\_t} i = 0; i < mParameters.size(); ++i)
+00359         \{
+00360             Param_GUI *gui = \textcolor{keyword}{new} Param_GUI();
+00361             gui->title = \textcolor{keyword}{new} wxStaticText(pnlReadControls, wxID\_ANY, wxString(
+      mParameters[i].name));
+00362             \textcolor{keywordflow}{if} (mParameters[i].writable)
+00363             \{
+00364                 gui->wValue = \textcolor{keyword}{new} wxSpinCtrl(pnlReadControls, wxNewId(), \_(\textcolor{stringliteral}{""}), wxDefaultPosition, 
+      wxDefaultSize, wxSP\_ARROW\_KEYS | wxTE\_PROCESS\_ENTER, mParameters[i].minValue, mParameters[
+      i].maxValue, mParameters[i].minValue);
+00365                 gui->wValue->Connect(wxEVT\_COMMAND\_SPINCTRL\_UPDATED, wxSpinEventHandler(
+      pnlBoardControls::OnSetDACvalues), NULL, \textcolor{keyword}{this});
+00366                 gui->wValue->Connect(wxEVT\_TEXT\_ENTER, wxCommandEventHandler(
+      pnlBoardControls::OnSetDACvaluesENTER), NULL, \textcolor{keyword}{this});
+00367             \}
+00368             \textcolor{keywordflow}{else}
+00369                 gui->rValue = \textcolor{keyword}{new} wxStaticText(pnlReadControls, wxID\_ANY, \_(\textcolor{stringliteral}{""}));
+00370             gui->units = \textcolor{keyword}{new} wxStaticText(pnlReadControls, wxID\_ANY, wxString::Format(\textcolor{stringliteral}{"%s"}, 
+      mParameters[i].units));
+00371             mGUI\_widgets.push\_back(gui);
+00372 
+00373             sizerAnalogRd->Add(gui->title, 1, wxLEFT | wxRIGHT | wxALIGN\_CENTER\_VERTICAL, 5);
+00374             \textcolor{keywordflow}{if} (mParameters[i].writable)
+00375                 sizerAnalogRd->Add(gui->wValue, 1, wxLEFT | wxRIGHT | wxALIGN\_CENTER\_VERTICAL, 5);
+00376             \textcolor{keywordflow}{else}
+00377                 sizerAnalogRd->Add(gui->rValue, 1, wxLEFT | wxRIGHT | wxALIGN\_CENTER\_VERTICAL, 5);
+00378             sizerAnalogRd->Add(gui->units, 1, wxLEFT | wxRIGHT | wxALIGN\_CENTER\_VERTICAL, 5);
+00379         \}
+00380     \}
+00381     sizerAnalogRd->Layout();
+00382 
+00383     \textcolor{keywordflow}{if}(boardID == GetDeviceName(LMS_DEV_LIMESDRMINI))
+00384     \{
+00385         pnluLimeSDR* pnl = \textcolor{keyword}{new} pnluLimeSDR(\textcolor{keyword}{this}, wxNewId());
+00386         pnl->Initialize(lmsControl);
+00387         additionalControls = pnl;
+00388         sizerAdditionalControls->Add(additionalControls);
+00389     \}
+00390     \textcolor{keywordflow}{else} \textcolor{keywordflow}{if}(boardID == GetDeviceName(LMS_DEV_LIMESDR)
+00391          || boardID == GetDeviceName(LMS_DEV_LIMESDR_PCIE))
+00392     \{
+00393         pnlLimeSDR* pnl = \textcolor{keyword}{new} pnlLimeSDR(\textcolor{keyword}{this}, wxNewId());
+00394         pnl->Initialize(lmsControl);
+00395         additionalControls = pnl;
+00396         sizerAdditionalControls->Add(additionalControls);
+00397     \}
+00398     \textcolor{keywordflow}{else} \textcolor{keywordflow}{if}(boardID == GetDeviceName(LMS_DEV_LMS7002M_ULTIMATE_EVB))
+00399     \{
+00400         pnlUltimateEVB* pnl = \textcolor{keyword}{new} pnlUltimateEVB(\textcolor{keyword}{this}, wxNewId());
+00401         pnl->Initialize(lmsControl);
+00402         additionalControls = pnl;
+00403         sizerAdditionalControls->Add(additionalControls);
+00404     \}
+00405     \textcolor{keywordflow}{else} \textcolor{keywordflow}{if}(boardID == GetDeviceName(LMS_DEV_RFSPARK)
+00406          || boardID == GetDeviceName(LMS_DEV_EVB7)
+00407          || boardID == GetDeviceName(LMS_DEV_EVB7V2))
+00408     \{
+00409         pnlBuffers* pnl = \textcolor{keyword}{new} pnlBuffers(\textcolor{keyword}{this}, wxNewId());
+00410         pnl->Initialize(lmsControl);
+00411         additionalControls = pnl;
+00412         sizerAdditionalControls->Add(additionalControls);
+00413     \}
+00414     \textcolor{keywordflow}{else} \textcolor{keywordflow}{if} (boardID == GetDeviceName(LMS_DEV_NOVENA))
+00415     \{
+00416         LMS7002M_Novena_wxgui* pnl = \textcolor{keyword}{new} LMS7002M_Novena_wxgui(\textcolor{keyword}{this}, wxNewId());
+00417         pnl->Initialize(lmsControl);
+00418         additionalControls = pnl;
+00419         sizerAdditionalControls->Add(additionalControls);
+00420     \}
+00421     \textcolor{keywordflow}{else} \textcolor{keywordflow}{if} (boardID == GetDeviceName(LMS_DEV_RFESPARK))
+00422     \{
+00423         RFSpark_wxgui* pnl = \textcolor{keyword}{new} RFSpark_wxgui(\textcolor{keyword}{this}, wxNewId());
+00424         pnl->Initialize(lmsControl);
+00425         additionalControls = pnl;
+00426         sizerAdditionalControls->Add(additionalControls);
+00427     \}
+00428     \textcolor{keywordflow}{else} \textcolor{keywordflow}{if} (boardID == GetDeviceName(LMS_DEV_LIMESDR_QPCIE))
+00429     \{
+00430         pnlQSpark* pnl = \textcolor{keyword}{new} pnlQSpark(\textcolor{keyword}{this}, wxNewId());
+00431         pnl->Initialize(lmsControl);
+00432         additionalControls = pnl;
+00433         sizerAdditionalControls->Add(additionalControls);
+00434     \}
+00435     Layout();
+00436     Fit();
+00437 \}
+00438 
+00439 \textcolor{keywordtype}{void} pnlBoardControls::OnSetDACvaluesENTER(wxCommandEvent &event)
+00440 \{
+00441     wxSpinEvent evt;
+00442     evt.SetEventObject(event.GetEventObject());
+00443     OnSetDACvalues(evt);
+00444 \}
+00445 
+00446 \textcolor{keywordtype}{void} pnlBoardControls::OnSetDACvalues(wxSpinEvent &event)
+00447 \{
+00448     \textcolor{keywordflow}{for} (\textcolor{keywordtype}{size\_t} i = 0; i < mGUI_widgets.size(); ++i)
+00449     \{
+00450         \textcolor{keywordflow}{if} (event.GetEventObject() == mGUI_widgets[i]->wValue)
+00451         \{
+00452             mParameters[i].value = mGUI_widgets[i]->wValue->GetValue();
+00453             \textcolor{comment}{//write to chip}
+00454             lms_name_t units;
+00455             strncpy(units,mParameters[i].units.c\_str(),\textcolor{keyword}{sizeof}(lms_name_t)-1);
+00456 
+00457             \textcolor{keywordflow}{if} (lmsControl == \textcolor{keyword}{nullptr})
+00458                 \textcolor{keywordflow}{return};
+00459 
+00460             \textcolor{keywordtype}{int} status = LMS_WriteCustomBoardParam(lmsControl,mParameters[i].channel,
+      mParameters[i].value,units);
+00461             \textcolor{keywordflow}{if} (status != 0)
+00462                 wxMessageBox(\_(\textcolor{stringliteral}{"Failed to set value"}), \_(\textcolor{stringliteral}{"Warning"}));
+00463             \textcolor{keywordflow}{return};
+00464         \}
+00465     \}
+00466 \}
+00467 
+00468 \textcolor{keywordtype}{void} pnlBoardControls::OnUserChangedBoardType(wxCommandEvent& event)
+00469 \{
+00470     SetupControls(GetDeviceName((eLMS_DEV)cmbBoardSelection->GetSelection()));
+00471 \}
+00472 
+00473 \textcolor{keywordtype}{void} pnlBoardControls::OnCustomRead(wxCommandEvent& event)
+00474 \{
+00475     uint8\_t \textcolor{keywordtype}{id} = spinCustomChannelRd->GetValue();
+00476     \textcolor{keywordtype}{double} value = 0;
+00477     lms_name_t units;
+00478 
+00479     \textcolor{keywordtype}{int} status = LMS_ReadCustomBoardParam(lmsControl,\textcolor{keywordtype}{id},&value,units);
+00480     \textcolor{keywordflow}{if} (status != 0)
+00481     \{
+00482         wxMessageBox(\_(\textcolor{stringliteral}{"Failed to read value"}), \_(\textcolor{stringliteral}{"Warning"}));
+00483         \textcolor{keywordflow}{return};
+00484     \}
+00485 
+00486     txtCustomUnitsRd->SetLabel(units);
+00487     txtCustomValueRd->SetLabel(wxString::Format(\_(\textcolor{stringliteral}{"%1.1f"}), value));
+00488 
+00489 \}
+00490 
+00491 \textcolor{keywordtype}{void} pnlBoardControls::OnCustomWrite(wxCommandEvent& event)
+00492 \{
+00493     uint8\_t \textcolor{keywordtype}{id} = spinCustomChannelWr->GetValue();
+00494     \textcolor{keywordtype}{int} powerOf10 = (cmbCustomPowerOf10Wr->GetSelection()-8)*3;
+00495     lms_name_t units;
+00496     strncpy(units,adcUnits2string(cmbCustomUnitsWr->GetSelection()),\textcolor{keyword}{sizeof}(units)-1);
+00497 
+00498     \textcolor{keywordtype}{double} value = spinCustomValueWr->GetValue()*pow(10, powerOf10);
+00499 
+00500 
+00501     \textcolor{keywordtype}{int} status = LMS_WriteCustomBoardParam(lmsControl,\textcolor{keywordtype}{id},value,units);
+00502     \textcolor{keywordflow}{if} (status != 0)
+00503     \{
+00504         wxMessageBox(\_(\textcolor{stringliteral}{"Failed to write value"}), \_(\textcolor{stringliteral}{"Warning"}));
+00505         \textcolor{keywordflow}{return};
+00506     \}
+00507 \}
+\end{DoxyCode}

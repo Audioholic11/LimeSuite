@@ -1,0 +1,249 @@
+\subsection{spi.\+cpp}
+\label{spi_8cpp_source}\index{/home/erik/prefix/default/src/limesuite-\/dev/mcu\+\_\+program/host\+\_\+src/spi.\+cpp@{/home/erik/prefix/default/src/limesuite-\/dev/mcu\+\_\+program/host\+\_\+src/spi.\+cpp}}
+
+\begin{DoxyCode}
+00001 \textcolor{preprocessor}{#include "spi.h"}
+00002 \textcolor{preprocessor}{#include "IConnection.h"}
+00003 \textcolor{preprocessor}{#include <ciso646>}
+00004 
+00005 \textcolor{keyword}{extern} lime::IConnection* serPort;
+00006 
+00007 \textcolor{keywordtype}{bool} batchActive = \textcolor{keyword}{false};
+00008 \textcolor{preprocessor}{#include <vector>}
+00009 \textcolor{preprocessor}{#include <string>}
+00010 \textcolor{preprocessor}{#include <fstream>}
+00011 \textcolor{keyword}{using namespace }std;
+00012 std::string bName;
+00013 std::vector<uint16\_t> bAddr;
+00014 std::vector<uint16\_t> bData;
+00015 std::vector<uint16\_t> bMask;
+00016 
+00017 uint32\_t readCnt = 0;
+00018 uint32\_t writeCnt = 0;
+00019 
+00020 \textcolor{comment}{//spiAddrReg might not have SPI write bit, add it here if necessary}
+00021 \textcolor{keywordtype}{void} SPI_write(\textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{short} spiAddrReg, \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{short} spiDataReg)
+00022 \{
+00023     ++writeCnt;
+00024     uint32\_t wrdata = spiAddrReg << 16 | spiDataReg;
+00025     serPort->TransactSPI(0x10, &wrdata, \textcolor{keyword}{nullptr}, 1);
+00026 \}
+00027 
+00028 \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{short} SPI_read (\textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{short} spiAddrReg)
+00029 \{
+00030     ++readCnt;
+00031     uint32\_t wrdata = spiAddrReg << 16;
+00032     uint32\_t rddata = 0;
+00033     serPort->TransactSPI(0x10, &wrdata, &rddata, 1);
+00034     \textcolor{keywordflow}{return} rddata & 0xFFFF;
+00035 \}
+00036 
+00037 \textcolor{keywordtype}{void} Modify_SPI_Reg_bits_WrOnly(\textcolor{keyword}{const} uint16\_t SPI\_reg\_addr, \textcolor{keyword}{const} uint8\_t bits, \textcolor{keyword}{const} uint16\_t 
+      new\_bits\_data, \textcolor{keyword}{const} uint16\_t spiDataReg)
+00038 \{
+00039     \textcolor{keyword}{const} uint16\_t spiMask = (~(~0 << ((bits>>4)-(bits&0xF)+1))) << (bits&0xF); \textcolor{comment}{// creates bit mask}
+00040     \textcolor{comment}{//spiDataReg = (spiDataReg & (~spiMask)) | ((new\_bits\_data << (bits&0xF)) & spiMask) ;//clear bits}
+00041 
+00042     \textcolor{keywordflow}{if}(batchActive)
+00043     \{
+00044     \textcolor{keywordtype}{bool} found = \textcolor{keyword}{false};
+00045     \textcolor{keywordflow}{for}(\textcolor{keywordtype}{size\_t} i=0; i<bAddr.size(); ++i)
+00046     \{
+00047         \textcolor{keywordflow}{if}(bAddr[i] == SPI\_reg\_addr)
+00048         \{
+00049             found = \textcolor{keyword}{true};
+00050             bData[i] &= ~spiMask;
+00051             bData[i] |= ((new\_bits\_data << (bits&0xF)) & spiMask);
+00052             bMask[i] |= spiMask;
+00053         \}
+00054     \}
+00055     \textcolor{keywordflow}{if}(!found)
+00056     \{
+00057         bAddr.push\_back(SPI\_reg\_addr);
+00058         bData.push\_back((new\_bits\_data << (bits&0xF)) & spiMask);
+00059         bMask.push\_back(spiMask);
+00060     \}
+00061     \}
+00062     SPI_write(SPI\_reg\_addr, (spiDataReg & (~spiMask)) | ((new\_bits\_data << (bits&0xF)) & spiMask)); \textcolor{comment}{//write
+       modified data back to SPI reg}
+00063 \}
+00064 
+00065 \textcolor{keywordtype}{void} Modify_SPI_Reg_bits(\textcolor{keyword}{const} uint16\_t SPI\_reg\_addr, \textcolor{keyword}{const} uint8\_t bits, \textcolor{keyword}{const} uint16\_t new\_bits\_data)
+00066 \{
+00067     uint16\_t spiDataReg = SPI_read(SPI\_reg\_addr); \textcolor{comment}{//read current SPI reg data}
+00068     \textcolor{keyword}{const} uint16\_t spiMask = (~(~0 << ((bits>>4)-(bits&0xF)+1))) << (bits&0xF); \textcolor{comment}{// creates bit mask}
+00069     spiDataReg = (spiDataReg & (~spiMask)) | ((new\_bits\_data << (bits&0xF)) & spiMask) ;\textcolor{comment}{//clear bits}
+00070 
+00071     \textcolor{keywordflow}{if}(batchActive)
+00072     \{
+00073     \textcolor{keywordtype}{bool} found = \textcolor{keyword}{false};
+00074     \textcolor{keywordflow}{for}(\textcolor{keywordtype}{size\_t} i=0; i<bAddr.size(); ++i)
+00075     \{
+00076         \textcolor{keywordflow}{if}(bAddr[i] == SPI\_reg\_addr)
+00077         \{
+00078             found = \textcolor{keyword}{true};
+00079             bData[i] &= ~spiMask;
+00080             bData[i] |= ((new\_bits\_data << (bits&0xF)) & spiMask);
+00081             bMask[i] |= spiMask;
+00082         \}
+00083     \}
+00084     \textcolor{keywordflow}{if}(!found)
+00085     \{
+00086         bAddr.push\_back(SPI\_reg\_addr);
+00087         bData.push\_back((new\_bits\_data << (bits&0xF)) & spiMask);
+00088         bMask.push\_back(spiMask);
+00089     \}
+00090     \}
+00091     SPI_write(SPI\_reg\_addr, spiDataReg); \textcolor{comment}{//write modified data back to SPI reg}
+00092 \}
+00093 
+00094 uint16\_t Get_SPI_Reg_bits(\textcolor{keyword}{const} uint16\_t SPI\_reg\_addr, \textcolor{keyword}{const} uint8\_t bits)
+00095 \{
+00096     \textcolor{keywordflow}{return} (SPI_read(SPI\_reg\_addr) & (~(~0<<((bits>>4)+1)))) >> (bits&0xF); \textcolor{comment}{//shift bits to LSB}
+00097 \}
+00098 
+00099 
+00100 \textcolor{keywordtype}{void} SPI_read_batch(\textcolor{keyword}{const} uint16\_t *addr, uint16\_t *values, uint8\_t cnt)
+00101 \{
+00102     readCnt += cnt;
+00103     std::vector<uint32\_t> wrdata(cnt);
+00104     std::vector<uint32\_t> rddata(cnt);
+00105     \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} i=0; i<cnt; ++i)
+00106         wrdata[i] = addr[i] << 16;
+00107     serPort->TransactSPI(0x10, wrdata.data(), rddata.data(), wrdata.size());
+00108     \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} i=0; i<cnt; ++i)
+00109         values[i] = rddata[i];
+00110 \}
+00111 \textcolor{keywordtype}{void} SPI_write_batch(\textcolor{keyword}{const} uint16\_t *addr, \textcolor{keyword}{const} uint16\_t *values, uint8\_t cnt)
+00112 \{
+00113     writeCnt += cnt;
+00114     std::vector<uint32\_t> data(cnt);
+00115     \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} i=0; i<cnt; ++i)
+00116     \{
+00117         data[i] = addr[i] << 16 | values[i];
+00118 
+00119         \textcolor{keywordflow}{if}(batchActive)
+00120         \{
+00121             \textcolor{keywordtype}{bool} found = \textcolor{keyword}{false};
+00122             \textcolor{keywordflow}{for}(\textcolor{keywordtype}{size\_t} i=0; i<bAddr.size(); ++i)
+00123             \{
+00124                 \textcolor{keywordflow}{if}(bAddr[i] == addr[i])
+00125                 \{
+00126                     found = \textcolor{keyword}{true};
+00127                     bData[i] = values[i];
+00128                     bMask[i] = 0xFFFF;
+00129                 \}
+00130             \}
+00131             \textcolor{keywordflow}{if}(!found)
+00132             \{
+00133                 bAddr.push\_back(addr[i]);
+00134                 bData.push\_back(values[i]);
+00135                 bMask.push\_back(0xFFFF);
+00136             \}
+00137         \}
+00138     \}
+00139     serPort->TransactSPI(0x10, data.data(), \textcolor{keyword}{nullptr}, data.size());
+00140 \}
+00141 
+00142 \textcolor{keywordtype}{int} BeginBatch(\textcolor{keyword}{const} \textcolor{keywordtype}{char}* name)
+00143 \{
+00144     \textcolor{keywordflow}{if}(batchActive)
+00145         \textcolor{keywordflow}{return} -1;
+00146     batchActive = \textcolor{keyword}{true};
+00147     bAddr.clear();
+00148     bData.clear();
+00149     bMask.clear();
+00150     bName = name;
+00151     \textcolor{keywordflow}{return} 0;
+00152 \}
+00153 
+00154 \textcolor{keywordtype}{void} EndBatch()
+00155 \{
+00156     \textcolor{comment}{//sort batch}
+00157     \textcolor{keywordflow}{for}(\textcolor{keywordtype}{size\_t} i=0; i<bAddr.size(); ++i)
+00158     \{
+00159         \textcolor{keywordflow}{for}(\textcolor{keywordtype}{size\_t} j=i; j<bAddr.size(); ++j)
+00160         \{
+00161             \textcolor{keywordflow}{if}(bAddr[i] > bAddr[j])
+00162             \{
+00163                 uint16\_t temp;
+00164                 temp = bAddr[j];
+00165                 bAddr[j] = bAddr[i];
+00166                 bAddr[i] = temp;
+00167 
+00168                 temp = bData[j];
+00169                 bData[j] = bData[i];
+00170                 bData[i] = temp;
+00171 
+00172                 temp = bMask[j];
+00173                 bMask[j] = bMask[i];
+00174                 bMask[i] = temp;
+00175             \}
+00176         \}
+00177     \}
+00178 
+00179     \textcolor{keywordtype}{char} temp[64];
+00180     std::fstream fout;
+00181     fout.open(\textcolor{stringliteral}{"Batches.txt"}, ios::out | ios::app);
+00182     fout << \textcolor{stringliteral}{"\(\backslash\)ncode const uint16\_t "} << bName << \textcolor{stringliteral}{"Addr[] = \{"};
+00183     \textcolor{keywordtype}{bool} skip = \textcolor{keyword}{false};
+00184     \textcolor{keywordtype}{int} i=0;
+00185     \textcolor{keywordflow}{for}(\textcolor{keyword}{auto} val : bAddr)
+00186     \{
+00187         \textcolor{keywordflow}{if}(bMask[i++] == 0xFFFF && ! skip)
+00188             \textcolor{keywordflow}{continue};
+00189         sprintf(temp, \textcolor{stringliteral}{"0x%04X,"}, val);
+00190         fout << temp;
+00191     \}
+00192     fout << \textcolor{stringliteral}{"\};"};
+00193     fout << \textcolor{stringliteral}{"\(\backslash\)ncode const uint16\_t "} << bName << \textcolor{stringliteral}{"Data[] = \{"};
+00194     i=0;
+00195     \textcolor{keywordflow}{for}(\textcolor{keyword}{auto} val : bData)
+00196     \{
+00197         \textcolor{keywordflow}{if}(bMask[i++] == 0xFFFF && !skip)
+00198             \textcolor{keywordflow}{continue};
+00199         sprintf(temp, \textcolor{stringliteral}{"0x%04X,"}, val);
+00200         fout << temp;
+00201     \}
+00202     fout << \textcolor{stringliteral}{"\};"};
+00203     fout << \textcolor{stringliteral}{"\(\backslash\)ncode const uint16\_t "} << bName << \textcolor{stringliteral}{"Mask[] = \{"};
+00204     i=0;
+00205     \textcolor{keywordflow}{for}(\textcolor{keyword}{auto} val : bMask)
+00206     \{
+00207         \textcolor{keywordflow}{if}(bMask[i++] == 0xFFFF && !skip)
+00208             \textcolor{keywordflow}{continue};
+00209         sprintf(temp, \textcolor{stringliteral}{"0x%04X,"}, val);
+00210         fout << temp;
+00211     \}
+00212     fout << \textcolor{stringliteral}{"\};"};
+00213 
+00214     fout << \textcolor{stringliteral}{"\(\backslash\)n\(\backslash\)ncode const uint16\_t "} << bName << \textcolor{stringliteral}{"AddrWrOnly[] = \{"};
+00215     i=0;
+00216     \textcolor{keywordflow}{for}(\textcolor{keyword}{auto} val : bAddr)
+00217     \{
+00218         \textcolor{keywordflow}{if}(bMask[i++] != 0xFFFF)
+00219             \textcolor{keywordflow}{continue};
+00220         sprintf(temp, \textcolor{stringliteral}{"0x%04X,"}, val);
+00221         fout << temp;
+00222     \}
+00223     fout << \textcolor{stringliteral}{"\};"};
+00224     fout << \textcolor{stringliteral}{"\(\backslash\)ncode const uint16\_t "} << bName << \textcolor{stringliteral}{"DataWrOnly[] = \{"};
+00225     i=0;
+00226     \textcolor{keywordflow}{for}(\textcolor{keyword}{auto} val : bData)
+00227     \{
+00228         \textcolor{keywordflow}{if}(bMask[i++] != 0xFFFF)
+00229             \textcolor{keywordflow}{continue};
+00230         sprintf(temp, \textcolor{stringliteral}{"0x%04X,"}, val);
+00231         fout << temp;
+00232     \}
+00233     fout << \textcolor{stringliteral}{"\};"};
+00234     fout.close();
+00235 \}
+00236 
+00244 \textcolor{keywordtype}{void} Modify_SPI_Reg_mask(\textcolor{keyword}{const} uint16\_t *addr, \textcolor{keyword}{const} uint16\_t *values, \textcolor{keyword}{const} uint16\_t *masks, uint8\_t cnt)
+00245 \{
+00246     uint8\_t i;
+00247     \textcolor{keywordflow}{for}(i=0; i<cnt; ++i)
+00248         SPI_write(addr[i], ( SPI_read(addr[i]) & ~masks[i] ) | (values[i] & masks[i]));
+00249 \}
+\end{DoxyCode}

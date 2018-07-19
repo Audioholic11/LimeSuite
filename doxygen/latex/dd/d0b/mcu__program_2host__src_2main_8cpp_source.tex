@@ -1,0 +1,424 @@
+\subsection{main.\+cpp}
+\label{mcu__program_2host__src_2main_8cpp_source}\index{/home/erik/prefix/default/src/limesuite-\/dev/mcu\+\_\+program/host\+\_\+src/main.\+cpp@{/home/erik/prefix/default/src/limesuite-\/dev/mcu\+\_\+program/host\+\_\+src/main.\+cpp}}
+
+\begin{DoxyCode}
+00001 \textcolor{preprocessor}{#include <stdio.h>}
+00002 \textcolor{preprocessor}{#include "lms7002m_calibrations.h"}
+00003 \textcolor{preprocessor}{#include "lms7002m_controls.h"}
+00004 \textcolor{preprocessor}{#include "lms7002m_filters.h"}
+00005 \textcolor{preprocessor}{#include "spi.h"}
+00006 \textcolor{preprocessor}{#include "mcu.h"}
+00007 \textcolor{preprocessor}{#include "mcuHexBin.h"}
+00008 \textcolor{preprocessor}{#include "MCU_BD.h"}
+00009 
+00010 \textcolor{preprocessor}{#include "LMSBoards.h"}
+00011 \textcolor{preprocessor}{#include "LMS7002M.h"}
+00012 \textcolor{preprocessor}{#include "IConnection.h"}
+00013 \textcolor{preprocessor}{#include "ConnectionRegistry.h"}
+00014 \textcolor{preprocessor}{#include <chrono>}
+00015 \textcolor{preprocessor}{#include <fstream>}
+00016 \textcolor{preprocessor}{#include <gnuPlotPipe.h>}
+00017 \textcolor{preprocessor}{#include <math.h>}
+00018 \textcolor{preprocessor}{#include "mcu_defines.h"}
+00019 \textcolor{keyword}{using namespace }std;
+00020 
+00021 lime::IConnection *serPort = \textcolor{keyword}{nullptr};
+00022 lime::LMS7002M lmsControl;
+00023 
+00024 \textcolor{comment}{//use the LMS7002M or calibrate directly from Host}
+00025 \textcolor{keyword}{static} \textcolor{keywordtype}{bool} useMCU =1;
+00026 \textcolor{keyword}{static} \textcolor{keywordtype}{bool} tx = 1;
+00027 \textcolor{keyword}{static} \textcolor{keywordtype}{bool} filters = 0;
+00028 \textcolor{keyword}{static} \textcolor{keywordtype}{float} FBW = 5e6;
+00029 \textcolor{keyword}{static} \textcolor{keywordtype}{bool} extLoop = \textcolor{keyword}{false};
+00030 \textcolor{keyword}{extern} \textcolor{keywordtype}{float} RefClk;
+00031 \textcolor{keyword}{extern} uint8\_t extLoopbackPair;
+00032 
+00033 uint8\_t GetExtLoopPair(lime::LMS7002M &ctr, \textcolor{keywordtype}{bool} calibratingTx)
+00034 \{
+00035     uint8\_t loopPair = 0;
+00036     lime::IConnection* port = ctr.GetConnection();
+00037     \textcolor{keywordflow}{if}(!port)
+00038         \textcolor{keywordflow}{return} 0;
+00039 
+00040     \textcolor{keyword}{auto} devName = port->GetDeviceInfo().deviceName;
+00041     uint8\_t activeLNA = ctr.Get_SPI_Reg_bits(LMS7_SEL_PATH_RFE);
+00042     uint8\_t activeBand = (ctr.Get_SPI_Reg_bits(LMS7_SEL_BAND2_TRF) << 1 | ctr.
+      Get_SPI_Reg_bits(LMS7_SEL_BAND1_TRF))-1;
+00043 
+00044     \textcolor{keywordflow}{if}(devName == lime::GetDeviceName(lime::LMS_DEV_LIMESDR))
+00045         loopPair = 1 << 2 | 0x1; \textcolor{comment}{// band2 -> LNAH}
+00046     \textcolor{keywordflow}{else} \textcolor{keywordflow}{if}(devName == lime::GetDeviceName(lime::LMS_DEV_LIMESDRMINI))
+00047         loopPair = activeBand << 2 | activeLNA;
+00048     \textcolor{keywordflow}{return} loopPair;
+00049 \}
+00050 
+00051 int16\_t ReadDCCorrector(\textcolor{keywordtype}{bool} tx, uint8\_t channel)
+00052 \{
+00053     uint16\_t addr = tx ? 0x05C3 : 0x05C7;
+00054     addr += channel;
+00055     uint16\_t mask = tx ? 0x03FF : 0x003F;
+00056     uint16\_t value = 0;
+00057 
+00058     SPI_write(addr, 0);
+00059     SPI_write(addr, 0x4000);
+00060     value = SPI_read(addr);
+00061     SPI_write(addr, value & ~0xC000);
+00062 
+00063     \textcolor{keywordflow}{if}(value & (mask+1))
+00064         \textcolor{keywordflow}{return} (value & mask) * -1;
+00065     \textcolor{keywordflow}{else}
+00066         \textcolor{keywordflow}{return} (value & mask);
+00067 \}
+00068 
+00069 \textcolor{keyword}{class }BoardLoopbackStore
+00070 \{
+00071 \textcolor{keyword}{public}:
+00072     BoardLoopbackStore(lime::IConnection* port) : port(port)
+00073     \{
+00074         \textcolor{keywordflow}{if}(port)
+00075             port->ReadRegister(LoopbackCtrAddr, mLoopbackState);
+00076     \}
+00077     ~BoardLoopbackStore()
+00078     \{
+00079         \textcolor{keywordflow}{if}(port)
+00080             port->WriteRegister(LoopbackCtrAddr, mLoopbackState);
+00081     \}
+00082 \textcolor{keyword}{private}:
+00083     lime::IConnection* port;
+00084     \textcolor{keyword}{static} \textcolor{keyword}{const} uint32\_t LoopbackCtrAddr = 0x0017;
+00085     \textcolor{keywordtype}{int} mLoopbackState;
+00086 \};
+00087 
+00088 \textcolor{keywordtype}{int} SetExtLoopback(lime::IConnection* port, uint8\_t ch, \textcolor{keywordtype}{bool} enable)
+00089 \{
+00090     \textcolor{comment}{//enable external loopback switches}
+00091     \textcolor{keyword}{const} uint32\_t LoopbackCtrAddr = 0x0017;
+00092     uint32\_t value = 0;
+00093     \textcolor{keywordtype}{int} status;
+00094     status = port->ReadRegister(LoopbackCtrAddr, value);
+00095     \textcolor{keywordflow}{if}(status != 0)
+00096         \textcolor{keywordflow}{return} -1;
+00097     \textcolor{keyword}{auto} devName = port->GetDeviceInfo().deviceName;
+00098 
+00099     \textcolor{keywordflow}{if}(devName == lime::GetDeviceName(lime::LMS_DEV_LIMESDR))
+00100     \{
+00101         \textcolor{keyword}{const} uint16\_t mask = 0x7;
+00102         \textcolor{keyword}{const} uint8\_t shiftCount = (ch==2 ? 4 : 0);
+00103         value &= ~(mask << shiftCount);
+00104         value |= enable << shiftCount;   \textcolor{comment}{//EN\_Loopback}
+00105         value |= enable << (shiftCount+1); \textcolor{comment}{//EN\_Attenuator}
+00106         value |= !enable << (shiftCount+2); \textcolor{comment}{//EN\_Shunt}
+00107     \}
+00108     \textcolor{keywordflow}{else} \textcolor{keywordflow}{if} (devName == lime::GetDeviceName(lime::LMS_DEV_LIMESDRMINI))
+00109     \{
+00110         \textcolor{comment}{//EN\_Shunt}
+00111         value &= ~(1 << 2);
+00112         value |= !enable << 2;
+00113 
+00114         \textcolor{keywordflow}{if}(tx)
+00115         \{
+00116             uint32\_t wr = 0x0103 << 16;
+00117             uint32\_t path;
+00118             port->ReadLMS7002MSPI(&wr, &path, 1);
+00119             path >>= 10;
+00120             path &= 0x3;
+00121             \textcolor{keywordflow}{if} (path==1)
+00122             \{
+00123                 value &= ~(1<<13);
+00124                 value |= 1<<12;
+00125 
+00126                 value &= ~(1<<8); \textcolor{comment}{//LNA\_H}
+00127                 value |= 1<<9;
+00128             \}
+00129             \textcolor{keywordflow}{else} \textcolor{keywordflow}{if} (path==2)
+00130             \{
+00131                 value &= ~(1<<12);
+00132                 value |= 1<<13;
+00133 
+00134                 value &= ~(1<<9); \textcolor{comment}{//LNA\_W}
+00135                 value |= 1<<8;
+00136             \}
+00137             \textcolor{comment}{//value |= enable << 1; //EN\_Attenuator}
+00138         \}
+00139         \textcolor{keywordflow}{else}
+00140         \{
+00141             uint32\_t wr = 0x010D << 16;
+00142             uint32\_t path;
+00143             port->ReadLMS7002MSPI(&wr, &path, 1);
+00144             path &= ~0x0180;
+00145             path >>= 7;
+00146             \textcolor{keywordflow}{if} (path==1)
+00147             \{
+00148                 value &= ~(1<<8);
+00149                 value |= 1<<9;
+00150             \}
+00151             \textcolor{keywordflow}{else} \textcolor{keywordflow}{if} (path==3)
+00152             \{
+00153                 value &= ~(1<<9);
+00154                 value |= 1<<8;
+00155             \}
+00156         \}
+00157     \}
+00158     status = port->WriteRegister(LoopbackCtrAddr, value);
+00159     \textcolor{keywordflow}{if}(status != 0)
+00160         \textcolor{keywordflow}{return} -1;
+00161     \textcolor{keywordflow}{return} status;
+00162 \}
+00163 
+00164 uint8\_t UploadMCUParameters(\textcolor{keywordtype}{float} ref, \textcolor{keywordtype}{float} bandwidth)
+00165 \{
+00166     uint8\_t status;
+00167     \textcolor{keywordflow}{if}((status = MCU_SetParameter(MCU_REF_CLK, ref)) != MCU_NO_ERROR)
+00168         printf(\textcolor{stringliteral}{"Failed to set Reference Clk\(\backslash\)n"});
+00169     \textcolor{keywordflow}{if}((status = MCU_SetParameter(MCU_BW, bandwidth)) != MCU_NO_ERROR)
+00170         printf(\textcolor{stringliteral}{"Failed to set Bandwidth\(\backslash\)n"});
+00171     \textcolor{keywordflow}{return} status;
+00172 \}
+00173 
+00174 \textcolor{keywordtype}{void} DCIQ()
+00175 \{
+00176     BoardLoopbackStore loopbackCache(lmsControl.GetConnection());
+00177 
+00178     \textcolor{keywordtype}{int} status;
+00179     \textcolor{keywordtype}{float} freqStart = 2000e6;
+00180     \textcolor{keywordtype}{float} freqEnd = freqStart;\textcolor{comment}{//1000e6;}
+00181     \textcolor{keywordtype}{float} freqStep = 10e6;
+00182 
+00183     \textcolor{keywordtype}{float} freq = freqStart;
+00184 
+00185     vector<float> vfreqs;
+00186     vector<int> vdci, vdcq, vgi, vgq, vph;
+00187 
+00188     \textcolor{keywordtype}{bool} isSetBW = \textcolor{keyword}{false};
+00189 
+00190     SetExtLoopback(lmsControl.GetConnection(), 0, extLoop);
+00191     \textcolor{keywordflow}{while}(freq <= freqEnd)
+00192     \{
+00193 
+00194         vfreqs.push\_back(freq);
+00195         \textcolor{comment}{//status = SetFrequencySX(true, freq + (tx ? 0 : 1e6));}
+00196         \textcolor{comment}{//status = SetFrequencySX(false, freq + (tx ? -1e6 : 0));}
+00197 
+00198         \textcolor{keyword}{auto} t1 = chrono::high\_resolution\_clock::now();
+00199         \textcolor{keywordflow}{if}(useMCU) \textcolor{comment}{//using algorithm inside MCU}
+00200         \{
+00201             \textcolor{keywordflow}{if}(!isSetBW)
+00202             \{
+00203                 \textcolor{keywordflow}{if}(UploadMCUParameters(RefClk, FBW) != MCU_NO_ERROR)
+00204                     \textcolor{keywordflow}{return};
+00205                 isSetBW = \textcolor{keyword}{true};
+00206 
+00207                 \textcolor{keywordflow}{if}(extLoop)
+00208                 \{
+00209                     uint8\_t loopPair = GetExtLoopPair(lmsControl, tx);
+00210                     status = MCU_SetParameter(MCU_EXT_LOOPBACK_PAIR, loopPair);
+00211                     \textcolor{keywordflow}{if}(status != 0)
+00212                         printf(\textcolor{stringliteral}{"Failed to set external loopback pair\(\backslash\)n"});
+00213                 \}
+00214             \}
+00215 
+00216             \textcolor{keywordflow}{if}(tx)
+00217                 MCU_RunProcedure(extLoop ? 17 : 1); \textcolor{comment}{//initiate Tx calibration}
+00218             \textcolor{keywordflow}{else}
+00219                 MCU_RunProcedure(extLoop ? 18 : 2); \textcolor{comment}{//initiate Rx calibration}
+00220             status = MCU_WaitForStatus(10000); \textcolor{comment}{//wait until MCU finishes}
+00221         \}
+00222         \textcolor{keywordflow}{else} \textcolor{comment}{//calibrating with PC}
+00223         \{
+00224             \textcolor{keywordflow}{if}(extLoop)
+00225                 extLoopbackPair = GetExtLoopPair(lmsControl, tx);
+00226 
+00227             \textcolor{keywordflow}{if}(tx)
+00228                 status = CalibrateTx(extLoop);
+00229             \textcolor{keywordflow}{else}
+00230                 status = CalibrateRx(extLoop, \textcolor{keyword}{false});
+00231         \}
+00232         \textcolor{keyword}{auto} t2 = chrono::high\_resolution\_clock::now();
+00233         \textcolor{keywordtype}{long} duration = chrono::duration\_cast<chrono::milliseconds>(t2 - t1).
+      count();
+00234 
+00235         \textcolor{keywordflow}{if}(status != MCU_NO_ERROR)
+00236             printf(\textcolor{stringliteral}{"MCU calibration FAILED : 0x%02X\(\backslash\)n"}, status);
+00237 
+00238         int16\_t dci, dcq, ph, gi, gq;
+00239         dci = ReadDCCorrector(tx, 0);
+00240         dcq = ReadDCCorrector(tx, 1);
+00241         gi = lmsControl.Get_SPI_Reg_bits(tx ? LMS7param(GCORRI_TXTSP) : 
+      LMS7param(GCORRI_RXTSP), \textcolor{keyword}{true});
+00242         gq = lmsControl.Get_SPI_Reg_bits(tx ? LMS7param(GCORRQ_TXTSP) : 
+      LMS7param(GCORRQ_RXTSP), \textcolor{keyword}{true});
+00243         ph = lmsControl.Get_SPI_Reg_bits(tx ? LMS7param(IQCORR_TXTSP) : 
+      LMS7param(IQCORR_RXTSP), \textcolor{keyword}{true});
+00244 
+00245         ph <<= 4;
+00246         ph >>= 4;
+00247         vdci.push\_back(dci);
+00248         vdcq.push\_back(dcq);
+00249         vgi.push\_back(gi);
+00250         vgq.push\_back(gq);
+00251         vph.push\_back(ph);
+00252 
+00253         printf(\textcolor{stringliteral}{"F: %4.0f MHz, DCI:%3i DCQ:%3i GI:%4i GQ:%4i PH:%4i - %s | %li ms\(\backslash\)n"},
+00254             freq/1e6, dci, dcq, gi, gq, ph,
+00255             (status == MCU_NO_ERROR ? \textcolor{stringliteral}{"OK"} : \textcolor{stringliteral}{"FAIL"}),
+00256             duration);
+00257         freq += freqStep;
+00258     \}
+00259     SetExtLoopback(lmsControl.GetConnection(), 0, \textcolor{keyword}{false});
+00260     \textcolor{keywordflow}{if}(tx)
+00261     \{
+00262         lmsControl.Modify_SPI_Reg_bits(LMS7param(TSGMODE_TXTSP), 0);
+00263         lmsControl.Modify_SPI_Reg_bits(LMS7param(TSGMODE_TXTSP), 1);
+00264         lmsControl.LoadDC_REG_IQ(\textcolor{keyword}{true}, 0x7FFF, 0x7FFF);
+00265     \}
+00266 \}
+00267 
+00268 \textcolor{keywordtype}{void} Filters()
+00269 \{
+00270     \textcolor{keywordtype}{int} status;
+00271     \textcolor{keyword}{auto} t1 = chrono::high\_resolution\_clock::now();
+00272     \textcolor{keywordflow}{if}(useMCU) \textcolor{comment}{//using algorithm inside MCU}
+00273     \{
+00274         \textcolor{keywordflow}{if}(UploadMCUParameters(RefClk, FBW) != MCU_NO_ERROR)
+00275             \textcolor{keywordflow}{return};
+00276         MCU_RunProcedure(tx ? 6 : 5); \textcolor{comment}{//initiate calibration}
+00277         status = MCU_WaitForStatus(1000); \textcolor{comment}{//wait until MCU finishes}
+00278     \}
+00279     \textcolor{keywordflow}{else} \textcolor{comment}{//calibrating with PC}
+00280         status = tx ? TuneTxFilter(FBW) : TuneRxFilter(FBW);
+00281 
+00282     \textcolor{keyword}{auto} t2 = chrono::high\_resolution\_clock::now();
+00283     \textcolor{keywordtype}{long} duration = chrono::duration\_cast<chrono::milliseconds>(t2 - t1).count();
+00284 
+00285     \textcolor{keywordflow}{if}(tx)
+00286     \{
+00287         int16\_t rcal\_lpflad = lmsControl.Get_SPI_Reg_bits(LMS7param(
+      RCAL_LPFLAD_TBB));
+00288         int16\_t ccal\_lpflad = lmsControl.Get_SPI_Reg_bits(LMS7param(
+      CCAL_LPFLAD_TBB));
+00289         int16\_t lpfh = lmsControl.Get_SPI_Reg_bits(LMS7param(RCAL_LPFH_TBB));
+00290         printf(\textcolor{stringliteral}{"Tx filter BW: %.0f MHz, RCAL\_LPFLAD: %i, CCAL\_LPFLAD: %i, RCAL\_LPFH: %i | %li ms (%s)\(\backslash\)n"},
+00291                 FBW/1e6, rcal\_lpflad, ccal\_lpflad, lpfh, duration,
+00292                 status == MCU_NO_ERROR ? \textcolor{stringliteral}{"OK"} : \textcolor{stringliteral}{"FAIL"});
+00293     \}
+00294     \textcolor{keywordflow}{else}
+00295     \{
+00296         \textcolor{keywordtype}{int} cfb\_tia\_rfe = lmsControl.Get_SPI_Reg_bits(LMS7param(CFB_TIA_RFE), \textcolor{keyword}{true});
+00297         \textcolor{keywordtype}{int} ccomp\_tia\_rfe = lmsControl.Get_SPI_Reg_bits(LMS7param(CCOMP_TIA_RFE), \textcolor{keyword}{true});
+00298         \textcolor{keywordtype}{int} rcomp\_tia\_rfe = lmsControl.Get_SPI_Reg_bits(LMS7param(RCOMP_TIA_RFE), \textcolor{keyword}{true});
+00299         \textcolor{keywordtype}{int} rcc\_ctl\_lpfl\_rbb = lmsControl.Get_SPI_Reg_bits(LMS7param(
+      RCC_CTL_LPFL_RBB), \textcolor{keyword}{true});
+00300         \textcolor{keywordtype}{int} c\_ctl\_lpfl\_rbb = lmsControl.Get_SPI_Reg_bits(LMS7param(
+      C_CTL_LPFL_RBB), \textcolor{keyword}{true});
+00301         \textcolor{keywordtype}{int} rcc\_ctl\_lpfh\_rbb = lmsControl.Get_SPI_Reg_bits(LMS7param(
+      RCC_CTL_LPFH_RBB), \textcolor{keyword}{true});
+00302         printf(\textcolor{stringliteral}{"Rx filter BW: %0.f MHz, CFB\_TIA: %i, CCOMP: %i, RCOMP: %i, "}
+00303             \textcolor{stringliteral}{"RCTL\_LPFL: %i, RCTL\_LPFH: %i, C\_CTL\_LPFL: %i | %li ms (%s)\(\backslash\)n"},
+00304             FBW/1e6, cfb\_tia\_rfe, ccomp\_tia\_rfe, rcomp\_tia\_rfe, rcc\_ctl\_lpfl\_rbb,
+00305             rcc\_ctl\_lpfh\_rbb, c\_ctl\_lpfl\_rbb, duration,
+00306             status == MCU_NO_ERROR ? \textcolor{stringliteral}{"OK"} : \textcolor{stringliteral}{"FAIL"});
+00307     \}
+00308 
+00309     \textcolor{keywordflow}{if}(tx)
+00310     \{
+00311         lmsControl.Modify_SPI_Reg_bits(LMS7param(TSGMODE_TXTSP), 0);
+00312         lmsControl.Modify_SPI_Reg_bits(LMS7param(TSGMODE_TXTSP), 1);
+00313         lmsControl.LoadDC_REG_IQ(\textcolor{keyword}{true}, 0x7FFF, 0x7FFF);
+00314     \}
+00315 \}
+00316 
+00317 \textcolor{keywordtype}{int} main(\textcolor{keywordtype}{int} argc, \textcolor{keywordtype}{char}** argv)
+00318 \{
+00319     \textcolor{comment}{//connect to first available device}
+00320     \textcolor{keyword}{auto} cachedHandles = lime::ConnectionRegistry::findConnections();
+00321     \textcolor{keywordflow}{if}(cachedHandles.size() > 0)
+00322         serPort = lime::ConnectionRegistry::makeConnection(cachedHandles.at(0));
+00323     \textcolor{keywordflow}{if}(serPort == \textcolor{keyword}{nullptr})
+00324         \textcolor{keywordflow}{return} 0;
+00325     \textcolor{keywordflow}{if} (serPort != \textcolor{keyword}{nullptr} && !serPort->IsOpen())
+00326     \{
+00327         \textcolor{keyword}{delete} serPort;
+00328         printf(\textcolor{stringliteral}{"failed to open LMS7 control device"});
+00329     \}
+00330     \textcolor{keywordflow}{else}
+00331     \{
+00332         \textcolor{keyword}{auto} info = serPort->GetDeviceInfo();
+00333         printf(\textcolor{stringliteral}{"Running tests with %s FW:%s HW:%s\(\backslash\)n"}, info.deviceName.c\_str(), 
+      info.firmwareVersion.c\_str(), info.hardwareVersion.c\_str());
+00334     \}
+00335 
+00336     lmsControl.SetConnection(serPort);
+00337     \textcolor{comment}{//change SPI switch to BB, just in case it was left for MCU}
+00338     lmsControl.SPI_write(0x0006, 0);
+00339 
+00340     RefClk = lmsControl.GetReferenceClk_SX(\textcolor{keyword}{false});
+00341 
+00342     \textcolor{comment}{//load initial chip config for testing}
+00343     \textcolor{keywordtype}{string} filename;
+00344     \textcolor{comment}{/*if(tx)}
+00345 \textcolor{comment}{        filename = "TxTest.ini";}
+00346 \textcolor{comment}{    else}
+00347 \textcolor{comment}{        filename = "RxTest.ini";*/}
+00348     filename = \textcolor{stringliteral}{"TxDCTest.ini"};
+00349     \textcolor{comment}{//filename = "AGC\_RSSI\_test.ini";}
+00350     \textcolor{keywordflow}{if}(lmsControl.LoadConfig(filename.c\_str()) != 0)
+00351     \{
+00352         printf(\textcolor{stringliteral}{"Failed to load .ini file\(\backslash\)n"});
+00353         lime::ConnectionRegistry::freeConnection(serPort);
+00354         \textcolor{keywordflow}{return} -1;
+00355     \}
+00356     lmsControl.UploadAll();
+00357     \textcolor{comment}{//calibrating A channel}
+00358     \textcolor{comment}{//lmsControl.SetActiveChannel(lime::LMS7002M::Channel::ChB);}
+00359 
+00360     \textcolor{keywordflow}{if}(tx)
+00361     \{
+00362         lmsControl.Modify_SPI_Reg_bits(LMS7param(TSGMODE_TXTSP), 0);
+00363         lmsControl.Modify_SPI_Reg_bits(LMS7param(TSGMODE_TXTSP), 1);
+00364     \}
+00365 
+00366     \textcolor{comment}{//lmsControl.Modify\_SPI\_Reg\_bits(LMS7param(MAC), 2);}
+00367     \textcolor{keywordtype}{float} crestFactor = 1;
+00368     uint32\_t wantedRSSI = 87330 / pow(10.0, (3+crestFactor)/20);
+00369     \textcolor{comment}{//RunAGC(wantedRSSI);}
+00370 
+00371     \textcolor{keywordtype}{int} status = 0;
+00372     \textcolor{keywordflow}{if}(useMCU)
+00373     \{
+00374         uint8\_t mcuImage[8192*2];
+00375         uint16\_t imgSize = 0;
+00376         status = MCU_HEX2BIN(\textcolor{stringliteral}{"calibrationsLMS7\_MCU.hex"}, \textcolor{keyword}{sizeof}(mcuImage), mcuImage, &imgSize);
+00377         \textcolor{keywordflow}{if}(status != 0)
+00378             \textcolor{keywordflow}{return} status;
+00379 
+00380         fstream fout;
+00381         fout.open(\textcolor{stringliteral}{"mcu\_bin.txt"}, ios::out);
+00382         fout << \textcolor{stringliteral}{"static const uint8\_t mcuImage[] = \{"};
+00383         \textcolor{keywordflow}{for}(\textcolor{keywordtype}{size\_t} i = 0; i < \textcolor{keyword}{sizeof}(mcuImage); ++i)
+00384         \{
+00385             \textcolor{keywordflow}{if}(i % 16 == 0)
+00386                 fout << endl;
+00387             \textcolor{keywordtype}{char} ctemp[40];
+00388             sprintf(ctemp, \textcolor{stringliteral}{"0x%02X,"}, mcuImage[i]);
+00389             fout << ctemp;
+00390         \}
+00391         fout << \textcolor{stringliteral}{"\}\(\backslash\)n"};
+00392         fout.close();
+00393 
+00394         status = MCU_UploadProgram(mcuImage, \textcolor{keyword}{sizeof}(mcuImage));
+00395         \textcolor{keywordflow}{if}(status != 0)
+00396         \{
+00397             printf(\textcolor{stringliteral}{"MCU programming failed\(\backslash\)n"});
+00398             \textcolor{keywordflow}{return} -1;
+00399         \}
+00400     \}
+00401 
+00402     \textcolor{keywordflow}{if}(filters)
+00403         Filters();
+00404     \textcolor{keywordflow}{else}
+00405         DCIQ();
+00406     lime::ConnectionRegistry::freeConnection(serPort);
+00407     \textcolor{keywordflow}{return} 0;
+00408 \}
+\end{DoxyCode}

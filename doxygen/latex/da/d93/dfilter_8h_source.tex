@@ -1,0 +1,29 @@
+\subsection{dfilter.\+h}
+\label{dfilter_8h_source}\index{/home/erik/prefix/default/src/limesuite-\/dev/src/\+G\+F\+I\+R/dfilter.\+h@{/home/erik/prefix/default/src/limesuite-\/dev/src/\+G\+F\+I\+R/dfilter.\+h}}
+
+\begin{DoxyCode}
+00001 \textcolor{comment}{/* ************************************************************************ }
+00002 \textcolor{comment}{   FILE:    dfilter.h}
+00003 \textcolor{comment}{   COMMENT: Define some structures used in DSP calculations.}
+00004 \textcolor{comment}{   CONTENT:}
+00005 \textcolor{comment}{   AUTHOR:  Lime Microsystems}
+00006 \textcolor{comment}{   DATE:    Feb 8, 2000}
+00007 \textcolor{comment}{   REVISION:}
+00008 \textcolor{comment}{   ************************************************************************ */}
+00009 \textcolor{preprocessor}{#define POINTS  256 }\textcolor{comment}{/* Maximum number of points to calculate */}\textcolor{preprocessor}{}
+00010 \textcolor{comment}{//#define POINTS  40000 /* Maximum number of points to calculate */}
+00011 
+00012 \textcolor{comment}{/* Digital filter transfer function parameters */}
+00013 \textcolor{keyword}{struct }dfilter \{
+00014     \textcolor{keywordtype}{int} m;      \textcolor{comment}{/* Polinomial order of the denominator */}
+00015     \textcolor{keywordtype}{int} n;      \textcolor{comment}{/* Polinomial order of the nominator */}
+00016     \textcolor{keywordtype}{double} *a;  \textcolor{comment}{/* Array of denominator coefficients */}
+00017     \textcolor{keywordtype}{double} *b;  \textcolor{comment}{/* Array of nominator coefficients */}
+00018     \textcolor{keywordtype}{double} *w;  \textcolor{comment}{/* Points on a frequency grid */}
+00019     \textcolor{keywordtype}{int} nw;     \textcolor{comment}{/* Number of points in *w */}
+00020     \textcolor{keywordtype}{double} amplitude[POINTS];   \textcolor{comment}{/* To store calculated data */}
+00021     \textcolor{keywordtype}{double} phase[POINTS];
+00022     \textcolor{keywordtype}{double} logamp[POINTS];      \textcolor{comment}{/* Amplitude in log scale */}
+00023     \textcolor{keywordtype}{double} max;         \textcolor{comment}{/* Maximum of amplitude */}
+00024 \};
+\end{DoxyCode}

@@ -1,0 +1,203 @@
+\subsection{System\+Resources.\+in.\+cpp}
+\label{SystemResources_8in_8cpp_source}\index{/home/erik/prefix/default/src/limesuite-\/dev/src/\+System\+Resources.\+in.\+cpp@{/home/erik/prefix/default/src/limesuite-\/dev/src/\+System\+Resources.\+in.\+cpp}}
+
+\begin{DoxyCode}
+00001 
+00007 \textcolor{preprocessor}{#include "SystemResources.h"}
+00008 \textcolor{preprocessor}{#include "Logger.h"}
+00009 
+00010 \textcolor{preprocessor}{#include <cstdlib>} \textcolor{comment}{//getenv, system}
+00011 \textcolor{preprocessor}{#include <vector>}
+00012 \textcolor{preprocessor}{#include <sstream>}
+00013 \textcolor{preprocessor}{#include <iostream>}
+00014 
+00015 \textcolor{preprocessor}{#ifdef \_MSC\_VER}
+00016 \textcolor{preprocessor}{#include <windows.h>}
+00017 \textcolor{preprocessor}{#include <shlobj.h>}
+00018 \textcolor{preprocessor}{#include <io.h>}
+00019 
+00020 \textcolor{comment}{//access mode constants}
+00021 \textcolor{preprocessor}{#define F\_OK 0}
+00022 \textcolor{preprocessor}{#define R\_OK 2}
+00023 \textcolor{preprocessor}{#define W\_OK 4}
+00024 \textcolor{preprocessor}{#endif}
+00025 
+00026 \textcolor{preprocessor}{#ifdef \_\_unix\_\_}
+00027 \textcolor{preprocessor}{#include <pwd.h>}
+00028 \textcolor{preprocessor}{#include <unistd.h>}
+00029 \textcolor{preprocessor}{#endif}
+00030 
+00031 \textcolor{preprocessor}{#include <sys/types.h>}
+00032 \textcolor{preprocessor}{#include <sys/stat.h>} \textcolor{comment}{//stat}
+00033 
+00034 std::string lime::getLimeSuiteRoot(\textcolor{keywordtype}{void})
+00035 \{
+00036     \textcolor{comment}{//first check the environment variable}
+00037     \textcolor{keyword}{const} \textcolor{keywordtype}{char} *limeSuiteRoot = std::getenv(\textcolor{stringliteral}{"LIME\_SUITE\_ROOT"});
+00038     \textcolor{keywordflow}{if} (limeSuiteRoot != \textcolor{keyword}{nullptr}) \textcolor{keywordflow}{return} limeSuiteRoot;
+00039 
+00040     \textcolor{comment}{// Get the path to the current dynamic linked library.}
+00041     \textcolor{comment}{// The path to this library can be used to determine}
+00042     \textcolor{comment}{// the installation root without prior knowledge.}
+00043 \textcolor{preprocessor}{    #if defined(\_MSC\_VER) && defined(LIME\_DLL)}
+00044     \textcolor{keywordtype}{char} path[MAX\_PATH];
+00045     HMODULE hm = NULL;
+00046     \textcolor{keywordflow}{if} (GetModuleHandleExA(
+00047         GET\_MODULE\_HANDLE\_EX\_FLAG\_FROM\_ADDRESS |
+00048         GET\_MODULE\_HANDLE\_EX\_FLAG\_UNCHANGED\_REFCOUNT,
+00049         (LPCSTR) &lime::getLimeSuiteRoot, &hm))
+00050     \{
+00051         \textcolor{keyword}{const} DWORD size = GetModuleFileNameA(hm, path, \textcolor{keyword}{sizeof}(path));
+00052         \textcolor{keywordflow}{if} (size != 0)
+00053         \{
+00054             \textcolor{keyword}{const} std::string libPath(path, size);
+00055             \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} slash0Pos = libPath.find\_last\_of(\textcolor{stringliteral}{"/\(\backslash\)\(\backslash\)"});
+00056             \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} slash1Pos = libPath.substr(0, slash0Pos).find\_last\_of(\textcolor{stringliteral}{"/\(\backslash\)\(\backslash\)"});
+00057             \textcolor{keywordflow}{if} (slash0Pos != std::string::npos && slash1Pos != std::string::npos)
+00058                 \textcolor{keywordflow}{return} libPath.substr(0, slash1Pos);
+00059         \}
+00060     \}
+00061 \textcolor{preprocessor}{    #endif //\_MSC\_VER && LIME\_DLL}
+00062 
+00063     \textcolor{keywordflow}{return} \textcolor{stringliteral}{"@LIME\_SUITE\_ROOT@"};
+00064 \}
+00065 
+00066 std::string lime::getHomeDirectory(\textcolor{keywordtype}{void})
+00067 \{
+00068     \textcolor{comment}{//first check the HOME environment variable}
+00069     \textcolor{keyword}{const} \textcolor{keywordtype}{char} *userHome = std::getenv(\textcolor{stringliteral}{"HOME"});
+00070     \textcolor{keywordflow}{if} (userHome != \textcolor{keyword}{nullptr}) \textcolor{keywordflow}{return} userHome;
+00071 
+00072     \textcolor{comment}{//use unix user id lookup to get the home directory}
+00073 \textcolor{preprocessor}{    #ifdef \_\_unix\_\_}
+00074     \textcolor{keyword}{const} \textcolor{keywordtype}{char} *pwDir = getpwuid(getuid())->pw\_dir;
+00075     \textcolor{keywordflow}{if} (pwDir != \textcolor{keyword}{nullptr}) \textcolor{keywordflow}{return} pwDir;
+00076 \textcolor{preprocessor}{    #endif}
+00077 
+00078     \textcolor{keywordflow}{return} \textcolor{stringliteral}{""};
+00079 \}
+00080 
+00084 \textcolor{keyword}{static} std::string getBareAppDataDirectory(\textcolor{keywordtype}{void})
+00085 \{
+00086     \textcolor{comment}{//always check APPDATA (usually windows, but can be set for linux)}
+00087     \textcolor{keyword}{const} \textcolor{keywordtype}{char} *appDataDir = std::getenv(\textcolor{stringliteral}{"APPDATA"});
+00088     \textcolor{keywordflow}{if} (appDataDir != \textcolor{keyword}{nullptr}) \textcolor{keywordflow}{return} appDataDir;
+00089 
+00090     \textcolor{comment}{//use windows API to query for roaming app data directory}
+00091 \textcolor{preprocessor}{    #ifdef \_MSC\_VER}
+00092     \textcolor{keywordtype}{char} csidlAppDataDir[MAX\_PATH];
+00093     \textcolor{keywordflow}{if} (SUCCEEDED(SHGetFolderPathA(NULL, CSIDL\_APPDATA, NULL, 0, csidlAppDataDir)))
+00094     \{
+00095         \textcolor{keywordflow}{return} csidlAppDataDir;
+00096     \}
+00097 \textcolor{preprocessor}{    #endif}
+00098 
+00099     \textcolor{comment}{//xdg freedesktop standard location environment variable}
+00100 \textcolor{preprocessor}{    #ifdef \_\_unix\_\_}
+00101     \textcolor{keyword}{const} \textcolor{keywordtype}{char} *xdgDataHome = std::getenv(\textcolor{stringliteral}{"XDG\_DATA\_HOME"});
+00102     \textcolor{keywordflow}{if} (xdgDataHome != \textcolor{keyword}{nullptr}) \textcolor{keywordflow}{return} xdgDataHome;
+00103 \textcolor{preprocessor}{    #endif}
+00104 
+00105     \textcolor{comment}{//xdg freedesktop standard location for data in home directory}
+00106     \textcolor{keywordflow}{return} lime::getHomeDirectory() + \textcolor{stringliteral}{"/.local/share"};
+00107 \}
+00108 
+00109 std::string lime::getAppDataDirectory(\textcolor{keywordtype}{void})
+00110 \{
+00111     \textcolor{keywordflow}{return} getBareAppDataDirectory() + \textcolor{stringliteral}{"/LimeSuite"};
+00112 \}
+00113 
+00114 std::string lime::getConfigDirectory(\textcolor{keywordtype}{void})
+00115 \{
+00116     \textcolor{comment}{//xdg standard is XDG\_CONFIG\_HOME or $HOME/.config}
+00117     \textcolor{comment}{//but historically we have used $HOME/.limesuite}
+00118     \textcolor{keywordflow}{return} lime::getHomeDirectory() + \textcolor{stringliteral}{"/.limesuite"};
+00119 \}
+00120 
+00121 std::vector<std::string> lime::listImageSearchPaths(\textcolor{keywordtype}{void})
+00122 \{
+00123     std::vector<std::string> imageSearchPaths;
+00124 
+00125     \textcolor{comment}{//separator for search paths in the environment variable}
+00126 \textcolor{preprocessor}{    #ifdef \_MSC\_VER}
+00127     \textcolor{keyword}{static} \textcolor{keyword}{const} \textcolor{keywordtype}{char} sep = \textcolor{charliteral}{';'};
+00128 \textcolor{preprocessor}{    #else}
+00129     \textcolor{keyword}{static} \textcolor{keyword}{const} \textcolor{keywordtype}{char} sep = \textcolor{charliteral}{':'};
+00130 \textcolor{preprocessor}{    #endif}
+00131 
+00132     \textcolor{comment}{//check the environment's search path}
+00133     \textcolor{keyword}{const} \textcolor{keywordtype}{char} *imagePathEnv = std::getenv(\textcolor{stringliteral}{"LIME\_IMAGE\_PATH"});
+00134     \textcolor{keywordflow}{if} (imagePathEnv != \textcolor{keyword}{nullptr})
+00135     \{
+00136         std::stringstream imagePaths(imagePathEnv);
+00137         std::string imagePath;
+00138         \textcolor{keywordflow}{while} (std::getline(imagePaths, imagePath, sep))
+00139         \{
+00140             \textcolor{keywordflow}{if} (imagePath.empty()) \textcolor{keywordflow}{continue};
+00141             imageSearchPaths.push\_back(imagePath);
+00142         \}
+00143     \}
+00144 
+00145     \textcolor{comment}{//search directories in the user's home directory}
+00146     imageSearchPaths.push\_back(lime::getAppDataDirectory() + \textcolor{stringliteral}{"/images"});
+00147 
+00148     \textcolor{comment}{//search global installation directories}
+00149     imageSearchPaths.push\_back(lime::getLimeSuiteRoot() + \textcolor{stringliteral}{"/share/LimeSuite/images"});
+00150 
+00151     \textcolor{keywordflow}{return} imageSearchPaths;
+00152 \}
+00153 
+00154 std::string lime::locateImageResource(\textcolor{keyword}{const} std::string &name)
+00155 \{
+00156     \textcolor{keywordflow}{for} (\textcolor{keyword}{const} \textcolor{keyword}{auto} &searchPath : lime::listImageSearchPaths())
+00157     \{
+00158         \textcolor{keyword}{const} std::string fullPath(searchPath + \textcolor{stringliteral}{"/@VERSION\_MAJOR@.@VERSION\_MINOR@/"} + name);
+00159         \textcolor{keywordflow}{if} (access(fullPath.c\_str(), R\_OK) == 0) \textcolor{keywordflow}{return} fullPath;
+00160     \}
+00161     \textcolor{keywordflow}{return} \textcolor{stringliteral}{""};
+00162 \}
+00163 
+00164 \textcolor{keywordtype}{int} lime::downloadImageResource(\textcolor{keyword}{const} std::string &name)
+00165 \{
+00166     \textcolor{keyword}{const} std::string destDir(lime::getAppDataDirectory() + \textcolor{stringliteral}{"/images/@VERSION\_MAJOR@.@VERSION\_MINOR@"});
+00167     \textcolor{keyword}{const} std::string destFile(destDir + \textcolor{stringliteral}{"/"} + name);
+00168     \textcolor{keyword}{const} std::string sourceUrl(\textcolor{stringliteral}{"
+      http://downloads.myriadrf.org/project/limesuite/@VERSION\_MAJOR@.@VERSION\_MINOR@/"} + name);
+00169 
+00170     \textcolor{comment}{//check if the directory already exists}
+00171     \textcolor{keyword}{struct }stat s;
+00172     \textcolor{keywordflow}{if} (stat(destDir.c\_str(), &s) == 0)
+00173     \{
+00174         \textcolor{keywordflow}{if} ((s.st\_mode & S\_IFDIR) == 0)
+00175         \{
+00176             \textcolor{keywordflow}{return} lime::ReportError(\textcolor{stringliteral}{"Not a directory: %s"}, destDir.c\_str());
+00177         \}
+00178     \}
+00179 
+00180     \textcolor{comment}{//create images directory}
+00181     \textcolor{keywordflow}{else}
+00182     \{
+00183 \textcolor{preprocessor}{        #ifdef \_\_unix\_\_}
+00184         \textcolor{keyword}{const} std::string mkdirCmd(\textcolor{stringliteral}{"mkdir -p \(\backslash\)""}+destDir+\textcolor{stringliteral}{"\(\backslash\)""});
+00185 \textcolor{preprocessor}{        #else}
+00186         \textcolor{keyword}{const} std::string mkdirCmd(\textcolor{stringliteral}{"md.exe \(\backslash\)""}+destDir+\textcolor{stringliteral}{"\(\backslash\)""});
+00187 \textcolor{preprocessor}{        #endif}
+00188         std::system(mkdirCmd.c\_str());
+00189     \}
+00190 
+00191     \textcolor{comment}{//check for write access}
+00192     \textcolor{keywordflow}{if} (access(destDir.c\_str(), W\_OK) != 0) lime::ReportError(\textcolor{stringliteral}{"Cannot write: %s"}, destDir.c\_str());
+00193 
+00194     \textcolor{comment}{//download the file}
+00195 \textcolor{preprocessor}{    #ifdef \_\_unix\_\_}
+00196     \textcolor{keyword}{const} std::string dnloadCmd(\textcolor{stringliteral}{"wget --output-document=\(\backslash\)""}+destFile+\textcolor{stringliteral}{"\(\backslash\)" \(\backslash\)""}+sourceUrl+\textcolor{stringliteral}{"\(\backslash\)""});
+00197 \textcolor{preprocessor}{    #else}
+00198     \textcolor{keyword}{const} std::string dnloadCmd(\textcolor{stringliteral}{"powershell.exe -Command \(\backslash\)"(new-object System.Net.WebClient).DownloadFile('
+      "}+sourceUrl+\textcolor{stringliteral}{"', '"}+destFile+\textcolor{stringliteral}{"')\(\backslash\)""});
+00199 \textcolor{preprocessor}{    #endif}
+00200     \textcolor{keywordtype}{int} result = std::system(dnloadCmd.c\_str());
+00201     \textcolor{keywordflow}{if} (result != 0) \textcolor{keywordflow}{return} lime::ReportError(result, \textcolor{stringliteral}{"Failed: %s"}, dnloadCmd.c\_str());
+00202 
+00203     \textcolor{keywordflow}{return} 0;
+00204 \}
+\end{DoxyCode}

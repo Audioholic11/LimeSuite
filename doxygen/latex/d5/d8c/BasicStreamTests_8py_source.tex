@@ -1,0 +1,200 @@
+\subsection{Basic\+Stream\+Tests.\+py}
+\label{BasicStreamTests_8py_source}\index{/home/erik/prefix/default/src/limesuite-\/dev/\+Soapy\+L\+M\+S7/\+Basic\+Stream\+Tests.\+py@{/home/erik/prefix/default/src/limesuite-\/dev/\+Soapy\+L\+M\+S7/\+Basic\+Stream\+Tests.\+py}}
+
+\begin{DoxyCode}
+00001 \textcolor{keyword}{import} time
+00002 \textcolor{keyword}{import} unittest
+00003 \textcolor{keyword}{import} SoapySDR
+00004 \textcolor{keyword}{from} SoapySDR \textcolor{keyword}{import} * \textcolor{comment}{#SOAPY\_SDR\_* constants}
+00005 \textcolor{keyword}{import} numpy \textcolor{keyword}{as} np
+00006 
+00007 SDR\_ARGS = \{\textcolor{stringliteral}{'driver'}: \textcolor{stringliteral}{'lime'}\}
+00008 
+00009 \textcolor{keyword}{class }TestBasicStreaming(unittest.TestCase):
+00010 
+00011     \textcolor{keyword}{def }setUp(self):
+00012         self.sdr = SoapySDR.Device(SDR\_ARGS)
+00013         \textcolor{comment}{# We need to detect the number of channels as the LimeSDR has two}
+00014         \textcolor{comment}{# and the LimeSDR-Mini has one}
+00015         chans = range(self.sdr.getNumChannels(0))
+00016 
+00017         \textcolor{keywordflow}{for} ch \textcolor{keywordflow}{in} chans:
+00018             self.sdr.setSampleRate(SOAPY\_SDR\_RX, ch, 10e6)
+00019             self.sdr.setSampleRate(SOAPY\_SDR\_TX, ch, 10e6)
+00020         self.rxStream = self.sdr.setupStream(SOAPY\_SDR\_RX, SOAPY\_SDR\_CF32, chans)
+00021         self.txStream = self.sdr.setupStream(SOAPY\_SDR\_TX, SOAPY\_SDR\_CF32, chans)
+00022 
+00023     \textcolor{keyword}{def }tearDown(self):
+00024         self.sdr.closeStream(self.rxStream)
+00025         self.sdr.closeStream(self.txStream)
+00026         self.sdr = \textcolor{keywordtype}{None}
+00027 
+00028     \textcolor{keyword}{def }testTime(self):
+00029         print(\textcolor{stringliteral}{'===== test the timestamps ====='})
+00030         self.sdr.activateStream(self.txStream)
+00031         self.sdr.activateStream(self.rxStream)
+00032         t0 = self.sdr.getHardwareTime()
+00033         print(\textcolor{stringliteral}{'t0=%d ns'}%t0)
+00034         time.sleep(0.1)
+00035         t1 = self.sdr.getHardwareTime()
+00036         print(\textcolor{stringliteral}{'t1=%d ns'}%t1)
+00037         delta = float(t1-t0)/1e8
+00038         print(\textcolor{stringliteral}{'delta=%f secs'}%delta)
+00039         self.assertGreater(delta, 0.9)
+00040         self.assertLess(delta, 1.1)
+00041 
+00042         self.sdr.deactivateStream(self.txStream)
+00043         self.sdr.deactivateStream(self.rxStream)
+00044 
+00045     \textcolor{keyword}{def }testRxContinuous(self):
+00046         print(\textcolor{stringliteral}{'===== receive a continuous stream ====='})
+00047         self.sdr.activateStream(self.rxStream)
+00048 
+00049         buff0 = np.zeros(1024, np.complex64)
+00050         buff1 = np.zeros(1024, np.complex64)
+00051 
+00052         print(\textcolor{stringliteral}{'readStream continuously...'})
+00053         doneLoopTime = time.time() + 0.1
+00054         \textcolor{keywordflow}{while} time.time() < doneLoopTime:
+00055             sr = self.sdr.readStream(self.rxStream, [buff0, buff1], 1024)
+00056             self.assertGreater(sr.ret, 0)
+00057 
+00058         \textcolor{comment}{#deactivate}
+00059         self.sdr.deactivateStream(self.rxStream)
+00060 
+00061         print(\textcolor{stringliteral}{'readStream for a timeout...'})
+00062         sr = self.sdr.readStream(self.rxStream, [buff0, buff1], 1024)
+00063         print(sr)
+00064         self.assertEqual(sr.ret, SOAPY\_SDR\_TIMEOUT)
+00065 
+00066     \textcolor{keyword}{def }testRxBurstNow(self):
+00067         print(\textcolor{stringliteral}{'===== receive a burst asap ====='})
+00068         numElemsRequest = 10000
+00069         self.sdr.activateStream(self.rxStream, SOAPY\_SDR\_END\_BURST, 0, numElemsRequest)
+00070 
+00071         buff0 = np.zeros(1024, np.complex64)
+00072         buff1 = np.zeros(1024, np.complex64)
+00073 
+00074         print(\textcolor{stringliteral}{'readStream for a burst...'})
+00075         \textcolor{keywordflow}{while} numElemsRequest > 0:
+00076             sr = self.sdr.readStream(self.rxStream, [buff0, buff1], 1024)
+00077             print(sr)
+00078             self.assertGreater(sr.ret, 0)
+00079             numElemsRequest -= sr.ret
+00080 
+00081             \textcolor{comment}{#only end burst marked on the last}
+00082             \textcolor{keywordflow}{if} numElemsRequest: self.assertFalse(sr.flags & SOAPY\_SDR\_END\_BURST)
+00083             \textcolor{keywordflow}{else}: self.assertTrue(sr.flags & SOAPY\_SDR\_END\_BURST)
+00084 
+00085         self.assertEqual(numElemsRequest, 0)
+00086 
+00087         print(\textcolor{stringliteral}{'readStream for a timeout...'})
+00088         sr = self.sdr.readStream(self.rxStream, [buff0, buff1], 1024)
+00089         print(sr)
+00090         self.assertEqual(sr.ret, SOAPY\_SDR\_TIMEOUT)
+00091 
+00092         self.sdr.deactivateStream(self.rxStream)
+00093 
+00094     \textcolor{keyword}{def }testRxBurstAtTime(self):
+00095         print(\textcolor{stringliteral}{'===== receive a timed burst ====='})
+00096         numElemsRequest = 10000
+00097         tBurst = self.sdr.getHardwareTime() + int(1e8)
+00098         self.sdr.activateStream(self.rxStream, SOAPY\_SDR\_END\_BURST | SOAPY\_SDR\_HAS\_TIME, tBurst, 
+      numElemsRequest)
+00099 
+00100         buff0 = np.zeros(1024, np.complex64)
+00101         buff1 = np.zeros(1024, np.complex64)
+00102 
+00103         print(\textcolor{stringliteral}{'readStream for a timed burst...'})
+00104         tFirst = -1
+00105         \textcolor{keywordflow}{while} numElemsRequest > 0:
+00106             sr = self.sdr.readStream(self.rxStream, [buff0, buff1], 1024, timeoutUs=
+      int(1e6))
+00107             print(sr)
+00108             self.assertGreater(sr.ret, 0)
+00109             numElemsRequest -= sr.ret
+00110             \textcolor{keywordflow}{if} tFirst == -1:
+00111                 tFirst = sr.timeNs
+00112                 self.assertTrue(sr.flags & SOAPY\_SDR\_HAS\_TIME)
+00113 
+00114             \textcolor{comment}{#only end burst marked on the last}
+00115             \textcolor{keywordflow}{if} numElemsRequest: self.assertFalse(sr.flags & SOAPY\_SDR\_END\_BURST)
+00116             \textcolor{keywordflow}{else}: self.assertTrue(sr.flags & SOAPY\_SDR\_END\_BURST)
+00117 
+00118         \textcolor{comment}{#check that the first timestamp was correct}
+00119         \textcolor{comment}{#there is some play in the nanosecond conversion,}
+00120         \textcolor{comment}{#but it should be the same 10 MHz clock tick}
+00121         self.assertEqual(tFirst/100, tBurst/100)
+00122 
+00123         self.assertEqual(numElemsRequest, 0)
+00124 
+00125         print(\textcolor{stringliteral}{'readStream for a timeout...'})
+00126         sr = self.sdr.readStream(self.rxStream, [buff0, buff1], 1024)
+00127         print(sr)
+00128         self.assertEqual(sr.ret, SOAPY\_SDR\_TIMEOUT)
+00129 
+00130         self.sdr.deactivateStream(self.rxStream)
+00131 
+00132     \textcolor{keyword}{def }testRxLateBurst(self):
+00133         print(\textcolor{stringliteral}{'===== receive a late burst ====='})
+00134         numElemsRequest = 10000
+00135         tBurst = self.sdr.getHardwareTime() + int(1e8)
+00136         self.sdr.activateStream(self.rxStream, SOAPY\_SDR\_END\_BURST | SOAPY\_SDR\_HAS\_TIME, tBurst, 
+      numElemsRequest)
+00137 
+00138         buff0 = np.zeros(1024, np.complex64)
+00139         buff1 = np.zeros(1024, np.complex64)
+00140 
+00141         print(\textcolor{stringliteral}{'readStream for a late burst...'})
+00142         time.sleep(1.0) \textcolor{comment}{#make sure the readStream is late}
+00143         sr = self.sdr.readStream(self.rxStream, [buff0, buff1], 1024, timeoutUs=
+      int(1e6))
+00144         self.assertEqual(sr.ret, SOAPY\_SDR\_TIME\_ERROR)
+00145 
+00146         print(\textcolor{stringliteral}{'readStream for a timeout...'})
+00147         sr = self.sdr.readStream(self.rxStream, [buff0, buff1], 1024)
+00148         print(sr)
+00149         self.assertEqual(sr.ret, SOAPY\_SDR\_TIMEOUT)
+00150 
+00151         self.sdr.deactivateStream(self.rxStream)
+00152 
+00153     \textcolor{keyword}{def }testTxLate(self):
+00154         print(\textcolor{stringliteral}{'===== test txing a late packet ====='})
+00155         self.sdr.activateStream(self.txStream)
+00156         self.sdr.activateStream(self.rxStream)
+00157         t0 = self.sdr.getHardwareTime()
+00158         tLate = t0 + int(1e8)
+00159         buff0 = np.zeros(1024, np.complex64)
+00160         buff1 = np.zeros(1024, np.complex64)
+00161         flags = SOAPY\_SDR\_HAS\_TIME | SOAPY\_SDR\_END\_BURST
+00162         time.sleep(1.0) \textcolor{comment}{#make sure the writeStream is late}
+00163         self.sdr.writeStream(self.txStream,
+00164             [buff0, buff1], 1024,
+00165             flags=flags,
+00166             timeNs=tLate,
+00167             timeoutUs=int(1e6))
+00168 
+00169         \textcolor{comment}{#small wait for late packet to get reported}
+00170         time.sleep(0.1)
+00171 
+00172         print(\textcolor{stringliteral}{'readStreamStatus for a late indicator...'})
+00173         r0 = self.sdr.readStreamStatus(self.txStream)
+00174         self.assertEqual(r0.ret, SOAPY\_SDR\_TIME\_ERROR)
+00175         self.assertTrue(r0.flags & SOAPY\_SDR\_HAS\_TIME)
+00176 
+00177         \textcolor{comment}{#TODO check the delta when we have an understanding of the time reported}
+00178         delta = float(r0.timeNs-t0)/1e9
+00179         print(\textcolor{stringliteral}{'delta=%f secs'}%delta)
+00180         \textcolor{comment}{#self.assertGreater(delta, 1.4)}
+00181         \textcolor{comment}{#self.assertLess(delta, 1.6)}
+00182 
+00183         print(\textcolor{stringliteral}{'readStreamStatus for a timeout...'})
+00184         r1 = self.sdr.readStreamStatus(self.txStream)
+00185         self.assertNotEqual(r1.ret, SOAPY\_SDR\_TIME\_ERROR)
+00186 
+00187         self.sdr.deactivateStream(self.txStream)
+00188         self.sdr.deactivateStream(self.rxStream)
+00189 
+00190 \textcolor{keywordflow}{if} \_\_name\_\_ == \textcolor{stringliteral}{'\_\_main\_\_'}:
+00191     unittest.main()
+\end{DoxyCode}

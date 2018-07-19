@@ -1,0 +1,64 @@
+\subsection{gnu\+Plot\+Pipe.\+h}
+\label{gnuPlotPipe_8h_source}\index{/home/erik/prefix/default/src/limesuite-\/dev/src/gnu\+Plot\+Pipe.\+h@{/home/erik/prefix/default/src/limesuite-\/dev/src/gnu\+Plot\+Pipe.\+h}}
+
+\begin{DoxyCode}
+00001 \textcolor{preprocessor}{#ifndef GNUPLOT\_PIPE\_H}
+00002 \textcolor{preprocessor}{#define GNUPLOT\_PIPE\_H}
+00003 
+00004 \textcolor{preprocessor}{#include <stdio.h>}
+00005 \textcolor{preprocessor}{#include <cstdio>}
+00006 \textcolor{preprocessor}{#include <stdarg.h>}
+00007 
+00008 \textcolor{keyword}{class }GNUPlotPipe
+00009 \{
+00010 \textcolor{keyword}{public}:
+00011     GNUPlotPipe(\textcolor{keywordtype}{bool} persistent = \textcolor{keyword}{true})
+00012     \{
+00013 \textcolor{preprocessor}{#ifdef \_\_unix\_\_}
+00014         \textcolor{keywordflow}{if}(persistent)
+00015             pipeHandle = popen(\textcolor{stringliteral}{"gnuplot -persistent"}, \textcolor{stringliteral}{"w"});
+00016         \textcolor{keywordflow}{else}
+00017             pipeHandle = popen(\textcolor{stringliteral}{"gnuplot"}, \textcolor{stringliteral}{"w"});
+00018 \textcolor{preprocessor}{#else}
+00019         \textcolor{keywordflow}{if}(persistent)
+00020             pipeHandle = \_popen(\textcolor{stringliteral}{"gnuplot -persistent"}, \textcolor{stringliteral}{"w"});
+00021         \textcolor{keywordflow}{else}
+00022             pipeHandle = \_popen(\textcolor{stringliteral}{"gnuplot"}, \textcolor{stringliteral}{"w"});
+00023 \textcolor{preprocessor}{#endif       }
+00024     \}
+00025     ~GNUPlotPipe()
+00026     \{
+00027         write(\textcolor{stringliteral}{"exit\(\backslash\)n"});
+00028 \textcolor{preprocessor}{#ifdef \_\_unix\_\_}
+00029         pclose(pipeHandle);
+00030 \textcolor{preprocessor}{#else}
+00031         \_pclose(pipeHandle);
+00032 \textcolor{preprocessor}{#endif}
+00033     \}
+00034 
+00035     \textcolor{keywordtype}{void} write(\textcolor{keyword}{const} \textcolor{keywordtype}{char}* str)
+00036     \{
+00037         fprintf(pipeHandle, \textcolor{stringliteral}{"%s"}, str);
+00038         fflush(pipeHandle);
+00039     \}
+00040 
+00041     \textcolor{keywordtype}{void} writef(\textcolor{keyword}{const} \textcolor{keywordtype}{char}* format, ...)
+00042     \{
+00043         \textcolor{keyword}{static} \textcolor{keywordtype}{char} temp[512];
+00044         va\_list argList;
+00045         va\_start(argList, format);
+00046         vsnprintf(temp, 512, format, argList);
+00047         write(temp);
+00048         va\_end(argList);
+00049     \}
+00050 
+00051     \textcolor{keywordtype}{void} flush()
+00052     \{
+00053         fflush(pipeHandle);
+00054     \}
+00055 \textcolor{keyword}{protected}:
+00056     FILE *pipeHandle;
+00057 \};
+00058 
+00059 \textcolor{preprocessor}{#endif}
+\end{DoxyCode}

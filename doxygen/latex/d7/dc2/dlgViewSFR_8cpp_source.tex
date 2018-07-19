@@ -1,0 +1,134 @@
+\subsection{dlg\+View\+S\+F\+R.\+cpp}
+\label{dlgViewSFR_8cpp_source}\index{/home/erik/prefix/default/src/limesuite-\/dev/src/lms7002\+\_\+wxgui/dlg\+View\+S\+F\+R.\+cpp@{/home/erik/prefix/default/src/limesuite-\/dev/src/lms7002\+\_\+wxgui/dlg\+View\+S\+F\+R.\+cpp}}
+
+\begin{DoxyCode}
+00001 
+00007 \textcolor{preprocessor}{#include "dlgViewSFR.h"}
+00008 
+00009 \textcolor{preprocessor}{#include <wx/sizer.h>}
+00010 \textcolor{preprocessor}{#include <wx/grid.h>}
+00011 \textcolor{preprocessor}{#include <wx/intl.h>}
+00012 \textcolor{preprocessor}{#include <wx/string.h>}
+00013 
+00014 \textcolor{keyword}{const} \textcolor{keywordtype}{long} dlgViewSFR::ID_GRID1 = wxNewId();
+00015 
+00016 BEGIN\_EVENT\_TABLE(dlgViewSFR,wxDialog)
+00017 END\_EVENT\_TABLE()
+00018 
+00019 dlgViewSFR::dlgViewSFR(wxWindow* parent,wxWindowID \textcolor{keywordtype}{id},const wxPoint& pos,const wxSize& 
+      size)
+00020 \{
+00021     wxBoxSizer* BoxSizer1;
+00022     Create(parent, wxID\_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxDEFAULT\_DIALOG\_STYLE, \_T(\textcolor{stringliteral}{"
+      wxID\_ANY"}));
+00023     BoxSizer1 = \textcolor{keyword}{new} wxBoxSizer(wxHORIZONTAL);
+00024     Grid1 = \textcolor{keyword}{new} wxGrid(\textcolor{keyword}{this}, ID\_GRID1, wxDefaultPosition, wxDefaultSize, 0, \_T(\textcolor{stringliteral}{"ID\_GRID1"}));
+00025     Grid1->CreateGrid(16,8);
+00026     Grid1->EnableEditing(\textcolor{keyword}{false});
+00027     Grid1->EnableGridLines(\textcolor{keyword}{true});
+00028     Grid1->SetDefaultCellFont( Grid1->GetFont() );
+00029     Grid1->SetDefaultCellTextColour( Grid1->GetForegroundColour() );
+00030     BoxSizer1->Add(Grid1, 1, wxALL|wxALIGN\_CENTER\_HORIZONTAL|wxALIGN\_CENTER\_VERTICAL, 5);
+00031     SetSizer(BoxSizer1);
+00032     BoxSizer1->Fit(\textcolor{keyword}{this});
+00033     BoxSizer1->SetSizeHints(\textcolor{keyword}{this});
+00034 \}
+00035 
+00036 dlgViewSFR::~dlgViewSFR()
+00037 \{   
+00038 \}
+00039 
+00040 \textcolor{keywordtype}{void} dlgViewSFR::StrArrayIni() 
+00041 \{
+00042     \textcolor{keywordtype}{int} i=0;
+00043     \textcolor{keywordflow}{for} (i=0; i<256; i++) strArray.Add(\textcolor{stringliteral}{""});
+00044 
+00045     strArray[0x80]=\textcolor{stringliteral}{"P0: "};
+00046     strArray[0x81]=\textcolor{stringliteral}{"SP: "};
+00047     strArray[0x82]=\textcolor{stringliteral}{"DPL0: "};
+00048     strArray[0x83]=\textcolor{stringliteral}{"DPH0: "};
+00049     strArray[0x84]=\textcolor{stringliteral}{"DPL1: "};
+00050     strArray[0x85]=\textcolor{stringliteral}{"DPH1: "};
+00051     strArray[0x86]=\textcolor{stringliteral}{"DPS: "};
+00052     strArray[0x87]=\textcolor{stringliteral}{"PCON: "};
+00053 
+00054     strArray[0x88]=\textcolor{stringliteral}{"TCON: "};
+00055     strArray[0x89]=\textcolor{stringliteral}{"TMOD: "};
+00056     strArray[0x8A]=\textcolor{stringliteral}{"TL0: "};
+00057     strArray[0x8B]=\textcolor{stringliteral}{"TL1: "};
+00058     strArray[0x8C]=\textcolor{stringliteral}{"TH0: "};
+00059     strArray[0x8D]=\textcolor{stringliteral}{"TH1: "};
+00060     strArray[0x8E]=\textcolor{stringliteral}{"PMSR: "};
+00061 
+00062     strArray[0x90]=\textcolor{stringliteral}{"P1: "};
+00063     strArray[0x91]=\textcolor{stringliteral}{"DIR1: "};
+00064 
+00065     strArray[0x98]=\textcolor{stringliteral}{"SCON: "};
+00066     strArray[0x99]=\textcolor{stringliteral}{"SBUF: "};
+00067 
+00068 
+00069     strArray[0xA0]=\textcolor{stringliteral}{"P2: "};
+00070     strArray[0xA1]=\textcolor{stringliteral}{"DIR2: "};
+00071     strArray[0xA2]=\textcolor{stringliteral}{"DIR0: "};
+00072 
+00073     strArray[0xA8]=\textcolor{stringliteral}{"IEN0: "};
+00074     strArray[0xA9]=\textcolor{stringliteral}{"IEN1: "};
+00075 
+00076     strArray[0xB0]=\textcolor{stringliteral}{"EECTRL: "};
+00077     strArray[0xB1]=\textcolor{stringliteral}{"EEDATA: "};
+00078 
+00079     strArray[0xB8]=\textcolor{stringliteral}{"IP0: "};
+00080     strArray[0xB9]=\textcolor{stringliteral}{"IP1: "};
+00081 
+00082     strArray[0xBF]=\textcolor{stringliteral}{"USR2: "};
+00083 
+00084     strArray[0xC0]=\textcolor{stringliteral}{"IRCON: "};
+00085 
+00086     strArray[0xC8]=\textcolor{stringliteral}{"T2CON: "};
+00087 
+00088     strArray[0xCA]=\textcolor{stringliteral}{"RCAP2L: "};
+00089     strArray[0xCB]=\textcolor{stringliteral}{"RCAP2H: "};
+00090     strArray[0xCC]=\textcolor{stringliteral}{"TL2: "};
+00091     strArray[0xCD]=\textcolor{stringliteral}{"TH2: "};
+00092 
+00093     strArray[0xD0]=\textcolor{stringliteral}{"PSW: "};
+00094 
+00095     strArray[0xE0]=\textcolor{stringliteral}{"ACC: "};
+00096 
+00097     strArray[0xF0]=\textcolor{stringliteral}{"B: "};
+00098 
+00099     strArray[0xEC]=\textcolor{stringliteral}{"REG0: "};
+00100     strArray[0xED]=\textcolor{stringliteral}{"REG1: "};
+00101     strArray[0xEE]=\textcolor{stringliteral}{"REG2: "};
+00102     strArray[0xEF]=\textcolor{stringliteral}{"REG3: "};
+00103     strArray[0xF4]=\textcolor{stringliteral}{"REG4: "};
+00104     strArray[0xF5]=\textcolor{stringliteral}{"REG5: "};
+00105     strArray[0xF6]=\textcolor{stringliteral}{"REG6: "};
+00106     strArray[0xF7]=\textcolor{stringliteral}{"REG7: "};
+00107 
+00108     strArray[0xFC]=\textcolor{stringliteral}{"REG8: "};
+00109     strArray[0xFD]=\textcolor{stringliteral}{"REG9: "};
+00110 \}
+00111 
+00112 \textcolor{keywordtype}{void} dlgViewSFR::InitGridData(\textcolor{keyword}{const} \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{char} *data)
+00113 \{
+00114     StrArrayIni();
+00115     \textcolor{keywordflow}{for} (\textcolor{keywordtype}{int} i=0; i<16; i++)
+00116         Grid1->SetRowLabelValue(i, wxString::Format(\_(\textcolor{stringliteral}{"Row: 0x%02X"}), 0xF8 - i * 8));
+00117 
+00118     \textcolor{keywordflow}{for} (\textcolor{keywordtype}{int} j=0; j<8; j++)
+00119         Grid1->SetColLabelValue(j, wxString::Format(\_(\textcolor{stringliteral}{"Col.: 0x%02X"}), j));
+00120 
+00121     \textcolor{keywordflow}{for} (\textcolor{keywordtype}{int} i=0x0080; i<=0x00FF; i++) 
+00122     \{
+00123         \textcolor{keywordtype}{int} row=((i-0x080)/8);
+00124         \textcolor{keywordtype}{int} col=((i-0x080)-row*8);
+00125         row=15-row;
+00126         \textcolor{keywordflow}{if} (!(strArray[i]==\textcolor{stringliteral}{""}))
+00127             Grid1->SetCellValue(row, col, strArray[i] + wxString::Format(\_(\textcolor{stringliteral}{"0x%02X"}), data[
+      i]));
+00128         \textcolor{keywordflow}{else}
+00129             Grid1->SetCellValue(row,col,\_(\textcolor{stringliteral}{""}));
+00130     \}
+00131 \}
+\end{DoxyCode}

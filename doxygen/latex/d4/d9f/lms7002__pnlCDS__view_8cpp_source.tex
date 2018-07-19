@@ -1,0 +1,73 @@
+\subsection{lms7002\+\_\+pnl\+C\+D\+S\+\_\+view.\+cpp}
+\label{lms7002__pnlCDS__view_8cpp_source}\index{/home/erik/prefix/default/src/limesuite-\/dev/src/lms7002\+\_\+wxgui/lms7002\+\_\+pnl\+C\+D\+S\+\_\+view.\+cpp@{/home/erik/prefix/default/src/limesuite-\/dev/src/lms7002\+\_\+wxgui/lms7002\+\_\+pnl\+C\+D\+S\+\_\+view.\+cpp}}
+
+\begin{DoxyCode}
+00001 \textcolor{preprocessor}{#include "lms7002_pnlCDS_view.h"}
+00002 \textcolor{preprocessor}{#include <map>}
+00003 \textcolor{preprocessor}{#include "lms7002_gui_utilities.h"}
+00004 
+00005 \textcolor{keyword}{using namespace }lime;
+00006 
+00007 lms7002_pnlCDS_view::lms7002_pnlCDS_view( wxWindow* parent )
+00008 :
+00009 pnlCDS_view( parent )
+00010 \{
+00011 
+00012 \}
+00013 
+00014 lms7002_pnlCDS_view::lms7002_pnlCDS_view( wxWindow* parent, wxWindowID \textcolor{keywordtype}{id}, \textcolor{keyword}{const} wxPoint& pos, \textcolor{keyword}{const} wxSize
+      & size, \textcolor{keywordtype}{long} style )
+00015     : pnlCDS_view(parent, id, pos, size, style), lmsControl(nullptr)
+00016 \{
+00017     wndId2Enum[chkCDSN_MCLK1] = LMS7param(CDSN_MCLK1);
+00018     wndId2Enum[chkCDSN_MCLK2] = LMS7param(CDSN_MCLK2);
+00019     wndId2Enum[chkCDSN_RXALML] = LMS7param(CDSN_RXALML);
+00020     wndId2Enum[chkCDSN_RXATSP] = LMS7param(CDSN_RXATSP);
+00021     wndId2Enum[chkCDSN_RXBLML] = LMS7param(CDSN_RXBLML);
+00022     wndId2Enum[chkCDSN_RXBTSP] = LMS7param(CDSN_RXBTSP);
+00023     wndId2Enum[chkCDSN_TXALML] = LMS7param(CDSN_TXALML);
+00024     wndId2Enum[chkCDSN_TXATSP] = LMS7param(CDSN_TXATSP);
+00025     wndId2Enum[chkCDSN_TXBLML] = LMS7param(CDSN_TXBLML);
+00026     wndId2Enum[chkCDSN_TXBTSP] = LMS7param(CDSN_TXBTSP);
+00027     wndId2Enum[rgrCDS_MCLK1] = LMS7param(CDS_MCLK1);
+00028     wndId2Enum[rgrCDS_MCLK2] = LMS7param(CDS_MCLK2);
+00029     wndId2Enum[rgrCDS_RXALML] = LMS7param(CDS_RXALML);
+00030     wndId2Enum[rgrCDS_RXATSP] = LMS7param(CDS_RXATSP);
+00031     wndId2Enum[rgrCDS_RXBLML] = LMS7param(CDS_RXBLML);
+00032     wndId2Enum[rgrCDS_RXBTSP] = LMS7param(CDS_RXBTSP);
+00033     wndId2Enum[rgrCDS_TXALML] = LMS7param(CDS_TXALML);
+00034     wndId2Enum[rgrCDS_TXATSP] = LMS7param(CDS_TXATSP);
+00035     wndId2Enum[rgrCDS_TXBLML] = LMS7param(CDS_TXBLML);
+00036     wndId2Enum[rgrCDS_TXBTSP] = LMS7param(CDS_TXBTSP);
+00037 
+00038     LMS7002_WXGUI::UpdateTooltips(wndId2Enum, \textcolor{keyword}{true});
+00039 \}
+00040 
+00041 \textcolor{keywordtype}{void} lms7002_pnlCDS_view::Initialize(lms_device_t* pControl)
+00042 \{
+00043     lmsControl = pControl;
+00044     assert(lmsControl != \textcolor{keyword}{nullptr});
+00045 \}
+00046 
+00047 \textcolor{keywordtype}{void} lms7002_pnlCDS_view::ParameterChangeHandler(wxCommandEvent& event)
+00048 \{
+00049     assert(lmsControl != \textcolor{keyword}{nullptr});
+00050     LMS7Parameter parameter;
+00051     \textcolor{keywordflow}{try}
+00052     \{
+00053         parameter = wndId2Enum.at(reinterpret\_cast<wxWindow*>(event.GetEventObject()));
+00054     \}
+00055     \textcolor{keywordflow}{catch} (std::exception & e)
+00056     \{
+00057         std::cout << \textcolor{stringliteral}{"Control element(ID = "} << \textcolor{keyword}{event}.GetId() << \textcolor{stringliteral}{") don't have assigned LMS parameter."} << 
+      std::endl;
+00058         \textcolor{keywordflow}{return};
+00059     \}
+00060     LMS_WriteParam(lmsControl,parameter,event.GetInt());
+00061 \}
+00062 
+00063 \textcolor{keywordtype}{void} lms7002_pnlCDS_view::UpdateGUI()
+00064 \{
+00065     LMS7002_WXGUI::UpdateControlsByMap(\textcolor{keyword}{this}, lmsControl, wndId2Enum);
+00066 \}
+\end{DoxyCode}

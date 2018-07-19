@@ -1,0 +1,107 @@
+\subsection{Si5351\+C.\+h}
+\label{Si5351C_8h_source}\index{/home/erik/prefix/default/src/limesuite-\/dev/src/\+Si5351\+C/\+Si5351\+C.\+h@{/home/erik/prefix/default/src/limesuite-\/dev/src/\+Si5351\+C/\+Si5351\+C.\+h}}
+
+\begin{DoxyCode}
+00001 
+00007 \textcolor{preprocessor}{#ifndef SI5351C\_MODULE}
+00008 \textcolor{preprocessor}{#define SI5351C\_MODULE}
+00009 
+00010 \textcolor{preprocessor}{#include <stdio.h>}
+00011 \textcolor{preprocessor}{#include <string>}
+00012 \textcolor{preprocessor}{#include "LimeSuiteConfig.h"}
+00013 \textcolor{comment}{//---------------------------------------------------------------------------}
+00014 \textcolor{keyword}{namespace }lime\{
+00015 
+00016 \textcolor{keyword}{enum} eSi_CLOCK_INPUT
+00017 \{
+00018     Si_CLKIN,
+00019     Si_XTAL,
+00020     Si_CMOS
+00021 \};
+00022 
+00023 \textcolor{keyword}{struct }Si5351_Channel
+00024 \{
+00025     Si5351_Channel() : outputDivider(1), outputFreqHz(1), multisynthDivider(1), 
+      pllSource(0),
+00026         phaseOffset(0), powered(true), inverted(false), int_mode(false) \{\};
+00027     \textcolor{keywordtype}{int} outputDivider;
+00028     \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{long} outputFreqHz;
+00029     \textcolor{keywordtype}{float} multisynthDivider;
+00030     \textcolor{keywordtype}{int} pllSource;
+00031     \textcolor{keywordtype}{float} phaseOffset;
+00032     \textcolor{keywordtype}{bool} powered;
+00033     \textcolor{keywordtype}{bool} inverted;
+00034     \textcolor{keywordtype}{bool} int_mode;
+00035 \};
+00036 
+00037 \textcolor{keyword}{struct }Si5351_PLL
+00038 \{
+00039     Si5351_PLL() : inputFreqHz(0), VCO\_Hz(0), feedbackDivider(0), CLKIN\_DIV(1), CLK\_SRC(1) \{\}
+00040     \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{long} inputFreqHz;
+00041     \textcolor{keywordtype}{float} VCO_Hz;
+00042     \textcolor{keywordtype}{float} feedbackDivider;
+00043     \textcolor{keywordtype}{int} CLKIN_DIV;
+00044     \textcolor{keywordtype}{int} CLK_SRC; \textcolor{comment}{//0-XTAL, 1-CLKIN}
+00045 \};
+00046 
+00047 \textcolor{keyword}{class }IConnection;
+00048 \textcolor{keyword}{class }LIME_API Si5351C
+00049 \{
+00050 \textcolor{keyword}{public}:
+00051     \textcolor{keyword}{enum} Status
+00052     \{
+00053         SUCCESS,
+00054         FAILED,
+00055     \};
+00056 
+00057     \textcolor{keyword}{struct }StatusBits
+00058     \{
+00059         StatusBits() : sys\_init(0), sys\_init\_stky(0), lol\_b(0), lol\_b\_stky(0), lol\_a(0), lol\_a\_stky(0), los
+      (0), los\_stky(0)
+00060         \{
+00061 
+00062         \}
+00063         \textcolor{keywordtype}{int} sys_init;
+00064         \textcolor{keywordtype}{int} sys_init_stky;
+00065         \textcolor{keywordtype}{int} lol_b;
+00066         \textcolor{keywordtype}{int} lol_b_stky;
+00067         \textcolor{keywordtype}{int} lol_a;
+00068         \textcolor{keywordtype}{int} lol_a_stky;
+00069         \textcolor{keywordtype}{int} los;
+00070         \textcolor{keywordtype}{int} los_stky;
+00071     \};
+00072 
+00073     StatusBits GetStatusBits();
+00074     Status ClearStatus();
+00075 
+00076     Si5351C();
+00077     ~Si5351C();
+00078     \textcolor{keywordtype}{void} Initialize(IConnection *mng);
+00079     \textcolor{keywordtype}{bool} LoadRegValuesFromFile(std::string FName);
+00080 
+00081     \textcolor{keywordtype}{void} SetPLL(\textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{char} \textcolor{keywordtype}{id}, \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{long} CLKIN\_Hz, \textcolor{keywordtype}{int} CLK\_SRC);
+00082     \textcolor{keywordtype}{void} SetClock(\textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{char} \textcolor{keywordtype}{id}, \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{long} fOut\_Hz, \textcolor{keywordtype}{bool} enabled = \textcolor{keyword}{true}, \textcolor{keywordtype}{bool} 
+      inverted = \textcolor{keyword}{false});
+00083 
+00084     Status UploadConfiguration();
+00085     Status ConfigureClocks();
+00086     \textcolor{keywordtype}{void} Reset();
+00087 
+00088 \textcolor{keyword}{private}:
+00089     \textcolor{keywordtype}{void} FindVCO(Si5351_Channel *clocks, Si5351_PLL *plls, \textcolor{keyword}{const} \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{long} Fmin, \textcolor{keyword}{const} \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{long} 
+      Fmax);
+00090     IConnection *device;
+00091     \textcolor{keywordtype}{int} addrSi5351;
+00092 
+00093     Si5351_PLL PLL[2];
+00094     Si5351_Channel CLK[8];
+00095 
+00096     \textcolor{keyword}{static} \textcolor{keyword}{const} \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{char} m\_defaultConfiguration[];
+00097     \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{char} m\_newConfiguration[255];
+00098 
+00099 
+00100 \};
+00101 
+00102 \}
+00103 \textcolor{preprocessor}{#endif // SI5351C\_MODULE}
+\end{DoxyCode}

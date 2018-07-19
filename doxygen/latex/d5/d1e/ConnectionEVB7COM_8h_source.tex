@@ -1,0 +1,69 @@
+\subsection{Connection\+E\+V\+B7\+C\+O\+M.\+h}
+\label{ConnectionEVB7COM_8h_source}\index{/home/erik/prefix/default/src/limesuite-\/dev/src/\+Connection\+E\+V\+B7\+C\+O\+M/\+Connection\+E\+V\+B7\+C\+O\+M.\+h@{/home/erik/prefix/default/src/limesuite-\/dev/src/\+Connection\+E\+V\+B7\+C\+O\+M/\+Connection\+E\+V\+B7\+C\+O\+M.\+h}}
+
+\begin{DoxyCode}
+00001 
+00007 \textcolor{preprocessor}{#pragma once}
+00008 \textcolor{preprocessor}{#include <ConnectionRegistry.h>}
+00009 \textcolor{preprocessor}{#include <IConnection.h>}
+00010 \textcolor{preprocessor}{#include <LMS64CProtocol.h>}
+00011 \textcolor{preprocessor}{#include <vector>}
+00012 \textcolor{preprocessor}{#include <string>}
+00013 
+00014 \textcolor{preprocessor}{#ifndef \_\_unix\_\_}
+00015 \textcolor{preprocessor}{    #include <windows.h>}
+00016 \textcolor{preprocessor}{#endif}
+00017 
+00018 \textcolor{keyword}{namespace }lime\{
+00019 
+00020 \textcolor{keyword}{class }ConnectionEVB7COM : \textcolor{keyword}{public} LMS64CProtocol
+00021 \{
+00022 \textcolor{keyword}{public}:
+00023     ConnectionEVB7COM(\textcolor{keyword}{const} \textcolor{keywordtype}{char} *comName, \textcolor{keywordtype}{int} baudrate);
+00024 
+00025     ~ConnectionEVB7COM(\textcolor{keywordtype}{void});
+00026 
+00027     \textcolor{keywordtype}{bool} IsOpen(\textcolor{keywordtype}{void});
+00028 
+00029 \textcolor{keyword}{private}:
+00030 
+00031     \textcolor{keywordtype}{int} Open(\textcolor{keyword}{const} \textcolor{keywordtype}{char} *comName, \textcolor{keywordtype}{int} baudrate);
+00032 
+00033     \textcolor{keywordtype}{void} Close(\textcolor{keywordtype}{void});
+00034 
+00035     eConnectionType GetType(\textcolor{keywordtype}{void})
+00036     \{
+00037         \textcolor{keywordflow}{return} COM_PORT;
+00038     \}
+00039 
+00040     \textcolor{keywordtype}{int} Write(\textcolor{keyword}{const} \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{char} *buffer, \textcolor{keywordtype}{int} length, \textcolor{keywordtype}{int} timeout_ms = 100);
+00041     \textcolor{keywordtype}{int} Read(\textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{char} *buffer, \textcolor{keywordtype}{int} length, \textcolor{keywordtype}{int} timeout_ms = 100);
+00042 
+00043 \textcolor{preprocessor}{    #ifndef \_\_unix\_\_}
+00044         HANDLE hComm;
+00045         COMMTIMEOUTS m_ctmoNew;
+00046         COMMTIMEOUTS m_ctmoOld;
+00047         OVERLAPPED m_osROverlap;
+00048         OVERLAPPED m_osWOverlap;
+00049         DCB m_dcbCommPort;
+00050 \textcolor{preprocessor}{    #else}
+00051         \textcolor{keywordtype}{int} hComm; \textcolor{comment}{//com port file descriptor}
+00052 \textcolor{preprocessor}{    #endif}
+00053 \};
+00054 
+00055 \textcolor{keyword}{class }ConnectionEVB7COMEntry : \textcolor{keyword}{public} ConnectionRegistryEntry
+00056 \{
+00057 \textcolor{keyword}{public}:
+00058     ConnectionEVB7COMEntry(\textcolor{keywordtype}{void});
+00059 
+00060     std::vector<ConnectionHandle> enumerate(\textcolor{keyword}{const} ConnectionHandle &hint);
+00061 
+00062     IConnection *make(\textcolor{keyword}{const} ConnectionHandle &handle);
+00063 
+00064 \textcolor{keyword}{private}:
+00065     std::vector<std::string> FindAllComPorts();
+00066     std::vector<std::string> FilterDeviceList(\textcolor{keyword}{const} std::vector<std::string> &);
+00067 \};
+00068 
+00069 \}
+\end{DoxyCode}

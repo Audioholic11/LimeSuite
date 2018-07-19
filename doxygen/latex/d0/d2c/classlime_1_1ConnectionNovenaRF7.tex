@@ -1,0 +1,781 @@
+\subsection{lime\+:\+:Connection\+Novena\+R\+F7 Class Reference}
+\label{classlime_1_1ConnectionNovenaRF7}\index{lime\+::\+Connection\+Novena\+R\+F7@{lime\+::\+Connection\+Novena\+R\+F7}}
+
+
+{\ttfamily \#include $<$Connection\+Novena\+R\+F7.\+h$>$}
+
+
+
+Inheritance diagram for lime\+:\+:Connection\+Novena\+R\+F7\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=550pt]{d0/d0e/classlime_1_1ConnectionNovenaRF7__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for lime\+:\+:Connection\+Novena\+R\+F7\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=550pt]{d2/ddf/classlime_1_1ConnectionNovenaRF7__coll__graph}
+\end{center}
+\end{figure}
+\subsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+class {\bf Stream\+Channel}
+\item 
+struct {\bf Thread\+Data}
+\end{DoxyCompactItemize}
+\subsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+{\bf Connection\+Novena\+R\+F7} ()
+\item 
+{\bf $\sim$\+Connection\+Novena\+R\+F7} ()
+\item 
+{\bf int} {\bf Open} (const char $\ast$spi\+Dev\+Path)
+\begin{DoxyCompactList}\small\item\em Opens connection to first found chip. \end{DoxyCompactList}\item 
+{\bf void} {\bf Close} ()
+\begin{DoxyCompactList}\small\item\em Closes connection to chip. \end{DoxyCompactList}\item 
+bool {\bf Is\+Open} ()
+\begin{DoxyCompactList}\small\item\em Returns whether chip is connected. \end{DoxyCompactList}\item 
+{\bf int} {\bf Write} (const unsigned char $\ast${\bf buffer}, {\bf int} {\bf length}, {\bf int} {\bf timeout\+\_\+ms}=0)
+\begin{DoxyCompactList}\small\item\em Sends data through S\+PI port. \end{DoxyCompactList}\item 
+{\bf int} {\bf Read} (unsigned char $\ast${\bf buffer}, {\bf int} {\bf length}, {\bf int} {\bf timeout\+\_\+ms}=0)
+\begin{DoxyCompactList}\small\item\em Reads data from S\+PI port. \end{DoxyCompactList}\item 
+{\bf e\+Connection\+Type} {\bf Get\+Type} ({\bf void})
+\begin{DoxyCompactList}\small\item\em implement in base class \end{DoxyCompactList}\item 
+{\bf void} {\bf Update\+External\+Band\+Select} (const size\+\_\+t channel, const {\bf int} trf\+Band, const {\bf int} rfe\+Path)
+\item 
+{\bf int} {\bf Setup\+Stream} (size\+\_\+t \&stream\+ID, const {\bf Stream\+Config} \&config)
+\item 
+{\bf int} {\bf Close\+Stream} (const size\+\_\+t stream\+ID)
+\item 
+size\+\_\+t {\bf Get\+Stream\+Size} (const size\+\_\+t stream\+ID)
+\item 
+{\bf int} {\bf Control\+Stream} (const size\+\_\+t stream\+ID, const bool {\bf enable})
+\item 
+{\bf int} {\bf Read\+Stream} (const size\+\_\+t stream\+ID, {\bf void} $\ast$buffs, const size\+\_\+t {\bf length}, const long {\bf timeout\+\_\+ms}, Stream\+Metadata \&metadata)
+\item 
+{\bf int} {\bf Write\+Stream} (const size\+\_\+t stream\+ID, const {\bf void} $\ast$buffs, const size\+\_\+t {\bf length}, const long {\bf timeout\+\_\+ms}, const Stream\+Metadata \&metadata)
+\item 
+{\bf int} {\bf Read\+Stream\+Status} (const size\+\_\+t stream\+ID, const long {\bf timeout\+\_\+ms}, Stream\+Metadata \&metadata)
+\end{DoxyCompactItemize}
+\subsubsection*{Static Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+static const {\bf int} {\bf c\+S\+P\+I\+\_\+\+B\+U\+F\+\_\+\+S\+I\+ZE} = 128
+\item 
+static const {\bf int} {\bf c\+S\+P\+I\+\_\+\+S\+P\+E\+E\+D\+\_\+\+HZ} = 2000000
+\end{DoxyCompactItemize}
+\subsubsection*{Protected Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+{\bf int} {\bf Update\+Threads} ()
+\end{DoxyCompactItemize}
+\subsubsection*{Static Protected Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+static {\bf void} {\bf Receive\+Packets\+Loop} (const {\bf Thread\+Data} {\bf args})
+\item 
+static {\bf void} {\bf Transmit\+Packets\+Loop} (const {\bf Thread\+Data} {\bf args})
+\end{DoxyCompactItemize}
+\subsubsection*{Protected Attributes}
+\begin{DoxyCompactItemize}
+\item 
+std\+::thread {\bf rx\+Thread}
+\item 
+std\+::atomic$<$ bool $>$ {\bf rx\+Running}
+\item 
+std\+::atomic$<$ bool $>$ {\bf terminate\+Rx}
+\item 
+std\+::atomic$<$ uint32\+\_\+t $>$ {\bf rx\+Data\+Rate\+\_\+\+Bps}
+\item 
+{\bf std\+::vector}$<$ {\bf Stream\+Channel} $\ast$ $>$ {\bf m\+Rx\+Streams}
+\item 
+{\bf std\+::vector}$<$ unsigned char $>$ {\bf rxbuf}
+\item 
+{\bf int} {\bf fd}
+\item 
+std\+::fstream {\bf m\+\_\+\+S\+EN}
+\end{DoxyCompactItemize}
+\subsubsection*{Additional Inherited Members}
+
+
+\subsubsection{Detailed Description}
+
+
+Definition at line {\bf 20} of file {\bf Connection\+Novena\+R\+F7.\+h}.
+
+
+
+\subsubsection{Constructor \& Destructor Documentation}
+\index{lime\+::\+Connection\+Novena\+R\+F7@{lime\+::\+Connection\+Novena\+R\+F7}!Connection\+Novena\+R\+F7@{Connection\+Novena\+R\+F7}}
+\index{Connection\+Novena\+R\+F7@{Connection\+Novena\+R\+F7}!lime\+::\+Connection\+Novena\+R\+F7@{lime\+::\+Connection\+Novena\+R\+F7}}
+\paragraph[{Connection\+Novena\+R\+F7()}]{\setlength{\rightskip}{0pt plus 5cm}Connection\+Novena\+R\+F7\+::\+Connection\+Novena\+R\+F7 (
+\begin{DoxyParamCaption}
+\item[{{\bf void}}]{}
+\end{DoxyParamCaption}
+)}\label{classlime_1_1ConnectionNovenaRF7_a16a4f567d439ec282e5cfc61121ac84c}
+
+
+Definition at line {\bf 29} of file {\bf Connection\+Novena\+R\+F7.\+cpp}.
+
+\index{lime\+::\+Connection\+Novena\+R\+F7@{lime\+::\+Connection\+Novena\+R\+F7}!````~Connection\+Novena\+R\+F7@{$\sim$\+Connection\+Novena\+R\+F7}}
+\index{````~Connection\+Novena\+R\+F7@{$\sim$\+Connection\+Novena\+R\+F7}!lime\+::\+Connection\+Novena\+R\+F7@{lime\+::\+Connection\+Novena\+R\+F7}}
+\paragraph[{$\sim$\+Connection\+Novena\+R\+F7()}]{\setlength{\rightskip}{0pt plus 5cm}Connection\+Novena\+R\+F7\+::$\sim$\+Connection\+Novena\+R\+F7 (
+\begin{DoxyParamCaption}
+\item[{{\bf void}}]{}
+\end{DoxyParamCaption}
+)}\label{classlime_1_1ConnectionNovenaRF7_a10cea112137ad77f41dbd0023df3f004}
+
+
+Definition at line {\bf 52} of file {\bf Connection\+Novena\+R\+F7.\+cpp}.
+
+
+
+\subsubsection{Member Function Documentation}
+\index{lime\+::\+Connection\+Novena\+R\+F7@{lime\+::\+Connection\+Novena\+R\+F7}!Close@{Close}}
+\index{Close@{Close}!lime\+::\+Connection\+Novena\+R\+F7@{lime\+::\+Connection\+Novena\+R\+F7}}
+\paragraph[{Close()}]{\setlength{\rightskip}{0pt plus 5cm}{\bf void} Connection\+Novena\+R\+F7\+::\+Close (
+\begin{DoxyParamCaption}
+\item[{{\bf void}}]{}
+\end{DoxyParamCaption}
+)}\label{classlime_1_1ConnectionNovenaRF7_abe8ef161b7fc1ce8c2ffd37712dd7793}
+
+
+Closes connection to chip. 
+
+
+
+Definition at line {\bf 113} of file {\bf Connection\+Novena\+R\+F7.\+cpp}.
+
+\index{lime\+::\+Connection\+Novena\+R\+F7@{lime\+::\+Connection\+Novena\+R\+F7}!Close\+Stream@{Close\+Stream}}
+\index{Close\+Stream@{Close\+Stream}!lime\+::\+Connection\+Novena\+R\+F7@{lime\+::\+Connection\+Novena\+R\+F7}}
+\paragraph[{Close\+Stream(const size\+\_\+t stream\+I\+D)}]{\setlength{\rightskip}{0pt plus 5cm}{\bf int} Connection\+Novena\+R\+F7\+::\+Close\+Stream (
+\begin{DoxyParamCaption}
+\item[{const size\+\_\+t}]{stream\+ID}
+\end{DoxyParamCaption}
+)}\label{classlime_1_1ConnectionNovenaRF7_a9106a21e8be034bc50c8ac58c89dd142}
+
+
+Definition at line {\bf 555} of file {\bf Connection\+Novena\+R\+F7\+\_\+streaming.\+cpp}.
+
+
+
+References {\bf i}, {\bf lime\+::\+Report\+Error()}, and {\bf stream}.
+
+
+
+Referenced by {\bf Get\+Type()}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{d0/d2c/classlime_1_1ConnectionNovenaRF7_a9106a21e8be034bc50c8ac58c89dd142_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{d0/d2c/classlime_1_1ConnectionNovenaRF7_a9106a21e8be034bc50c8ac58c89dd142_icgraph}
+\end{center}
+\end{figure}
+
+
+\index{lime\+::\+Connection\+Novena\+R\+F7@{lime\+::\+Connection\+Novena\+R\+F7}!Control\+Stream@{Control\+Stream}}
+\index{Control\+Stream@{Control\+Stream}!lime\+::\+Connection\+Novena\+R\+F7@{lime\+::\+Connection\+Novena\+R\+F7}}
+\paragraph[{Control\+Stream(const size\+\_\+t stream\+I\+D, const bool enable)}]{\setlength{\rightskip}{0pt plus 5cm}{\bf int} Connection\+Novena\+R\+F7\+::\+Control\+Stream (
+\begin{DoxyParamCaption}
+\item[{const size\+\_\+t}]{stream\+ID, }
+\item[{const bool}]{enable}
+\end{DoxyParamCaption}
+)}\label{classlime_1_1ConnectionNovenaRF7_afd6f39f39e5fb4582e585ad7124f6dab}
+
+
+Definition at line {\bf 577} of file {\bf Connection\+Novena\+R\+F7\+\_\+streaming.\+cpp}.
+
+
+
+References {\bf stream}.
+
+
+
+Referenced by {\bf Get\+Type()}.
+
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{d0/d2c/classlime_1_1ConnectionNovenaRF7_afd6f39f39e5fb4582e585ad7124f6dab_icgraph}
+\end{center}
+\end{figure}
+
+
+\index{lime\+::\+Connection\+Novena\+R\+F7@{lime\+::\+Connection\+Novena\+R\+F7}!Get\+Stream\+Size@{Get\+Stream\+Size}}
+\index{Get\+Stream\+Size@{Get\+Stream\+Size}!lime\+::\+Connection\+Novena\+R\+F7@{lime\+::\+Connection\+Novena\+R\+F7}}
+\paragraph[{Get\+Stream\+Size(const size\+\_\+t stream\+I\+D)}]{\setlength{\rightskip}{0pt plus 5cm}size\+\_\+t Connection\+Novena\+R\+F7\+::\+Get\+Stream\+Size (
+\begin{DoxyParamCaption}
+\item[{const size\+\_\+t}]{stream\+ID}
+\end{DoxyParamCaption}
+)}\label{classlime_1_1ConnectionNovenaRF7_a49e145a882b925659923ffceff3306de}
+
+
+Definition at line {\bf 572} of file {\bf Connection\+Novena\+R\+F7\+\_\+streaming.\+cpp}.
+
+
+
+Referenced by {\bf Get\+Type()}.
+
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{d0/d2c/classlime_1_1ConnectionNovenaRF7_a49e145a882b925659923ffceff3306de_icgraph}
+\end{center}
+\end{figure}
+
+
+\index{lime\+::\+Connection\+Novena\+R\+F7@{lime\+::\+Connection\+Novena\+R\+F7}!Get\+Type@{Get\+Type}}
+\index{Get\+Type@{Get\+Type}!lime\+::\+Connection\+Novena\+R\+F7@{lime\+::\+Connection\+Novena\+R\+F7}}
+\paragraph[{Get\+Type(void)}]{\setlength{\rightskip}{0pt plus 5cm}{\bf e\+Connection\+Type} lime\+::\+Connection\+Novena\+R\+F7\+::\+Get\+Type (
+\begin{DoxyParamCaption}
+\item[{{\bf void}}]{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}\label{classlime_1_1ConnectionNovenaRF7_a40c5e1a531233f3823db79886d8a1d2e}
+
+
+implement in base class 
+
+
+
+Implements {\bf lime\+::\+L\+M\+S64\+C\+Protocol} \doxyref{}{p.}{de/d46/classlime_1_1LMS64CProtocol_ab766d6322a66164891a296359c2b9019}.
+
+
+
+Definition at line {\bf 58} of file {\bf Connection\+Novena\+R\+F7.\+h}.
+
+
+
+References {\bf Close\+Stream()}, {\bf lime\+::\+Connection\+Novena\+R\+F7\+::\+Stream\+Channel\+::config}, {\bf Control\+Stream()}, {\bf enable}, {\bf Get\+Stream\+Size()}, {\bf Read\+Stream()}, {\bf Read\+Stream\+Status()}, {\bf Setup\+Stream()}, {\bf lime\+::\+L\+M\+S64\+C\+Protocol\+::\+S\+P\+I\+\_\+\+P\+O\+RT}, {\bf timeout\+\_\+ms}, {\bf Update\+External\+Band\+Select()}, and {\bf Write\+Stream()}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{d0/d2c/classlime_1_1ConnectionNovenaRF7_a40c5e1a531233f3823db79886d8a1d2e_cgraph}
+\end{center}
+\end{figure}
+
+
+\index{lime\+::\+Connection\+Novena\+R\+F7@{lime\+::\+Connection\+Novena\+R\+F7}!Is\+Open@{Is\+Open}}
+\index{Is\+Open@{Is\+Open}!lime\+::\+Connection\+Novena\+R\+F7@{lime\+::\+Connection\+Novena\+R\+F7}}
+\paragraph[{Is\+Open()}]{\setlength{\rightskip}{0pt plus 5cm}bool Connection\+Novena\+R\+F7\+::\+Is\+Open (
+\begin{DoxyParamCaption}
+\item[{{\bf void}}]{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [virtual]}}\label{classlime_1_1ConnectionNovenaRF7_a263d24435fd0a6b651360cb331aeb08f}
+
+
+Returns whether chip is connected. 
+
+\begin{DoxyReturn}{Returns}
+chip is connected 
+\end{DoxyReturn}
+
+
+Reimplemented from {\bf lime\+::\+I\+Connection} \doxyref{}{p.}{d2/de5/classlime_1_1IConnection_abf1c25c85e31e262ded3e33e65cc58e3}.
+
+
+
+Definition at line {\bf 124} of file {\bf Connection\+Novena\+R\+F7.\+cpp}.
+
+\index{lime\+::\+Connection\+Novena\+R\+F7@{lime\+::\+Connection\+Novena\+R\+F7}!Open@{Open}}
+\index{Open@{Open}!lime\+::\+Connection\+Novena\+R\+F7@{lime\+::\+Connection\+Novena\+R\+F7}}
+\paragraph[{Open(const char $\ast$spi\+Dev\+Path)}]{\setlength{\rightskip}{0pt plus 5cm}{\bf int} Connection\+Novena\+R\+F7\+::\+Open (
+\begin{DoxyParamCaption}
+\item[{const char $\ast$}]{spi\+Dev\+Path}
+\end{DoxyParamCaption}
+)}\label{classlime_1_1ConnectionNovenaRF7_a6cffd8a4ac13fa6ab1974d2517440131}
+
+
+Opens connection to first found chip. 
+
+\begin{DoxyReturn}{Returns}
+0-\/success 
+\end{DoxyReturn}
+
+
+Definition at line {\bf 60} of file {\bf Connection\+Novena\+R\+F7.\+cpp}.
+
+
+
+References {\bf mode}, and {\bf lime\+::\+Report\+Error()}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{d0/d2c/classlime_1_1ConnectionNovenaRF7_a6cffd8a4ac13fa6ab1974d2517440131_cgraph}
+\end{center}
+\end{figure}
+
+
+\index{lime\+::\+Connection\+Novena\+R\+F7@{lime\+::\+Connection\+Novena\+R\+F7}!Read@{Read}}
+\index{Read@{Read}!lime\+::\+Connection\+Novena\+R\+F7@{lime\+::\+Connection\+Novena\+R\+F7}}
+\paragraph[{Read(unsigned char $\ast$buffer, int length, int timeout\+\_\+ms=0)}]{\setlength{\rightskip}{0pt plus 5cm}{\bf int} Connection\+Novena\+R\+F7\+::\+Read (
+\begin{DoxyParamCaption}
+\item[{unsigned char $\ast$}]{buffer, }
+\item[{{\bf int}}]{length, }
+\item[{{\bf int}}]{timeout\+\_\+ms = {\ttfamily 0}}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [virtual]}}\label{classlime_1_1ConnectionNovenaRF7_a3c6dd3a6f9233a70ad36561479709ad8}
+
+
+Reads data from S\+PI port. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em buffer} & pointer to data buffer for receiving \\
+\hline
+{\em length} & number of bytes to read \\
+\hline
+{\em timeout\+\_\+ms} & timeout limit for operation in milliseconds \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+Number of bytes received 
+\end{DoxyReturn}
+
+
+Implements {\bf lime\+::\+L\+M\+S64\+C\+Protocol} \doxyref{}{p.}{de/d46/classlime_1_1LMS64CProtocol_ab9e954443ee121eff8e1e6d4f8de3d4b}.
+
+
+
+Definition at line {\bf 180} of file {\bf Connection\+Novena\+R\+F7.\+cpp}.
+
+
+
+References {\bf int()}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=288pt]{d0/d2c/classlime_1_1ConnectionNovenaRF7_a3c6dd3a6f9233a70ad36561479709ad8_cgraph}
+\end{center}
+\end{figure}
+
+
+\index{lime\+::\+Connection\+Novena\+R\+F7@{lime\+::\+Connection\+Novena\+R\+F7}!Read\+Stream@{Read\+Stream}}
+\index{Read\+Stream@{Read\+Stream}!lime\+::\+Connection\+Novena\+R\+F7@{lime\+::\+Connection\+Novena\+R\+F7}}
+\paragraph[{Read\+Stream(const size\+\_\+t stream\+I\+D, void $\ast$buffs, const size\+\_\+t length, const long timeout\+\_\+ms, Stream\+Metadata \&metadata)}]{\setlength{\rightskip}{0pt plus 5cm}{\bf int} Connection\+Novena\+R\+F7\+::\+Read\+Stream (
+\begin{DoxyParamCaption}
+\item[{const size\+\_\+t}]{stream\+ID, }
+\item[{{\bf void} $\ast$}]{buffs, }
+\item[{const size\+\_\+t}]{length, }
+\item[{const long}]{timeout\+\_\+ms, }
+\item[{Stream\+Metadata \&}]{metadata}
+\end{DoxyParamCaption}
+)}\label{classlime_1_1ConnectionNovenaRF7_a79a392f0d1ea7a11d65588feab1126fb}
+
+
+Definition at line {\bf 521} of file {\bf Connection\+Novena\+R\+F7\+\_\+streaming.\+cpp}.
+
+
+
+References {\bf meta}, {\bf status}, {\bf lms\+\_\+stream\+\_\+meta\+\_\+t\+::timestamp}, and {\bf lms\+\_\+stream\+\_\+status\+\_\+t\+::timestamp}.
+
+
+
+Referenced by {\bf Get\+Type()}.
+
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{d0/d2c/classlime_1_1ConnectionNovenaRF7_a79a392f0d1ea7a11d65588feab1126fb_icgraph}
+\end{center}
+\end{figure}
+
+
+\index{lime\+::\+Connection\+Novena\+R\+F7@{lime\+::\+Connection\+Novena\+R\+F7}!Read\+Stream\+Status@{Read\+Stream\+Status}}
+\index{Read\+Stream\+Status@{Read\+Stream\+Status}!lime\+::\+Connection\+Novena\+R\+F7@{lime\+::\+Connection\+Novena\+R\+F7}}
+\paragraph[{Read\+Stream\+Status(const size\+\_\+t stream\+I\+D, const long timeout\+\_\+ms, Stream\+Metadata \&metadata)}]{\setlength{\rightskip}{0pt plus 5cm}{\bf int} Connection\+Novena\+R\+F7\+::\+Read\+Stream\+Status (
+\begin{DoxyParamCaption}
+\item[{const size\+\_\+t}]{stream\+ID, }
+\item[{const long}]{timeout\+\_\+ms, }
+\item[{Stream\+Metadata \&}]{metadata}
+\end{DoxyParamCaption}
+)}\label{classlime_1_1ConnectionNovenaRF7_a5935a9b73daee3693bbafef22e52435b}
+
+
+Definition at line {\bf 588} of file {\bf Connection\+Novena\+R\+F7\+\_\+streaming.\+cpp}.
+
+
+
+References {\bf lime\+::\+Stream\+Channel\+::\+Info\+::dropped\+Packets}, {\bf info}, {\bf lime\+::\+Stream\+Channel\+::\+Info\+::timestamp}, and {\bf lime\+::\+Stream\+Channel\+::\+Info\+::underrun}.
+
+
+
+Referenced by {\bf Get\+Type()}.
+
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{d0/d2c/classlime_1_1ConnectionNovenaRF7_a5935a9b73daee3693bbafef22e52435b_icgraph}
+\end{center}
+\end{figure}
+
+
+\index{lime\+::\+Connection\+Novena\+R\+F7@{lime\+::\+Connection\+Novena\+R\+F7}!Receive\+Packets\+Loop@{Receive\+Packets\+Loop}}
+\index{Receive\+Packets\+Loop@{Receive\+Packets\+Loop}!lime\+::\+Connection\+Novena\+R\+F7@{lime\+::\+Connection\+Novena\+R\+F7}}
+\paragraph[{Receive\+Packets\+Loop(const Thread\+Data args)}]{\setlength{\rightskip}{0pt plus 5cm}{\bf void} Connection\+Novena\+R\+F7\+::\+Receive\+Packets\+Loop (
+\begin{DoxyParamCaption}
+\item[{const {\bf Thread\+Data}}]{args}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [static]}, {\ttfamily [protected]}}\label{classlime_1_1ConnectionNovenaRF7_a300d621a46fa1b8a81648d10cef9c060}
+
+
+Definition at line {\bf 398} of file {\bf Connection\+Novena\+R\+F7\+\_\+streaming.\+cpp}.
+
+
+
+References {\bf buffer}, {\bf lime\+::\+Connection\+Novena\+R\+F7\+::\+Thread\+Data\+::channels}, {\bf lime\+::\+Connection\+Novena\+R\+F7\+::\+Thread\+Data\+::data\+Port}, {\bf lime\+::\+Connection\+Novena\+R\+F7\+::\+Thread\+Data\+::data\+Rate\+\_\+\+Bps}, {\bf fpga\+\_\+read()}, {\bf meta}, {\bf prep\+\_\+eim\+\_\+burst()}, {\bf lime\+::\+I\+Connection\+::\+Read\+Register()}, {\bf samples}, {\bf t1}, {\bf t2}, {\bf lime\+::\+Connection\+Novena\+R\+F7\+::\+Thread\+Data\+::terminate}, {\bf lms\+\_\+stream\+\_\+meta\+\_\+t\+::timestamp}, and {\bf lime\+::\+I\+Connection\+::\+Write\+Register()}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{d0/d2c/classlime_1_1ConnectionNovenaRF7_a300d621a46fa1b8a81648d10cef9c060_cgraph}
+\end{center}
+\end{figure}
+
+
+\index{lime\+::\+Connection\+Novena\+R\+F7@{lime\+::\+Connection\+Novena\+R\+F7}!Setup\+Stream@{Setup\+Stream}}
+\index{Setup\+Stream@{Setup\+Stream}!lime\+::\+Connection\+Novena\+R\+F7@{lime\+::\+Connection\+Novena\+R\+F7}}
+\paragraph[{Setup\+Stream(size\+\_\+t \&stream\+I\+D, const Stream\+Config \&config)}]{\setlength{\rightskip}{0pt plus 5cm}{\bf int} Connection\+Novena\+R\+F7\+::\+Setup\+Stream (
+\begin{DoxyParamCaption}
+\item[{size\+\_\+t \&}]{stream\+ID, }
+\item[{const {\bf Stream\+Config} \&}]{config}
+\end{DoxyParamCaption}
+)}\label{classlime_1_1ConnectionNovenaRF7_adbd4468fce9fc369a48fcc9ad894e8e1}
+
+
+Definition at line {\bf 539} of file {\bf Connection\+Novena\+R\+F7\+\_\+streaming.\+cpp}.
+
+
+
+References {\bf lime\+::\+Connection\+Novena\+R\+F7\+::\+Stream\+Channel\+::config}, {\bf lime\+::\+Stream\+Config\+::is\+Tx}, {\bf lime\+::\+Report\+Error()}, and {\bf stream}.
+
+
+
+Referenced by {\bf Get\+Type()}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{d0/d2c/classlime_1_1ConnectionNovenaRF7_adbd4468fce9fc369a48fcc9ad894e8e1_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{d0/d2c/classlime_1_1ConnectionNovenaRF7_adbd4468fce9fc369a48fcc9ad894e8e1_icgraph}
+\end{center}
+\end{figure}
+
+
+\index{lime\+::\+Connection\+Novena\+R\+F7@{lime\+::\+Connection\+Novena\+R\+F7}!Transmit\+Packets\+Loop@{Transmit\+Packets\+Loop}}
+\index{Transmit\+Packets\+Loop@{Transmit\+Packets\+Loop}!lime\+::\+Connection\+Novena\+R\+F7@{lime\+::\+Connection\+Novena\+R\+F7}}
+\paragraph[{Transmit\+Packets\+Loop(const Thread\+Data args)}]{\setlength{\rightskip}{0pt plus 5cm}static {\bf void} lime\+::\+Connection\+Novena\+R\+F7\+::\+Transmit\+Packets\+Loop (
+\begin{DoxyParamCaption}
+\item[{const {\bf Thread\+Data}}]{args}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [static]}, {\ttfamily [protected]}}\label{classlime_1_1ConnectionNovenaRF7_a91407234a494cc19007da02fed87895f}
+\index{lime\+::\+Connection\+Novena\+R\+F7@{lime\+::\+Connection\+Novena\+R\+F7}!Update\+External\+Band\+Select@{Update\+External\+Band\+Select}}
+\index{Update\+External\+Band\+Select@{Update\+External\+Band\+Select}!lime\+::\+Connection\+Novena\+R\+F7@{lime\+::\+Connection\+Novena\+R\+F7}}
+\paragraph[{Update\+External\+Band\+Select(const size\+\_\+t channel, const int trf\+Band, const int rfe\+Path)}]{\setlength{\rightskip}{0pt plus 5cm}{\bf void} Connection\+Novena\+R\+F7\+::\+Update\+External\+Band\+Select (
+\begin{DoxyParamCaption}
+\item[{const size\+\_\+t}]{channel, }
+\item[{const {\bf int}}]{trf\+Band, }
+\item[{const {\bf int}}]{rfe\+Path}
+\end{DoxyParamCaption}
+)}\label{classlime_1_1ConnectionNovenaRF7_afd42400d8ae404c1943cc0632f443079}
+
+
+Definition at line {\bf 195} of file {\bf Connection\+Novena\+R\+F7.\+cpp}.
+
+
+
+Referenced by {\bf Get\+Type()}.
+
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{d0/d2c/classlime_1_1ConnectionNovenaRF7_afd42400d8ae404c1943cc0632f443079_icgraph}
+\end{center}
+\end{figure}
+
+
+\index{lime\+::\+Connection\+Novena\+R\+F7@{lime\+::\+Connection\+Novena\+R\+F7}!Update\+Threads@{Update\+Threads}}
+\index{Update\+Threads@{Update\+Threads}!lime\+::\+Connection\+Novena\+R\+F7@{lime\+::\+Connection\+Novena\+R\+F7}}
+\paragraph[{Update\+Threads()}]{\setlength{\rightskip}{0pt plus 5cm}{\bf int} Connection\+Novena\+R\+F7\+::\+Update\+Threads (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [protected]}}\label{classlime_1_1ConnectionNovenaRF7_a3946a2af40b07cb4deda258ba5feade4}
+
+
+Definition at line {\bf 227} of file {\bf Connection\+Novena\+R\+F7.\+cpp}.
+
+
+
+References {\bf args}, {\bf lime\+::\+Connection\+Novena\+R\+F7\+::\+Thread\+Data\+::channels}, {\bf lime\+::\+L\+M\+S64\+C\+Protocol\+::\+Generic\+Packet\+::cmd}, {\bf lime\+::\+C\+M\+D\+\_\+\+U\+S\+B\+\_\+\+F\+I\+F\+O\+\_\+\+R\+ST}, {\bf lime\+::\+Connection\+Novena\+R\+F7\+::\+Thread\+Data\+::data\+Port}, {\bf lime\+::\+Connection\+Novena\+R\+F7\+::\+Thread\+Data\+::data\+Rate\+\_\+\+Bps}, {\bf i}, {\bf lime\+::\+L\+M\+S64\+C\+Protocol\+::\+Generic\+Packet\+::out\+Buffer}, {\bf Read\+Register()}, {\bf lime\+::\+Connection\+Novena\+R\+F7\+::\+Thread\+Data\+::terminate}, and {\bf Write\+Register()}.
+
+
+
+Referenced by {\bf lime\+::\+Connection\+Novena\+R\+F7\+::\+Stream\+Channel\+::\+Start()}, and {\bf lime\+::\+Connection\+Novena\+R\+F7\+::\+Stream\+Channel\+::\+Stop()}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=336pt]{d0/d2c/classlime_1_1ConnectionNovenaRF7_a3946a2af40b07cb4deda258ba5feade4_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{d0/d2c/classlime_1_1ConnectionNovenaRF7_a3946a2af40b07cb4deda258ba5feade4_icgraph}
+\end{center}
+\end{figure}
+
+
+\index{lime\+::\+Connection\+Novena\+R\+F7@{lime\+::\+Connection\+Novena\+R\+F7}!Write@{Write}}
+\index{Write@{Write}!lime\+::\+Connection\+Novena\+R\+F7@{lime\+::\+Connection\+Novena\+R\+F7}}
+\paragraph[{Write(const unsigned char $\ast$buffer, int length, int timeout\+\_\+ms=0)}]{\setlength{\rightskip}{0pt plus 5cm}{\bf int} Connection\+Novena\+R\+F7\+::\+Write (
+\begin{DoxyParamCaption}
+\item[{const unsigned char $\ast$}]{buffer, }
+\item[{{\bf int}}]{length, }
+\item[{{\bf int}}]{timeout\+\_\+ms = {\ttfamily 0}}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [virtual]}}\label{classlime_1_1ConnectionNovenaRF7_ae3864094461c2ce423966af42da8ccdf}
+
+
+Sends data through S\+PI port. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em buffer} & data buffer to send \\
+\hline
+{\em length} & size of data buffer \\
+\hline
+{\em timeout\+\_\+ms} & timeout limit for operation in milliseconds \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+Number of bytes sent 
+\end{DoxyReturn}
+
+
+Implements {\bf lime\+::\+L\+M\+S64\+C\+Protocol} \doxyref{}{p.}{de/d46/classlime_1_1LMS64CProtocol_aa78b82a017792421b61bc6a99b4c55c0}.
+
+
+
+Definition at line {\bf 135} of file {\bf Connection\+Novena\+R\+F7.\+cpp}.
+
+
+
+References {\bf i}, and {\bf read()}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=294pt]{d0/d2c/classlime_1_1ConnectionNovenaRF7_ae3864094461c2ce423966af42da8ccdf_cgraph}
+\end{center}
+\end{figure}
+
+
+\index{lime\+::\+Connection\+Novena\+R\+F7@{lime\+::\+Connection\+Novena\+R\+F7}!Write\+Stream@{Write\+Stream}}
+\index{Write\+Stream@{Write\+Stream}!lime\+::\+Connection\+Novena\+R\+F7@{lime\+::\+Connection\+Novena\+R\+F7}}
+\paragraph[{Write\+Stream(const size\+\_\+t stream\+I\+D, const void $\ast$buffs, const size\+\_\+t length, const long timeout\+\_\+ms, const Stream\+Metadata \&metadata)}]{\setlength{\rightskip}{0pt plus 5cm}{\bf int} Connection\+Novena\+R\+F7\+::\+Write\+Stream (
+\begin{DoxyParamCaption}
+\item[{const size\+\_\+t}]{stream\+ID, }
+\item[{const {\bf void} $\ast$}]{buffs, }
+\item[{const size\+\_\+t}]{length, }
+\item[{const long}]{timeout\+\_\+ms, }
+\item[{const Stream\+Metadata \&}]{metadata}
+\end{DoxyParamCaption}
+)}\label{classlime_1_1ConnectionNovenaRF7_a267e2298218b1a3233fb25348ce575a2}
+
+
+Definition at line {\bf 534} of file {\bf Connection\+Novena\+R\+F7\+\_\+streaming.\+cpp}.
+
+
+
+Referenced by {\bf Get\+Type()}.
+
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{d0/d2c/classlime_1_1ConnectionNovenaRF7_a267e2298218b1a3233fb25348ce575a2_icgraph}
+\end{center}
+\end{figure}
+
+
+
+
+\subsubsection{Member Data Documentation}
+\index{lime\+::\+Connection\+Novena\+R\+F7@{lime\+::\+Connection\+Novena\+R\+F7}!c\+S\+P\+I\+\_\+\+B\+U\+F\+\_\+\+S\+I\+ZE@{c\+S\+P\+I\+\_\+\+B\+U\+F\+\_\+\+S\+I\+ZE}}
+\index{c\+S\+P\+I\+\_\+\+B\+U\+F\+\_\+\+S\+I\+ZE@{c\+S\+P\+I\+\_\+\+B\+U\+F\+\_\+\+S\+I\+ZE}!lime\+::\+Connection\+Novena\+R\+F7@{lime\+::\+Connection\+Novena\+R\+F7}}
+\paragraph[{c\+S\+P\+I\+\_\+\+B\+U\+F\+\_\+\+S\+I\+ZE}]{\setlength{\rightskip}{0pt plus 5cm}const {\bf int} Connection\+Novena\+R\+F7\+::c\+S\+P\+I\+\_\+\+B\+U\+F\+\_\+\+S\+I\+ZE = 128\hspace{0.3cm}{\ttfamily [static]}}\label{classlime_1_1ConnectionNovenaRF7_ae79fa32aac7e06f972bc3dd6efc2c5f0}
+
+
+Definition at line {\bf 45} of file {\bf Connection\+Novena\+R\+F7.\+h}.
+
+\index{lime\+::\+Connection\+Novena\+R\+F7@{lime\+::\+Connection\+Novena\+R\+F7}!c\+S\+P\+I\+\_\+\+S\+P\+E\+E\+D\+\_\+\+HZ@{c\+S\+P\+I\+\_\+\+S\+P\+E\+E\+D\+\_\+\+HZ}}
+\index{c\+S\+P\+I\+\_\+\+S\+P\+E\+E\+D\+\_\+\+HZ@{c\+S\+P\+I\+\_\+\+S\+P\+E\+E\+D\+\_\+\+HZ}!lime\+::\+Connection\+Novena\+R\+F7@{lime\+::\+Connection\+Novena\+R\+F7}}
+\paragraph[{c\+S\+P\+I\+\_\+\+S\+P\+E\+E\+D\+\_\+\+HZ}]{\setlength{\rightskip}{0pt plus 5cm}const {\bf int} Connection\+Novena\+R\+F7\+::c\+S\+P\+I\+\_\+\+S\+P\+E\+E\+D\+\_\+\+HZ = 2000000\hspace{0.3cm}{\ttfamily [static]}}\label{classlime_1_1ConnectionNovenaRF7_abad56883cae15d9f23f8fb499136d7e4}
+
+
+Definition at line {\bf 46} of file {\bf Connection\+Novena\+R\+F7.\+h}.
+
+\index{lime\+::\+Connection\+Novena\+R\+F7@{lime\+::\+Connection\+Novena\+R\+F7}!fd@{fd}}
+\index{fd@{fd}!lime\+::\+Connection\+Novena\+R\+F7@{lime\+::\+Connection\+Novena\+R\+F7}}
+\paragraph[{fd}]{\setlength{\rightskip}{0pt plus 5cm}{\bf int} lime\+::\+Connection\+Novena\+R\+F7\+::fd\hspace{0.3cm}{\ttfamily [protected]}}\label{classlime_1_1ConnectionNovenaRF7_a1048711d61c1c613c21b3db17832c3b5}
+
+
+Definition at line {\bf 96} of file {\bf Connection\+Novena\+R\+F7.\+h}.
+
+\index{lime\+::\+Connection\+Novena\+R\+F7@{lime\+::\+Connection\+Novena\+R\+F7}!m\+\_\+\+S\+EN@{m\+\_\+\+S\+EN}}
+\index{m\+\_\+\+S\+EN@{m\+\_\+\+S\+EN}!lime\+::\+Connection\+Novena\+R\+F7@{lime\+::\+Connection\+Novena\+R\+F7}}
+\paragraph[{m\+\_\+\+S\+EN}]{\setlength{\rightskip}{0pt plus 5cm}std\+::fstream lime\+::\+Connection\+Novena\+R\+F7\+::m\+\_\+\+S\+EN\hspace{0.3cm}{\ttfamily [protected]}}\label{classlime_1_1ConnectionNovenaRF7_ab7fa4f3c4f936dd2e336c3bad7067a6d}
+
+
+Definition at line {\bf 97} of file {\bf Connection\+Novena\+R\+F7.\+h}.
+
+\index{lime\+::\+Connection\+Novena\+R\+F7@{lime\+::\+Connection\+Novena\+R\+F7}!m\+Rx\+Streams@{m\+Rx\+Streams}}
+\index{m\+Rx\+Streams@{m\+Rx\+Streams}!lime\+::\+Connection\+Novena\+R\+F7@{lime\+::\+Connection\+Novena\+R\+F7}}
+\paragraph[{m\+Rx\+Streams}]{\setlength{\rightskip}{0pt plus 5cm}{\bf std\+::vector}$<${\bf Stream\+Channel}$\ast$$>$ lime\+::\+Connection\+Novena\+R\+F7\+::m\+Rx\+Streams\hspace{0.3cm}{\ttfamily [protected]}}\label{classlime_1_1ConnectionNovenaRF7_a6a156b47be57cb4298a6889cebb9c30d}
+
+
+Definition at line {\bf 93} of file {\bf Connection\+Novena\+R\+F7.\+h}.
+
+\index{lime\+::\+Connection\+Novena\+R\+F7@{lime\+::\+Connection\+Novena\+R\+F7}!rxbuf@{rxbuf}}
+\index{rxbuf@{rxbuf}!lime\+::\+Connection\+Novena\+R\+F7@{lime\+::\+Connection\+Novena\+R\+F7}}
+\paragraph[{rxbuf}]{\setlength{\rightskip}{0pt plus 5cm}{\bf std\+::vector}$<$unsigned char$>$ lime\+::\+Connection\+Novena\+R\+F7\+::rxbuf\hspace{0.3cm}{\ttfamily [protected]}}\label{classlime_1_1ConnectionNovenaRF7_a51775db211574912b203b92cd8a869f1}
+
+
+Definition at line {\bf 95} of file {\bf Connection\+Novena\+R\+F7.\+h}.
+
+\index{lime\+::\+Connection\+Novena\+R\+F7@{lime\+::\+Connection\+Novena\+R\+F7}!rx\+Data\+Rate\+\_\+\+Bps@{rx\+Data\+Rate\+\_\+\+Bps}}
+\index{rx\+Data\+Rate\+\_\+\+Bps@{rx\+Data\+Rate\+\_\+\+Bps}!lime\+::\+Connection\+Novena\+R\+F7@{lime\+::\+Connection\+Novena\+R\+F7}}
+\paragraph[{rx\+Data\+Rate\+\_\+\+Bps}]{\setlength{\rightskip}{0pt plus 5cm}std\+::atomic$<$uint32\+\_\+t$>$ lime\+::\+Connection\+Novena\+R\+F7\+::rx\+Data\+Rate\+\_\+\+Bps\hspace{0.3cm}{\ttfamily [protected]}}\label{classlime_1_1ConnectionNovenaRF7_a37fb6444ecc6c2913ca9efbfa7e91280}
+
+
+Definition at line {\bf 92} of file {\bf Connection\+Novena\+R\+F7.\+h}.
+
+
+
+Referenced by {\bf lime\+::\+Connection\+Novena\+R\+F7\+::\+Stream\+Channel\+::\+Get\+Info()}.
+
+\index{lime\+::\+Connection\+Novena\+R\+F7@{lime\+::\+Connection\+Novena\+R\+F7}!rx\+Running@{rx\+Running}}
+\index{rx\+Running@{rx\+Running}!lime\+::\+Connection\+Novena\+R\+F7@{lime\+::\+Connection\+Novena\+R\+F7}}
+\paragraph[{rx\+Running}]{\setlength{\rightskip}{0pt plus 5cm}std\+::atomic$<$bool$>$ lime\+::\+Connection\+Novena\+R\+F7\+::rx\+Running\hspace{0.3cm}{\ttfamily [protected]}}\label{classlime_1_1ConnectionNovenaRF7_a203058d9031f0b6cc224d81ae4107301}
+
+
+Definition at line {\bf 90} of file {\bf Connection\+Novena\+R\+F7.\+h}.
+
+\index{lime\+::\+Connection\+Novena\+R\+F7@{lime\+::\+Connection\+Novena\+R\+F7}!rx\+Thread@{rx\+Thread}}
+\index{rx\+Thread@{rx\+Thread}!lime\+::\+Connection\+Novena\+R\+F7@{lime\+::\+Connection\+Novena\+R\+F7}}
+\paragraph[{rx\+Thread}]{\setlength{\rightskip}{0pt plus 5cm}std\+::thread lime\+::\+Connection\+Novena\+R\+F7\+::rx\+Thread\hspace{0.3cm}{\ttfamily [protected]}}\label{classlime_1_1ConnectionNovenaRF7_ab79422c480c0b394162807aedfb5e6d7}
+
+
+Definition at line {\bf 89} of file {\bf Connection\+Novena\+R\+F7.\+h}.
+
+\index{lime\+::\+Connection\+Novena\+R\+F7@{lime\+::\+Connection\+Novena\+R\+F7}!terminate\+Rx@{terminate\+Rx}}
+\index{terminate\+Rx@{terminate\+Rx}!lime\+::\+Connection\+Novena\+R\+F7@{lime\+::\+Connection\+Novena\+R\+F7}}
+\paragraph[{terminate\+Rx}]{\setlength{\rightskip}{0pt plus 5cm}std\+::atomic$<$bool$>$ lime\+::\+Connection\+Novena\+R\+F7\+::terminate\+Rx\hspace{0.3cm}{\ttfamily [protected]}}\label{classlime_1_1ConnectionNovenaRF7_af774bdca14533578177c2141cf42e62b}
+
+
+Definition at line {\bf 91} of file {\bf Connection\+Novena\+R\+F7.\+h}.
+
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+/home/erik/prefix/default/src/limesuite-\/dev/src/\+Connection\+Novena\+R\+F7/{\bf Connection\+Novena\+R\+F7.\+h}\item 
+/home/erik/prefix/default/src/limesuite-\/dev/src/\+Connection\+Novena\+R\+F7/{\bf Connection\+Novena\+R\+F7.\+cpp}\item 
+/home/erik/prefix/default/src/limesuite-\/dev/src/\+Connection\+Novena\+R\+F7/{\bf Connection\+Novena\+R\+F7\+\_\+streaming.\+cpp}\end{DoxyCompactItemize}

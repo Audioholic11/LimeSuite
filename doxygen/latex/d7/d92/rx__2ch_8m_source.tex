@@ -1,0 +1,33 @@
+\subsection{rx\+\_\+2ch.\+m}
+\label{rx__2ch_8m_source}\index{/home/erik/prefix/default/src/limesuite-\/dev/octave/rx\+\_\+2ch.\+m@{/home/erik/prefix/default/src/limesuite-\/dev/octave/rx\+\_\+2ch.\+m}}
+
+\begin{DoxyCode}
+00001 clear all;
+00002 
+00003 LoadLimeSuite
+00004 
+00005 LimeInitialize();               % open first device
+00006 
+00007 LimeLoadConfig(\textcolor{stringliteral}{'trxTest.ini'});  % load configuration from file
+00008                                 % use LimeSuiteGUI to create configuration file
+00009 
+00010 readCnt = 1024*64;          %samples to read (64K)
+00011 fifoSize = 1024*1024        %set library FIFO size to 1 MSample
+00012 
+00013 LimeStartStreaming(fifoSize,["rx0"; "rx1"]); % start RX from channels 0 and 1
+00014 
+00015 %receive samples, overwrite the same array
+00016 for i=1:16
+00017     samplesCh0 = LimeReceiveSamples(readCnt,0); % read samples from RX channel 0
+00018     samplesCh1 = LimeReceiveSamples(readCnt,1); % read samples from RX channel 1
+00019 end
+00020 %stop streaming
+00021 LimeStopStreaming();      % stop streaming
+00022 LimeDestroy();            % close device
+00023 %plot samples
+00024 figure(1)
+00025 plot(real(samplesCh0));
+00026 figure(2)
+00027 plot(real(samplesCh1));
+00028 
+\end{DoxyCode}

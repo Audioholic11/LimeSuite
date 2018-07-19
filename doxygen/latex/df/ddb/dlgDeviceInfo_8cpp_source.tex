@@ -1,0 +1,49 @@
+\subsection{dlg\+Device\+Info.\+cpp}
+\label{dlgDeviceInfo_8cpp_source}\index{/home/erik/prefix/default/src/limesuite-\/dev/src/utilities\+\_\+gui/dlg\+Device\+Info.\+cpp@{/home/erik/prefix/default/src/limesuite-\/dev/src/utilities\+\_\+gui/dlg\+Device\+Info.\+cpp}}
+
+\begin{DoxyCode}
+00001 \textcolor{preprocessor}{#include "dlgDeviceInfo.h"}
+00002 
+00003 
+00004 dlgDeviceInfo::dlgDeviceInfo(wxWindow* parent, wxWindowID \textcolor{keywordtype}{id}, \textcolor{keyword}{const} wxString &title, \textcolor{keyword}{const} wxPoint& pos, \textcolor{keyword}{
+      const} wxSize& size, \textcolor{keywordtype}{long} styles)
+00005 :
+00006 dlgDeviceInfo_view( parent, id, title, pos, size, styles)
+00007 \{
+00008     lmsControl = \textcolor{keyword}{nullptr};
+00009 
+00010 \}
+00011 
+00012 \textcolor{keywordtype}{void} dlgDeviceInfo::Initialize(lms_device_t* lms)
+00013 \{
+00014     lmsControl = lms;
+00015 \}
+00016 
+00017 \textcolor{keywordtype}{void} dlgDeviceInfo::OnGetInfo( wxCommandEvent& event )
+00018 \{
+00019     \textcolor{keyword}{const} lms_dev_info_t* info;
+00020 
+00021     \textcolor{keywordflow}{if} ((info = LMS_GetDeviceInfo(lmsControl))!=\textcolor{keyword}{nullptr})
+00022     \{
+00023         lblDeviceCtr->SetLabel(info->deviceName);
+00024         lblExpansionCtr->SetLabel(info->expansionName);
+00025         lblFirmwareCtr->SetLabel(info->firmwareVersion);
+00026         lblHardwareCtr->SetLabel(info->hardwareVersion);
+00027         lblProtocolCtr->SetLabel(info->protocolVersion);
+00028         lblGatewareCtr->SetLabel(info->gatewareVersion);
+00029         lblGatewareTargetCtr->SetLabel(info->gatewareTargetBoard);
+00030     \}
+00031     \textcolor{keywordflow}{else}
+00032     \{
+00033         lblDeviceCtr->SetLabel(\_(\textcolor{stringliteral}{"???"}));
+00034         lblExpansionCtr->SetLabel(\_(\textcolor{stringliteral}{"???"}));
+00035         lblFirmwareCtr->SetLabel(\_(\textcolor{stringliteral}{"???"}));
+00036         lblHardwareCtr->SetLabel(\_(\textcolor{stringliteral}{"???"}));
+00037         lblProtocolCtr->SetLabel(\_(\textcolor{stringliteral}{"???"}));
+00038         lblGatewareCtr->SetLabel(\_(\textcolor{stringliteral}{"???"}));
+00039         lblGatewareTargetCtr->SetLabel(\_(\textcolor{stringliteral}{"???"}));
+00040     \}
+00041 
+00042 
+00043 \}
+\end{DoxyCode}

@@ -1,0 +1,36 @@
+\subsection{rx.\+m}
+\label{rx_8m_source}\index{/home/erik/prefix/default/src/limesuite-\/dev/octave/rx.\+m@{/home/erik/prefix/default/src/limesuite-\/dev/octave/rx.\+m}}
+
+\begin{DoxyCode}
+00001 LoadLimeSuite
+00002 
+00003 LimeInitialize()
+00004 LimeLoadConfig('rxTest.ini');
+00005 samplesToBuffer = 1024*64; %octave has array limit around 20M
+00006 
+00007 batches = 32;
+00008 FIFOsize = samplesToBuffer*batches % total number of samples to be buffered inside DLL, they will be 
+      contiguous
+00009 LimeStartStreaming(FIFOsize);
+00010 
+00011 %must use separate arrays, otherwise octave array index limit will be reached
+00012 samplesBatch1 = LimeReceiveSamples(samplesToBuffer);
+00013 samplesBatch2 = LimeReceiveSamples(samplesToBuffer);
+00014 samplesBatch3 = LimeReceiveSamples(samplesToBuffer);
+00015 samplesBatch4 = LimeReceiveSamples(samplesToBuffer);
+00016 samplesBatch5 = LimeReceiveSamples(samplesToBuffer);
+00017 samplesBatch6 = LimeReceiveSamples(samplesToBuffer);
+00018 
+00019 %or overwrite the same array
+00020 for i=1:batches
+00021     samplesBatch = LimeReceiveSamples(samplesToBuffer);
+00022     %do some processing on samplesBatch
+00023 end
+00024 
+00025 LimeStopStreaming();
+00026 LimeDestroy();
+00027 
+00028 plot(real(samplesBatch1));
+00029 %plot(real(samplesBatch2));
+00030 %plot(real(samplesBatch3));
+\end{DoxyCode}

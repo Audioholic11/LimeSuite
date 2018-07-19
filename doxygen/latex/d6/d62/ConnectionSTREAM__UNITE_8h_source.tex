@@ -1,0 +1,40 @@
+\subsection{Connection\+S\+T\+R\+E\+A\+M\+\_\+\+U\+N\+I\+T\+E.\+h}
+\label{ConnectionSTREAM__UNITE_8h_source}\index{/home/erik/prefix/default/src/limesuite-\/dev/src/\+Connection\+S\+T\+R\+E\+A\+M\+\_\+\+U\+N\+I\+T\+E/\+Connection\+S\+T\+R\+E\+A\+M\+\_\+\+U\+N\+I\+T\+E.\+h@{/home/erik/prefix/default/src/limesuite-\/dev/src/\+Connection\+S\+T\+R\+E\+A\+M\+\_\+\+U\+N\+I\+T\+E/\+Connection\+S\+T\+R\+E\+A\+M\+\_\+\+U\+N\+I\+T\+E.\+h}}
+
+\begin{DoxyCode}
+00001 
+00007 \textcolor{preprocessor}{#pragma once}
+00008 \textcolor{preprocessor}{#include <ConnectionRegistry.h>}
+00009 \textcolor{preprocessor}{#include <ConnectionHandle.h>}
+00010 \textcolor{preprocessor}{#include <ConnectionEVB7COM/ConnectionEVB7COM.h>}
+00011 \textcolor{preprocessor}{#include <ConnectionFX3/ConnectionFX3.h>}
+00012 
+00013 \textcolor{keyword}{namespace }lime
+00014 \{
+00015 \textcolor{keyword}{class }ConnectionSTREAM_UNITE : \textcolor{keyword}{public} \textcolor{keyword}{virtual} ConnectionFX3
+00016 \{
+00017 \textcolor{keyword}{public}:
+00018     ConnectionSTREAM_UNITE(\textcolor{keywordtype}{void}* ctx, \textcolor{keyword}{const} std::string &vidpid, \textcolor{keyword}{const} std::string &serial, \textcolor{keyword}{const} \textcolor{keywordtype}{unsigned} 
+      index, \textcolor{keyword}{const} \textcolor{keywordtype}{char}* comPortName=\textcolor{keyword}{nullptr});
+00019     \textcolor{keyword}{virtual} ~ConnectionSTREAM_UNITE(\textcolor{keywordtype}{void});
+00020 
+00021     \textcolor{keyword}{virtual} DeviceInfo GetDeviceInfo(\textcolor{keywordtype}{void}) \textcolor{keyword}{override};
+00022     \textcolor{keyword}{virtual} \textcolor{keywordtype}{int} TransactSPI(\textcolor{keyword}{const} \textcolor{keywordtype}{int} addr, \textcolor{keyword}{const} uint32\_t *writeData, uint32\_t *readData, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} 
+      size) \textcolor{keyword}{override};
+00023     \textcolor{keyword}{virtual} \textcolor{keywordtype}{int} DeviceReset(\textcolor{keywordtype}{int} ind = 0) \textcolor{keyword}{override};
+00024     \textcolor{keyword}{virtual} \textcolor{keywordtype}{int} TransferPacket(GenericPacket &pkt) \textcolor{keyword}{override};
+00025 \textcolor{keyword}{protected}:
+00026     ConnectionEVB7COM *comPort;
+00027 \};
+00028 
+00029 \textcolor{keyword}{class }ConnectionSTREAM_UNITEEntry : \textcolor{keyword}{public} \textcolor{keyword}{virtual} ConnectionFX3Entry
+00030 \{
+00031 \textcolor{keyword}{public}:
+00032     ConnectionSTREAM_UNITEEntry(\textcolor{keywordtype}{void});
+00033     ~ConnectionSTREAM_UNITEEntry(\textcolor{keywordtype}{void});
+00034     std::vector<ConnectionHandle> enumerate(\textcolor{keyword}{const} ConnectionHandle& hint);
+00035     IConnection* make(\textcolor{keyword}{const} ConnectionHandle& handle);
+00036 \};
+00037 
+00038 \}
+\end{DoxyCode}

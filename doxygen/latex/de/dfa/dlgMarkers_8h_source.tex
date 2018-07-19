@@ -1,0 +1,78 @@
+\subsection{dlg\+Markers.\+h}
+\label{dlgMarkers_8h_source}\index{/home/erik/prefix/default/src/limesuite-\/dev/src/ogl\+Graph/dlg\+Markers.\+h@{/home/erik/prefix/default/src/limesuite-\/dev/src/ogl\+Graph/dlg\+Markers.\+h}}
+
+\begin{DoxyCode}
+00001 
+00005 \textcolor{preprocessor}{#ifndef DLGMARKERS\_H}
+00006 \textcolor{preprocessor}{#define DLGMARKERS\_H}
+00007 
+00008 \textcolor{comment}{//(*Headers(dlgMarkers)}
+00009 \textcolor{preprocessor}{#include <wx/dialog.h>}
+00010 \textcolor{keyword}{class }wxFlexGridSizer;
+00011 \textcolor{keyword}{class }wxButton;
+00012 \textcolor{comment}{//*)}
+00013 \textcolor{preprocessor}{#include <wx/timer.h>}
+00014 
+00015 \textcolor{keyword}{class }wxStaticText;
+00016 \textcolor{keyword}{class }wxTextCtrl;
+00017 \textcolor{keyword}{class }wxCheckBox;
+00018 \textcolor{keyword}{class }wxChoice;
+00019 \textcolor{keyword}{class }wxButton;
+00020 \textcolor{preprocessor}{#include <vector>}
+00021 
+00022 \textcolor{keyword}{class }OpenGLGraph;
+00023 
+00024 \textcolor{keyword}{class }dlgMarkers: \textcolor{keyword}{public} wxDialog
+00025 \{
+00026     \textcolor{keyword}{public}:
+00027 
+00028         dlgMarkers(wxWindow* parent,wxWindowID \textcolor{keywordtype}{id}=wxID\_ANY,\textcolor{keyword}{const} wxPoint& pos=wxDefaultPosition,\textcolor{keyword}{const} 
+      wxSize& size=wxDefaultSize);
+00029         \textcolor{keyword}{virtual} ~dlgMarkers();
+00030                 OpenGLGraph* parent_graph;
+00031         \textcolor{keywordtype}{void} AddMarker(\textcolor{keywordtype}{int} \textcolor{keywordtype}{id});
+00032         std::vector<float> marker_valuesA;
+00033                 std::vector<float> marker_valuesB;
+00034         std::vector<wxStaticText*> labels;
+00035         std::vector<wxTextCtrl*> freqs;
+00036         std::vector<wxCheckBox*> enables;
+00037         std::vector<wxCheckBox*> shows;
+00038         \textcolor{keywordtype}{void} UpdateValues();
+00039         \textcolor{keywordtype}{void} AddDeltas();
+00040 
+00041         std::vector<wxChoice*> deltaSrc;
+00042         std::vector<wxStaticText*> deltaValues;
+00043 
+00044         \textcolor{comment}{//(*Declarations(dlgMarkers)}
+00045         wxButton* btnClose;
+00046         wxFlexGridSizer* sizerMarkerList;
+00047         wxFlexGridSizer* sizerDeltasList;
+00048         wxFlexGridSizer* FlexGridSizer1;
+00049         \textcolor{comment}{//*)}
+00050 
+00051         \textcolor{comment}{//(*Identifiers(dlgMarkers)}
+00052         \textcolor{keyword}{static} \textcolor{keyword}{const} \textcolor{keywordtype}{long} ID_BUTTON1;
+00053         \textcolor{comment}{//*)}
+00054 
+00055         \textcolor{comment}{//(*Handlers(dlgMarkers)}
+00056         \textcolor{keywordtype}{void} OnbtnCloseClick(wxCommandEvent& event);
+00057         \textcolor{keywordtype}{void} OnbtnAddMarkerClick(wxCommandEvent& event);
+00058         \textcolor{keywordtype}{void} OnbtnDeleteClick(wxCommandEvent& event);
+00059         \textcolor{keywordtype}{void} OnMarkerChange(wxCommandEvent& event);
+00060         \textcolor{keywordtype}{void} OnButton1Click(wxCommandEvent& event);
+00061         \textcolor{keywordtype}{void} OnInit(wxInitDialogEvent& event);
+00062         \textcolor{keywordtype}{void} OnButton1Click1(wxCommandEvent& event);
+00063         \textcolor{comment}{//*)}
+00064         \textcolor{keywordtype}{void} OnEnableMarker(wxCommandEvent& event);
+00065         \textcolor{keywordtype}{bool} refreshMarkFreq;
+00066 
+00067     \textcolor{keyword}{protected}:
+00068         \textcolor{keywordtype}{bool} initialized;
+00069         \textcolor{keywordtype}{void} BuildContent(wxWindow* parent,wxWindowID \textcolor{keywordtype}{id},\textcolor{keyword}{const} wxPoint& pos,\textcolor{keyword}{const} wxSize& 
+      size);
+00070 
+00071         DECLARE\_EVENT\_TABLE()
+00072 \};
+00073 
+00074 \textcolor{preprocessor}{#endif}
+\end{DoxyCode}

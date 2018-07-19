@@ -1,0 +1,672 @@
+\subsection{L\+M\+S7002\+M\+\_\+parameters\+\_\+compact.\+h}
+\label{LMS7002M__parameters__compact_8h_source}\index{/home/erik/prefix/default/src/limesuite-\/dev/mcu\+\_\+program/common\+\_\+src/\+L\+M\+S7002\+M\+\_\+parameters\+\_\+compact.\+h@{/home/erik/prefix/default/src/limesuite-\/dev/mcu\+\_\+program/common\+\_\+src/\+L\+M\+S7002\+M\+\_\+parameters\+\_\+compact.\+h}}
+
+\begin{DoxyCode}
+00001 
+00006 \textcolor{preprocessor}{#ifndef LMS7002M\_PARAMETERS\_COMPACT\_H}
+00007 \textcolor{preprocessor}{#define LMS7002M\_PARAMETERS\_COMPACT\_H}
+00008 
+00009 \textcolor{preprocessor}{#define MSB\_LSB(m, l) (m << 4 | l)}
+00010 
+00011 \textcolor{preprocessor}{#include "typedefs.h"}
+00012 
+00013 \textcolor{keyword}{typedef} \textcolor{keyword}{struct}
+00014 \{
+00015     uint16\_t address;
+00016     uint8\_t msblsb;
+00017 \} LMS7Parameter;
+00018 
+00019 \textcolor{comment}{//#define DCOFFI\_RFE 0x010E, 13<<4 |  7}
+00020 \textcolor{comment}{//#define DCOFFQ\_RFE 0x010E, 6<<4 |  0}
+00021 \textcolor{keyword}{extern} ROM \textcolor{keyword}{const} LMS7Parameter DCOFFI_RFE;
+00022 \textcolor{keyword}{extern} ROM \textcolor{keyword}{const} LMS7Parameter DCOFFQ_RFE;
+00023 
+00024 \textcolor{comment}{//#define IQCORR\_TXTSP 0x0203, 11<<4 |  0}
+00025 \textcolor{comment}{//#define DCCORRI\_TXTSP 0x0204, 15<<4 |  8}
+00026 \textcolor{comment}{//#define DCCORRQ\_TXTSP 0x0204, 7<<4 |  0}
+00027 
+00028 \textcolor{keyword}{extern} ROM \textcolor{keyword}{const} LMS7Parameter DCCORRI_TXTSP;
+00029 \textcolor{keyword}{extern} ROM \textcolor{keyword}{const} LMS7Parameter DCCORRQ_TXTSP;
+00030 \textcolor{keyword}{extern} ROM \textcolor{keyword}{const} LMS7Parameter IQCORR_TXTSP;
+00031 \textcolor{comment}{//#define IQCORR\_RXTSP 0x0403, 11<<4 |  0}
+00032 \textcolor{keyword}{extern} ROM \textcolor{keyword}{const} LMS7Parameter IQCORR_RXTSP;
+00033 
+00034 \textcolor{comment}{//#define GCORRQ\_TXTSP 0x0201, 10<<4 |  0}
+00035 \textcolor{comment}{//#define GCORRI\_TXTSP 0x0202, 10<<4 |  0}
+00036 \textcolor{keyword}{extern} ROM \textcolor{keyword}{const} LMS7Parameter GCORRI_TXTSP;
+00037 \textcolor{keyword}{extern} ROM \textcolor{keyword}{const} LMS7Parameter GCORRQ_TXTSP;
+00038 \textcolor{comment}{//#define GCORRQ\_RXTSP 0x0401, 10<<4 |  0}
+00039 \textcolor{comment}{//#define GCORRI\_RXTSP 0x0402, 10<<4 |  0}
+00040 \textcolor{keyword}{extern} ROM \textcolor{keyword}{const} LMS7Parameter GCORRI_RXTSP;
+00041 \textcolor{keyword}{extern} ROM \textcolor{keyword}{const} LMS7Parameter GCORRQ_RXTSP;
+00042 
+00043 \textcolor{preprocessor}{#define SECTION\_LimeLight 0x0020, 0x002F}
+00044 \textcolor{preprocessor}{#define SECTION\_AFE 0x0082, 0x0082}
+00045 \textcolor{preprocessor}{#define SECTION\_BIAS 0x0084, 0x0084}
+00046 \textcolor{preprocessor}{#define SECTION\_XBUF 0x0085, 0x0085}
+00047 \textcolor{preprocessor}{#define SECTION\_CGEN 0x0086, 0x008C}
+00048 \textcolor{preprocessor}{#define SECTION\_LDO 0x0092, 0x00A7}
+00049 \textcolor{preprocessor}{#define SECTION\_BIST 0x00A8, 0x00A8}
+00050 \textcolor{preprocessor}{#define SECTION\_CDS 0x00AD, 0x00AE}
+00051 \textcolor{preprocessor}{#define SECTION\_TRF 0x0100, 0x0104}
+00052 \textcolor{preprocessor}{#define SECTION\_TBB 0x0105, 0x010A}
+00053 \textcolor{preprocessor}{#define SECTION\_RFE 0x010C, 0x0114}
+00054 \textcolor{preprocessor}{#define SECTION\_RBB 0x0115, 0x011A}
+00055 \textcolor{preprocessor}{#define SECTION\_SX 0x011C, 0x0124}
+00056 \textcolor{preprocessor}{#define SECTION\_TxTSP 0x0200, 0x020C}
+00057 \textcolor{preprocessor}{#define SECTION\_TxNCO 0x0240, 0x0261}
+00058 \textcolor{preprocessor}{#define SECTION\_RxTSP 0x0400, 0x040F}
+00059 \textcolor{preprocessor}{#define SECTION\_RxNCO 0x0440, 0x0461}
+00060 \textcolor{preprocessor}{#define SECTION\_RSSI\_DC\_CALIBRATION 0x05C0,0x05CC}
+00061 
+00062 \textcolor{comment}{//parameters are defines as uint16\_t address, uint16\_t msb\_lsb bits}
+00063 \textcolor{preprocessor}{#define MRST\_TX\_B 0x0020, 14<<4 |  14}
+00064 \textcolor{preprocessor}{#define LRST\_TX\_A 0x0020, 13<<4 |  13}
+00065 \textcolor{preprocessor}{#define MRST\_TX\_A 0x0020, 12<<4 |  12}
+00066 \textcolor{preprocessor}{#define LRST\_RX\_B 0x0020, 11<<4 |  11}
+00067 \textcolor{preprocessor}{#define MRST\_RX\_B 0x0020, 10<<4 |  10}
+00068 \textcolor{preprocessor}{#define LRST\_RX\_A 0x0020, 9<<4 |  9}
+00069 \textcolor{preprocessor}{#define MRST\_RX\_A 0x0020, 8<<4 |  8}
+00070 \textcolor{preprocessor}{#define SRST\_RXFIFO 0x0020, 7<<4 |  7}
+00071 \textcolor{preprocessor}{#define SRST\_TXFIFO 0x0020, 6<<4 |  6}
+00072 \textcolor{preprocessor}{#define RXEN\_B 0x0020, 5<<4 |  5}
+00073 \textcolor{preprocessor}{#define RXEN\_A 0x0020, 4<<4 |  4}
+00074 \textcolor{preprocessor}{#define TXEN\_B 0x0020, 3<<4 |  3}
+00075 \textcolor{preprocessor}{#define TXEN\_A 0x0020, 2<<4 |  2}
+00076 \textcolor{preprocessor}{#define MAC 0x0020, 1<<4 |  0}
+00077 \textcolor{preprocessor}{#define TX\_CLK\_PE 0x0021, 11<<4 |  11}
+00078 \textcolor{preprocessor}{#define RX\_CLK\_PE 0x0021, 10<<4 |  10}
+00079 \textcolor{preprocessor}{#define SDA\_PE 0x0021, 9<<4 |  9}
+00080 \textcolor{preprocessor}{#define SDA\_DS 0x0021, 8<<4 |  8}
+00081 \textcolor{preprocessor}{#define SCL\_PE 0x0021, 7<<4 |  7}
+00082 \textcolor{preprocessor}{#define SCL\_DS 0x0021, 6<<4 |  6}
+00083 \textcolor{preprocessor}{#define SDIO\_DS 0x0021, 5<<4 |  5}
+00084 \textcolor{preprocessor}{#define SDIO\_PE 0x0021, 4<<4 |  4}
+00085 \textcolor{preprocessor}{#define SDO\_PE 0x0021, 3<<4 |  3}
+00086 \textcolor{preprocessor}{#define SCLK\_PE 0x0021, 2<<4 |  2}
+00087 \textcolor{preprocessor}{#define SEN\_PE 0x0021, 1<<4 |  1}
+00088 \textcolor{preprocessor}{#define SPIMODE 0x0021, 0<<4 |  0}
+00089 \textcolor{preprocessor}{#define DIQ2\_DS 0x0022, 11<<4 |  11}
+00090 \textcolor{preprocessor}{#define DIQ2\_PE 0x0022, 10<<4 |  10}
+00091 \textcolor{preprocessor}{#define IQ\_SEL\_EN\_2\_PE 0x0022, 9<<4 |  9}
+00092 \textcolor{preprocessor}{#define TXNRX2\_PE 0x0022, 8<<4 |  8}
+00093 \textcolor{preprocessor}{#define FCLK2\_PE 0x0022, 7<<4 |  7}
+00094 \textcolor{preprocessor}{#define MCLK2\_PE 0x0022, 6<<4 |  6}
+00095 \textcolor{preprocessor}{#define DIQ1\_DS 0x0022, 5<<4 |  5}
+00096 \textcolor{preprocessor}{#define DIQ1\_PE 0x0022, 4<<4 |  4}
+00097 \textcolor{preprocessor}{#define IQ\_SEL\_EN\_1\_PE 0x0022, 3<<4 |  3}
+00098 \textcolor{preprocessor}{#define TXNRX1\_PE 0x0022, 2<<4 |  2}
+00099 \textcolor{preprocessor}{#define FCLK1\_PE 0x0022, 1<<4 |  1}
+00100 \textcolor{preprocessor}{#define MCLK1\_PE 0x0022, 0<<4 |  0}
+00101 \textcolor{preprocessor}{#define DIQDIRCTR2 0x0023, 15<<4 |  15}
+00102 \textcolor{preprocessor}{#define DIQDIR2 0x0023, 14<<4 |  14}
+00103 \textcolor{preprocessor}{#define DIQDIRCTR1 0x0023, 13<<4 |  13}
+00104 \textcolor{preprocessor}{#define DIQDIR1 0x0023, 12<<4 |  12}
+00105 \textcolor{preprocessor}{#define ENABLEDIRCTR2 0x0023, 11<<4 |  11}
+00106 \textcolor{preprocessor}{#define ENABLEDIR2 0x0023, 10<<4 |  10}
+00107 \textcolor{preprocessor}{#define ENABLEDIRCTR1 0x0023, 9<<4 |  9}
+00108 \textcolor{preprocessor}{#define ENABLEDIR1 0x0023, 8<<4 |  8}
+00109 \textcolor{preprocessor}{#define MOD\_EN 0x0023, 6<<4 |  6}
+00110 \textcolor{preprocessor}{#define LML2\_FIDM 0x0023, 5<<4 |  5}
+00111 \textcolor{preprocessor}{#define LML2\_TXNRXIQ 0x0023, 4<<4 |  4}
+00112 \textcolor{preprocessor}{#define LML2\_MODE 0x0023, 3<<4 |  3}
+00113 \textcolor{preprocessor}{#define LML1\_FIDM 0x0023, 2<<4 |  2}
+00114 \textcolor{preprocessor}{#define LML1\_TXNRXIQ 0x0023, 1<<4 |  1}
+00115 \textcolor{preprocessor}{#define LML1\_MODE 0x0023, 0<<4 |  0}
+00116 \textcolor{preprocessor}{#define LML1\_S3S 0x0024, 15<<4 |  14}
+00117 \textcolor{preprocessor}{#define LML1\_S2S 0x0024, 13<<4 |  12}
+00118 \textcolor{preprocessor}{#define LML1\_S1S 0x0024, 11<<4 |  10}
+00119 \textcolor{preprocessor}{#define LML1\_S0S 0x0024, 9<<4 |  8}
+00120 \textcolor{preprocessor}{#define LML1\_BQP 0x0024, 7<<4 |  6}
+00121 \textcolor{preprocessor}{#define LML1\_BIP 0x0024, 5<<4 |  4}
+00122 \textcolor{preprocessor}{#define LML1\_AQP 0x0024, 3<<4 |  2}
+00123 \textcolor{preprocessor}{#define LML1\_AIP 0x0024, 1<<4 |  0}
+00124 \textcolor{preprocessor}{#define LML1\_BB2RF\_PST 0x0025, 15<<4 |  8}
+00125 \textcolor{preprocessor}{#define LML1\_BB2RF\_PRE 0x0025, 7<<4 |  0}
+00126 \textcolor{preprocessor}{#define LML1\_RF2BB\_PST 0x0026, 15<<4 |  8}
+00127 \textcolor{preprocessor}{#define LML1\_RF2BB\_PRE 0x0026, 7<<4 |  0}
+00128 \textcolor{preprocessor}{#define LML2\_S3S 0x0027, 15<<4 |  14}
+00129 \textcolor{preprocessor}{#define LML2\_S2S 0x0027, 13<<4 |  12}
+00130 \textcolor{preprocessor}{#define LML2\_S1S 0x0027, 11<<4 |  10}
+00131 \textcolor{preprocessor}{#define LML2\_S0S 0x0027, 9<<4 |  8}
+00132 \textcolor{preprocessor}{#define LML2\_BQP 0x0027, 7<<4 |  6}
+00133 \textcolor{preprocessor}{#define LML2\_BIP 0x0027, 5<<4 |  4}
+00134 \textcolor{preprocessor}{#define LML2\_AQP 0x0027, 3<<4 |  2}
+00135 \textcolor{preprocessor}{#define LML2\_AIP 0x0027, 1<<4 |  0}
+00136 \textcolor{preprocessor}{#define LML2\_BB2RF\_PST 0x0028, 15<<4 |  8}
+00137 \textcolor{preprocessor}{#define LML2\_BB2RF\_PRE 0x0028, 7<<4 |  0}
+00138 \textcolor{preprocessor}{#define LML2\_RF2BB\_PST 0x0029, 15<<4 |  8}
+00139 \textcolor{preprocessor}{#define LML2\_RF2BB\_PRE 0x0029, 7<<4 |  0}
+00140 \textcolor{preprocessor}{#define RX\_MUX 0x002A, 11<<4 |  10}
+00141 \textcolor{preprocessor}{#define TX\_MUX 0x002A, 9<<4 |  8}
+00142 \textcolor{preprocessor}{#define TXRDCLK\_MUX 0x002A, 7<<4 |  6}
+00143 \textcolor{preprocessor}{#define TXWRCLK\_MUX 0x002A, 5<<4 |  4}
+00144 \textcolor{preprocessor}{#define RXRDCLK\_MUX 0x002A, 3<<4 |  2}
+00145 \textcolor{preprocessor}{#define RXWRCLK\_MUX 0x002A, 1<<4 |  0}
+00146 \textcolor{preprocessor}{#define FCLK2\_INV 0x002B, 15<<4 |  15}
+00147 \textcolor{preprocessor}{#define FCLK1\_INV 0x002B, 14<<4 |  14}
+00148 \textcolor{preprocessor}{#define MCLK2DLY 0x002B, 13<<4 |  12}
+00149 \textcolor{preprocessor}{#define MCLK1DLY 0x002B, 11<<4 |  10}
+00150 \textcolor{preprocessor}{#define MCLK2SRC 0x002B, 5<<4 |  4}
+00151 \textcolor{preprocessor}{#define MCLK1SRC 0x002B, 3<<4 |  2}
+00152 \textcolor{preprocessor}{#define TXDIVEN 0x002B, 1<<4 |  1}
+00153 \textcolor{preprocessor}{#define RXDIVEN 0x002B, 0<<4 |  0}
+00154 \textcolor{preprocessor}{#define TXTSPCLKA\_DIV 0x002C, 15<<4 |  8}
+00155 \textcolor{preprocessor}{#define RXTSPCLKA\_DIV 0x002C, 7<<4 |  0}
+00156 \textcolor{preprocessor}{#define MIMO\_SISO 0x002E, 15<<4 |  15}
+00157 \textcolor{preprocessor}{#define VER 0x002F, 15<<4 |  11}
+00158 \textcolor{preprocessor}{#define REV 0x002F, 10<<4 |  6}
+00159 \textcolor{preprocessor}{#define MASK 0x002F, 5<<4 |  0}
+00160 \textcolor{preprocessor}{#define EN\_DIR\_LDO 0x0081, 3<<4 |  3}
+00161 \textcolor{preprocessor}{#define EN\_DIR\_CGEN 0x0081, 2<<4 |  2}
+00162 \textcolor{preprocessor}{#define EN\_DIR\_XBUF 0x0081, 1<<4 |  1}
+00163 \textcolor{preprocessor}{#define EN\_DIR\_AFE 0x0081, 0<<4 |  0}
+00164 \textcolor{preprocessor}{#define ISEL\_DAC\_AFE 0x0082, 15<<4 |  13}
+00165 \textcolor{preprocessor}{#define MODE\_INTERLEAVE\_AFE 0x0082, 12<<4 |  12}
+00166 \textcolor{preprocessor}{#define MUX\_AFE\_1 0x0082, 11<<4 |  10}
+00167 \textcolor{preprocessor}{#define MUX\_AFE\_2 0x0082, 9<<4 |  8}
+00168 \textcolor{preprocessor}{#define PD\_AFE 0x0082, 5<<4 |  5}
+00169 \textcolor{preprocessor}{#define PD\_RX\_AFE1 0x0082, 4<<4 |  4}
+00170 \textcolor{preprocessor}{#define PD\_RX\_AFE2 0x0082, 3<<4 |  3}
+00171 \textcolor{preprocessor}{#define PD\_TX\_AFE1 0x0082, 2<<4 |  2}
+00172 \textcolor{preprocessor}{#define PD\_TX\_AFE2 0x0082, 1<<4 |  1}
+00173 \textcolor{preprocessor}{#define EN\_G\_AFE 0x0082, 0<<4 |  0}
+00174 \textcolor{preprocessor}{#define MUX\_BIAS\_OUT 0x0084, 12<<4 |  11}
+00175 \textcolor{preprocessor}{#define RP\_CALIB\_BIAS 0x0084, 10<<4 |  6}
+00176 \textcolor{preprocessor}{#define PD\_FRP\_BIAS 0x0084, 4<<4 |  4}
+00177 \textcolor{preprocessor}{#define PD\_F\_BIAS 0x0084, 3<<4 |  3}
+00178 \textcolor{preprocessor}{#define PD\_PTRP\_BIAS 0x0084, 2<<4 |  2}
+00179 \textcolor{preprocessor}{#define PD\_PT\_BIAS 0x0084, 1<<4 |  1}
+00180 \textcolor{preprocessor}{#define PD\_BIAS\_MASTER 0x0084, 0<<4 |  0}
+00181 \textcolor{preprocessor}{#define SLFB\_XBUF\_RX 0x0085, 8<<4 |  8}
+00182 \textcolor{preprocessor}{#define SLFB\_XBUF\_TX 0x0085, 7<<4 |  7}
+00183 \textcolor{preprocessor}{#define BYP\_XBUF\_RX 0x0085, 6<<4 |  6}
+00184 \textcolor{preprocessor}{#define BYP\_XBUF\_TX 0x0085, 5<<4 |  5}
+00185 \textcolor{preprocessor}{#define EN\_OUT2\_XBUF\_TX 0x0085, 4<<4 |  4}
+00186 \textcolor{preprocessor}{#define EN\_TBUFIN\_XBUF\_RX 0x0085, 3<<4 |  3}
+00187 \textcolor{preprocessor}{#define PD\_XBUF\_RX 0x0085, 2<<4 |  2}
+00188 \textcolor{preprocessor}{#define PD\_XBUF\_TX 0x0085, 1<<4 |  1}
+00189 \textcolor{preprocessor}{#define EN\_G\_XBUF 0x0085, 0<<4 |  0}
+00190 \textcolor{preprocessor}{#define SPDUP\_VCO\_CGEN 0x0086, 15<<4 |  15}
+00191 \textcolor{preprocessor}{#define RESET\_N\_CGEN 0x0086, 14<<4 |  14}
+00192 \textcolor{preprocessor}{#define EN\_ADCCLKH\_CLKGN 0x0086, 11<<4 |  11}
+00193 \textcolor{preprocessor}{#define EN\_COARSE\_CKLGEN 0x0086, 10<<4 |  10}
+00194 \textcolor{preprocessor}{#define EN\_INTONLY\_SDM\_CGEN 0x0086, 9<<4 |  9}
+00195 \textcolor{preprocessor}{#define EN\_SDM\_CLK\_CGEN 0x0086, 8<<4 |  8}
+00196 \textcolor{preprocessor}{#define PD\_CP\_CGEN 0x0086, 6<<4 |  6}
+00197 \textcolor{preprocessor}{#define PD\_FDIV\_FB\_CGEN 0x0086, 5<<4 |  5}
+00198 \textcolor{preprocessor}{#define PD\_FDIV\_O\_CGEN 0x0086, 4<<4 |  4}
+00199 \textcolor{preprocessor}{#define PD\_SDM\_CGEN 0x0086, 3<<4 |  3}
+00200 \textcolor{preprocessor}{#define PD\_VCO\_CGEN 0x0086, 2<<4 |  2}
+00201 \textcolor{preprocessor}{#define PD\_VCO\_COMP\_CGEN 0x0086, 1<<4 |  1}
+00202 \textcolor{preprocessor}{#define EN\_G\_CGEN 0x0086, 0<<4 |  0}
+00203 \textcolor{preprocessor}{#define FRAC\_SDM\_CGEN 0x0087, 19<<4 |  0}
+00204 \textcolor{preprocessor}{#define INT\_SDM\_CGEN 0x0088, 13<<4 |  4}
+00205 \textcolor{preprocessor}{#define REV\_SDMCLK\_CGEN 0x0089, 15<<4 |  15}
+00206 \textcolor{preprocessor}{#define SEL\_SDMCLK\_CGEN 0x0089, 14<<4 |  14}
+00207 \textcolor{preprocessor}{#define SX\_DITHER\_EN\_CGEN 0x0089, 13<<4 |  13}
+00208 \textcolor{preprocessor}{#define CLKH\_OV\_CLKL\_CGEN 0x0089, 12<<4 |  11}
+00209 \textcolor{preprocessor}{#define DIV\_OUTCH\_CGEN 0x0089, 10<<4 |  3}
+00210 \textcolor{preprocessor}{#define TST\_CGEN 0x0089, 2<<4 |  0}
+00211 \textcolor{preprocessor}{#define REV\_CLKDAC\_CGEN 0x008A, 14<<4 |  14}
+00212 \textcolor{preprocessor}{#define REV\_CLKADC\_CGEN 0x008A, 13<<4 |  13}
+00213 \textcolor{preprocessor}{#define REVPH\_PFD\_CGEN 0x008A, 12<<4 |  12}
+00214 \textcolor{preprocessor}{#define IOFFSET\_CP\_CGEN 0x008A, 11<<4 |  6}
+00215 \textcolor{preprocessor}{#define IPULSE\_CP\_CGEN 0x008A, 5<<4 |  0}
+00216 \textcolor{preprocessor}{#define ICT\_VCO\_CGEN 0x008B, 13<<4 |  9}
+00217 \textcolor{preprocessor}{#define CSW\_VCO\_CGEN 0x008B, 8<<4 |  1}
+00218 \textcolor{preprocessor}{#define COARSE\_START\_CGEN 0x008B, 0<<4 |  0}
+00219 \textcolor{preprocessor}{#define COARSE\_STEPDONE\_CGEN 0x008C, 15<<4 |  15}
+00220 \textcolor{preprocessor}{#define COARSEPLL\_COMPO\_CGEN 0x008C, 14<<4 |  14}
+00221 \textcolor{preprocessor}{#define VCO\_CMPHO\_CGEN 0x008C, 13<<4 |  13}
+00222 \textcolor{preprocessor}{#define VCO\_CMPLO\_CGEN 0x008C, 12<<4 |  12}
+00223 \textcolor{preprocessor}{#define CP2\_CGEN 0x008C, 11<<4 |  8}
+00224 \textcolor{preprocessor}{#define CP3\_CGEN 0x008C, 7<<4 |  4}
+00225 \textcolor{preprocessor}{#define CZ\_CGEN 0x008C, 3<<4 |  0}
+00226 \textcolor{preprocessor}{#define EN\_LDO\_DIG 0x0092, 15<<4 |  15}
+00227 \textcolor{preprocessor}{#define EN\_LDO\_DIGGN 0x0092, 14<<4 |  14}
+00228 \textcolor{preprocessor}{#define EN\_LDO\_DIGSXR 0x0092, 13<<4 |  13}
+00229 \textcolor{preprocessor}{#define EN\_LDO\_DIGSXT 0x0092, 12<<4 |  12}
+00230 \textcolor{preprocessor}{#define EN\_LDO\_DIVGN 0x0092, 11<<4 |  11}
+00231 \textcolor{preprocessor}{#define EN\_LDO\_DIVSXR 0x0092, 10<<4 |  10}
+00232 \textcolor{preprocessor}{#define EN\_LDO\_DIVSXT 0x0092, 9<<4 |  9}
+00233 \textcolor{preprocessor}{#define EN\_LDO\_LNA12 0x0092, 8<<4 |  8}
+00234 \textcolor{preprocessor}{#define EN\_LDO\_LNA14 0x0092, 7<<4 |  7}
+00235 \textcolor{preprocessor}{#define EN\_LDO\_MXRFE 0x0092, 6<<4 |  6}
+00236 \textcolor{preprocessor}{#define EN\_LDO\_RBB 0x0092, 5<<4 |  5}
+00237 \textcolor{preprocessor}{#define EN\_LDO\_RXBUF 0x0092, 4<<4 |  4}
+00238 \textcolor{preprocessor}{#define EN\_LDO\_TBB 0x0092, 3<<4 |  3}
+00239 \textcolor{preprocessor}{#define EN\_LDO\_TIA12 0x0092, 2<<4 |  2}
+00240 \textcolor{preprocessor}{#define EN\_LDO\_TIA14 0x0092, 1<<4 |  1}
+00241 \textcolor{preprocessor}{#define EN\_G\_LDO 0x0092, 0<<4 |  0}
+00242 \textcolor{preprocessor}{#define EN\_LOADIMP\_LDO\_TLOB 0x0093, 15<<4 |  15}
+00243 \textcolor{preprocessor}{#define EN\_LOADIMP\_LDO\_TPAD 0x0093, 14<<4 |  14}
+00244 \textcolor{preprocessor}{#define EN\_LOADIMP\_LDO\_TXBUF 0x0093, 13<<4 |  13}
+00245 \textcolor{preprocessor}{#define EN\_LOADIMP\_LDO\_VCOGN 0x0093, 12<<4 |  12}
+00246 \textcolor{preprocessor}{#define EN\_LOADIMP\_LDO\_VCOSXR 0x0093, 11<<4 |  11}
+00247 \textcolor{preprocessor}{#define EN\_LOADIMP\_LDO\_VCOSXT 0x0093, 10<<4 |  10}
+00248 \textcolor{preprocessor}{#define EN\_LDO\_AFE 0x0093, 9<<4 |  9}
+00249 \textcolor{preprocessor}{#define EN\_LDO\_CPGN 0x0093, 8<<4 |  8}
+00250 \textcolor{preprocessor}{#define EN\_LDO\_CPSXR 0x0093, 7<<4 |  7}
+00251 \textcolor{preprocessor}{#define EN\_LDO\_TLOB 0x0093, 6<<4 |  6}
+00252 \textcolor{preprocessor}{#define EN\_LDO\_TPAD 0x0093, 5<<4 |  5}
+00253 \textcolor{preprocessor}{#define EN\_LDO\_TXBUF 0x0093, 4<<4 |  4}
+00254 \textcolor{preprocessor}{#define EN\_LDO\_VCOGN 0x0093, 3<<4 |  3}
+00255 \textcolor{preprocessor}{#define EN\_LDO\_VCOSXR 0x0093, 2<<4 |  2}
+00256 \textcolor{preprocessor}{#define EN\_LDO\_VCOSXT 0x0093, 1<<4 |  1}
+00257 \textcolor{preprocessor}{#define EN\_LDO\_CPSXT 0x0093, 0<<4 |  0}
+00258 \textcolor{preprocessor}{#define EN\_LOADIMP\_LDO\_CPSXT 0x0094, 15<<4 |  15}
+00259 \textcolor{preprocessor}{#define EN\_LOADIMP\_LDO\_DIG 0x0094, 14<<4 |  14}
+00260 \textcolor{preprocessor}{#define EN\_LOADIMP\_LDO\_DIGGN 0x0094, 13<<4 |  13}
+00261 \textcolor{preprocessor}{#define EN\_LOADIMP\_LDO\_DIGSXR 0x0094, 12<<4 |  12}
+00262 \textcolor{preprocessor}{#define EN\_LOADIMP\_LDO\_DIGSXT 0x0094, 11<<4 |  11}
+00263 \textcolor{preprocessor}{#define EN\_LOADIMP\_LDO\_DIVGN 0x0094, 10<<4 |  10}
+00264 \textcolor{preprocessor}{#define EN\_LOADIMP\_LDO\_DIVSXR 0x0094, 9<<4 |  9}
+00265 \textcolor{preprocessor}{#define EN\_LOADIMP\_LDO\_DIVSXT 0x0094, 8<<4 |  8}
+00266 \textcolor{preprocessor}{#define EN\_LOADIMP\_LDO\_LNA12 0x0094, 7<<4 |  7}
+00267 \textcolor{preprocessor}{#define EN\_LOADIMP\_LDO\_LNA14 0x0094, 6<<4 |  6}
+00268 \textcolor{preprocessor}{#define EN\_LOADIMP\_LDO\_MXRFE 0x0094, 5<<4 |  5}
+00269 \textcolor{preprocessor}{#define EN\_LOADIMP\_LDO\_RBB 0x0094, 4<<4 |  4}
+00270 \textcolor{preprocessor}{#define EN\_LOADIMP\_LDO\_RXBUF 0x0094, 3<<4 |  3}
+00271 \textcolor{preprocessor}{#define EN\_LOADIMP\_LDO\_TBB 0x0094, 2<<4 |  2}
+00272 \textcolor{preprocessor}{#define EN\_LOADIMP\_LDO\_TIA12 0x0094, 1<<4 |  1}
+00273 \textcolor{preprocessor}{#define EN\_LOADIMP\_LDO\_TIA14 0x0094, 0<<4 |  0}
+00274 \textcolor{preprocessor}{#define BYP\_LDO\_TBB 0x0095, 15<<4 |  15}
+00275 \textcolor{preprocessor}{#define BYP\_LDO\_TIA12 0x0095, 14<<4 |  14}
+00276 \textcolor{preprocessor}{#define BYP\_LDO\_TIA14 0x0095, 13<<4 |  13}
+00277 \textcolor{preprocessor}{#define BYP\_LDO\_TLOB 0x0095, 12<<4 |  12}
+00278 \textcolor{preprocessor}{#define BYP\_LDO\_TPAD 0x0095, 11<<4 |  11}
+00279 \textcolor{preprocessor}{#define BYP\_LDO\_TXBUF 0x0095, 10<<4 |  10}
+00280 \textcolor{preprocessor}{#define BYP\_LDO\_VCOGN 0x0095, 9<<4 |  9}
+00281 \textcolor{preprocessor}{#define BYP\_LDO\_VCOSXR 0x0095, 8<<4 |  8}
+00282 \textcolor{preprocessor}{#define BYP\_LDO\_VCOSXT 0x0095, 7<<4 |  7}
+00283 \textcolor{preprocessor}{#define EN\_LOADIMP\_LDO\_AFE 0x0095, 2<<4 |  2}
+00284 \textcolor{preprocessor}{#define EN\_LOADIMP\_LDO\_CPGN 0x0095, 1<<4 |  1}
+00285 \textcolor{preprocessor}{#define EN\_LOADIMP\_LDO\_CPSXR 0x0095, 0<<4 |  0}
+00286 \textcolor{preprocessor}{#define BYP\_LDO\_AFE 0x0096, 15<<4 |  15}
+00287 \textcolor{preprocessor}{#define BYP\_LDO\_CPGN 0x0096, 14<<4 |  14}
+00288 \textcolor{preprocessor}{#define BYP\_LDO\_CPSXR 0x0096, 13<<4 |  13}
+00289 \textcolor{preprocessor}{#define BYP\_LDO\_CPSXT 0x0096, 12<<4 |  12}
+00290 \textcolor{preprocessor}{#define BYP\_LDO\_DIG 0x0096, 11<<4 |  11}
+00291 \textcolor{preprocessor}{#define BYP\_LDO\_DIGGN 0x0096, 10<<4 |  10}
+00292 \textcolor{preprocessor}{#define BYP\_LDO\_DIGSXR 0x0096, 9<<4 |  9}
+00293 \textcolor{preprocessor}{#define BYP\_LDO\_DIGSXT 0x0096, 8<<4 |  8}
+00294 \textcolor{preprocessor}{#define BYP\_LDO\_DIVGN 0x0096, 7<<4 |  7}
+00295 \textcolor{preprocessor}{#define BYP\_LDO\_DIVSXR 0x0096, 6<<4 |  6}
+00296 \textcolor{preprocessor}{#define BYP\_LDO\_DIVSXT 0x0096, 5<<4 |  5}
+00297 \textcolor{preprocessor}{#define BYP\_LDO\_LNA12 0x0096, 4<<4 |  4}
+00298 \textcolor{preprocessor}{#define BYP\_LDO\_LNA14 0x0096, 3<<4 |  3}
+00299 \textcolor{preprocessor}{#define BYP\_LDO\_MXRFE 0x0096, 2<<4 |  2}
+00300 \textcolor{preprocessor}{#define BYP\_LDO\_RBB 0x0096, 1<<4 |  1}
+00301 \textcolor{preprocessor}{#define BYP\_LDO\_RXBUF 0x0096, 0<<4 |  0}
+00302 \textcolor{preprocessor}{#define SPDUP\_LDO\_DIVSXR 0x0097, 15<<4 |  15}
+00303 \textcolor{preprocessor}{#define SPDUP\_LDO\_DIVSXT 0x0097, 14<<4 |  14}
+00304 \textcolor{preprocessor}{#define SPDUP\_LDO\_LNA12 0x0097, 13<<4 |  13}
+00305 \textcolor{preprocessor}{#define SPDUP\_LDO\_LNA14 0x0097, 12<<4 |  12}
+00306 \textcolor{preprocessor}{#define SPDUP\_LDO\_MXRFE 0x0097, 11<<4 |  11}
+00307 \textcolor{preprocessor}{#define SPDUP\_LDO\_RBB 0x0097, 10<<4 |  10}
+00308 \textcolor{preprocessor}{#define SPDUP\_LDO\_RXBUF 0x0097, 9<<4 |  9}
+00309 \textcolor{preprocessor}{#define SPDUP\_LDO\_TBB 0x0097, 8<<4 |  8}
+00310 \textcolor{preprocessor}{#define SPDUP\_LDO\_TIA12 0x0097, 7<<4 |  7}
+00311 \textcolor{preprocessor}{#define SPDUP\_LDO\_TIA14 0x0097, 6<<4 |  6}
+00312 \textcolor{preprocessor}{#define SPDUP\_LDO\_TLOB 0x0097, 5<<4 |  5}
+00313 \textcolor{preprocessor}{#define SPDUP\_LDO\_TPAD 0x0097, 4<<4 |  4}
+00314 \textcolor{preprocessor}{#define SPDUP\_LDO\_TXBUF 0x0097, 3<<4 |  3}
+00315 \textcolor{preprocessor}{#define SPDUP\_LDO\_VCOGN 0x0097, 2<<4 |  2}
+00316 \textcolor{preprocessor}{#define SPDUP\_LDO\_VCOSXR 0x0097, 1<<4 |  1}
+00317 \textcolor{preprocessor}{#define SPDUP\_LDO\_VCOSXT 0x0097, 0<<4 |  0}
+00318 \textcolor{preprocessor}{#define SPDUP\_LDO\_AFE 0x0098, 8<<4 |  8}
+00319 \textcolor{preprocessor}{#define SPDUP\_LDO\_CPGN 0x0098, 7<<4 |  7}
+00320 \textcolor{preprocessor}{#define SPDUP\_LDO\_CPSXR 0x0098, 6<<4 |  6}
+00321 \textcolor{preprocessor}{#define SPDUP\_LDO\_CPSXT 0x0098, 5<<4 |  5}
+00322 \textcolor{preprocessor}{#define SPDUP\_LDO\_DIG 0x0098, 4<<4 |  4}
+00323 \textcolor{preprocessor}{#define SPDUP\_LDO\_DIGGN 0x0098, 3<<4 |  3}
+00324 \textcolor{preprocessor}{#define SPDUP\_LDO\_DIGSXR 0x0098, 2<<4 |  2}
+00325 \textcolor{preprocessor}{#define SPDUP\_LDO\_DIGSXT 0x0098, 1<<4 |  1}
+00326 \textcolor{preprocessor}{#define SPDUP\_LDO\_DIVGN 0x0098, 0<<4 |  0}
+00327 \textcolor{preprocessor}{#define RDIV\_VCOSXR 0x0099, 15<<4 |  8}
+00328 \textcolor{preprocessor}{#define RDIV\_VCOSXT 0x0099, 7<<4 |  0}
+00329 \textcolor{preprocessor}{#define RDIV\_TXBUF 0x009A, 15<<4 |  8}
+00330 \textcolor{preprocessor}{#define RDIV\_VCOGN 0x009A, 7<<4 |  0}
+00331 \textcolor{preprocessor}{#define RDIV\_TLOB 0x009B, 15<<4 |  8}
+00332 \textcolor{preprocessor}{#define RDIV\_TPAD 0x009B, 7<<4 |  0}
+00333 \textcolor{preprocessor}{#define RDIV\_TIA12 0x009C, 15<<4 |  8}
+00334 \textcolor{preprocessor}{#define RDIV\_TIA14 0x009C, 7<<4 |  0}
+00335 \textcolor{preprocessor}{#define RDIV\_RXBUF 0x009D, 15<<4 |  8}
+00336 \textcolor{preprocessor}{#define RDIV\_TBB 0x009D, 7<<4 |  0}
+00337 \textcolor{preprocessor}{#define RDIV\_MXRFE 0x009E, 15<<4 |  8}
+00338 \textcolor{preprocessor}{#define RDIV\_RBB 0x009E, 7<<4 |  0}
+00339 \textcolor{preprocessor}{#define RDIV\_LNA12 0x009F, 15<<4 |  8}
+00340 \textcolor{preprocessor}{#define RDIV\_LNA14 0x009F, 7<<4 |  0}
+00341 \textcolor{preprocessor}{#define RDIV\_DIVSXR 0x00A0, 15<<4 |  8}
+00342 \textcolor{preprocessor}{#define RDIV\_DIVSXT 0x00A0, 7<<4 |  0}
+00343 \textcolor{preprocessor}{#define RDIV\_DIGSXT 0x00A1, 15<<4 |  8}
+00344 \textcolor{preprocessor}{#define RDIV\_DIVGN 0x00A1, 7<<4 |  0}
+00345 \textcolor{preprocessor}{#define RDIV\_DIGGN 0x00A2, 15<<4 |  8}
+00346 \textcolor{preprocessor}{#define RDIV\_DIGSXR 0x00A2, 7<<4 |  0}
+00347 \textcolor{preprocessor}{#define RDIV\_CPSXT 0x00A3, 15<<4 |  8}
+00348 \textcolor{preprocessor}{#define RDIV\_DIG 0x00A3, 7<<4 |  0}
+00349 \textcolor{preprocessor}{#define RDIV\_CPGN 0x00A4, 15<<4 |  8}
+00350 \textcolor{preprocessor}{#define RDIV\_CPSXR 0x00A4, 7<<4 |  0}
+00351 \textcolor{preprocessor}{#define RDIV\_SPIBUF 0x00A5, 15<<4 |  8}
+00352 \textcolor{preprocessor}{#define RDIV\_AFE 0x00A5, 7<<4 |  0}
+00353 \textcolor{preprocessor}{#define SPDUP\_LDO\_SPIBUF 0x00A6, 12<<4 |  12}
+00354 \textcolor{preprocessor}{#define SPDUP\_LDO\_DIGIp2 0x00A6, 11<<4 |  11}
+00355 \textcolor{preprocessor}{#define SPDUP\_LDO\_DIGIp1 0x00A6, 10<<4 |  10}
+00356 \textcolor{preprocessor}{#define BYP\_LDO\_SPIBUF 0x00A6, 9<<4 |  9}
+00357 \textcolor{preprocessor}{#define BYP\_LDO\_DIGIp2 0x00A6, 8<<4 |  8}
+00358 \textcolor{preprocessor}{#define BYP\_LDO\_DIGIp1 0x00A6, 7<<4 |  7}
+00359 \textcolor{preprocessor}{#define EN\_LOADIMP\_LDO\_SPIBUF 0x00A6, 6<<4 |  6}
+00360 \textcolor{preprocessor}{#define EN\_LOADIMP\_LDO\_DIGIp2 0x00A6, 5<<4 |  5}
+00361 \textcolor{preprocessor}{#define EN\_LOADIMP\_LDO\_DIGIp1 0x00A6, 4<<4 |  4}
+00362 \textcolor{preprocessor}{#define PD\_LDO\_SPIBUF 0x00A6, 3<<4 |  3}
+00363 \textcolor{preprocessor}{#define PD\_LDO\_DIGIp2 0x00A6, 2<<4 |  2}
+00364 \textcolor{preprocessor}{#define PD\_LDO\_DIGIp1 0x00A6, 1<<4 |  1}
+00365 \textcolor{preprocessor}{#define EN\_G\_LDOP 0x00A6, 0<<4 |  0}
+00366 \textcolor{preprocessor}{#define RDIV\_DIGIp2 0x00A7, 15<<4 |  8}
+00367 \textcolor{preprocessor}{#define RDIV\_DIGIp1 0x00A7, 7<<4 |  0}
+00368 \textcolor{preprocessor}{#define BSIGT 0x00A8, 31<<4 |  9}
+00369 \textcolor{preprocessor}{#define BSTATE 0x00A8, 8<<4 |  8}
+00370 \textcolor{preprocessor}{#define EN\_SDM\_TSTO\_SXT 0x00A8, 6<<4 |  6}
+00371 \textcolor{preprocessor}{#define EN\_SDM\_TSTO\_SXR 0x00A8, 5<<4 |  5}
+00372 \textcolor{preprocessor}{#define EN\_SDM\_TSTO\_CGEN 0x00A8, 4<<4 |  4}
+00373 \textcolor{preprocessor}{#define BENC 0x00A8, 3<<4 |  3}
+00374 \textcolor{preprocessor}{#define BENR 0x00A8, 2<<4 |  2}
+00375 \textcolor{preprocessor}{#define BENT 0x00A8, 1<<4 |  1}
+00376 \textcolor{preprocessor}{#define BSTART 0x00A8, 0<<4 |  0}
+00377 \textcolor{preprocessor}{#define BSIGR 0x00AA, 22<<4 |  0}
+00378 \textcolor{preprocessor}{#define BSIGC 0x00AB, 29<<4 |  7}
+00379 \textcolor{preprocessor}{#define CDS\_MCLK2 0x00AD, 15<<4 |  14}
+00380 \textcolor{preprocessor}{#define CDS\_MCLK1 0x00AD, 13<<4 |  12}
+00381 \textcolor{preprocessor}{#define CDSN\_TXBTSP 0x00AD, 9<<4 |  9}
+00382 \textcolor{preprocessor}{#define CDSN\_TXATSP 0x00AD, 8<<4 |  8}
+00383 \textcolor{preprocessor}{#define CDSN\_RXBTSP 0x00AD, 7<<4 |  7}
+00384 \textcolor{preprocessor}{#define CDSN\_RXATSP 0x00AD, 6<<4 |  6}
+00385 \textcolor{preprocessor}{#define CDSN\_TXBLML 0x00AD, 5<<4 |  5}
+00386 \textcolor{preprocessor}{#define CDSN\_TXALML 0x00AD, 4<<4 |  4}
+00387 \textcolor{preprocessor}{#define CDSN\_RXBLML 0x00AD, 3<<4 |  3}
+00388 \textcolor{preprocessor}{#define CDSN\_RXALML 0x00AD, 2<<4 |  2}
+00389 \textcolor{preprocessor}{#define CDSN\_MCLK2 0x00AD, 1<<4 |  1}
+00390 \textcolor{preprocessor}{#define CDSN\_MCLK1 0x00AD, 0<<4 |  0}
+00391 \textcolor{preprocessor}{#define CDS\_TXBTSP 0x00AE, 15<<4 |  14}
+00392 \textcolor{preprocessor}{#define CDS\_TXATSP 0x00AE, 13<<4 |  12}
+00393 \textcolor{preprocessor}{#define CDS\_RXBTSP 0x00AE, 11<<4 |  10}
+00394 \textcolor{preprocessor}{#define CDS\_RXATSP 0x00AE, 9<<4 |  8}
+00395 \textcolor{preprocessor}{#define CDS\_TXBLML 0x00AE, 7<<4 |  6}
+00396 \textcolor{preprocessor}{#define CDS\_TXALML 0x00AE, 5<<4 |  4}
+00397 \textcolor{preprocessor}{#define CDS\_RXBLML 0x00AE, 3<<4 |  2}
+00398 \textcolor{preprocessor}{#define CDS\_RXALML 0x00AE, 1<<4 |  0}
+00399 \textcolor{preprocessor}{#define EN\_LOWBWLOMX\_TMX\_TRF 0x0100, 15<<4 |  15}
+00400 \textcolor{preprocessor}{#define EN\_NEXTTX\_TRF 0x0100, 14<<4 |  14}
+00401 \textcolor{preprocessor}{#define EN\_AMPHF\_PDET\_TRF 0x0100, 13<<4 |  12}
+00402 \textcolor{preprocessor}{#define LOADR\_PDET\_TRF 0x0100, 11<<4 |  10}
+00403 \textcolor{preprocessor}{#define PD\_PDET\_TRF 0x0100, 3<<4 |  3}
+00404 \textcolor{preprocessor}{#define PD\_TLOBUF\_TRF 0x0100, 2<<4 |  2}
+00405 \textcolor{preprocessor}{#define PD\_TXPAD\_TRF 0x0100, 1<<4 |  1}
+00406 \textcolor{preprocessor}{#define EN\_G\_TRF 0x0100, 0<<4 |  0}
+00407 \textcolor{preprocessor}{#define F\_TXPAD\_TRF 0x0101, 15<<4 |  13}
+00408 \textcolor{preprocessor}{#define L\_LOOPB\_TXPAD\_TRF 0x0101, 12<<4 |  11}
+00409 \textcolor{preprocessor}{#define LOSS\_LIN\_TXPAD\_TRF 0x0101, 10<<4 |  6}
+00410 \textcolor{preprocessor}{#define LOSS\_MAIN\_TXPAD\_TRF 0x0101, 5<<4 |  1}
+00411 \textcolor{preprocessor}{#define EN\_LOOPB\_TXPAD\_TRF 0x0101, 0<<4 |  0}
+00412 \textcolor{preprocessor}{#define GCAS\_GNDREF\_TXPAD\_TRF 0x0102, 15<<4 |  15}
+00413 \textcolor{preprocessor}{#define ICT\_LIN\_TXPAD\_TRF 0x0102, 14<<4 |  10}
+00414 \textcolor{preprocessor}{#define ICT\_MAIN\_TXPAD\_TRF 0x0102, 9<<4 |  5}
+00415 \textcolor{preprocessor}{#define VGCAS\_TXPAD\_TRF 0x0102, 4<<4 |  0}
+00416 \textcolor{preprocessor}{#define SEL\_BAND1\_TRF 0x0103, 11<<4 |  11}
+00417 \textcolor{preprocessor}{#define SEL\_BAND2\_TRF 0x0103, 10<<4 |  10}
+00418 \textcolor{preprocessor}{#define LOBIASN\_TXM\_TRF 0x0103, 9<<4 |  5}
+00419 \textcolor{preprocessor}{#define LOBIASP\_TXX\_TRF 0x0103, 4<<4 |  0}
+00420 \textcolor{preprocessor}{#define CDC\_I\_TRF 0x0104, 7<<4 |  4}
+00421 \textcolor{preprocessor}{#define CDC\_Q\_TRF 0x0104, 3<<4 |  0}
+00422 \textcolor{preprocessor}{#define STATPULSE\_TBB 0x0105, 15<<4 |  15}
+00423 \textcolor{preprocessor}{#define LOOPB\_TBB 0x0105, 14<<4 |  12}
+00424 \textcolor{preprocessor}{#define PD\_LPFH\_TBB 0x0105, 4<<4 |  4}
+00425 \textcolor{preprocessor}{#define PD\_LPFIAMP\_TBB 0x0105, 3<<4 |  3}
+00426 \textcolor{preprocessor}{#define PD\_LPFLAD\_TBB 0x0105, 2<<4 |  2}
+00427 \textcolor{preprocessor}{#define PD\_LPFS5\_TBB 0x0105, 1<<4 |  1}
+00428 \textcolor{preprocessor}{#define EN\_G\_TBB 0x0105, 0<<4 |  0}
+00429 \textcolor{preprocessor}{#define ICT\_LPFS5\_F\_TBB 0x0106, 14<<4 |  10}
+00430 \textcolor{preprocessor}{#define ICT\_LPFS5\_PT\_TBB 0x0106, 9<<4 |  5}
+00431 \textcolor{preprocessor}{#define ICT\_LPF\_H\_PT\_TBB 0x0106, 4<<4 |  0}
+00432 \textcolor{preprocessor}{#define ICT\_LPFH\_F\_TBB 0x0107, 14<<4 |  10}
+00433 \textcolor{preprocessor}{#define ICT\_LPFLAD\_F\_TBB 0x0107, 9<<4 |  5}
+00434 \textcolor{preprocessor}{#define ICT\_LPFLAD\_PT\_TBB 0x0107, 4<<4 |  0}
+00435 \textcolor{preprocessor}{#define CG\_IAMP\_TBB 0x0108, 15<<4 |  10}
+00436 \textcolor{preprocessor}{#define ICT\_IAMP\_FRP\_TBB 0x0108, 9<<4 |  5}
+00437 \textcolor{preprocessor}{#define ICT\_IAMP\_GG\_FRP\_TBB 0x0108, 4<<4 |  0}
+00438 \textcolor{preprocessor}{#define RCAL\_LPFH\_TBB 0x0109, 15<<4 |  8}
+00439 \textcolor{preprocessor}{#define RCAL\_LPFLAD\_TBB 0x0109, 7<<4 |  0}
+00440 \textcolor{preprocessor}{#define TSTIN\_TBB 0x010A, 15<<4 |  14}
+00441 \textcolor{preprocessor}{#define BYPLADDER\_TBB 0x010A, 13<<4 |  13}
+00442 \textcolor{preprocessor}{#define CCAL\_LPFLAD\_TBB 0x010A, 12<<4 |  8}
+00443 \textcolor{preprocessor}{#define RCAL\_LPFS5\_TBB 0x010A, 7<<4 |  0}
+00444 \textcolor{preprocessor}{#define CDC\_I\_RFE 0x010C, 15<<4 |  12}
+00445 \textcolor{preprocessor}{#define CDC\_Q\_RFE 0x010C, 11<<4 |  8}
+00446 \textcolor{preprocessor}{#define PD\_LNA\_RFE 0x010C, 7<<4 |  7}
+00447 \textcolor{preprocessor}{#define PD\_RLOOPB\_1\_RFE 0x010C, 6<<4 |  6}
+00448 \textcolor{preprocessor}{#define PD\_RLOOPB\_2\_RFE 0x010C, 5<<4 |  5}
+00449 \textcolor{preprocessor}{#define PD\_MXLOBUF\_RFE 0x010C, 4<<4 |  4}
+00450 \textcolor{preprocessor}{#define PD\_QGEN\_RFE 0x010C, 3<<4 |  3}
+00451 \textcolor{preprocessor}{#define PD\_RSSI\_RFE 0x010C, 2<<4 |  2}
+00452 \textcolor{preprocessor}{#define PD\_TIA\_RFE 0x010C, 1<<4 |  1}
+00453 \textcolor{preprocessor}{#define EN\_G\_RFE 0x010C, 0<<4 |  0}
+00454 \textcolor{preprocessor}{#define SEL\_PATH\_RFE 0x010D, 8<<4 |  7}
+00455 \textcolor{preprocessor}{#define EN\_DCOFF\_RXFE\_RFE 0x010D, 6<<4 |  6}
+00456 \textcolor{preprocessor}{#define EN\_INSHSW\_LB1\_RFE 0x010D, 4<<4 |  4}
+00457 \textcolor{preprocessor}{#define EN\_INSHSW\_LB2\_RFE 0x010D, 3<<4 |  3}
+00458 \textcolor{preprocessor}{#define EN\_INSHSW\_L\_RFE 0x010D, 2<<4 |  2}
+00459 \textcolor{preprocessor}{#define EN\_INSHSW\_W\_RFE 0x010D, 1<<4 |  1}
+00460 \textcolor{preprocessor}{#define EN\_NEXTRX\_RFE 0x010D, 0<<4 |  0}
+00461 \textcolor{preprocessor}{#define ICT\_LOOPB\_RFE 0x010F, 14<<4 |  10}
+00462 \textcolor{preprocessor}{#define ICT\_TIAMAIN\_RFE 0x010F, 9<<4 |  5}
+00463 \textcolor{preprocessor}{#define ICT\_TIAOUT\_RFE 0x010F, 4<<4 |  0}
+00464 \textcolor{preprocessor}{#define ICT\_LNACMO\_RFE 0x0110, 14<<4 |  10}
+00465 \textcolor{preprocessor}{#define ICT\_LNA\_RFE 0x0110, 9<<4 |  5}
+00466 \textcolor{preprocessor}{#define ICT\_LODC\_RFE 0x0110, 4<<4 |  0}
+00467 \textcolor{preprocessor}{#define CAP\_RXMXO\_RFE 0x0111, 9<<4 |  5}
+00468 \textcolor{preprocessor}{#define CGSIN\_LNA\_RFE 0x0111, 4<<4 |  0}
+00469 \textcolor{preprocessor}{#define CCOMP\_TIA\_RFE 0x0112, 15<<4 |  12}
+00470 \textcolor{preprocessor}{#define CFB\_TIA\_RFE 0x0112, 11<<4 |  0}
+00471 \textcolor{preprocessor}{#define G\_LNA\_RFE 0x0113, 9<<4 |  6}
+00472 \textcolor{preprocessor}{#define G\_RXLOOPB\_RFE 0x0113, 5<<4 |  2}
+00473 \textcolor{preprocessor}{#define G\_TIA\_RFE 0x0113, 1<<4 |  0}
+00474 \textcolor{preprocessor}{#define RCOMP\_TIA\_RFE 0x0114, 8<<4 |  5}
+00475 \textcolor{preprocessor}{#define RFB\_TIA\_RFE 0x0114, 4<<4 |  0}
+00476 \textcolor{preprocessor}{#define EN\_LB\_LPFH\_RBB 0x0115, 15<<4 |  15}
+00477 \textcolor{preprocessor}{#define EN\_LB\_LPFL\_RBB 0x0115, 14<<4 |  14}
+00478 \textcolor{preprocessor}{#define PD\_LPFH\_RBB 0x0115, 3<<4 |  3}
+00479 \textcolor{preprocessor}{#define PD\_LPFL\_RBB 0x0115, 2<<4 |  2}
+00480 \textcolor{preprocessor}{#define PD\_PGA\_RBB 0x0115, 1<<4 |  1}
+00481 \textcolor{preprocessor}{#define EN\_G\_RBB 0x0115, 0<<4 |  0}
+00482 \textcolor{preprocessor}{#define R\_CTL\_LPF\_RBB 0x0116, 15<<4 |  11}
+00483 \textcolor{preprocessor}{#define RCC\_CTL\_LPFH\_RBB 0x0116, 10<<4 |  8}
+00484 \textcolor{preprocessor}{#define C\_CTL\_LPFH\_RBB 0x0116, 7<<4 |  0}
+00485 \textcolor{preprocessor}{#define RCC\_CTL\_LPFL\_RBB 0x0117, 13<<4 |  11}
+00486 \textcolor{preprocessor}{#define C\_CTL\_LPFL\_RBB 0x0117, 10<<4 |  0}
+00487 \textcolor{preprocessor}{#define INPUT\_CTL\_PGA\_RBB 0x0118, 15<<4 |  13}
+00488 \textcolor{preprocessor}{#define ICT\_LPF\_IN\_RBB 0x0118, 9<<4 |  5}
+00489 \textcolor{preprocessor}{#define ICT\_LPF\_OUT\_RBB 0x0118, 4<<4 |  0}
+00490 \textcolor{preprocessor}{#define OSW\_PGA\_RBB 0x0119, 15<<4 |  15}
+00491 \textcolor{preprocessor}{#define ICT\_PGA\_OUT\_RBB 0x0119, 14<<4 |  10}
+00492 \textcolor{preprocessor}{#define ICT\_PGA\_IN\_RBB 0x0119, 9<<4 |  5}
+00493 \textcolor{preprocessor}{#define G\_PGA\_RBB 0x0119, 4<<4 |  0}
+00494 \textcolor{preprocessor}{#define RCC\_CTL\_PGA\_RBB 0x011A, 13<<4 |  9}
+00495 \textcolor{preprocessor}{#define C\_CTL\_PGA\_RBB 0x011A, 6<<4 |  0}
+00496 \textcolor{preprocessor}{#define RESET\_N 0x011C, 15<<4 |  15}
+00497 \textcolor{preprocessor}{#define SPDUP\_VCO 0x011C, 14<<4 |  14}
+00498 \textcolor{preprocessor}{#define BYPLDO\_VCO 0x011C, 13<<4 |  13}
+00499 \textcolor{preprocessor}{#define EN\_COARSEPLL 0x011C, 12<<4 |  12}
+00500 \textcolor{preprocessor}{#define CURLIM\_VCO 0x011C, 11<<4 |  11}
+00501 \textcolor{preprocessor}{#define EN\_DIV2\_DIVPROG 0x011C, 10<<4 |  10}
+00502 \textcolor{preprocessor}{#define EN\_INTONLY\_SDM 0x011C, 9<<4 |  9}
+00503 \textcolor{preprocessor}{#define EN\_SDM\_CLK 0x011C, 8<<4 |  8}
+00504 \textcolor{preprocessor}{#define PD\_FBDIV 0x011C, 7<<4 |  7}
+00505 \textcolor{preprocessor}{#define PD\_LOCH\_T2RBUF 0x011C, 6<<4 |  6}
+00506 \textcolor{preprocessor}{#define PD\_CP 0x011C, 5<<4 |  5}
+00507 \textcolor{preprocessor}{#define PD\_FDIV 0x011C, 4<<4 |  4}
+00508 \textcolor{preprocessor}{#define PD\_SDM 0x011C, 3<<4 |  3}
+00509 \textcolor{preprocessor}{#define PD\_VCO\_COMP 0x011C, 2<<4 |  2}
+00510 \textcolor{preprocessor}{#define PD\_VCO 0x011C, 1<<4 |  1}
+00511 \textcolor{preprocessor}{#define EN\_G 0x011C, 0<<4 |  0}
+00512 \textcolor{preprocessor}{#define FRAC\_SDM 0x011D, 19<<4 |  0}
+00513 \textcolor{preprocessor}{#define INT\_SDM 0x011E, 13<<4 |  4}
+00514 \textcolor{preprocessor}{#define PW\_DIV2\_LOCH 0x011F, 14<<4 |  12}
+00515 \textcolor{preprocessor}{#define PW\_DIV4\_LOCH 0x011F, 11<<4 |  9}
+00516 \textcolor{preprocessor}{#define DIV\_LOCH 0x011F, 8<<4 |  6}
+00517 \textcolor{preprocessor}{#define TST\_SX 0x011F, 5<<4 |  3}
+00518 \textcolor{preprocessor}{#define SEL\_SDMCLK 0x011F, 2<<4 |  2}
+00519 \textcolor{preprocessor}{#define SX\_DITHER\_EN 0x011F, 1<<4 |  1}
+00520 \textcolor{preprocessor}{#define REV\_SDMCLK 0x011F, 0<<4 |  0}
+00521 \textcolor{preprocessor}{#define VDIV\_VCO 0x0120, 15<<4 |  8}
+00522 \textcolor{preprocessor}{#define ICT\_VCO 0x0120, 7<<4 |  0}
+00523 \textcolor{preprocessor}{#define RSEL\_LDO\_VCO 0x0121, 15<<4 |  11}
+00524 \textcolor{preprocessor}{#define CSW\_VCO 0x0121, 10<<4 |  3}
+00525 \textcolor{preprocessor}{#define SEL\_VCO 0x0121, 2<<4 |  1}
+00526 \textcolor{preprocessor}{#define COARSE\_START 0x0121, 0<<4 |  0}
+00527 \textcolor{preprocessor}{#define REVPH\_PFD 0x0122, 12<<4 |  12}
+00528 \textcolor{preprocessor}{#define IOFFSET\_CP 0x0122, 11<<4 |  6}
+00529 \textcolor{preprocessor}{#define IPULSE\_CP 0x0122, 5<<4 |  0}
+00530 \textcolor{preprocessor}{#define COARSE\_STEPDONE 0x0123, 15<<4 |  15}
+00531 \textcolor{preprocessor}{#define COARSEPLL\_COMPO 0x0123, 14<<4 |  14}
+00532 \textcolor{preprocessor}{#define VCO\_CMPHO 0x0123, 13<<4 |  13}
+00533 \textcolor{preprocessor}{#define VCO\_CMPLO 0x0123, 12<<4 |  12}
+00534 \textcolor{preprocessor}{#define CP2\_PLL 0x0123, 11<<4 |  8}
+00535 \textcolor{preprocessor}{#define CP3\_PLL 0x0123, 7<<4 |  4}
+00536 \textcolor{preprocessor}{#define CZ 0x0123, 3<<4 |  0}
+00537 \textcolor{preprocessor}{#define EN\_DIR\_SXRSXT 0x0124, 4<<4 |  4}
+00538 \textcolor{preprocessor}{#define EN\_DIR\_RBB 0x0124, 3<<4 |  3}
+00539 \textcolor{preprocessor}{#define EN\_DIR\_RFE 0x0124, 2<<4 |  2}
+00540 \textcolor{preprocessor}{#define EN\_DIR\_TBB 0x0124, 1<<4 |  1}
+00541 \textcolor{preprocessor}{#define EN\_DIR\_TRF 0x0124, 0<<4 |  0}
+00542 \textcolor{preprocessor}{#define TSGFC\_TXTSP 0x0200, 9<<4 |  9}
+00543 \textcolor{preprocessor}{#define TSGFCW\_TXTSP 0x0200, 8<<4 |  7}
+00544 \textcolor{preprocessor}{#define TSGDCLDQ\_TXTSP 0x0200, 6<<4 |  6}
+00545 \textcolor{preprocessor}{#define TSGDCLDI\_TXTSP 0x0200, 5<<4 |  5}
+00546 \textcolor{preprocessor}{#define TSGSWAPIQ\_TXTSP 0x0200, 4<<4 |  4}
+00547 \textcolor{preprocessor}{#define TSGMODE\_TXTSP 0x0200, 3<<4 |  3}
+00548 \textcolor{preprocessor}{#define INSEL\_TXTSP 0x0200, 2<<4 |  2}
+00549 \textcolor{preprocessor}{#define BSTART\_TXTSP 0x0200, 1<<4 |  1}
+00550 \textcolor{preprocessor}{#define EN\_TXTSP 0x0200, 0<<4 |  0}
+00551 \textcolor{preprocessor}{#define HBI\_OVR\_TXTSP 0x0203, 14<<4 |  12}
+00552 \textcolor{preprocessor}{#define GFIR1\_L\_TXTSP 0x0205, 10<<4 |  8}
+00553 \textcolor{preprocessor}{#define GFIR1\_N\_TXTSP 0x0205, 7<<4 |  0}
+00554 \textcolor{preprocessor}{#define GFIR2\_L\_TXTSP 0x0206, 10<<4 |  8}
+00555 \textcolor{preprocessor}{#define GFIR2\_N\_TXTSP 0x0206, 7<<4 |  0}
+00556 \textcolor{preprocessor}{#define GFIR3\_L\_TXTSP 0x0207, 10<<4 |  8}
+00557 \textcolor{preprocessor}{#define GFIR3\_N\_TXTSP 0x0207, 7<<4 |  0}
+00558 \textcolor{preprocessor}{#define CMIX\_GAIN\_TXTSP 0x0208, 15<<4 |  14}
+00559 \textcolor{preprocessor}{#define CMIX\_GAIN\_TXTSP\_R3 0x0208, 12<<4 |  12}
+00560 \textcolor{preprocessor}{#define CMIX\_SC\_TXTSP 0x0208, 13<<4 |  13}
+00561 \textcolor{preprocessor}{#define CMIX\_BYP\_TXTSP 0x0208, 8<<4 |  8}
+00562 \textcolor{preprocessor}{#define ISINC\_BYP\_TXTSP 0x0208, 7<<4 |  7}
+00563 \textcolor{preprocessor}{#define GFIR3\_BYP\_TXTSP 0x0208, 6<<4 |  6}
+00564 \textcolor{preprocessor}{#define GFIR2\_BYP\_TXTSP 0x0208, 5<<4 |  5}
+00565 \textcolor{preprocessor}{#define GFIR1\_BYP\_TXTSP 0x0208, 4<<4 |  4}
+00566 \textcolor{preprocessor}{#define DC\_BYP\_TXTSP 0x0208, 3<<4 |  3}
+00567 \textcolor{preprocessor}{#define GC\_BYP\_TXTSP 0x0208, 1<<4 |  1}
+00568 \textcolor{preprocessor}{#define PH\_BYP\_TXTSP 0x0208, 0<<4 |  0}
+00569 \textcolor{preprocessor}{#define BSIGI\_TXTSP 0x0209, 23<<4 |  1}
+00570 \textcolor{preprocessor}{#define BSTATE\_TXTSP 0x0209, 0<<4 |  0}
+00571 \textcolor{preprocessor}{#define BSIGQ\_TXTSP 0x020A, 30<<4 |  8}
+00572 \textcolor{preprocessor}{#define DC\_REG\_TXTSP 0x020C, 15<<4 |  0}
+00573 \textcolor{preprocessor}{#define DTHBIT\_TX 0x0240, 8<<4 |  5}
+00574 \textcolor{preprocessor}{#define SEL\_TX 0x0240, 4<<4 |  1}
+00575 \textcolor{preprocessor}{#define MODE\_TX 0x0240, 0<<4 |  0}
+00576 \textcolor{preprocessor}{#define CAPTURE 0x0400, 15<<4 |  15}
+00577 \textcolor{preprocessor}{#define CAPSEL 0x0400, 14<<4 |  13}
+00578 \textcolor{preprocessor}{#define TSGFC\_RXTSP 0x0400, 9<<4 |  9}
+00579 \textcolor{preprocessor}{#define TSGFCW\_RXTSP 0x0400, 8<<4 |  7}
+00580 \textcolor{preprocessor}{#define TSGDCLDQ\_RXTSP 0x0400, 6<<4 |  6}
+00581 \textcolor{preprocessor}{#define TSGDCLDI\_RXTSP 0x0400, 5<<4 |  5}
+00582 \textcolor{preprocessor}{#define TSGSWAPIQ\_RXTSP 0x0400, 4<<4 |  4}
+00583 \textcolor{preprocessor}{#define TSGMODE\_RXTSP 0x0400, 3<<4 |  3}
+00584 \textcolor{preprocessor}{#define INSEL\_RXTSP 0x0400, 2<<4 |  2}
+00585 \textcolor{preprocessor}{#define BSTART\_RXTSP 0x0400, 1<<4 |  1}
+00586 \textcolor{preprocessor}{#define EN\_RXTSP 0x0400, 0<<4 |  0}
+00587 \textcolor{preprocessor}{#define HBD\_OVR\_RXTSP 0x0403, 14<<4 |  12}
+00588 \textcolor{preprocessor}{#define DCCORR\_AVG\_RXTSP 0x0404, 2<<4 |  0}
+00589 \textcolor{preprocessor}{#define GFIR1\_L\_RXTSP 0x0405, 10<<4 |  8}
+00590 \textcolor{preprocessor}{#define GFIR1\_N\_RXTSP 0x0405, 7<<4 |  0}
+00591 \textcolor{preprocessor}{#define GFIR2\_L\_RXTSP 0x0406, 10<<4 |  8}
+00592 \textcolor{preprocessor}{#define GFIR2\_N\_RXTSP 0x0406, 7<<4 |  0}
+00593 \textcolor{preprocessor}{#define GFIR3\_L\_RXTSP 0x0407, 10<<4 |  8}
+00594 \textcolor{preprocessor}{#define GFIR3\_N\_RXTSP 0x0407, 7<<4 |  0}
+00595 \textcolor{preprocessor}{#define AGC\_K\_RXTSP 0x0408, 17<<4 |  0}
+00596 \textcolor{preprocessor}{#define AGC\_ADESIRED\_RXTSP 0x0409, 15<<4 |  4}
+00597 \textcolor{preprocessor}{#define AGC\_MODE\_RXTSP 0x040A, 13<<4 |  12}
+00598 \textcolor{preprocessor}{#define AGC\_AVG\_RXTSP 0x040A, 2<<4 |  0}
+00599 \textcolor{preprocessor}{#define DC\_REG\_RXTSP 0x040B, 15<<4 |  0}
+00600 \textcolor{preprocessor}{#define CMIX\_GAIN\_RXTSP 0x040C, 15<<4 |  14}
+00601 \textcolor{preprocessor}{#define CMIX\_SC\_RXTSP 0x040C, 13<<4 |  13}
+00602 \textcolor{preprocessor}{#define CMIX\_GAIN\_RXTSP\_R3 0x040C, 12<<4 | 12}
+00603 \textcolor{preprocessor}{#define CMIX\_BYP\_RXTSP 0x040C, 7<<4 |  7}
+00604 \textcolor{preprocessor}{#define AGC\_BYP\_RXTSP 0x040C, 6<<4 |  6}
+00605 \textcolor{preprocessor}{#define GFIR3\_BYP\_RXTSP 0x040C, 5<<4 |  5}
+00606 \textcolor{preprocessor}{#define GFIR2\_BYP\_RXTSP 0x040C, 4<<4 |  4}
+00607 \textcolor{preprocessor}{#define GFIR1\_BYP\_RXTSP 0x040C, 3<<4 |  3}
+00608 \textcolor{preprocessor}{#define DC\_BYP\_RXTSP 0x040C, 2<<4 |  2}
+00609 \textcolor{preprocessor}{#define GC\_BYP\_RXTSP 0x040C, 1<<4 |  1}
+00610 \textcolor{preprocessor}{#define PH\_BYP\_RXTSP 0x040C, 0<<4 |  0}
+00611 \textcolor{preprocessor}{#define CAPD 0x040E, 31<<4 |  0}
+00612 \textcolor{preprocessor}{#define DTHBIT\_RX 0x0440, 8<<4 |  5}
+00613 \textcolor{preprocessor}{#define SEL\_RX 0x0440, 4<<4 |  1}
+00614 \textcolor{preprocessor}{#define MODE\_RX 0x0440, 0<<4 |  0}
+00615 
+00616 \textcolor{preprocessor}{#define DCMODE 0x05C0, 15<<4 | 15}
+00617 \textcolor{preprocessor}{#define PD\_DCDAC\_RXB 0x05C0, 7<<4 | 7}
+00618 \textcolor{preprocessor}{#define PD\_DCDAC\_RXA 0x05C0, 6<<4 | 6}
+00619 \textcolor{preprocessor}{#define PD\_DCDAC\_TXB 0x05C0, 5<<4 | 5}
+00620 \textcolor{preprocessor}{#define PD\_DCDAC\_TXA 0x05C0, 4<<4 | 4}
+00621 \textcolor{preprocessor}{#define PD\_DCCMP\_RXB 0x05C0, 3<<4 | 3}
+00622 \textcolor{preprocessor}{#define PD\_DCCMP\_RXA 0x05C0, 2<<4 | 2}
+00623 \textcolor{preprocessor}{#define PD\_DCCMP\_TXB 0x05C0, 1<<4 | 1}
+00624 \textcolor{preprocessor}{#define PD\_DCCMP\_TXA 0x05C0, 0<<4 | 0}
+00625 
+00626 \textcolor{preprocessor}{#define DCWR\_TXAI 0x05C3, 15<<4 | 15}
+00627 \textcolor{preprocessor}{#define DCRD\_TXAI 0x05C3, 14<<4 | 14}
+00628 \textcolor{preprocessor}{#define DC\_TXAI 0x05C3, 10<<4 | 0}
+00629 \textcolor{preprocessor}{#define DCWR\_TXAQ 0x05C4, 15<<4 | 15}
+00630 \textcolor{preprocessor}{#define DCRD\_TXAQ 0x05C4, 14<<4 | 14}
+00631 \textcolor{preprocessor}{#define DC\_TXAQ 0x05C4, 10<<4 | 0}
+00632 \textcolor{preprocessor}{#define DCWR\_TXBI 0x05C5, 15<<4 | 15}
+00633 \textcolor{preprocessor}{#define DCRD\_TXBI 0x05C5, 14<<4 | 14}
+00634 \textcolor{preprocessor}{#define DC\_TXBI 0x05C5, 10<<4 | 0}
+00635 \textcolor{preprocessor}{#define DCWR\_TXBQ 0x05C6, 15<<4 | 15}
+00636 \textcolor{preprocessor}{#define DCRD\_TXBQ 0x05C6, 14<<4 | 14}
+00637 \textcolor{preprocessor}{#define DC\_TXBQ 0x05C6, 10<<4 | 0}
+00638 \textcolor{preprocessor}{#define DCWR\_RXAI 0x05C7, 15<<4 | 15}
+00639 \textcolor{preprocessor}{#define DCRD\_RXAI 0x05C7, 14<<4 | 14}
+00640 \textcolor{preprocessor}{#define DC\_RXAI 0x05C7, 6<<4 | 0}
+00641 \textcolor{preprocessor}{#define DCWR\_RXAQ 0x05C8, 15<<4 | 15}
+00642 \textcolor{preprocessor}{#define DCRD\_RXAQ 0x05C8, 14<<4 | 14}
+00643 \textcolor{preprocessor}{#define DC\_RXAQ 0x05C8, 6<<4 | 0}
+00644 \textcolor{preprocessor}{#define DCWR\_RXBI 0x05C9, 15<<4 | 15}
+00645 \textcolor{preprocessor}{#define DCRD\_RXBI 0x05C9, 14<<4 | 14}
+00646 \textcolor{preprocessor}{#define DC\_RXBI 0x05C9, 6<<4 | 0}
+00647 \textcolor{preprocessor}{#define DCWR\_RXBQ 0x05CA, 15<<4 | 15}
+00648 \textcolor{preprocessor}{#define DCRD\_RXBQ 0x05CA, 14<<4 | 14}
+00649 
+00650 \textcolor{preprocessor}{#define R5\_LPF\_BYP\_TBB 0x010B, 0<<4 | 0}
+00651 \textcolor{preprocessor}{#define RSSI\_RSSI1\_VAL 0x0605, 7 << 4 | 0}
+00652 \textcolor{preprocessor}{#define TRX\_GAIN\_SRC 0x0081, 15 << 4 | 15}
+00653 \textcolor{preprocessor}{#define G\_LNA\_RFE\_R3 0x0126, 5 << 4 | 2}
+00654 \textcolor{preprocessor}{#define G\_PGA\_RBB\_R3 0x0126, 10 << 4 | 6}
+00655 \textcolor{preprocessor}{#define G\_TIA\_RFE\_R3 0x0126, 1 << 4 | 0}
+00656 \textcolor{preprocessor}{#define CG\_IAMP\_TBB\_R3 0x0125, 15 << 4 | 10}
+00657 \textcolor{preprocessor}{#define LOSS\_LIN\_TXPAD\_TRF\_R3 0x0125, 9 << 4 | 5}
+00658 \textcolor{preprocessor}{#define LOSS\_MAIN\_TXPAD\_TRF\_R3 0x0125, 4 << 4 | 0}
+00659 
+00660 \textcolor{preprocessor}{#define DCOFFI\_RFE 0x010E, 13<<4 | 7}
+00661 \textcolor{preprocessor}{#define DCOFFQ\_RFE 0x010E, 6<<4 | 0}
+00662 \textcolor{preprocessor}{#define DCCORRI\_TXTSP 0x0204, 15<<4 | 8}
+00663 \textcolor{preprocessor}{#define DCCORRQ\_TXTSP 0x0204, 7<<4 | 0}
+00664 \textcolor{preprocessor}{#define IQCORR\_TXTSP 0x0203, 11<<4 | 0}
+00665 \textcolor{preprocessor}{#define IQCORR\_RXTSP 0x0403, 11<<4 | 0}
+00666 \textcolor{preprocessor}{#define GCORRI\_TXTSP 0x0202, 10<<4 | 0}
+00667 \textcolor{preprocessor}{#define GCORRQ\_TXTSP 0x0201, 10<<4 | 0}
+00668 \textcolor{preprocessor}{#define GCORRI\_RXTSP 0x0402, 10<<4 | 0}
+00669 \textcolor{preprocessor}{#define GCORRQ\_RXTSP 0x0401, 10<<4 | 0}
+00670 
+00671 \textcolor{preprocessor}{#endif}
+\end{DoxyCode}

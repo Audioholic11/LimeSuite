@@ -1,0 +1,126 @@
+\subsection{lms7002\+\_\+dlg\+G\+F\+I\+R\+\_\+\+Coefficients.\+cpp}
+\label{lms7002__dlgGFIR__Coefficients_8cpp_source}\index{/home/erik/prefix/default/src/limesuite-\/dev/src/lms7002\+\_\+wxgui/lms7002\+\_\+dlg\+G\+F\+I\+R\+\_\+\+Coefficients.\+cpp@{/home/erik/prefix/default/src/limesuite-\/dev/src/lms7002\+\_\+wxgui/lms7002\+\_\+dlg\+G\+F\+I\+R\+\_\+\+Coefficients.\+cpp}}
+
+\begin{DoxyCode}
+00001 \textcolor{preprocessor}{#include "lms7002_dlgGFIR_Coefficients.h"}
+00002 \textcolor{preprocessor}{#include <wx/filedlg.h>}
+00003 \textcolor{preprocessor}{#include <wx/msgdlg.h>}
+00004 \textcolor{preprocessor}{#include "CoefficientFileParser.h"}
+00005 
+00006 lms7002_dlgGFIR_Coefficients::lms7002_dlgGFIR_Coefficients( wxWindow* parent )
+00007 :
+00008 dlgGFIR_Coefficients( parent )
+00009 \{
+00010 
+00011 \}
+00012 
+00013 \textcolor{keywordtype}{void} lms7002_dlgGFIR_Coefficients::OnLoadFromFile( wxCommandEvent& event )
+00014 \{
+00015     wxFileDialog dlg(\textcolor{keyword}{this}, \_(\textcolor{stringliteral}{"Open coefficients file"}), \textcolor{stringliteral}{""}, \textcolor{stringliteral}{""}, \textcolor{stringliteral}{"FIR Coeffs (*.fir)|*.fir"}, wxFD\_OPEN | 
+      wxFD\_FILE\_MUST\_EXIST);
+00016     \textcolor{keywordflow}{if} (dlg.ShowModal() == wxID\_CANCEL)
+00017         \textcolor{keywordflow}{return};
+00018 
+00019     \textcolor{keywordtype}{float} cbuf[200];
+00020     \textcolor{keywordtype}{int} iVal = Parser::getcoeffs((\textcolor{keyword}{const} \textcolor{keywordtype}{char}*)dlg.GetPath().ToStdString().c\_str(), cbuf, 200);
+00021 
+00022     \textcolor{keywordflow}{switch} (iVal)
+00023     \{
+00024     \textcolor{keywordflow}{case} -2:
+00025         wxMessageDialog(\textcolor{keyword}{this}, \textcolor{stringliteral}{"syntax error within the file"}, \textcolor{stringliteral}{"Warning"});
+00026         \textcolor{keywordflow}{break};
+00027     \textcolor{keywordflow}{case} -3:
+00028         wxMessageDialog(\textcolor{keyword}{this}, \textcolor{stringliteral}{"filename is empty string"}, \textcolor{stringliteral}{"Warning"});
+00029         \textcolor{keywordflow}{break};
+00030     \textcolor{keywordflow}{case} -4:
+00031         wxMessageDialog(\textcolor{keyword}{this}, \textcolor{stringliteral}{"can not open the file"}, \textcolor{stringliteral}{"Warning"});
+00032         \textcolor{keywordflow}{break};
+00033     \textcolor{keywordflow}{case} -5:
+00034         wxMessageDialog(\textcolor{keyword}{this}, \textcolor{stringliteral}{"too many coefficients in the file"}, \textcolor{stringliteral}{"Warning"});
+00035         \textcolor{keywordflow}{break};
+00036     \}
+00037     \textcolor{keywordflow}{if} (iVal < 0)
+00038         \textcolor{keywordflow}{return};
+00039 
+00040     spinCoefCount->SetValue(iVal);
+00041     \textcolor{keywordflow}{if} (gridCoef->GetTable()->GetRowsCount() > 0)
+00042         gridCoef->GetTable()->DeleteRows(0, gridCoef->GetTable()->GetRowsCount());
+00043     gridCoef->GetTable()->AppendRows(spinCoefCount->GetValue());
+00044     \textcolor{keywordflow}{for} (\textcolor{keywordtype}{int} i = 0; i<iVal; ++i)
+00045     \{
+00046         gridCoef->SetCellValue(i, 0, wxString::Format(\textcolor{stringliteral}{"%f"}, cbuf[i]));
+00047     \}
+00048 \}
+00049 
+00050 \textcolor{keywordtype}{void} lms7002_dlgGFIR_Coefficients::OnSaveToFile( wxCommandEvent& event )
+00051 \{
+00052     wxFileDialog dlg(\textcolor{keyword}{this}, \_(\textcolor{stringliteral}{"Save coefficients file"}), \textcolor{stringliteral}{""}, \textcolor{stringliteral}{""}, \textcolor{stringliteral}{"FIR Coeffs (*.fir)|*.fir"}, wxFD\_SAVE | 
+      wxFD\_OVERWRITE\_PROMPT);
+00053     \textcolor{keywordflow}{if} (dlg.ShowModal() == wxID\_CANCEL)
+00054         \textcolor{keywordflow}{return};
+00055     \textcolor{keywordtype}{float} coefficients[200];
+00056     memset(coefficients, 0, \textcolor{keyword}{sizeof}(\textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{short}) * 200);
+00057     \textcolor{keywordtype}{double} ltemp;
+00058     \textcolor{keywordflow}{for} (\textcolor{keywordtype}{int} i = 0; i<spinCoefCount->GetValue(); ++i)
+00059     \{
+00060         ltemp = 0;
+00061         gridCoef->GetCellValue(i, 0).ToDouble(&ltemp);
+00062         coefficients[i] = ltemp;
+00063     \}
+00064     Parser::saveToFile((\textcolor{keyword}{const} \textcolor{keywordtype}{char}*)dlg.GetPath().ToStdString().c\_str(), coefficients, 
+      spinCoefCount->GetValue());
+00065 \}
+00066 
+00067 \textcolor{keywordtype}{void} lms7002_dlgGFIR_Coefficients::OnClearTable( wxCommandEvent& event )
+00068 \{
+00069     \textcolor{keywordflow}{if} (gridCoef->GetTable()->GetRowsCount() > 0)
+00070         gridCoef->GetTable()->DeleteRows(0, gridCoef->GetTable()->GetRowsCount());
+00071     gridCoef->GetTable()->AppendRows(spinCoefCount->GetValue());
+00072     \textcolor{keywordflow}{for} (\textcolor{keywordtype}{int} i = 0; i<spinCoefCount->GetValue(); ++i)
+00073     \{
+00074         gridCoef->SetCellValue(i, 0, wxString::Format(\textcolor{stringliteral}{"%i"}, 0));
+00075     \}
+00076 \}
+00077 
+00078 \textcolor{keywordtype}{void} lms7002_dlgGFIR_Coefficients::OnspinCoefCountChange(wxSpinEvent& event)
+00079 \{
+00080     \textcolor{keywordflow}{if} (spinCoefCount->GetValue() < gridCoef->GetTable()->GetRowsCount())
+00081         gridCoef->GetTable()->DeleteRows(spinCoefCount->GetValue(), gridCoef->GetTable()->GetRowsCount() - 
+      spinCoefCount->GetValue());
+00082     \textcolor{keywordflow}{else}
+00083         gridCoef->GetTable()->AppendRows(spinCoefCount->GetValue() - gridCoef->GetTable()->GetRowsCount());
+00084 \}
+00085 
+00086 \textcolor{keywordtype}{void} lms7002_dlgGFIR_Coefficients::SetCoefficients(\textcolor{keyword}{const} std::vector<double> &coefficients)
+00087 \{
+00088     spinCoefCount->SetValue(coefficients.size());
+00089     \textcolor{keywordflow}{if} (gridCoef->GetTable()->GetRowsCount() > 0)
+00090         gridCoef->GetTable()->DeleteRows(0, gridCoef->GetTable()->GetRowsCount());
+00091     gridCoef->GetTable()->AppendRows(coefficients.size());
+00092     \textcolor{keywordflow}{for} (\textcolor{keywordtype}{unsigned} i = 0; i<coefficients.size(); ++i)
+00093         gridCoef->SetCellValue(i, 0, wxString::Format(\textcolor{stringliteral}{"%.6f"}, coefficients[i]));
+00094 \}
+00095 
+00096 std::vector<double> lms7002_dlgGFIR_Coefficients::GetCoefficients()
+00097 \{
+00098     std::vector<double> coefficients;
+00099     coefficients.resize(spinCoefCount->GetValue(), 0);
+00100     \textcolor{keywordflow}{for} (\textcolor{keywordtype}{int} i = 0; i<spinCoefCount->GetValue(); ++i)
+00101     \{
+00102         \textcolor{keywordtype}{double} dtemp = 0;
+00103         gridCoef->GetCellValue(i, 0).ToDouble(&dtemp);
+00104         coefficients[i] = dtemp;
+00105     \}
+00106     \textcolor{keywordflow}{return} coefficients;
+00107 \}
+00108 
+00109 \textcolor{keywordtype}{void} lms7002_dlgGFIR_Coefficients::OnBtnOkClick(wxCommandEvent& event)
+00110 \{
+00111     EndModal(wxID\_OK);
+00112 \}
+00113 
+00114 \textcolor{keywordtype}{void} lms7002_dlgGFIR_Coefficients::OnBtnCancelClick(wxCommandEvent& event)
+00115 \{
+00116     EndModal(wxID\_CANCEL);
+00117 \}
+\end{DoxyCode}

@@ -1,0 +1,116 @@
+\subsection{Connection\+Novena\+R\+F7.\+h}
+\label{ConnectionNovenaRF7_8h_source}\index{/home/erik/prefix/default/src/limesuite-\/dev/src/\+Connection\+Novena\+R\+F7/\+Connection\+Novena\+R\+F7.\+h@{/home/erik/prefix/default/src/limesuite-\/dev/src/\+Connection\+Novena\+R\+F7/\+Connection\+Novena\+R\+F7.\+h}}
+
+\begin{DoxyCode}
+00001 
+00007 \textcolor{preprocessor}{#ifndef CONNECTION\_NOVENA\_RF7\_H}
+00008 \textcolor{preprocessor}{#define CONNECTION\_NOVENA\_RF7\_H}
+00009 
+00010 \textcolor{preprocessor}{#include <ConnectionRegistry.h>}
+00011 \textcolor{preprocessor}{#include <IConnection.h>}
+00012 \textcolor{preprocessor}{#include <LMS64CProtocol.h>}
+00013 \textcolor{preprocessor}{#include <fstream>}
+00014 \textcolor{preprocessor}{#include <string>}
+00015 \textcolor{preprocessor}{#include <vector>}
+00016 \textcolor{preprocessor}{#include <fifo.h>}
+00017 
+00018 \textcolor{keyword}{namespace }lime \{
+00019 
+00020 \textcolor{keyword}{class }ConnectionNovenaRF7 : \textcolor{keyword}{public} LMS64CProtocol
+00021 \{
+00022 \textcolor{keyword}{public}:
+00023     \textcolor{keyword}{class }StreamChannel : \textcolor{keyword}{public} IStreamChannel
+00024     \{
+00025     \textcolor{keyword}{public}:
+00026         StreamChannel(IConnection* port);
+00027         ~StreamChannel();
+00028 
+00029         \textcolor{keywordtype}{int} Read(\textcolor{keywordtype}{void}* samples, \textcolor{keyword}{const} uint32\_t count, Metadata* meta, \textcolor{keyword}{const} int32\_t 
+      timeout_ms = 100);
+00030         \textcolor{keywordtype}{int} Write(\textcolor{keyword}{const} \textcolor{keywordtype}{void}* samples, \textcolor{keyword}{const} uint32\_t count, \textcolor{keyword}{const} Metadata* meta, \textcolor{keyword}{const} int32\_t 
+      timeout_ms = 100);
+00031         IStreamChannel::Info GetInfo();
+00032 
+00033         \textcolor{keywordtype}{bool} IsActive() \textcolor{keyword}{const};
+00034         \textcolor{keywordtype}{int} Start();
+00035         \textcolor{keywordtype}{int} Stop();
+00036         StreamConfig config;
+00037     \textcolor{keyword}{protected}:
+00038         RingFIFO* fifo;
+00039         ConnectionNovenaRF7* port;
+00040         \textcolor{keywordtype}{bool} mActive;
+00041     \textcolor{keyword}{private}:
+00042         StreamChannel() = \textcolor{keywordflow}{default};
+00043     \};
+00044 
+00045     \textcolor{keyword}{static} \textcolor{keyword}{const} \textcolor{keywordtype}{int} cSPI_BUF_SIZE;
+00046     \textcolor{keyword}{static} \textcolor{keyword}{const} \textcolor{keywordtype}{int} cSPI_SPEED_HZ;
+00047 
+00048     ConnectionNovenaRF7();
+00049     ~ConnectionNovenaRF7();
+00050 
+00051     \textcolor{keywordtype}{int} Open(\textcolor{keyword}{const} \textcolor{keywordtype}{char} *spiDevPath);
+00052     \textcolor{keywordtype}{void} Close();
+00053     \textcolor{keywordtype}{bool} IsOpen();
+00054 
+00055     \textcolor{keywordtype}{int} Write(\textcolor{keyword}{const} \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{char} *buffer, \textcolor{keywordtype}{int} length, \textcolor{keywordtype}{int} timeout_ms = 0);
+00056     \textcolor{keywordtype}{int} Read(\textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{char} *buffer, \textcolor{keywordtype}{int} length, \textcolor{keywordtype}{int} timeout_ms = 0);
+00057 
+00058     eConnectionType GetType(\textcolor{keywordtype}{void})
+00059     \{
+00060         \textcolor{keywordflow}{return} SPI_PORT;
+00061     \}
+00062 
+00063     \textcolor{keywordtype}{void} UpdateExternalBandSelect(\textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} channel, \textcolor{keyword}{const} \textcolor{keywordtype}{int} trfBand, \textcolor{keyword}{const} \textcolor{keywordtype}{int} rfePath);
+00064 
+00065     \textcolor{comment}{//IConnection stream API implementation}
+00066     \textcolor{keywordtype}{int} SetupStream(\textcolor{keywordtype}{size\_t}& streamID, \textcolor{keyword}{const} StreamConfig& config);
+00067     \textcolor{keywordtype}{int} CloseStream(\textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} streamID);
+00068     \textcolor{keywordtype}{size\_t} GetStreamSize(\textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} streamID);
+00069     \textcolor{keywordtype}{int} ControlStream(\textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} streamID, \textcolor{keyword}{const} \textcolor{keywordtype}{bool} enable);
+00070     \textcolor{keywordtype}{int} ReadStream(\textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} streamID, \textcolor{keywordtype}{void}* buffs, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} length, \textcolor{keyword}{const} \textcolor{keywordtype}{long} 
+      timeout_ms, StreamMetadata& metadata);
+00071     \textcolor{keywordtype}{int} WriteStream(\textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} streamID, \textcolor{keyword}{const} \textcolor{keywordtype}{void}* buffs, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} length, \textcolor{keyword}{const} \textcolor{keywordtype}{long} timeout\_ms, \textcolor{keyword}{
+      const} StreamMetadata& metadata);
+00072     \textcolor{keywordtype}{int} ReadStreamStatus(\textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} streamID, \textcolor{keyword}{const} \textcolor{keywordtype}{long} timeout\_ms, StreamMetadata& metadata);
+00073 
+00074 \textcolor{keyword}{protected}:
+00075     \textcolor{keyword}{struct }ThreadData
+00076     \{
+00077         ConnectionNovenaRF7* dataPort; 
+00078         std::atomic<bool>* terminate; 
+00079         std::atomic<uint32\_t>* dataRate_Bps; 
+00080         std::vector<StreamChannel*> channels; 
+00081         std::atomic<bool>* generateData; 
+00082         std::condition\_variable* safeToConfigInterface;
+00083         std::atomic<uint64\_t>* lastTimestamp; 
+00084     \};
+00085     \textcolor{keyword}{static} \textcolor{keywordtype}{void} ReceivePacketsLoop(\textcolor{keyword}{const} ThreadData args);
+00086     \textcolor{keyword}{static} \textcolor{keywordtype}{void} TransmitPacketsLoop(\textcolor{keyword}{const} ThreadData args);
+00087     \textcolor{keywordtype}{int} UpdateThreads();
+00088 
+00089     std::thread rxThread;
+00090     std::atomic<bool> rxRunning;
+00091     std::atomic<bool> terminateRx;
+00092     std::atomic<uint32\_t> rxDataRate_Bps;
+00093     std::vector<StreamChannel*> mRxStreams;
+00094 
+00095     std::vector<unsigned char> rxbuf;
+00096     \textcolor{keywordtype}{int} fd;
+00097     std::fstream m_SEN;
+00098 \};
+00099 
+00100 \textcolor{keyword}{class }ConnectionNovenaRF7Entry : \textcolor{keyword}{public} ConnectionRegistryEntry
+00101 \{
+00102 \textcolor{keyword}{public}:
+00103     ConnectionNovenaRF7Entry(\textcolor{keywordtype}{void});
+00104 
+00105     std::vector<ConnectionHandle> enumerate(\textcolor{keyword}{const} ConnectionHandle &hint);
+00106 
+00107     IConnection *make(\textcolor{keyword}{const} ConnectionHandle &handle);
+00108 \};
+00109 
+00110 \}
+00111 
+00112 \textcolor{preprocessor}{#endif //CONNECTION\_NOVENA\_RF7\_H}
+\end{DoxyCode}

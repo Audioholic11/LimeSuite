@@ -1,0 +1,723 @@
+\subsection{Connection\+F\+T601.\+cpp}
+\label{ConnectionFT601_8cpp_source}\index{/home/erik/prefix/default/src/limesuite-\/dev/src/\+Connection\+F\+T\+D\+I/\+Connection\+F\+T601.\+cpp@{/home/erik/prefix/default/src/limesuite-\/dev/src/\+Connection\+F\+T\+D\+I/\+Connection\+F\+T601.\+cpp}}
+
+\begin{DoxyCode}
+00001 
+00007 \textcolor{preprocessor}{#include "ConnectionFT601.h"}
+00008 \textcolor{preprocessor}{#include <cstring>}
+00009 \textcolor{preprocessor}{#include <iostream>}
+00010 \textcolor{preprocessor}{#include <vector>}
+00011 
+00012 \textcolor{preprocessor}{#include <thread>}
+00013 \textcolor{preprocessor}{#include <chrono>}
+00014 \textcolor{preprocessor}{#include <FPGA_common.h>}
+00015 \textcolor{preprocessor}{#include <ciso646>}
+00016 \textcolor{preprocessor}{#include "Logger.h"}
+00017 
+00018 \textcolor{keyword}{using namespace }std;
+00019 \textcolor{keyword}{using namespace }lime;
+00020 
+00021 \textcolor{keyword}{const} \textcolor{keywordtype}{int} ConnectionFT601::streamWrEp = 0x03;
+00022 \textcolor{keyword}{const} \textcolor{keywordtype}{int} ConnectionFT601::streamRdEp = 0x83;
+00023 \textcolor{keyword}{const} \textcolor{keywordtype}{int} ConnectionFT601::ctrlWrEp = 0x02;
+00024 \textcolor{keyword}{const} \textcolor{keywordtype}{int} ConnectionFT601::ctrlRdEp = 0x82;
+00025 
+00026 ConnectionFT601::ConnectionFT601(\textcolor{keywordtype}{void} *arg)
+00027 \{
+00028     isConnected = \textcolor{keyword}{false};
+00029 \textcolor{preprocessor}{#ifndef \_\_unix\_\_}
+00030     mFTHandle = NULL;
+00031 \textcolor{preprocessor}{#else}
+00032     dev\_handle = 0;
+00033     mUsbCounter = 0;
+00034     ctx = (libusb\_context *)arg;
+00035 \textcolor{preprocessor}{#endif}
+00036 \}
+00037 
+00040 ConnectionFT601::ConnectionFT601(\textcolor{keywordtype}{void} *arg, \textcolor{keyword}{const} ConnectionHandle &handle)
+00041 \{
+00042     isConnected = \textcolor{keyword}{false};
+00043     \textcolor{keywordtype}{int} pid = -1;
+00044     \textcolor{keywordtype}{int} vid = -1;
+00045     mSerial = std::strtoll(handle.serial.c\_str(),\textcolor{keyword}{nullptr},16);
+00046 \textcolor{preprocessor}{#ifndef \_\_unix\_\_}
+00047     mFTHandle = NULL;
+00048 \textcolor{preprocessor}{#else}
+00049     \textcolor{keyword}{const} \textcolor{keyword}{auto} pidvid = handle.addr;
+00050     \textcolor{keyword}{const} \textcolor{keyword}{auto} splitPos = pidvid.find(\textcolor{stringliteral}{":"});
+00051     pid = std::stoi(pidvid.substr(0, splitPos));
+00052     vid = std::stoi(pidvid.substr(splitPos+1));
+00053     dev\_handle = 0;
+00054     mUsbCounter = 0;
+00055     ctx = (libusb\_context *)arg;
+00056 \textcolor{preprocessor}{#endif}
+00057     \textcolor{keywordflow}{if} (this->Open(handle.serial, vid, pid) != 0)
+00058         lime::error(\textcolor{stringliteral}{"Failed to open device"});
+00059 \}
+00060 
+00063 ConnectionFT601::~ConnectionFT601()
+00064 \{
+00065     Close();
+00066 \}
+00067 \textcolor{preprocessor}{#ifdef \_\_unix\_\_}
+00068 \textcolor{keywordtype}{int} ConnectionFT601::FT\_FlushPipe(\textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{char} ep)
+00069 \{
+00070     \textcolor{keywordtype}{int} actual = 0;
+00071     \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{char} wbuffer[20]=\{0\};
+00072 
+00073     mUsbCounter++;
+00074     wbuffer[0] = (mUsbCounter)&0xFF;
+00075     wbuffer[1] = (mUsbCounter>>8)&0xFF;
+00076     wbuffer[2] = (mUsbCounter>>16)&0xFF;
+00077     wbuffer[3] = (mUsbCounter>>24)&0xFF;
+00078     wbuffer[4] = ep;
+00079     libusb\_bulk\_transfer(dev\_handle, 0x01, wbuffer, 20, &actual, 1000);
+00080     \textcolor{keywordflow}{if} (actual != 20)
+00081         \textcolor{keywordflow}{return} -1;
+00082 
+00083     mUsbCounter++;
+00084     wbuffer[0] = (mUsbCounter)&0xFF;
+00085     wbuffer[1] = (mUsbCounter>>8)&0xFF;
+00086     wbuffer[2] = (mUsbCounter>>16)&0xFF;
+00087     wbuffer[3] = (mUsbCounter>>24)&0xFF;
+00088     wbuffer[4] = ep;
+00089     wbuffer[5] = 0x03;
+00090     libusb\_bulk\_transfer(dev\_handle, 0x01, wbuffer, 20, &actual, 1000);
+00091     \textcolor{keywordflow}{if} (actual != 20)
+00092         \textcolor{keywordflow}{return} -1;
+00093     \textcolor{keywordflow}{return} 0;
+00094 \}
+00095 
+00096 \textcolor{keywordtype}{int} ConnectionFT601::FT\_SetStreamPipe(\textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{char} ep, \textcolor{keywordtype}{size\_t} size)
+00097 \{
+00098     \textcolor{keywordtype}{int} actual = 0;
+00099     \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{char} wbuffer[20]=\{0\};
+00100 
+00101     mUsbCounter++;
+00102     wbuffer[0] = (mUsbCounter)&0xFF;
+00103     wbuffer[1] = (mUsbCounter>>8)&0xFF;
+00104     wbuffer[2] = (mUsbCounter>>16)&0xFF;
+00105     wbuffer[3] = (mUsbCounter>>24)&0xFF;
+00106     wbuffer[4] = ep;
+00107     libusb\_bulk\_transfer(dev\_handle, 0x01, wbuffer, 20, &actual, 1000);
+00108     \textcolor{keywordflow}{if} (actual != 20)
+00109         \textcolor{keywordflow}{return} -1;
+00110 
+00111     mUsbCounter++;
+00112     wbuffer[0] = (mUsbCounter)&0xFF;
+00113     wbuffer[1] = (mUsbCounter>>8)&0xFF;
+00114     wbuffer[2] = (mUsbCounter>>16)&0xFF;
+00115     wbuffer[3] = (mUsbCounter>>24)&0xFF;
+00116     wbuffer[5] = 0x02;
+00117     wbuffer[8] = (size)&0xFF;
+00118     wbuffer[9] = (size>>8)&0xFF;
+00119     wbuffer[10] = (size>>16)&0xFF;
+00120     wbuffer[11] = (size>>24)&0xFF;
+00121     libusb\_bulk\_transfer(dev\_handle, 0x01, wbuffer, 20, &actual, 1000);
+00122     \textcolor{keywordflow}{if} (actual != 20)
+00123         \textcolor{keywordflow}{return} -1;
+00124     \textcolor{keywordflow}{return} 0;
+00125 \}
+00126 \textcolor{preprocessor}{#endif}
+00127 
+00131 \textcolor{keywordtype}{int} ConnectionFT601::Open(\textcolor{keyword}{const} std::string &serial, \textcolor{keywordtype}{int} vid, \textcolor{keywordtype}{int} pid)
+00132 \{
+00133 \textcolor{preprocessor}{#ifndef \_\_unix\_\_}
+00134     DWORD devCount;
+00135     FT_STATUS ftStatus = FT_OK;
+00136     DWORD dwNumDevices = 0;
+00137     \textcolor{comment}{// Open a device}
+00138     ftStatus = FT\_Create((\textcolor{keywordtype}{void}*)serial.c\_str(), FT_OPEN_BY_SERIAL_NUMBER, &mFTHandle);
+00139     \textcolor{keywordflow}{if} (FT_FAILED(ftStatus))
+00140     \{
+00141         ReportError(ENODEV, \textcolor{stringliteral}{"Failed to list USB Devices"});
+00142         \textcolor{keywordflow}{return} -1;
+00143     \}
+00144     FT\_AbortPipe(mFTHandle, streamRdEp);
+00145     FT\_AbortPipe(mFTHandle, ctrlRdEp);
+00146     FT\_AbortPipe(mFTHandle, ctrlWrEp);
+00147     FT\_AbortPipe(mFTHandle, streamWrEp);
+00148     FT\_SetStreamPipe(mFTHandle, FALSE, FALSE, ctrlRdEp, 64);
+00149     FT\_SetStreamPipe(mFTHandle, FALSE, FALSE, ctrlWrEp, 64);
+00150     FT\_SetStreamPipe(mFTHandle, FALSE, FALSE, streamRdEp, \textcolor{keyword}{sizeof}(FPGA_DataPacket));
+00151     FT\_SetStreamPipe(mFTHandle, FALSE, FALSE, streamWrEp, \textcolor{keyword}{sizeof}(FPGA_DataPacket));
+00152     FT\_SetPipeTimeout(mFTHandle, ctrlWrEp, 500);
+00153     FT\_SetPipeTimeout(mFTHandle, ctrlRdEp, 500);
+00154     FT\_SetPipeTimeout(mFTHandle, streamRdEp, 0);
+00155     FT\_SetPipeTimeout(mFTHandle, streamWrEp, 0);
+00156     isConnected = \textcolor{keyword}{true};
+00157     \textcolor{keywordflow}{return} 0;
+00158 \textcolor{preprocessor}{#else}
+00159 
+00160     libusb\_device **devs; \textcolor{comment}{//pointer to pointer of device, used to retrieve a list of devices}
+00161     \textcolor{keywordtype}{int} usbDeviceCount = libusb\_get\_device\_list(ctx, &devs);
+00162 
+00163     \textcolor{keywordflow}{if} (usbDeviceCount < 0)
+00164         \textcolor{keywordflow}{return} ReportError(-1, \textcolor{stringliteral}{"libusb\_get\_device\_list failed: %s"}, libusb\_strerror(libusb\_error(
+      usbDeviceCount)));
+00165 
+00166     \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} i=0; i<usbDeviceCount; ++i)
+00167     \{
+00168         libusb\_device\_descriptor desc;
+00169         \textcolor{keywordtype}{int} r = libusb\_get\_device\_descriptor(devs[i], &desc);
+00170         \textcolor{keywordflow}{if}(r<0) \{
+00171             lime::error(\textcolor{stringliteral}{"failed to get device description"});
+00172             \textcolor{keywordflow}{continue};
+00173         \}
+00174         \textcolor{keywordflow}{if} (desc.idProduct != pid) \textcolor{keywordflow}{continue};
+00175         \textcolor{keywordflow}{if} (desc.idVendor != vid) \textcolor{keywordflow}{continue};
+00176         \textcolor{keywordflow}{if}(libusb\_open(devs[i], &dev\_handle) != 0) \textcolor{keywordflow}{continue};
+00177 
+00178         std::string foundSerial;
+00179         \textcolor{keywordflow}{if} (desc.iSerialNumber > 0)
+00180         \{
+00181             \textcolor{keywordtype}{char} data[255];
+00182             r = libusb\_get\_string\_descriptor\_ascii(dev\_handle,desc.iSerialNumber,(\textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{char}*)data, \textcolor{keyword}{
+      sizeof}(data));
+00183             \textcolor{keywordflow}{if}(r<0)
+00184                 lime::error(\textcolor{stringliteral}{"failed to get serial number"});
+00185             \textcolor{keywordflow}{else}
+00186                 foundSerial = std::string(data, \textcolor{keywordtype}{size\_t}(r));
+00187         \}
+00188 
+00189         \textcolor{keywordflow}{if} (serial == foundSerial) \textcolor{keywordflow}{break}; \textcolor{comment}{//found it}
+00190         libusb\_close(dev\_handle);
+00191         dev\_handle = \textcolor{keyword}{nullptr};
+00192     \}
+00193     libusb\_free\_device\_list(devs, 1);
+00194 
+00195     \textcolor{keywordflow}{if}(dev\_handle == \textcolor{keyword}{nullptr})
+00196         \textcolor{keywordflow}{return} ReportError(ENODEV, \textcolor{stringliteral}{"libusb\_open failed"});
+00197 
+00198     \textcolor{keywordflow}{if}(libusb\_kernel\_driver\_active(dev\_handle, 1) == 1)   \textcolor{comment}{//find out if kernel driver is attached}
+00199     \{
+00200         lime::debug(\textcolor{stringliteral}{"Kernel Driver Active"});
+00201         \textcolor{keywordflow}{if}(libusb\_detach\_kernel\_driver(dev\_handle, 1) == 0) \textcolor{comment}{//detach it}
+00202             lime::debug(\textcolor{stringliteral}{"Kernel Driver Detached!"});
+00203     \}
+00204     \textcolor{keywordtype}{int} r = libusb\_claim\_interface(dev\_handle, 0); \textcolor{comment}{//claim interface 0 (the first) of device}
+00205     \textcolor{keywordflow}{if} (r < 0)
+00206         \textcolor{keywordflow}{return} ReportError(-1, \textcolor{stringliteral}{"Cannot claim interface - %s"}, libusb\_strerror(libusb\_error(r)));
+00207 
+00208     \textcolor{keywordflow}{if} ((r = libusb\_claim\_interface(dev\_handle, 1))<0) \textcolor{comment}{//claim interface 1 of device}
+00209         \textcolor{keywordflow}{return} ReportError(-1, \textcolor{stringliteral}{"Cannot claim interface - %s"}, libusb\_strerror(libusb\_error(r)));
+00210     lime::debug(\textcolor{stringliteral}{"Claimed Interface"});
+00211 
+00212     \textcolor{keywordflow}{if} (libusb\_reset\_device(dev\_handle)!=0)
+00213         \textcolor{keywordflow}{return} ReportError(-1, \textcolor{stringliteral}{"USB reset failed"}, libusb\_strerror(libusb\_error(r)));
+00214 
+00215     FT\_FlushPipe(ctrlRdEp);  \textcolor{comment}{//clear ctrl ep rx buffer}
+00216     FT\_SetStreamPipe(ctrlRdEp,64);
+00217     FT\_SetStreamPipe(ctrlWrEp,64);
+00218     isConnected = \textcolor{keyword}{true};
+00219     \textcolor{keywordflow}{return} 0;
+00220 \textcolor{preprocessor}{#endif}
+00221 \}
+00222 
+00225 \textcolor{keywordtype}{void} ConnectionFT601::Close()
+00226 \{
+00227 \textcolor{preprocessor}{#ifndef \_\_unix\_\_}
+00228     FT\_Close(mFTHandle);
+00229 \textcolor{preprocessor}{#else}
+00230     \textcolor{keywordflow}{if}(dev\_handle != 0)
+00231     \{
+00232         FT\_FlushPipe(streamRdEp);
+00233         FT\_FlushPipe(ctrlRdEp);
+00234         libusb\_release\_interface(dev\_handle, 1);
+00235         libusb\_close(dev\_handle);
+00236         dev\_handle = 0;
+00237     \}
+00238 \textcolor{preprocessor}{#endif}
+00239     isConnected = \textcolor{keyword}{false};
+00240 \}
+00241 
+00245 \textcolor{keywordtype}{bool} ConnectionFT601::IsOpen()
+00246 \{
+00247     \textcolor{keywordflow}{return} isConnected;
+00248 \}
+00249 
+00250 \textcolor{preprocessor}{#ifndef \_\_unix\_\_}
+00251 \textcolor{keywordtype}{int} ConnectionFT601::ReinitPipe(\textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{char} ep)
+00252 \{
+00253     FT\_AbortPipe(mFTHandle, ep);
+00254     FT\_FlushPipe(mFTHandle, ep);
+00255     FT\_SetStreamPipe(mFTHandle, FALSE, FALSE, ep, 64);
+00256     \textcolor{keywordflow}{return} 0;
+00257 \}
+00258 \textcolor{preprocessor}{#endif}
+00259 
+00266 \textcolor{keywordtype}{int} ConnectionFT601::Write(\textcolor{keyword}{const} \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{char} *buffer, \textcolor{keyword}{const} \textcolor{keywordtype}{int} length, \textcolor{keywordtype}{int} 
+      timeout_ms)
+00267 \{
+00268     std::lock\_guard<std::mutex> lock(mExtraUsbMutex);
+00269     \textcolor{keywordtype}{long} len = 0;
+00270     \textcolor{keywordflow}{if} (IsOpen() == \textcolor{keyword}{false})
+00271         \textcolor{keywordflow}{return} 0;
+00272 
+00273 \textcolor{preprocessor}{#ifndef \_\_unix\_\_}
+00274     ULONG ulBytesWrite = 0;
+00275     FT_STATUS ftStatus = FT_OK;
+00276     OVERLAPPED  vOverlapped = \{ 0 \};
+00277     FT\_InitializeOverlapped(mFTHandle, &vOverlapped);
+00278     ftStatus = FT\_WritePipe(mFTHandle, ctrlWrEp, (\textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{char}*)buffer, length, &ulBytesWrite, &
+      vOverlapped);
+00279     \textcolor{keywordflow}{if} (ftStatus != FT_IO_PENDING)
+00280     \{
+00281         FT\_ReleaseOverlapped(mFTHandle, &vOverlapped);
+00282         ReinitPipe(ctrlWrEp);
+00283         \textcolor{keywordflow}{return} -1;
+00284     \}
+00285 
+00286     DWORD dwRet = WaitForSingleObject(vOverlapped.hEvent, timeout\_ms);
+00287     \textcolor{keywordflow}{if} (dwRet == WAIT\_OBJECT\_0 || dwRet == WAIT\_TIMEOUT)
+00288     \{
+00289         \textcolor{keywordflow}{if} (GetOverlappedResult(mFTHandle, &vOverlapped, &ulBytesWrite, FALSE) == FALSE)
+00290         \{
+00291             ReinitPipe(ctrlWrEp);
+00292             ulBytesWrite = -1;
+00293         \}
+00294     \}
+00295     \textcolor{keywordflow}{else}
+00296     \{
+00297         ReinitPipe(ctrlWrEp);
+00298         ulBytesWrite = -1;
+00299     \}
+00300     FT\_ReleaseOverlapped(mFTHandle, &vOverlapped);
+00301     \textcolor{keywordflow}{return} ulBytesWrite;
+00302 \textcolor{preprocessor}{#else}
+00303     \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{char}* wbuffer = \textcolor{keyword}{new} \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{char}[length];
+00304     memcpy(wbuffer, buffer, length);
+00305     \textcolor{keywordtype}{int} actual = 0;
+00306     libusb\_bulk\_transfer(dev\_handle, ctrlWrEp, wbuffer, length, &actual, timeout\_ms);
+00307     len = actual;
+00308     \textcolor{keyword}{delete}[] wbuffer;
+00309     \textcolor{keywordflow}{return} len;
+00310 \textcolor{preprocessor}{#endif}
+00311 \}
+00312 
+00321 \textcolor{keywordtype}{int} ConnectionFT601::Read(\textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{char} *buffer, \textcolor{keyword}{const} \textcolor{keywordtype}{int} length, \textcolor{keywordtype}{int} 
+      timeout_ms)
+00322 \{
+00323     std::lock\_guard<std::mutex> lock(mExtraUsbMutex);
+00324     \textcolor{keywordtype}{long} len = length;
+00325     \textcolor{keywordflow}{if}(IsOpen() == \textcolor{keyword}{false})
+00326         \textcolor{keywordflow}{return} 0;
+00327 \textcolor{preprocessor}{#ifndef \_\_unix\_\_}
+00328     ULONG ulBytesRead = 0;
+00329     FT_STATUS ftStatus = FT_OK;
+00330     OVERLAPPED  vOverlapped = \{ 0 \};
+00331     FT\_InitializeOverlapped(mFTHandle, &vOverlapped);
+00332     ftStatus = FT\_ReadPipe(mFTHandle, ctrlRdEp, buffer, length, &ulBytesRead, &vOverlapped);
+00333     \textcolor{keywordflow}{if} (ftStatus != FT_IO_PENDING)
+00334     \{
+00335         FT\_ReleaseOverlapped(mFTHandle, &vOverlapped);
+00336         ReinitPipe(ctrlRdEp);
+00337         \textcolor{keywordflow}{return} -1;;
+00338     \}
+00339 
+00340     DWORD dwRet = WaitForSingleObject(vOverlapped.hEvent, timeout\_ms);
+00341     \textcolor{keywordflow}{if} (dwRet == WAIT\_OBJECT\_0 || dwRet == WAIT\_TIMEOUT)
+00342     \{
+00343         \textcolor{keywordflow}{if} (GetOverlappedResult(mFTHandle, &vOverlapped, &ulBytesRead, FALSE)==FALSE)
+00344         \{
+00345             ReinitPipe(ctrlRdEp);
+00346             ulBytesRead = -1;
+00347         \}
+00348     \}
+00349     \textcolor{keywordflow}{else}
+00350     \{
+00351         ReinitPipe(ctrlRdEp);
+00352         ulBytesRead = -1;
+00353     \}
+00354     FT\_ReleaseOverlapped(mFTHandle, &vOverlapped);
+00355     \textcolor{keywordflow}{return} ulBytesRead;
+00356 \textcolor{preprocessor}{#else}
+00357     \textcolor{keywordtype}{int} actual = 0;
+00358     libusb\_bulk\_transfer(dev\_handle, ctrlRdEp, buffer, len, &actual, timeout\_ms);
+00359     len = actual;
+00360 \textcolor{preprocessor}{#endif}
+00361     \textcolor{keywordflow}{return} len;
+00362 \}
+00363 
+00364 \textcolor{preprocessor}{#ifdef \_\_unix\_\_}
+00365 
+00367 \textcolor{keyword}{static} \textcolor{keywordtype}{void} callback\_libusbtransfer(libusb\_transfer *trans)
+00368 \{
+00369     ConnectionFT601::USBTransferContext *context = \textcolor{keyword}{reinterpret\_cast<}
+      ConnectionFT601::USBTransferContext*\textcolor{keyword}{>}(trans->user\_data);
+00370     std::unique\_lock<std::mutex> lck(context->transferLock);
+00371     \textcolor{keywordflow}{switch}(trans->status)
+00372     \{
+00373         \textcolor{keywordflow}{case} LIBUSB\_TRANSFER\_CANCELLED:
+00374             context->bytesXfered = trans->actual\_length;
+00375             context->done.store(\textcolor{keyword}{true});
+00376             \textcolor{keywordflow}{break};
+00377         \textcolor{keywordflow}{case} LIBUSB\_TRANSFER\_COMPLETED:
+00378             context->bytesXfered = trans->actual\_length;
+00379             context->done.store(\textcolor{keyword}{true});
+00380             \textcolor{keywordflow}{break};
+00381         \textcolor{keywordflow}{case} LIBUSB\_TRANSFER\_ERROR:
+00382             lime::error(\textcolor{stringliteral}{"TRANSFER ERROR"});
+00383             context->bytesXfered = trans->actual\_length;
+00384             context->done.store(\textcolor{keyword}{true});
+00385             \textcolor{keywordflow}{break};
+00386         \textcolor{keywordflow}{case} LIBUSB\_TRANSFER\_TIMED\_OUT:
+00387             lime::error(\textcolor{stringliteral}{"USB transfer timed out"});
+00388             context->done.store(\textcolor{keyword}{true});
+00389             \textcolor{keywordflow}{break};
+00390         \textcolor{keywordflow}{case} LIBUSB\_TRANSFER\_OVERFLOW:
+00391             lime::error(\textcolor{stringliteral}{"transfer overflow\(\backslash\)n"});
+00392             \textcolor{keywordflow}{break};
+00393         \textcolor{keywordflow}{case} LIBUSB\_TRANSFER\_STALL:
+00394             lime::error(\textcolor{stringliteral}{"transfer stalled"});
+00395             \textcolor{keywordflow}{break};
+00396         \textcolor{keywordflow}{case} LIBUSB\_TRANSFER\_NO\_DEVICE:
+00397             lime::error(\textcolor{stringliteral}{"transfer no device"});
+00398             \textcolor{keywordflow}{break};
+00399     \}
+00400     lck.unlock();
+00401     context->cv.notify\_one();
+00402 \}
+00403 \textcolor{preprocessor}{#endif}
+00404 
+00405 \textcolor{keywordtype}{int} ConnectionFT601::GetBuffersCount()\textcolor{keyword}{ const}
+00406 \textcolor{keyword}{}\{
+00407     \textcolor{keywordflow}{return} USB\_MAX\_CONTEXTS;
+00408 \};
+00409 
+00410 \textcolor{keywordtype}{int} ConnectionFT601::CheckStreamSize(\textcolor{keywordtype}{int} size)\textcolor{keyword}{const}
+00411 \textcolor{keyword}{}\{
+00412     \textcolor{keywordflow}{return} size;
+00413 \};
+00414 
+00421 \textcolor{keywordtype}{int} ConnectionFT601::BeginDataReading(\textcolor{keywordtype}{char} *buffer, uint32\_t length, \textcolor{keywordtype}{int} ep)
+00422 \{
+00423     \textcolor{keywordtype}{int} i = 0;
+00424     \textcolor{keywordtype}{bool} contextFound = \textcolor{keyword}{false};
+00425     \textcolor{comment}{//find not used context}
+00426     \textcolor{keywordflow}{for}(i = 0; i<USB\_MAX\_CONTEXTS; i++)
+00427     \{
+00428         \textcolor{keywordflow}{if}(!contexts[i].used)
+00429         \{
+00430             contextFound = \textcolor{keyword}{true};
+00431             \textcolor{keywordflow}{break};
+00432         \}
+00433     \}
+00434     \textcolor{keywordflow}{if}(!contextFound)
+00435     \{
+00436         lime::error(\textcolor{stringliteral}{"No contexts left for reading data"});
+00437         \textcolor{keywordflow}{return} -1;
+00438     \}
+00439     contexts[i].used = \textcolor{keyword}{true};
+00440 
+00441 \textcolor{preprocessor}{#ifndef \_\_unix\_\_}
+00442     FT\_InitializeOverlapped(mFTHandle, &contexts[i].inOvLap);
+00443     ULONG ulActual;
+00444     FT_STATUS ftStatus = FT_OK;
+00445     ftStatus = FT\_ReadPipe(mFTHandle, streamRdEp, (\textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{char}*)buffer, length, &ulActual, &contexts[i].
+      inOvLap);
+00446     \textcolor{keywordflow}{if} (ftStatus != FT_IO_PENDING)
+00447         \textcolor{keywordflow}{return} -1;
+00448 \textcolor{preprocessor}{#else}
+00449     libusb\_transfer *tr = contexts[i].transfer;
+00450     libusb\_fill\_bulk\_transfer(tr, dev\_handle, streamRdEp, (\textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{char}*)buffer, length, 
+      callback\_libusbtransfer, &contexts[i], 0);
+00451     contexts[i].done = \textcolor{keyword}{false};
+00452     contexts[i].bytesXfered = 0;
+00453     \textcolor{keywordtype}{int} status = libusb\_submit\_transfer(tr);
+00454     \textcolor{keywordflow}{if}(status != 0)
+00455     \{
+00456         lime::error(\textcolor{stringliteral}{"ERROR BEGIN DATA READING %s"}, libusb\_error\_name(status));
+00457         contexts[i].used = \textcolor{keyword}{false};
+00458         \textcolor{keywordflow}{return} -1;
+00459     \}
+00460 \textcolor{preprocessor}{#endif}
+00461     \textcolor{keywordflow}{return} i;
+00462 \}
+00463 
+00470 \textcolor{keywordtype}{bool} ConnectionFT601::WaitForReading(\textcolor{keywordtype}{int} contextHandle, \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{int} timeout_ms)
+00471 \{
+00472     \textcolor{keywordflow}{if}(contextHandle >= 0 && contexts[contextHandle].used == \textcolor{keyword}{true})
+00473     \{
+00474 \textcolor{preprocessor}{#ifndef \_\_unix\_\_}
+00475         DWORD dwRet = WaitForSingleObject(contexts[contextHandle].inOvLap.hEvent, timeout\_ms);
+00476             \textcolor{keywordflow}{if} (dwRet == WAIT\_OBJECT\_0)
+00477                 \textcolor{keywordflow}{return} 1;
+00478 \textcolor{preprocessor}{#else}
+00479         \textcolor{keyword}{auto} t1 = chrono::high\_resolution\_clock::now();
+00480         \textcolor{keyword}{auto} t2 = t1;
+00481 
+00482         std::unique\_lock<std::mutex> lck(contexts[contextHandle].transferLock);
+00483         \textcolor{keywordflow}{while}(contexts[contextHandle].done.load() == \textcolor{keyword}{false} && std::chrono::duration\_cast<
+      std::chrono::milliseconds>(t2 - t1).count() < timeout_ms)
+00484         \{
+00485             \textcolor{comment}{//blocking not to waste CPU}
+00486             contexts[contextHandle].cv.wait\_for(lck, chrono::milliseconds(timeout\_ms));
+00487             t2 = chrono::high\_resolution\_clock::now();
+00488         \}
+00489         \textcolor{keywordflow}{return} contexts[contextHandle].done.load() == \textcolor{keyword}{true};
+00490 \textcolor{preprocessor}{#endif}
+00491     \}
+00492     \textcolor{keywordflow}{return} 0;
+00493 \}
+00494 
+00502 \textcolor{keywordtype}{int} ConnectionFT601::FinishDataReading(\textcolor{keywordtype}{char} *buffer, uint32\_t length, \textcolor{keywordtype}{int} contextHandle)
+00503 \{
+00504     \textcolor{keywordflow}{if}(contextHandle >= 0 && contexts[contextHandle].used == \textcolor{keyword}{true})
+00505     \{
+00506 \textcolor{preprocessor}{#ifndef \_\_unix\_\_}
+00507     ULONG ulActualBytesTransferred;
+00508         FT_STATUS ftStatus = FT_OK;
+00509 
+00510         ftStatus = FT\_GetOverlappedResult(mFTHandle, &contexts[contextHandle].inOvLap, &
+      ulActualBytesTransferred, FALSE);
+00511         \textcolor{keywordflow}{if} (ftStatus != FT_OK)
+00512             length = 0;
+00513         \textcolor{keywordflow}{else}
+00514             length = ulActualBytesTransferred;
+00515         FT\_ReleaseOverlapped(mFTHandle, &contexts[contextHandle].inOvLap);
+00516         contexts[contextHandle].used = \textcolor{keyword}{false};
+00517         \textcolor{keywordflow}{return} length;
+00518 \textcolor{preprocessor}{#else}
+00519         length = contexts[contextHandle].bytesXfered;
+00520         contexts[contextHandle].used = \textcolor{keyword}{false};
+00521         \textcolor{keywordflow}{return} length;
+00522 \textcolor{preprocessor}{#endif}
+00523     \}
+00524     \textcolor{keywordflow}{return} 0;
+00525 \}
+00526 
+00530 \textcolor{keywordtype}{void} ConnectionFT601::AbortReading(\textcolor{keywordtype}{int} ep)
+00531 \{
+00532 \textcolor{preprocessor}{#ifndef \_\_unix\_\_}
+00533     FT\_AbortPipe(mFTHandle, streamRdEp);
+00534     \textcolor{keywordflow}{for} (\textcolor{keywordtype}{int} i = 0; i < USB\_MAX\_CONTEXTS; ++i)
+00535     \{
+00536         \textcolor{keywordflow}{if} (contexts[i].used == \textcolor{keyword}{true})
+00537         \{
+00538             FT\_ReleaseOverlapped(mFTHandle, &contexts[i].inOvLap);
+00539             contexts[i].used = \textcolor{keyword}{false};
+00540         \}
+00541     \}
+00542     FT\_FlushPipe(mFTHandle, streamRdEp);
+00543     FT\_SetStreamPipe(mFTHandle, FALSE, FALSE, streamRdEp, \textcolor{keyword}{sizeof}(FPGA_DataPacket));
+00544 \textcolor{preprocessor}{#else}
+00545 
+00546     \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} i = 0; i<USB\_MAX\_CONTEXTS; ++i)
+00547     \{
+00548         \textcolor{keywordflow}{if}(contexts[i].used)
+00549             libusb\_cancel\_transfer(contexts[i].transfer);
+00550     \}
+00551     FT\_FlushPipe(streamRdEp);
+00552     \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} i=0; i<USB\_MAX\_CONTEXTS; ++i)
+00553     \{
+00554         \textcolor{keywordflow}{if}(contexts[i].used)
+00555         \{
+00556             WaitForReading(i, 250);
+00557             FinishDataReading(\textcolor{keyword}{nullptr}, 0, i);
+00558         \}
+00559     \}
+00560 \textcolor{preprocessor}{#endif}
+00561 \}
+00562 
+00569 \textcolor{keywordtype}{int} ConnectionFT601::BeginDataSending(\textcolor{keyword}{const} \textcolor{keywordtype}{char} *buffer, uint32\_t length, \textcolor{keywordtype}{int} ep)
+00570 \{
+00571     \textcolor{keywordtype}{int} i = 0;
+00572     \textcolor{comment}{//find not used context}
+00573     \textcolor{keywordtype}{bool} contextFound = \textcolor{keyword}{false};
+00574     \textcolor{keywordflow}{for}(i = 0; i<USB\_MAX\_CONTEXTS; i++)
+00575     \{
+00576         \textcolor{keywordflow}{if}(!contextsToSend[i].used)
+00577         \{
+00578             contextFound = \textcolor{keyword}{true};
+00579             \textcolor{keywordflow}{break};
+00580         \}
+00581     \}
+00582     \textcolor{keywordflow}{if}(!contextFound)
+00583         \textcolor{keywordflow}{return} -1;
+00584     contextsToSend[i].used = \textcolor{keyword}{true};
+00585 
+00586 \textcolor{preprocessor}{#ifndef \_\_unix\_\_}
+00587     FT_STATUS ftStatus = FT_OK;
+00588     ULONG ulActualBytesSend;
+00589     FT\_InitializeOverlapped(mFTHandle, &contextsToSend[i].inOvLap);
+00590     ftStatus = FT\_WritePipe(mFTHandle, streamWrEp, (\textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{char}*)buffer, length, &ulActualBytesSend, &
+      contextsToSend[i].inOvLap);
+00591     \textcolor{keywordflow}{if} (ftStatus != FT_IO_PENDING)
+00592         \textcolor{keywordflow}{return} -1;
+00593 \textcolor{preprocessor}{#else}
+00594     libusb\_transfer *tr = contextsToSend[i].transfer;
+00595     contextsToSend[i].done = \textcolor{keyword}{false};
+00596     contextsToSend[i].bytesXfered = 0;
+00597     libusb\_fill\_bulk\_transfer(tr, dev\_handle, streamWrEp, (\textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{char}*)buffer, length, 
+      callback\_libusbtransfer, &contextsToSend[i], 0);
+00598     \textcolor{keywordtype}{int} status = libusb\_submit\_transfer(tr);
+00599     \textcolor{keywordflow}{if}(status != 0)
+00600     \{
+00601         lime::error(\textcolor{stringliteral}{"ERROR BEGIN DATA SENDING %s"}, libusb\_error\_name(status));
+00602         contextsToSend[i].used = \textcolor{keyword}{false};
+00603         \textcolor{keywordflow}{return} -1;
+00604     \}
+00605 \textcolor{preprocessor}{#endif}
+00606     \textcolor{keywordflow}{return} i;
+00607 \}
+00608 
+00615 \textcolor{keywordtype}{bool} ConnectionFT601::WaitForSending(\textcolor{keywordtype}{int} contextHandle, \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{int} timeout_ms)
+00616 \{
+00617     \textcolor{keywordflow}{if}(contextsToSend[contextHandle].used == \textcolor{keyword}{true})
+00618     \{
+00619 \textcolor{preprocessor}{#ifndef \_\_unix\_\_}
+00620         DWORD dwRet = WaitForSingleObject(contextsToSend[contextHandle].inOvLap.hEvent, timeout\_ms);
+00621             \textcolor{keywordflow}{if} (dwRet == WAIT\_OBJECT\_0)
+00622                 \textcolor{keywordflow}{return} 1;
+00623 \textcolor{preprocessor}{#else}
+00624         \textcolor{keyword}{auto} t1 = chrono::high\_resolution\_clock::now();
+00625         \textcolor{keyword}{auto} t2 = t1;
+00626         std::unique\_lock<std::mutex> lck(contextsToSend[contextHandle].transferLock);
+00627         \textcolor{keywordflow}{while}(contextsToSend[contextHandle].done.load() == \textcolor{keyword}{false} && std::chrono::duration\_cast<
+      std::chrono::milliseconds>(t2 - t1).count() < timeout_ms)
+00628         \{
+00629             \textcolor{comment}{//blocking not to waste CPU}
+00630             contextsToSend[contextHandle].cv.wait\_for(lck, chrono::milliseconds(timeout\_ms));
+00631             t2 = chrono::high\_resolution\_clock::now();
+00632         \}
+00633         \textcolor{keywordflow}{return} contextsToSend[contextHandle].done == \textcolor{keyword}{true};
+00634 \textcolor{preprocessor}{#endif}
+00635     \}
+00636     \textcolor{keywordflow}{return} 0;
+00637 \}
+00638 
+00646 \textcolor{keywordtype}{int} ConnectionFT601::FinishDataSending(\textcolor{keyword}{const} \textcolor{keywordtype}{char} *buffer, uint32\_t length, \textcolor{keywordtype}{int} contextHandle)
+00647 \{
+00648     \textcolor{keywordflow}{if}(contextsToSend[contextHandle].used == \textcolor{keyword}{true})
+00649     \{
+00650 \textcolor{preprocessor}{#ifndef \_\_unix\_\_}
+00651         ULONG ulActualBytesTransferred ;
+00652         FT_STATUS ftStatus = FT_OK;
+00653         ftStatus = FT\_GetOverlappedResult(mFTHandle, &contextsToSend[contextHandle].inOvLap, &
+      ulActualBytesTransferred, FALSE);
+00654         \textcolor{keywordflow}{if} (ftStatus != FT_OK)
+00655             length = 0;
+00656         \textcolor{keywordflow}{else}
+00657         length = ulActualBytesTransferred;
+00658         FT\_ReleaseOverlapped(mFTHandle, &contextsToSend[contextHandle].inOvLap);
+00659         contextsToSend[contextHandle].used = \textcolor{keyword}{false};
+00660         \textcolor{keywordflow}{return} length;
+00661 \textcolor{preprocessor}{#else}
+00662         length = contextsToSend[contextHandle].bytesXfered;
+00663         contextsToSend[contextHandle].used = \textcolor{keyword}{false};
+00664         \textcolor{keywordflow}{return} length;
+00665 \textcolor{preprocessor}{#endif}
+00666     \}
+00667     \textcolor{keywordflow}{else}
+00668         \textcolor{keywordflow}{return} 0;
+00669 \}
+00670 
+00674 \textcolor{keywordtype}{void} ConnectionFT601::AbortSending(\textcolor{keywordtype}{int} ep)
+00675 \{
+00676 \textcolor{preprocessor}{#ifndef \_\_unix\_\_}
+00677     FT\_AbortPipe(mFTHandle, streamWrEp);
+00678     \textcolor{keywordflow}{for} (\textcolor{keywordtype}{int} i = 0; i < USB\_MAX\_CONTEXTS; ++i)
+00679     \{
+00680         \textcolor{keywordflow}{if} (contextsToSend[i].used == \textcolor{keyword}{true})
+00681         \{
+00682             FT\_ReleaseOverlapped(mFTHandle, &contextsToSend[i].inOvLap);
+00683             contextsToSend[i].used = \textcolor{keyword}{false};
+00684         \}
+00685     \}
+00686     FT\_SetStreamPipe(mFTHandle, FALSE, FALSE, streamWrEp, \textcolor{keyword}{sizeof}(FPGA_DataPacket));
+00687 \textcolor{preprocessor}{#else}
+00688     \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} i = 0; i<USB\_MAX\_CONTEXTS; ++i)
+00689     \{
+00690         \textcolor{keywordflow}{if}(contextsToSend[i].used)
+00691             libusb\_cancel\_transfer(contextsToSend[i].transfer);
+00692     \}
+00693     \textcolor{keywordflow}{for} (\textcolor{keywordtype}{int} i = 0; i<USB\_MAX\_CONTEXTS; ++i)
+00694     \{
+00695         \textcolor{keywordflow}{if}(contextsToSend[i].used)
+00696         \{
+00697             WaitForSending(i, 250);
+00698             FinishDataSending(\textcolor{keyword}{nullptr}, 0, i);
+00699         \}
+00700     \}
+00701 \textcolor{preprocessor}{#endif}
+00702 \}
+00703 
+00704 \textcolor{keywordtype}{int} ConnectionFT601::ResetStreamBuffers()
+00705 \{
+00706 \textcolor{preprocessor}{#ifndef \_\_unix\_\_}
+00707     \textcolor{keywordflow}{if} (FT\_AbortPipe(mFTHandle, streamRdEp)!=FT_OK)
+00708         \textcolor{keywordflow}{return} -1;
+00709     \textcolor{keywordflow}{if} (FT\_AbortPipe(mFTHandle, streamWrEp)!=FT_OK)
+00710         \textcolor{keywordflow}{return} -1;
+00711     \textcolor{keywordflow}{if} (FT\_FlushPipe(mFTHandle, streamRdEp)!=FT_OK)
+00712         \textcolor{keywordflow}{return} -1;
+00713     \textcolor{keywordflow}{if} (FT\_SetStreamPipe(mFTHandle, FALSE, FALSE, streamRdEp, \textcolor{keyword}{sizeof}(
+      FPGA_DataPacket)) != 0)
+00714         \textcolor{keywordflow}{return} -1;
+00715     \textcolor{keywordflow}{if} (FT\_SetStreamPipe(mFTHandle, FALSE, FALSE, streamWrEp, \textcolor{keyword}{sizeof}(
+      FPGA_DataPacket)) != 0)
+00716         \textcolor{keywordflow}{return} -1;
+00717 \textcolor{preprocessor}{#else}
+00718     \textcolor{keywordflow}{if} (FT\_FlushPipe(streamWrEp)!=0)
+00719         \textcolor{keywordflow}{return} -1;
+00720     \textcolor{keywordflow}{if} (FT\_FlushPipe(streamRdEp)!=0)
+00721         \textcolor{keywordflow}{return} -1;
+00722     \textcolor{keywordflow}{if} (FT\_SetStreamPipe(streamWrEp,\textcolor{keyword}{sizeof}(FPGA_DataPacket))!=0)
+00723         \textcolor{keywordflow}{return} -1;
+00724     \textcolor{keywordflow}{if} (FT\_SetStreamPipe(streamRdEp,\textcolor{keyword}{sizeof}(FPGA_DataPacket))!=0)
+00725         \textcolor{keywordflow}{return} -1;
+00726 \textcolor{preprocessor}{#endif}
+00727     \textcolor{keywordflow}{return} 0;
+00728 \}
+00729 
+00730 \textcolor{keywordtype}{int} ConnectionFT601::ProgramWrite(\textcolor{keyword}{const} \textcolor{keywordtype}{char} *data\_src, \textcolor{keywordtype}{size\_t} length, \textcolor{keywordtype}{int} prog\_mode, \textcolor{keywordtype}{int} 
+      device, ProgrammingCallback callback)
+00731 \{
+00732     \textcolor{keywordflow}{if} (device != LMS64CProtocol::FPGA)
+00733     \{
+00734         lime::error(\textcolor{stringliteral}{"Unsupported programming target"});
+00735         \textcolor{keywordflow}{return} -1;
+00736     \}
+00737     \textcolor{keywordflow}{if} (prog\_mode == 0)
+00738     \{
+00739         lime::error(\textcolor{stringliteral}{"Programming to RAM is not supported"});
+00740         \textcolor{keywordflow}{return} -1;
+00741     \}
+00742 
+00743     \textcolor{keywordflow}{if} (prog\_mode == 2)
+00744         \textcolor{keywordflow}{return} LMS64CProtocol::ProgramWrite(data\_src, length, prog\_mode, device, callback);
+00745     \textcolor{keywordflow}{if} (GetFPGAInfo().gatewareVersion != 0)
+00746     \{
+00747         LMS64CProtocol::ProgramWrite(\textcolor{keyword}{nullptr}, 0, 2, 2, \textcolor{keyword}{nullptr});
+00748         std::this\_thread::sleep\_for(std::chrono::milliseconds(2000));
+00749     \}
+00750     \textcolor{keyword}{const} \textcolor{keywordtype}{int} sizeUFM = 0x8000;
+00751     \textcolor{keyword}{const} \textcolor{keywordtype}{int} sizeCFM0 = 0x42000;
+00752     \textcolor{keyword}{const} \textcolor{keywordtype}{int} startUFM = 0x1000;
+00753     \textcolor{keyword}{const} \textcolor{keywordtype}{int} startCFM0 = 0x4B000;
+00754 
+00755     \textcolor{keywordflow}{if} (length != startCFM0 + sizeCFM0)
+00756     \{
+00757         lime::error(\textcolor{stringliteral}{"Invalid image file"});
+00758         \textcolor{keywordflow}{return} -1;
+00759     \}
+00760     std::vector<char> buffer(sizeUFM + sizeCFM0);
+00761     memcpy(buffer.data(), data\_src + startUFM, sizeUFM);
+00762     memcpy(buffer.data() + sizeUFM, data\_src + startCFM0, sizeCFM0);
+00763 
+00764     \textcolor{keywordtype}{int} ret = LMS64CProtocol::ProgramWrite(buffer.data(), buffer.size(), prog\_mode,  
+      device, callback);
+00765     LMS64CProtocol::ProgramWrite(\textcolor{keyword}{nullptr}, 0, 2, 2, \textcolor{keyword}{nullptr});
+00766 
+00767     \textcolor{keywordflow}{return} ret;
+00768 \}
+00769 
+00770 DeviceInfo ConnectionFT601::GetDeviceInfo(\textcolor{keywordtype}{void})
+00771 \{
+00772     DeviceInfo info = LMS64CProtocol::GetDeviceInfo();
+00773     info.boardSerialNumber = mSerial;
+00774     \textcolor{keywordflow}{return} info;
+00775 \}
+00776 
+\end{DoxyCode}

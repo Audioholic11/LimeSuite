@@ -1,0 +1,108 @@
+\subsection{Connection\+Novena\+R\+F7\+Entry.\+cpp}
+\label{ConnectionNovenaRF7Entry_8cpp_source}\index{/home/erik/prefix/default/src/limesuite-\/dev/src/\+Connection\+Novena\+R\+F7/\+Connection\+Novena\+R\+F7\+Entry.\+cpp@{/home/erik/prefix/default/src/limesuite-\/dev/src/\+Connection\+Novena\+R\+F7/\+Connection\+Novena\+R\+F7\+Entry.\+cpp}}
+
+\begin{DoxyCode}
+00001 
+00007 \textcolor{preprocessor}{#include "ConnectionNovenaRF7.h"}
+00008 \textcolor{preprocessor}{#include "ErrorReporting.h"}
+00009 \textcolor{preprocessor}{#include <errno.h>}
+00010 \textcolor{preprocessor}{#include <unistd.h>}
+00011 \textcolor{preprocessor}{#include <termios.h>}
+00012 \textcolor{preprocessor}{#include <sys/types.h>}
+00013 \textcolor{preprocessor}{#include <sys/stat.h>}
+00014 \textcolor{preprocessor}{#include <fcntl.h>}
+00015 \textcolor{preprocessor}{#include <stdlib.h>}
+00016 \textcolor{preprocessor}{#include <stdio.h>}
+00017 \textcolor{preprocessor}{#include <sys/ioctl.h>}
+00018 \textcolor{preprocessor}{#include <linux/types.h>}
+00019 \textcolor{preprocessor}{#include <linux/spi/spidev.h>}
+00020 \textcolor{preprocessor}{#include <linux/i2c-dev.h>}
+00021 \textcolor{preprocessor}{#include <iostream>}
+00022 
+00023 \textcolor{keyword}{using namespace }lime;
+00024 
+00028 \textcolor{keywordtype}{bool} IsNovenaBoard()
+00029 \{
+00030 \textcolor{preprocessor}{#ifdef \_\_unix\_\_}
+00031     \textcolor{keywordtype}{char} data[8];
+00032     \textcolor{keywordtype}{int} count = 6;
+00033     memset(data, 0, 8);
+00034     \textcolor{keywordtype}{int} addr = 0;
+00035     \textcolor{keyword}{struct }i2c\_rdwr\_ioctl\_data session;
+00036     \textcolor{keyword}{struct }i2c\_msg messages[2];
+00037     \textcolor{keywordtype}{char} set\_addr\_buf[2];
+00038     memset(set\_addr\_buf, 0, \textcolor{keyword}{sizeof}(set\_addr\_buf));
+00039     memset(data, 0, count);
+00040     set\_addr\_buf[0] = addr>>8;
+00041     set\_addr\_buf[1] = addr;
+00042     messages[0].addr = 0xac>>1;
+00043     messages[0].flags = 0;
+00044     messages[0].len = \textcolor{keyword}{sizeof}(set\_addr\_buf);
+00045     messages[0].buf = set\_addr\_buf;
+00046     messages[1].addr = 0xac>>1;
+00047     messages[1].flags = I2C\_M\_RD;
+00048     messages[1].len = count;
+00049     messages[1].buf = data;
+00050     session.msgs = messages;
+00051     session.nmsgs = 2;
+00052 
+00053     \textcolor{keywordtype}{bool} isNovena = \textcolor{keyword}{false};
+00054 
+00055     \textcolor{keywordtype}{int} fd = open(\textcolor{stringliteral}{"/dev/i2c-2"}, O\_RDWR);
+00056     \textcolor{keywordflow}{if}(fd > 0)
+00057     \{
+00058         \textcolor{keywordflow}{if}(ioctl(fd, I2C\_RDWR, &session) < 0)
+00059         \{
+00060             perror(\textcolor{stringliteral}{"Unable to communicate with i2c device"});
+00061             isNovena = \textcolor{keyword}{false};
+00062         \}
+00063         \textcolor{keywordflow}{if}(strcmp(\textcolor{stringliteral}{"Novena"}, data) == 0)
+00064             isNovena = \textcolor{keyword}{true};
+00065     \}
+00066     close(fd);
+00067     \textcolor{keywordflow}{return} isNovena;
+00068 \textcolor{preprocessor}{#else}
+00069     \textcolor{keywordflow}{return} \textcolor{keyword}{false};
+00070 \textcolor{preprocessor}{#endif}
+00071 \}
+00072 
+00074 \textcolor{keywordtype}{void} __loadConnectionNovenaRF7Entry(\textcolor{keywordtype}{void}) \textcolor{comment}{//TODO fixme replace with LoadLibrary/dlopen}
+00075 \{
+00076 \textcolor{keyword}{static} ConnectionNovenaRF7Entry NovenaRF7Entry;
+00077 \}
+00078 
+00079 ConnectionNovenaRF7Entry::ConnectionNovenaRF7Entry(\textcolor{keywordtype}{void}):
+00080     ConnectionRegistryEntry(\textcolor{stringliteral}{"NovenaRF7"})
+00081 \{
+00082     \textcolor{keywordflow}{return};
+00083 \}
+00084 
+00085 std::vector<ConnectionHandle> ConnectionNovenaRF7Entry::enumerate(\textcolor{keyword}{const} 
+      ConnectionHandle &hint)
+00086 \{
+00087     std::vector<ConnectionHandle> result;
+00088 
+00089     \textcolor{keyword}{const} \textcolor{keywordtype}{char} *spiDevPath = \textcolor{stringliteral}{"/dev/spidev2.0"};
+00090     \textcolor{keywordtype}{int} spidev = open(spiDevPath, O\_RDWR);
+00091     \textcolor{keyword}{const} \textcolor{keywordtype}{bool} hasSpiDev = (spidev >= 0);
+00092     close(spidev);
+00093 
+00094     \textcolor{keywordflow}{if} (hasSpiDev and IsNovenaBoard())
+00095     \{
+00096         ConnectionHandle handle;
+00097         handle.media = \textcolor{stringliteral}{"SPI"};
+00098         handle.name = \textcolor{stringliteral}{"NOVENA"};
+00099         handle.addr = spiDevPath;
+00100         result.push\_back(handle);
+00101     \}
+00102     \textcolor{keywordflow}{return} result;
+00103 \}
+00104 
+00105 IConnection *ConnectionNovenaRF7Entry::make(\textcolor{keyword}{const} ConnectionHandle &handle)
+00106 \{
+00107     \textcolor{keyword}{auto} conn = \textcolor{keyword}{new} ConnectionNovenaRF7();
+00108     \textcolor{keywordflow}{if} (conn->Open(handle.addr.c\_str()) != 0)
+00109         std::cerr << \textcolor{stringliteral}{"Failed to popen device"} << std::endl;
+00110     \textcolor{keywordflow}{return} conn;
+00111 \}
+\end{DoxyCode}

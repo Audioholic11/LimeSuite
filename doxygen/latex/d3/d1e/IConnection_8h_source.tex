@@ -1,0 +1,175 @@
+\subsection{I\+Connection.\+h}
+\label{IConnection_8h_source}\index{/home/erik/prefix/default/src/limesuite-\/dev/src/\+Connection\+Registry/\+I\+Connection.\+h@{/home/erik/prefix/default/src/limesuite-\/dev/src/\+Connection\+Registry/\+I\+Connection.\+h}}
+
+\begin{DoxyCode}
+00001 
+00007 \textcolor{preprocessor}{#ifndef ICONNECTION\_H}
+00008 \textcolor{preprocessor}{#define ICONNECTION\_H}
+00009 
+00010 \textcolor{preprocessor}{#include "LimeSuiteConfig.h"}
+00011 \textcolor{preprocessor}{#include "ConnectionHandle.h"}
+00012 \textcolor{preprocessor}{#include <string>}
+00013 \textcolor{preprocessor}{#include <vector>}
+00014 \textcolor{preprocessor}{#include <cstring>} \textcolor{comment}{//memset}
+00015 \textcolor{preprocessor}{#include <functional>}
+00016 \textcolor{preprocessor}{#include <stdint.h>}
+00017 
+00018 \textcolor{keyword}{namespace }lime\{
+00019 
+00028 \textcolor{keyword}{struct }LIME_API DeviceInfo
+00029 \{
+00030     DeviceInfo(\textcolor{keywordtype}{void})\{\};
+00031 
+00033     std::string deviceName;
+00034 
+00038     std::string expansionName;
+00039 
+00041     std::string firmwareVersion;
+00042 
+00044     std::string gatewareVersion;
+00046     std::string gatewareRevision;
+00048     std::string gatewareTargetBoard;
+00049 
+00051     std::string hardwareVersion;
+00052 
+00054     std::string protocolVersion;
+00055 
+00057     uint64\_t boardSerialNumber;
+00058 \};
+00059 
+00067 \textcolor{keyword}{class }LIME_API IConnection
+00068 \{
+00069 \textcolor{keyword}{public}:
+00070 
+00072     IConnection(\textcolor{keywordtype}{void});
+00073 
+00075     \textcolor{keyword}{virtual} ~IConnection(\textcolor{keywordtype}{void});
+00076 
+00078     \textcolor{keyword}{const} ConnectionHandle &GetHandle(\textcolor{keywordtype}{void}) \textcolor{keyword}{const};
+00079 
+00086     \textcolor{keyword}{virtual} \textcolor{keywordtype}{bool} IsOpen(\textcolor{keywordtype}{void});
+00087 
+00093     \textcolor{keyword}{virtual} DeviceInfo GetDeviceInfo(\textcolor{keywordtype}{void});
+00094 
+00095     \textcolor{comment}{/***********************************************************************}
+00096 \textcolor{comment}{     * Serial API}
+00097 \textcolor{comment}{     **********************************************************************/}
+00098 
+00114     \textcolor{keyword}{virtual} \textcolor{keywordtype}{int} TransactSPI(\textcolor{keyword}{const} \textcolor{keywordtype}{int} addr, \textcolor{keyword}{const} uint32\_t *writeData, uint32\_t *readData, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} 
+      size);
+00115 
+00116     \textcolor{keyword}{virtual} \textcolor{keywordtype}{int} WriteLMS7002MSPI(\textcolor{keyword}{const} uint32\_t *writeData, \textcolor{keywordtype}{size\_t} size,\textcolor{keywordtype}{unsigned} periphID = 0)=0;
+00117     \textcolor{keyword}{virtual} \textcolor{keywordtype}{int} ReadLMS7002MSPI(\textcolor{keyword}{const} uint32\_t *writeData, uint32\_t *readData, \textcolor{keywordtype}{size\_t} size, \textcolor{keywordtype}{unsigned} 
+      periphID = 0)=0;
+00118 
+00125     \textcolor{keyword}{virtual} \textcolor{keywordtype}{int} WriteI2C(\textcolor{keyword}{const} \textcolor{keywordtype}{int} addr, \textcolor{keyword}{const} std::string &data);
+00126 
+00138     \textcolor{keyword}{virtual} \textcolor{keywordtype}{int} ReadI2C(\textcolor{keyword}{const} \textcolor{keywordtype}{int} addr, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} numBytes, std::string &data);
+00139 
+00140     \textcolor{comment}{/***********************************************************************}
+00141 \textcolor{comment}{     * LMS7002M Driver callbacks}
+00142 \textcolor{comment}{     **********************************************************************/}
+00143 
+00149     \textcolor{keyword}{virtual} \textcolor{keywordtype}{int} DeviceReset(\textcolor{keywordtype}{int} ind=0);
+00150 
+00151     \textcolor{comment}{/***********************************************************************}
+00152 \textcolor{comment}{     * Stream API}
+00153 \textcolor{comment}{     **********************************************************************/}
+00154 
+00161     \textcolor{keyword}{virtual} \textcolor{keywordtype}{int} ResetStreamBuffers();
+00162     \textcolor{keyword}{virtual} \textcolor{keywordtype}{int} GetBuffersCount()\textcolor{keyword}{const};
+00163     \textcolor{keyword}{virtual} \textcolor{keywordtype}{int} CheckStreamSize(\textcolor{keywordtype}{int} size)\textcolor{keyword}{const};
+00164     \textcolor{keyword}{virtual} \textcolor{keywordtype}{int} ReceiveData(\textcolor{keywordtype}{char}* buffer, \textcolor{keywordtype}{int} length, \textcolor{keywordtype}{int} epIndex, \textcolor{keywordtype}{int} timeout = 100);
+00165     \textcolor{keyword}{virtual} \textcolor{keywordtype}{int} SendData(\textcolor{keyword}{const} \textcolor{keywordtype}{char}* buffer, \textcolor{keywordtype}{int} length, \textcolor{keywordtype}{int} epIndex, \textcolor{keywordtype}{int} timeout = 100);
+00166     
+00167     \textcolor{keyword}{virtual} \textcolor{keywordtype}{int} BeginDataSending(\textcolor{keyword}{const} \textcolor{keywordtype}{char}* buffer, uint32\_t length, \textcolor{keywordtype}{int} ep);
+00168     \textcolor{keyword}{virtual} \textcolor{keywordtype}{bool} WaitForSending(\textcolor{keywordtype}{int} contextHandle, uint32\_t timeout_ms);
+00169     \textcolor{keyword}{virtual} \textcolor{keywordtype}{int} FinishDataSending(\textcolor{keyword}{const} \textcolor{keywordtype}{char}* buffer, uint32\_t length, \textcolor{keywordtype}{int} contextHandle);
+00170     \textcolor{keyword}{virtual} \textcolor{keywordtype}{void} AbortSending(\textcolor{keywordtype}{int} ep)\{\};
+00171     
+00172     \textcolor{keyword}{virtual} \textcolor{keywordtype}{int} BeginDataReading(\textcolor{keywordtype}{char}* buffer, uint32\_t length, \textcolor{keywordtype}{int} ep);
+00173     \textcolor{keyword}{virtual} \textcolor{keywordtype}{bool} WaitForReading(\textcolor{keywordtype}{int} contextHandle, \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{int} timeout\_ms);
+00174     \textcolor{keyword}{virtual} \textcolor{keywordtype}{int} FinishDataReading(\textcolor{keywordtype}{char}* buffer, uint32\_t length, \textcolor{keywordtype}{int} contextHandle);
+00175     \textcolor{keyword}{virtual} \textcolor{keywordtype}{void} AbortReading(\textcolor{keywordtype}{int} ep)\{\};
+00176     
+00177     \textcolor{comment}{/***********************************************************************}
+00178 \textcolor{comment}{     * Programming API}
+00179 \textcolor{comment}{     **********************************************************************/}
+00180 
+00188     \textcolor{keyword}{typedef} std::function<bool(int bsent, int btotal, const char* progressMsg)> 
+      ProgrammingCallback;
+00189 
+00201     \textcolor{keyword}{virtual} \textcolor{keywordtype}{int} ProgramWrite(\textcolor{keyword}{const} \textcolor{keywordtype}{char} *buffer, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} length, \textcolor{keyword}{const} \textcolor{keywordtype}{int} programmingMode, \textcolor{keyword}{const} \textcolor{keywordtype}{int} 
+      index, ProgrammingCallback callback = 0);
+00202 
+00203     \textcolor{keyword}{enum} MCU_PROG_MODE
+00204     \{
+00205         RESET = 0,
+00206         EEPROM_AND_SRAM,
+00207         SRAM,
+00208         BOOT\_SRAM\_FROM\_EEPROM
+00209     \};
+00219     \textcolor{keyword}{virtual} \textcolor{keywordtype}{int} ProgramMCU(\textcolor{keyword}{const} uint8\_t *buffer, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} length, \textcolor{keyword}{const} 
+      MCU_PROG_MODE mode, ProgrammingCallback callback = 0);
+00220 
+00237     \textcolor{keyword}{virtual} \textcolor{keywordtype}{int} ProgramUpdate(\textcolor{keyword}{const} \textcolor{keywordtype}{bool} download = \textcolor{keyword}{true}, ProgrammingCallback 
+      callback = 0);
+00238 
+00239     \textcolor{comment}{/***********************************************************************}
+00240 \textcolor{comment}{     * GPIO API}
+00241 \textcolor{comment}{     **********************************************************************/}
+00242 
+00248     \textcolor{keyword}{virtual} \textcolor{keywordtype}{int} GPIOWrite(\textcolor{keyword}{const} uint8\_t *buffer, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} bufLength);
+00249 
+00255     \textcolor{keyword}{virtual} \textcolor{keywordtype}{int} GPIORead(uint8\_t *buffer, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} bufLength);
+00256 
+00262     \textcolor{keyword}{virtual} \textcolor{keywordtype}{int} GPIODirWrite(\textcolor{keyword}{const} uint8\_t *buffer, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} bufLength);
+00263 
+00269     \textcolor{keyword}{virtual} \textcolor{keywordtype}{int} GPIODirRead(uint8\_t *buffer, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} bufLength);
+00270 
+00271     \textcolor{comment}{/***********************************************************************}
+00272 \textcolor{comment}{     * Register API}
+00273 \textcolor{comment}{     **********************************************************************/}
+00274 
+00283     \textcolor{keyword}{virtual} \textcolor{keywordtype}{int} WriteRegisters(\textcolor{keyword}{const} uint32\_t *addrs, \textcolor{keyword}{const} uint32\_t *data, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} size);
+00284 
+00286     \textcolor{keywordtype}{int} WriteRegister(\textcolor{keyword}{const} uint32\_t addr, \textcolor{keyword}{const} uint32\_t data);
+00287 
+00296     \textcolor{keyword}{virtual} \textcolor{keywordtype}{int} ReadRegisters(\textcolor{keyword}{const} uint32\_t *addrs, uint32\_t *data, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} size);
+00297 
+00299     \textcolor{keyword}{template} <\textcolor{keyword}{typename} ReadType>
+00300     \textcolor{keywordtype}{int} ReadRegister(\textcolor{keyword}{const} uint32\_t addr, ReadType &data);
+00301 
+00302     \textcolor{comment}{/***********************************************************************}
+00303 \textcolor{comment}{     * Aribtrary settings API}
+00304 \textcolor{comment}{     **********************************************************************/}
+00305 
+00313     \textcolor{keyword}{virtual} \textcolor{keywordtype}{int} CustomParameterWrite(\textcolor{keyword}{const} uint8\_t *ids, \textcolor{keyword}{const} \textcolor{keywordtype}{double} *values, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} 
+      count, \textcolor{keyword}{const} std::string& units);
+00314 
+00322     \textcolor{keyword}{virtual} \textcolor{keywordtype}{int} CustomParameterRead(\textcolor{keyword}{const} uint8\_t *ids, \textcolor{keywordtype}{double} *values, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} 
+      count, std::string* units);
+00323 
+00326     \textcolor{keywordtype}{void} SetDataLogCallback(std::function<\textcolor{keywordtype}{void}(\textcolor{keywordtype}{bool}, \textcolor{keyword}{const} \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{char}*, \textcolor{keyword}{const} \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{int})> 
+      callback);
+00327 \textcolor{keyword}{protected}:
+00328     std::function<void(bool, const unsigned char*, const unsigned int)> 
+      callback_logData;
+00329 
+00330 \textcolor{keyword}{private}:
+00331     \textcolor{keyword}{friend} \textcolor{keyword}{class }ConnectionRegistry;
+00332     ConnectionHandle _handle;
+00333 \};
+00334 
+00335 \textcolor{keyword}{template} <\textcolor{keyword}{typename} ReadType>
+00336 \textcolor{keywordtype}{int} IConnection::ReadRegister(\textcolor{keyword}{const} uint32\_t addr, ReadType &data)
+00337 \{
+00338     uint32\_t data32 = 0;
+00339     \textcolor{keywordtype}{int} st = this->ReadRegisters(&addr, &data32, 1);
+00340     data = ReadType(data32);
+00341     \textcolor{keywordflow}{return} st;
+00342 \}
+00343 \}
+00344 \textcolor{preprocessor}{#endif}
+00345 
+\end{DoxyCode}

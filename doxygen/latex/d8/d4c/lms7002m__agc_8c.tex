@@ -1,0 +1,239 @@
+\subsection{/home/erik/prefix/default/src/limesuite-\/dev/mcu\+\_\+program/common\+\_\+src/lms7002m\+\_\+agc.c File Reference}
+\label{lms7002m__agc_8c}\index{/home/erik/prefix/default/src/limesuite-\/dev/mcu\+\_\+program/common\+\_\+src/lms7002m\+\_\+agc.\+c@{/home/erik/prefix/default/src/limesuite-\/dev/mcu\+\_\+program/common\+\_\+src/lms7002m\+\_\+agc.\+c}}
+{\ttfamily \#include \char`\"{}lms7002m\+\_\+controls.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}spi.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}L\+M\+S7002\+M\+\_\+parameters\+\_\+compact.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}typedefs.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}mcu\+\_\+defines.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}lms7002m\+\_\+calibrations.\+h\char`\"{}}\\*
+{\ttfamily \#include $<$math.\+h$>$}\\*
+Include dependency graph for lms7002m\+\_\+agc.\+c\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{d1/ddc/lms7002m__agc_8c__incl}
+\end{center}
+\end{figure}
+\subsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define {\bf T\+A\+B\+L\+E\+\_\+\+E\+N\+T\+RY}(gain\+\_\+setting,  gain\+L\+NA,  gain\+P\+GA)~(gain\+P\+GA $<$$<$ 4 $\vert$ gain\+L\+NA)
+\item 
+\#define {\bf G\+E\+T\+\_\+\+P\+G\+A\+\_\+\+G\+A\+IN}(value)~((value $>$$>$ 4) \& 0x1\+F)
+\item 
+\#define {\bf G\+E\+T\+\_\+\+L\+N\+A\+\_\+\+G\+A\+IN}(value)~((value) \& 0x\+F)
+\end{DoxyCompactItemize}
+\subsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+static {\bf void} {\bf Store\+State} (bool write)
+\item 
+uint8\+\_\+t {\bf Run\+A\+GC} (uint32\+\_\+t wanted\+R\+S\+SI)
+\end{DoxyCompactItemize}
+\subsubsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+bool {\bf has\+Stopped}
+\item 
+bool {\bf stop\+Procedure}
+\item 
+static uint16\+\_\+t {\bf state\+Addresses} [$\,$] = \{0x0081, 0x010\+F, 0x0126, 0x040\+A, 0x040\+C\}
+\item 
+static uint16\+\_\+t {\bf state\+Storage} [2 $\ast$sizeof({\bf state\+Addresses})/sizeof(uint16\+\_\+t)]
+\item 
+static const uint16\+\_\+t {\bf A\+G\+C\+\_\+gain\+\_\+table} [$\,$]
+\end{DoxyCompactItemize}
+
+
+\subsubsection{Macro Definition Documentation}
+\index{lms7002m\+\_\+agc.\+c@{lms7002m\+\_\+agc.\+c}!G\+E\+T\+\_\+\+L\+N\+A\+\_\+\+G\+A\+IN@{G\+E\+T\+\_\+\+L\+N\+A\+\_\+\+G\+A\+IN}}
+\index{G\+E\+T\+\_\+\+L\+N\+A\+\_\+\+G\+A\+IN@{G\+E\+T\+\_\+\+L\+N\+A\+\_\+\+G\+A\+IN}!lms7002m\+\_\+agc.\+c@{lms7002m\+\_\+agc.\+c}}
+\paragraph[{G\+E\+T\+\_\+\+L\+N\+A\+\_\+\+G\+A\+IN}]{\setlength{\rightskip}{0pt plus 5cm}\#define G\+E\+T\+\_\+\+L\+N\+A\+\_\+\+G\+A\+IN(
+\begin{DoxyParamCaption}
+\item[{}]{value}
+\end{DoxyParamCaption}
+)~((value) \& 0x\+F)}\label{lms7002m__agc_8c_a8a829780a77efa7eab7eb0ed0839d371}
+
+
+Definition at line {\bf 46} of file {\bf lms7002m\+\_\+agc.\+c}.
+
+
+
+Referenced by {\bf Run\+A\+G\+C()}.
+
+\index{lms7002m\+\_\+agc.\+c@{lms7002m\+\_\+agc.\+c}!G\+E\+T\+\_\+\+P\+G\+A\+\_\+\+G\+A\+IN@{G\+E\+T\+\_\+\+P\+G\+A\+\_\+\+G\+A\+IN}}
+\index{G\+E\+T\+\_\+\+P\+G\+A\+\_\+\+G\+A\+IN@{G\+E\+T\+\_\+\+P\+G\+A\+\_\+\+G\+A\+IN}!lms7002m\+\_\+agc.\+c@{lms7002m\+\_\+agc.\+c}}
+\paragraph[{G\+E\+T\+\_\+\+P\+G\+A\+\_\+\+G\+A\+IN}]{\setlength{\rightskip}{0pt plus 5cm}\#define G\+E\+T\+\_\+\+P\+G\+A\+\_\+\+G\+A\+IN(
+\begin{DoxyParamCaption}
+\item[{}]{value}
+\end{DoxyParamCaption}
+)~((value $>$$>$ 4) \& 0x1\+F)}\label{lms7002m__agc_8c_a492b3eb4224e425ded216f4cc8f5f1e7}
+
+
+Definition at line {\bf 45} of file {\bf lms7002m\+\_\+agc.\+c}.
+
+
+
+Referenced by {\bf Run\+A\+G\+C()}.
+
+\index{lms7002m\+\_\+agc.\+c@{lms7002m\+\_\+agc.\+c}!T\+A\+B\+L\+E\+\_\+\+E\+N\+T\+RY@{T\+A\+B\+L\+E\+\_\+\+E\+N\+T\+RY}}
+\index{T\+A\+B\+L\+E\+\_\+\+E\+N\+T\+RY@{T\+A\+B\+L\+E\+\_\+\+E\+N\+T\+RY}!lms7002m\+\_\+agc.\+c@{lms7002m\+\_\+agc.\+c}}
+\paragraph[{T\+A\+B\+L\+E\+\_\+\+E\+N\+T\+RY}]{\setlength{\rightskip}{0pt plus 5cm}\#define T\+A\+B\+L\+E\+\_\+\+E\+N\+T\+RY(
+\begin{DoxyParamCaption}
+\item[{}]{gain\+\_\+setting, }
+\item[{}]{gain\+L\+NA, }
+\item[{}]{gain\+P\+GA}
+\end{DoxyParamCaption}
+)~(gain\+P\+GA $<$$<$ 4 $\vert$ gain\+L\+NA)}\label{lms7002m__agc_8c_a4116133f91958472954fe2829d45d4d3}
+
+
+Definition at line {\bf 44} of file {\bf lms7002m\+\_\+agc.\+c}.
+
+
+
+\subsubsection{Function Documentation}
+\index{lms7002m\+\_\+agc.\+c@{lms7002m\+\_\+agc.\+c}!Run\+A\+GC@{Run\+A\+GC}}
+\index{Run\+A\+GC@{Run\+A\+GC}!lms7002m\+\_\+agc.\+c@{lms7002m\+\_\+agc.\+c}}
+\paragraph[{Run\+A\+G\+C(uint32\+\_\+t wanted\+R\+S\+S\+I)}]{\setlength{\rightskip}{0pt plus 5cm}uint8\+\_\+t Run\+A\+GC (
+\begin{DoxyParamCaption}
+\item[{uint32\+\_\+t}]{wanted\+R\+S\+SI}
+\end{DoxyParamCaption}
+)}\label{lms7002m__agc_8c_adce4a8efb4d0eb17b578b99489f4ef77}
+
+
+Definition at line {\bf 112} of file {\bf lms7002m\+\_\+agc.\+c}.
+
+
+
+References {\bf A\+G\+C\+\_\+\+B\+Y\+P\+\_\+\+R\+X\+T\+SP}, {\bf A\+G\+C\+\_\+gain\+\_\+table}, {\bf Calibrate\+Rx()}, {\bf C\+G\+\_\+\+I\+A\+M\+P\+\_\+\+T\+BB}, {\bf C\+G\+\_\+\+I\+A\+M\+P\+\_\+\+T\+B\+B\+\_\+\+R3}, {\bf clamp()}, {\bf Clock\+Logic\+Resets()}, {\bf C\+M\+I\+X\+\_\+\+B\+Y\+P\+\_\+\+R\+X\+T\+SP}, {\bf C\+M\+I\+X\+\_\+\+G\+A\+I\+N\+\_\+\+R\+X\+T\+SP}, {\bf C\+M\+I\+X\+\_\+\+G\+A\+I\+N\+\_\+\+R\+X\+T\+S\+P\+\_\+\+R3}, {\bf G\+E\+T\+\_\+\+L\+N\+A\+\_\+\+G\+A\+IN}, {\bf G\+E\+T\+\_\+\+P\+G\+A\+\_\+\+G\+A\+IN}, {\bf Get\+\_\+\+S\+P\+I\+\_\+\+Reg\+\_\+bits()}, {\bf Get\+Value\+Of\+\_\+c\+\_\+ctl\+\_\+pga\+\_\+rbb()}, {\bf has\+Stopped}, {\bf I\+C\+T\+\_\+\+T\+I\+A\+M\+A\+I\+N\+\_\+\+R\+FE}, {\bf I\+C\+T\+\_\+\+T\+I\+A\+O\+U\+T\+\_\+\+R\+FE}, {\bf L\+O\+S\+S\+\_\+\+L\+I\+N\+\_\+\+T\+X\+P\+A\+D\+\_\+\+T\+RF}, {\bf L\+O\+S\+S\+\_\+\+L\+I\+N\+\_\+\+T\+X\+P\+A\+D\+\_\+\+T\+R\+F\+\_\+\+R3}, {\bf L\+O\+S\+S\+\_\+\+M\+A\+I\+N\+\_\+\+T\+X\+P\+A\+D\+\_\+\+T\+RF}, {\bf L\+O\+S\+S\+\_\+\+M\+A\+I\+N\+\_\+\+T\+X\+P\+A\+D\+\_\+\+T\+R\+F\+\_\+\+R3}, {\bf Modify\+\_\+\+S\+P\+I\+\_\+\+Reg\+\_\+bits()}, {\bf S\+P\+I\+\_\+read()}, {\bf S\+P\+I\+\_\+write()}, {\bf status}, {\bf stop\+Procedure}, {\bf Store\+State()}, {\bf T\+R\+X\+\_\+\+G\+A\+I\+N\+\_\+\+S\+RC}, {\bf Update\+R\+S\+S\+I\+Delay()}, and {\bf xdata}.
+
+
+
+Referenced by {\bf main()}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{d8/d4c/lms7002m__agc_8c_adce4a8efb4d0eb17b578b99489f4ef77_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=210pt]{d8/d4c/lms7002m__agc_8c_adce4a8efb4d0eb17b578b99489f4ef77_icgraph}
+\end{center}
+\end{figure}
+
+
+\index{lms7002m\+\_\+agc.\+c@{lms7002m\+\_\+agc.\+c}!Store\+State@{Store\+State}}
+\index{Store\+State@{Store\+State}!lms7002m\+\_\+agc.\+c@{lms7002m\+\_\+agc.\+c}}
+\paragraph[{Store\+State(bool write)}]{\setlength{\rightskip}{0pt plus 5cm}static {\bf void} Store\+State (
+\begin{DoxyParamCaption}
+\item[{bool}]{write}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [static]}}\label{lms7002m__agc_8c_aeea0727a5f74f1304e4d766253c44562}
+
+
+Definition at line {\bf 23} of file {\bf lms7002m\+\_\+agc.\+c}.
+
+
+
+References {\bf i}, {\bf S\+P\+I\+\_\+read()}, {\bf S\+P\+I\+\_\+write()}, {\bf state\+Addresses}, and {\bf state\+Storage}.
+
+
+
+Referenced by {\bf Run\+A\+G\+C()}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=238pt]{d8/d4c/lms7002m__agc_8c_aeea0727a5f74f1304e4d766253c44562_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=309pt]{d8/d4c/lms7002m__agc_8c_aeea0727a5f74f1304e4d766253c44562_icgraph}
+\end{center}
+\end{figure}
+
+
+
+
+\subsubsection{Variable Documentation}
+\index{lms7002m\+\_\+agc.\+c@{lms7002m\+\_\+agc.\+c}!A\+G\+C\+\_\+gain\+\_\+table@{A\+G\+C\+\_\+gain\+\_\+table}}
+\index{A\+G\+C\+\_\+gain\+\_\+table@{A\+G\+C\+\_\+gain\+\_\+table}!lms7002m\+\_\+agc.\+c@{lms7002m\+\_\+agc.\+c}}
+\paragraph[{A\+G\+C\+\_\+gain\+\_\+table}]{\setlength{\rightskip}{0pt plus 5cm}const uint16\+\_\+t A\+G\+C\+\_\+gain\+\_\+table[$\,$]\hspace{0.3cm}{\ttfamily [static]}}\label{lms7002m__agc_8c_ada7637c6ba650283d996e02ab7dc13b9}
+
+
+Definition at line {\bf 47} of file {\bf lms7002m\+\_\+agc.\+c}.
+
+
+
+Referenced by {\bf Run\+A\+G\+C()}.
+
+\index{lms7002m\+\_\+agc.\+c@{lms7002m\+\_\+agc.\+c}!has\+Stopped@{has\+Stopped}}
+\index{has\+Stopped@{has\+Stopped}!lms7002m\+\_\+agc.\+c@{lms7002m\+\_\+agc.\+c}}
+\paragraph[{has\+Stopped}]{\setlength{\rightskip}{0pt plus 5cm}bool has\+Stopped}\label{lms7002m__agc_8c_ac270116f25a6da3a3aca9b2d98ef648f}
+
+
+Definition at line {\bf 11} of file {\bf main.\+c}.
+
+
+
+Referenced by {\bf main()}, and {\bf Run\+A\+G\+C()}.
+
+\index{lms7002m\+\_\+agc.\+c@{lms7002m\+\_\+agc.\+c}!state\+Addresses@{state\+Addresses}}
+\index{state\+Addresses@{state\+Addresses}!lms7002m\+\_\+agc.\+c@{lms7002m\+\_\+agc.\+c}}
+\paragraph[{state\+Addresses}]{\setlength{\rightskip}{0pt plus 5cm}uint16\+\_\+t state\+Addresses[$\,$] = \{0x0081, 0x010\+F, 0x0126, 0x040\+A, 0x040\+C\}\hspace{0.3cm}{\ttfamily [static]}}\label{lms7002m__agc_8c_a5f90da07c3e3f1b7ed880282764eac8e}
+
+
+Definition at line {\bf 19} of file {\bf lms7002m\+\_\+agc.\+c}.
+
+
+
+Referenced by {\bf Store\+State()}.
+
+\index{lms7002m\+\_\+agc.\+c@{lms7002m\+\_\+agc.\+c}!state\+Storage@{state\+Storage}}
+\index{state\+Storage@{state\+Storage}!lms7002m\+\_\+agc.\+c@{lms7002m\+\_\+agc.\+c}}
+\paragraph[{state\+Storage}]{\setlength{\rightskip}{0pt plus 5cm}uint16\+\_\+t state\+Storage[2 $\ast$sizeof({\bf state\+Addresses})/sizeof(uint16\+\_\+t)]\hspace{0.3cm}{\ttfamily [static]}}\label{lms7002m__agc_8c_a5df9762674f1a4cd02705230f095a15e}
+
+
+Definition at line {\bf 21} of file {\bf lms7002m\+\_\+agc.\+c}.
+
+
+
+Referenced by {\bf Store\+State()}.
+
+\index{lms7002m\+\_\+agc.\+c@{lms7002m\+\_\+agc.\+c}!stop\+Procedure@{stop\+Procedure}}
+\index{stop\+Procedure@{stop\+Procedure}!lms7002m\+\_\+agc.\+c@{lms7002m\+\_\+agc.\+c}}
+\paragraph[{stop\+Procedure}]{\setlength{\rightskip}{0pt plus 5cm}bool stop\+Procedure}\label{lms7002m__agc_8c_a9892bd020ffd46c1744bbbf4d78346a5}
+
+
+Definition at line {\bf 10} of file {\bf main.\+c}.
+
+
+
+Referenced by {\bf ext3\+\_\+int()}, {\bf main()}, and {\bf Run\+A\+G\+C()}.
+

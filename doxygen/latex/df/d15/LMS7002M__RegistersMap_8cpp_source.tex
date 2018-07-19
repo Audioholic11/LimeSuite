@@ -1,0 +1,114 @@
+\subsection{L\+M\+S7002\+M\+\_\+\+Registers\+Map.\+cpp}
+\label{LMS7002M__RegistersMap_8cpp_source}\index{/home/erik/prefix/default/src/limesuite-\/dev/src/lms7002m/\+L\+M\+S7002\+M\+\_\+\+Registers\+Map.\+cpp@{/home/erik/prefix/default/src/limesuite-\/dev/src/lms7002m/\+L\+M\+S7002\+M\+\_\+\+Registers\+Map.\+cpp}}
+
+\begin{DoxyCode}
+00001 \textcolor{preprocessor}{#include "LMS7002M_RegistersMap.h"}
+00002 \textcolor{preprocessor}{#include "LMS7002M_parameters.h"}
+00003 \textcolor{keyword}{using namespace }lime;
+00004 
+00005 LMS7002M_RegistersMap::LMS7002M_RegistersMap()
+00006 \{
+00007 
+00008 \}
+00009 
+00010 LMS7002M_RegistersMap::~LMS7002M_RegistersMap()
+00011 \{
+00012 
+00013 \}
+00014 
+00015 uint16\_t LMS7002M_RegistersMap::GetDefaultValue(uint16\_t address)\textcolor{keyword}{ const}
+00016 \textcolor{keyword}{}\{
+00017     \textcolor{keyword}{auto} iter = mChannelA.find(address);
+00018     \textcolor{keywordflow}{if}( iter != mChannelA.end())
+00019         \textcolor{keywordflow}{return} iter->second.defaultValue;
+00020     \textcolor{keywordflow}{else}
+00021         \textcolor{keywordflow}{return} 0;
+00022 \}
+00023 
+00024 \textcolor{keywordtype}{void} LMS7002M_RegistersMap::InitializeDefaultValues(\textcolor{keyword}{const} std::vector<const LMS7Parameter*> parameterList)
+00025 \{
+00026     \textcolor{keywordflow}{for}(\textcolor{keyword}{auto} parameter : parameterList)
+00027     \{
+00028         uint16\_t regValue = mChannelA[parameter->address].defaultValue;
+00029         mChannelA[parameter->address].defaultValue = regValue | (parameter->defaultValue << parameter->lsb)
+      ;
+00030         mChannelA[parameter->address].value = mChannelA[parameter->address].defaultValue;
+00031         \textcolor{keywordflow}{if}(parameter->address >= 0x0100)
+00032             mChannelB[parameter->address].value = mChannelA[parameter->address].value;
+00033     \}
+00034     \textcolor{comment}{//add NCO/PHO registers}
+00035     \textcolor{keyword}{const} uint16\_t addr = 0x0242;
+00036     \textcolor{keywordflow}{for} (\textcolor{keywordtype}{int} i = 0; i < 32; ++i)
+00037     \{
+00038         mChannelA[addr + i].defaultValue = 0;
+00039         mChannelA[addr + i].value = 0;
+00040         mChannelB[addr + i].defaultValue = 0;
+00041         mChannelB[addr + i].value = 0;
+00042         mChannelA[addr + i + 0x0200].defaultValue = 0;
+00043         mChannelA[addr + i + 0x0200].value = 0;
+00044         mChannelB[addr + i + 0x0200].defaultValue = 0;
+00045         mChannelB[addr + i + 0x0200].value = 0;
+00046     \}
+00047 
+00048     \textcolor{comment}{//add GFIRS}
+00049     std::vector<std::pair<uint16\_t, uint16\_t> > intervals = \{
+00050         \{0x0280, 0x02A7\},
+00051         \{0x02C0, 0x02E7\},
+00052         \{0x0300, 0x0327\},
+00053         \{0x0340, 0x0367\},
+00054         \{0x0380, 0x03A7\},
+00055     \};
+00056     \textcolor{keywordflow}{for} (\textcolor{keyword}{const} \textcolor{keyword}{auto} &range : intervals)
+00057     \{
+00058         \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} i=range.first; i<=range.second; ++i)
+00059         \{
+00060             mChannelA[i].defaultValue = 0;
+00061             mChannelA[i].value = 0;
+00062             mChannelB[i].defaultValue = 0;
+00063             mChannelB[i].value = 0;
+00064 
+00065             mChannelA[i+0x0200].defaultValue = 0;
+00066             mChannelA[i+0x0200].value = 0;
+00067             mChannelB[i+0x0200].defaultValue = 0;
+00068             mChannelB[i+0x0200].value = 0;
+00069         \}
+00070     \}
+00071 \}
+00072 
+00073 \textcolor{keywordtype}{void} LMS7002M_RegistersMap::SetValue(uint8\_t channel, \textcolor{keyword}{const} uint16\_t address, \textcolor{keyword}{const} uint16\_t value)
+00074 \{
+00075     \textcolor{keywordflow}{if}(channel == 0)
+00076         mChannelA[address].value = value;
+00077     \textcolor{keywordflow}{else} \textcolor{keywordflow}{if}(channel == 1)
+00078         mChannelB[address].value = value;
+00079 \}
+00080 
+00081 uint16\_t LMS7002M_RegistersMap::GetValue(uint8\_t channel, uint16\_t address)\textcolor{keyword}{ const}
+00082 \textcolor{keyword}{}\{
+00083     \textcolor{keyword}{const} std::map<const uint16\_t, Register> *regMap(\textcolor{keyword}{nullptr});
+00084     \textcolor{keywordflow}{if}(channel == 0)
+00085         regMap = &mChannelA;
+00086     \textcolor{keywordflow}{else} \textcolor{keywordflow}{if}(channel == 1)
+00087         regMap = &mChannelB;
+00088     \textcolor{keywordflow}{else}
+00089         \textcolor{keywordflow}{return} 0;
+00090     std::map<const uint16\_t, Register>::const\_iterator iter;
+00091     iter = regMap->find(address);
+00092     \textcolor{keywordflow}{if} (iter != regMap->end())
+00093         \textcolor{keywordflow}{return} iter->second.value;
+00094     \textcolor{keywordflow}{else}
+00095         \textcolor{keywordflow}{return} 0;
+00096 \}
+00097 
+00098 std::vector<uint16\_t> LMS7002M_RegistersMap::GetUsedAddresses(\textcolor{keyword}{const} uint8\_t channel)\textcolor{keyword}{ const}
+00099 \textcolor{keyword}{}\{
+00100     std::vector<uint16\_t> addresses;
+00101     \textcolor{keywordflow}{if}(channel == 0)
+00102         \textcolor{keywordflow}{for}(\textcolor{keyword}{auto} iter : mChannelA)
+00103             addresses.push\_back(iter.first);
+00104     \textcolor{keywordflow}{else} \textcolor{keywordflow}{if}(channel == 1)
+00105         \textcolor{keywordflow}{for}(\textcolor{keyword}{auto} iter : mChannelB)
+00106             addresses.push\_back(iter.first);
+00107     \textcolor{keywordflow}{return} addresses;
+00108 \}
+\end{DoxyCode}

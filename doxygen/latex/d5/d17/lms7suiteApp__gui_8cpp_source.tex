@@ -1,0 +1,301 @@
+\subsection{lms7suite\+App\+\_\+gui.\+cpp}
+\label{lms7suiteApp__gui_8cpp_source}\index{/home/erik/prefix/default/src/limesuite-\/dev/src/lms7suite\+App\+\_\+gui.\+cpp@{/home/erik/prefix/default/src/limesuite-\/dev/src/lms7suite\+App\+\_\+gui.\+cpp}}
+
+\begin{DoxyCode}
+00001 \textcolor{comment}{// C++ code generated with wxFormBuilder (version Feb 16 2016)}
+00003 \textcolor{comment}{// http://www.wxformbuilder.org/}
+00004 \textcolor{comment}{//}
+00005 \textcolor{comment}{// PLEASE DO "NOT" EDIT THIS FILE!}
+00007 \textcolor{comment}{}
+00008 \textcolor{preprocessor}{#include "wx/wxprec.h"}
+00009 
+00010 \textcolor{preprocessor}{#ifdef \_\_BORLANDC\_\_}
+00011 \textcolor{preprocessor}{#pragma hdrstop}
+00012 \textcolor{preprocessor}{#endif //\_\_BORLANDC\_\_}
+00013 
+00014 \textcolor{preprocessor}{#ifndef WX\_PRECOMP}
+00015 \textcolor{preprocessor}{#include <wx/wx.h>}
+00016 \textcolor{preprocessor}{#endif //WX\_PRECOMP}
+00017 
+00018 \textcolor{preprocessor}{#include "lms7002_mainPanel.h"}
+00019 
+00020 \textcolor{preprocessor}{#include "lms7suiteApp_gui.h"}
+00021 
+00023 
+00024 AppFrame_view::AppFrame_view( wxWindow* parent, wxWindowID \textcolor{keywordtype}{id}, \textcolor{keyword}{const} wxString& title, \textcolor{keyword}{const} wxPoint& pos, \textcolor{keyword}{
+      const} wxSize& size, \textcolor{keywordtype}{long} style ) : wxFrame( parent, id, title, pos, size, style )
+00025 \{
+00026     this->SetSizeHints( wxDefaultSize, wxDefaultSize );
+00027     
+00028     mbar = \textcolor{keyword}{new} wxMenuBar( 0 );
+00029     fileMenu = \textcolor{keyword}{new} wxMenu();
+00030     wxMenuItem* menuFileQuit;
+00031     menuFileQuit = \textcolor{keyword}{new} wxMenuItem( fileMenu, idMenuQuit, wxString( wxT(\textcolor{stringliteral}{"&Quit"}) ) + wxT(\textcolor{charliteral}{'\(\backslash\)t'}) + wxT(\textcolor{stringliteral}{"Alt+F4
+      "}), wxT(\textcolor{stringliteral}{"Quit the application"}), wxITEM\_NORMAL );
+00032     fileMenu->Append( menuFileQuit );
+00033     
+00034     mbar->Append( fileMenu, wxT(\textcolor{stringliteral}{"&File"}) ); 
+00035     
+00036     mnuOptions = \textcolor{keyword}{new} wxMenu();
+00037     wxMenuItem* mnuConnectionSettings;
+00038     mnuConnectionSettings = \textcolor{keyword}{new} wxMenuItem( mnuOptions, wxID\_ANY, wxString( wxT(\textcolor{stringliteral}{"ConnectionSettings"}) ) , 
+      wxEmptyString, wxITEM\_NORMAL );
+00039     mnuOptions->Append( mnuConnectionSettings );
+00040     
+00041     mnuCacheValues = \textcolor{keyword}{new} wxMenuItem( mnuOptions, wxID\_ANY, wxString( wxT(\textcolor{stringliteral}{"Use cache "}) ) , wxEmptyString, 
+      wxITEM\_CHECK );
+00042     mnuOptions->Append( mnuCacheValues );
+00043     
+00044     mbar->Append( mnuOptions, wxT(\textcolor{stringliteral}{"Options"}) ); 
+00045     
+00046     mnuModules = \textcolor{keyword}{new} wxMenu();
+00047     wxMenuItem* mnuFFTviewer;
+00048     mnuFFTviewer = \textcolor{keyword}{new} wxMenuItem( mnuModules, wxID\_ANY, wxString( wxT(\textcolor{stringliteral}{"FFTviewer"}) ) , wxEmptyString, 
+      wxITEM\_NORMAL );
+00049     mnuModules->Append( mnuFFTviewer );
+00050     
+00051     wxMenuItem* mnuADF4002;
+00052     mnuADF4002 = \textcolor{keyword}{new} wxMenuItem( mnuModules, wxID\_ANY, wxString( wxT(\textcolor{stringliteral}{"ADF4002"}) ) , wxEmptyString, 
+      wxITEM\_NORMAL );
+00053     mnuModules->Append( mnuADF4002 );
+00054     
+00055     wxMenuItem* mnuSi5351C;
+00056     mnuSi5351C = \textcolor{keyword}{new} wxMenuItem( mnuModules, wxID\_ANY, wxString( wxT(\textcolor{stringliteral}{"Si5351C"}) ) , wxEmptyString, 
+      wxITEM\_NORMAL );
+00057     mnuModules->Append( mnuSi5351C );
+00058     
+00059     wxMenuItem* mnuPrograming;
+00060     mnuPrograming = \textcolor{keyword}{new} wxMenuItem( mnuModules, wxID\_ANY, wxString( wxT(\textcolor{stringliteral}{"Programming"}) ) , wxEmptyString, 
+      wxITEM\_NORMAL );
+00061     mnuModules->Append( mnuPrograming );
+00062     
+00063     wxMenuItem* mnuFPGAcontrols;
+00064     mnuFPGAcontrols = \textcolor{keyword}{new} wxMenuItem( mnuModules, wxID\_ANY, wxString( wxT(\textcolor{stringliteral}{"FPGA controls"}) ) , 
+      wxEmptyString, wxITEM\_NORMAL );
+00065     mnuModules->Append( mnuFPGAcontrols );
+00066     
+00067     wxMenuItem* mnuDeviceInfo;
+00068     mnuDeviceInfo = \textcolor{keyword}{new} wxMenuItem( mnuModules, wxID\_ANY, wxString( wxT(\textcolor{stringliteral}{"Device Info"}) ) , wxEmptyString, 
+      wxITEM\_NORMAL );
+00069     mnuModules->Append( mnuDeviceInfo );
+00070     
+00071     wxMenuItem* mnuSPI;
+00072     mnuSPI = \textcolor{keyword}{new} wxMenuItem( mnuModules, wxID\_ANY, wxString( wxT(\textcolor{stringliteral}{"SPI"}) ) , wxEmptyString, wxITEM\_NORMAL );
+00073     mnuModules->Append( mnuSPI );
+00074     
+00075     wxMenuItem* mnuBoardControls;
+00076     mnuBoardControls = \textcolor{keyword}{new} wxMenuItem( mnuModules, wxID\_ANY, wxString( wxT(\textcolor{stringliteral}{"Board controls"}) ) , 
+      wxEmptyString, wxITEM\_NORMAL );
+00077     mnuModules->Append( mnuBoardControls );
+00078     
+00079     mbar->Append( mnuModules, wxT(\textcolor{stringliteral}{"Modules"}) ); 
+00080     
+00081     helpMenu = \textcolor{keyword}{new} wxMenu();
+00082     wxMenuItem* menuHelpAbout;
+00083     menuHelpAbout = \textcolor{keyword}{new} wxMenuItem( helpMenu, idMenuAbout, wxString( wxT(\textcolor{stringliteral}{"&About"}) ) + wxT(\textcolor{charliteral}{'\(\backslash\)t'}) + wxT(\textcolor{stringliteral}{"F1"}
+      ), wxT(\textcolor{stringliteral}{"Show info about this application"}), wxITEM\_NORMAL );
+00084     helpMenu->Append( menuHelpAbout );
+00085     
+00086     mbar->Append( helpMenu, wxT(\textcolor{stringliteral}{"&Help"}) ); 
+00087     
+00088     this->SetMenuBar( mbar );
+00089     
+00090     statusBar = this->CreateStatusBar( 3, wxST\_SIZEGRIP, wxID\_ANY );
+00091     wxFlexGridSizer* fgSizer8;
+00092     fgSizer8 = \textcolor{keyword}{new} wxFlexGridSizer( 2, 0, 0, 0 );
+00093     fgSizer8->AddGrowableCol( 0 );
+00094     fgSizer8->AddGrowableRow( 0 );
+00095     fgSizer8->AddGrowableRow( 1 );
+00096     fgSizer8->SetFlexibleDirection( wxBOTH );
+00097     fgSizer8->SetNonFlexibleGrowMode( wxFLEX\_GROWMODE\_SPECIFIED );
+00098     
+00099     bSizer6 = \textcolor{keyword}{new} wxBoxSizer( wxVERTICAL );
+00100     
+00101     m_scrolledWindow1 = \textcolor{keyword}{new} wxScrolledWindow( \textcolor{keyword}{this}, wxID\_ANY, wxDefaultPosition, wxSize( 1180,665 ), 
+      wxHSCROLL|wxVSCROLL );
+00102     m_scrolledWindow1->SetScrollRate( 5, 5 );
+00103     contentSizer = \textcolor{keyword}{new} wxFlexGridSizer( 0, 1, 0, 0 );
+00104     contentSizer->AddGrowableCol( 0 );
+00105     contentSizer->AddGrowableRow( 0 );
+00106     contentSizer->SetFlexibleDirection( wxBOTH );
+00107     contentSizer->SetNonFlexibleGrowMode( wxFLEX\_GROWMODE\_SPECIFIED );
+00108     
+00109     mContent = \textcolor{keyword}{new} lms7002_mainPanel( m_scrolledWindow1, wxID\_ANY, wxDefaultPosition, wxDefaultSize, 
+      wxTAB\_TRAVERSAL );
+00110     contentSizer->Add( mContent, 1, wxEXPAND, 5 );
+00111     
+00112     
+00113     m_scrolledWindow1->SetSizer( contentSizer );
+00114     m_scrolledWindow1->Layout();
+00115     bSizer6->Add( m_scrolledWindow1, 4, wxALIGN\_BOTTOM|wxBOTTOM|wxEXPAND, 5 );
+00116     
+00117     
+00118     fgSizer8->Add( bSizer6, 1, wxEXPAND, 5 );
+00119     
+00120     
+00121     this->SetSizer( fgSizer8 );
+00122     this->Layout();
+00123     fgSizer8->Fit( \textcolor{keyword}{this} );
+00124     
+00125     \textcolor{comment}{// Connect Events}
+00126     this->Connect( wxEVT\_CLOSE\_WINDOW, wxCloseEventHandler( 
+      AppFrame_view::OnClose ) );
+00127     this->Connect( menuFileQuit->GetId(), wxEVT\_COMMAND\_MENU\_SELECTED, wxCommandEventHandler( 
+      AppFrame_view::OnQuit ) );
+00128     this->Connect( mnuConnectionSettings->GetId(), wxEVT\_COMMAND\_MENU\_SELECTED, wxCommandEventHandler( 
+      AppFrame_view::OnShowConnectionSettings ) );
+00129     this->Connect( mnuCacheValues->GetId(), wxEVT\_COMMAND\_MENU\_SELECTED, wxCommandEventHandler( 
+      AppFrame_view::OnChangeCacheSettings ) );
+00130     this->Connect( mnuFFTviewer->GetId(), wxEVT\_COMMAND\_MENU\_SELECTED, wxCommandEventHandler( 
+      AppFrame_view::OnShowFFTviewer ) );
+00131     this->Connect( mnuADF4002->GetId(), wxEVT\_COMMAND\_MENU\_SELECTED, wxCommandEventHandler( 
+      AppFrame_view::OnShowADF4002 ) );
+00132     this->Connect( mnuSi5351C->GetId(), wxEVT\_COMMAND\_MENU\_SELECTED, wxCommandEventHandler( 
+      AppFrame_view::OnShowSi5351C ) );
+00133     this->Connect( mnuPrograming->GetId(), wxEVT\_COMMAND\_MENU\_SELECTED, wxCommandEventHandler( 
+      AppFrame_view::OnShowPrograming ) );
+00134     this->Connect( mnuFPGAcontrols->GetId(), wxEVT\_COMMAND\_MENU\_SELECTED, wxCommandEventHandler( 
+      AppFrame_view::OnShowFPGAcontrols ) );
+00135     this->Connect( mnuDeviceInfo->GetId(), wxEVT\_COMMAND\_MENU\_SELECTED, wxCommandEventHandler( 
+      AppFrame_view::OnShowDeviceInfo ) );
+00136     this->Connect( mnuSPI->GetId(), wxEVT\_COMMAND\_MENU\_SELECTED, wxCommandEventHandler( 
+      AppFrame_view::OnShowSPI ) );
+00137     this->Connect( mnuBoardControls->GetId(), wxEVT\_COMMAND\_MENU\_SELECTED, wxCommandEventHandler( 
+      AppFrame_view::OnShowBoardControls ) );
+00138     this->Connect( menuHelpAbout->GetId(), wxEVT\_COMMAND\_MENU\_SELECTED, wxCommandEventHandler( 
+      AppFrame_view::OnAbout ) );
+00139 \}
+00140 
+00141 AppFrame_view::~AppFrame_view()
+00142 \{
+00143     \textcolor{comment}{// Disconnect Events}
+00144     this->Disconnect( wxEVT\_CLOSE\_WINDOW, wxCloseEventHandler( 
+      AppFrame_view::OnClose ) );
+00145     this->Disconnect( idMenuQuit, wxEVT\_COMMAND\_MENU\_SELECTED, wxCommandEventHandler( 
+      AppFrame_view::OnQuit ) );
+00146     this->Disconnect( wxID\_ANY, wxEVT\_COMMAND\_MENU\_SELECTED, wxCommandEventHandler( 
+      AppFrame_view::OnShowConnectionSettings ) );
+00147     this->Disconnect( wxID\_ANY, wxEVT\_COMMAND\_MENU\_SELECTED, wxCommandEventHandler( 
+      AppFrame_view::OnChangeCacheSettings ) );
+00148     this->Disconnect( wxID\_ANY, wxEVT\_COMMAND\_MENU\_SELECTED, wxCommandEventHandler( 
+      AppFrame_view::OnShowFFTviewer ) );
+00149     this->Disconnect( wxID\_ANY, wxEVT\_COMMAND\_MENU\_SELECTED, wxCommandEventHandler( 
+      AppFrame_view::OnShowADF4002 ) );
+00150     this->Disconnect( wxID\_ANY, wxEVT\_COMMAND\_MENU\_SELECTED, wxCommandEventHandler( 
+      AppFrame_view::OnShowSi5351C ) );
+00151     this->Disconnect( wxID\_ANY, wxEVT\_COMMAND\_MENU\_SELECTED, wxCommandEventHandler( 
+      AppFrame_view::OnShowPrograming ) );
+00152     this->Disconnect( wxID\_ANY, wxEVT\_COMMAND\_MENU\_SELECTED, wxCommandEventHandler( 
+      AppFrame_view::OnShowFPGAcontrols ) );
+00153     this->Disconnect( wxID\_ANY, wxEVT\_COMMAND\_MENU\_SELECTED, wxCommandEventHandler( 
+      AppFrame_view::OnShowDeviceInfo ) );
+00154     this->Disconnect( wxID\_ANY, wxEVT\_COMMAND\_MENU\_SELECTED, wxCommandEventHandler( 
+      AppFrame_view::OnShowSPI ) );
+00155     this->Disconnect( wxID\_ANY, wxEVT\_COMMAND\_MENU\_SELECTED, wxCommandEventHandler( 
+      AppFrame_view::OnShowBoardControls ) );
+00156     this->Disconnect( idMenuAbout, wxEVT\_COMMAND\_MENU\_SELECTED, wxCommandEventHandler( 
+      AppFrame_view::OnAbout ) );
+00157     
+00158 \}
+00159 
+00160 dlgAbout_view::dlgAbout_view( wxWindow* parent, wxWindowID \textcolor{keywordtype}{id}, \textcolor{keyword}{const} wxString& title, \textcolor{keyword}{const} wxPoint& pos, \textcolor{keyword}{
+      const} wxSize& size, \textcolor{keywordtype}{long} style ) : wxDialog( parent, id, title, pos, size, style )
+00161 \{
+00162     this->SetSizeHints( wxDefaultSize, wxDefaultSize );
+00163     this->SetBackgroundColour( wxSystemSettings::GetColour( wxSYS\_COLOUR\_WINDOW ) );
+00164     
+00165     wxFlexGridSizer* fgSizer2;
+00166     fgSizer2 = \textcolor{keyword}{new} wxFlexGridSizer( 0, 1, 0, 0 );
+00167     fgSizer2->SetFlexibleDirection( wxBOTH );
+00168     fgSizer2->SetNonFlexibleGrowMode( wxFLEX\_GROWMODE\_SPECIFIED );
+00169     
+00170     wxFlexGridSizer* fgSizer3;
+00171     fgSizer3 = \textcolor{keyword}{new} wxFlexGridSizer( 0, 2, 0, 0 );
+00172     fgSizer3->SetFlexibleDirection( wxBOTH );
+00173     fgSizer3->SetNonFlexibleGrowMode( wxFLEX\_GROWMODE\_SPECIFIED );
+00174     
+00175     imgLogo = \textcolor{keyword}{new} wxStaticBitmap( \textcolor{keyword}{this}, wxID\_ANY, wxNullBitmap, wxDefaultPosition, wxSize( 195,106 ), 0 );
+00176     fgSizer3->Add( imgLogo, 1, wxALL|wxALIGN\_CENTER\_HORIZONTAL|wxALIGN\_CENTER\_VERTICAL, 5 );
+00177     
+00178     wxFlexGridSizer* fgSizer4;
+00179     fgSizer4 = \textcolor{keyword}{new} wxFlexGridSizer( 0, 1, 0, 0 );
+00180     fgSizer4->AddGrowableCol( 0 );
+00181     fgSizer4->AddGrowableRow( 0 );
+00182     fgSizer4->SetFlexibleDirection( wxBOTH );
+00183     fgSizer4->SetNonFlexibleGrowMode( wxFLEX\_GROWMODE\_SPECIFIED );
+00184     
+00185     ID_STATICTEXT1 = \textcolor{keyword}{new} wxStaticText( \textcolor{keyword}{this}, wxID\_ANY, wxT(\textcolor{stringliteral}{"LMS7002 Software "}), wxDefaultPosition, 
+      wxDefaultSize, 0 );
+00186     ID_STATICTEXT1->Wrap( -1 );
+00187     ID_STATICTEXT1->SetFont( wxFont( 18, 70, 90, 90, \textcolor{keyword}{false}, wxEmptyString ) );
+00188     
+00189     fgSizer4->Add( ID_STATICTEXT1, 1, wxALIGN\_CENTER\_HORIZONTAL|wxALIGN\_CENTER\_VERTICAL, 5 );
+00190     
+00191     txtVersion = \textcolor{keyword}{new} wxStaticText( \textcolor{keyword}{this}, wxID\_ANY, wxT(\textcolor{stringliteral}{"v. 1.0.0.0\(\backslash\)nBuild date: 2015-03-18"}), 
+      wxDefaultPosition, wxDefaultSize, 0 );
+00192     txtVersion->Wrap( -1 );
+00193     fgSizer4->Add( txtVersion, 1, wxALIGN\_CENTER\_HORIZONTAL|wxALIGN\_CENTER\_VERTICAL, 5 );
+00194     
+00195     
+00196     fgSizer3->Add( fgSizer4, 1, wxALL|wxALIGN\_CENTER\_HORIZONTAL|wxALIGN\_CENTER\_VERTICAL, 5 );
+00197     
+00198     
+00199     fgSizer2->Add( fgSizer3, 1, wxALL|wxALIGN\_CENTER\_HORIZONTAL|wxALIGN\_CENTER\_VERTICAL, 5 );
+00200     
+00201     wxFlexGridSizer* fgSizer5;
+00202     fgSizer5 = \textcolor{keyword}{new} wxFlexGridSizer( 0, 3, 0, 50 );
+00203     fgSizer5->SetFlexibleDirection( wxBOTH );
+00204     fgSizer5->SetNonFlexibleGrowMode( wxFLEX\_GROWMODE\_SPECIFIED );
+00205     
+00206     ID_STATICTEXT4 = \textcolor{keyword}{new} wxStaticText( \textcolor{keyword}{this}, wxID\_ANY, wxT(\textcolor{stringliteral}{"Lime Microsystems\(\backslash\)nSurrey Tech Centre\(\backslash\)nOccam
+       Road\(\backslash\)nThe Surrey Research Park\(\backslash\)nGuildford Surrey\(\backslash\)nGU2 7YG\(\backslash\)nUNITED KINGDOM"}), wxDefaultPosition, wxDefaultSize,
+       0 );
+00207     ID_STATICTEXT4->Wrap( -1 );
+00208     fgSizer5->Add( ID_STATICTEXT4, 1, wxALL|wxALIGN\_CENTER\_HORIZONTAL|wxALIGN\_CENTER\_VERTICAL, 5 );
+00209     
+00210     wxFlexGridSizer* fgSizer6;
+00211     fgSizer6 = \textcolor{keyword}{new} wxFlexGridSizer( 0, 1, 0, 0 );
+00212     fgSizer6->SetFlexibleDirection( wxBOTH );
+00213     fgSizer6->SetNonFlexibleGrowMode( wxFLEX\_GROWMODE\_SPECIFIED );
+00214     
+00215     ID_STATICTEXT5 = \textcolor{keyword}{new} wxStaticText( \textcolor{keyword}{this}, wxID\_ANY, wxT(\textcolor{stringliteral}{"Phone: +44 (0) 1483 685 063"}), 
+      wxDefaultPosition, wxDefaultSize, 0 );
+00216     ID_STATICTEXT5->Wrap( -1 );
+00217     fgSizer6->Add( ID_STATICTEXT5, 1, wxALIGN\_LEFT|wxALIGN\_BOTTOM, 5 );
+00218     
+00219     ID_HYPERLINKCTRL1 = \textcolor{keyword}{new} wxHyperlinkCtrl( \textcolor{keyword}{this}, wxID\_ANY, wxT(\textcolor{stringliteral}{"http://www.limemicro.com"}), wxT(\textcolor{stringliteral}{"
+      http://www.limemicro.com"}), wxDefaultPosition, wxDefaultSize, wxHL\_DEFAULT\_STYLE );
+00220     fgSizer6->Add( ID_HYPERLINKCTRL1, 1, wxALIGN\_LEFT|wxALIGN\_TOP, 5 );
+00221     
+00222     
+00223     fgSizer5->Add( fgSizer6, 1, wxALL|wxALIGN\_CENTER\_HORIZONTAL|wxALIGN\_CENTER\_VERTICAL, 5 );
+00224     
+00225     
+00226     fgSizer2->Add( fgSizer5, 1, wxALIGN\_CENTER\_HORIZONTAL|wxALIGN\_CENTER\_VERTICAL, 5 );
+00227     
+00228     btnClose = \textcolor{keyword}{new} wxButton( \textcolor{keyword}{this}, wxID\_ANY, wxT(\textcolor{stringliteral}{"Close"}), wxDefaultPosition, wxDefaultSize, 0 );
+00229     btnClose->SetDefault(); 
+00230     fgSizer2->Add( btnClose, 1, wxBOTTOM|wxALIGN\_CENTER\_HORIZONTAL|wxALIGN\_CENTER\_VERTICAL, 5 );
+00231     
+00232     
+00233     this->SetSizer( fgSizer2 );
+00234     this->Layout();
+00235     fgSizer2->Fit( \textcolor{keyword}{this} );
+00236     
+00237     \textcolor{comment}{// Connect Events}
+00238     this->Connect( wxEVT\_INIT\_DIALOG, wxInitDialogEventHandler( 
+      dlgAbout_view::OnInit ) );
+00239     btnClose->Connect( wxEVT\_COMMAND\_BUTTON\_CLICKED, wxCommandEventHandler( 
+      dlgAbout_view::OnbtnClose ), NULL, \textcolor{keyword}{this} );
+00240 \}
+00241 
+00242 dlgAbout_view::~dlgAbout_view()
+00243 \{
+00244     \textcolor{comment}{// Disconnect Events}
+00245     this->Disconnect( wxEVT\_INIT\_DIALOG, wxInitDialogEventHandler( 
+      dlgAbout_view::OnInit ) );
+00246     btnClose->Disconnect( wxEVT\_COMMAND\_BUTTON\_CLICKED, wxCommandEventHandler( 
+      dlgAbout_view::OnbtnClose ), NULL, \textcolor{keyword}{this} );
+00247     
+00248 \}
+\end{DoxyCode}

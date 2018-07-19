@@ -1,0 +1,239 @@
+\subsection{dlg\+Markers.\+cpp}
+\label{dlgMarkers_8cpp_source}\index{/home/erik/prefix/default/src/limesuite-\/dev/src/ogl\+Graph/dlg\+Markers.\+cpp@{/home/erik/prefix/default/src/limesuite-\/dev/src/ogl\+Graph/dlg\+Markers.\+cpp}}
+
+\begin{DoxyCode}
+00001 
+00007 \textcolor{preprocessor}{#include "dlgMarkers.h"}
+00008 
+00009 \textcolor{comment}{//(*InternalHeaders(dlgMarkers)}
+00010 \textcolor{preprocessor}{#include <wx/sizer.h>}
+00011 \textcolor{preprocessor}{#include <wx/button.h>}
+00012 \textcolor{preprocessor}{#include <wx/string.h>}
+00013 \textcolor{comment}{//*)}
+00014 
+00015 \textcolor{comment}{//(*IdInit(dlgMarkers)}
+00016 \textcolor{keyword}{const} \textcolor{keywordtype}{long} dlgMarkers::ID_BUTTON1 = wxNewId();
+00017 \textcolor{comment}{//*)}
+00018 \textcolor{preprocessor}{#include "wx/stattext.h"}
+00019 \textcolor{preprocessor}{#include "wx/textctrl.h"}
+00020 \textcolor{preprocessor}{#include "wx/checkbox.h"}
+00021 \textcolor{preprocessor}{#include "wx/choice.h"}
+00022 \textcolor{preprocessor}{#include "wx/button.h"}
+00023 \textcolor{preprocessor}{#include "OpenGLGraph.h"}
+00024 
+00025 BEGIN\_EVENT\_TABLE(dlgMarkers,wxDialog)
+00026     \textcolor{comment}{//(*EventTable(dlgMarkers)}
+00027     \textcolor{comment}{//*)}
+00028 END\_EVENT\_TABLE()
+00029 
+00030 dlgMarkers::dlgMarkers(wxWindow* parent,wxWindowID \textcolor{keywordtype}{id},const wxPoint& pos,const wxSize& 
+      size)
+00031 \{
+00032     initialized = \textcolor{keyword}{false};
+00033     BuildContent(parent,\textcolor{keywordtype}{id},pos,size);
+00034 \}
+00035 
+00036 \textcolor{keywordtype}{void} dlgMarkers::BuildContent(wxWindow* parent,wxWindowID \textcolor{keywordtype}{id},\textcolor{keyword}{const} wxPoint& pos,\textcolor{keyword}{const} wxSize& 
+      size)
+00037 \{
+00038     parent_graph = (OpenGLGraph*)parent;
+00039     \textcolor{comment}{//(*Initialize(dlgMarkers)}
+00040     Create(parent, \textcolor{keywordtype}{id}, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxDEFAULT\_DIALOG\_STYLE|
+      wxRESIZE\_BORDER, \_T(\textcolor{stringliteral}{"id"}));
+00041     SetClientSize(wxDefaultSize);
+00042     Move(wxDefaultPosition);
+00043     FlexGridSizer1 = \textcolor{keyword}{new} wxFlexGridSizer(0, 1, 0, 0);
+00044     FlexGridSizer1->AddGrowableCol(0);
+00045     FlexGridSizer1->AddGrowableRow(1);
+00046     FlexGridSizer1->AddGrowableRow(2);
+00047     sizerMarkerList = \textcolor{keyword}{new} wxFlexGridSizer(0, 1, 0, 0);
+00048     sizerMarkerList->AddGrowableCol(0);
+00049     FlexGridSizer1->Add(sizerMarkerList, 1, wxEXPAND|wxALIGN\_LEFT|wxALIGN\_TOP, 5);
+00050     sizerDeltasList = \textcolor{keyword}{new} wxFlexGridSizer(0, 1, 0, 0);
+00051     FlexGridSizer1->Add(sizerDeltasList, 1, wxALL|wxEXPAND|wxALIGN\_LEFT|wxALIGN\_TOP, 5);
+00052     btnClose = \textcolor{keyword}{new} wxButton(\textcolor{keyword}{this}, ID_BUTTON1, \_T(\textcolor{stringliteral}{"Close"}), wxDefaultPosition, wxDefaultSize, 0, 
+      wxDefaultValidator, \_T(\textcolor{stringliteral}{"ID\_BUTTON1"}));
+00053     FlexGridSizer1->Add(btnClose, 1, wxALIGN\_TOP|wxALIGN\_CENTER\_HORIZONTAL, 5);
+00054     SetSizer(FlexGridSizer1);
+00055     FlexGridSizer1->Fit(\textcolor{keyword}{this});
+00056     FlexGridSizer1->SetSizeHints(\textcolor{keyword}{this});
+00057 
+00058     Connect(ID_BUTTON1,wxEVT\_COMMAND\_BUTTON\_CLICKED,(wxObjectEventFunction)&
+      dlgMarkers::OnbtnCloseClick);
+00059     \textcolor{comment}{//*)}
+00060 \}
+00061 
+00062 dlgMarkers::~dlgMarkers()
+00063 \{
+00064     \textcolor{comment}{//(*Destroy(dlgMarkers)}
+00065     \textcolor{comment}{//*)}
+00066 \}
+00067 
+00068 \textcolor{keywordtype}{void} dlgMarkers::AddMarker(\textcolor{keywordtype}{int} \textcolor{keywordtype}{id})
+00069 \{
+00070     \textcolor{keywordtype}{int} index = id;
+00071     \textcolor{keywordtype}{int} markerId = \textcolor{keywordtype}{id}+1000;
+00072     wxPanel *pnl = \textcolor{keyword}{new} wxPanel(\textcolor{keyword}{this}, markerId);
+00073     wxFlexGridSizer* FlexGridSizer3;
+00074     FlexGridSizer3 = \textcolor{keyword}{new} wxFlexGridSizer(0, 6, 0, 0);
+00075     wxCheckBox* chk = \textcolor{keyword}{new} wxCheckBox(pnl, markerId, wxString::Format(\textcolor{stringliteral}{"M%i"}, \textcolor{keywordtype}{id}));
+00076     FlexGridSizer3->Add(chk, 1, wxALL|wxALIGN\_CENTER\_HORIZONTAL|wxALIGN\_CENTER\_VERTICAL, 5);
+00077     enables.push\_back(chk);
+00078     chk = \textcolor{keyword}{new} wxCheckBox(pnl, markerId, \textcolor{stringliteral}{"display"});
+00079     FlexGridSizer3->Add(chk, 1, wxALL|wxALIGN\_CENTER\_HORIZONTAL|wxALIGN\_CENTER\_VERTICAL, 5);
+00080     shows.push\_back(chk);
+00081     wxStaticText *StaticText2 = \textcolor{keyword}{new} wxStaticText(pnl, markerId, wxString::Format(\textcolor{stringliteral}{"Marker%i freq(MHz):"}, \textcolor{keywordtype}{id})
+      , wxDefaultPosition, wxDefaultSize, 0, \_T(\textcolor{stringliteral}{"ID\_STATICTEXT2"}));
+00082     FlexGridSizer3->Add(StaticText2, 1, wxALL|wxALIGN\_CENTER\_HORIZONTAL|wxALIGN\_CENTER\_VERTICAL, 5);
+00083     wxTextCtrl *TextCtrl1 = \textcolor{keyword}{new} wxTextCtrl(pnl, markerId, \_T(\textcolor{stringliteral}{"0.0"}), wxDefaultPosition, wxSize(48,-1), 
+      wxTE\_PROCESS\_ENTER, wxDefaultValidator, \_T(\textcolor{stringliteral}{"ID\_TEXTCTRL1"}));
+00084     freqs.push\_back(TextCtrl1);
+00085     FlexGridSizer3->Add(TextCtrl1, 1, wxALIGN\_CENTER\_HORIZONTAL|wxALIGN\_CENTER\_VERTICAL, 5);
+00086     wxStaticText* StaticText3 = \textcolor{keyword}{new} wxStaticText(pnl, markerId, \_T(\textcolor{stringliteral}{"value (dB):"}), wxDefaultPosition, 
+      wxDefaultSize, 0, \_T(\textcolor{stringliteral}{"ID\_STATICTEXT3"}));
+00087     FlexGridSizer3->Add(StaticText3, 1, wxALL|wxALIGN\_CENTER\_HORIZONTAL|wxALIGN\_CENTER\_VERTICAL, 5);
+00088     wxStaticText* StaticText4 = \textcolor{keyword}{new} wxStaticText(pnl, markerId, \_T(\textcolor{stringliteral}{"0.0"}), wxDefaultPosition, wxSize(168,-1
+      ), 0, \_T(\textcolor{stringliteral}{"ID\_STATICTEXT4"}));
+00089     labels.push\_back(StaticText4);
+00090     marker_valuesA.push\_back(0);
+00091     marker_valuesB.push\_back(0);
+00092     FlexGridSizer3->Add(StaticText4, 1, wxALL|wxALIGN\_RIGHT|wxALIGN\_CENTER\_VERTICAL, 5);
+00093     Connect(markerId,wxEVT\_CHECKBOX,(wxObjectEventFunction)&
+      dlgMarkers::OnMarkerChange);
+00094     Connect(markerId,wxEVT\_COMMAND\_TEXT\_UPDATED,(wxObjectEventFunction)&dlgMarkers::OnMarkerChange);
+00095     pnl->SetSizer(FlexGridSizer3);
+00096     sizerMarkerList->Add(pnl, 1, wxALIGN\_LEFT|wxALIGN\_TOP, 5);
+00097     pnl->Layout();
+00098     FlexGridSizer1->Layout();
+00099     Fit();
+00100     parent_graph->markers[index].used = \textcolor{keyword}{false};
+00101 \}
+00102 
+00103 \textcolor{keywordtype}{void} dlgMarkers::AddDeltas()
+00104 \{
+00105     wxArrayString selections;
+00106     \textcolor{keywordflow}{for}(\textcolor{keywordtype}{unsigned} i=0; i<parent_graph->markers.size(); ++i)
+00107     \{
+00108         selections.push\_back(wxString::Format(\textcolor{stringliteral}{"M%u"}, i));
+00109     \}
+00110     \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} i=0; i<5; ++i)
+00111     \{
+00112         wxPanel *pnl = \textcolor{keyword}{new} wxPanel(\textcolor{keyword}{this}, wxNewId());
+00113         wxFlexGridSizer* FlexGridSizer3;
+00114         FlexGridSizer3 = \textcolor{keyword}{new} wxFlexGridSizer(0, 4, 0, 0);
+00115         wxStaticText* StaticText1 = \textcolor{keyword}{new} wxStaticText(pnl, wxNewId(), wxString::Format(\textcolor{stringliteral}{"Delta%i"}, 
+      i), wxDefaultPosition, wxDefaultSize, 0, \_T(\textcolor{stringliteral}{"ID\_STATICTEXT1"}));
+00116         FlexGridSizer3->Add(StaticText1, 1, wxALL|wxALIGN\_CENTER\_HORIZONTAL|wxALIGN\_CENTER\_VERTICAL, 5);
+00117         wxChoice* dsrc0 = \textcolor{keyword}{new} wxChoice(pnl, wxNewId(), wxDefaultPosition, wxSize(64,-1), 0, 0, 0, 
+      wxDefaultValidator, \_T(\textcolor{stringliteral}{"ID\_CHOICE1"}));
+00118         dsrc0->Append(selections);
+00119         dsrc0->SetSelection(0);
+00120         deltaSrc.push\_back(dsrc0);
+00121         FlexGridSizer3->Add(dsrc0, 1, wxALIGN\_CENTER\_HORIZONTAL|wxALIGN\_CENTER\_VERTICAL, 5);
+00122         wxChoice* dsrc1 = \textcolor{keyword}{new} wxChoice(pnl, wxNewId(), wxDefaultPosition, wxSize(64,-1), 0, 0, 0, 
+      wxDefaultValidator, \_T(\textcolor{stringliteral}{"ID\_CHOICE2"}));
+00123         dsrc1->Append(selections);
+00124         dsrc1->SetSelection(0);
+00125         deltaSrc.push\_back(dsrc1);
+00126         FlexGridSizer3->Add(dsrc1, 1, wxALIGN\_CENTER\_HORIZONTAL|wxALIGN\_CENTER\_VERTICAL, 5);
+00127         wxStaticText* lblDelta0 = \textcolor{keyword}{new} wxStaticText(pnl, wxNewId(), \_T(\textcolor{stringliteral}{"0.0 dB"}), wxDefaultPosition, wxSize(
+      180,-1), 0, \_T(\textcolor{stringliteral}{"ID\_STATICTEXT2"}));
+00128         deltaValues.push\_back(lblDelta0);
+00129         FlexGridSizer3->Add(lblDelta0, 1, wxALL|wxLEFT|wxALIGN\_LEFT|wxALIGN\_CENTER\_VERTICAL, 10);
+00130         pnl->SetSizer(FlexGridSizer3);
+00131         sizerDeltasList->Add(pnl, 1, wxALIGN\_LEFT|wxALIGN\_TOP, 5);
+00132         pnl->Layout();
+00133     \}
+00134     FlexGridSizer1->Layout();
+00135     Fit();
+00136 \}
+00137 
+00138 \textcolor{keywordtype}{void} dlgMarkers::OnbtnCloseClick(wxCommandEvent& event)
+00139 \{
+00140     Hide();
+00141 \}
+00142 
+00143 \textcolor{keywordtype}{void} dlgMarkers::OnMarkerChange(wxCommandEvent& event)
+00144 \{
+00145     \textcolor{keywordtype}{double} freq = 0;
+00146     \textcolor{keywordtype}{int} markerIndex = \textcolor{keyword}{event}.GetId() - 1000;
+00147     \textcolor{keywordflow}{if} (event.GetEventType() == wxEVT\_COMMAND\_TEXT\_UPDATED)
+00148         event.GetString().ToDouble(&freq);
+00149     \textcolor{keywordflow}{else} 
+00150         freqs[markerIndex]->GetValue().ToDouble(&freq);
+00151     freq *= 1000000;
+00152     parent_graph->SetMarker(markerIndex, freq, enables[markerIndex]->IsChecked(), 
+      shows[markerIndex]->IsChecked());
+00153 \}
+00154 
+00155 \textcolor{keywordtype}{void} dlgMarkers::UpdateValues()
+00156 \{
+00157     \textcolor{keywordflow}{if}(IsShownOnScreen())
+00158     \{
+00159         \textcolor{keywordflow}{for}(\textcolor{keywordtype}{size\_t} i=0; i<labels.size(); ++i)
+00160         \{
+00161             \textcolor{keywordflow}{if}(parent_graph == NULL)
+00162                 \textcolor{keywordflow}{return};
+00163             \textcolor{keywordflow}{if} (!parent_graph->markers[i].used)
+00164                 \textcolor{keywordflow}{continue};
+00165             \textcolor{keywordtype}{char} text[128];
+00166             \textcolor{keywordtype}{double} valueA = 0;
+00167             \textcolor{keywordtype}{double} valueB = 0;
+00168             \textcolor{keywordtype}{int} cnt=0;
+00169 
+00170             \textcolor{keywordflow}{if}(parent_graph->series[0]->size > 0 && parent_graph->series[0]->visible)
+00171             \{
+00172                 valueA = parent_graph->series[0]->values[parent_graph->markers[i].dataValueIndex+1];
+00173                 cnt = sprintf(text, \textcolor{stringliteral}{"%3.1f (ChA) ; "},valueA);
+00174             \}
+00175 
+00176             \textcolor{keywordflow}{if}(parent_graph->series[1]->size > 0 && parent_graph->series[1]->visible)
+00177             \{
+00178                 valueB = parent_graph->series[1]->values[parent_graph->markers[i].dataValueIndex+1];
+00179                 sprintf(text+cnt, \textcolor{stringliteral}{"%3.1f (ChB) ;"},valueB);
+00180             \}
+00181 
+00182             labels[i]->SetLabel(wxString(text));
+00183             marker_valuesA[i] = valueA;
+00184             marker_valuesB[i] = valueB;
+00185             enables[i]->SetValue(parent_graph->markers[i].used);
+00186             shows[i]->SetValue(parent_graph->markers[i].show);
+00187         \}
+00188 
+00189         \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} i=0; i<5; ++i)
+00190         \{
+00191             \textcolor{keywordtype}{int} src1 = deltaSrc[2*i]->GetSelection();
+00192             \textcolor{keywordtype}{int} src2 = deltaSrc[2*i+1]->GetSelection();
+00193             \textcolor{keywordtype}{char} text[128]=\{0\};
+00194             \textcolor{keywordtype}{int} cnt = 0;
+00195 
+00196             \textcolor{keywordflow}{if}(parent_graph->series[0]->size > 0 && parent_graph->series[0]->visible)
+00197             \{
+00198                 \textcolor{keywordtype}{float} deltaValue = marker_valuesA[src1]-marker_valuesA[src2];
+00199                 cnt = sprintf(text, \textcolor{stringliteral}{"%.3f (ChA) ; "},deltaValue);
+00200             \}
+00201 
+00202             \textcolor{keywordflow}{if}(parent_graph->series[1]->size > 0 && parent_graph->series[1]->visible)
+00203             \{
+00204                 \textcolor{keywordtype}{float} deltaValue = marker_valuesB[src1]-marker_valuesB[src2];
+00205                 sprintf(text+cnt, \textcolor{stringliteral}{"%.3f (ChB)"},deltaValue);
+00206             \}
+00207             deltaValues[i]->SetLabel(wxString(text));
+00208         \}
+00209         \textcolor{keywordflow}{if} (refreshMarkFreq)
+00210         \{
+00211             \textcolor{keywordflow}{for} (\textcolor{keywordtype}{size\_t} i = 0; i < labels.size(); ++i)
+00212             \{
+00213                 \textcolor{keywordtype}{double} freq = parent_graph->markers[i].posX / 1000000;
+00214                 freqs[i]->SetValue(wxString::Format(\textcolor{stringliteral}{"%3.2f"}, freq));
+00215             \}
+00216             refreshMarkFreq = \textcolor{keyword}{false};
+00217         \}
+00218     \}
+00219 \}
+00220 
+00221 \textcolor{keywordtype}{void} dlgMarkers::OnButton1Click1(wxCommandEvent& event)
+00222 \{
+00223 \}
+00224 
+\end{DoxyCode}

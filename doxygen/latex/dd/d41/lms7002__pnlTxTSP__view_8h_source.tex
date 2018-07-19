@@ -1,0 +1,48 @@
+\subsection{lms7002\+\_\+pnl\+Tx\+T\+S\+P\+\_\+view.\+h}
+\label{lms7002__pnlTxTSP__view_8h_source}\index{/home/erik/prefix/default/src/limesuite-\/dev/src/lms7002\+\_\+wxgui/lms7002\+\_\+pnl\+Tx\+T\+S\+P\+\_\+view.\+h@{/home/erik/prefix/default/src/limesuite-\/dev/src/lms7002\+\_\+wxgui/lms7002\+\_\+pnl\+Tx\+T\+S\+P\+\_\+view.\+h}}
+
+\begin{DoxyCode}
+00001 \textcolor{preprocessor}{#ifndef \_\_lms7002\_pnlTxTSP\_view\_\_}
+00002 \textcolor{preprocessor}{#define \_\_lms7002\_pnlTxTSP\_view\_\_}
+00003 
+00009 \textcolor{preprocessor}{#include "lms7002_wxgui.h"}
+00010 
+00012 \textcolor{preprocessor}{#include <map>}
+00013 \textcolor{preprocessor}{#include <vector>}
+00014 \textcolor{preprocessor}{#include "lime/LimeSuite.h"}
+00015 \textcolor{keyword}{namespace }lime\{
+00016 \}
+00018 \textcolor{keyword}{class }lms7002_pnlTxTSP_view : \textcolor{keyword}{public} pnlTxTSP_view
+00019 \{
+00020 \textcolor{keyword}{protected}:
+00021     \textcolor{comment}{// Handlers for pnlTxTSP\_view events.}
+00022     \textcolor{keywordtype}{void} ParameterChangeHandler( wxSpinEvent& event );
+00023     \textcolor{keywordtype}{void} ParameterChangeHandler( wxCommandEvent& event );
+00024     \textcolor{keywordtype}{void} OnNCOSelectionChange(wxCommandEvent& event);
+00025     \textcolor{keywordtype}{void} onbtnReadBISTSignature( wxCommandEvent& event );
+00026     \textcolor{keywordtype}{void} OnbtnLoadDCIClick( wxCommandEvent& event );
+00027     \textcolor{keywordtype}{void} OnbtnLoadDCQClick( wxCommandEvent& event );
+00028     \textcolor{keywordtype}{void} onbtnGFIR1Coef( wxCommandEvent& event );
+00029     \textcolor{keywordtype}{void} onbtnGFIR2Coef( wxCommandEvent& event );
+00030     \textcolor{keywordtype}{void} onbtnGFIR3Coef( wxCommandEvent& event );
+00031     \textcolor{keywordtype}{void} OnbtnUploadNCOClick( wxCommandEvent& event );
+00032 \textcolor{keyword}{public}:
+00034     lms7002_pnlTxTSP_view( wxWindow* parent );
+00036     lms7002_pnlTxTSP_view(wxWindow* parent, wxWindowID \textcolor{keywordtype}{id} = wxID\_ANY, \textcolor{keyword}{const} wxPoint& pos = 
+      wxDefaultPosition, \textcolor{keyword}{const} wxSize& size = wxDefaultSize, \textcolor{keywordtype}{long} style = wxTAB\_TRAVERSAL);
+00037     \textcolor{keywordtype}{void} Initialize(lms_device_t* pControl);
+00038     \textcolor{keywordtype}{void} UpdateGUI();
+00039     \textcolor{keywordtype}{void} UpdateNCOinputs();
+00040 \textcolor{keyword}{protected}:
+00041     \textcolor{keywordtype}{void} PHOinputChanged(wxCommandEvent& event);
+00042     \textcolor{keywordtype}{void} txtFCWPHOmodeAdditional\_OnMouseWheel(wxMouseEvent& event);
+00043     lms_device_t* lmsControl;
+00044     std::map<wxWindow*, LMS7Parameter> wndId2Enum;
+00045 
+00046     std::vector<wxStaticText*> lblNCOangles;
+00047     std::vector<wxRadioButton*> rgrNCOselections;
+00048     std::vector<wxTextCtrl*> txtNCOinputs;
+00049 \};
+00050 
+00051 \textcolor{preprocessor}{#endif // \_\_lms7002\_pnlTxTSP\_view\_\_}
+\end{DoxyCode}

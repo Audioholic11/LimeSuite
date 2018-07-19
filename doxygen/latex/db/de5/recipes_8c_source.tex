@@ -1,0 +1,256 @@
+\subsection{recipes.\+c}
+\label{recipes_8c_source}\index{/home/erik/prefix/default/src/limesuite-\/dev/src/\+G\+F\+I\+R/recipes.\+c@{/home/erik/prefix/default/src/limesuite-\/dev/src/\+G\+F\+I\+R/recipes.\+c}}
+
+\begin{DoxyCode}
+00001 \textcolor{comment}{/* *******************************************************************}
+00002 \textcolor{comment}{FILE:       recipes.c}
+00003 \textcolor{comment}{DESCRIPTION:    Routines for vector and matrix allocation/free.}
+00004 \textcolor{comment}{        Linear system solving by LU decomposition.}
+00005 \textcolor{comment}{        All are from "Numerical Recipes in C".}
+00006 \textcolor{comment}{}
+00007 \textcolor{comment}{CONTAINTS:  }
+00008 \textcolor{comment}{        double  *vector(nl,nh)}
+00009 \textcolor{comment}{        int    nl,nh;}
+00010 \textcolor{comment}{}
+00011 \textcolor{comment}{        int  *ivector(nl,nh)}
+00012 \textcolor{comment}{        int  nl,nh;}
+00013 \textcolor{comment}{}
+00014 \textcolor{comment}{        void free\_vector(v,nl,nh)}
+00015 \textcolor{comment}{        double *v;}
+00016 \textcolor{comment}{        int   nl,nh;}
+00017 \textcolor{comment}{}
+00018 \textcolor{comment}{        void free\_ivector(v,nl,nh)}
+00019 \textcolor{comment}{        int *v;}
+00020 \textcolor{comment}{        int   nl,nh;}
+00021 \textcolor{comment}{}
+00022 \textcolor{comment}{        double  **matrix(nrl,nrh,ncl,nch)}
+00023 \textcolor{comment}{        int  nrl,nrh,ncl,nch;}
+00024 \textcolor{comment}{}
+00025 \textcolor{comment}{        void free\_matrix(m,nrl,nrh,ncl,nch)}
+00026 \textcolor{comment}{        double **m;}
+00027 \textcolor{comment}{        int   nrl,nrh,ncl,nch;}
+00028 \textcolor{comment}{}
+00029 \textcolor{comment}{        nrerror(error\_text)}
+00030 \textcolor{comment}{        char error\_text[];}
+00031 \textcolor{comment}{}
+00032 \textcolor{comment}{        void ludcmp(a,n,indx,d)}
+00033 \textcolor{comment}{        int n, *indx;}
+00034 \textcolor{comment}{        double **a,*d;}
+00035 \textcolor{comment}{}
+00036 \textcolor{comment}{        void lubksb(a,n,indx,b)}
+00037 \textcolor{comment}{        double **a,b[];}
+00038 \textcolor{comment}{        int n,indx[];}
+00039 \textcolor{comment}{}
+00040 \textcolor{comment}{DATE:       }
+00041 \textcolor{comment}{AUTHOR:     From "Numerical Recipes in C"}
+00042 \textcolor{comment}{REVISIONS:  February 01, 1994: File created.}
+00043 \textcolor{comment}{        Febryary 24, 2000:}
+00044 \textcolor{comment}{            This file is taken out from my PhD sources, Srdjan.}
+00045 \textcolor{comment}{            Unnecessary functions are removed.}
+00046 \textcolor{comment}{            All floats are converted to doubles.}
+00047 \textcolor{comment}{  ********************************************************************* */}
+00048 \textcolor{preprocessor}{#include <stdio.h>}
+00049 \textcolor{preprocessor}{#include <stdlib.h>}
+00050 \textcolor{preprocessor}{#include <math.h>}
+00051 \textcolor{preprocessor}{#include "recipes.h"}
+00052 
+00053 \textcolor{preprocessor}{#define TINY 1.0e-20}
+00054 
+00055 \textcolor{keywordtype}{void} nrerror(\textcolor{keywordtype}{char} * error\_text); 
+00056 
+00057 \textcolor{comment}{/*****************************************************/}
+00058 \textcolor{comment}{/*** Allocates a double vector with range [nl..nh]. ***/}
+00059 \textcolor{comment}{/*****************************************************/}
+00060 \textcolor{keywordtype}{double}  *vector(nl,nh)
+00061 int    nl,nh;
+00062 \{
+00063     \textcolor{keywordtype}{double} *v;
+00064 
+00065     v = (\textcolor{keywordtype}{double} *) malloc((\textcolor{keywordtype}{unsigned}) (nh-nl+1)*\textcolor{keyword}{sizeof}(\textcolor{keywordtype}{double}));
+00066     \textcolor{keywordflow}{if} (!v) nrerror(\textcolor{stringliteral}{"Allocation failure in vector().\(\backslash\)n"});
+00067     \textcolor{keywordflow}{return} (v-nl);
+00068 \}
+00069 
+00070 \textcolor{comment}{/*****************************************************/}
+00071 \textcolor{comment}{/*** Allocates an int vector with range [nl..nh].  ***/}
+00072 \textcolor{comment}{/*****************************************************/}
+00073 \textcolor{keywordtype}{int}  *ivector(nl,nh)
+00074 int  nl,nh;
+00075 \{
+00076     \textcolor{keywordtype}{int} *v;
+00077 
+00078     v = (\textcolor{keywordtype}{int} *) calloc((\textcolor{keywordtype}{unsigned}) (nh-nl+1),\textcolor{keyword}{sizeof}(\textcolor{keywordtype}{int}));
+00079     \textcolor{keywordflow}{if} (!v) nrerror(\textcolor{stringliteral}{"Allocation failure in vector().\(\backslash\)n"});
+00080     \textcolor{keywordflow}{return} (v-nl);
+00081 \}
+00082 
+00083 \textcolor{comment}{/****************************************************/}
+00084 \textcolor{comment}{/*** Frees a double vector allocated by vector().  ***/}
+00085 \textcolor{comment}{/****************************************************/}
+00086 \textcolor{keywordtype}{void} free_vector(v,nl,nh)
+00087 double *v;
+00088 \textcolor{keywordtype}{int}   nl,nh;
+00089 \{
+00090     free((\textcolor{keywordtype}{char}*) (v+nl));
+00091 \}
+00092 
+00093 \textcolor{comment}{/****************************************************/}
+00094 \textcolor{comment}{/*** Frees an int vector allocated by ivector().  ***/}
+00095 \textcolor{comment}{/****************************************************/}
+00096 \textcolor{keywordtype}{void} free_ivector(v,nl,nh)
+00097 int *v;
+00098 \textcolor{keywordtype}{int}   nl,nh;
+00099 \{
+00100     free((\textcolor{keywordtype}{char}*) (v+nl));
+00101 \}
+00102 
+00103 \textcolor{comment}{/*******************************************/}
+00104 \textcolor{comment}{/****  Allocates a double matrix with    ****/}
+00105 \textcolor{comment}{/****  range [nrl..nrh] [ncl..nch].     ****/}
+00106 \textcolor{comment}{/*******************************************/}
+00107 \textcolor{keywordtype}{double}  **matrix(nrl,nrh,ncl,nch)
+00108 int  nrl,nrh,ncl,nch;
+00109 \{
+00110     \textcolor{keywordtype}{int}    i;
+00111     \textcolor{keywordtype}{double}  **m;
+00112 
+00113     \textcolor{comment}{/*** Allocate pointers to rows.   ****/}
+00114     m = (\textcolor{keywordtype}{double}**) calloc((\textcolor{keywordtype}{unsigned}) (nrh-nrl+1),\textcolor{keyword}{sizeof}(\textcolor{keywordtype}{double}*));
+00115     \textcolor{keywordflow}{if} (!m) nrerror(\textcolor{stringliteral}{"Allocation failure #1 in matrix()."});  
+00116     m -= nrl;
+00117 
+00118    
+00119     \textcolor{comment}{/***  Allocate rows and pointers to them.  ***/}
+00120     \textcolor{keywordflow}{for} (i=nrl; i<=nrh; i++)  \{
+00121         m[i] = (\textcolor{keywordtype}{double} *) malloc((\textcolor{keywordtype}{unsigned}) (nch-ncl+1)*\textcolor{keyword}{sizeof}(\textcolor{keywordtype}{double}));
+00122         \textcolor{keywordflow}{if} (!m[i]) nrerror(\textcolor{stringliteral}{"Allocation failure #2 in matrix()."});
+00123         m[i] -= ncl;
+00124     \}
+00125     \textcolor{keywordflow}{return}(m);
+00126 \}
+00127 
+00128 \textcolor{comment}{/******************************************/}
+00129 \textcolor{comment}{/****   Frees a matrix allocated by ... ***/}
+00130 \textcolor{comment}{/****   matrix().                       ***/}
+00131 \textcolor{comment}{/******************************************/}
+00132 \textcolor{keywordtype}{void} free_matrix(m,nrl,nrh,ncl,nch)
+00133 double **m;
+00134 \textcolor{keywordtype}{int}   nrl,nrh,ncl,nch;
+00135 \{
+00136     \textcolor{keywordtype}{int} i;
+00137  
+00138     \textcolor{keywordflow}{for} (i=nrh; i>=nrl; i--)  free((\textcolor{keywordtype}{char}*) (m[i]+ncl));
+00139     free ((\textcolor{keywordtype}{char}*) (m+nrl));
+00140 \}
+00141 
+00142 \textcolor{comment}{/*************************************************/}
+00143 \textcolor{comment}{/*** Numerical Recipes standard error handler. ***/}
+00144 \textcolor{comment}{/*************************************************/}
+00145 \textcolor{keywordtype}{void} nrerror(error\_text)
+00146 char error\_text[];
+00147 \{
+00148     \textcolor{keywordtype}{void} exit();
+00149 
+00150     fprintf(stderr,\textcolor{stringliteral}{"Numerical Recipes run-time error...\(\backslash\)n"});
+00151     fprintf(stderr,\textcolor{stringliteral}{"%s\(\backslash\)n"},error\_text);
+00152     fprintf(stderr,\textcolor{stringliteral}{"Forced to exit.\(\backslash\)n"});
+00153     exit(1);
+00154 \}
+00155 
+00156 \textcolor{comment}{/* ******************************************************************** */}
+00157 \textcolor{comment}{/* LU Decomposition of a matrix                     */}
+00158 \textcolor{comment}{/*  a[1:n][1:n]     system matrix,              */}
+00159 \textcolor{comment}{/*  n           problem dimension,          */}
+00160 \textcolor{comment}{/*  indx[1:n]       temporary storage,          */}
+00161 \textcolor{comment}{/*  d           temporary storage.          */}
+00162 \textcolor{comment}{/* ******************************************************************** */}
+00163 \textcolor{keywordtype}{int} ludcmp(a,n,indx,d)
+00164 int n, *indx;
+00165 \textcolor{keywordtype}{double} **a,*d;
+00166 \{
+00167     \textcolor{keywordtype}{int} i,imax,j,k;
+00168     \textcolor{keywordtype}{double} big,dum,sum,temp;
+00169     \textcolor{keywordtype}{double} *vv,*vector();
+00170     \textcolor{keywordtype}{void} free_vector();
+00171 
+00172     imax = 0; 
+00173 
+00174     vv=vector(1,n);
+00175     (*d)=1.0;
+00176     \textcolor{keywordflow}{for} (i=1;i<=n;i++) \{
+00177         big=0.0;
+00178         \textcolor{keywordflow}{for} (j=1;j<=n;j++)
+00179             \textcolor{keywordflow}{if} ((temp=fabs(a[i][j])) > big) big=temp;
+00180         \textcolor{keywordflow}{if} (!big) nrerror(\textcolor{stringliteral}{"Singular matrix in routine LUDCMP"});
+00181         vv[i]=1.0/big;
+00182     \}
+00183     \textcolor{keywordflow}{for} (j=1;j<=n;j++) \{
+00184         \textcolor{keywordflow}{for} (i=1;i<j;i++) \{
+00185             sum=a[i][j];
+00186             \textcolor{keywordflow}{for} (k=1;k<i;k++) sum -= a[i][k]*a[k][j];
+00187             a[i][j]=sum;
+00188         \}
+00189         big=0.0;
+00190         \textcolor{keywordflow}{for} (i=j;i<=n;i++) \{
+00191             sum=a[i][j];
+00192             \textcolor{keywordflow}{for} (k=1;k<j;k++)
+00193                 sum -= a[i][k]*a[k][j];
+00194             a[i][j]=sum;
+00195             \textcolor{keywordflow}{if} ((dum=vv[i]*fabs(sum))>=big) \{
+00196                 big=dum;
+00197                 imax=i;
+00198             \}
+00199         \}
+00200         \textcolor{keywordflow}{if} (j!=imax) \{
+00201             \textcolor{keywordflow}{for} (k=1;k<=n;k++) \{
+00202                 dum=a[imax][k];
+00203                 a[imax][k]=a[j][k];
+00204                 a[j][k]=dum;
+00205             \}
+00206             (*d)= -(*d);
+00207             vv[imax]=vv[j];
+00208         \}
+00209         indx[j]=imax;
+00210         \textcolor{keywordflow}{if} (!a[j][j]) \{
+00211             a[j][j]=TINY;
+00212         \} 
+00213         \textcolor{keywordflow}{if} (j!=n) \{
+00214             dum=1.0/(a[j][j]);
+00215             \textcolor{keywordflow}{for} (i=j+1;i<=n;i++) a[i][j] *= dum;
+00216         \}
+00217         \}
+00218     free_vector(vv,1,n);
+00219     \textcolor{keywordflow}{return}(0);
+00220 
+00221 \} \textcolor{comment}{/* end of ludcmp() */}
+00222 
+00223 \textcolor{comment}{/* ******************************************************************** */}
+00224 \textcolor{comment}{/* Solve system of equation                     */}
+00225 \textcolor{comment}{/* ******************************************************************** */}
+00226 \textcolor{keywordtype}{void} lubksb(a,n,indx,b)
+00227 double **a,b[];
+00228 \textcolor{keywordtype}{int} n,indx[];
+00229 \{
+00230     \textcolor{keywordtype}{int} i,ii=0,ip,j;
+00231     \textcolor{keywordtype}{double} sum;
+00232 
+00233     \textcolor{keywordflow}{for} (i=1;i<=n;i++) \{
+00234         ip=indx[i];
+00235         sum=b[ip];
+00236         b[ip]=b[i];
+00237         \textcolor{keywordflow}{if} (ii) \{
+00238             \textcolor{keywordflow}{for} (j=ii;j<=i-1;j++) sum -= a[i][j]*b[j];
+00239         \} \textcolor{keywordflow}{else} \textcolor{keywordflow}{if} (sum) \{
+00240             ii=i;
+00241         \}
+00242         b[i]=sum;
+00243     \}
+00244     \textcolor{keywordflow}{for} (i=n;i>=1;i--) \{
+00245         sum=b[i];
+00246         \textcolor{keywordflow}{for} (j=i+1;j<=n;j++) sum -= a[i][j]*b[j];
+00247         b[i]=sum/a[i][i];
+00248     \}
+00249 
+00250 \}   \textcolor{comment}{/*  end of lubksb() */}
+00251 
+\end{DoxyCode}

@@ -1,0 +1,240 @@
+\subsection{lms7002\+\_\+pnl\+Calibrations\+\_\+view.\+cpp}
+\label{lms7002__pnlCalibrations__view_8cpp_source}\index{/home/erik/prefix/default/src/limesuite-\/dev/src/lms7002\+\_\+wxgui/lms7002\+\_\+pnl\+Calibrations\+\_\+view.\+cpp@{/home/erik/prefix/default/src/limesuite-\/dev/src/lms7002\+\_\+wxgui/lms7002\+\_\+pnl\+Calibrations\+\_\+view.\+cpp}}
+
+\begin{DoxyCode}
+00001 \textcolor{preprocessor}{#include "lms7002_pnlCalibrations_view.h"}
+00002 \textcolor{preprocessor}{#include "lms7002_gui_utilities.h"}
+00003 \textcolor{preprocessor}{#include <wx/msgdlg.h>}
+00004 \textcolor{preprocessor}{#include "numericSlider.h"}
+00005 \textcolor{preprocessor}{#include "lms7suiteEvents.h"}
+00006 \textcolor{preprocessor}{#include <wx/busyinfo.h>}
+00007 \textcolor{preprocessor}{#include "lms7suiteAppFrame.h"}
+00008 \textcolor{keyword}{using namespace }lime;
+00009 
+00010 lms7002_pnlCalibrations_view::lms7002_pnlCalibrations_view( wxWindow* parent )
+00011 :
+00012 pnlCalibrations_view( parent )
+00013 \{
+00014 
+00015 \}
+00016 
+00017 lms7002_pnlCalibrations_view::lms7002_pnlCalibrations_view(wxWindow* parent, wxWindowID \textcolor{keywordtype}{id}, \textcolor{keyword}{const} wxPoint& 
+      pos, \textcolor{keyword}{const} wxSize& size, \textcolor{keywordtype}{long} style)
+00018     : pnlCalibrations_view(parent, id, pos, size, style), lmsControl(nullptr)
+00019 \{
+00020     wndId2Enum[cmbIQCORR_TXTSP] = LMS7param(IQCORR_TXTSP);
+00021     wndId2Enum[cmbDCCORRI_TXTSP] = LMS7param(DCCORRI_TXTSP);
+00022     wndId2Enum[cmbDCCORRQ_TXTSP] = LMS7param(DCCORRQ_TXTSP);
+00023     wndId2Enum[cmbGCORRI_TXTSP] = LMS7param(GCORRI_TXTSP);
+00024     wndId2Enum[cmbGCORRQ_TXTSP] = LMS7param(GCORRQ_TXTSP);
+00025     wndId2Enum[cmbGCORRI_RXTSP] = LMS7param(GCORRI_RXTSP);
+00026     wndId2Enum[cmbGCORRQ_RXTSP] = LMS7param(GCORRQ_RXTSP);
+00027     wndId2Enum[cmbIQCORR_RXTSP] = LMS7param(IQCORR_RXTSP);
+00028     wndId2Enum[chkEN_DCOFF_RXFE_RFE] = LMS7param(EN_DCOFF_RXFE_RFE);
+00029     wndId2Enum[cmbDCOFFI_RFE] = LMS7param(DCOFFI_RFE);
+00030     wndId2Enum[cmbDCOFFQ_RFE] = LMS7param(DCOFFQ_RFE);
+00031     wndId2Enum[chkDCMODE] = LMS7param(DCMODE);
+00032 
+00033     LMS7002_WXGUI::UpdateTooltips(wndId2Enum, \textcolor{keyword}{true});
+00034     rgrCalibrationMethod->Hide();
+00035 \}
+00036 
+00037 \textcolor{keywordtype}{void} lms7002_pnlCalibrations_view::OnbtnCalibrateRx(wxCommandEvent& event)
+00038 \{
+00039     \textcolor{keywordtype}{int} flags = 0;
+00040     \textcolor{keywordflow}{if}(rgrCalibrationMethod->GetSelection() == 0)
+00041         flags = 0;
+00042     \textcolor{keywordflow}{else}
+00043     \{
+00044         flags = 1;
+00045     \}
+00046     \textcolor{keywordtype}{double} bandwidth\_MHz = 0;
+00047     txtCalibrationBW->GetValue().ToDouble(&bandwidth\_MHz);
+00048     \textcolor{keywordtype}{int} status;
+00049     \{
+00050 \textcolor{preprocessor}{#ifdef NDEBUG}
+00051         wxBusyInfo wait(\textcolor{stringliteral}{"Please wait, calibrating receiver..."});
+00052 \textcolor{preprocessor}{#endif}
+00053         uint16\_t ch;
+00054         LMS_ReadParam(lmsControl,LMS7param(MAC),&ch);
+00055         ch = (ch == 2) ? 1 : 0;
+00056         ch += 2*LMS7SuiteAppFrame::m_lmsSelection;
+00057         status = LMS_Calibrate(lmsControl, LMS_CH_RX, ch, bandwidth\_MHz * 1e6, flags);
+00058     \}
+00059     \textcolor{keywordflow}{if} (status != 0)
+00060         wxMessageBox(wxString::Format(\_(\textcolor{stringliteral}{"Rx calibration failed: %s"}), 
+      LMS_GetLastErrorMessage()));
+00061     \textcolor{keywordflow}{else}
+00062     \{
+00063         wxMessageBox(\_(\textcolor{stringliteral}{"Rx Calibration Finished"}), \_(\textcolor{stringliteral}{"Info"}), wxOK, \textcolor{keyword}{this});
+00064         wxCommandEvent evt;
+00065         evt.SetEventType(LOG\_MESSAGE);
+00066         evt.SetInt(lime::LOG_LEVEL_INFO);
+00067         evt.SetString(\_(\textcolor{stringliteral}{"Rx Calibrated"}));
+00068         wxPostEvent(\textcolor{keyword}{this}, evt);
+00069     \}
+00070     UpdateGUI();
+00071 \}
+00072 
+00073 \textcolor{keywordtype}{void} lms7002_pnlCalibrations_view::OnbtnCalibrateTx( wxCommandEvent& event )
+00074 \{
+00075     \textcolor{keywordtype}{bool} useExtLoopback = \textcolor{keyword}{false};
+00076     \textcolor{keywordflow}{if}(rgrCalibrationMethod->GetSelection() == 0)
+00077         useExtLoopback = \textcolor{keyword}{false};
+00078     \textcolor{keywordflow}{else}
+00079     \{
+00080         useExtLoopback = \textcolor{keyword}{true};
+00081     \}
+00082     \textcolor{keywordtype}{double} bandwidth\_MHz = 0;
+00083     txtCalibrationBW->GetValue().ToDouble(&bandwidth\_MHz);
+00084     \textcolor{keywordtype}{int} status = 0;
+00085     \{
+00086 \textcolor{preprocessor}{#ifdef NDEBUG}
+00087         wxBusyInfo wait(\textcolor{stringliteral}{"Please wait, calibrating transmitter..."});
+00088 \textcolor{preprocessor}{#endif}
+00089         uint16\_t ch;
+00090         LMS_ReadParam(lmsControl,LMS7param(MAC),&ch);
+00091         status = LMS_Calibrate(lmsControl,LMS_CH_TX,ch-1,bandwidth\_MHz * 1e6,useExtLoopback);
+00092     \}
+00093     \textcolor{keywordflow}{if} (status != 0)
+00094         wxMessageBox(wxString::Format(\_(\textcolor{stringliteral}{"Tx calibration failed: %s"}), 
+      LMS_GetLastErrorMessage()));
+00095     \textcolor{keywordflow}{else}
+00096     \{
+00097         wxMessageBox(\_(\textcolor{stringliteral}{"Tx Calibration Finished"}), \_(\textcolor{stringliteral}{"Info"}), wxOK, \textcolor{keyword}{this});
+00098         wxCommandEvent evt;
+00099         evt.SetEventType(LOG\_MESSAGE);
+00100         evt.SetInt(lime::LOG_LEVEL_INFO);
+00101         evt.SetString(\_(\textcolor{stringliteral}{"Tx Calibrated"}));
+00102         wxPostEvent(\textcolor{keyword}{this}, evt);
+00103     \}
+00104     UpdateGUI();
+00105 \}
+00106 
+00107 \textcolor{keywordtype}{void} lms7002_pnlCalibrations_view::OnbtnCalibrateAll( wxCommandEvent& event )
+00108 \{
+00109     \textcolor{keywordtype}{bool} useExtLoopback = \textcolor{keyword}{false};
+00110     \textcolor{keywordflow}{if}(rgrCalibrationMethod->GetSelection() == 0)
+00111         useExtLoopback = \textcolor{keyword}{false};
+00112     \textcolor{keywordflow}{else}
+00113         useExtLoopback = \textcolor{keyword}{true};
+00114     \textcolor{keywordtype}{double} bandwidth\_MHz = 0;
+00115     txtCalibrationBW->GetValue().ToDouble(&bandwidth\_MHz);
+00116     \textcolor{keywordflow}{if} (2.5 > bandwidth\_MHz || bandwidth\_MHz > 120.0)
+00117     \{
+00118         wxMessageBox(wxString(\textcolor{stringliteral}{"Frequency out of range, available range: 2.5-120 MHz"}));
+00119         \textcolor{keywordflow}{return};
+00120     \}
+00121     uint16\_t ch;
+00122     LMS_ReadParam(lmsControl,LMS7param(MAC),&ch);
+00123     \textcolor{keywordtype}{int} status = LMS_Calibrate(lmsControl,LMS_CH_TX,ch-1,bandwidth\_MHz * 1e6,useExtLoopback);
+00124 
+00125     \textcolor{keywordflow}{if} (status != 0)
+00126     \{
+00127         wxMessageBox(wxString::Format(\_(\textcolor{stringliteral}{"Tx Calibration Failed: %s"}), 
+      LMS_GetLastErrorMessage()), \_(\textcolor{stringliteral}{"Info"}), wxOK, \textcolor{keyword}{this});
+00128         UpdateGUI();
+00129         \textcolor{keywordflow}{return};
+00130     \}
+00131 
+00132     status |= LMS_Calibrate(lmsControl,LMS_CH_RX,ch-1,bandwidth\_MHz * 1e6,useExtLoopback);
+00133     \textcolor{keywordflow}{if} (status != 0)
+00134         wxMessageBox(wxString::Format(\_(\textcolor{stringliteral}{"Rx Calibration Failed: %s"}), 
+      LMS_GetLastErrorMessage()), \_(\textcolor{stringliteral}{"Info"}), wxOK, \textcolor{keyword}{this});
+00135     \textcolor{keywordflow}{else}
+00136         wxMessageBox(\_(\textcolor{stringliteral}{"Calibration Finished"}), \_(\textcolor{stringliteral}{"Info"}), wxOK, \textcolor{keyword}{this});
+00137     UpdateGUI();
+00138 \}
+00139 
+00140 \textcolor{keywordtype}{void} lms7002_pnlCalibrations_view::Initialize(lms_device_t* pControl)
+00141 \{
+00142     lmsControl = pControl;
+00143     assert(lmsControl != \textcolor{keyword}{nullptr});
+00144     uint16\_t value;
+00145     \textcolor{keywordflow}{if} (LMS_ReadParam(lmsControl,LMS7param(MASK),&value)!=0  || value != 0)
+00146         value = 1;
+00147     chkDCMODE->Enable(value);
+00148 \}
+00149 
+00150 \textcolor{keywordtype}{void} lms7002_pnlCalibrations_view::ParameterChangeHandler(wxSpinEvent& event)
+00151 \{
+00152     wxCommandEvent evt;
+00153     evt.SetInt(event.GetInt());
+00154     evt.SetId(event.GetId());
+00155     evt.SetEventObject(event.GetEventObject());
+00156     ParameterChangeHandler(evt);
+00157 \}
+00158 
+00159 \textcolor{keywordtype}{void} lms7002_pnlCalibrations_view::ParameterChangeHandler(wxCommandEvent& event)
+00160 \{
+00161     assert(lmsControl != \textcolor{keyword}{nullptr});
+00162     LMS7Parameter parameter;
+00163     \textcolor{keywordflow}{try}
+00164     \{
+00165         parameter = wndId2Enum.at(reinterpret\_cast<wxWindow*>(event.GetEventObject()));
+00166     \}
+00167     \textcolor{keywordflow}{catch} (std::exception & e)
+00168     \{
+00169         std::cout << \textcolor{stringliteral}{"Control element(ID = "} << \textcolor{keyword}{event}.GetId() << \textcolor{stringliteral}{") don't have assigned LMS parameter."} << 
+      std::endl;
+00170         \textcolor{keywordflow}{return};
+00171     \}
+00172     \textcolor{keywordflow}{if}(event.GetEventObject() == cmbDCOFFI_RFE || \textcolor{keyword}{event}.GetEventObject() == 
+      cmbDCOFFQ_RFE)
+00173     \{
+00174         int16\_t value = (\textcolor{keyword}{event}.GetInt() < 0) << 6;
+00175         value |= abs(event.GetInt()) & 0x3F;
+00176         LMS_WriteParam(lmsControl,parameter,value);
+00177     \}
+00178     \textcolor{keywordflow}{else}
+00179         LMS_WriteParam(lmsControl,parameter,event.GetInt());
+00180 \}
+00181 
+00182 \textcolor{keywordtype}{void} lms7002_pnlCalibrations_view::UpdateGUI()
+00183 \{
+00184     LMS7002_WXGUI::UpdateControlsByMap(\textcolor{keyword}{this}, lmsControl, wndId2Enum);
+00185     int16\_t value;
+00186     LMS_ReadParam(lmsControl,LMS7param(IQCORR_RXTSP),(uint16\_t*)&value);
+00187     \textcolor{keywordtype}{int} bitsToShift = (15 - LMS7param(IQCORR_RXTSP).msb - LMS7param(IQCORR_RXTSP).lsb);
+00188     value = value << bitsToShift;
+00189     value = value >> bitsToShift;
+00190     cmbIQCORR_RXTSP->SetValue(value);
+00191 
+00192     LMS_ReadParam(lmsControl,LMS7param(IQCORR_TXTSP),(uint16\_t*)&value);
+00193     bitsToShift = (15 - LMS7param(IQCORR_TXTSP).msb - LMS7param(IQCORR_TXTSP).lsb);
+00194     value = value << bitsToShift;
+00195     value = value >> bitsToShift;
+00196     cmbIQCORR_TXTSP->SetValue(value);
+00197 
+00198     LMS_ReadParam(lmsControl,LMS7param(DCOFFI_RFE),(uint16\_t*)&value);
+00199     int16\_t dcvalue = value & 0x3F;
+00200     \textcolor{keywordflow}{if} ((value & 0x40) != 0)
+00201         dcvalue *= -1;
+00202     cmbDCOFFI_RFE->SetValue(dcvalue);
+00203     LMS_ReadParam(lmsControl,LMS7param(DCOFFQ_RFE),(uint16\_t*)&value);
+00204     dcvalue = value & 0x3F;
+00205     \textcolor{keywordflow}{if} ((value & 0x40) != 0)
+00206         dcvalue *= -1;
+00207     cmbDCOFFQ_RFE->SetValue(dcvalue);
+00208 
+00209     int8\_t dccorr;
+00210     LMS_ReadParam(lmsControl,LMS7param(DCCORRI_TXTSP),(uint16\_t*)&value);
+00211     dccorr = value;
+00212     cmbDCCORRI_TXTSP->SetValue(dccorr);
+00213     LMS_ReadParam(lmsControl,LMS7param(DCCORRQ_TXTSP),(uint16\_t*)&value);
+00214     dccorr = value;
+00215     cmbDCCORRQ_TXTSP->SetValue(dccorr);
+00216     float_type freq;
+00217     LMS_GetClockFreq(lmsControl,LMS_CLOCK_REF,&freq);
+00218     lblCGENrefClk->SetLabel(wxString::Format(\_(\textcolor{stringliteral}{"%f"}), freq/1e6));
+00219 \}
+00220 
+00221 \textcolor{keywordtype}{void} lms7002_pnlCalibrations_view::OnCalibrationMethodChange( wxCommandEvent& event )
+00222 \{
+00223     \textcolor{keywordflow}{if}(rgrCalibrationMethod->GetSelection() == 0)
+00224         lblCalibrationNote->SetLabel(\textcolor{stringliteral}{""});
+00225     \textcolor{keywordflow}{else}
+00226         lblCalibrationNote->SetLabel(\textcolor{stringliteral}{"Some boards might not have onboard loopback for selected Rx/Tx paths"}
+      );
+00227 \}
+\end{DoxyCode}

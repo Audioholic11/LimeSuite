@@ -1,0 +1,540 @@
+\subsection{M\+C\+U\+\_\+\+File.\+h}
+\label{MCU__File_8h_source}\index{/home/erik/prefix/default/src/limesuite-\/dev/src/lms7002m\+\_\+mcu/\+M\+C\+U\+\_\+\+File.\+h@{/home/erik/prefix/default/src/limesuite-\/dev/src/lms7002m\+\_\+mcu/\+M\+C\+U\+\_\+\+File.\+h}}
+
+\begin{DoxyCode}
+00001 \textcolor{preprocessor}{#include <stdio.h>}
+00002 \textcolor{preprocessor}{#include <string.h>}
+00003 \textcolor{preprocessor}{#include <vector>}
+00004 \textcolor{preprocessor}{#include <iostream>}
+00005 
+00006 \textcolor{preprocessor}{#if !(defined(max)) && \_MSC\_VER}
+00007     \textcolor{comment}{// VC fix}
+00008 \textcolor{preprocessor}{    #define max \_\_max}
+00009 \textcolor{preprocessor}{#endif}
+00010 
+00011 \textcolor{keyword}{using namespace }std;
+00012 
+00013 \textcolor{keyword}{class }MemBlock
+00014 \{
+00015 \textcolor{keyword}{public}:
+00016     \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{long} m_startAddress;
+00017     vector<unsigned char> m_bytes;
+00018 \};
+00019 
+00020 \textcolor{keyword}{class }MCU_File
+00021 \{
+00022 \textcolor{keyword}{public}:
+00023     \textcolor{keyword}{explicit} MCU_File(\textcolor{keyword}{const} \textcolor{keywordtype}{char} *fileName, \textcolor{keyword}{const} \textcolor{keywordtype}{char} *mode)
+00024     \{
+00025         m\_file = fopen(fileName, mode);
+00026         \textcolor{keywordflow}{if} (m\_file != NULL)
+00027         \{
+00028             \textcolor{keywordflow}{return};
+00029         \}
+00030 
+00031         cout << \textcolor{stringliteral}{"Error opening"};
+00032         \textcolor{comment}{//string errorStr = "Error opening ";}
+00033         \textcolor{comment}{//errorStr += fileName;}
+00034         \textcolor{comment}{//errorStr += "\(\backslash\)n";}
+00035         \textcolor{comment}{//throw errorStr;}
+00036     \}
+00037 
+00038     ~MCU_File()
+00039     \{
+00040         \textcolor{keywordflow}{if} (m\_file)
+00041             fclose(m\_file);
+00042     \}
+00043 
+00044     \textcolor{keywordtype}{bool} FileOpened()
+00045     \{
+00046         \textcolor{keywordflow}{return} m\_file != NULL;
+00047     \}
+00048 
+00049     \textcolor{comment}{// Read binary file}
+00050     \textcolor{keywordtype}{void} ReadBin(\textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{long} limit)
+00051     \{
+00052         m\_top = 0;
+00053 
+00054         m\_chunks.push\_back(MemBlock());
+00055         m\_chunks.back().m\_startAddress = 0;
+00056 
+00057         cout << \textcolor{stringliteral}{"Reading binary file\(\backslash\)n"};
+00058 
+00059         \textcolor{keywordtype}{int} tmp = fgetc(m\_file);
+00060 
+00061         \textcolor{keywordflow}{while} (!feof(m\_file))
+00062         \{
+00063             m\_chunks.back().m\_bytes.push\_back(tmp);
+00064 
+00065             \textcolor{keywordflow}{if} (m\_chunks.back().m\_bytes.size() > limit + 1)
+00066             \{
+00067                 m\_chunks.back().m\_bytes.pop\_back();
+00068                 m\_top = m\_chunks.back().m\_bytes.size() - 1;
+00069                 cout << \textcolor{stringliteral}{"Ignoring data above address space!\(\backslash\)n"};
+00070                 cout << \textcolor{stringliteral}{" Limit: "} << limit << \textcolor{stringliteral}{"\(\backslash\)n"};
+00071                 \textcolor{keywordflow}{return};
+00072             \}
+00073 
+00074             tmp = fgetc(m\_file);
+00075         \}
+00076 
+00077         m\_top = m\_chunks.back().m\_bytes.size() - 1;
+00078 
+00079         \textcolor{keywordflow}{if} (!m\_chunks.back().m\_bytes.size())
+00080         \{
+00081             cout << \textcolor{stringliteral}{"No data!\(\backslash\)n"};
+00082 
+00083             m\_chunks.pop\_back();
+00084         \}
+00085     \}
+00086 
+00087     \textcolor{comment}{// Read hex file}
+00088     \textcolor{keywordtype}{void} ReadHex(\textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{long} limit)
+00089     \{
+00090         \textcolor{keywordtype}{char} szLine[1024];
+00091         \textcolor{keywordtype}{bool} formatDetected = \textcolor{keyword}{false};
+00092         \textcolor{keywordtype}{bool} intel = \textcolor{keyword}{false};
+00093         \textcolor{keywordtype}{bool} endSeen = \textcolor{keyword}{false};
+00094         \textcolor{keywordtype}{bool} linear = \textcolor{keyword}{true};             \textcolor{comment}{// Only used for intel hex}
+00095         \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{long} addressBase = 0;  \textcolor{comment}{// Only used for intel hex}
+00096         \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{long} dataRecords = 0;  \textcolor{comment}{// Only used for s-record}
+00097         \textcolor{keywordflow}{while} (!feof(m\_file))
+00098         \{
+00099             \textcolor{keywordflow}{if} (fgets(szLine, 1024, m\_file) == 0)
+00100             \{
+00101                 \textcolor{keywordflow}{if} (ferror(m\_file))
+00102                 \{
+00103                     \textcolor{keywordflow}{throw} \textcolor{stringliteral}{"Error reading input!\(\backslash\)n"};
+00104                 \}
+00105                 \textcolor{keywordflow}{continue};
+00106             \}
+00107 
+00108             \textcolor{keywordflow}{if} (szLine[strlen(szLine) - 1] == 0xA || szLine[strlen(szLine) - 1] == 0xD)
+00109             \{
+00110                 szLine[strlen(szLine) - 1] = 0;
+00111             \}
+00112 
+00113             \textcolor{keywordflow}{if} (szLine[strlen(szLine) - 1] == 0xA || szLine[strlen(szLine) - 1] == 0xD)
+00114             \{
+00115                 szLine[strlen(szLine) - 1] = 0;
+00116             \}
+00117 
+00118             \textcolor{keywordflow}{if} (strlen(szLine) == 1023)
+00119             \{
+00120                 \textcolor{keywordflow}{throw} \textcolor{stringliteral}{"Hex file lines to long!\(\backslash\)n"};
+00121             \}
+00122             \textcolor{comment}{// Ignore blank lines}
+00123             \textcolor{keywordflow}{if} (szLine[0] == \textcolor{charliteral}{'\(\backslash\)n'})
+00124             \{
+00125                 \textcolor{keywordflow}{continue};
+00126             \}
+00127             \textcolor{comment}{// Detect format and warn if garbage lines are found}
+00128             \textcolor{keywordflow}{if} (!formatDetected)
+00129             \{
+00130                 \textcolor{keywordflow}{if} (szLine[0] != \textcolor{charliteral}{':'} && szLine[0] != \textcolor{charliteral}{'S'})
+00131                 \{
+00132                     cout << \textcolor{stringliteral}{"Ignoring garbage line!\(\backslash\)n"};
+00133                     \textcolor{keywordflow}{continue};
+00134                 \}
+00135                 \textcolor{keywordflow}{if} (szLine[0] == \textcolor{charliteral}{'S'})
+00136                 \{
+00137                     intel = \textcolor{keyword}{false};
+00138                     cout << \textcolor{stringliteral}{"Detected S-Record\(\backslash\)n"};
+00139                 \}
+00140                 \textcolor{keywordflow}{else}
+00141                 \{
+00142                     intel = \textcolor{keyword}{true};
+00143                     cout << \textcolor{stringliteral}{"Detected intel hex file\(\backslash\)n"};
+00144                 \}
+00145                 formatDetected = \textcolor{keyword}{true};
+00146             \}
+00147             \textcolor{keywordflow}{else} \textcolor{keywordflow}{if} ((intel && szLine[0] != \textcolor{charliteral}{':'}) ||
+00148                     (!intel && szLine[0] != \textcolor{charliteral}{'S'}))
+00149             \{
+00150                 cout << \textcolor{stringliteral}{"Ignoring garbage line!\(\backslash\)n"};
+00151                 \textcolor{keywordflow}{continue};
+00152             \}
+00153 
+00154             \textcolor{keywordflow}{if} (endSeen)
+00155             \{
+00156                 \textcolor{keywordflow}{throw} \textcolor{stringliteral}{"Hex line after end of file record!\(\backslash\)n"};
+00157             \}
+00158 
+00159             \textcolor{keywordflow}{if} (intel)
+00160             \{
+00161                 \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{long}   dataBytes;
+00162                 \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{long}   startAddress;
+00163                 \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{long}   type;
+00164                 \textcolor{keywordflow}{if} (sscanf(&szLine[1], \textcolor{stringliteral}{"%2lx%4lx%2lx"}, &dataBytes, &startAddress, &type) != 3)
+00165                 \{
+00166                     \textcolor{keywordflow}{throw} \textcolor{stringliteral}{"Hex line beginning corrupt!\(\backslash\)n"};
+00167                 \}
+00168                 \textcolor{comment}{// Check line length}
+00169                 \textcolor{keywordflow}{if} (szLine[11 + dataBytes * 2] != \textcolor{charliteral}{'\(\backslash\)n'} && szLine[11 + dataBytes * 2] != 0)
+00170                 \{
+00171                     \textcolor{keywordflow}{throw} \textcolor{stringliteral}{"Hex line length incorrect!\(\backslash\)n"};
+00172                 \}
+00173                 \textcolor{comment}{// Check line checksum}
+00174                 \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{char}   checkSum = 0;
+00175                 \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{long}   tmp;
+00176                 \textcolor{keywordflow}{for} (\textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{int} i = 0; i <= dataBytes + 4; ++i)
+00177                 \{
+00178                     \textcolor{keywordflow}{if} (sscanf(&szLine[1 + i * 2], \textcolor{stringliteral}{"%2lx"}, &tmp) != 1)
+00179                     \{
+00180                         \textcolor{keywordflow}{throw} \textcolor{stringliteral}{"Hex line data corrupt!\(\backslash\)n"};
+00181                     \}
+00182                     checkSum += tmp;
+00183                 \}
+00184                 \textcolor{keywordflow}{if} (checkSum != 0)
+00185                 \{
+00186                     \textcolor{keywordflow}{throw} \textcolor{stringliteral}{"Hex line checksum error!\(\backslash\)n"};
+00187                 \}
+00188 
+00189                 \textcolor{keywordflow}{switch} (type)
+00190                 \{
+00191                 \textcolor{keywordflow}{case} 0:
+00192                     \textcolor{comment}{// Data record}
+00193                     \textcolor{keywordflow}{if} (!linear)
+00194                     \{
+00195                         \textcolor{comment}{// Segmented}
+00196                         \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{long} test = startAddress;
+00197                         test += dataBytes;
+00198                         \textcolor{keywordflow}{if} (test > 0xffff)
+00199                         \{
+00200                             \textcolor{keywordflow}{throw} \textcolor{stringliteral}{"Can't handle wrapped segments!\(\backslash\)n"};
+00201                         \}
+00202                     \}
+00203                     \textcolor{keywordflow}{if} (!m\_chunks.size() ||
+00204                         m\_chunks.back().m\_startAddress + m\_chunks.back().m\_bytes.size() !=
+00205                         addressBase + startAddress)
+00206                     \{
+00207                         m\_chunks.push\_back(MemBlock());
+00208                         m\_chunks.back().m\_startAddress = addressBase + startAddress;
+00209                     \}
+00210                     \{
+00211                         \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{char} i = 0;
+00212                         \textcolor{keywordflow}{for} (i = 0; i < dataBytes; ++i)
+00213                         \{
+00214                             sscanf(&szLine[9 + i * 2], \textcolor{stringliteral}{"%2lx"}, &tmp);
+00215                             \textcolor{keywordflow}{if} (addressBase + startAddress + i > limit)
+00216                             \{
+00217                                 cout << \textcolor{stringliteral}{"Ignoring data above address space!\(\backslash\)n"};
+00218                                 cout << \textcolor{stringliteral}{"Data address: "} << addressBase + startAddress + 
+      i;
+00219                                 cout << \textcolor{stringliteral}{" Limit: "} << limit << \textcolor{stringliteral}{"\(\backslash\)n"};
+00220                                 \textcolor{keywordflow}{if} (!m\_chunks.back().m\_bytes.size())
+00221                                 \{
+00222                                     m\_chunks.pop\_back();
+00223                                 \}
+00224                                 \textcolor{keywordflow}{continue};
+00225                             \}
+00226                             m\_chunks.back().m\_bytes.push\_back(tmp);
+00227                         \}
+00228                     \}
+00229                     \textcolor{keywordflow}{break};
+00230 
+00231                 \textcolor{keywordflow}{case} 1:
+00232                     \textcolor{comment}{// End-of-file record}
+00233                     \textcolor{keywordflow}{if} (dataBytes != 0)
+00234                     \{
+00235                         cout << \textcolor{stringliteral}{"Warning: End of file record not zero length!\(\backslash\)n"};
+00236                     \}
+00237                     \textcolor{keywordflow}{if} (startAddress != 0)
+00238                     \{
+00239                         cout << \textcolor{stringliteral}{"Warning: End of file record address not zero!\(\backslash\)n"};
+00240                     \}
+00241                     endSeen = \textcolor{keyword}{true};
+00242                     \textcolor{keywordflow}{break};
+00243 
+00244                 \textcolor{keywordflow}{case} 2:
+00245                     \textcolor{comment}{// Extended segment address record}
+00246                     \textcolor{keywordflow}{if} (dataBytes != 2)
+00247                     \{
+00248                         \textcolor{keywordflow}{throw} \textcolor{stringliteral}{"Length field must be 2 in extended segment address record!\(\backslash\)n"};
+00249                     \}
+00250                     \textcolor{keywordflow}{if} (startAddress != 0)
+00251                     \{
+00252                         \textcolor{keywordflow}{throw} \textcolor{stringliteral}{"Address field must be zero in extended segment address record!\(\backslash\)n"};
+00253                     \}
+00254                     sscanf(&szLine[9], \textcolor{stringliteral}{"%4lx"}, &startAddress);
+00255                     addressBase = startAddress << 4;
+00256                     linear = \textcolor{keyword}{false};
+00257                     \textcolor{keywordflow}{break};
+00258 
+00259                 \textcolor{keywordflow}{case} 3:
+00260                     \textcolor{comment}{// Start segment address record}
+00261                     \textcolor{keywordflow}{if} (dataBytes != 4)
+00262                     \{
+00263                         cout << \textcolor{stringliteral}{"Warning: Length field must be 4 in start segment address record!\(\backslash\)n"};
+00264                     \}
+00265                     \textcolor{keywordflow}{if} (startAddress != 0)
+00266                     \{
+00267                         cout << \textcolor{stringliteral}{"Warning: Address field must be zero in start segment address record!\(\backslash\)n"};
+00268                     \}
+00269                     \textcolor{keywordflow}{if} (dataBytes == 4)
+00270                     \{
+00271                         \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{long} ssa;
+00272                         \textcolor{keywordtype}{char}    ssaStr[16];
+00273                         sscanf(&szLine[9], \textcolor{stringliteral}{"%8lx"}, &ssa);
+00274                         sprintf(ssaStr, \textcolor{stringliteral}{"%08lX\(\backslash\)n"}, ssa);
+00275                         cout << \textcolor{stringliteral}{"Segment start address (CS/IP): "};
+00276                         cout << ssaStr;
+00277                     \}
+00278                     \textcolor{keywordflow}{break};
+00279 
+00280                 \textcolor{keywordflow}{case} 4:
+00281                     \textcolor{comment}{// Extended linear address record}
+00282                     \textcolor{keywordflow}{if} (dataBytes != 2)
+00283                     \{
+00284                         \textcolor{keywordflow}{throw} \textcolor{stringliteral}{"Length field must be 2 in extended linear address record!\(\backslash\)n"};
+00285                     \}
+00286                     \textcolor{keywordflow}{if} (startAddress != 0)
+00287                     \{
+00288                         \textcolor{keywordflow}{throw} \textcolor{stringliteral}{"Address field must be zero in extended linear address record!\(\backslash\)n"};
+00289                     \}
+00290                     sscanf(&szLine[9], \textcolor{stringliteral}{"%4lx"}, &startAddress);
+00291                     addressBase = ((\textcolor{keywordtype}{unsigned} long)startAddress) << 16;
+00292                     linear = \textcolor{keyword}{true};
+00293                     \textcolor{keywordflow}{break};
+00294 
+00295                 \textcolor{keywordflow}{case} 5:
+00296                     \textcolor{comment}{// Start linear address record}
+00297                     \textcolor{keywordflow}{if} (dataBytes != 4)
+00298                     \{
+00299                         cout << \textcolor{stringliteral}{"Warning: Length field must be 4 in start linear address record!\(\backslash\)n"};
+00300                     \}
+00301                     \textcolor{keywordflow}{if} (startAddress != 0)
+00302                     \{
+00303                         cout << \textcolor{stringliteral}{"Warning: Address field must be zero in start linear address record!\(\backslash\)n"};
+00304                     \}
+00305                     \textcolor{keywordflow}{if} (dataBytes == 4)
+00306                     \{
+00307                         \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{long} lsa;
+00308                         \textcolor{keywordtype}{char}    lsaStr[16];
+00309                         sscanf(&szLine[9], \textcolor{stringliteral}{"%8lx"}, &lsa);
+00310                         sprintf(lsaStr, \textcolor{stringliteral}{"%08lX\(\backslash\)n"}, lsa);
+00311                         cout << \textcolor{stringliteral}{"Linear start address: "};
+00312                         cout << lsaStr;
+00313                     \}
+00314                     \textcolor{keywordflow}{break};
+00315 
+00316                 \textcolor{keywordflow}{default}:
+00317                     cout << \textcolor{stringliteral}{"Waring: Unknown record found!\(\backslash\)n"};
+00318                 \}
+00319             \}
+00320             \textcolor{keywordflow}{else}
+00321             \{
+00322                 \textcolor{comment}{// S-record}
+00323                 \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{long} count;
+00324                 \textcolor{keywordtype}{char}            type;
+00325                 \textcolor{keywordflow}{if} (sscanf(&szLine[1], \textcolor{stringliteral}{"%c%2lx"}, &type, &count) != 2)
+00326                 \{
+00327                     \textcolor{keywordflow}{throw} \textcolor{stringliteral}{"Hex line beginning corrupt!\(\backslash\)n"};
+00328                 \}
+00329                 \textcolor{comment}{// Check line length}
+00330                 \textcolor{keywordflow}{if} (szLine[4 + count * 2] != \textcolor{charliteral}{'\(\backslash\)n'} && szLine[4 + count * 2] != 0)
+00331                 \{
+00332                     \textcolor{keywordflow}{throw} \textcolor{stringliteral}{"Hex line length incorrect!\(\backslash\)n"};
+00333                 \}
+00334                 \textcolor{comment}{// Check line checksum}
+00335                 \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{char}   checkSum = 0;
+00336                 \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{long}   tmp;
+00337                 \textcolor{keywordflow}{for} (\textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{int} i = 0; i < count + 1; ++i)
+00338                 \{
+00339                     \textcolor{keywordflow}{if} (sscanf(&szLine[2 + i * 2], \textcolor{stringliteral}{"%2lx"}, &tmp) != 1)
+00340                     \{
+00341                         \textcolor{keywordflow}{throw} \textcolor{stringliteral}{"Hex line data corrupt!\(\backslash\)n"};
+00342                     \}
+00343                     checkSum += tmp;
+00344                 \}
+00345                 \textcolor{keywordflow}{if} (checkSum != 255)
+00346                 \{
+00347                     \textcolor{keywordflow}{throw} \textcolor{stringliteral}{"Hex line checksum error!\(\backslash\)n"};
+00348                 \}
+00349 
+00350                 \textcolor{keywordflow}{switch} (type)
+00351                 \{
+00352                 \textcolor{keywordflow}{case} \textcolor{charliteral}{'0'}:
+00353                     \textcolor{comment}{// Header record}
+00354                     \{
+00355                         \textcolor{keywordtype}{char} header[256];
+00356                         uint8\_t i = 0;
+00357                         \textcolor{keywordflow}{for} (i = 0; uint8\_t(i + 3) < count; ++i)
+00358                         \{
+00359                             sscanf(&szLine[8 + i * 2], \textcolor{stringliteral}{"%2lx"}, &tmp);
+00360                             header[i] = tmp;
+00361                         \}
+00362                         header[i] = 0;
+00363                         \textcolor{keywordflow}{if} (i > 0)
+00364                         \{
+00365                             cout << \textcolor{stringliteral}{"Module name: "} << header << \textcolor{stringliteral}{"\(\backslash\)n"};
+00366                         \}
+00367                     \}
+00368                     \textcolor{keywordflow}{break};
+00369 
+00370                 \textcolor{keywordflow}{case} \textcolor{charliteral}{'1'}:
+00371                 \textcolor{keywordflow}{case} \textcolor{charliteral}{'2'}:
+00372                 \textcolor{keywordflow}{case} \textcolor{charliteral}{'3'}:
+00373                     \textcolor{comment}{// Data record}
+00374                     \{
+00375                         dataRecords++;
+00376                         \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{long}   startAddress;
+00377                         \textcolor{keywordflow}{if} (type == \textcolor{charliteral}{'1'})
+00378                         \{
+00379                             sscanf(&szLine[4], \textcolor{stringliteral}{"%4lx"}, &startAddress);
+00380                         \}
+00381                         \textcolor{keywordflow}{else} \textcolor{keywordflow}{if} (type == \textcolor{charliteral}{'2'})
+00382                         \{
+00383                             sscanf(&szLine[4], \textcolor{stringliteral}{"%6lx"}, &startAddress);
+00384                         \}
+00385                         \textcolor{keywordflow}{else}
+00386                         \{
+00387                             sscanf(&szLine[4], \textcolor{stringliteral}{"%8lx"}, &startAddress);
+00388                         \}
+00389 
+00390                         \textcolor{keywordflow}{if} (!m\_chunks.size() ||
+00391                             m\_chunks.back().m\_startAddress + m\_chunks.back().m\_bytes.size() !=
+00392                             startAddress)
+00393                         \{
+00394                             m\_chunks.push\_back(MemBlock());
+00395                             m\_chunks.back().m\_startAddress = startAddress;
+00396                         \}
+00397                         \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{char} i = 0;
+00398                         \textcolor{keywordflow}{for} (i = uint8\_t(type - \textcolor{charliteral}{'1'}); uint8\_t(i + 3) < count; ++
+      i)
+00399                         \{
+00400                             sscanf(&szLine[8 + i * 2], \textcolor{stringliteral}{"%2lx"}, &tmp);
+00401                             \textcolor{keywordflow}{if} (startAddress + i > limit)
+00402                             \{
+00403                                 cout << \textcolor{stringliteral}{"Ignoring data above address space!\(\backslash\)n"};
+00404                                 cout << \textcolor{stringliteral}{"Data address: "} << startAddress + i;
+00405                                 cout << \textcolor{stringliteral}{" Limit: "} << limit << \textcolor{stringliteral}{"\(\backslash\)n"};
+00406                                 \textcolor{keywordflow}{if} (!m\_chunks.back().m\_bytes.size())
+00407                                 \{
+00408                                     m\_chunks.pop\_back();
+00409                                 \}
+00410                                 \textcolor{keywordflow}{continue};
+00411                             \}
+00412                             m\_chunks.back().m\_bytes.push\_back(tmp);
+00413                         \}
+00414                     \}
+00415                     \textcolor{keywordflow}{break};
+00416 
+00417                 \textcolor{keywordflow}{case} \textcolor{charliteral}{'5'}:
+00418                     \textcolor{comment}{// Count record}
+00419                     \{
+00420                         \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{long}   address;
+00421                         sscanf(&szLine[4], \textcolor{stringliteral}{"%4lx"}, &address);
+00422                         \textcolor{keywordflow}{if} (address != dataRecords)
+00423                         \{
+00424                             \textcolor{keywordflow}{throw} \textcolor{stringliteral}{"Wrong number of data records!\(\backslash\)n"};
+00425                         \}
+00426                     \}
+00427                     \textcolor{keywordflow}{break};
+00428 
+00429                 \textcolor{keywordflow}{case} \textcolor{charliteral}{'7'}:
+00430                 \textcolor{keywordflow}{case} \textcolor{charliteral}{'8'}:
+00431                 \textcolor{keywordflow}{case} \textcolor{charliteral}{'9'}:
+00432                     \textcolor{comment}{// Start address record}
+00433                     cout << \textcolor{stringliteral}{"Ignoring start address record!\(\backslash\)n"};
+00434                     \textcolor{keywordflow}{break};
+00435 
+00436                 \textcolor{keywordflow}{default}:
+00437                     cout << \textcolor{stringliteral}{"Unknown record found!\(\backslash\)n"};
+00438                 \}
+00439             \}
+00440         \}
+00441         \textcolor{keywordflow}{if} (intel && !endSeen)
+00442         \{
+00443             cout << \textcolor{stringliteral}{"No end of file record!\(\backslash\)n"};
+00444         \}
+00445         \textcolor{keywordflow}{if} (!m\_chunks.size())
+00446         \{
+00447             \textcolor{keywordflow}{throw} \textcolor{stringliteral}{"No data in file!\(\backslash\)n"};
+00448         \}
+00449         vector<MemBlock>::iterator  vi;
+00450         m\_top = 0;
+00451         \textcolor{keywordflow}{for} (vi = m\_chunks.begin(); vi < m\_chunks.end(); vi++)
+00452         \{
+00453             m\_top = max(m\_top, vi->m\_startAddress + vi->m\_bytes.size() - 1);
+00454         \}
+00455     \}
+00456 
+00457     \textcolor{comment}{// Rather inefficient this one, fix sometime}
+00458     \textcolor{keywordtype}{bool} GetByte(\textcolor{keyword}{const} \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{long} address, \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{char} &chr)
+00459     \{
+00460         vector<MemBlock>::iterator  vi;
+00461 
+00462         \textcolor{keywordflow}{for} (vi = m\_chunks.begin(); vi < m\_chunks.end(); vi++)
+00463         \{
+00464             \textcolor{keywordflow}{if} (vi->m\_startAddress + vi->m\_bytes.size() > address && vi->m\_startAddress <= 
+      address)
+00465             \{
+00466                 \textcolor{keywordflow}{break};
+00467             \}
+00468         \}
+00469         \textcolor{keywordflow}{if} (vi == m\_chunks.end())
+00470         \{
+00471             \textcolor{keywordflow}{return} \textcolor{keyword}{false};
+00472         \}
+00473         chr = vi->m\_bytes[address - vi->m\_startAddress];
+00474         \textcolor{keywordflow}{return} \textcolor{keyword}{true};
+00475     \}
+00476 
+00477     \textcolor{keywordtype}{bool} BitString(\textcolor{keyword}{const} \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{long} address, \textcolor{keyword}{const} \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{char} bits, \textcolor{keyword}{const} \textcolor{keywordtype}{bool} lEndian, \textcolor{keywordtype}{string} &str)
+00478     \{
+00479         \textcolor{keywordtype}{bool}            ok = \textcolor{keyword}{false};
+00480         \textcolor{keywordtype}{long}            i;
+00481         \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{char}   chr;
+00482         \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{long}   data = 0;
+00483         \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{long}   tmp;
+00484 
+00485         \textcolor{keywordflow}{if} (lEndian)
+00486         \{
+00487             \textcolor{keywordflow}{for} (i = 0; i < (bits + 7) / 8; ++i)
+00488             \{
+00489                 ok |= GetByte(address + i, chr);
+00490                 tmp = chr;
+00491                 data |= tmp << (8 * i);
+00492             \}
+00493         \}
+00494         \textcolor{keywordflow}{else}
+00495         \{
+00496             \textcolor{keywordflow}{for} (i = 0; i < (bits + 7) / 8; ++i)
+00497             \{
+00498                 ok |= GetByte(address + i, chr);
+00499                 tmp = chr;
+00500                 data |= tmp << (8 * ((bits + 7) / 8 - i - 1));
+00501             \}
+00502         \}
+00503 
+00504         \textcolor{keywordflow}{if} (!ok)
+00505         \{
+00506             \textcolor{keywordflow}{return} \textcolor{keyword}{false};
+00507         \}
+00508 
+00509         \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{long} mask = 1;
+00510 
+00511         str = \textcolor{stringliteral}{""};
+00512         \textcolor{keywordflow}{for} (i = 0; i < bits; i++)
+00513         \{
+00514             \textcolor{keywordflow}{if} (data & mask)
+00515             \{
+00516                 str.insert(0,\textcolor{stringliteral}{"1"});
+00517             \}
+00518             \textcolor{keywordflow}{else}
+00519             \{
+00520                 str.insert(0,\textcolor{stringliteral}{"0"});
+00521             \}
+00522             mask <<= 1;
+00523         \}
+00524         \textcolor{keywordflow}{return} \textcolor{keyword}{true};
+00525     \}
+00526 
+00527     FILE *Handle() \{ \textcolor{keywordflow}{return} m\_file; \};
+00528     vector<MemBlock>    m_chunks;
+00529     \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{long}       m_top;
+00530 \textcolor{keyword}{private}:
+00531     FILE                *m_file;
+00532 \};
+\end{DoxyCode}

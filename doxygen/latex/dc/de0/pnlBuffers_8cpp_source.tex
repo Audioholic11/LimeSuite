@@ -1,0 +1,164 @@
+\subsection{pnl\+Buffers.\+cpp}
+\label{pnlBuffers_8cpp_source}\index{/home/erik/prefix/default/src/limesuite-\/dev/src/boards\+\_\+wxgui/pnl\+Buffers.\+cpp@{/home/erik/prefix/default/src/limesuite-\/dev/src/boards\+\_\+wxgui/pnl\+Buffers.\+cpp}}
+
+\begin{DoxyCode}
+00001 \textcolor{preprocessor}{#include "pnlBuffers.h"}
+00002 
+00003 \textcolor{preprocessor}{#include <wx/sizer.h>}
+00004 \textcolor{preprocessor}{#include <wx/stattext.h>}
+00005 \textcolor{preprocessor}{#include <wx/button.h>}
+00006 \textcolor{preprocessor}{#include <wx/string.h>}
+00007 \textcolor{preprocessor}{#include <wx/checkbox.h>}
+00008 \textcolor{preprocessor}{#include <wx/msgdlg.h>}
+00009 \textcolor{preprocessor}{#include "lms7suiteEvents.h"}
+00010 
+00011 \textcolor{preprocessor}{#include <ciso646>}
+00012 
+00013 
+00014 \textcolor{keyword}{using namespace }std;
+00015 
+00016 BEGIN\_EVENT\_TABLE(pnlBuffers, wxPanel)
+00017 END\_EVENT\_TABLE()
+00018 
+00019 pnlBuffers::pnlBuffers(wxWindow* parent,wxWindowID \textcolor{keywordtype}{id}, const wxPoint& pos,const wxSize& 
+      size, \textcolor{keywordtype}{int} style, wxString name)
+00020 \{
+00021     lmsControl = \textcolor{keyword}{nullptr};
+00022 
+00023     Create(parent, \textcolor{keywordtype}{id}, pos, size, style, name);
+00024 \textcolor{preprocessor}{#ifdef WIN32}
+00025     SetBackgroundColour(wxSystemSettings::GetColour(wxSYS\_COLOUR\_BTNFACE));
+00026 \textcolor{preprocessor}{#endif}
+00027     wxFlexGridSizer* fgSizer239;
+00028     fgSizer239 = \textcolor{keyword}{new} wxFlexGridSizer( 0, 2, 0, 0 );
+00029     fgSizer239->SetFlexibleDirection( wxBOTH );
+00030     fgSizer239->SetNonFlexibleGrowMode( wxFLEX\_GROWMODE\_SPECIFIED );
+00031 
+00032     wxStaticBoxSizer* sbSizer128;
+00033     sbSizer128 = \textcolor{keyword}{new} wxStaticBoxSizer( \textcolor{keyword}{new} wxStaticBox( \textcolor{keyword}{this}, wxID\_ANY, wxT(\textcolor{stringliteral}{"Buffers"}) ), wxVERTICAL );
+00034 
+00035     chkDIO\_DIR\_CTRL1 = \textcolor{keyword}{new} wxCheckBox( sbSizer128->GetStaticBox(), wxID\_ANY, wxT(\textcolor{stringliteral}{"DIO\_DIR\_CTRL1"}), 
+      wxDefaultPosition, wxDefaultSize, 0 );
+00036     sbSizer128->Add( chkDIO\_DIR\_CTRL1, 0, 0, 5 );
+00037 
+00038     chkDIO\_DIR\_CTRL2 = \textcolor{keyword}{new} wxCheckBox( sbSizer128->GetStaticBox(), wxID\_ANY, wxT(\textcolor{stringliteral}{"DIO\_DIR\_CTRL2"}), 
+      wxDefaultPosition, wxDefaultSize, 0 );
+00039     sbSizer128->Add( chkDIO\_DIR\_CTRL2, 0, 0, 5 );
+00040 
+00041     chkDIO\_BUFF\_OE = \textcolor{keyword}{new} wxCheckBox( sbSizer128->GetStaticBox(), wxID\_ANY, wxT(\textcolor{stringliteral}{"DIO\_BUFF\_OE"}), 
+      wxDefaultPosition, wxDefaultSize, 0 );
+00042     sbSizer128->Add( chkDIO\_BUFF\_OE, 0, wxRIGHT, 5 );
+00043 
+00044     chkIQ\_SEL1\_DIR = \textcolor{keyword}{new} wxCheckBox( sbSizer128->GetStaticBox(), wxID\_ANY, wxT(\textcolor{stringliteral}{"IQ\_SEL1\_DIR"}), 
+      wxDefaultPosition, wxDefaultSize, 0 );
+00045     sbSizer128->Add( chkIQ\_SEL1\_DIR, 0, 0, 5 );
+00046 
+00047     chkIQ\_SEL2\_DIR = \textcolor{keyword}{new} wxCheckBox( sbSizer128->GetStaticBox(), wxID\_ANY, wxT(\textcolor{stringliteral}{"IQ\_SEL2\_DIR"}), 
+      wxDefaultPosition, wxDefaultSize, 0 );
+00048     sbSizer128->Add( chkIQ\_SEL2\_DIR, 0, 0, 5 );
+00049 
+00050     chkG\_PWR\_DWN = \textcolor{keyword}{new} wxCheckBox( sbSizer128->GetStaticBox(), wxID\_ANY, wxT(\textcolor{stringliteral}{"G\_PWR\_DWN"}), 
+      wxDefaultPosition, wxDefaultSize, 0 );
+00051     sbSizer128->Add( chkG\_PWR\_DWN, 0, 0, 5 );
+00052 
+00053 
+00054     fgSizer239->Add( sbSizer128, 1, wxEXPAND, 5 );
+00055 
+00056     this->SetSizer( fgSizer239 );
+00057     this->Layout();
+00058     fgSizer239->Fit( \textcolor{keyword}{this} );
+00059 
+00060     \textcolor{comment}{// Connect Events}
+00061     chkDIO\_DIR\_CTRL1->Connect( wxEVT\_COMMAND\_CHECKBOX\_CLICKED, wxCommandEventHandler( 
+      pnlBuffers::OnGPIOchanged ), NULL, \textcolor{keyword}{this} );
+00062     chkDIO\_DIR\_CTRL2->Connect( wxEVT\_COMMAND\_CHECKBOX\_CLICKED, wxCommandEventHandler( 
+      pnlBuffers::OnGPIOchanged ), NULL, \textcolor{keyword}{this} );
+00063     chkDIO\_BUFF\_OE->Connect( wxEVT\_COMMAND\_CHECKBOX\_CLICKED, wxCommandEventHandler( 
+      pnlBuffers::OnGPIOchanged ), NULL, \textcolor{keyword}{this} );
+00064     chkIQ\_SEL1\_DIR->Connect( wxEVT\_COMMAND\_CHECKBOX\_CLICKED, wxCommandEventHandler( 
+      pnlBuffers::OnGPIOchanged ), NULL, \textcolor{keyword}{this} );
+00065     chkIQ\_SEL2\_DIR->Connect( wxEVT\_COMMAND\_CHECKBOX\_CLICKED, wxCommandEventHandler( 
+      pnlBuffers::OnGPIOchanged ), NULL, \textcolor{keyword}{this} );
+00066     chkG\_PWR\_DWN->Connect( wxEVT\_COMMAND\_CHECKBOX\_CLICKED, wxCommandEventHandler( 
+      pnlBuffers::OnGPIOchanged ), NULL, \textcolor{keyword}{this} );
+00067 
+00068     Bind(READ\_ALL\_VALUES, &pnlBuffers::OnReadAll, \textcolor{keyword}{this}, this->GetId());
+00069     Bind(WRITE\_ALL\_VALUES, &pnlBuffers::OnWriteAll, \textcolor{keyword}{this}, this->GetId());
+00070 \}
+00071 
+00072 \textcolor{keywordtype}{void} pnlBuffers::Initialize(lms_device_t* pControl)
+00073 \{
+00074     lmsControl = pControl;
+00075 \}
+00076 
+00077 pnlBuffers::~pnlBuffers()
+00078 \{
+00079     \textcolor{comment}{// Disconnect Events}
+00080     chkDIO\_DIR\_CTRL1->Disconnect( wxEVT\_COMMAND\_CHECKBOX\_CLICKED, wxCommandEventHandler( 
+      pnlBuffers::OnGPIOchanged ), NULL, \textcolor{keyword}{this} );
+00081     chkDIO\_DIR\_CTRL2->Disconnect( wxEVT\_COMMAND\_CHECKBOX\_CLICKED, wxCommandEventHandler( 
+      pnlBuffers::OnGPIOchanged ), NULL, \textcolor{keyword}{this} );
+00082     chkDIO\_BUFF\_OE->Disconnect( wxEVT\_COMMAND\_CHECKBOX\_CLICKED, wxCommandEventHandler( 
+      pnlBuffers::OnGPIOchanged ), NULL, \textcolor{keyword}{this} );
+00083     chkIQ\_SEL1\_DIR->Disconnect( wxEVT\_COMMAND\_CHECKBOX\_CLICKED, wxCommandEventHandler( 
+      pnlBuffers::OnGPIOchanged ), NULL, \textcolor{keyword}{this} );
+00084     chkIQ\_SEL2\_DIR->Disconnect( wxEVT\_COMMAND\_CHECKBOX\_CLICKED, wxCommandEventHandler( 
+      pnlBuffers::OnGPIOchanged ), NULL, \textcolor{keyword}{this} );
+00085     chkG\_PWR\_DWN->Disconnect( wxEVT\_COMMAND\_CHECKBOX\_CLICKED, wxCommandEventHandler( 
+      pnlBuffers::OnGPIOchanged ), NULL, \textcolor{keyword}{this} );
+00086 \}
+00087 
+00088 \textcolor{keyword}{static} \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{char} setbit(\textcolor{keyword}{const} \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{char} src, \textcolor{keyword}{const} \textcolor{keywordtype}{int} pos, \textcolor{keyword}{const} \textcolor{keywordtype}{bool} value)
+00089 \{
+00090     \textcolor{keywordtype}{int} val = src;
+00091     val = val & ~(0x1 << pos);
+00092     val |= value << pos;
+00093     \textcolor{keywordflow}{return} val;
+00094 \}
+00095 
+00096 \textcolor{keywordtype}{void} pnlBuffers::OnGPIOchanged( wxCommandEvent& event )
+00097 \{
+00098     uint8\_t value = 0;
+00099     value = setbit(value, 0, chkDIO\_DIR\_CTRL1->GetValue());
+00100     value = setbit(value, 1, chkDIO\_DIR\_CTRL2->GetValue());
+00101     value = setbit(value, 2, chkDIO\_BUFF\_OE->GetValue());
+00102     value = setbit(value, 3, chkIQ\_SEL1\_DIR->GetValue());
+00103     value = setbit(value, 4, chkIQ\_SEL2\_DIR->GetValue());
+00104     value = setbit(value, 5, chkG\_PWR\_DWN->GetValue());
+00105 
+00106     LMS_GPIOWrite(lmsControl,&value,1);
+00107     \{
+00108         wxMessageBox(wxString(\_(\textcolor{stringliteral}{"GPIO Write Failed"})));
+00109     \}
+00110 \}
+00111 
+00112 \textcolor{keyword}{static} \textcolor{keywordtype}{bool} getbit(\textcolor{keyword}{const} \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{char} src, \textcolor{keyword}{const} \textcolor{keywordtype}{int} pos)
+00113 \{
+00114     \textcolor{keywordflow}{return} (src >> pos) & 0x01;
+00115 \}
+00116 
+00117 \textcolor{keywordtype}{void} pnlBuffers::UpdatePanel()
+00118 \{
+00119     uint8\_t value;
+00120     \textcolor{keywordflow}{if} (LMS_GPIORead(lmsControl,&value,1)==0)
+00121     \{
+00122         chkDIO\_BUFF\_OE->SetValue(getbit(value, 2));
+00123         chkDIO\_DIR\_CTRL1->SetValue(getbit(value, 0));
+00124         chkDIO\_DIR\_CTRL2->SetValue(getbit(value, 1));
+00125         chkIQ\_SEL1\_DIR->SetValue(getbit(value, 3));
+00126         chkIQ\_SEL2\_DIR->SetValue(getbit(value, 4));
+00127         chkG\_PWR\_DWN->SetValue(getbit(value, 5));
+00128     \}
+00129     \textcolor{keywordflow}{else} wxMessageBox(wxString::Format(\_(\textcolor{stringliteral}{"GPIO Read: Failed"})));
+00130 \}
+00131 
+00132 \textcolor{keywordtype}{void} pnlBuffers::OnReadAll(wxCommandEvent &event)
+00133 \{
+00134     UpdatePanel();
+00135 \}
+00136 
+00137 \textcolor{keywordtype}{void} pnlBuffers::OnWriteAll(wxCommandEvent &event)
+00138 \{
+00139     OnGPIOchanged(event);
+00140 \}
+\end{DoxyCode}

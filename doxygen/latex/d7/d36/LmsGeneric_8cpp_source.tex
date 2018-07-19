@@ -1,0 +1,44 @@
+\subsection{Lms\+Generic.\+cpp}
+\label{LmsGeneric_8cpp_source}\index{/home/erik/prefix/default/src/limesuite-\/dev/src/\+A\+P\+I/\+Lms\+Generic.\+cpp@{/home/erik/prefix/default/src/limesuite-\/dev/src/\+A\+P\+I/\+Lms\+Generic.\+cpp}}
+
+\begin{DoxyCode}
+00001 \textcolor{comment}{/*}
+00002 \textcolor{comment}{ * File:   LimeSDR.cpp}
+00003 \textcolor{comment}{ * Author: Ignas J}
+00004 \textcolor{comment}{ *}
+00005 \textcolor{comment}{ * Created on September 18, 2016}
+00006 \textcolor{comment}{ */}
+00007 \textcolor{preprocessor}{#include "LmsGeneric.h"}
+00008 \textcolor{preprocessor}{#include "FPGA_common.h"}
+00009 
+00010 \textcolor{keyword}{namespace }lime
+00011 \{
+00012 
+00013 LMS7_Generic::LMS7_Generic(lime::IConnection* conn, LMS7_Device *obj) : 
+      LMS7_Device(obj) 
+00014 \{
+00015     fpga = \textcolor{keyword}{new} lime::FPGA();
+00016     tx_channels.resize(GetNumChannels());
+00017     rx_channels.resize(GetNumChannels());
+00018     
+00019     \textcolor{keywordflow}{while} (obj && lms_list.size() > 1)
+00020     \{
+00021         \textcolor{keyword}{delete} lms_list.back();
+00022         lms_list.pop\_back();
+00023     \}
+00024     fpga->SetConnection(conn);
+00025     \textcolor{keywordtype}{double} refClk = fpga->DetectRefClk(100.6e6);
+00026     this->lms_list[0]->SetConnection(conn);
+00027     mStreamers.push\_back(\textcolor{keyword}{new} lime::Streamer(fpga,lms_list[0],0));
+00028     lms_list[0]->SetReferenceClk\_SX(\textcolor{keyword}{false}, refClk);
+00029     connection = conn;
+00030 \}
+00031 
+00032 \}
+00033 
+00034 
+00035 
+00036 
+00037 
+00038 
+\end{DoxyCode}

@@ -1,0 +1,173 @@
+\subsection{Connection\+F\+T601\+Entry.\+cpp}
+\label{ConnectionFT601Entry_8cpp_source}\index{/home/erik/prefix/default/src/limesuite-\/dev/src/\+Connection\+F\+T\+D\+I/\+Connection\+F\+T601\+Entry.\+cpp@{/home/erik/prefix/default/src/limesuite-\/dev/src/\+Connection\+F\+T\+D\+I/\+Connection\+F\+T601\+Entry.\+cpp}}
+
+\begin{DoxyCode}
+00001 
+00007 \textcolor{preprocessor}{#include "ConnectionFT601.h"}
+00008 \textcolor{preprocessor}{#include "Logger.h"}
+00009 \textcolor{keyword}{using namespace }lime;
+00010 
+00011 \textcolor{preprocessor}{#ifdef \_\_unix\_\_}
+00012 \textcolor{keywordtype}{void} ConnectionFT601Entry::handle\_libusb\_events()
+00013 \{
+00014     \textcolor{keyword}{struct }timeval tv;
+00015     tv.tv\_sec = 0;
+00016     tv.tv\_usec = 250000;
+00017     \textcolor{keywordflow}{while}(mProcessUSBEvents.load() == \textcolor{keyword}{true})
+00018     \{
+00019         \textcolor{keywordtype}{int} r = libusb\_handle\_events\_timeout\_completed(ctx, &tv, NULL);
+00020         \textcolor{keywordflow}{if}(r != 0) lime::error(\textcolor{stringliteral}{"error libusb\_handle\_events %s"}, libusb\_strerror(libusb\_error(r)));
+00021     \}
+00022 \}
+00023 \textcolor{preprocessor}{#endif // \_\_UNIX\_\_}
+00024 
+00026 \textcolor{keywordtype}{void} __loadConnectionFT601Entry(\textcolor{keywordtype}{void}) \textcolor{comment}{//TODO fixme replace with LoadLibrary/dlopen}
+00027 \{
+00028     \textcolor{keyword}{static} ConnectionFT601Entry FTDIEntry;
+00029 \}
+00030 
+00031 ConnectionFT601Entry::ConnectionFT601Entry(\textcolor{keywordtype}{void}):
+00032     ConnectionRegistryEntry(\textcolor{stringliteral}{"FT601"})
+00033 \{
+00034 \textcolor{preprocessor}{#ifndef \_\_unix\_\_}
+00035     \textcolor{comment}{//m\_pDriver = new CDriverInterface();}
+00036 \textcolor{preprocessor}{#else}
+00037     \textcolor{keywordtype}{int} r = libusb\_init(&ctx); \textcolor{comment}{//initialize the library for the session we just declared}
+00038     \textcolor{keywordflow}{if}(r < 0)
+00039         lime::error(\textcolor{stringliteral}{"Init Error %i"}, r); \textcolor{comment}{//there was an error}
+00040 \textcolor{preprocessor}{#if LIBUSBX\_API\_VERSION < 0x01000106}
+00041     libusb\_set\_debug(ctx, 3); \textcolor{comment}{//set verbosity level to 3, as suggested in the documentation}
+00042 \textcolor{preprocessor}{#else}
+00043     libusb\_set\_option(ctx, LIBUSB\_OPTION\_LOG\_LEVEL, 3); \textcolor{comment}{//set verbosity level to 3, as suggested in the
+       documentation}
+00044 \textcolor{preprocessor}{#endif}
+00045     mProcessUSBEvents.store(\textcolor{keyword}{true});
+00046     mUSBProcessingThread = std::thread(&ConnectionFT601Entry::handle\_libusb\_events, \textcolor{keyword}{this});
+00047 \textcolor{preprocessor}{#endif}
+00048 \}
+00049 
+00050 ConnectionFT601Entry::~ConnectionFT601Entry(\textcolor{keywordtype}{void})
+00051 \{
+00052 \textcolor{preprocessor}{#ifndef \_\_unix\_\_}
+00053     \textcolor{comment}{//delete m\_pDriver;}
+00054 \textcolor{preprocessor}{#else}
+00055     mProcessUSBEvents.store(\textcolor{keyword}{false});
+00056     mUSBProcessingThread.join();
+00057     libusb\_exit(ctx);
+00058 \textcolor{preprocessor}{#endif}
+00059 \}
+00060 
+00061 std::vector<ConnectionHandle> ConnectionFT601Entry::enumerate(\textcolor{keyword}{const} 
+      ConnectionHandle &hint)
+00062 \{
+00063     std::vector<ConnectionHandle> handles;
+00064 
+00065 \textcolor{preprocessor}{#ifndef \_\_unix\_\_}
+00066     FT_STATUS ftStatus=FT_OK;
+00067     \textcolor{keyword}{static} DWORD numDevs = 0;
+00068 
+00069     ftStatus = FT\_CreateDeviceInfoList(&numDevs);
+00070 
+00071     \textcolor{keywordflow}{if} (!FT_FAILED(ftStatus) && numDevs > 0)
+00072     \{
+00073         DWORD Flags = 0;
+00074         \textcolor{keywordtype}{char} SerialNumber[16] = \{ 0 \};
+00075         \textcolor{keywordtype}{char} Description[32] = \{ 0 \};
+00076         \textcolor{keywordflow}{for} (DWORD i = 0; i < numDevs; i++)
+00077         \{
+00078             ftStatus = FT\_GetDeviceInfoDetail(i, &Flags, \textcolor{keyword}{nullptr}, \textcolor{keyword}{nullptr}, \textcolor{keyword}{nullptr}, SerialNumber, 
+      Description, \textcolor{keyword}{nullptr});
+00079             \textcolor{keywordflow}{if} (!FT_FAILED(ftStatus))
+00080             \{
+00081                 ConnectionHandle handle;
+00082                 handle.media = Flags & FT_FLAGS_SUPERSPEED ? \textcolor{stringliteral}{"USB 3"} : Flags & 
+      FT_FLAGS_HISPEED ? \textcolor{stringliteral}{"USB 2"} : \textcolor{stringliteral}{"USB"};
+00083                 handle.name = Description;
+00084                 handle.index = i;
+00085                 handle.serial = SerialNumber;
+00086                 \textcolor{comment}{//add handle conditionally, filter by serial number}
+00087                 \textcolor{keywordflow}{if} (hint.serial.empty() || hint.serial == handle.serial)
+00088                     handles.push\_back(handle);
+00089             \}
+00090         \}
+00091     \}
+00092 \textcolor{preprocessor}{#else}
+00093     libusb\_device **devs; \textcolor{comment}{//pointer to pointer of device, used to retrieve a list of devices}
+00094     \textcolor{keywordtype}{int} usbDeviceCount = libusb\_get\_device\_list(ctx, &devs);
+00095 
+00096     \textcolor{keywordflow}{if} (usbDeviceCount < 0) \{
+00097         lime::error(\textcolor{stringliteral}{"failed to get libusb device list: %s"}, libusb\_strerror(libusb\_error(usbDeviceCount)));
+00098         \textcolor{keywordflow}{return} handles;
+00099     \}
+00100 
+00101     libusb\_device\_descriptor desc;
+00102     \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} i=0; i<usbDeviceCount; ++i)
+00103     \{
+00104         \textcolor{keywordtype}{int} r = libusb\_get\_device\_descriptor(devs[i], &desc);
+00105         \textcolor{keywordflow}{if}(r<0)
+00106             lime::error(\textcolor{stringliteral}{"failed to get device description"});
+00107         \textcolor{keywordtype}{int} pid = desc.idProduct;
+00108         \textcolor{keywordtype}{int} vid = desc.idVendor;
+00109 
+00110         \textcolor{keywordflow}{if}( vid == 0x0403)
+00111         \{
+00112             \textcolor{keywordflow}{if}(pid == 0x601F)
+00113             \{
+00114                 libusb\_device\_handle *tempDev\_handle(\textcolor{keyword}{nullptr});
+00115                 \textcolor{keywordflow}{if}(libusb\_open(devs[i], &tempDev\_handle) != 0 || tempDev\_handle == \textcolor{keyword}{nullptr})
+00116                     \textcolor{keywordflow}{continue};
+00117 
+00118                 ConnectionHandle handle;
+00119                 \textcolor{comment}{//check operating speed}
+00120                 \textcolor{keywordtype}{int} speed = libusb\_get\_device\_speed(devs[i]);
+00121                 \textcolor{keywordflow}{if}(speed == LIBUSB\_SPEED\_HIGH)
+00122                     handle.media = \textcolor{stringliteral}{"USB 2.0"};
+00123                 \textcolor{keywordflow}{else} \textcolor{keywordflow}{if}(speed == LIBUSB\_SPEED\_SUPER)
+00124                     handle.media = \textcolor{stringliteral}{"USB 3.0"};
+00125                 \textcolor{keywordflow}{else}
+00126                     handle.media = \textcolor{stringliteral}{"USB"};
+00127                 \textcolor{comment}{//read device name}
+00128                 \textcolor{keywordtype}{char} data[255];
+00129                 memset(data, 0, 255);
+00130                 \textcolor{keywordtype}{int} st = libusb\_get\_string\_descriptor\_ascii(tempDev\_handle, LIBUSB\_CLASS\_COMM, (\textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{
+      char}*)data, 255);
+00131                 \textcolor{keywordflow}{if}(st < 0)
+00132                     lime::error(\textcolor{stringliteral}{"Error getting usb descriptor"});
+00133                 \textcolor{keywordflow}{else}
+00134                     handle.name = std::string(data, \textcolor{keywordtype}{size\_t}(st));
+00135                 handle.addr = std::to\_string(\textcolor{keywordtype}{int}(pid))+\textcolor{stringliteral}{":"}+std::to\_string(\textcolor{keywordtype}{int}(vid));
+00136 
+00137                 \textcolor{keywordflow}{if} (desc.iSerialNumber > 0)
+00138                 \{
+00139                     r = libusb\_get\_string\_descriptor\_ascii(tempDev\_handle,desc.iSerialNumber,(\textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{char}
+      *)data, \textcolor{keyword}{sizeof}(data));
+00140                     \textcolor{keywordflow}{if}(r<0)
+00141                         lime::error(\textcolor{stringliteral}{"failed to get serial number"});
+00142                     \textcolor{keywordflow}{else}
+00143                         handle.serial = std::string(data, \textcolor{keywordtype}{size\_t}(r));
+00144                 \}
+00145                 libusb\_close(tempDev\_handle);
+00146 
+00147                 \textcolor{comment}{//add handle conditionally, filter by serial number}
+00148                 \textcolor{keywordflow}{if} (hint.serial.empty() or hint.serial == handle.serial)
+00149                 \{
+00150                     handles.push\_back(handle);
+00151                 \}
+00152             \}
+00153         \}
+00154     \}
+00155 
+00156     libusb\_free\_device\_list(devs, 1);
+00157 \textcolor{preprocessor}{#endif}
+00158     \textcolor{keywordflow}{return} handles;
+00159 \}
+00160 
+00161 IConnection *ConnectionFT601Entry::make(\textcolor{keyword}{const} ConnectionHandle &handle)
+00162 \{
+00163 \textcolor{preprocessor}{#ifndef \_\_unix\_\_}
+00164     \textcolor{keywordflow}{return} \textcolor{keyword}{new} ConnectionFT601(mFTHandle, handle);
+00165 \textcolor{preprocessor}{#else}
+00166     \textcolor{keywordflow}{return} \textcolor{keyword}{new} ConnectionFT601(ctx, handle);
+00167 \textcolor{preprocessor}{#endif}
+00168 \}
+\end{DoxyCode}

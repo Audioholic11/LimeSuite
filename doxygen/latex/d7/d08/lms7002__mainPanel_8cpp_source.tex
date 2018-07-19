@@ -1,0 +1,411 @@
+\subsection{lms7002\+\_\+main\+Panel.\+cpp}
+\label{lms7002__mainPanel_8cpp_source}\index{/home/erik/prefix/default/src/limesuite-\/dev/src/lms7002\+\_\+wxgui/lms7002\+\_\+main\+Panel.\+cpp@{/home/erik/prefix/default/src/limesuite-\/dev/src/lms7002\+\_\+wxgui/lms7002\+\_\+main\+Panel.\+cpp}}
+
+\begin{DoxyCode}
+00001 \textcolor{preprocessor}{#include <assert.h>}
+00002 \textcolor{preprocessor}{#include "lms7002_mainPanel.h"}
+00003 \textcolor{preprocessor}{#include "lms7002_pnlAFE_view.h"}
+00004 \textcolor{preprocessor}{#include "lms7002_pnlBIAS_view.h"}
+00005 \textcolor{preprocessor}{#include "lms7002_pnlBIST_view.h"}
+00006 \textcolor{preprocessor}{#include "lms7002_pnlCDS_view.h"}
+00007 \textcolor{preprocessor}{#include "lms7002_pnlCLKGEN_view.h"}
+00008 \textcolor{preprocessor}{#include "lms7002_pnlLDO_view.h"}
+00009 \textcolor{preprocessor}{#include "lms7002_pnlLimeLightPAD_view.h"}
+00010 \textcolor{preprocessor}{#include "lms7002_pnlTxTSP_view.h"}
+00011 \textcolor{preprocessor}{#include "lms7002_pnlRxTSP_view.h"}
+00012 \textcolor{preprocessor}{#include "lms7002_pnlRBB_view.h"}
+00013 \textcolor{preprocessor}{#include "lms7002_pnlRFE_view.h"}
+00014 \textcolor{preprocessor}{#include "lms7002_pnlSX_view.h"}
+00015 \textcolor{preprocessor}{#include "lms7002_pnlTBB_view.h"}
+00016 \textcolor{preprocessor}{#include "lms7002_pnlTRF_view.h"}
+00017 \textcolor{preprocessor}{#include "lms7002_pnlXBUF_view.h"}
+00018 \textcolor{preprocessor}{#include "lms7002_pnlGains_view.h"}
+00019 \textcolor{preprocessor}{#include "lms7002_pnlCalibrations_view.h"}
+00020 \textcolor{preprocessor}{#include <wx/time.h>}
+00021 \textcolor{preprocessor}{#include <wx/msgdlg.h>}
+00022 \textcolor{preprocessor}{#include <iostream>}
+00023 \textcolor{preprocessor}{#include <wx/filedlg.h>}
+00024 \textcolor{preprocessor}{#include "lms7suiteEvents.h"}
+00025 \textcolor{preprocessor}{#include "lms7002_pnlMCU_BD_view.h"}
+00026 \textcolor{preprocessor}{#include "lms7002_pnlR3.h"}
+00027 \textcolor{preprocessor}{#include "lime/LimeSuite.h"}
+00028 \textcolor{preprocessor}{#include "lms7_device.h"}
+00029 \textcolor{keyword}{using namespace }std;
+00030 \textcolor{keyword}{using namespace }lime;
+00031 
+00032 lms7002_mainPanel::lms7002_mainPanel(wxWindow* parent, wxWindowID \textcolor{keywordtype}{id}, \textcolor{keyword}{const} wxPoint& pos, \textcolor{keyword}{const} wxSize& 
+      size, \textcolor{keywordtype}{long} style)
+00033     :
+00034     mainPanel(parent, id, pos, size, style), lmsControl(nullptr)
+00035 \{
+00036     mTabMCU = \textcolor{keyword}{new} lms7002_pnlMCU_BD_view(tabsNotebook);
+00037     tabsNotebook->AddPage(mTabMCU, \_(\textcolor{stringliteral}{"MCU"}));
+00038 
+00039     mTabR3 = \textcolor{keyword}{new} lms7002_pnlR3_view(tabsNotebook, wxNewId());
+00040     tabsNotebook->AddPage(mTabR3, \_(\textcolor{stringliteral}{"R3 Controls"}));
+00041 \}
+00042 
+00043 lms7002_mainPanel::~lms7002_mainPanel()
+00044 \{
+00045 \}
+00046 
+00047 \textcolor{keywordtype}{void} lms7002_mainPanel::UpdateVisiblePanel()
+00048 \{
+00049     wxWindow* currentPage = tabsNotebook->GetCurrentPage();
+00050     uint16\_t spisw\_ctrl = 0;
+00051     LMS_ReadLMSReg(lmsControl, 0x0006, &spisw\_ctrl);
+00052     \textcolor{keywordflow}{if}(spisw\_ctrl & 1) \textcolor{comment}{// transceiver controlled by MCU}
+00053     \{
+00054         \textcolor{keywordflow}{if}(currentPage != mTabMCU && currentPage != mTabTrxGain)
+00055             currentPage->Disable();
+00056         \textcolor{keywordflow}{return};
+00057     \}
+00058     \textcolor{keywordflow}{else}
+00059         currentPage->Enable();
+00060 
+00061     wxLongLong t1, t2;
+00062     t1 = wxGetUTCTimeMillis();
+00063     \textcolor{keywordtype}{long} visibleTabId = tabsNotebook->GetCurrentPage()->GetId();
+00064     \textcolor{keywordflow}{switch} (visibleTabId)
+00065     \{
+00066     \textcolor{keywordflow}{case} ID_TAB_AFE:
+00067         mTabAFE->UpdateGUI();
+00068         \textcolor{keywordflow}{break};
+00069     \textcolor{keywordflow}{case} ID_TAB_BIAS:
+00070         mTabBIAS->UpdateGUI();
+00071         \textcolor{keywordflow}{break};
+00072     \textcolor{keywordflow}{case} ID_TAB_BIST:
+00073         mTabBIST->UpdateGUI();
+00074         \textcolor{keywordflow}{break};
+00075     \textcolor{keywordflow}{case} ID_TAB_CDS:
+00076         mTabCDS->UpdateGUI();
+00077         \textcolor{keywordflow}{break};
+00078     \textcolor{keywordflow}{case} ID_TAB_CGEN:
+00079         mTabCGEN->UpdateGUI();
+00080         \textcolor{keywordflow}{break};
+00081     \textcolor{keywordflow}{case} ID_TAB_LDO:
+00082         mTabLDO->UpdateGUI();
+00083         \textcolor{keywordflow}{break};
+00084     \textcolor{keywordflow}{case} ID_TAB_LIMELIGHT:
+00085         mTabLimeLight->UpdateGUI();
+00086         \textcolor{keywordflow}{break};
+00087     \textcolor{keywordflow}{case} ID_TAB_TXTSP:
+00088         mTabTxTSP->UpdateGUI();
+00089         \textcolor{keywordflow}{break};
+00090     \textcolor{keywordflow}{case} ID_TAB_RXTSP:
+00091         mTabRxTSP->UpdateGUI();
+00092         \textcolor{keywordflow}{break};
+00093     \textcolor{keywordflow}{case} ID_TAB_RBB:
+00094         mTabRBB->UpdateGUI();
+00095         \textcolor{keywordflow}{break};
+00096     \textcolor{keywordflow}{case} ID_TAB_RFE:
+00097         mTabRFE->UpdateGUI();
+00098         \textcolor{keywordflow}{break};
+00099     \textcolor{keywordflow}{case} ID_TAB_SXR:
+00100         mTabSXR->UpdateGUI();
+00101         \textcolor{keywordflow}{break};
+00102     \textcolor{keywordflow}{case} ID_TAB_SXT:
+00103         mTabSXT->UpdateGUI();
+00104         \textcolor{keywordflow}{break};
+00105     \textcolor{keywordflow}{case} ID_TAB_TBB:
+00106         mTabTBB->UpdateGUI();
+00107         \textcolor{keywordflow}{break};
+00108     \textcolor{keywordflow}{case} ID_TAB_TRF:
+00109         mTabTRF->UpdateGUI();
+00110         \textcolor{keywordflow}{break};
+00111     \textcolor{keywordflow}{case} ID_TAB_XBUF:
+00112         mTabXBUF->UpdateGUI();
+00113         \textcolor{keywordflow}{break};
+00114     \textcolor{keywordflow}{case} ID_TAB_CALIBRATIONS:
+00115         mTabCalibrations->UpdateGUI();
+00116         \textcolor{keywordflow}{break};
+00117     \textcolor{keywordflow}{case} ID_TAB_GAINS:
+00118         mTabTrxGain->UpdateGUI();
+00119         \textcolor{keywordflow}{break};
+00120     \}
+00121     \textcolor{keywordflow}{if}(visibleTabId == mTabR3->GetId())
+00122         mTabR3->UpdateGUI();
+00123     t2 = wxGetUTCTimeMillis();
+00124 \textcolor{preprocessor}{#ifndef NDEBUG}
+00125     cout << \textcolor{stringliteral}{"Visible GUI update time: "} << (t2 - t1).ToString() << endl;
+00126 \textcolor{preprocessor}{#endif}
+00127 \}
+00128 
+00129 \textcolor{keywordtype}{void} lms7002_mainPanel::Initialize(lms_device_t* pControl)
+00130 \{
+00131     assert(pControl != \textcolor{keyword}{nullptr});
+00132     lmsControl = pControl;
+00133     mTabRFE->Initialize(lmsControl);
+00134     mTabRBB->Initialize(lmsControl);
+00135     mTabTRF->Initialize(lmsControl);
+00136     mTabTBB->Initialize(lmsControl);
+00137     mTabAFE->Initialize(lmsControl);
+00138     mTabBIAS->Initialize(lmsControl);
+00139     mTabLDO->Initialize(lmsControl);
+00140     mTabXBUF->Initialize(lmsControl);
+00141     mTabCGEN->Initialize(lmsControl);
+00142     mTabSXR->Initialize(lmsControl);
+00143     mTabSXT->Initialize(lmsControl);
+00144     mTabTrxGain->Initialize(lmsControl);
+00145     mTabLimeLight->Initialize(lmsControl);
+00146     mTabTxTSP->Initialize(lmsControl);
+00147     mTabRxTSP->Initialize(lmsControl);
+00148     mTabCDS->Initialize(lmsControl);
+00149     mTabBIST->Initialize(lmsControl);
+00150     mTabCalibrations->Initialize(lmsControl);
+00151     mTabMCU->Initialize(lmsControl);
+00152     mTabR3->Initialize(lmsControl);
+00153     ((LMS7_Device*)lmsControl)->SetActiveChip(0);
+00154     cmbLmsDevice->SetSelection(0);
+00155 
+00156     \textcolor{keywordflow}{if} (((LMS7_Device*)lmsControl)->GetNumChannels() > 2)
+00157         cmbLmsDevice->Show();
+00158     \textcolor{keywordflow}{else}
+00159         cmbLmsDevice->Hide();
+00160     UpdateGUI();
+00161     Layout();
+00162 \}
+00163 
+00164 \textcolor{keywordtype}{void} lms7002_mainPanel::OnResetChip(wxCommandEvent &event)
+00165 \{
+00166     \textcolor{keywordtype}{int} status = LMS_Reset(lmsControl);
+00167     \textcolor{keywordflow}{if} (status != 0)
+00168         wxMessageBox(\_(\textcolor{stringliteral}{"Chip reset failed"}), \_(\textcolor{stringliteral}{"Warning"}));
+00169     wxNotebookEvent evt;
+00170     chkEnableMIMO->SetValue(\textcolor{keyword}{false});
+00171     Onnotebook_modulesPageChanged(evt); \textcolor{comment}{//after reset chip active channel might change, this refresh
+       channel for active tab}
+00172 \}
+00173 
+00174 \textcolor{keywordtype}{void} lms7002_mainPanel::OnLoadDefault(wxCommandEvent& event)
+00175 \{
+00176     \textcolor{keywordtype}{int} status = LMS_Init(lmsControl);
+00177     \textcolor{keywordflow}{if} (status != 0)
+00178         wxMessageBox(\_(\textcolor{stringliteral}{"Load Default failed"}), \_(\textcolor{stringliteral}{"Warning"}));
+00179 
+00180     wxNotebookEvent evt;
+00181     chkEnableMIMO->SetValue(\textcolor{keyword}{false});
+00182     Onnotebook_modulesPageChanged(evt); \textcolor{comment}{//after reset chip active channel might change, this refresh
+       channel for active tab}
+00183     wxCommandEvent evt2;
+00184     evt.SetEventType(CGEN\_FREQUENCY\_CHANGED);
+00185     wxPostEvent(\textcolor{keyword}{this}, evt2);
+00186 \}
+00187 
+00188 \textcolor{keywordtype}{void} lms7002_mainPanel::UpdateGUI()
+00189 \{
+00190     wxLongLong t1, t2;
+00191     t1 = wxGetUTCTimeMillis();
+00192     t2 = wxGetUTCTimeMillis();
+00193     uint16\_t chan;
+00194     LMS_ReadParam(lmsControl,LMS7param(MAC),&chan);
+00195     \textcolor{keywordflow}{if} (chan == 1)
+00196     \{
+00197         rbChannelA->SetValue(\textcolor{keyword}{true});
+00198         rbChannelB->SetValue(\textcolor{keyword}{false});
+00199     \}
+00200     \textcolor{keywordflow}{else} \textcolor{keywordflow}{if} (chan == 2)
+00201     \{
+00202         rbChannelA->SetValue(\textcolor{keyword}{false});
+00203         rbChannelB->SetValue(\textcolor{keyword}{true});
+00204     \}
+00205     \textcolor{keywordflow}{else}
+00206     \{
+00207         \textcolor{keyword}{auto} conn = ((LMS7_Device*)lmsControl)->GetConnection();
+00208         \textcolor{keywordflow}{if} (conn && conn->IsOpen())
+00209             LMS_WriteParam(lmsControl,LMS7param(MAC),1);
+00210         rbChannelA->SetValue(\textcolor{keyword}{true});
+00211         rbChannelB->SetValue(\textcolor{keyword}{false});
+00212     \}
+00213 
+00214     UpdateVisiblePanel();
+00215 \}
+00216 
+00217 \textcolor{keywordtype}{void} lms7002_mainPanel::OnNewProject( wxCommandEvent& event )
+00218 \{
+00219     LMS_Reset(lmsControl);
+00220     LMS_WriteParam(lmsControl,LMS7param(MAC),rbChannelA->GetValue() == 1 ? 1: 2);
+00221     LMS_WriteParam(lmsControl,LMS7param(MAC),1);
+00222     UpdateGUI();
+00223 \}
+00224 
+00225 \textcolor{keywordtype}{void} lms7002_mainPanel::OnOpenProject( wxCommandEvent& event )
+00226 \{
+00227     wxFileDialog dlg(\textcolor{keyword}{this}, \_(\textcolor{stringliteral}{"Open config file"}), \textcolor{stringliteral}{""}, \textcolor{stringliteral}{""}, \textcolor{stringliteral}{"Project-File (*.ini)|*.ini"}, wxFD\_OPEN | 
+      wxFD\_FILE\_MUST\_EXIST);
+00228     \textcolor{keywordflow}{if} (dlg.ShowModal() == wxID\_CANCEL)
+00229         \textcolor{keywordflow}{return};
+00230     \textcolor{keywordtype}{int} status = LMS_LoadConfig(lmsControl,dlg.GetPath().To8BitData());
+00231     \textcolor{keywordflow}{if} (status != 0)
+00232     \{
+00233         wxMessageBox(\_(\textcolor{stringliteral}{"Failed to load file"}), \_(\textcolor{stringliteral}{"Warning"}));
+00234     \}
+00235     wxCommandEvent tevt;
+00236     LMS_WriteParam(lmsControl,LMS7param(MAC),rbChannelA->GetValue() == 1 ? 1: 2);
+00237     UpdateGUI();
+00238     wxCommandEvent evt;
+00239     evt.SetEventType(CGEN\_FREQUENCY\_CHANGED);
+00240     wxPostEvent(\textcolor{keyword}{this}, evt);
+00241 \}
+00242 
+00243 \textcolor{keywordtype}{void} lms7002_mainPanel::OnSaveProject( wxCommandEvent& event )
+00244 \{
+00245     wxFileDialog dlg(\textcolor{keyword}{this}, \_(\textcolor{stringliteral}{"Save config file"}), \textcolor{stringliteral}{""}, \textcolor{stringliteral}{""}, \textcolor{stringliteral}{"Project-File (*.ini)|*.ini"}, wxFD\_SAVE | 
+      wxFD\_OVERWRITE\_PROMPT);
+00246     \textcolor{keywordflow}{if} (dlg.ShowModal() == wxID\_CANCEL)
+00247         \textcolor{keywordflow}{return};
+00248     \textcolor{keywordtype}{int} status = LMS_SaveConfig(lmsControl,dlg.GetPath().To8BitData());
+00249     \textcolor{keywordflow}{if} (status != 0)
+00250         wxMessageBox(\_(\textcolor{stringliteral}{"Failed to save file"}), \_(\textcolor{stringliteral}{"Warning"}));
+00251 \}
+00252 
+00253 \textcolor{keywordtype}{void} lms7002_mainPanel::OnSwitchToChannelA(wxCommandEvent& event)
+00254 \{
+00255     LMS_WriteParam(lmsControl,LMS7param(MAC),1);
+00256     UpdateVisiblePanel();
+00257 \}
+00258 
+00259 \textcolor{keywordtype}{void} lms7002_mainPanel::OnSwitchToChannelB(wxCommandEvent& event)
+00260 \{
+00261     LMS_WriteParam(lmsControl,LMS7param(MAC),2);
+00262     UpdateVisiblePanel();
+00263 \}
+00264 
+00265 \textcolor{keywordtype}{void} lms7002_mainPanel::Onnotebook_modulesPageChanged( wxNotebookEvent& event )
+00266 \{
+00267     wxNotebookPage* page = tabsNotebook->GetCurrentPage();
+00268     \textcolor{keywordflow}{if} (page == mTabAFE || page == mTabBIAS || page == mTabLDO || page == 
+      mTabXBUF || page == mTabCGEN || page == mTabCDS || page == mTabBIST)
+00269     \{
+00270         rbChannelA->Disable();
+00271         rbChannelB->Disable();
+00272     \}
+00273     \textcolor{keywordflow}{else} \textcolor{keywordflow}{if} (page == mTabSXR) \textcolor{comment}{//change active channel to A}
+00274     \{
+00275         LMS_WriteParam(lmsControl,LMS7param(MAC),1);
+00276         rbChannelA->Disable();
+00277         rbChannelB->Disable();
+00278     \}
+00279     \textcolor{keywordflow}{else} \textcolor{keywordflow}{if} (page == mTabSXT) \textcolor{comment}{//change active channel to B}
+00280     \{
+00281         LMS_WriteParam(lmsControl,LMS7param(MAC),2);
+00282         rbChannelA->Disable();
+00283         rbChannelB->Disable();
+00284     \}
+00285     \textcolor{keywordflow}{else}
+00286     \{
+00287         LMS_WriteParam(lmsControl,LMS7param(MAC),rbChannelA->GetValue() == 1 ? 1: 2);
+00288         rbChannelA->Enable();
+00289         rbChannelB->Enable();
+00290     \}
+00291 
+00292 \textcolor{preprocessor}{#ifdef \_\_APPLE\_\_}
+00293     \textcolor{comment}{//force show the page selected by the event (needed on apple)}
+00294     \textcolor{keywordflow}{if} (event.GetSelection() != -1)
+00295     \{
+00296         \textcolor{keyword}{dynamic\_cast<}wxNotebook*\textcolor{keyword}{>}(\textcolor{keyword}{event}.GetEventObject())->GetPage(event.GetSelection())->Show(\textcolor{keyword}{true});
+00297     \}
+00298 \textcolor{preprocessor}{#endif}
+00299 
+00300     UpdateVisiblePanel();
+00301 \}
+00302 
+00303 \textcolor{keywordtype}{void} lms7002_mainPanel::OnDownloadAll(wxCommandEvent& event)
+00304 \{
+00305     \textcolor{keywordtype}{int} status = LMS_Synchronize(lmsControl,\textcolor{keyword}{false});
+00306     \textcolor{keywordflow}{if} (status != 0)
+00307         wxMessageBox(\_(\textcolor{stringliteral}{"Download all registers failed"}), \_(\textcolor{stringliteral}{"Warning"}));
+00308     UpdateVisiblePanel();
+00309 \}
+00310 
+00311 \textcolor{keywordtype}{void} lms7002_mainPanel::OnUploadAll(wxCommandEvent& event)
+00312 \{
+00313     \textcolor{keywordtype}{int} status = LMS_Synchronize(lmsControl,\textcolor{keyword}{true});
+00314     \textcolor{keywordflow}{if} (status != 0)
+00315         wxMessageBox(\_(\textcolor{stringliteral}{"Upload all registers failed"}), \_(\textcolor{stringliteral}{"Warning"}));
+00316     wxCommandEvent evt;
+00317     evt.SetEventType(CGEN\_FREQUENCY\_CHANGED);
+00318     wxPostEvent(\textcolor{keyword}{this}, evt);
+00319     UpdateVisiblePanel();
+00320 \}
+00321 
+00322 \textcolor{keywordtype}{void} lms7002_mainPanel::OnReadTemperature(wxCommandEvent& event)
+00323 \{
+00324     \textcolor{keywordtype}{double} t = 0.0;
+00325     \textcolor{keywordtype}{int} status = LMS_GetChipTemperature(lmsControl,0,&t);
+00326     \textcolor{keywordflow}{if} (status != 0)
+00327         wxMessageBox(\_(\textcolor{stringliteral}{"Failed to read chip temperature"}), \_(\textcolor{stringliteral}{"Warning"}));
+00328     txtTemperature->SetLabel(wxString::Format(\textcolor{stringliteral}{"Temperature: %.0f C"}, t));
+00329 \}
+00330 
+00331 \textcolor{keywordtype}{void} lms7002_mainPanel::OnSyncABchecked(wxCommandEvent& event)
+00332 \{
+00333     \textcolor{comment}{/*}
+00334 \textcolor{comment}{    rbChannelA->Enable(!chkSyncAB->IsChecked());}
+00335 \textcolor{comment}{    rbChannelB->Enable(!chkSyncAB->IsChecked());}
+00336 \textcolor{comment}{    if(chkSyncAB->IsChecked())}
+00337 \textcolor{comment}{    \{}
+00338 \textcolor{comment}{        int status = lmsControl->CopyChannelRegisters(LMS7002M::ChA, LMS7002M::ChB, false);}
+00339 \textcolor{comment}{        if(status != 0)}
+00340 \textcolor{comment}{            wxMessageBox(wxString::Format(\_("Failed to copy A to B: %s"),
+       wxString::From8BitData(GetLastErrorMessage())), \_("Error"));}
+00341 \textcolor{comment}{        wxNotebookPage* page = tabsNotebook->GetCurrentPage();}
+00342 \textcolor{comment}{        if(page != mTabSXR && page != mTabSXT)}
+00343 \textcolor{comment}{            lmsControl->SetActiveChannel(lime::LMS7002M::ChAB);}
+00344 \textcolor{comment}{    \}}
+00345 \textcolor{comment}{    else}
+00346 \textcolor{comment}{    \{}
+00347 \textcolor{comment}{        if(rbChannelA->GetValue() != 0)}
+00348 \textcolor{comment}{            lmsControl->SetActiveChannel(lime::LMS7002M::ChA);}
+00349 \textcolor{comment}{        else}
+00350 \textcolor{comment}{            lmsControl->SetActiveChannel(lime::LMS7002M::ChB);}
+00351 \textcolor{comment}{    \}}
+00352 \textcolor{comment}{    UpdateVisiblePanel();}
+00353 \textcolor{comment}{    */}
+00354 \}
+00355 
+00356 \textcolor{keywordtype}{void} lms7002_mainPanel::OnEnableMIMOchecked(wxCommandEvent& event)
+00357 \{
+00358     uint16\_t chBck;
+00359     LMS_ReadParam(lmsControl, LMS7param(MAC), &chBck);
+00360     \textcolor{keywordtype}{bool} enable = chkEnableMIMO->IsChecked();
+00361     \textcolor{keywordflow}{for} (\textcolor{keywordtype}{int} ch = enable ? 0 : 1 ; ch < LMS_GetNumChannels(lmsControl,\textcolor{keyword}{false});ch++)
+00362     \{
+00363         LMS_EnableChannel(lmsControl,LMS_CH_RX,ch,enable);
+00364         LMS_EnableChannel(lmsControl,LMS_CH_TX,ch,enable);
+00365     \}
+00366     LMS_WriteParam(lmsControl, LMS7param(MAC), chBck);
+00367     UpdateVisiblePanel();
+00368 \}
+00369 
+00370 \textcolor{keywordtype}{void} lms7002_mainPanel::OnCalibrateInternalADC(wxCommandEvent& event)
+00371 \{
+00372     LMS7002M* lms = ((LMS7_Device*)lmsControl)->GetLMS();
+00373     \textcolor{keywordtype}{int} status = lms->CalibrateInternalADC();
+00374     \textcolor{keywordflow}{if} (status != 0)
+00375         wxMessageBox(\_(\textcolor{stringliteral}{"Internal ADC calibration failed"}), \_(\textcolor{stringliteral}{"Warning"}));
+00376 \}
+00377 
+00378 \textcolor{keywordtype}{int} lms7002_mainPanel::GetLmsSelection()
+00379 \{
+00380     \textcolor{keywordflow}{return} cmbLmsDevice->GetSelection();
+00381 \}
+00382 
+00383 \textcolor{keywordtype}{void} lms7002_mainPanel::OnLmsDeviceSelect( wxCommandEvent& event )
+00384 \{
+00385     \textcolor{keywordtype}{int} deviceSelection = cmbLmsDevice->GetSelection();
+00386     ((LMS7_Device*)lmsControl)->SetActiveChip(deviceSelection);
+00387 
+00388     wxNotebookPage* page = tabsNotebook->GetCurrentPage();
+00389     \textcolor{keywordflow}{if} (page == mTabSXR) \textcolor{comment}{//change active channel to A}
+00390         LMS_WriteParam(lmsControl,LMS7param(MAC),1);
+00391     \textcolor{keywordflow}{else} \textcolor{keywordflow}{if} (page == mTabSXT) \textcolor{comment}{//change active channel to B}
+00392         LMS_WriteParam(lmsControl,LMS7param(MAC),2);
+00393 
+00394     UpdateVisiblePanel();
+00395     wxCommandEvent evt;
+00396     evt.SetEventType(LMS\_CHANGED);
+00397     evt.SetInt(deviceSelection);
+00398     wxPostEvent(this->GetParent(), evt);
+00399 \}
+\end{DoxyCode}

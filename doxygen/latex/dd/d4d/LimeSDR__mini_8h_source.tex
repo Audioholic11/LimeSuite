@@ -1,0 +1,41 @@
+\subsection{Lime\+S\+D\+R\+\_\+mini.\+h}
+\label{LimeSDR__mini_8h_source}\index{/home/erik/prefix/default/src/limesuite-\/dev/src/\+A\+P\+I/\+Lime\+S\+D\+R\+\_\+mini.\+h@{/home/erik/prefix/default/src/limesuite-\/dev/src/\+A\+P\+I/\+Lime\+S\+D\+R\+\_\+mini.\+h}}
+
+\begin{DoxyCode}
+00001 \textcolor{comment}{/*}
+00002 \textcolor{comment}{ * File:   LimeSDR\_mini.h}
+00003 \textcolor{comment}{ * Author: Ignas J}
+00004 \textcolor{comment}{ *}
+00005 \textcolor{comment}{ * Created on September 18, 2017}
+00006 \textcolor{comment}{ */}
+00007 
+00008 \textcolor{preprocessor}{#ifndef LIMESDR\_MINI\_H}
+00009 \textcolor{preprocessor}{#define LIMESDR\_MINI\_H}
+00010 \textcolor{preprocessor}{#include "lms7_device.h"}
+00011 
+00012 \textcolor{keyword}{namespace }lime \{
+00013 
+00014 \textcolor{keyword}{class }LMS7_LimeSDR_mini : \textcolor{keyword}{public} LMS7_Device
+00015 \{
+00016 \textcolor{keyword}{public}:
+00017     LMS7_LimeSDR_mini(lime::IConnection* conn, LMS7_Device *obj = \textcolor{keyword}{nullptr});
+00018     \textcolor{keywordtype}{int} Init() \textcolor{keyword}{override};
+00019     \textcolor{keywordtype}{int} SetRate(\textcolor{keywordtype}{bool} tx, \textcolor{keywordtype}{double} f\_Hz, \textcolor{keywordtype}{unsigned} oversample) \textcolor{keyword}{override};
+00020     \textcolor{keywordtype}{int} SetRate(\textcolor{keywordtype}{double} f\_Hz, \textcolor{keywordtype}{int} oversample) \textcolor{keyword}{override};
+00021     \textcolor{keywordtype}{unsigned} GetNumChannels(\textcolor{keyword}{const} \textcolor{keywordtype}{bool} tx = \textcolor{keyword}{false}) \textcolor{keyword}{const override};
+00022     \textcolor{keywordtype}{int} SetFrequency(\textcolor{keywordtype}{bool} isTx, \textcolor{keywordtype}{unsigned} chan, \textcolor{keywordtype}{double} f\_Hz) \textcolor{keyword}{override};
+00023     Range GetRxPathBand(\textcolor{keywordtype}{unsigned} path, \textcolor{keywordtype}{unsigned} chan) \textcolor{keyword}{const override};
+00024     Range GetTxPathBand(\textcolor{keywordtype}{unsigned} path, \textcolor{keywordtype}{unsigned} chan) \textcolor{keyword}{const override};
+00025     Range GetRateRange(\textcolor{keywordtype}{bool} dir = \textcolor{keyword}{false}, \textcolor{keywordtype}{unsigned} chan = 0) \textcolor{keyword}{const override};
+00026     Range GetFrequencyRange(\textcolor{keywordtype}{bool} tx) \textcolor{keyword}{const override};
+00027     std::vector<std::string> GetPathNames(\textcolor{keywordtype}{bool} dir_tx, \textcolor{keywordtype}{unsigned} chan) \textcolor{keyword}{const override};
+00028     \textcolor{keywordtype}{int} SetPath(\textcolor{keywordtype}{bool} tx, \textcolor{keywordtype}{unsigned} chan, \textcolor{keywordtype}{unsigned} path) \textcolor{keyword}{override};
+00029     std::vector<std::string> GetProgramModes() \textcolor{keyword}{const override};
+00030 \textcolor{keyword}{private}:
+00031 \};
+00032 
+00033 \}
+00034 
+00035 \textcolor{preprocessor}{#endif  }\textcolor{comment}{/* LIMESDR\_MINI\_H */}\textcolor{preprocessor}{}
+00036 
+\end{DoxyCode}

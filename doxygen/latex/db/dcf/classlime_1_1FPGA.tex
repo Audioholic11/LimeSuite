@@ -1,0 +1,691 @@
+\subsection{lime\+:\+:F\+P\+GA Class Reference}
+\label{classlime_1_1FPGA}\index{lime\+::\+F\+P\+GA@{lime\+::\+F\+P\+GA}}
+
+
+{\ttfamily \#include $<$F\+P\+G\+A\+\_\+common.\+h$>$}
+
+
+
+Inheritance diagram for lime\+:\+:F\+P\+GA\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=328pt]{d3/d9c/classlime_1_1FPGA__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for lime\+:\+:F\+P\+GA\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=550pt]{da/d3c/classlime_1_1FPGA__coll__graph}
+\end{center}
+\end{figure}
+\subsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct {\bf F\+P\+G\+A\+\_\+\+P\+L\+L\+\_\+clock}
+\end{DoxyCompactItemize}
+\subsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+{\bf F\+P\+GA} ()
+\item 
+virtual {\bf $\sim$\+F\+P\+GA} ()
+\item 
+{\bf void} {\bf Set\+Connection} ({\bf I\+Connection} $\ast$conn)
+\item 
+{\bf I\+Connection} $\ast$ {\bf Get\+Connection} () const 
+\item 
+{\bf int} {\bf Start\+Streaming} ()
+\item 
+{\bf int} {\bf Stop\+Streaming} ()
+\item 
+{\bf int} {\bf Reset\+Timestamp} ()
+\item 
+virtual {\bf int} {\bf Upload\+W\+FM} (const {\bf void} $\ast$const $\ast${\bf samples}, uint8\+\_\+t {\bf ch\+Count}, size\+\_\+t {\bf sample\+\_\+count}, {\bf Stream\+Config\+::\+Stream\+Data\+Format} {\bf format}, {\bf int} ep\+Index)
+\item 
+virtual {\bf int} {\bf Set\+Interface\+Freq} (double f\+\_\+\+Tx\+\_\+\+Hz, double f\+\_\+\+Rx\+\_\+\+Hz, double tx\+Phase, double rx\+Phase, {\bf int} ch=0)
+\begin{DoxyCompactList}\small\item\em Configures \doxyref{F\+P\+GA}{p.}{db/dcf/classlime_1_1FPGA} P\+L\+Ls to Lime\+Light interface frequency. \end{DoxyCompactList}\item 
+virtual {\bf int} {\bf Set\+Interface\+Freq} (double f\+\_\+\+Tx\+\_\+\+Hz, double f\+\_\+\+Rx\+\_\+\+Hz, {\bf int} ch=0)
+\begin{DoxyCompactList}\small\item\em Configures \doxyref{F\+P\+GA}{p.}{db/dcf/classlime_1_1FPGA} P\+L\+Ls to Lime\+Light interface frequency. \end{DoxyCompactList}\item 
+double {\bf Detect\+Ref\+Clk} (double fx3\+Clk=100e6)
+\end{DoxyCompactItemize}
+\subsubsection*{Static Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+static {\bf int} {\bf F\+P\+G\+A\+Packet\+Payload2\+Samples} (const uint8\+\_\+t $\ast${\bf buffer}, {\bf int} buf\+Len, bool mimo, bool compressed, {\bf complex16\+\_\+t} $\ast$$\ast${\bf samples})
+\begin{DoxyCompactList}\small\item\em Parses \doxyref{F\+P\+GA}{p.}{db/dcf/classlime_1_1FPGA} packet payload into samples. \end{DoxyCompactList}\item 
+static {\bf int} {\bf Samples2\+F\+P\+G\+A\+Packet\+Payload} (const {\bf complex16\+\_\+t} $\ast$const $\ast${\bf samples}, {\bf int} samples\+Count, bool mimo, bool compressed, uint8\+\_\+t $\ast${\bf buffer})
+\end{DoxyCompactItemize}
+\subsubsection*{Protected Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+{\bf int} {\bf Set\+Pll\+Frequency} (uint8\+\_\+t pll\+Index, double input\+Freq, {\bf F\+P\+G\+A\+\_\+\+P\+L\+L\+\_\+clock} $\ast$outputs, uint8\+\_\+t clock\+Count)
+\begin{DoxyCompactList}\small\item\em Configures board \doxyref{F\+P\+GA}{p.}{db/dcf/classlime_1_1FPGA} clocks. \end{DoxyCompactList}\item 
+{\bf int} {\bf Set\+Direct\+Clocking} ({\bf int} clock\+Index)
+\end{DoxyCompactItemize}
+\subsubsection*{Protected Attributes}
+\begin{DoxyCompactItemize}
+\item 
+{\bf I\+Connection} $\ast$ {\bf connection}
+\end{DoxyCompactItemize}
+\subsubsection*{Private Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+virtual {\bf int} {\bf Read\+Raw\+Stream\+Data} (char $\ast${\bf buffer}, unsigned {\bf length}, {\bf int} ep\+Index, {\bf int} {\bf timeout\+\_\+ms})
+\item 
+{\bf int} {\bf Set\+Pll\+Clock} ({\bf int} clock\+Index, {\bf int} n\+Steps, bool wait\+Lock, uint16\+\_\+t \&reg23val)
+\end{DoxyCompactItemize}
+
+
+\subsubsection{Detailed Description}
+
+
+Definition at line {\bf 17} of file {\bf F\+P\+G\+A\+\_\+common.\+h}.
+
+
+
+\subsubsection{Constructor \& Destructor Documentation}
+\index{lime\+::\+F\+P\+GA@{lime\+::\+F\+P\+GA}!F\+P\+GA@{F\+P\+GA}}
+\index{F\+P\+GA@{F\+P\+GA}!lime\+::\+F\+P\+GA@{lime\+::\+F\+P\+GA}}
+\paragraph[{F\+P\+G\+A()}]{\setlength{\rightskip}{0pt plus 5cm}lime\+::\+F\+P\+G\+A\+::\+F\+P\+GA (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inline]}}\label{classlime_1_1FPGA_a6b7ea8599689900811091f5a5a25ac44}
+
+
+Definition at line {\bf 21} of file {\bf F\+P\+G\+A\+\_\+common.\+h}.
+
+\index{lime\+::\+F\+P\+GA@{lime\+::\+F\+P\+GA}!````~F\+P\+GA@{$\sim$\+F\+P\+GA}}
+\index{````~F\+P\+GA@{$\sim$\+F\+P\+GA}!lime\+::\+F\+P\+GA@{lime\+::\+F\+P\+GA}}
+\paragraph[{$\sim$\+F\+P\+G\+A()}]{\setlength{\rightskip}{0pt plus 5cm}virtual lime\+::\+F\+P\+G\+A\+::$\sim$\+F\+P\+GA (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}\label{classlime_1_1FPGA_a4a3ebf6b032b292b0746bfb58b741b16}
+
+
+Definition at line {\bf 22} of file {\bf F\+P\+G\+A\+\_\+common.\+h}.
+
+
+
+References {\bf ch\+Count}, {\bf format}, {\bf sample\+\_\+count}, and {\bf samples}.
+
+
+
+\subsubsection{Member Function Documentation}
+\index{lime\+::\+F\+P\+GA@{lime\+::\+F\+P\+GA}!Detect\+Ref\+Clk@{Detect\+Ref\+Clk}}
+\index{Detect\+Ref\+Clk@{Detect\+Ref\+Clk}!lime\+::\+F\+P\+GA@{lime\+::\+F\+P\+GA}}
+\paragraph[{Detect\+Ref\+Clk(double fx3\+Clk=100e6)}]{\setlength{\rightskip}{0pt plus 5cm}double lime\+::\+F\+P\+G\+A\+::\+Detect\+Ref\+Clk (
+\begin{DoxyParamCaption}
+\item[{double}]{fx3\+Clk = {\ttfamily 100e6}}
+\end{DoxyParamCaption}
+)}\label{classlime_1_1FPGA_a364e9ef0225dfd09a180c622e2f01e37}
+
+
+Definition at line {\bf 805} of file {\bf F\+P\+G\+A\+\_\+common.\+cpp}.
+
+
+
+References {\bf lime\+::debug()}, {\bf i}, and {\bf lime\+::info()}.
+
+
+
+Referenced by {\bf lime\+::\+L\+M\+S7\+\_\+\+Generic\+::\+L\+M\+S7\+\_\+\+Generic()}, and {\bf lime\+::\+L\+M\+S7\+\_\+\+Lime\+S\+D\+R\+\_\+mini\+::\+L\+M\+S7\+\_\+\+Lime\+S\+D\+R\+\_\+mini()}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{db/dcf/classlime_1_1FPGA_a364e9ef0225dfd09a180c622e2f01e37_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{db/dcf/classlime_1_1FPGA_a364e9ef0225dfd09a180c622e2f01e37_icgraph}
+\end{center}
+\end{figure}
+
+
+\index{lime\+::\+F\+P\+GA@{lime\+::\+F\+P\+GA}!F\+P\+G\+A\+Packet\+Payload2\+Samples@{F\+P\+G\+A\+Packet\+Payload2\+Samples}}
+\index{F\+P\+G\+A\+Packet\+Payload2\+Samples@{F\+P\+G\+A\+Packet\+Payload2\+Samples}!lime\+::\+F\+P\+GA@{lime\+::\+F\+P\+GA}}
+\paragraph[{F\+P\+G\+A\+Packet\+Payload2\+Samples(const uint8\+\_\+t $\ast$buffer, int buf\+Len, bool mimo, bool compressed, complex16\+\_\+t $\ast$$\ast$samples)}]{\setlength{\rightskip}{0pt plus 5cm}{\bf int} lime\+::\+F\+P\+G\+A\+::\+F\+P\+G\+A\+Packet\+Payload2\+Samples (
+\begin{DoxyParamCaption}
+\item[{const uint8\+\_\+t $\ast$}]{buffer, }
+\item[{{\bf int}}]{buf\+Len, }
+\item[{bool}]{mimo, }
+\item[{bool}]{compressed, }
+\item[{{\bf complex16\+\_\+t} $\ast$$\ast$}]{samples}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [static]}}\label{classlime_1_1FPGA_acbaf6c2d519b04e7e2409c58c3f26555}
+
+
+Parses \doxyref{F\+P\+GA}{p.}{db/dcf/classlime_1_1FPGA} packet payload into samples. 
+
+
+
+Definition at line {\bf 427} of file {\bf F\+P\+G\+A\+\_\+common.\+cpp}.
+
+
+
+References {\bf lime\+::complex16\+\_\+t\+::i}, {\bf i}, and {\bf lime\+::complex16\+\_\+t\+::q}.
+
+
+
+Referenced by {\bf lime\+::\+Streamer\+::\+Receive\+Packets\+Loop()}.
+
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{db/dcf/classlime_1_1FPGA_acbaf6c2d519b04e7e2409c58c3f26555_icgraph}
+\end{center}
+\end{figure}
+
+
+\index{lime\+::\+F\+P\+GA@{lime\+::\+F\+P\+GA}!Get\+Connection@{Get\+Connection}}
+\index{Get\+Connection@{Get\+Connection}!lime\+::\+F\+P\+GA@{lime\+::\+F\+P\+GA}}
+\paragraph[{Get\+Connection() const }]{\setlength{\rightskip}{0pt plus 5cm}{\bf I\+Connection} $\ast$ lime\+::\+F\+P\+G\+A\+::\+Get\+Connection (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+) const}\label{classlime_1_1FPGA_a201c06faccfb5265ccad9fdb387baa4d}
+
+
+Definition at line {\bf 39} of file {\bf F\+P\+G\+A\+\_\+common.\+cpp}.
+
+
+
+Referenced by {\bf lime\+::\+Streamer\+::\+Streamer()}.
+
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{db/dcf/classlime_1_1FPGA_a201c06faccfb5265ccad9fdb387baa4d_icgraph}
+\end{center}
+\end{figure}
+
+
+\index{lime\+::\+F\+P\+GA@{lime\+::\+F\+P\+GA}!Read\+Raw\+Stream\+Data@{Read\+Raw\+Stream\+Data}}
+\index{Read\+Raw\+Stream\+Data@{Read\+Raw\+Stream\+Data}!lime\+::\+F\+P\+GA@{lime\+::\+F\+P\+GA}}
+\paragraph[{Read\+Raw\+Stream\+Data(char $\ast$buffer, unsigned length, int ep\+Index, int timeout\+\_\+ms)}]{\setlength{\rightskip}{0pt plus 5cm}{\bf int} lime\+::\+F\+P\+G\+A\+::\+Read\+Raw\+Stream\+Data (
+\begin{DoxyParamCaption}
+\item[{char $\ast$}]{buffer, }
+\item[{unsigned}]{length, }
+\item[{{\bf int}}]{ep\+Index, }
+\item[{{\bf int}}]{timeout\+\_\+ms}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [private]}, {\ttfamily [virtual]}}\label{classlime_1_1FPGA_a673cc284c3b570e85ab0d5d5e16ca347}
+
+
+Reimplemented in {\bf lime\+::\+F\+P\+G\+A\+\_\+\+Mini} \doxyref{}{p.}{d5/ddc/classlime_1_1FPGA__Mini_aaad1bc75afbc99d7e579f98cbab3bb3b}.
+
+
+
+Definition at line {\bf 791} of file {\bf F\+P\+G\+A\+\_\+common.\+cpp}.
+
+\index{lime\+::\+F\+P\+GA@{lime\+::\+F\+P\+GA}!Reset\+Timestamp@{Reset\+Timestamp}}
+\index{Reset\+Timestamp@{Reset\+Timestamp}!lime\+::\+F\+P\+GA@{lime\+::\+F\+P\+GA}}
+\paragraph[{Reset\+Timestamp()}]{\setlength{\rightskip}{0pt plus 5cm}{\bf int} lime\+::\+F\+P\+G\+A\+::\+Reset\+Timestamp (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}\label{classlime_1_1FPGA_a692bdb4efdacfd7cefcaf58ebe9ec3ba}
+
+
+Definition at line {\bf 66} of file {\bf F\+P\+G\+A\+\_\+common.\+cpp}.
+
+
+
+References {\bf lime\+::\+Report\+Error()}, {\bf lime\+::\+S\+M\+P\+L\+\_\+\+N\+R\+\_\+\+C\+LR}, and {\bf status}.
+
+
+
+Referenced by {\bf lime\+::\+Streamer\+::\+Get\+Hardware\+Timestamp()}, and {\bf lime\+::\+Streamer\+::\+Update\+Threads()}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{db/dcf/classlime_1_1FPGA_a692bdb4efdacfd7cefcaf58ebe9ec3ba_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{db/dcf/classlime_1_1FPGA_a692bdb4efdacfd7cefcaf58ebe9ec3ba_icgraph}
+\end{center}
+\end{figure}
+
+
+\index{lime\+::\+F\+P\+GA@{lime\+::\+F\+P\+GA}!Samples2\+F\+P\+G\+A\+Packet\+Payload@{Samples2\+F\+P\+G\+A\+Packet\+Payload}}
+\index{Samples2\+F\+P\+G\+A\+Packet\+Payload@{Samples2\+F\+P\+G\+A\+Packet\+Payload}!lime\+::\+F\+P\+GA@{lime\+::\+F\+P\+GA}}
+\paragraph[{Samples2\+F\+P\+G\+A\+Packet\+Payload(const complex16\+\_\+t $\ast$const $\ast$samples, int samples\+Count, bool mimo, bool compressed, uint8\+\_\+t $\ast$buffer)}]{\setlength{\rightskip}{0pt plus 5cm}{\bf int} lime\+::\+F\+P\+G\+A\+::\+Samples2\+F\+P\+G\+A\+Packet\+Payload (
+\begin{DoxyParamCaption}
+\item[{const {\bf complex16\+\_\+t} $\ast$const $\ast$}]{samples, }
+\item[{{\bf int}}]{samples\+Count, }
+\item[{bool}]{mimo, }
+\item[{bool}]{compressed, }
+\item[{uint8\+\_\+t $\ast$}]{buffer}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [static]}}\label{classlime_1_1FPGA_aaa382cea798f7648047f13c18a4fc965}
+
+
+Definition at line {\bf 476} of file {\bf F\+P\+G\+A\+\_\+common.\+cpp}.
+
+
+
+References {\bf lime\+::complex16\+\_\+t\+::i}, {\bf lime\+::complex16\+\_\+t\+::q}, and {\bf src}.
+
+
+
+Referenced by {\bf lime\+::\+Streamer\+::\+Transmit\+Packets\+Loop()}.
+
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{db/dcf/classlime_1_1FPGA_aaa382cea798f7648047f13c18a4fc965_icgraph}
+\end{center}
+\end{figure}
+
+
+\index{lime\+::\+F\+P\+GA@{lime\+::\+F\+P\+GA}!Set\+Connection@{Set\+Connection}}
+\index{Set\+Connection@{Set\+Connection}!lime\+::\+F\+P\+GA@{lime\+::\+F\+P\+GA}}
+\paragraph[{Set\+Connection(\+I\+Connection $\ast$conn)}]{\setlength{\rightskip}{0pt plus 5cm}{\bf void} lime\+::\+F\+P\+G\+A\+::\+Set\+Connection (
+\begin{DoxyParamCaption}
+\item[{{\bf I\+Connection} $\ast$}]{conn}
+\end{DoxyParamCaption}
+)}\label{classlime_1_1FPGA_a68a291f8d4f877e92f83c305465b7daf}
+
+
+Definition at line {\bf 34} of file {\bf F\+P\+G\+A\+\_\+common.\+cpp}.
+
+
+
+Referenced by {\bf lime\+::\+L\+M\+S7\+\_\+\+Generic\+::\+L\+M\+S7\+\_\+\+Generic()}, {\bf lime\+::\+L\+M\+S7\+\_\+\+Lime\+S\+D\+R\+\_\+mini\+::\+L\+M\+S7\+\_\+\+Lime\+S\+D\+R\+\_\+mini()}, and {\bf lime\+::\+L\+M\+S7\+\_\+q\+Lime\+S\+D\+R\+::\+L\+M\+S7\+\_\+q\+Lime\+S\+D\+R()}.
+
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{db/dcf/classlime_1_1FPGA_a68a291f8d4f877e92f83c305465b7daf_icgraph}
+\end{center}
+\end{figure}
+
+
+\index{lime\+::\+F\+P\+GA@{lime\+::\+F\+P\+GA}!Set\+Direct\+Clocking@{Set\+Direct\+Clocking}}
+\index{Set\+Direct\+Clocking@{Set\+Direct\+Clocking}!lime\+::\+F\+P\+GA@{lime\+::\+F\+P\+GA}}
+\paragraph[{Set\+Direct\+Clocking(int clock\+Index)}]{\setlength{\rightskip}{0pt plus 5cm}{\bf int} lime\+::\+F\+P\+G\+A\+::\+Set\+Direct\+Clocking (
+\begin{DoxyParamCaption}
+\item[{{\bf int}}]{clock\+Index}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [protected]}}\label{classlime_1_1FPGA_ab3ff9b848c90ef45d6788d0f1537a973}
+
+
+Definition at line {\bf 405} of file {\bf F\+P\+G\+A\+\_\+common.\+cpp}.
+
+
+
+References {\bf lime\+::\+Report\+Error()}.
+
+
+
+Referenced by {\bf lime\+::\+F\+P\+G\+A\+\_\+\+Mini\+::\+Set\+Interface\+Freq()}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{db/dcf/classlime_1_1FPGA_ab3ff9b848c90ef45d6788d0f1537a973_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{db/dcf/classlime_1_1FPGA_ab3ff9b848c90ef45d6788d0f1537a973_icgraph}
+\end{center}
+\end{figure}
+
+
+\index{lime\+::\+F\+P\+GA@{lime\+::\+F\+P\+GA}!Set\+Interface\+Freq@{Set\+Interface\+Freq}}
+\index{Set\+Interface\+Freq@{Set\+Interface\+Freq}!lime\+::\+F\+P\+GA@{lime\+::\+F\+P\+GA}}
+\paragraph[{Set\+Interface\+Freq(double f\+\_\+\+Tx\+\_\+\+Hz, double f\+\_\+\+Rx\+\_\+\+Hz, double tx\+Phase, double rx\+Phase, int ch=0)}]{\setlength{\rightskip}{0pt plus 5cm}{\bf int} lime\+::\+F\+P\+G\+A\+::\+Set\+Interface\+Freq (
+\begin{DoxyParamCaption}
+\item[{double}]{f\+\_\+\+Tx\+\_\+\+Hz, }
+\item[{double}]{f\+\_\+\+Rx\+\_\+\+Hz, }
+\item[{double}]{tx\+Phase, }
+\item[{double}]{rx\+Phase, }
+\item[{{\bf int}}]{ch = {\ttfamily 0}}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [virtual]}}\label{classlime_1_1FPGA_acdb47b68575d5e7d5e9fafe6574f3f47}
+
+
+Configures \doxyref{F\+P\+GA}{p.}{db/dcf/classlime_1_1FPGA} P\+L\+Ls to Lime\+Light interface frequency. 
+
+
+
+Reimplemented in {\bf lime\+::\+F\+P\+G\+A\+\_\+\+Mini} \doxyref{}{p.}{d5/ddc/classlime_1_1FPGA__Mini_a5eda45a2c1e1d622b75a2a6aea63e797}, and {\bf lime\+::\+F\+P\+G\+A\+\_\+Q} \doxyref{}{p.}{d9/d58/classlime_1_1FPGA__Q_a9c91f2ff024e4df1d48fbca0b9fc9b22}.
+
+
+
+Definition at line {\bf 603} of file {\bf F\+P\+G\+A\+\_\+common.\+cpp}.
+
+
+
+References {\bf lime\+::\+F\+P\+G\+A\+::\+F\+P\+G\+A\+\_\+\+P\+L\+L\+\_\+clock\+::index}, {\bf lime\+::\+F\+P\+G\+A\+::\+F\+P\+G\+A\+\_\+\+P\+L\+L\+\_\+clock\+::out\+Frequency}, {\bf lime\+::\+F\+P\+G\+A\+::\+F\+P\+G\+A\+\_\+\+P\+L\+L\+\_\+clock\+::phase\+Shift\+\_\+deg}, {\bf status}, and {\bf val}.
+
+
+
+Referenced by {\bf lime\+::\+L\+M\+S7\+\_\+\+Device\+::\+Load\+Config()}, {\bf lime\+::\+L\+M\+S7\+\_\+\+Device\+::\+Set\+F\+P\+G\+A\+Interface\+Freq()}, {\bf lime\+::\+L\+M\+S7\+\_\+\+Lime\+S\+D\+R\+\_\+mini\+::\+Set\+Rate()}, {\bf lime\+::\+L\+M\+S7\+\_\+q\+Lime\+S\+D\+R\+::\+Set\+Rate()}, and {\bf lime\+::\+L\+M\+S7\+\_\+\+Device\+::\+Synchronize()}.
+
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{db/dcf/classlime_1_1FPGA_acdb47b68575d5e7d5e9fafe6574f3f47_icgraph}
+\end{center}
+\end{figure}
+
+
+\index{lime\+::\+F\+P\+GA@{lime\+::\+F\+P\+GA}!Set\+Interface\+Freq@{Set\+Interface\+Freq}}
+\index{Set\+Interface\+Freq@{Set\+Interface\+Freq}!lime\+::\+F\+P\+GA@{lime\+::\+F\+P\+GA}}
+\paragraph[{Set\+Interface\+Freq(double f\+\_\+\+Tx\+\_\+\+Hz, double f\+\_\+\+Rx\+\_\+\+Hz, int ch=0)}]{\setlength{\rightskip}{0pt plus 5cm}{\bf int} lime\+::\+F\+P\+G\+A\+::\+Set\+Interface\+Freq (
+\begin{DoxyParamCaption}
+\item[{double}]{f\+\_\+\+Tx\+\_\+\+Hz, }
+\item[{double}]{f\+\_\+\+Rx\+\_\+\+Hz, }
+\item[{{\bf int}}]{ch = {\ttfamily 0}}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [virtual]}}\label{classlime_1_1FPGA_ad2f6a2577174abb7f137d525e963eeb8}
+
+
+Configures \doxyref{F\+P\+GA}{p.}{db/dcf/classlime_1_1FPGA} P\+L\+Ls to Lime\+Light interface frequency. 
+
+
+
+Reimplemented in {\bf lime\+::\+F\+P\+G\+A\+\_\+\+Mini} \doxyref{}{p.}{d5/ddc/classlime_1_1FPGA__Mini_accf287398ba048ad7dd74a9e2ce15ae6}.
+
+
+
+Definition at line {\bf 644} of file {\bf F\+P\+G\+A\+\_\+common.\+cpp}.
+
+
+
+References {\bf lime\+::\+F\+P\+G\+A\+::\+F\+P\+G\+A\+\_\+\+P\+L\+L\+\_\+clock\+::find\+Phase}, {\bf i}, {\bf lime\+::\+F\+P\+G\+A\+::\+F\+P\+G\+A\+\_\+\+P\+L\+L\+\_\+clock\+::index}, {\bf lime\+::\+F\+P\+G\+A\+::\+F\+P\+G\+A\+\_\+\+P\+L\+L\+\_\+clock\+::out\+Frequency}, {\bf lime\+::\+F\+P\+G\+A\+::\+F\+P\+G\+A\+\_\+\+P\+L\+L\+\_\+clock\+::phase\+Shift\+\_\+deg}, {\bf status}, and {\bf val}.
+
+\index{lime\+::\+F\+P\+GA@{lime\+::\+F\+P\+GA}!Set\+Pll\+Clock@{Set\+Pll\+Clock}}
+\index{Set\+Pll\+Clock@{Set\+Pll\+Clock}!lime\+::\+F\+P\+GA@{lime\+::\+F\+P\+GA}}
+\paragraph[{Set\+Pll\+Clock(int clock\+Index, int n\+Steps, bool wait\+Lock, uint16\+\_\+t \&reg23val)}]{\setlength{\rightskip}{0pt plus 5cm}{\bf int} lime\+::\+F\+P\+G\+A\+::\+Set\+Pll\+Clock (
+\begin{DoxyParamCaption}
+\item[{{\bf int}}]{clock\+Index, }
+\item[{{\bf int}}]{n\+Steps, }
+\item[{bool}]{wait\+Lock, }
+\item[{uint16\+\_\+t \&}]{reg23val}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [private]}}\label{classlime_1_1FPGA_a129bcde3c599a5adeaa5a24a998201ef}
+
+
+Definition at line {\bf 91} of file {\bf F\+P\+G\+A\+\_\+common.\+cpp}.
+
+
+
+References {\bf lime\+::\+P\+H\+C\+F\+G\+\_\+\+M\+O\+DE}, {\bf lime\+::\+P\+H\+C\+F\+G\+\_\+\+U\+P\+DN}, {\bf lime\+::\+Report\+Error()}, {\bf t1}, and {\bf t2}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{db/dcf/classlime_1_1FPGA_a129bcde3c599a5adeaa5a24a998201ef_cgraph}
+\end{center}
+\end{figure}
+
+
+\index{lime\+::\+F\+P\+GA@{lime\+::\+F\+P\+GA}!Set\+Pll\+Frequency@{Set\+Pll\+Frequency}}
+\index{Set\+Pll\+Frequency@{Set\+Pll\+Frequency}!lime\+::\+F\+P\+GA@{lime\+::\+F\+P\+GA}}
+\paragraph[{Set\+Pll\+Frequency(uint8\+\_\+t pll\+Index, double input\+Freq, F\+P\+G\+A\+\_\+\+P\+L\+L\+\_\+clock $\ast$outputs, uint8\+\_\+t clock\+Count)}]{\setlength{\rightskip}{0pt plus 5cm}{\bf int} lime\+::\+F\+P\+G\+A\+::\+Set\+Pll\+Frequency (
+\begin{DoxyParamCaption}
+\item[{uint8\+\_\+t}]{pll\+Index, }
+\item[{double}]{input\+Freq, }
+\item[{{\bf F\+P\+G\+A\+\_\+\+P\+L\+L\+\_\+clock} $\ast$}]{clocks, }
+\item[{uint8\+\_\+t}]{clock\+Count}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [protected]}}\label{classlime_1_1FPGA_af8856c51c4459b540d1884e6373f0d56}
+
+
+Configures board \doxyref{F\+P\+GA}{p.}{db/dcf/classlime_1_1FPGA} clocks. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em ser\+Port} & communications port \\
+\hline
+{\em pll\+Index} & index of \doxyref{F\+P\+GA}{p.}{db/dcf/classlime_1_1FPGA} pll \\
+\hline
+{\em clocks} & list of clocks to configure \\
+\hline
+{\em clocks\+Count} & number of clocks to configure \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+0-\/success, other-\/failure 
+\end{DoxyReturn}
+
+
+Definition at line {\bf 144} of file {\bf F\+P\+G\+A\+\_\+common.\+cpp}.
+
+
+
+References {\bf coef}, {\bf lime\+::debug()}, {\bf error()}, {\bf lime\+::error()}, {\bf lime\+::\+F\+P\+G\+A\+::\+F\+P\+G\+A\+\_\+\+P\+L\+L\+\_\+clock\+::find\+Phase}, {\bf freq}, {\bf lime\+::\+Get\+Device\+Name()}, {\bf i}, {\bf lime\+::\+F\+P\+G\+A\+::\+F\+P\+G\+A\+\_\+\+P\+L\+L\+\_\+clock\+::index}, {\bf index}, {\bf int()}, {\bf lime\+::\+L\+M\+S\+\_\+\+D\+E\+V\+\_\+\+L\+I\+M\+E\+S\+D\+R\+\_\+\+Q\+P\+C\+IE}, {\bf lime\+::\+L\+M\+S\+\_\+\+D\+E\+V\+\_\+\+U\+N\+K\+N\+O\+WN}, {\bf lime\+::\+F\+P\+G\+A\+::\+F\+P\+G\+A\+\_\+\+P\+L\+L\+\_\+clock\+::out\+Frequency}, {\bf lime\+::\+F\+P\+G\+A\+::\+F\+P\+G\+A\+\_\+\+P\+L\+L\+\_\+clock\+::phase\+Shift\+\_\+deg}, {\bf lime\+::\+P\+H\+C\+F\+G\+\_\+\+M\+O\+DE}, {\bf lime\+::\+P\+H\+C\+F\+G\+\_\+\+U\+P\+DN}, {\bf lime\+::\+F\+P\+G\+A\+::\+F\+P\+G\+A\+\_\+\+P\+L\+L\+\_\+clock\+::rd\+\_\+actual\+Frequency}, {\bf lime\+::\+Report\+Error()}, {\bf t1}, and {\bf t2}.
+
+
+
+Referenced by {\bf lime\+::\+F\+P\+G\+A\+\_\+\+Mini\+::\+Set\+Interface\+Freq()}, and {\bf lime\+::\+F\+P\+G\+A\+\_\+\+Q\+::\+Set\+Interface\+Freq()}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{db/dcf/classlime_1_1FPGA_af8856c51c4459b540d1884e6373f0d56_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{db/dcf/classlime_1_1FPGA_af8856c51c4459b540d1884e6373f0d56_icgraph}
+\end{center}
+\end{figure}
+
+
+\index{lime\+::\+F\+P\+GA@{lime\+::\+F\+P\+GA}!Start\+Streaming@{Start\+Streaming}}
+\index{Start\+Streaming@{Start\+Streaming}!lime\+::\+F\+P\+GA@{lime\+::\+F\+P\+GA}}
+\paragraph[{Start\+Streaming()}]{\setlength{\rightskip}{0pt plus 5cm}{\bf int} lime\+::\+F\+P\+G\+A\+::\+Start\+Streaming (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}\label{classlime_1_1FPGA_ad04cb35a54c7eef0aacc9a1a019c4cfd}
+
+
+Definition at line {\bf 44} of file {\bf F\+P\+G\+A\+\_\+common.\+cpp}.
+
+
+
+References {\bf lime\+::\+R\+X\+\_\+\+EN}, and {\bf status}.
+
+
+
+Referenced by {\bf lime\+::\+Streamer\+::\+Align\+Rx\+T\+S\+P()}, {\bf lime\+::\+Streamer\+::\+Get\+Phase\+Offset()}, {\bf lime\+::\+F\+P\+G\+A\+\_\+\+Mini\+::\+Read\+Raw\+Stream\+Data()}, and {\bf lime\+::\+Streamer\+::\+Update\+Threads()}.
+
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{db/dcf/classlime_1_1FPGA_ad04cb35a54c7eef0aacc9a1a019c4cfd_icgraph}
+\end{center}
+\end{figure}
+
+
+\index{lime\+::\+F\+P\+GA@{lime\+::\+F\+P\+GA}!Stop\+Streaming@{Stop\+Streaming}}
+\index{Stop\+Streaming@{Stop\+Streaming}!lime\+::\+F\+P\+GA@{lime\+::\+F\+P\+GA}}
+\paragraph[{Stop\+Streaming()}]{\setlength{\rightskip}{0pt plus 5cm}{\bf int} lime\+::\+F\+P\+G\+A\+::\+Stop\+Streaming (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}\label{classlime_1_1FPGA_acecc385c80d18f662c4ad5575c932456}
+
+
+Definition at line {\bf 55} of file {\bf F\+P\+G\+A\+\_\+common.\+cpp}.
+
+
+
+References {\bf status}, and {\bf lime\+::\+T\+X\+\_\+\+EN}.
+
+
+
+Referenced by {\bf lime\+::\+Streamer\+::\+Align\+Quadrature()}, {\bf lime\+::\+Streamer\+::\+Align\+Rx\+R\+F()}, {\bf lime\+::\+Streamer\+::\+Align\+Rx\+T\+S\+P()}, {\bf lime\+::\+Streamer\+::\+Get\+Hardware\+Timestamp()}, {\bf lime\+::\+Streamer\+::\+Get\+Phase\+Offset()}, {\bf lime\+::\+F\+P\+G\+A\+\_\+\+Mini\+::\+Read\+Raw\+Stream\+Data()}, and {\bf lime\+::\+Streamer\+::\+Update\+Threads()}.
+
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{db/dcf/classlime_1_1FPGA_acecc385c80d18f662c4ad5575c932456_icgraph}
+\end{center}
+\end{figure}
+
+
+\index{lime\+::\+F\+P\+GA@{lime\+::\+F\+P\+GA}!Upload\+W\+FM@{Upload\+W\+FM}}
+\index{Upload\+W\+FM@{Upload\+W\+FM}!lime\+::\+F\+P\+GA@{lime\+::\+F\+P\+GA}}
+\paragraph[{Upload\+W\+F\+M(const void $\ast$const $\ast$samples, uint8\+\_\+t ch\+Count, size\+\_\+t sample\+\_\+count, Stream\+Config\+::\+Stream\+Data\+Format format, int ep\+Index)}]{\setlength{\rightskip}{0pt plus 5cm}{\bf int} lime\+::\+F\+P\+G\+A\+::\+Upload\+W\+FM (
+\begin{DoxyParamCaption}
+\item[{const {\bf void} $\ast$const $\ast$}]{samples, }
+\item[{uint8\+\_\+t}]{ch\+Count, }
+\item[{size\+\_\+t}]{sample\+\_\+count, }
+\item[{{\bf Stream\+Config\+::\+Stream\+Data\+Format}}]{format, }
+\item[{{\bf int}}]{ep\+Index}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [virtual]}}\label{classlime_1_1FPGA_aca5222f70ee503928de003a2810ddcc5}
+
+
+Reimplemented in {\bf lime\+::\+F\+P\+G\+A\+\_\+\+Mini} \doxyref{}{p.}{d5/ddc/classlime_1_1FPGA__Mini_ac8037a854bd8b1e011d2bffa35f9c5dd}.
+
+
+
+Definition at line {\bf 510} of file {\bf F\+P\+G\+A\+\_\+common.\+cpp}.
+
+
+
+References {\bf ch\+Count}, {\bf lime\+::\+F\+P\+G\+A\+\_\+\+Data\+Packet\+::counter}, {\bf lime\+::\+F\+P\+G\+A\+\_\+\+Data\+Packet\+::data}, {\bf lime\+::complex16\+\_\+t\+::i}, {\bf i}, {\bf lime\+::complex16\+\_\+t\+::q}, {\bf lime\+::\+Report\+Error()}, {\bf lime\+::\+F\+P\+G\+A\+\_\+\+Data\+Packet\+::reserved}, {\bf sample\+\_\+count}, {\bf lime\+::samples12\+In\+Pkt}, {\bf lime\+::samples16\+In\+Pkt}, {\bf src}, and {\bf lime\+::warning()}.
+
+
+
+Referenced by {\bf lime\+::\+L\+M\+S7\+\_\+\+Device\+::\+Upload\+W\+F\+M()}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{db/dcf/classlime_1_1FPGA_aca5222f70ee503928de003a2810ddcc5_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{db/dcf/classlime_1_1FPGA_aca5222f70ee503928de003a2810ddcc5_icgraph}
+\end{center}
+\end{figure}
+
+
+
+
+\subsubsection{Member Data Documentation}
+\index{lime\+::\+F\+P\+GA@{lime\+::\+F\+P\+GA}!connection@{connection}}
+\index{connection@{connection}!lime\+::\+F\+P\+GA@{lime\+::\+F\+P\+GA}}
+\paragraph[{connection}]{\setlength{\rightskip}{0pt plus 5cm}{\bf I\+Connection}$\ast$ lime\+::\+F\+P\+G\+A\+::connection\hspace{0.3cm}{\ttfamily [protected]}}\label{classlime_1_1FPGA_a3f122b89459378fcf8e6808d2db6a5cd}
+
+
+Definition at line {\bf 56} of file {\bf F\+P\+G\+A\+\_\+common.\+h}.
+
+
+
+Referenced by {\bf lime\+::\+F\+P\+G\+A\+\_\+\+Mini\+::\+Read\+Raw\+Stream\+Data()}, and {\bf lime\+::\+F\+P\+G\+A\+\_\+\+Mini\+::\+Set\+Interface\+Freq()}.
+
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+/home/erik/prefix/default/src/limesuite-\/dev/src/\+F\+P\+G\+A\+\_\+common/{\bf F\+P\+G\+A\+\_\+common.\+h}\item 
+/home/erik/prefix/default/src/limesuite-\/dev/src/\+F\+P\+G\+A\+\_\+common/{\bf F\+P\+G\+A\+\_\+common.\+cpp}\end{DoxyCompactItemize}

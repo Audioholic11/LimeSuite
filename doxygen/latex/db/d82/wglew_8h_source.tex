@@ -1,0 +1,1574 @@
+\subsection{wglew.\+h}
+\label{wglew_8h_source}\index{/home/erik/prefix/default/src/limesuite-\/dev/src/ogl\+Graph/glew/\+G\+L/wglew.\+h@{/home/erik/prefix/default/src/limesuite-\/dev/src/ogl\+Graph/glew/\+G\+L/wglew.\+h}}
+
+\begin{DoxyCode}
+00001 \textcolor{comment}{/*}
+00002 \textcolor{comment}{** The OpenGL Extension Wrangler Library}
+00003 \textcolor{comment}{** Copyright (C) 2008-2015, Nigel Stewart <nigels[]users sourceforge net>}
+00004 \textcolor{comment}{** Copyright (C) 2002-2008, Milan Ikits <milan ikits[]ieee org>}
+00005 \textcolor{comment}{** Copyright (C) 2002-2008, Marcelo E. Magallon <mmagallo[]debian org>}
+00006 \textcolor{comment}{** Copyright (C) 2002, Lev Povalahev}
+00007 \textcolor{comment}{** All rights reserved.}
+00008 \textcolor{comment}{** }
+00009 \textcolor{comment}{** Redistribution and use in source and binary forms, with or without }
+00010 \textcolor{comment}{** modification, are permitted provided that the following conditions are met:}
+00011 \textcolor{comment}{** }
+00012 \textcolor{comment}{** * Redistributions of source code must retain the above copyright notice, }
+00013 \textcolor{comment}{**   this list of conditions and the following disclaimer.}
+00014 \textcolor{comment}{** * Redistributions in binary form must reproduce the above copyright notice, }
+00015 \textcolor{comment}{**   this list of conditions and the following disclaimer in the documentation }
+00016 \textcolor{comment}{**   and/or other materials provided with the distribution.}
+00017 \textcolor{comment}{** * The name of the author may be used to endorse or promote products }
+00018 \textcolor{comment}{**   derived from this software without specific prior written permission.}
+00019 \textcolor{comment}{**}
+00020 \textcolor{comment}{** THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" }
+00021 \textcolor{comment}{** AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE }
+00022 \textcolor{comment}{** IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE}
+00023 \textcolor{comment}{** ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE }
+00024 \textcolor{comment}{** LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR }
+00025 \textcolor{comment}{** CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF }
+00026 \textcolor{comment}{** SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS}
+00027 \textcolor{comment}{** INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN}
+00028 \textcolor{comment}{** CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)}
+00029 \textcolor{comment}{** ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF}
+00030 \textcolor{comment}{** THE POSSIBILITY OF SUCH DAMAGE.}
+00031 \textcolor{comment}{*/}
+00032 
+00033 \textcolor{comment}{/*}
+00034 \textcolor{comment}{** Copyright (c) 2007 The Khronos Group Inc.}
+00035 \textcolor{comment}{** }
+00036 \textcolor{comment}{** Permission is hereby granted, free of charge, to any person obtaining a}
+00037 \textcolor{comment}{** copy of this software and/or associated documentation files (the}
+00038 \textcolor{comment}{** "Materials"), to deal in the Materials without restriction, including}
+00039 \textcolor{comment}{** without limitation the rights to use, copy, modify, merge, publish,}
+00040 \textcolor{comment}{** distribute, sublicense, and/or sell copies of the Materials, and to}
+00041 \textcolor{comment}{** permit persons to whom the Materials are furnished to do so, subject to}
+00042 \textcolor{comment}{** the following conditions:}
+00043 \textcolor{comment}{** }
+00044 \textcolor{comment}{** The above copyright notice and this permission notice shall be included}
+00045 \textcolor{comment}{** in all copies or substantial portions of the Materials.}
+00046 \textcolor{comment}{** }
+00047 \textcolor{comment}{** THE MATERIALS ARE PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,}
+00048 \textcolor{comment}{** EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF}
+00049 \textcolor{comment}{** MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.}
+00050 \textcolor{comment}{** IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY}
+00051 \textcolor{comment}{** CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,}
+00052 \textcolor{comment}{** TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE}
+00053 \textcolor{comment}{** MATERIALS OR THE USE OR OTHER DEALINGS IN THE MATERIALS.}
+00054 \textcolor{comment}{*/}
+00055 
+00056 \textcolor{preprocessor}{#ifndef \_\_wglew\_h\_\_}
+00057 \textcolor{preprocessor}{#define \_\_wglew\_h\_\_}
+00058 \textcolor{preprocessor}{#define \_\_WGLEW\_H\_\_}
+00059 
+00060 \textcolor{preprocessor}{#ifdef \_\_wglext\_h\_}
+00061 \textcolor{preprocessor}{#error wglext.h included before wglew.h}
+00062 \textcolor{preprocessor}{#endif}
+00063 
+00064 \textcolor{preprocessor}{#define \_\_wglext\_h\_}
+00065 
+00066 \textcolor{preprocessor}{#if !defined(WINAPI)}
+00067 \textcolor{preprocessor}{#  ifndef WIN32\_LEAN\_AND\_MEAN}
+00068 \textcolor{preprocessor}{#    define WIN32\_LEAN\_AND\_MEAN 1}
+00069 \textcolor{preprocessor}{#  endif}
+00070 \textcolor{preprocessor}{#include <windows.h>}
+00071 \textcolor{preprocessor}{#  undef WIN32\_LEAN\_AND\_MEAN}
+00072 \textcolor{preprocessor}{#endif}
+00073 
+00074 \textcolor{comment}{/*}
+00075 \textcolor{comment}{ * GLEW\_STATIC needs to be set when using the static version.}
+00076 \textcolor{comment}{ * GLEW\_BUILD is set when building the DLL version.}
+00077 \textcolor{comment}{ */}
+00078 \textcolor{preprocessor}{#ifdef GLEW\_STATIC}
+00079 \textcolor{preprocessor}{#  define GLEWAPI extern}
+00080 \textcolor{preprocessor}{#else}
+00081 \textcolor{preprocessor}{#  ifdef GLEW\_BUILD}
+00082 \textcolor{preprocessor}{#    define GLEWAPI extern \_\_declspec(dllexport)}
+00083 \textcolor{preprocessor}{#  else}
+00084 \textcolor{preprocessor}{#    define GLEWAPI extern \_\_declspec(dllimport)}
+00085 \textcolor{preprocessor}{#  endif}
+00086 \textcolor{preprocessor}{#endif}
+00087 
+00088 \textcolor{preprocessor}{#ifdef \_\_cplusplus}
+00089 \textcolor{keyword}{extern} \textcolor{stringliteral}{"C"} \{
+00090 \textcolor{preprocessor}{#endif}
+00091 
+00092 \textcolor{comment}{/* -------------------------- WGL\_3DFX\_multisample ------------------------- */}
+00093 
+00094 \textcolor{preprocessor}{#ifndef WGL\_3DFX\_multisample}
+00095 \textcolor{preprocessor}{#define WGL\_3DFX\_multisample 1}
+00096 
+00097 \textcolor{preprocessor}{#define WGL\_SAMPLE\_BUFFERS\_3DFX 0x2060}
+00098 \textcolor{preprocessor}{#define WGL\_SAMPLES\_3DFX 0x2061}
+00099 
+00100 \textcolor{preprocessor}{#define WGLEW\_3DFX\_multisample WGLEW\_GET\_VAR(\_\_WGLEW\_3DFX\_multisample)}
+00101 
+00102 \textcolor{preprocessor}{#endif }\textcolor{comment}{/* WGL\_3DFX\_multisample */}\textcolor{preprocessor}{}
+00103 
+00104 \textcolor{comment}{/* ------------------------- WGL\_3DL\_stereo\_control ------------------------ */}
+00105 
+00106 \textcolor{preprocessor}{#ifndef WGL\_3DL\_stereo\_control}
+00107 \textcolor{preprocessor}{#define WGL\_3DL\_stereo\_control 1}
+00108 
+00109 \textcolor{preprocessor}{#define WGL\_STEREO\_EMITTER\_ENABLE\_3DL 0x2055}
+00110 \textcolor{preprocessor}{#define WGL\_STEREO\_EMITTER\_DISABLE\_3DL 0x2056}
+00111 \textcolor{preprocessor}{#define WGL\_STEREO\_POLARITY\_NORMAL\_3DL 0x2057}
+00112 \textcolor{preprocessor}{#define WGL\_STEREO\_POLARITY\_INVERT\_3DL 0x2058}
+00113 
+00114 \textcolor{keyword}{typedef} BOOL (WINAPI * PFNWGLSETSTEREOEMITTERSTATE3DLPROC) (HDC hDC, UINT uState);
+00115 
+00116 \textcolor{preprocessor}{#define wglSetStereoEmitterState3DL WGLEW\_GET\_FUN(\_\_wglewSetStereoEmitterState3DL)}
+00117 
+00118 \textcolor{preprocessor}{#define WGLEW\_3DL\_stereo\_control WGLEW\_GET\_VAR(\_\_WGLEW\_3DL\_stereo\_control)}
+00119 
+00120 \textcolor{preprocessor}{#endif }\textcolor{comment}{/* WGL\_3DL\_stereo\_control */}\textcolor{preprocessor}{}
+00121 
+00122 \textcolor{comment}{/* ------------------------ WGL\_AMD\_gpu\_association ------------------------ */}
+00123 
+00124 \textcolor{preprocessor}{#ifndef WGL\_AMD\_gpu\_association}
+00125 \textcolor{preprocessor}{#define WGL\_AMD\_gpu\_association 1}
+00126 
+00127 \textcolor{preprocessor}{#define WGL\_GPU\_VENDOR\_AMD 0x1F00}
+00128 \textcolor{preprocessor}{#define WGL\_GPU\_RENDERER\_STRING\_AMD 0x1F01}
+00129 \textcolor{preprocessor}{#define WGL\_GPU\_OPENGL\_VERSION\_STRING\_AMD 0x1F02}
+00130 \textcolor{preprocessor}{#define WGL\_GPU\_FASTEST\_TARGET\_GPUS\_AMD 0x21A2}
+00131 \textcolor{preprocessor}{#define WGL\_GPU\_RAM\_AMD 0x21A3}
+00132 \textcolor{preprocessor}{#define WGL\_GPU\_CLOCK\_AMD 0x21A4}
+00133 \textcolor{preprocessor}{#define WGL\_GPU\_NUM\_PIPES\_AMD 0x21A5}
+00134 \textcolor{preprocessor}{#define WGL\_GPU\_NUM\_SIMD\_AMD 0x21A6}
+00135 \textcolor{preprocessor}{#define WGL\_GPU\_NUM\_RB\_AMD 0x21A7}
+00136 \textcolor{preprocessor}{#define WGL\_GPU\_NUM\_SPI\_AMD 0x21A8}
+00137 
+00138 \textcolor{keyword}{typedef} VOID (WINAPI * PFNWGLBLITCONTEXTFRAMEBUFFERAMDPROC) (HGLRC dstCtx, GLint 
+      srcX0, GLint srcY0, GLint srcX1, GLint srcY1, GLint dstX0, GLint dstY0, GLint 
+      dstX1, GLint dstY1, GLbitfield mask, GLenum filter);
+00139 \textcolor{keyword}{typedef} HGLRC (WINAPI * PFNWGLCREATEASSOCIATEDCONTEXTAMDPROC) (UINT id);
+00140 \textcolor{keyword}{typedef} HGLRC (WINAPI * PFNWGLCREATEASSOCIATEDCONTEXTATTRIBSAMDPROC) (UINT id, 
+      HGLRC hShareContext, \textcolor{keyword}{const} \textcolor{keywordtype}{int}* attribList);
+00141 \textcolor{keyword}{typedef} BOOL (WINAPI * PFNWGLDELETEASSOCIATEDCONTEXTAMDPROC) (HGLRC hglrc);
+00142 \textcolor{keyword}{typedef} UINT (WINAPI * PFNWGLGETCONTEXTGPUIDAMDPROC) (HGLRC hglrc);
+00143 \textcolor{keyword}{typedef} HGLRC (WINAPI * PFNWGLGETCURRENTASSOCIATEDCONTEXTAMDPROC) (void);
+00144 \textcolor{keyword}{typedef} UINT (WINAPI * PFNWGLGETGPUIDSAMDPROC) (UINT maxCount, UINT* ids);
+00145 \textcolor{keyword}{typedef} INT (WINAPI * PFNWGLGETGPUINFOAMDPROC) (UINT id, INT property, GLenum 
+      dataType, UINT size, \textcolor{keywordtype}{void}* data);
+00146 \textcolor{keyword}{typedef} BOOL (WINAPI * PFNWGLMAKEASSOCIATEDCONTEXTCURRENTAMDPROC) (HGLRC hglrc);
+00147 
+00148 \textcolor{preprocessor}{#define wglBlitContextFramebufferAMD WGLEW\_GET\_FUN(\_\_wglewBlitContextFramebufferAMD)}
+00149 \textcolor{preprocessor}{#define wglCreateAssociatedContextAMD WGLEW\_GET\_FUN(\_\_wglewCreateAssociatedContextAMD)}
+00150 \textcolor{preprocessor}{#define wglCreateAssociatedContextAttribsAMD WGLEW\_GET\_FUN(\_\_wglewCreateAssociatedContextAttribsAMD)}
+00151 \textcolor{preprocessor}{#define wglDeleteAssociatedContextAMD WGLEW\_GET\_FUN(\_\_wglewDeleteAssociatedContextAMD)}
+00152 \textcolor{preprocessor}{#define wglGetContextGPUIDAMD WGLEW\_GET\_FUN(\_\_wglewGetContextGPUIDAMD)}
+00153 \textcolor{preprocessor}{#define wglGetCurrentAssociatedContextAMD WGLEW\_GET\_FUN(\_\_wglewGetCurrentAssociatedContextAMD)}
+00154 \textcolor{preprocessor}{#define wglGetGPUIDsAMD WGLEW\_GET\_FUN(\_\_wglewGetGPUIDsAMD)}
+00155 \textcolor{preprocessor}{#define wglGetGPUInfoAMD WGLEW\_GET\_FUN(\_\_wglewGetGPUInfoAMD)}
+00156 \textcolor{preprocessor}{#define wglMakeAssociatedContextCurrentAMD WGLEW\_GET\_FUN(\_\_wglewMakeAssociatedContextCurrentAMD)}
+00157 
+00158 \textcolor{preprocessor}{#define WGLEW\_AMD\_gpu\_association WGLEW\_GET\_VAR(\_\_WGLEW\_AMD\_gpu\_association)}
+00159 
+00160 \textcolor{preprocessor}{#endif }\textcolor{comment}{/* WGL\_AMD\_gpu\_association */}\textcolor{preprocessor}{}
+00161 
+00162 \textcolor{comment}{/* ------------------------- WGL\_ARB\_buffer\_region ------------------------- */}
+00163 
+00164 \textcolor{preprocessor}{#ifndef WGL\_ARB\_buffer\_region}
+00165 \textcolor{preprocessor}{#define WGL\_ARB\_buffer\_region 1}
+00166 
+00167 \textcolor{preprocessor}{#define WGL\_FRONT\_COLOR\_BUFFER\_BIT\_ARB 0x00000001}
+00168 \textcolor{preprocessor}{#define WGL\_BACK\_COLOR\_BUFFER\_BIT\_ARB 0x00000002}
+00169 \textcolor{preprocessor}{#define WGL\_DEPTH\_BUFFER\_BIT\_ARB 0x00000004}
+00170 \textcolor{preprocessor}{#define WGL\_STENCIL\_BUFFER\_BIT\_ARB 0x00000008}
+00171 
+00172 \textcolor{keyword}{typedef} HANDLE (WINAPI * PFNWGLCREATEBUFFERREGIONARBPROC) (HDC hDC, \textcolor{keywordtype}{int} 
+      iLayerPlane, UINT uType);
+00173 \textcolor{keyword}{typedef} VOID (WINAPI * PFNWGLDELETEBUFFERREGIONARBPROC) (HANDLE hRegion);
+00174 \textcolor{keyword}{typedef} BOOL (WINAPI * PFNWGLRESTOREBUFFERREGIONARBPROC) (HANDLE hRegion, \textcolor{keywordtype}{int} x, \textcolor{keywordtype}{int} 
+      y, \textcolor{keywordtype}{int} width, \textcolor{keywordtype}{int} height, \textcolor{keywordtype}{int} xSrc, \textcolor{keywordtype}{int} ySrc);
+00175 \textcolor{keyword}{typedef} BOOL (WINAPI * PFNWGLSAVEBUFFERREGIONARBPROC) (HANDLE hRegion, \textcolor{keywordtype}{int} x, \textcolor{keywordtype}{int} 
+      y, \textcolor{keywordtype}{int} width, \textcolor{keywordtype}{int} height);
+00176 
+00177 \textcolor{preprocessor}{#define wglCreateBufferRegionARB WGLEW\_GET\_FUN(\_\_wglewCreateBufferRegionARB)}
+00178 \textcolor{preprocessor}{#define wglDeleteBufferRegionARB WGLEW\_GET\_FUN(\_\_wglewDeleteBufferRegionARB)}
+00179 \textcolor{preprocessor}{#define wglRestoreBufferRegionARB WGLEW\_GET\_FUN(\_\_wglewRestoreBufferRegionARB)}
+00180 \textcolor{preprocessor}{#define wglSaveBufferRegionARB WGLEW\_GET\_FUN(\_\_wglewSaveBufferRegionARB)}
+00181 
+00182 \textcolor{preprocessor}{#define WGLEW\_ARB\_buffer\_region WGLEW\_GET\_VAR(\_\_WGLEW\_ARB\_buffer\_region)}
+00183 
+00184 \textcolor{preprocessor}{#endif }\textcolor{comment}{/* WGL\_ARB\_buffer\_region */}\textcolor{preprocessor}{}
+00185 
+00186 \textcolor{comment}{/* --------------------- WGL\_ARB\_context\_flush\_control --------------------- */}
+00187 
+00188 \textcolor{preprocessor}{#ifndef WGL\_ARB\_context\_flush\_control}
+00189 \textcolor{preprocessor}{#define WGL\_ARB\_context\_flush\_control 1}
+00190 
+00191 \textcolor{preprocessor}{#define WGL\_CONTEXT\_RELEASE\_BEHAVIOR\_NONE\_ARB 0x0000}
+00192 \textcolor{preprocessor}{#define WGL\_CONTEXT\_RELEASE\_BEHAVIOR\_ARB 0x2097}
+00193 \textcolor{preprocessor}{#define WGL\_CONTEXT\_RELEASE\_BEHAVIOR\_FLUSH\_ARB 0x2098}
+00194 
+00195 \textcolor{preprocessor}{#define WGLEW\_ARB\_context\_flush\_control WGLEW\_GET\_VAR(\_\_WGLEW\_ARB\_context\_flush\_control)}
+00196 
+00197 \textcolor{preprocessor}{#endif }\textcolor{comment}{/* WGL\_ARB\_context\_flush\_control */}\textcolor{preprocessor}{}
+00198 
+00199 \textcolor{comment}{/* ------------------------- WGL\_ARB\_create\_context ------------------------ */}
+00200 
+00201 \textcolor{preprocessor}{#ifndef WGL\_ARB\_create\_context}
+00202 \textcolor{preprocessor}{#define WGL\_ARB\_create\_context 1}
+00203 
+00204 \textcolor{preprocessor}{#define WGL\_CONTEXT\_DEBUG\_BIT\_ARB 0x0001}
+00205 \textcolor{preprocessor}{#define WGL\_CONTEXT\_FORWARD\_COMPATIBLE\_BIT\_ARB 0x0002}
+00206 \textcolor{preprocessor}{#define WGL\_CONTEXT\_MAJOR\_VERSION\_ARB 0x2091}
+00207 \textcolor{preprocessor}{#define WGL\_CONTEXT\_MINOR\_VERSION\_ARB 0x2092}
+00208 \textcolor{preprocessor}{#define WGL\_CONTEXT\_LAYER\_PLANE\_ARB 0x2093}
+00209 \textcolor{preprocessor}{#define WGL\_CONTEXT\_FLAGS\_ARB 0x2094}
+00210 \textcolor{preprocessor}{#define ERROR\_INVALID\_VERSION\_ARB 0x2095}
+00211 \textcolor{preprocessor}{#define ERROR\_INVALID\_PROFILE\_ARB 0x2096}
+00212 
+00213 \textcolor{keyword}{typedef} HGLRC (WINAPI * PFNWGLCREATECONTEXTATTRIBSARBPROC) (HDC hDC, HGLRC 
+      hShareContext, \textcolor{keyword}{const} \textcolor{keywordtype}{int}* attribList);
+00214 
+00215 \textcolor{preprocessor}{#define wglCreateContextAttribsARB WGLEW\_GET\_FUN(\_\_wglewCreateContextAttribsARB)}
+00216 
+00217 \textcolor{preprocessor}{#define WGLEW\_ARB\_create\_context WGLEW\_GET\_VAR(\_\_WGLEW\_ARB\_create\_context)}
+00218 
+00219 \textcolor{preprocessor}{#endif }\textcolor{comment}{/* WGL\_ARB\_create\_context */}\textcolor{preprocessor}{}
+00220 
+00221 \textcolor{comment}{/* --------------------- WGL\_ARB\_create\_context\_profile -------------------- */}
+00222 
+00223 \textcolor{preprocessor}{#ifndef WGL\_ARB\_create\_context\_profile}
+00224 \textcolor{preprocessor}{#define WGL\_ARB\_create\_context\_profile 1}
+00225 
+00226 \textcolor{preprocessor}{#define WGL\_CONTEXT\_CORE\_PROFILE\_BIT\_ARB 0x00000001}
+00227 \textcolor{preprocessor}{#define WGL\_CONTEXT\_COMPATIBILITY\_PROFILE\_BIT\_ARB 0x00000002}
+00228 \textcolor{preprocessor}{#define WGL\_CONTEXT\_PROFILE\_MASK\_ARB 0x9126}
+00229 
+00230 \textcolor{preprocessor}{#define WGLEW\_ARB\_create\_context\_profile WGLEW\_GET\_VAR(\_\_WGLEW\_ARB\_create\_context\_profile)}
+00231 
+00232 \textcolor{preprocessor}{#endif }\textcolor{comment}{/* WGL\_ARB\_create\_context\_profile */}\textcolor{preprocessor}{}
+00233 
+00234 \textcolor{comment}{/* ------------------- WGL\_ARB\_create\_context\_robustness ------------------- */}
+00235 
+00236 \textcolor{preprocessor}{#ifndef WGL\_ARB\_create\_context\_robustness}
+00237 \textcolor{preprocessor}{#define WGL\_ARB\_create\_context\_robustness 1}
+00238 
+00239 \textcolor{preprocessor}{#define WGL\_CONTEXT\_ROBUST\_ACCESS\_BIT\_ARB 0x00000004}
+00240 \textcolor{preprocessor}{#define WGL\_LOSE\_CONTEXT\_ON\_RESET\_ARB 0x8252}
+00241 \textcolor{preprocessor}{#define WGL\_CONTEXT\_RESET\_NOTIFICATION\_STRATEGY\_ARB 0x8256}
+00242 \textcolor{preprocessor}{#define WGL\_NO\_RESET\_NOTIFICATION\_ARB 0x8261}
+00243 
+00244 \textcolor{preprocessor}{#define WGLEW\_ARB\_create\_context\_robustness WGLEW\_GET\_VAR(\_\_WGLEW\_ARB\_create\_context\_robustness)}
+00245 
+00246 \textcolor{preprocessor}{#endif }\textcolor{comment}{/* WGL\_ARB\_create\_context\_robustness */}\textcolor{preprocessor}{}
+00247 
+00248 \textcolor{comment}{/* ----------------------- WGL\_ARB\_extensions\_string ----------------------- */}
+00249 
+00250 \textcolor{preprocessor}{#ifndef WGL\_ARB\_extensions\_string}
+00251 \textcolor{preprocessor}{#define WGL\_ARB\_extensions\_string 1}
+00252 
+00253 \textcolor{keyword}{typedef} \textcolor{keyword}{const} \textcolor{keywordtype}{char}* (WINAPI * PFNWGLGETEXTENSIONSSTRINGARBPROC) (HDC hdc);
+00254 
+00255 \textcolor{preprocessor}{#define wglGetExtensionsStringARB WGLEW\_GET\_FUN(\_\_wglewGetExtensionsStringARB)}
+00256 
+00257 \textcolor{preprocessor}{#define WGLEW\_ARB\_extensions\_string WGLEW\_GET\_VAR(\_\_WGLEW\_ARB\_extensions\_string)}
+00258 
+00259 \textcolor{preprocessor}{#endif }\textcolor{comment}{/* WGL\_ARB\_extensions\_string */}\textcolor{preprocessor}{}
+00260 
+00261 \textcolor{comment}{/* ------------------------ WGL\_ARB\_framebuffer\_sRGB ----------------------- */}
+00262 
+00263 \textcolor{preprocessor}{#ifndef WGL\_ARB\_framebuffer\_sRGB}
+00264 \textcolor{preprocessor}{#define WGL\_ARB\_framebuffer\_sRGB 1}
+00265 
+00266 \textcolor{preprocessor}{#define WGL\_FRAMEBUFFER\_SRGB\_CAPABLE\_ARB 0x20A9}
+00267 
+00268 \textcolor{preprocessor}{#define WGLEW\_ARB\_framebuffer\_sRGB WGLEW\_GET\_VAR(\_\_WGLEW\_ARB\_framebuffer\_sRGB)}
+00269 
+00270 \textcolor{preprocessor}{#endif }\textcolor{comment}{/* WGL\_ARB\_framebuffer\_sRGB */}\textcolor{preprocessor}{}
+00271 
+00272 \textcolor{comment}{/* ----------------------- WGL\_ARB\_make\_current\_read ----------------------- */}
+00273 
+00274 \textcolor{preprocessor}{#ifndef WGL\_ARB\_make\_current\_read}
+00275 \textcolor{preprocessor}{#define WGL\_ARB\_make\_current\_read 1}
+00276 
+00277 \textcolor{preprocessor}{#define ERROR\_INVALID\_PIXEL\_TYPE\_ARB 0x2043}
+00278 \textcolor{preprocessor}{#define ERROR\_INCOMPATIBLE\_DEVICE\_CONTEXTS\_ARB 0x2054}
+00279 
+00280 \textcolor{keyword}{typedef} HDC (WINAPI * PFNWGLGETCURRENTREADDCARBPROC) (VOID);
+00281 \textcolor{keyword}{typedef} BOOL (WINAPI * PFNWGLMAKECONTEXTCURRENTARBPROC) (HDC hDrawDC, HDC 
+      hReadDC, HGLRC hglrc);
+00282 
+00283 \textcolor{preprocessor}{#define wglGetCurrentReadDCARB WGLEW\_GET\_FUN(\_\_wglewGetCurrentReadDCARB)}
+00284 \textcolor{preprocessor}{#define wglMakeContextCurrentARB WGLEW\_GET\_FUN(\_\_wglewMakeContextCurrentARB)}
+00285 
+00286 \textcolor{preprocessor}{#define WGLEW\_ARB\_make\_current\_read WGLEW\_GET\_VAR(\_\_WGLEW\_ARB\_make\_current\_read)}
+00287 
+00288 \textcolor{preprocessor}{#endif }\textcolor{comment}{/* WGL\_ARB\_make\_current\_read */}\textcolor{preprocessor}{}
+00289 
+00290 \textcolor{comment}{/* -------------------------- WGL\_ARB\_multisample -------------------------- */}
+00291 
+00292 \textcolor{preprocessor}{#ifndef WGL\_ARB\_multisample}
+00293 \textcolor{preprocessor}{#define WGL\_ARB\_multisample 1}
+00294 
+00295 \textcolor{preprocessor}{#define WGL\_SAMPLE\_BUFFERS\_ARB 0x2041}
+00296 \textcolor{preprocessor}{#define WGL\_SAMPLES\_ARB 0x2042}
+00297 
+00298 \textcolor{preprocessor}{#define WGLEW\_ARB\_multisample WGLEW\_GET\_VAR(\_\_WGLEW\_ARB\_multisample)}
+00299 
+00300 \textcolor{preprocessor}{#endif }\textcolor{comment}{/* WGL\_ARB\_multisample */}\textcolor{preprocessor}{}
+00301 
+00302 \textcolor{comment}{/* ---------------------------- WGL\_ARB\_pbuffer ---------------------------- */}
+00303 
+00304 \textcolor{preprocessor}{#ifndef WGL\_ARB\_pbuffer}
+00305 \textcolor{preprocessor}{#define WGL\_ARB\_pbuffer 1}
+00306 
+00307 \textcolor{preprocessor}{#define WGL\_DRAW\_TO\_PBUFFER\_ARB 0x202D}
+00308 \textcolor{preprocessor}{#define WGL\_MAX\_PBUFFER\_PIXELS\_ARB 0x202E}
+00309 \textcolor{preprocessor}{#define WGL\_MAX\_PBUFFER\_WIDTH\_ARB 0x202F}
+00310 \textcolor{preprocessor}{#define WGL\_MAX\_PBUFFER\_HEIGHT\_ARB 0x2030}
+00311 \textcolor{preprocessor}{#define WGL\_PBUFFER\_LARGEST\_ARB 0x2033}
+00312 \textcolor{preprocessor}{#define WGL\_PBUFFER\_WIDTH\_ARB 0x2034}
+00313 \textcolor{preprocessor}{#define WGL\_PBUFFER\_HEIGHT\_ARB 0x2035}
+00314 \textcolor{preprocessor}{#define WGL\_PBUFFER\_LOST\_ARB 0x2036}
+00315 
+00316 DECLARE_HANDLE(HPBUFFERARB);
+00317 
+00318 \textcolor{keyword}{typedef} HPBUFFERARB (WINAPI * PFNWGLCREATEPBUFFERARBPROC) (HDC hDC, \textcolor{keywordtype}{int} 
+      iPixelFormat, \textcolor{keywordtype}{int} iWidth, \textcolor{keywordtype}{int} iHeight, \textcolor{keyword}{const} \textcolor{keywordtype}{int}* piAttribList);
+00319 \textcolor{keyword}{typedef} BOOL (WINAPI * PFNWGLDESTROYPBUFFERARBPROC) (HPBUFFERARB hPbuffer);
+00320 \textcolor{keyword}{typedef} HDC (WINAPI * PFNWGLGETPBUFFERDCARBPROC) (HPBUFFERARB hPbuffer);
+00321 \textcolor{keyword}{typedef} BOOL (WINAPI * PFNWGLQUERYPBUFFERARBPROC) (HPBUFFERARB hPbuffer, \textcolor{keywordtype}{int} 
+      iAttribute, \textcolor{keywordtype}{int}* piValue);
+00322 \textcolor{keyword}{typedef} int (WINAPI * PFNWGLRELEASEPBUFFERDCARBPROC) (HPBUFFERARB hPbuffer, HDC 
+      hDC);
+00323 
+00324 \textcolor{preprocessor}{#define wglCreatePbufferARB WGLEW\_GET\_FUN(\_\_wglewCreatePbufferARB)}
+00325 \textcolor{preprocessor}{#define wglDestroyPbufferARB WGLEW\_GET\_FUN(\_\_wglewDestroyPbufferARB)}
+00326 \textcolor{preprocessor}{#define wglGetPbufferDCARB WGLEW\_GET\_FUN(\_\_wglewGetPbufferDCARB)}
+00327 \textcolor{preprocessor}{#define wglQueryPbufferARB WGLEW\_GET\_FUN(\_\_wglewQueryPbufferARB)}
+00328 \textcolor{preprocessor}{#define wglReleasePbufferDCARB WGLEW\_GET\_FUN(\_\_wglewReleasePbufferDCARB)}
+00329 
+00330 \textcolor{preprocessor}{#define WGLEW\_ARB\_pbuffer WGLEW\_GET\_VAR(\_\_WGLEW\_ARB\_pbuffer)}
+00331 
+00332 \textcolor{preprocessor}{#endif }\textcolor{comment}{/* WGL\_ARB\_pbuffer */}\textcolor{preprocessor}{}
+00333 
+00334 \textcolor{comment}{/* -------------------------- WGL\_ARB\_pixel\_format ------------------------- */}
+00335 
+00336 \textcolor{preprocessor}{#ifndef WGL\_ARB\_pixel\_format}
+00337 \textcolor{preprocessor}{#define WGL\_ARB\_pixel\_format 1}
+00338 
+00339 \textcolor{preprocessor}{#define WGL\_NUMBER\_PIXEL\_FORMATS\_ARB 0x2000}
+00340 \textcolor{preprocessor}{#define WGL\_DRAW\_TO\_WINDOW\_ARB 0x2001}
+00341 \textcolor{preprocessor}{#define WGL\_DRAW\_TO\_BITMAP\_ARB 0x2002}
+00342 \textcolor{preprocessor}{#define WGL\_ACCELERATION\_ARB 0x2003}
+00343 \textcolor{preprocessor}{#define WGL\_NEED\_PALETTE\_ARB 0x2004}
+00344 \textcolor{preprocessor}{#define WGL\_NEED\_SYSTEM\_PALETTE\_ARB 0x2005}
+00345 \textcolor{preprocessor}{#define WGL\_SWAP\_LAYER\_BUFFERS\_ARB 0x2006}
+00346 \textcolor{preprocessor}{#define WGL\_SWAP\_METHOD\_ARB 0x2007}
+00347 \textcolor{preprocessor}{#define WGL\_NUMBER\_OVERLAYS\_ARB 0x2008}
+00348 \textcolor{preprocessor}{#define WGL\_NUMBER\_UNDERLAYS\_ARB 0x2009}
+00349 \textcolor{preprocessor}{#define WGL\_TRANSPARENT\_ARB 0x200A}
+00350 \textcolor{preprocessor}{#define WGL\_SHARE\_DEPTH\_ARB 0x200C}
+00351 \textcolor{preprocessor}{#define WGL\_SHARE\_STENCIL\_ARB 0x200D}
+00352 \textcolor{preprocessor}{#define WGL\_SHARE\_ACCUM\_ARB 0x200E}
+00353 \textcolor{preprocessor}{#define WGL\_SUPPORT\_GDI\_ARB 0x200F}
+00354 \textcolor{preprocessor}{#define WGL\_SUPPORT\_OPENGL\_ARB 0x2010}
+00355 \textcolor{preprocessor}{#define WGL\_DOUBLE\_BUFFER\_ARB 0x2011}
+00356 \textcolor{preprocessor}{#define WGL\_STEREO\_ARB 0x2012}
+00357 \textcolor{preprocessor}{#define WGL\_PIXEL\_TYPE\_ARB 0x2013}
+00358 \textcolor{preprocessor}{#define WGL\_COLOR\_BITS\_ARB 0x2014}
+00359 \textcolor{preprocessor}{#define WGL\_RED\_BITS\_ARB 0x2015}
+00360 \textcolor{preprocessor}{#define WGL\_RED\_SHIFT\_ARB 0x2016}
+00361 \textcolor{preprocessor}{#define WGL\_GREEN\_BITS\_ARB 0x2017}
+00362 \textcolor{preprocessor}{#define WGL\_GREEN\_SHIFT\_ARB 0x2018}
+00363 \textcolor{preprocessor}{#define WGL\_BLUE\_BITS\_ARB 0x2019}
+00364 \textcolor{preprocessor}{#define WGL\_BLUE\_SHIFT\_ARB 0x201A}
+00365 \textcolor{preprocessor}{#define WGL\_ALPHA\_BITS\_ARB 0x201B}
+00366 \textcolor{preprocessor}{#define WGL\_ALPHA\_SHIFT\_ARB 0x201C}
+00367 \textcolor{preprocessor}{#define WGL\_ACCUM\_BITS\_ARB 0x201D}
+00368 \textcolor{preprocessor}{#define WGL\_ACCUM\_RED\_BITS\_ARB 0x201E}
+00369 \textcolor{preprocessor}{#define WGL\_ACCUM\_GREEN\_BITS\_ARB 0x201F}
+00370 \textcolor{preprocessor}{#define WGL\_ACCUM\_BLUE\_BITS\_ARB 0x2020}
+00371 \textcolor{preprocessor}{#define WGL\_ACCUM\_ALPHA\_BITS\_ARB 0x2021}
+00372 \textcolor{preprocessor}{#define WGL\_DEPTH\_BITS\_ARB 0x2022}
+00373 \textcolor{preprocessor}{#define WGL\_STENCIL\_BITS\_ARB 0x2023}
+00374 \textcolor{preprocessor}{#define WGL\_AUX\_BUFFERS\_ARB 0x2024}
+00375 \textcolor{preprocessor}{#define WGL\_NO\_ACCELERATION\_ARB 0x2025}
+00376 \textcolor{preprocessor}{#define WGL\_GENERIC\_ACCELERATION\_ARB 0x2026}
+00377 \textcolor{preprocessor}{#define WGL\_FULL\_ACCELERATION\_ARB 0x2027}
+00378 \textcolor{preprocessor}{#define WGL\_SWAP\_EXCHANGE\_ARB 0x2028}
+00379 \textcolor{preprocessor}{#define WGL\_SWAP\_COPY\_ARB 0x2029}
+00380 \textcolor{preprocessor}{#define WGL\_SWAP\_UNDEFINED\_ARB 0x202A}
+00381 \textcolor{preprocessor}{#define WGL\_TYPE\_RGBA\_ARB 0x202B}
+00382 \textcolor{preprocessor}{#define WGL\_TYPE\_COLORINDEX\_ARB 0x202C}
+00383 \textcolor{preprocessor}{#define WGL\_TRANSPARENT\_RED\_VALUE\_ARB 0x2037}
+00384 \textcolor{preprocessor}{#define WGL\_TRANSPARENT\_GREEN\_VALUE\_ARB 0x2038}
+00385 \textcolor{preprocessor}{#define WGL\_TRANSPARENT\_BLUE\_VALUE\_ARB 0x2039}
+00386 \textcolor{preprocessor}{#define WGL\_TRANSPARENT\_ALPHA\_VALUE\_ARB 0x203A}
+00387 \textcolor{preprocessor}{#define WGL\_TRANSPARENT\_INDEX\_VALUE\_ARB 0x203B}
+00388 
+00389 \textcolor{keyword}{typedef} BOOL (WINAPI * PFNWGLCHOOSEPIXELFORMATARBPROC) (HDC hdc, \textcolor{keyword}{const} \textcolor{keywordtype}{int}* 
+      piAttribIList, \textcolor{keyword}{const} FLOAT *pfAttribFList, UINT nMaxFormats, \textcolor{keywordtype}{int} *piFormats, 
+      UINT *nNumFormats);
+00390 \textcolor{keyword}{typedef} BOOL (WINAPI * PFNWGLGETPIXELFORMATATTRIBFVARBPROC) (HDC hdc, \textcolor{keywordtype}{int} 
+      iPixelFormat, \textcolor{keywordtype}{int} iLayerPlane, UINT nAttributes, \textcolor{keyword}{const} \textcolor{keywordtype}{int}* piAttributes, FLOAT *
+      pfValues);
+00391 \textcolor{keyword}{typedef} BOOL (WINAPI * PFNWGLGETPIXELFORMATATTRIBIVARBPROC) (HDC hdc, \textcolor{keywordtype}{int} 
+      iPixelFormat, \textcolor{keywordtype}{int} iLayerPlane, UINT nAttributes, \textcolor{keyword}{const} \textcolor{keywordtype}{int}* piAttributes, \textcolor{keywordtype}{int} *
+      piValues);
+00392 
+00393 \textcolor{preprocessor}{#define wglChoosePixelFormatARB WGLEW\_GET\_FUN(\_\_wglewChoosePixelFormatARB)}
+00394 \textcolor{preprocessor}{#define wglGetPixelFormatAttribfvARB WGLEW\_GET\_FUN(\_\_wglewGetPixelFormatAttribfvARB)}
+00395 \textcolor{preprocessor}{#define wglGetPixelFormatAttribivARB WGLEW\_GET\_FUN(\_\_wglewGetPixelFormatAttribivARB)}
+00396 
+00397 \textcolor{preprocessor}{#define WGLEW\_ARB\_pixel\_format WGLEW\_GET\_VAR(\_\_WGLEW\_ARB\_pixel\_format)}
+00398 
+00399 \textcolor{preprocessor}{#endif }\textcolor{comment}{/* WGL\_ARB\_pixel\_format */}\textcolor{preprocessor}{}
+00400 
+00401 \textcolor{comment}{/* ----------------------- WGL\_ARB\_pixel\_format\_float ---------------------- */}
+00402 
+00403 \textcolor{preprocessor}{#ifndef WGL\_ARB\_pixel\_format\_float}
+00404 \textcolor{preprocessor}{#define WGL\_ARB\_pixel\_format\_float 1}
+00405 
+00406 \textcolor{preprocessor}{#define WGL\_TYPE\_RGBA\_FLOAT\_ARB 0x21A0}
+00407 
+00408 \textcolor{preprocessor}{#define WGLEW\_ARB\_pixel\_format\_float WGLEW\_GET\_VAR(\_\_WGLEW\_ARB\_pixel\_format\_float)}
+00409 
+00410 \textcolor{preprocessor}{#endif }\textcolor{comment}{/* WGL\_ARB\_pixel\_format\_float */}\textcolor{preprocessor}{}
+00411 
+00412 \textcolor{comment}{/* ------------------------- WGL\_ARB\_render\_texture ------------------------ */}
+00413 
+00414 \textcolor{preprocessor}{#ifndef WGL\_ARB\_render\_texture}
+00415 \textcolor{preprocessor}{#define WGL\_ARB\_render\_texture 1}
+00416 
+00417 \textcolor{preprocessor}{#define WGL\_BIND\_TO\_TEXTURE\_RGB\_ARB 0x2070}
+00418 \textcolor{preprocessor}{#define WGL\_BIND\_TO\_TEXTURE\_RGBA\_ARB 0x2071}
+00419 \textcolor{preprocessor}{#define WGL\_TEXTURE\_FORMAT\_ARB 0x2072}
+00420 \textcolor{preprocessor}{#define WGL\_TEXTURE\_TARGET\_ARB 0x2073}
+00421 \textcolor{preprocessor}{#define WGL\_MIPMAP\_TEXTURE\_ARB 0x2074}
+00422 \textcolor{preprocessor}{#define WGL\_TEXTURE\_RGB\_ARB 0x2075}
+00423 \textcolor{preprocessor}{#define WGL\_TEXTURE\_RGBA\_ARB 0x2076}
+00424 \textcolor{preprocessor}{#define WGL\_NO\_TEXTURE\_ARB 0x2077}
+00425 \textcolor{preprocessor}{#define WGL\_TEXTURE\_CUBE\_MAP\_ARB 0x2078}
+00426 \textcolor{preprocessor}{#define WGL\_TEXTURE\_1D\_ARB 0x2079}
+00427 \textcolor{preprocessor}{#define WGL\_TEXTURE\_2D\_ARB 0x207A}
+00428 \textcolor{preprocessor}{#define WGL\_MIPMAP\_LEVEL\_ARB 0x207B}
+00429 \textcolor{preprocessor}{#define WGL\_CUBE\_MAP\_FACE\_ARB 0x207C}
+00430 \textcolor{preprocessor}{#define WGL\_TEXTURE\_CUBE\_MAP\_POSITIVE\_X\_ARB 0x207D}
+00431 \textcolor{preprocessor}{#define WGL\_TEXTURE\_CUBE\_MAP\_NEGATIVE\_X\_ARB 0x207E}
+00432 \textcolor{preprocessor}{#define WGL\_TEXTURE\_CUBE\_MAP\_POSITIVE\_Y\_ARB 0x207F}
+00433 \textcolor{preprocessor}{#define WGL\_TEXTURE\_CUBE\_MAP\_NEGATIVE\_Y\_ARB 0x2080}
+00434 \textcolor{preprocessor}{#define WGL\_TEXTURE\_CUBE\_MAP\_POSITIVE\_Z\_ARB 0x2081}
+00435 \textcolor{preprocessor}{#define WGL\_TEXTURE\_CUBE\_MAP\_NEGATIVE\_Z\_ARB 0x2082}
+00436 \textcolor{preprocessor}{#define WGL\_FRONT\_LEFT\_ARB 0x2083}
+00437 \textcolor{preprocessor}{#define WGL\_FRONT\_RIGHT\_ARB 0x2084}
+00438 \textcolor{preprocessor}{#define WGL\_BACK\_LEFT\_ARB 0x2085}
+00439 \textcolor{preprocessor}{#define WGL\_BACK\_RIGHT\_ARB 0x2086}
+00440 \textcolor{preprocessor}{#define WGL\_AUX0\_ARB 0x2087}
+00441 \textcolor{preprocessor}{#define WGL\_AUX1\_ARB 0x2088}
+00442 \textcolor{preprocessor}{#define WGL\_AUX2\_ARB 0x2089}
+00443 \textcolor{preprocessor}{#define WGL\_AUX3\_ARB 0x208A}
+00444 \textcolor{preprocessor}{#define WGL\_AUX4\_ARB 0x208B}
+00445 \textcolor{preprocessor}{#define WGL\_AUX5\_ARB 0x208C}
+00446 \textcolor{preprocessor}{#define WGL\_AUX6\_ARB 0x208D}
+00447 \textcolor{preprocessor}{#define WGL\_AUX7\_ARB 0x208E}
+00448 \textcolor{preprocessor}{#define WGL\_AUX8\_ARB 0x208F}
+00449 \textcolor{preprocessor}{#define WGL\_AUX9\_ARB 0x2090}
+00450 
+00451 \textcolor{keyword}{typedef} BOOL (WINAPI * PFNWGLBINDTEXIMAGEARBPROC) (HPBUFFERARB hPbuffer, \textcolor{keywordtype}{int} 
+      iBuffer);
+00452 \textcolor{keyword}{typedef} BOOL (WINAPI * PFNWGLRELEASETEXIMAGEARBPROC) (HPBUFFERARB hPbuffer, \textcolor{keywordtype}{int} 
+      iBuffer);
+00453 \textcolor{keyword}{typedef} BOOL (WINAPI * PFNWGLSETPBUFFERATTRIBARBPROC) (HPBUFFERARB hPbuffer, \textcolor{keyword}{const} \textcolor{keywordtype}{int}* 
+      piAttribList);
+00454 
+00455 \textcolor{preprocessor}{#define wglBindTexImageARB WGLEW\_GET\_FUN(\_\_wglewBindTexImageARB)}
+00456 \textcolor{preprocessor}{#define wglReleaseTexImageARB WGLEW\_GET\_FUN(\_\_wglewReleaseTexImageARB)}
+00457 \textcolor{preprocessor}{#define wglSetPbufferAttribARB WGLEW\_GET\_FUN(\_\_wglewSetPbufferAttribARB)}
+00458 
+00459 \textcolor{preprocessor}{#define WGLEW\_ARB\_render\_texture WGLEW\_GET\_VAR(\_\_WGLEW\_ARB\_render\_texture)}
+00460 
+00461 \textcolor{preprocessor}{#endif }\textcolor{comment}{/* WGL\_ARB\_render\_texture */}\textcolor{preprocessor}{}
+00462 
+00463 \textcolor{comment}{/* ---------------- WGL\_ARB\_robustness\_application\_isolation --------------- */}
+00464 
+00465 \textcolor{preprocessor}{#ifndef WGL\_ARB\_robustness\_application\_isolation}
+00466 \textcolor{preprocessor}{#define WGL\_ARB\_robustness\_application\_isolation 1}
+00467 
+00468 \textcolor{preprocessor}{#define WGL\_CONTEXT\_RESET\_ISOLATION\_BIT\_ARB 0x00000008}
+00469 
+00470 \textcolor{preprocessor}{#define WGLEW\_ARB\_robustness\_application\_isolation
+       WGLEW\_GET\_VAR(\_\_WGLEW\_ARB\_robustness\_application\_isolation)}
+00471 
+00472 \textcolor{preprocessor}{#endif }\textcolor{comment}{/* WGL\_ARB\_robustness\_application\_isolation */}\textcolor{preprocessor}{}
+00473 
+00474 \textcolor{comment}{/* ---------------- WGL\_ARB\_robustness\_share\_group\_isolation --------------- */}
+00475 
+00476 \textcolor{preprocessor}{#ifndef WGL\_ARB\_robustness\_share\_group\_isolation}
+00477 \textcolor{preprocessor}{#define WGL\_ARB\_robustness\_share\_group\_isolation 1}
+00478 
+00479 \textcolor{preprocessor}{#define WGL\_CONTEXT\_RESET\_ISOLATION\_BIT\_ARB 0x00000008}
+00480 
+00481 \textcolor{preprocessor}{#define WGLEW\_ARB\_robustness\_share\_group\_isolation
+       WGLEW\_GET\_VAR(\_\_WGLEW\_ARB\_robustness\_share\_group\_isolation)}
+00482 
+00483 \textcolor{preprocessor}{#endif }\textcolor{comment}{/* WGL\_ARB\_robustness\_share\_group\_isolation */}\textcolor{preprocessor}{}
+00484 
+00485 \textcolor{comment}{/* ----------------------- WGL\_ATI\_pixel\_format\_float ---------------------- */}
+00486 
+00487 \textcolor{preprocessor}{#ifndef WGL\_ATI\_pixel\_format\_float}
+00488 \textcolor{preprocessor}{#define WGL\_ATI\_pixel\_format\_float 1}
+00489 
+00490 \textcolor{preprocessor}{#define WGL\_TYPE\_RGBA\_FLOAT\_ATI 0x21A0}
+00491 \textcolor{preprocessor}{#define GL\_RGBA\_FLOAT\_MODE\_ATI 0x8820}
+00492 \textcolor{preprocessor}{#define GL\_COLOR\_CLEAR\_UNCLAMPED\_VALUE\_ATI 0x8835}
+00493 
+00494 \textcolor{preprocessor}{#define WGLEW\_ATI\_pixel\_format\_float WGLEW\_GET\_VAR(\_\_WGLEW\_ATI\_pixel\_format\_float)}
+00495 
+00496 \textcolor{preprocessor}{#endif }\textcolor{comment}{/* WGL\_ATI\_pixel\_format\_float */}\textcolor{preprocessor}{}
+00497 
+00498 \textcolor{comment}{/* -------------------- WGL\_ATI\_render\_texture\_rectangle ------------------- */}
+00499 
+00500 \textcolor{preprocessor}{#ifndef WGL\_ATI\_render\_texture\_rectangle}
+00501 \textcolor{preprocessor}{#define WGL\_ATI\_render\_texture\_rectangle 1}
+00502 
+00503 \textcolor{preprocessor}{#define WGL\_TEXTURE\_RECTANGLE\_ATI 0x21A5}
+00504 
+00505 \textcolor{preprocessor}{#define WGLEW\_ATI\_render\_texture\_rectangle WGLEW\_GET\_VAR(\_\_WGLEW\_ATI\_render\_texture\_rectangle)}
+00506 
+00507 \textcolor{preprocessor}{#endif }\textcolor{comment}{/* WGL\_ATI\_render\_texture\_rectangle */}\textcolor{preprocessor}{}
+00508 
+00509 \textcolor{comment}{/* ------------------- WGL\_EXT\_create\_context\_es2\_profile ------------------ */}
+00510 
+00511 \textcolor{preprocessor}{#ifndef WGL\_EXT\_create\_context\_es2\_profile}
+00512 \textcolor{preprocessor}{#define WGL\_EXT\_create\_context\_es2\_profile 1}
+00513 
+00514 \textcolor{preprocessor}{#define WGL\_CONTEXT\_ES2\_PROFILE\_BIT\_EXT 0x00000004}
+00515 
+00516 \textcolor{preprocessor}{#define WGLEW\_EXT\_create\_context\_es2\_profile WGLEW\_GET\_VAR(\_\_WGLEW\_EXT\_create\_context\_es2\_profile)}
+00517 
+00518 \textcolor{preprocessor}{#endif }\textcolor{comment}{/* WGL\_EXT\_create\_context\_es2\_profile */}\textcolor{preprocessor}{}
+00519 
+00520 \textcolor{comment}{/* ------------------- WGL\_EXT\_create\_context\_es\_profile ------------------- */}
+00521 
+00522 \textcolor{preprocessor}{#ifndef WGL\_EXT\_create\_context\_es\_profile}
+00523 \textcolor{preprocessor}{#define WGL\_EXT\_create\_context\_es\_profile 1}
+00524 
+00525 \textcolor{preprocessor}{#define WGL\_CONTEXT\_ES\_PROFILE\_BIT\_EXT 0x00000004}
+00526 
+00527 \textcolor{preprocessor}{#define WGLEW\_EXT\_create\_context\_es\_profile WGLEW\_GET\_VAR(\_\_WGLEW\_EXT\_create\_context\_es\_profile)}
+00528 
+00529 \textcolor{preprocessor}{#endif }\textcolor{comment}{/* WGL\_EXT\_create\_context\_es\_profile */}\textcolor{preprocessor}{}
+00530 
+00531 \textcolor{comment}{/* -------------------------- WGL\_EXT\_depth\_float -------------------------- */}
+00532 
+00533 \textcolor{preprocessor}{#ifndef WGL\_EXT\_depth\_float}
+00534 \textcolor{preprocessor}{#define WGL\_EXT\_depth\_float 1}
+00535 
+00536 \textcolor{preprocessor}{#define WGL\_DEPTH\_FLOAT\_EXT 0x2040}
+00537 
+00538 \textcolor{preprocessor}{#define WGLEW\_EXT\_depth\_float WGLEW\_GET\_VAR(\_\_WGLEW\_EXT\_depth\_float)}
+00539 
+00540 \textcolor{preprocessor}{#endif }\textcolor{comment}{/* WGL\_EXT\_depth\_float */}\textcolor{preprocessor}{}
+00541 
+00542 \textcolor{comment}{/* ---------------------- WGL\_EXT\_display\_color\_table ---------------------- */}
+00543 
+00544 \textcolor{preprocessor}{#ifndef WGL\_EXT\_display\_color\_table}
+00545 \textcolor{preprocessor}{#define WGL\_EXT\_display\_color\_table 1}
+00546 
+00547 \textcolor{keyword}{typedef} GLboolean (WINAPI * PFNWGLBINDDISPLAYCOLORTABLEEXTPROC) (GLushort id);
+00548 \textcolor{keyword}{typedef} GLboolean (WINAPI * PFNWGLCREATEDISPLAYCOLORTABLEEXTPROC) (GLushort id);
+00549 \textcolor{keyword}{typedef} void (WINAPI * PFNWGLDESTROYDISPLAYCOLORTABLEEXTPROC) (GLushort id);
+00550 \textcolor{keyword}{typedef} GLboolean (WINAPI * PFNWGLLOADDISPLAYCOLORTABLEEXTPROC) (GLushort* table, 
+      GLuint length);
+00551 
+00552 \textcolor{preprocessor}{#define wglBindDisplayColorTableEXT WGLEW\_GET\_FUN(\_\_wglewBindDisplayColorTableEXT)}
+00553 \textcolor{preprocessor}{#define wglCreateDisplayColorTableEXT WGLEW\_GET\_FUN(\_\_wglewCreateDisplayColorTableEXT)}
+00554 \textcolor{preprocessor}{#define wglDestroyDisplayColorTableEXT WGLEW\_GET\_FUN(\_\_wglewDestroyDisplayColorTableEXT)}
+00555 \textcolor{preprocessor}{#define wglLoadDisplayColorTableEXT WGLEW\_GET\_FUN(\_\_wglewLoadDisplayColorTableEXT)}
+00556 
+00557 \textcolor{preprocessor}{#define WGLEW\_EXT\_display\_color\_table WGLEW\_GET\_VAR(\_\_WGLEW\_EXT\_display\_color\_table)}
+00558 
+00559 \textcolor{preprocessor}{#endif }\textcolor{comment}{/* WGL\_EXT\_display\_color\_table */}\textcolor{preprocessor}{}
+00560 
+00561 \textcolor{comment}{/* ----------------------- WGL\_EXT\_extensions\_string ----------------------- */}
+00562 
+00563 \textcolor{preprocessor}{#ifndef WGL\_EXT\_extensions\_string}
+00564 \textcolor{preprocessor}{#define WGL\_EXT\_extensions\_string 1}
+00565 
+00566 \textcolor{keyword}{typedef} \textcolor{keyword}{const} \textcolor{keywordtype}{char}* (WINAPI * PFNWGLGETEXTENSIONSSTRINGEXTPROC) (\textcolor{keywordtype}{void});
+00567 
+00568 \textcolor{preprocessor}{#define wglGetExtensionsStringEXT WGLEW\_GET\_FUN(\_\_wglewGetExtensionsStringEXT)}
+00569 
+00570 \textcolor{preprocessor}{#define WGLEW\_EXT\_extensions\_string WGLEW\_GET\_VAR(\_\_WGLEW\_EXT\_extensions\_string)}
+00571 
+00572 \textcolor{preprocessor}{#endif }\textcolor{comment}{/* WGL\_EXT\_extensions\_string */}\textcolor{preprocessor}{}
+00573 
+00574 \textcolor{comment}{/* ------------------------ WGL\_EXT\_framebuffer\_sRGB ----------------------- */}
+00575 
+00576 \textcolor{preprocessor}{#ifndef WGL\_EXT\_framebuffer\_sRGB}
+00577 \textcolor{preprocessor}{#define WGL\_EXT\_framebuffer\_sRGB 1}
+00578 
+00579 \textcolor{preprocessor}{#define WGL\_FRAMEBUFFER\_SRGB\_CAPABLE\_EXT 0x20A9}
+00580 
+00581 \textcolor{preprocessor}{#define WGLEW\_EXT\_framebuffer\_sRGB WGLEW\_GET\_VAR(\_\_WGLEW\_EXT\_framebuffer\_sRGB)}
+00582 
+00583 \textcolor{preprocessor}{#endif }\textcolor{comment}{/* WGL\_EXT\_framebuffer\_sRGB */}\textcolor{preprocessor}{}
+00584 
+00585 \textcolor{comment}{/* ----------------------- WGL\_EXT\_make\_current\_read ----------------------- */}
+00586 
+00587 \textcolor{preprocessor}{#ifndef WGL\_EXT\_make\_current\_read}
+00588 \textcolor{preprocessor}{#define WGL\_EXT\_make\_current\_read 1}
+00589 
+00590 \textcolor{preprocessor}{#define ERROR\_INVALID\_PIXEL\_TYPE\_EXT 0x2043}
+00591 
+00592 \textcolor{keyword}{typedef} HDC (WINAPI * PFNWGLGETCURRENTREADDCEXTPROC) (VOID);
+00593 \textcolor{keyword}{typedef} BOOL (WINAPI * PFNWGLMAKECONTEXTCURRENTEXTPROC) (HDC hDrawDC, HDC 
+      hReadDC, HGLRC hglrc);
+00594 
+00595 \textcolor{preprocessor}{#define wglGetCurrentReadDCEXT WGLEW\_GET\_FUN(\_\_wglewGetCurrentReadDCEXT)}
+00596 \textcolor{preprocessor}{#define wglMakeContextCurrentEXT WGLEW\_GET\_FUN(\_\_wglewMakeContextCurrentEXT)}
+00597 
+00598 \textcolor{preprocessor}{#define WGLEW\_EXT\_make\_current\_read WGLEW\_GET\_VAR(\_\_WGLEW\_EXT\_make\_current\_read)}
+00599 
+00600 \textcolor{preprocessor}{#endif }\textcolor{comment}{/* WGL\_EXT\_make\_current\_read */}\textcolor{preprocessor}{}
+00601 
+00602 \textcolor{comment}{/* -------------------------- WGL\_EXT\_multisample -------------------------- */}
+00603 
+00604 \textcolor{preprocessor}{#ifndef WGL\_EXT\_multisample}
+00605 \textcolor{preprocessor}{#define WGL\_EXT\_multisample 1}
+00606 
+00607 \textcolor{preprocessor}{#define WGL\_SAMPLE\_BUFFERS\_EXT 0x2041}
+00608 \textcolor{preprocessor}{#define WGL\_SAMPLES\_EXT 0x2042}
+00609 
+00610 \textcolor{preprocessor}{#define WGLEW\_EXT\_multisample WGLEW\_GET\_VAR(\_\_WGLEW\_EXT\_multisample)}
+00611 
+00612 \textcolor{preprocessor}{#endif }\textcolor{comment}{/* WGL\_EXT\_multisample */}\textcolor{preprocessor}{}
+00613 
+00614 \textcolor{comment}{/* ---------------------------- WGL\_EXT\_pbuffer ---------------------------- */}
+00615 
+00616 \textcolor{preprocessor}{#ifndef WGL\_EXT\_pbuffer}
+00617 \textcolor{preprocessor}{#define WGL\_EXT\_pbuffer 1}
+00618 
+00619 \textcolor{preprocessor}{#define WGL\_DRAW\_TO\_PBUFFER\_EXT 0x202D}
+00620 \textcolor{preprocessor}{#define WGL\_MAX\_PBUFFER\_PIXELS\_EXT 0x202E}
+00621 \textcolor{preprocessor}{#define WGL\_MAX\_PBUFFER\_WIDTH\_EXT 0x202F}
+00622 \textcolor{preprocessor}{#define WGL\_MAX\_PBUFFER\_HEIGHT\_EXT 0x2030}
+00623 \textcolor{preprocessor}{#define WGL\_OPTIMAL\_PBUFFER\_WIDTH\_EXT 0x2031}
+00624 \textcolor{preprocessor}{#define WGL\_OPTIMAL\_PBUFFER\_HEIGHT\_EXT 0x2032}
+00625 \textcolor{preprocessor}{#define WGL\_PBUFFER\_LARGEST\_EXT 0x2033}
+00626 \textcolor{preprocessor}{#define WGL\_PBUFFER\_WIDTH\_EXT 0x2034}
+00627 \textcolor{preprocessor}{#define WGL\_PBUFFER\_HEIGHT\_EXT 0x2035}
+00628 
+00629 DECLARE_HANDLE(HPBUFFEREXT);
+00630 
+00631 \textcolor{keyword}{typedef} HPBUFFEREXT (WINAPI * PFNWGLCREATEPBUFFEREXTPROC) (HDC hDC, \textcolor{keywordtype}{int} 
+      iPixelFormat, \textcolor{keywordtype}{int} iWidth, \textcolor{keywordtype}{int} iHeight, \textcolor{keyword}{const} \textcolor{keywordtype}{int}* piAttribList);
+00632 \textcolor{keyword}{typedef} BOOL (WINAPI * PFNWGLDESTROYPBUFFEREXTPROC) (HPBUFFEREXT hPbuffer);
+00633 \textcolor{keyword}{typedef} HDC (WINAPI * PFNWGLGETPBUFFERDCEXTPROC) (HPBUFFEREXT hPbuffer);
+00634 \textcolor{keyword}{typedef} BOOL (WINAPI * PFNWGLQUERYPBUFFEREXTPROC) (HPBUFFEREXT hPbuffer, \textcolor{keywordtype}{int} 
+      iAttribute, \textcolor{keywordtype}{int}* piValue);
+00635 \textcolor{keyword}{typedef} int (WINAPI * PFNWGLRELEASEPBUFFERDCEXTPROC) (HPBUFFEREXT hPbuffer, HDC 
+      hDC);
+00636 
+00637 \textcolor{preprocessor}{#define wglCreatePbufferEXT WGLEW\_GET\_FUN(\_\_wglewCreatePbufferEXT)}
+00638 \textcolor{preprocessor}{#define wglDestroyPbufferEXT WGLEW\_GET\_FUN(\_\_wglewDestroyPbufferEXT)}
+00639 \textcolor{preprocessor}{#define wglGetPbufferDCEXT WGLEW\_GET\_FUN(\_\_wglewGetPbufferDCEXT)}
+00640 \textcolor{preprocessor}{#define wglQueryPbufferEXT WGLEW\_GET\_FUN(\_\_wglewQueryPbufferEXT)}
+00641 \textcolor{preprocessor}{#define wglReleasePbufferDCEXT WGLEW\_GET\_FUN(\_\_wglewReleasePbufferDCEXT)}
+00642 
+00643 \textcolor{preprocessor}{#define WGLEW\_EXT\_pbuffer WGLEW\_GET\_VAR(\_\_WGLEW\_EXT\_pbuffer)}
+00644 
+00645 \textcolor{preprocessor}{#endif }\textcolor{comment}{/* WGL\_EXT\_pbuffer */}\textcolor{preprocessor}{}
+00646 
+00647 \textcolor{comment}{/* -------------------------- WGL\_EXT\_pixel\_format ------------------------- */}
+00648 
+00649 \textcolor{preprocessor}{#ifndef WGL\_EXT\_pixel\_format}
+00650 \textcolor{preprocessor}{#define WGL\_EXT\_pixel\_format 1}
+00651 
+00652 \textcolor{preprocessor}{#define WGL\_NUMBER\_PIXEL\_FORMATS\_EXT 0x2000}
+00653 \textcolor{preprocessor}{#define WGL\_DRAW\_TO\_WINDOW\_EXT 0x2001}
+00654 \textcolor{preprocessor}{#define WGL\_DRAW\_TO\_BITMAP\_EXT 0x2002}
+00655 \textcolor{preprocessor}{#define WGL\_ACCELERATION\_EXT 0x2003}
+00656 \textcolor{preprocessor}{#define WGL\_NEED\_PALETTE\_EXT 0x2004}
+00657 \textcolor{preprocessor}{#define WGL\_NEED\_SYSTEM\_PALETTE\_EXT 0x2005}
+00658 \textcolor{preprocessor}{#define WGL\_SWAP\_LAYER\_BUFFERS\_EXT 0x2006}
+00659 \textcolor{preprocessor}{#define WGL\_SWAP\_METHOD\_EXT 0x2007}
+00660 \textcolor{preprocessor}{#define WGL\_NUMBER\_OVERLAYS\_EXT 0x2008}
+00661 \textcolor{preprocessor}{#define WGL\_NUMBER\_UNDERLAYS\_EXT 0x2009}
+00662 \textcolor{preprocessor}{#define WGL\_TRANSPARENT\_EXT 0x200A}
+00663 \textcolor{preprocessor}{#define WGL\_TRANSPARENT\_VALUE\_EXT 0x200B}
+00664 \textcolor{preprocessor}{#define WGL\_SHARE\_DEPTH\_EXT 0x200C}
+00665 \textcolor{preprocessor}{#define WGL\_SHARE\_STENCIL\_EXT 0x200D}
+00666 \textcolor{preprocessor}{#define WGL\_SHARE\_ACCUM\_EXT 0x200E}
+00667 \textcolor{preprocessor}{#define WGL\_SUPPORT\_GDI\_EXT 0x200F}
+00668 \textcolor{preprocessor}{#define WGL\_SUPPORT\_OPENGL\_EXT 0x2010}
+00669 \textcolor{preprocessor}{#define WGL\_DOUBLE\_BUFFER\_EXT 0x2011}
+00670 \textcolor{preprocessor}{#define WGL\_STEREO\_EXT 0x2012}
+00671 \textcolor{preprocessor}{#define WGL\_PIXEL\_TYPE\_EXT 0x2013}
+00672 \textcolor{preprocessor}{#define WGL\_COLOR\_BITS\_EXT 0x2014}
+00673 \textcolor{preprocessor}{#define WGL\_RED\_BITS\_EXT 0x2015}
+00674 \textcolor{preprocessor}{#define WGL\_RED\_SHIFT\_EXT 0x2016}
+00675 \textcolor{preprocessor}{#define WGL\_GREEN\_BITS\_EXT 0x2017}
+00676 \textcolor{preprocessor}{#define WGL\_GREEN\_SHIFT\_EXT 0x2018}
+00677 \textcolor{preprocessor}{#define WGL\_BLUE\_BITS\_EXT 0x2019}
+00678 \textcolor{preprocessor}{#define WGL\_BLUE\_SHIFT\_EXT 0x201A}
+00679 \textcolor{preprocessor}{#define WGL\_ALPHA\_BITS\_EXT 0x201B}
+00680 \textcolor{preprocessor}{#define WGL\_ALPHA\_SHIFT\_EXT 0x201C}
+00681 \textcolor{preprocessor}{#define WGL\_ACCUM\_BITS\_EXT 0x201D}
+00682 \textcolor{preprocessor}{#define WGL\_ACCUM\_RED\_BITS\_EXT 0x201E}
+00683 \textcolor{preprocessor}{#define WGL\_ACCUM\_GREEN\_BITS\_EXT 0x201F}
+00684 \textcolor{preprocessor}{#define WGL\_ACCUM\_BLUE\_BITS\_EXT 0x2020}
+00685 \textcolor{preprocessor}{#define WGL\_ACCUM\_ALPHA\_BITS\_EXT 0x2021}
+00686 \textcolor{preprocessor}{#define WGL\_DEPTH\_BITS\_EXT 0x2022}
+00687 \textcolor{preprocessor}{#define WGL\_STENCIL\_BITS\_EXT 0x2023}
+00688 \textcolor{preprocessor}{#define WGL\_AUX\_BUFFERS\_EXT 0x2024}
+00689 \textcolor{preprocessor}{#define WGL\_NO\_ACCELERATION\_EXT 0x2025}
+00690 \textcolor{preprocessor}{#define WGL\_GENERIC\_ACCELERATION\_EXT 0x2026}
+00691 \textcolor{preprocessor}{#define WGL\_FULL\_ACCELERATION\_EXT 0x2027}
+00692 \textcolor{preprocessor}{#define WGL\_SWAP\_EXCHANGE\_EXT 0x2028}
+00693 \textcolor{preprocessor}{#define WGL\_SWAP\_COPY\_EXT 0x2029}
+00694 \textcolor{preprocessor}{#define WGL\_SWAP\_UNDEFINED\_EXT 0x202A}
+00695 \textcolor{preprocessor}{#define WGL\_TYPE\_RGBA\_EXT 0x202B}
+00696 \textcolor{preprocessor}{#define WGL\_TYPE\_COLORINDEX\_EXT 0x202C}
+00697 
+00698 \textcolor{keyword}{typedef} BOOL (WINAPI * PFNWGLCHOOSEPIXELFORMATEXTPROC) (HDC hdc, \textcolor{keyword}{const} \textcolor{keywordtype}{int}* 
+      piAttribIList, \textcolor{keyword}{const} FLOAT *pfAttribFList, UINT nMaxFormats, \textcolor{keywordtype}{int} *piFormats, 
+      UINT *nNumFormats);
+00699 \textcolor{keyword}{typedef} BOOL (WINAPI * PFNWGLGETPIXELFORMATATTRIBFVEXTPROC) (HDC hdc, \textcolor{keywordtype}{int} 
+      iPixelFormat, \textcolor{keywordtype}{int} iLayerPlane, UINT nAttributes, \textcolor{keywordtype}{int}* piAttributes, FLOAT *
+      pfValues);
+00700 \textcolor{keyword}{typedef} BOOL (WINAPI * PFNWGLGETPIXELFORMATATTRIBIVEXTPROC) (HDC hdc, \textcolor{keywordtype}{int} 
+      iPixelFormat, \textcolor{keywordtype}{int} iLayerPlane, UINT nAttributes, \textcolor{keywordtype}{int}* piAttributes, \textcolor{keywordtype}{int} *
+      piValues);
+00701 
+00702 \textcolor{preprocessor}{#define wglChoosePixelFormatEXT WGLEW\_GET\_FUN(\_\_wglewChoosePixelFormatEXT)}
+00703 \textcolor{preprocessor}{#define wglGetPixelFormatAttribfvEXT WGLEW\_GET\_FUN(\_\_wglewGetPixelFormatAttribfvEXT)}
+00704 \textcolor{preprocessor}{#define wglGetPixelFormatAttribivEXT WGLEW\_GET\_FUN(\_\_wglewGetPixelFormatAttribivEXT)}
+00705 
+00706 \textcolor{preprocessor}{#define WGLEW\_EXT\_pixel\_format WGLEW\_GET\_VAR(\_\_WGLEW\_EXT\_pixel\_format)}
+00707 
+00708 \textcolor{preprocessor}{#endif }\textcolor{comment}{/* WGL\_EXT\_pixel\_format */}\textcolor{preprocessor}{}
+00709 
+00710 \textcolor{comment}{/* ------------------- WGL\_EXT\_pixel\_format\_packed\_float ------------------- */}
+00711 
+00712 \textcolor{preprocessor}{#ifndef WGL\_EXT\_pixel\_format\_packed\_float}
+00713 \textcolor{preprocessor}{#define WGL\_EXT\_pixel\_format\_packed\_float 1}
+00714 
+00715 \textcolor{preprocessor}{#define WGL\_TYPE\_RGBA\_UNSIGNED\_FLOAT\_EXT 0x20A8}
+00716 
+00717 \textcolor{preprocessor}{#define WGLEW\_EXT\_pixel\_format\_packed\_float WGLEW\_GET\_VAR(\_\_WGLEW\_EXT\_pixel\_format\_packed\_float)}
+00718 
+00719 \textcolor{preprocessor}{#endif }\textcolor{comment}{/* WGL\_EXT\_pixel\_format\_packed\_float */}\textcolor{preprocessor}{}
+00720 
+00721 \textcolor{comment}{/* -------------------------- WGL\_EXT\_swap\_control ------------------------- */}
+00722 
+00723 \textcolor{preprocessor}{#ifndef WGL\_EXT\_swap\_control}
+00724 \textcolor{preprocessor}{#define WGL\_EXT\_swap\_control 1}
+00725 
+00726 \textcolor{keyword}{typedef} int (WINAPI * PFNWGLGETSWAPINTERVALEXTPROC) (void);
+00727 \textcolor{keyword}{typedef} BOOL (WINAPI * PFNWGLSWAPINTERVALEXTPROC) (\textcolor{keywordtype}{int} interval);
+00728 
+00729 \textcolor{preprocessor}{#define wglGetSwapIntervalEXT WGLEW\_GET\_FUN(\_\_wglewGetSwapIntervalEXT)}
+00730 \textcolor{preprocessor}{#define wglSwapIntervalEXT WGLEW\_GET\_FUN(\_\_wglewSwapIntervalEXT)}
+00731 
+00732 \textcolor{preprocessor}{#define WGLEW\_EXT\_swap\_control WGLEW\_GET\_VAR(\_\_WGLEW\_EXT\_swap\_control)}
+00733 
+00734 \textcolor{preprocessor}{#endif }\textcolor{comment}{/* WGL\_EXT\_swap\_control */}\textcolor{preprocessor}{}
+00735 
+00736 \textcolor{comment}{/* ----------------------- WGL\_EXT\_swap\_control\_tear ----------------------- */}
+00737 
+00738 \textcolor{preprocessor}{#ifndef WGL\_EXT\_swap\_control\_tear}
+00739 \textcolor{preprocessor}{#define WGL\_EXT\_swap\_control\_tear 1}
+00740 
+00741 \textcolor{preprocessor}{#define WGLEW\_EXT\_swap\_control\_tear WGLEW\_GET\_VAR(\_\_WGLEW\_EXT\_swap\_control\_tear)}
+00742 
+00743 \textcolor{preprocessor}{#endif }\textcolor{comment}{/* WGL\_EXT\_swap\_control\_tear */}\textcolor{preprocessor}{}
+00744 
+00745 \textcolor{comment}{/* --------------------- WGL\_I3D\_digital\_video\_control --------------------- */}
+00746 
+00747 \textcolor{preprocessor}{#ifndef WGL\_I3D\_digital\_video\_control}
+00748 \textcolor{preprocessor}{#define WGL\_I3D\_digital\_video\_control 1}
+00749 
+00750 \textcolor{preprocessor}{#define WGL\_DIGITAL\_VIDEO\_CURSOR\_ALPHA\_FRAMEBUFFER\_I3D 0x2050}
+00751 \textcolor{preprocessor}{#define WGL\_DIGITAL\_VIDEO\_CURSOR\_ALPHA\_VALUE\_I3D 0x2051}
+00752 \textcolor{preprocessor}{#define WGL\_DIGITAL\_VIDEO\_CURSOR\_INCLUDED\_I3D 0x2052}
+00753 \textcolor{preprocessor}{#define WGL\_DIGITAL\_VIDEO\_GAMMA\_CORRECTED\_I3D 0x2053}
+00754 
+00755 \textcolor{keyword}{typedef} BOOL (WINAPI * PFNWGLGETDIGITALVIDEOPARAMETERSI3DPROC) (HDC hDC, \textcolor{keywordtype}{int} 
+      iAttribute, \textcolor{keywordtype}{int}* piValue);
+00756 \textcolor{keyword}{typedef} BOOL (WINAPI * PFNWGLSETDIGITALVIDEOPARAMETERSI3DPROC) (HDC hDC, \textcolor{keywordtype}{int} 
+      iAttribute, \textcolor{keyword}{const} \textcolor{keywordtype}{int}* piValue);
+00757 
+00758 \textcolor{preprocessor}{#define wglGetDigitalVideoParametersI3D WGLEW\_GET\_FUN(\_\_wglewGetDigitalVideoParametersI3D)}
+00759 \textcolor{preprocessor}{#define wglSetDigitalVideoParametersI3D WGLEW\_GET\_FUN(\_\_wglewSetDigitalVideoParametersI3D)}
+00760 
+00761 \textcolor{preprocessor}{#define WGLEW\_I3D\_digital\_video\_control WGLEW\_GET\_VAR(\_\_WGLEW\_I3D\_digital\_video\_control)}
+00762 
+00763 \textcolor{preprocessor}{#endif }\textcolor{comment}{/* WGL\_I3D\_digital\_video\_control */}\textcolor{preprocessor}{}
+00764 
+00765 \textcolor{comment}{/* ----------------------------- WGL\_I3D\_gamma ----------------------------- */}
+00766 
+00767 \textcolor{preprocessor}{#ifndef WGL\_I3D\_gamma}
+00768 \textcolor{preprocessor}{#define WGL\_I3D\_gamma 1}
+00769 
+00770 \textcolor{preprocessor}{#define WGL\_GAMMA\_TABLE\_SIZE\_I3D 0x204E}
+00771 \textcolor{preprocessor}{#define WGL\_GAMMA\_EXCLUDE\_DESKTOP\_I3D 0x204F}
+00772 
+00773 \textcolor{keyword}{typedef} BOOL (WINAPI * PFNWGLGETGAMMATABLEI3DPROC) (HDC hDC, \textcolor{keywordtype}{int} iEntries, USHORT* 
+      puRed, USHORT *puGreen, USHORT *puBlue);
+00774 \textcolor{keyword}{typedef} BOOL (WINAPI * PFNWGLGETGAMMATABLEPARAMETERSI3DPROC) (HDC hDC, \textcolor{keywordtype}{int} 
+      iAttribute, \textcolor{keywordtype}{int}* piValue);
+00775 \textcolor{keyword}{typedef} BOOL (WINAPI * PFNWGLSETGAMMATABLEI3DPROC) (HDC hDC, \textcolor{keywordtype}{int} iEntries, \textcolor{keyword}{const} USHORT* 
+      puRed, \textcolor{keyword}{const} USHORT *puGreen, \textcolor{keyword}{const} USHORT *puBlue);
+00776 \textcolor{keyword}{typedef} BOOL (WINAPI * PFNWGLSETGAMMATABLEPARAMETERSI3DPROC) (HDC hDC, \textcolor{keywordtype}{int} 
+      iAttribute, \textcolor{keyword}{const} \textcolor{keywordtype}{int}* piValue);
+00777 
+00778 \textcolor{preprocessor}{#define wglGetGammaTableI3D WGLEW\_GET\_FUN(\_\_wglewGetGammaTableI3D)}
+00779 \textcolor{preprocessor}{#define wglGetGammaTableParametersI3D WGLEW\_GET\_FUN(\_\_wglewGetGammaTableParametersI3D)}
+00780 \textcolor{preprocessor}{#define wglSetGammaTableI3D WGLEW\_GET\_FUN(\_\_wglewSetGammaTableI3D)}
+00781 \textcolor{preprocessor}{#define wglSetGammaTableParametersI3D WGLEW\_GET\_FUN(\_\_wglewSetGammaTableParametersI3D)}
+00782 
+00783 \textcolor{preprocessor}{#define WGLEW\_I3D\_gamma WGLEW\_GET\_VAR(\_\_WGLEW\_I3D\_gamma)}
+00784 
+00785 \textcolor{preprocessor}{#endif }\textcolor{comment}{/* WGL\_I3D\_gamma */}\textcolor{preprocessor}{}
+00786 
+00787 \textcolor{comment}{/* ---------------------------- WGL\_I3D\_genlock ---------------------------- */}
+00788 
+00789 \textcolor{preprocessor}{#ifndef WGL\_I3D\_genlock}
+00790 \textcolor{preprocessor}{#define WGL\_I3D\_genlock 1}
+00791 
+00792 \textcolor{preprocessor}{#define WGL\_GENLOCK\_SOURCE\_MULTIVIEW\_I3D 0x2044}
+00793 \textcolor{preprocessor}{#define WGL\_GENLOCK\_SOURCE\_EXTERNAL\_SYNC\_I3D 0x2045}
+00794 \textcolor{preprocessor}{#define WGL\_GENLOCK\_SOURCE\_EXTERNAL\_FIELD\_I3D 0x2046}
+00795 \textcolor{preprocessor}{#define WGL\_GENLOCK\_SOURCE\_EXTERNAL\_TTL\_I3D 0x2047}
+00796 \textcolor{preprocessor}{#define WGL\_GENLOCK\_SOURCE\_DIGITAL\_SYNC\_I3D 0x2048}
+00797 \textcolor{preprocessor}{#define WGL\_GENLOCK\_SOURCE\_DIGITAL\_FIELD\_I3D 0x2049}
+00798 \textcolor{preprocessor}{#define WGL\_GENLOCK\_SOURCE\_EDGE\_FALLING\_I3D 0x204A}
+00799 \textcolor{preprocessor}{#define WGL\_GENLOCK\_SOURCE\_EDGE\_RISING\_I3D 0x204B}
+00800 \textcolor{preprocessor}{#define WGL\_GENLOCK\_SOURCE\_EDGE\_BOTH\_I3D 0x204C}
+00801 
+00802 \textcolor{keyword}{typedef} BOOL (WINAPI * PFNWGLDISABLEGENLOCKI3DPROC) (HDC hDC);
+00803 \textcolor{keyword}{typedef} BOOL (WINAPI * PFNWGLENABLEGENLOCKI3DPROC) (HDC hDC);
+00804 \textcolor{keyword}{typedef} BOOL (WINAPI * PFNWGLGENLOCKSAMPLERATEI3DPROC) (HDC hDC, UINT uRate);
+00805 \textcolor{keyword}{typedef} BOOL (WINAPI * PFNWGLGENLOCKSOURCEDELAYI3DPROC) (HDC hDC, UINT uDelay);
+00806 \textcolor{keyword}{typedef} BOOL (WINAPI * PFNWGLGENLOCKSOURCEEDGEI3DPROC) (HDC hDC, UINT uEdge);
+00807 \textcolor{keyword}{typedef} BOOL (WINAPI * PFNWGLGENLOCKSOURCEI3DPROC) (HDC hDC, UINT uSource);
+00808 \textcolor{keyword}{typedef} BOOL (WINAPI * PFNWGLGETGENLOCKSAMPLERATEI3DPROC) (HDC hDC, UINT* uRate);
+00809 \textcolor{keyword}{typedef} BOOL (WINAPI * PFNWGLGETGENLOCKSOURCEDELAYI3DPROC) (HDC hDC, UINT* 
+      uDelay);
+00810 \textcolor{keyword}{typedef} BOOL (WINAPI * PFNWGLGETGENLOCKSOURCEEDGEI3DPROC) (HDC hDC, UINT* uEdge);
+00811 \textcolor{keyword}{typedef} BOOL (WINAPI * PFNWGLGETGENLOCKSOURCEI3DPROC) (HDC hDC, UINT* uSource);
+00812 \textcolor{keyword}{typedef} BOOL (WINAPI * PFNWGLISENABLEDGENLOCKI3DPROC) (HDC hDC, BOOL* pFlag);
+00813 \textcolor{keyword}{typedef} BOOL (WINAPI * PFNWGLQUERYGENLOCKMAXSOURCEDELAYI3DPROC) (HDC hDC, UINT* 
+      uMaxLineDelay, UINT *uMaxPixelDelay);
+00814 
+00815 \textcolor{preprocessor}{#define wglDisableGenlockI3D WGLEW\_GET\_FUN(\_\_wglewDisableGenlockI3D)}
+00816 \textcolor{preprocessor}{#define wglEnableGenlockI3D WGLEW\_GET\_FUN(\_\_wglewEnableGenlockI3D)}
+00817 \textcolor{preprocessor}{#define wglGenlockSampleRateI3D WGLEW\_GET\_FUN(\_\_wglewGenlockSampleRateI3D)}
+00818 \textcolor{preprocessor}{#define wglGenlockSourceDelayI3D WGLEW\_GET\_FUN(\_\_wglewGenlockSourceDelayI3D)}
+00819 \textcolor{preprocessor}{#define wglGenlockSourceEdgeI3D WGLEW\_GET\_FUN(\_\_wglewGenlockSourceEdgeI3D)}
+00820 \textcolor{preprocessor}{#define wglGenlockSourceI3D WGLEW\_GET\_FUN(\_\_wglewGenlockSourceI3D)}
+00821 \textcolor{preprocessor}{#define wglGetGenlockSampleRateI3D WGLEW\_GET\_FUN(\_\_wglewGetGenlockSampleRateI3D)}
+00822 \textcolor{preprocessor}{#define wglGetGenlockSourceDelayI3D WGLEW\_GET\_FUN(\_\_wglewGetGenlockSourceDelayI3D)}
+00823 \textcolor{preprocessor}{#define wglGetGenlockSourceEdgeI3D WGLEW\_GET\_FUN(\_\_wglewGetGenlockSourceEdgeI3D)}
+00824 \textcolor{preprocessor}{#define wglGetGenlockSourceI3D WGLEW\_GET\_FUN(\_\_wglewGetGenlockSourceI3D)}
+00825 \textcolor{preprocessor}{#define wglIsEnabledGenlockI3D WGLEW\_GET\_FUN(\_\_wglewIsEnabledGenlockI3D)}
+00826 \textcolor{preprocessor}{#define wglQueryGenlockMaxSourceDelayI3D WGLEW\_GET\_FUN(\_\_wglewQueryGenlockMaxSourceDelayI3D)}
+00827 
+00828 \textcolor{preprocessor}{#define WGLEW\_I3D\_genlock WGLEW\_GET\_VAR(\_\_WGLEW\_I3D\_genlock)}
+00829 
+00830 \textcolor{preprocessor}{#endif }\textcolor{comment}{/* WGL\_I3D\_genlock */}\textcolor{preprocessor}{}
+00831 
+00832 \textcolor{comment}{/* -------------------------- WGL\_I3D\_image\_buffer ------------------------- */}
+00833 
+00834 \textcolor{preprocessor}{#ifndef WGL\_I3D\_image\_buffer}
+00835 \textcolor{preprocessor}{#define WGL\_I3D\_image\_buffer 1}
+00836 
+00837 \textcolor{preprocessor}{#define WGL\_IMAGE\_BUFFER\_MIN\_ACCESS\_I3D 0x00000001}
+00838 \textcolor{preprocessor}{#define WGL\_IMAGE\_BUFFER\_LOCK\_I3D 0x00000002}
+00839 
+00840 \textcolor{keyword}{typedef} BOOL (WINAPI * PFNWGLASSOCIATEIMAGEBUFFEREVENTSI3DPROC) (HDC hdc, HANDLE* 
+      pEvent, LPVOID *pAddress, DWORD *pSize, UINT count);
+00841 \textcolor{keyword}{typedef} LPVOID (WINAPI * PFNWGLCREATEIMAGEBUFFERI3DPROC) (HDC hDC, DWORD dwSize, 
+      UINT uFlags);
+00842 \textcolor{keyword}{typedef} BOOL (WINAPI * PFNWGLDESTROYIMAGEBUFFERI3DPROC) (HDC hDC, LPVOID 
+      pAddress);
+00843 \textcolor{keyword}{typedef} BOOL (WINAPI * PFNWGLRELEASEIMAGEBUFFEREVENTSI3DPROC) (HDC hdc, LPVOID* 
+      pAddress, UINT count);
+00844 
+00845 \textcolor{preprocessor}{#define wglAssociateImageBufferEventsI3D WGLEW\_GET\_FUN(\_\_wglewAssociateImageBufferEventsI3D)}
+00846 \textcolor{preprocessor}{#define wglCreateImageBufferI3D WGLEW\_GET\_FUN(\_\_wglewCreateImageBufferI3D)}
+00847 \textcolor{preprocessor}{#define wglDestroyImageBufferI3D WGLEW\_GET\_FUN(\_\_wglewDestroyImageBufferI3D)}
+00848 \textcolor{preprocessor}{#define wglReleaseImageBufferEventsI3D WGLEW\_GET\_FUN(\_\_wglewReleaseImageBufferEventsI3D)}
+00849 
+00850 \textcolor{preprocessor}{#define WGLEW\_I3D\_image\_buffer WGLEW\_GET\_VAR(\_\_WGLEW\_I3D\_image\_buffer)}
+00851 
+00852 \textcolor{preprocessor}{#endif }\textcolor{comment}{/* WGL\_I3D\_image\_buffer */}\textcolor{preprocessor}{}
+00853 
+00854 \textcolor{comment}{/* ------------------------ WGL\_I3D\_swap\_frame\_lock ------------------------ */}
+00855 
+00856 \textcolor{preprocessor}{#ifndef WGL\_I3D\_swap\_frame\_lock}
+00857 \textcolor{preprocessor}{#define WGL\_I3D\_swap\_frame\_lock 1}
+00858 
+00859 \textcolor{keyword}{typedef} BOOL (WINAPI * PFNWGLDISABLEFRAMELOCKI3DPROC) (VOID);
+00860 \textcolor{keyword}{typedef} BOOL (WINAPI * PFNWGLENABLEFRAMELOCKI3DPROC) (VOID);
+00861 \textcolor{keyword}{typedef} BOOL (WINAPI * PFNWGLISENABLEDFRAMELOCKI3DPROC) (BOOL* pFlag);
+00862 \textcolor{keyword}{typedef} BOOL (WINAPI * PFNWGLQUERYFRAMELOCKMASTERI3DPROC) (BOOL* pFlag);
+00863 
+00864 \textcolor{preprocessor}{#define wglDisableFrameLockI3D WGLEW\_GET\_FUN(\_\_wglewDisableFrameLockI3D)}
+00865 \textcolor{preprocessor}{#define wglEnableFrameLockI3D WGLEW\_GET\_FUN(\_\_wglewEnableFrameLockI3D)}
+00866 \textcolor{preprocessor}{#define wglIsEnabledFrameLockI3D WGLEW\_GET\_FUN(\_\_wglewIsEnabledFrameLockI3D)}
+00867 \textcolor{preprocessor}{#define wglQueryFrameLockMasterI3D WGLEW\_GET\_FUN(\_\_wglewQueryFrameLockMasterI3D)}
+00868 
+00869 \textcolor{preprocessor}{#define WGLEW\_I3D\_swap\_frame\_lock WGLEW\_GET\_VAR(\_\_WGLEW\_I3D\_swap\_frame\_lock)}
+00870 
+00871 \textcolor{preprocessor}{#endif }\textcolor{comment}{/* WGL\_I3D\_swap\_frame\_lock */}\textcolor{preprocessor}{}
+00872 
+00873 \textcolor{comment}{/* ------------------------ WGL\_I3D\_swap\_frame\_usage ----------------------- */}
+00874 
+00875 \textcolor{preprocessor}{#ifndef WGL\_I3D\_swap\_frame\_usage}
+00876 \textcolor{preprocessor}{#define WGL\_I3D\_swap\_frame\_usage 1}
+00877 
+00878 \textcolor{keyword}{typedef} BOOL (WINAPI * PFNWGLBEGINFRAMETRACKINGI3DPROC) (void);
+00879 \textcolor{keyword}{typedef} BOOL (WINAPI * PFNWGLENDFRAMETRACKINGI3DPROC) (void);
+00880 \textcolor{keyword}{typedef} BOOL (WINAPI * PFNWGLGETFRAMEUSAGEI3DPROC) (\textcolor{keywordtype}{float}* pUsage);
+00881 \textcolor{keyword}{typedef} BOOL (WINAPI * PFNWGLQUERYFRAMETRACKINGI3DPROC) (DWORD* pFrameCount, DWORD *
+      pMissedFrames, \textcolor{keywordtype}{float} *pLastMissedUsage);
+00882 
+00883 \textcolor{preprocessor}{#define wglBeginFrameTrackingI3D WGLEW\_GET\_FUN(\_\_wglewBeginFrameTrackingI3D)}
+00884 \textcolor{preprocessor}{#define wglEndFrameTrackingI3D WGLEW\_GET\_FUN(\_\_wglewEndFrameTrackingI3D)}
+00885 \textcolor{preprocessor}{#define wglGetFrameUsageI3D WGLEW\_GET\_FUN(\_\_wglewGetFrameUsageI3D)}
+00886 \textcolor{preprocessor}{#define wglQueryFrameTrackingI3D WGLEW\_GET\_FUN(\_\_wglewQueryFrameTrackingI3D)}
+00887 
+00888 \textcolor{preprocessor}{#define WGLEW\_I3D\_swap\_frame\_usage WGLEW\_GET\_VAR(\_\_WGLEW\_I3D\_swap\_frame\_usage)}
+00889 
+00890 \textcolor{preprocessor}{#endif }\textcolor{comment}{/* WGL\_I3D\_swap\_frame\_usage */}\textcolor{preprocessor}{}
+00891 
+00892 \textcolor{comment}{/* --------------------------- WGL\_NV\_DX\_interop --------------------------- */}
+00893 
+00894 \textcolor{preprocessor}{#ifndef WGL\_NV\_DX\_interop}
+00895 \textcolor{preprocessor}{#define WGL\_NV\_DX\_interop 1}
+00896 
+00897 \textcolor{preprocessor}{#define WGL\_ACCESS\_READ\_ONLY\_NV 0x0000}
+00898 \textcolor{preprocessor}{#define WGL\_ACCESS\_READ\_WRITE\_NV 0x0001}
+00899 \textcolor{preprocessor}{#define WGL\_ACCESS\_WRITE\_DISCARD\_NV 0x0002}
+00900 
+00901 \textcolor{keyword}{typedef} BOOL (WINAPI * PFNWGLDXCLOSEDEVICENVPROC) (HANDLE hDevice);
+00902 \textcolor{keyword}{typedef} BOOL (WINAPI * PFNWGLDXLOCKOBJECTSNVPROC) (HANDLE hDevice, GLint count, 
+      HANDLE* hObjects);
+00903 \textcolor{keyword}{typedef} BOOL (WINAPI * PFNWGLDXOBJECTACCESSNVPROC) (HANDLE hObject, GLenum 
+      access);
+00904 \textcolor{keyword}{typedef} HANDLE (WINAPI * PFNWGLDXOPENDEVICENVPROC) (\textcolor{keywordtype}{void}* dxDevice);
+00905 \textcolor{keyword}{typedef} HANDLE (WINAPI * PFNWGLDXREGISTEROBJECTNVPROC) (HANDLE hDevice, \textcolor{keywordtype}{void}* 
+      dxObject, GLuint name, GLenum type, GLenum access);
+00906 \textcolor{keyword}{typedef} BOOL (WINAPI * PFNWGLDXSETRESOURCESHAREHANDLENVPROC) (\textcolor{keywordtype}{void}* dxObject, 
+      HANDLE shareHandle);
+00907 \textcolor{keyword}{typedef} BOOL (WINAPI * PFNWGLDXUNLOCKOBJECTSNVPROC) (HANDLE hDevice, GLint count, 
+      HANDLE* hObjects);
+00908 \textcolor{keyword}{typedef} BOOL (WINAPI * PFNWGLDXUNREGISTEROBJECTNVPROC) (HANDLE hDevice, HANDLE 
+      hObject);
+00909 
+00910 \textcolor{preprocessor}{#define wglDXCloseDeviceNV WGLEW\_GET\_FUN(\_\_wglewDXCloseDeviceNV)}
+00911 \textcolor{preprocessor}{#define wglDXLockObjectsNV WGLEW\_GET\_FUN(\_\_wglewDXLockObjectsNV)}
+00912 \textcolor{preprocessor}{#define wglDXObjectAccessNV WGLEW\_GET\_FUN(\_\_wglewDXObjectAccessNV)}
+00913 \textcolor{preprocessor}{#define wglDXOpenDeviceNV WGLEW\_GET\_FUN(\_\_wglewDXOpenDeviceNV)}
+00914 \textcolor{preprocessor}{#define wglDXRegisterObjectNV WGLEW\_GET\_FUN(\_\_wglewDXRegisterObjectNV)}
+00915 \textcolor{preprocessor}{#define wglDXSetResourceShareHandleNV WGLEW\_GET\_FUN(\_\_wglewDXSetResourceShareHandleNV)}
+00916 \textcolor{preprocessor}{#define wglDXUnlockObjectsNV WGLEW\_GET\_FUN(\_\_wglewDXUnlockObjectsNV)}
+00917 \textcolor{preprocessor}{#define wglDXUnregisterObjectNV WGLEW\_GET\_FUN(\_\_wglewDXUnregisterObjectNV)}
+00918 
+00919 \textcolor{preprocessor}{#define WGLEW\_NV\_DX\_interop WGLEW\_GET\_VAR(\_\_WGLEW\_NV\_DX\_interop)}
+00920 
+00921 \textcolor{preprocessor}{#endif }\textcolor{comment}{/* WGL\_NV\_DX\_interop */}\textcolor{preprocessor}{}
+00922 
+00923 \textcolor{comment}{/* --------------------------- WGL\_NV\_DX\_interop2 -------------------------- */}
+00924 
+00925 \textcolor{preprocessor}{#ifndef WGL\_NV\_DX\_interop2}
+00926 \textcolor{preprocessor}{#define WGL\_NV\_DX\_interop2 1}
+00927 
+00928 \textcolor{preprocessor}{#define WGLEW\_NV\_DX\_interop2 WGLEW\_GET\_VAR(\_\_WGLEW\_NV\_DX\_interop2)}
+00929 
+00930 \textcolor{preprocessor}{#endif }\textcolor{comment}{/* WGL\_NV\_DX\_interop2 */}\textcolor{preprocessor}{}
+00931 
+00932 \textcolor{comment}{/* --------------------------- WGL\_NV\_copy\_image --------------------------- */}
+00933 
+00934 \textcolor{preprocessor}{#ifndef WGL\_NV\_copy\_image}
+00935 \textcolor{preprocessor}{#define WGL\_NV\_copy\_image 1}
+00936 
+00937 \textcolor{keyword}{typedef} BOOL (WINAPI * PFNWGLCOPYIMAGESUBDATANVPROC) (HGLRC hSrcRC, GLuint 
+      srcName, GLenum srcTarget, GLint srcLevel, GLint srcX, GLint srcY, GLint srcZ, 
+      HGLRC hDstRC, GLuint dstName, GLenum dstTarget, GLint dstLevel, GLint dstX, 
+      GLint dstY, GLint dstZ, GLsizei width, GLsizei height, GLsizei depth);
+00938 
+00939 \textcolor{preprocessor}{#define wglCopyImageSubDataNV WGLEW\_GET\_FUN(\_\_wglewCopyImageSubDataNV)}
+00940 
+00941 \textcolor{preprocessor}{#define WGLEW\_NV\_copy\_image WGLEW\_GET\_VAR(\_\_WGLEW\_NV\_copy\_image)}
+00942 
+00943 \textcolor{preprocessor}{#endif }\textcolor{comment}{/* WGL\_NV\_copy\_image */}\textcolor{preprocessor}{}
+00944 
+00945 \textcolor{comment}{/* ------------------------ WGL\_NV\_delay\_before\_swap ----------------------- */}
+00946 
+00947 \textcolor{preprocessor}{#ifndef WGL\_NV\_delay\_before\_swap}
+00948 \textcolor{preprocessor}{#define WGL\_NV\_delay\_before\_swap 1}
+00949 
+00950 \textcolor{keyword}{typedef} BOOL (WINAPI * PFNWGLDELAYBEFORESWAPNVPROC) (HDC hDC, GLfloat seconds);
+00951 
+00952 \textcolor{preprocessor}{#define wglDelayBeforeSwapNV WGLEW\_GET\_FUN(\_\_wglewDelayBeforeSwapNV)}
+00953 
+00954 \textcolor{preprocessor}{#define WGLEW\_NV\_delay\_before\_swap WGLEW\_GET\_VAR(\_\_WGLEW\_NV\_delay\_before\_swap)}
+00955 
+00956 \textcolor{preprocessor}{#endif }\textcolor{comment}{/* WGL\_NV\_delay\_before\_swap */}\textcolor{preprocessor}{}
+00957 
+00958 \textcolor{comment}{/* -------------------------- WGL\_NV\_float\_buffer -------------------------- */}
+00959 
+00960 \textcolor{preprocessor}{#ifndef WGL\_NV\_float\_buffer}
+00961 \textcolor{preprocessor}{#define WGL\_NV\_float\_buffer 1}
+00962 
+00963 \textcolor{preprocessor}{#define WGL\_FLOAT\_COMPONENTS\_NV 0x20B0}
+00964 \textcolor{preprocessor}{#define WGL\_BIND\_TO\_TEXTURE\_RECTANGLE\_FLOAT\_R\_NV 0x20B1}
+00965 \textcolor{preprocessor}{#define WGL\_BIND\_TO\_TEXTURE\_RECTANGLE\_FLOAT\_RG\_NV 0x20B2}
+00966 \textcolor{preprocessor}{#define WGL\_BIND\_TO\_TEXTURE\_RECTANGLE\_FLOAT\_RGB\_NV 0x20B3}
+00967 \textcolor{preprocessor}{#define WGL\_BIND\_TO\_TEXTURE\_RECTANGLE\_FLOAT\_RGBA\_NV 0x20B4}
+00968 \textcolor{preprocessor}{#define WGL\_TEXTURE\_FLOAT\_R\_NV 0x20B5}
+00969 \textcolor{preprocessor}{#define WGL\_TEXTURE\_FLOAT\_RG\_NV 0x20B6}
+00970 \textcolor{preprocessor}{#define WGL\_TEXTURE\_FLOAT\_RGB\_NV 0x20B7}
+00971 \textcolor{preprocessor}{#define WGL\_TEXTURE\_FLOAT\_RGBA\_NV 0x20B8}
+00972 
+00973 \textcolor{preprocessor}{#define WGLEW\_NV\_float\_buffer WGLEW\_GET\_VAR(\_\_WGLEW\_NV\_float\_buffer)}
+00974 
+00975 \textcolor{preprocessor}{#endif }\textcolor{comment}{/* WGL\_NV\_float\_buffer */}\textcolor{preprocessor}{}
+00976 
+00977 \textcolor{comment}{/* -------------------------- WGL\_NV\_gpu\_affinity -------------------------- */}
+00978 
+00979 \textcolor{preprocessor}{#ifndef WGL\_NV\_gpu\_affinity}
+00980 \textcolor{preprocessor}{#define WGL\_NV\_gpu\_affinity 1}
+00981 
+00982 \textcolor{preprocessor}{#define WGL\_ERROR\_INCOMPATIBLE\_AFFINITY\_MASKS\_NV 0x20D0}
+00983 \textcolor{preprocessor}{#define WGL\_ERROR\_MISSING\_AFFINITY\_MASK\_NV 0x20D1}
+00984 
+00985 DECLARE_HANDLE(HGPUNV);
+00986 \textcolor{keyword}{typedef} \textcolor{keyword}{struct }_GPU_DEVICE \{
+00987   DWORD cb; 
+00988   CHAR DeviceName[32]; 
+00989   CHAR DeviceString[128]; 
+00990   DWORD Flags; 
+00991   RECT rcVirtualScreen; 
+00992 \} GPU_DEVICE, *PGPU_DEVICE;
+00993 
+00994 \textcolor{keyword}{typedef} HDC (WINAPI * PFNWGLCREATEAFFINITYDCNVPROC) (\textcolor{keyword}{const} HGPUNV *phGpuList);
+00995 \textcolor{keyword}{typedef} BOOL (WINAPI * PFNWGLDELETEDCNVPROC) (HDC hdc);
+00996 \textcolor{keyword}{typedef} BOOL (WINAPI * PFNWGLENUMGPUDEVICESNVPROC) (HGPUNV hGpu, UINT 
+      iDeviceIndex, PGPU\_DEVICE lpGpuDevice);
+00997 \textcolor{keyword}{typedef} BOOL (WINAPI * PFNWGLENUMGPUSFROMAFFINITYDCNVPROC) (HDC hAffinityDC, 
+      UINT iGpuIndex, HGPUNV *hGpu);
+00998 \textcolor{keyword}{typedef} BOOL (WINAPI * PFNWGLENUMGPUSNVPROC) (UINT iGpuIndex, HGPUNV *phGpu);
+00999 
+01000 \textcolor{preprocessor}{#define wglCreateAffinityDCNV WGLEW\_GET\_FUN(\_\_wglewCreateAffinityDCNV)}
+01001 \textcolor{preprocessor}{#define wglDeleteDCNV WGLEW\_GET\_FUN(\_\_wglewDeleteDCNV)}
+01002 \textcolor{preprocessor}{#define wglEnumGpuDevicesNV WGLEW\_GET\_FUN(\_\_wglewEnumGpuDevicesNV)}
+01003 \textcolor{preprocessor}{#define wglEnumGpusFromAffinityDCNV WGLEW\_GET\_FUN(\_\_wglewEnumGpusFromAffinityDCNV)}
+01004 \textcolor{preprocessor}{#define wglEnumGpusNV WGLEW\_GET\_FUN(\_\_wglewEnumGpusNV)}
+01005 
+01006 \textcolor{preprocessor}{#define WGLEW\_NV\_gpu\_affinity WGLEW\_GET\_VAR(\_\_WGLEW\_NV\_gpu\_affinity)}
+01007 
+01008 \textcolor{preprocessor}{#endif }\textcolor{comment}{/* WGL\_NV\_gpu\_affinity */}\textcolor{preprocessor}{}
+01009 
+01010 \textcolor{comment}{/* ---------------------- WGL\_NV\_multisample\_coverage ---------------------- */}
+01011 
+01012 \textcolor{preprocessor}{#ifndef WGL\_NV\_multisample\_coverage}
+01013 \textcolor{preprocessor}{#define WGL\_NV\_multisample\_coverage 1}
+01014 
+01015 \textcolor{preprocessor}{#define WGL\_COVERAGE\_SAMPLES\_NV 0x2042}
+01016 \textcolor{preprocessor}{#define WGL\_COLOR\_SAMPLES\_NV 0x20B9}
+01017 
+01018 \textcolor{preprocessor}{#define WGLEW\_NV\_multisample\_coverage WGLEW\_GET\_VAR(\_\_WGLEW\_NV\_multisample\_coverage)}
+01019 
+01020 \textcolor{preprocessor}{#endif }\textcolor{comment}{/* WGL\_NV\_multisample\_coverage */}\textcolor{preprocessor}{}
+01021 
+01022 \textcolor{comment}{/* -------------------------- WGL\_NV\_present\_video ------------------------- */}
+01023 
+01024 \textcolor{preprocessor}{#ifndef WGL\_NV\_present\_video}
+01025 \textcolor{preprocessor}{#define WGL\_NV\_present\_video 1}
+01026 
+01027 \textcolor{preprocessor}{#define WGL\_NUM\_VIDEO\_SLOTS\_NV 0x20F0}
+01028 
+01029 DECLARE_HANDLE(HVIDEOOUTPUTDEVICENV);
+01030 
+01031 \textcolor{keyword}{typedef} BOOL (WINAPI * PFNWGLBINDVIDEODEVICENVPROC) (HDC hDc, \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{int} 
+      uVideoSlot, HVIDEOOUTPUTDEVICENV hVideoDevice, \textcolor{keyword}{const} \textcolor{keywordtype}{int}* piAttribList);
+01032 \textcolor{keyword}{typedef} int (WINAPI * PFNWGLENUMERATEVIDEODEVICESNVPROC) (HDC hDc, HVIDEOOUTPUTDEVICENV* 
+      phDeviceList);
+01033 \textcolor{keyword}{typedef} BOOL (WINAPI * PFNWGLQUERYCURRENTCONTEXTNVPROC) (\textcolor{keywordtype}{int} iAttribute, \textcolor{keywordtype}{int}* 
+      piValue);
+01034 
+01035 \textcolor{preprocessor}{#define wglBindVideoDeviceNV WGLEW\_GET\_FUN(\_\_wglewBindVideoDeviceNV)}
+01036 \textcolor{preprocessor}{#define wglEnumerateVideoDevicesNV WGLEW\_GET\_FUN(\_\_wglewEnumerateVideoDevicesNV)}
+01037 \textcolor{preprocessor}{#define wglQueryCurrentContextNV WGLEW\_GET\_FUN(\_\_wglewQueryCurrentContextNV)}
+01038 
+01039 \textcolor{preprocessor}{#define WGLEW\_NV\_present\_video WGLEW\_GET\_VAR(\_\_WGLEW\_NV\_present\_video)}
+01040 
+01041 \textcolor{preprocessor}{#endif }\textcolor{comment}{/* WGL\_NV\_present\_video */}\textcolor{preprocessor}{}
+01042 
+01043 \textcolor{comment}{/* ---------------------- WGL\_NV\_render\_depth\_texture ---------------------- */}
+01044 
+01045 \textcolor{preprocessor}{#ifndef WGL\_NV\_render\_depth\_texture}
+01046 \textcolor{preprocessor}{#define WGL\_NV\_render\_depth\_texture 1}
+01047 
+01048 \textcolor{preprocessor}{#define WGL\_NO\_TEXTURE\_ARB 0x2077}
+01049 \textcolor{preprocessor}{#define WGL\_BIND\_TO\_TEXTURE\_DEPTH\_NV 0x20A3}
+01050 \textcolor{preprocessor}{#define WGL\_BIND\_TO\_TEXTURE\_RECTANGLE\_DEPTH\_NV 0x20A4}
+01051 \textcolor{preprocessor}{#define WGL\_DEPTH\_TEXTURE\_FORMAT\_NV 0x20A5}
+01052 \textcolor{preprocessor}{#define WGL\_TEXTURE\_DEPTH\_COMPONENT\_NV 0x20A6}
+01053 \textcolor{preprocessor}{#define WGL\_DEPTH\_COMPONENT\_NV 0x20A7}
+01054 
+01055 \textcolor{preprocessor}{#define WGLEW\_NV\_render\_depth\_texture WGLEW\_GET\_VAR(\_\_WGLEW\_NV\_render\_depth\_texture)}
+01056 
+01057 \textcolor{preprocessor}{#endif }\textcolor{comment}{/* WGL\_NV\_render\_depth\_texture */}\textcolor{preprocessor}{}
+01058 
+01059 \textcolor{comment}{/* -------------------- WGL\_NV\_render\_texture\_rectangle -------------------- */}
+01060 
+01061 \textcolor{preprocessor}{#ifndef WGL\_NV\_render\_texture\_rectangle}
+01062 \textcolor{preprocessor}{#define WGL\_NV\_render\_texture\_rectangle 1}
+01063 
+01064 \textcolor{preprocessor}{#define WGL\_BIND\_TO\_TEXTURE\_RECTANGLE\_RGB\_NV 0x20A0}
+01065 \textcolor{preprocessor}{#define WGL\_BIND\_TO\_TEXTURE\_RECTANGLE\_RGBA\_NV 0x20A1}
+01066 \textcolor{preprocessor}{#define WGL\_TEXTURE\_RECTANGLE\_NV 0x20A2}
+01067 
+01068 \textcolor{preprocessor}{#define WGLEW\_NV\_render\_texture\_rectangle WGLEW\_GET\_VAR(\_\_WGLEW\_NV\_render\_texture\_rectangle)}
+01069 
+01070 \textcolor{preprocessor}{#endif }\textcolor{comment}{/* WGL\_NV\_render\_texture\_rectangle */}\textcolor{preprocessor}{}
+01071 
+01072 \textcolor{comment}{/* --------------------------- WGL\_NV\_swap\_group --------------------------- */}
+01073 
+01074 \textcolor{preprocessor}{#ifndef WGL\_NV\_swap\_group}
+01075 \textcolor{preprocessor}{#define WGL\_NV\_swap\_group 1}
+01076 
+01077 \textcolor{keyword}{typedef} BOOL (WINAPI * PFNWGLBINDSWAPBARRIERNVPROC) (GLuint group, GLuint 
+      barrier);
+01078 \textcolor{keyword}{typedef} BOOL (WINAPI * PFNWGLJOINSWAPGROUPNVPROC) (HDC hDC, GLuint group);
+01079 \textcolor{keyword}{typedef} BOOL (WINAPI * PFNWGLQUERYFRAMECOUNTNVPROC) (HDC hDC, GLuint* count);
+01080 \textcolor{keyword}{typedef} BOOL (WINAPI * PFNWGLQUERYMAXSWAPGROUPSNVPROC) (HDC hDC, GLuint* 
+      maxGroups, GLuint *maxBarriers);
+01081 \textcolor{keyword}{typedef} BOOL (WINAPI * PFNWGLQUERYSWAPGROUPNVPROC) (HDC hDC, GLuint* group, 
+      GLuint *barrier);
+01082 \textcolor{keyword}{typedef} BOOL (WINAPI * PFNWGLRESETFRAMECOUNTNVPROC) (HDC hDC);
+01083 
+01084 \textcolor{preprocessor}{#define wglBindSwapBarrierNV WGLEW\_GET\_FUN(\_\_wglewBindSwapBarrierNV)}
+01085 \textcolor{preprocessor}{#define wglJoinSwapGroupNV WGLEW\_GET\_FUN(\_\_wglewJoinSwapGroupNV)}
+01086 \textcolor{preprocessor}{#define wglQueryFrameCountNV WGLEW\_GET\_FUN(\_\_wglewQueryFrameCountNV)}
+01087 \textcolor{preprocessor}{#define wglQueryMaxSwapGroupsNV WGLEW\_GET\_FUN(\_\_wglewQueryMaxSwapGroupsNV)}
+01088 \textcolor{preprocessor}{#define wglQuerySwapGroupNV WGLEW\_GET\_FUN(\_\_wglewQuerySwapGroupNV)}
+01089 \textcolor{preprocessor}{#define wglResetFrameCountNV WGLEW\_GET\_FUN(\_\_wglewResetFrameCountNV)}
+01090 
+01091 \textcolor{preprocessor}{#define WGLEW\_NV\_swap\_group WGLEW\_GET\_VAR(\_\_WGLEW\_NV\_swap\_group)}
+01092 
+01093 \textcolor{preprocessor}{#endif }\textcolor{comment}{/* WGL\_NV\_swap\_group */}\textcolor{preprocessor}{}
+01094 
+01095 \textcolor{comment}{/* ----------------------- WGL\_NV\_vertex\_array\_range ----------------------- */}
+01096 
+01097 \textcolor{preprocessor}{#ifndef WGL\_NV\_vertex\_array\_range}
+01098 \textcolor{preprocessor}{#define WGL\_NV\_vertex\_array\_range 1}
+01099 
+01100 \textcolor{keyword}{typedef} \textcolor{keywordtype}{void} * (WINAPI * PFNWGLALLOCATEMEMORYNVPROC) (GLsizei size, GLfloat readFrequency, 
+      GLfloat writeFrequency, GLfloat priority);
+01101 \textcolor{keyword}{typedef} void (WINAPI * PFNWGLFREEMEMORYNVPROC) (\textcolor{keywordtype}{void} *pointer);
+01102 
+01103 \textcolor{preprocessor}{#define wglAllocateMemoryNV WGLEW\_GET\_FUN(\_\_wglewAllocateMemoryNV)}
+01104 \textcolor{preprocessor}{#define wglFreeMemoryNV WGLEW\_GET\_FUN(\_\_wglewFreeMemoryNV)}
+01105 
+01106 \textcolor{preprocessor}{#define WGLEW\_NV\_vertex\_array\_range WGLEW\_GET\_VAR(\_\_WGLEW\_NV\_vertex\_array\_range)}
+01107 
+01108 \textcolor{preprocessor}{#endif }\textcolor{comment}{/* WGL\_NV\_vertex\_array\_range */}\textcolor{preprocessor}{}
+01109 
+01110 \textcolor{comment}{/* -------------------------- WGL\_NV\_video\_capture ------------------------- */}
+01111 
+01112 \textcolor{preprocessor}{#ifndef WGL\_NV\_video\_capture}
+01113 \textcolor{preprocessor}{#define WGL\_NV\_video\_capture 1}
+01114 
+01115 \textcolor{preprocessor}{#define WGL\_UNIQUE\_ID\_NV 0x20CE}
+01116 \textcolor{preprocessor}{#define WGL\_NUM\_VIDEO\_CAPTURE\_SLOTS\_NV 0x20CF}
+01117 
+01118 DECLARE_HANDLE(HVIDEOINPUTDEVICENV);
+01119 
+01120 \textcolor{keyword}{typedef} BOOL (WINAPI * PFNWGLBINDVIDEOCAPTUREDEVICENVPROC) (UINT uVideoSlot, HVIDEOINPUTDEVICENV 
+      hDevice);
+01121 \textcolor{keyword}{typedef} UINT (WINAPI * PFNWGLENUMERATEVIDEOCAPTUREDEVICESNVPROC) (HDC hDc, HVIDEOINPUTDEVICENV* 
+      phDeviceList);
+01122 \textcolor{keyword}{typedef} BOOL (WINAPI * PFNWGLLOCKVIDEOCAPTUREDEVICENVPROC) (HDC hDc, HVIDEOINPUTDEVICENV 
+      hDevice);
+01123 \textcolor{keyword}{typedef} BOOL (WINAPI * PFNWGLQUERYVIDEOCAPTUREDEVICENVPROC) (HDC hDc, HVIDEOINPUTDEVICENV 
+      hDevice, \textcolor{keywordtype}{int} iAttribute, \textcolor{keywordtype}{int}* piValue);
+01124 \textcolor{keyword}{typedef} BOOL (WINAPI * PFNWGLRELEASEVIDEOCAPTUREDEVICENVPROC) (HDC hDc, HVIDEOINPUTDEVICENV 
+      hDevice);
+01125 
+01126 \textcolor{preprocessor}{#define wglBindVideoCaptureDeviceNV WGLEW\_GET\_FUN(\_\_wglewBindVideoCaptureDeviceNV)}
+01127 \textcolor{preprocessor}{#define wglEnumerateVideoCaptureDevicesNV WGLEW\_GET\_FUN(\_\_wglewEnumerateVideoCaptureDevicesNV)}
+01128 \textcolor{preprocessor}{#define wglLockVideoCaptureDeviceNV WGLEW\_GET\_FUN(\_\_wglewLockVideoCaptureDeviceNV)}
+01129 \textcolor{preprocessor}{#define wglQueryVideoCaptureDeviceNV WGLEW\_GET\_FUN(\_\_wglewQueryVideoCaptureDeviceNV)}
+01130 \textcolor{preprocessor}{#define wglReleaseVideoCaptureDeviceNV WGLEW\_GET\_FUN(\_\_wglewReleaseVideoCaptureDeviceNV)}
+01131 
+01132 \textcolor{preprocessor}{#define WGLEW\_NV\_video\_capture WGLEW\_GET\_VAR(\_\_WGLEW\_NV\_video\_capture)}
+01133 
+01134 \textcolor{preprocessor}{#endif }\textcolor{comment}{/* WGL\_NV\_video\_capture */}\textcolor{preprocessor}{}
+01135 
+01136 \textcolor{comment}{/* -------------------------- WGL\_NV\_video\_output -------------------------- */}
+01137 
+01138 \textcolor{preprocessor}{#ifndef WGL\_NV\_video\_output}
+01139 \textcolor{preprocessor}{#define WGL\_NV\_video\_output 1}
+01140 
+01141 \textcolor{preprocessor}{#define WGL\_BIND\_TO\_VIDEO\_RGB\_NV 0x20C0}
+01142 \textcolor{preprocessor}{#define WGL\_BIND\_TO\_VIDEO\_RGBA\_NV 0x20C1}
+01143 \textcolor{preprocessor}{#define WGL\_BIND\_TO\_VIDEO\_RGB\_AND\_DEPTH\_NV 0x20C2}
+01144 \textcolor{preprocessor}{#define WGL\_VIDEO\_OUT\_COLOR\_NV 0x20C3}
+01145 \textcolor{preprocessor}{#define WGL\_VIDEO\_OUT\_ALPHA\_NV 0x20C4}
+01146 \textcolor{preprocessor}{#define WGL\_VIDEO\_OUT\_DEPTH\_NV 0x20C5}
+01147 \textcolor{preprocessor}{#define WGL\_VIDEO\_OUT\_COLOR\_AND\_ALPHA\_NV 0x20C6}
+01148 \textcolor{preprocessor}{#define WGL\_VIDEO\_OUT\_COLOR\_AND\_DEPTH\_NV 0x20C7}
+01149 \textcolor{preprocessor}{#define WGL\_VIDEO\_OUT\_FRAME 0x20C8}
+01150 \textcolor{preprocessor}{#define WGL\_VIDEO\_OUT\_FIELD\_1 0x20C9}
+01151 \textcolor{preprocessor}{#define WGL\_VIDEO\_OUT\_FIELD\_2 0x20CA}
+01152 \textcolor{preprocessor}{#define WGL\_VIDEO\_OUT\_STACKED\_FIELDS\_1\_2 0x20CB}
+01153 \textcolor{preprocessor}{#define WGL\_VIDEO\_OUT\_STACKED\_FIELDS\_2\_1 0x20CC}
+01154 
+01155 DECLARE_HANDLE(HPVIDEODEV);
+01156 
+01157 \textcolor{keyword}{typedef} BOOL (WINAPI * PFNWGLBINDVIDEOIMAGENVPROC) (HPVIDEODEV hVideoDevice, 
+      HPBUFFERARB hPbuffer, \textcolor{keywordtype}{int} iVideoBuffer);
+01158 \textcolor{keyword}{typedef} BOOL (WINAPI * PFNWGLGETVIDEODEVICENVPROC) (HDC hDC, \textcolor{keywordtype}{int} numDevices, HPVIDEODEV* 
+      hVideoDevice);
+01159 \textcolor{keyword}{typedef} BOOL (WINAPI * PFNWGLGETVIDEOINFONVPROC) (HPVIDEODEV hpVideoDevice, \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{long}* 
+      pulCounterOutputPbuffer, \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{long} *pulCounterOutputVideo);
+01160 \textcolor{keyword}{typedef} BOOL (WINAPI * PFNWGLRELEASEVIDEODEVICENVPROC) (HPVIDEODEV hVideoDevice);
+01161 \textcolor{keyword}{typedef} BOOL (WINAPI * PFNWGLRELEASEVIDEOIMAGENVPROC) (HPBUFFERARB hPbuffer, \textcolor{keywordtype}{int} 
+      iVideoBuffer);
+01162 \textcolor{keyword}{typedef} BOOL (WINAPI * PFNWGLSENDPBUFFERTOVIDEONVPROC) (HPBUFFERARB hPbuffer, \textcolor{keywordtype}{int} 
+      iBufferType, \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{long}* pulCounterPbuffer, BOOL bBlock);
+01163 
+01164 \textcolor{preprocessor}{#define wglBindVideoImageNV WGLEW\_GET\_FUN(\_\_wglewBindVideoImageNV)}
+01165 \textcolor{preprocessor}{#define wglGetVideoDeviceNV WGLEW\_GET\_FUN(\_\_wglewGetVideoDeviceNV)}
+01166 \textcolor{preprocessor}{#define wglGetVideoInfoNV WGLEW\_GET\_FUN(\_\_wglewGetVideoInfoNV)}
+01167 \textcolor{preprocessor}{#define wglReleaseVideoDeviceNV WGLEW\_GET\_FUN(\_\_wglewReleaseVideoDeviceNV)}
+01168 \textcolor{preprocessor}{#define wglReleaseVideoImageNV WGLEW\_GET\_FUN(\_\_wglewReleaseVideoImageNV)}
+01169 \textcolor{preprocessor}{#define wglSendPbufferToVideoNV WGLEW\_GET\_FUN(\_\_wglewSendPbufferToVideoNV)}
+01170 
+01171 \textcolor{preprocessor}{#define WGLEW\_NV\_video\_output WGLEW\_GET\_VAR(\_\_WGLEW\_NV\_video\_output)}
+01172 
+01173 \textcolor{preprocessor}{#endif }\textcolor{comment}{/* WGL\_NV\_video\_output */}\textcolor{preprocessor}{}
+01174 
+01175 \textcolor{comment}{/* -------------------------- WGL\_OML\_sync\_control ------------------------- */}
+01176 
+01177 \textcolor{preprocessor}{#ifndef WGL\_OML\_sync\_control}
+01178 \textcolor{preprocessor}{#define WGL\_OML\_sync\_control 1}
+01179 
+01180 \textcolor{keyword}{typedef} BOOL (WINAPI * PFNWGLGETMSCRATEOMLPROC) (HDC hdc, INT32* numerator, INT32 *
+      denominator);
+01181 \textcolor{keyword}{typedef} BOOL (WINAPI * PFNWGLGETSYNCVALUESOMLPROC) (HDC hdc, INT64* ust, INT64 *
+      msc, INT64 *sbc);
+01182 \textcolor{keyword}{typedef} INT64 (WINAPI * PFNWGLSWAPBUFFERSMSCOMLPROC) (HDC hdc, INT64 target_msc, 
+      INT64 divisor, INT64 remainder);
+01183 \textcolor{keyword}{typedef} INT64 (WINAPI * PFNWGLSWAPLAYERBUFFERSMSCOMLPROC) (HDC hdc, INT fuPlanes, 
+      INT64 target_msc, INT64 divisor, INT64 remainder);
+01184 \textcolor{keyword}{typedef} BOOL (WINAPI * PFNWGLWAITFORMSCOMLPROC) (HDC hdc, INT64 target_msc, 
+      INT64 divisor, INT64 remainder, INT64* ust, INT64 *msc, INT64 *sbc);
+01185 \textcolor{keyword}{typedef} BOOL (WINAPI * PFNWGLWAITFORSBCOMLPROC) (HDC hdc, INT64 target_sbc, 
+      INT64* ust, INT64 *msc, INT64 *sbc);
+01186 
+01187 \textcolor{preprocessor}{#define wglGetMscRateOML WGLEW\_GET\_FUN(\_\_wglewGetMscRateOML)}
+01188 \textcolor{preprocessor}{#define wglGetSyncValuesOML WGLEW\_GET\_FUN(\_\_wglewGetSyncValuesOML)}
+01189 \textcolor{preprocessor}{#define wglSwapBuffersMscOML WGLEW\_GET\_FUN(\_\_wglewSwapBuffersMscOML)}
+01190 \textcolor{preprocessor}{#define wglSwapLayerBuffersMscOML WGLEW\_GET\_FUN(\_\_wglewSwapLayerBuffersMscOML)}
+01191 \textcolor{preprocessor}{#define wglWaitForMscOML WGLEW\_GET\_FUN(\_\_wglewWaitForMscOML)}
+01192 \textcolor{preprocessor}{#define wglWaitForSbcOML WGLEW\_GET\_FUN(\_\_wglewWaitForSbcOML)}
+01193 
+01194 \textcolor{preprocessor}{#define WGLEW\_OML\_sync\_control WGLEW\_GET\_VAR(\_\_WGLEW\_OML\_sync\_control)}
+01195 
+01196 \textcolor{preprocessor}{#endif }\textcolor{comment}{/* WGL\_OML\_sync\_control */}\textcolor{preprocessor}{}
+01197 
+01198 \textcolor{comment}{/* ------------------------------------------------------------------------- */}
+01199 
+01200 \textcolor{preprocessor}{#ifdef GLEW\_MX}
+01201 \textcolor{preprocessor}{#define WGLEW\_FUN\_EXPORT}
+01202 \textcolor{preprocessor}{#define WGLEW\_VAR\_EXPORT}
+01203 \textcolor{preprocessor}{#else}
+01204 \textcolor{preprocessor}{#define WGLEW\_FUN\_EXPORT GLEW\_FUN\_EXPORT}
+01205 \textcolor{preprocessor}{#define WGLEW\_VAR\_EXPORT GLEW\_VAR\_EXPORT}
+01206 \textcolor{preprocessor}{#endif }\textcolor{comment}{/* GLEW\_MX */}\textcolor{preprocessor}{}
+01207 
+01208 \textcolor{preprocessor}{#ifdef GLEW\_MX}
+01209 \textcolor{keyword}{struct }WGLEWContextStruct
+01210 \{
+01211 \textcolor{preprocessor}{#endif }\textcolor{comment}{/* GLEW\_MX */}\textcolor{preprocessor}{}
+01212 
+01213 WGLEW_FUN_EXPORT PFNWGLSETSTEREOEMITTERSTATE3DLPROC 
+      __wglewSetStereoEmitterState3DL;
+01214 
+01215 WGLEW_FUN_EXPORT PFNWGLBLITCONTEXTFRAMEBUFFERAMDPROC 
+      __wglewBlitContextFramebufferAMD;
+01216 WGLEW_FUN_EXPORT PFNWGLCREATEASSOCIATEDCONTEXTAMDPROC 
+      __wglewCreateAssociatedContextAMD;
+01217 WGLEW_FUN_EXPORT PFNWGLCREATEASSOCIATEDCONTEXTATTRIBSAMDPROC 
+      __wglewCreateAssociatedContextAttribsAMD;
+01218 WGLEW_FUN_EXPORT PFNWGLDELETEASSOCIATEDCONTEXTAMDPROC 
+      __wglewDeleteAssociatedContextAMD;
+01219 WGLEW_FUN_EXPORT PFNWGLGETCONTEXTGPUIDAMDPROC __wglewGetContextGPUIDAMD;
+01220 WGLEW_FUN_EXPORT PFNWGLGETCURRENTASSOCIATEDCONTEXTAMDPROC 
+      __wglewGetCurrentAssociatedContextAMD;
+01221 WGLEW_FUN_EXPORT PFNWGLGETGPUIDSAMDPROC __wglewGetGPUIDsAMD;
+01222 WGLEW_FUN_EXPORT PFNWGLGETGPUINFOAMDPROC __wglewGetGPUInfoAMD;
+01223 WGLEW_FUN_EXPORT PFNWGLMAKEASSOCIATEDCONTEXTCURRENTAMDPROC 
+      __wglewMakeAssociatedContextCurrentAMD;
+01224 
+01225 WGLEW_FUN_EXPORT PFNWGLCREATEBUFFERREGIONARBPROC __wglewCreateBufferRegionARB;
+01226 WGLEW_FUN_EXPORT PFNWGLDELETEBUFFERREGIONARBPROC __wglewDeleteBufferRegionARB;
+01227 WGLEW_FUN_EXPORT PFNWGLRESTOREBUFFERREGIONARBPROC __wglewRestoreBufferRegionARB;
+01228 WGLEW_FUN_EXPORT PFNWGLSAVEBUFFERREGIONARBPROC __wglewSaveBufferRegionARB;
+01229 
+01230 WGLEW_FUN_EXPORT PFNWGLCREATECONTEXTATTRIBSARBPROC 
+      __wglewCreateContextAttribsARB;
+01231 
+01232 WGLEW_FUN_EXPORT PFNWGLGETEXTENSIONSSTRINGARBPROC __wglewGetExtensionsStringARB;
+01233 
+01234 WGLEW_FUN_EXPORT PFNWGLGETCURRENTREADDCARBPROC __wglewGetCurrentReadDCARB;
+01235 WGLEW_FUN_EXPORT PFNWGLMAKECONTEXTCURRENTARBPROC __wglewMakeContextCurrentARB;
+01236 
+01237 WGLEW_FUN_EXPORT PFNWGLCREATEPBUFFERARBPROC __wglewCreatePbufferARB;
+01238 WGLEW_FUN_EXPORT PFNWGLDESTROYPBUFFERARBPROC __wglewDestroyPbufferARB;
+01239 WGLEW_FUN_EXPORT PFNWGLGETPBUFFERDCARBPROC __wglewGetPbufferDCARB;
+01240 WGLEW_FUN_EXPORT PFNWGLQUERYPBUFFERARBPROC __wglewQueryPbufferARB;
+01241 WGLEW_FUN_EXPORT PFNWGLRELEASEPBUFFERDCARBPROC __wglewReleasePbufferDCARB;
+01242 
+01243 WGLEW_FUN_EXPORT PFNWGLCHOOSEPIXELFORMATARBPROC __wglewChoosePixelFormatARB;
+01244 WGLEW_FUN_EXPORT PFNWGLGETPIXELFORMATATTRIBFVARBPROC 
+      __wglewGetPixelFormatAttribfvARB;
+01245 WGLEW_FUN_EXPORT PFNWGLGETPIXELFORMATATTRIBIVARBPROC 
+      __wglewGetPixelFormatAttribivARB;
+01246 
+01247 WGLEW_FUN_EXPORT PFNWGLBINDTEXIMAGEARBPROC __wglewBindTexImageARB;
+01248 WGLEW_FUN_EXPORT PFNWGLRELEASETEXIMAGEARBPROC __wglewReleaseTexImageARB;
+01249 WGLEW_FUN_EXPORT PFNWGLSETPBUFFERATTRIBARBPROC __wglewSetPbufferAttribARB;
+01250 
+01251 WGLEW_FUN_EXPORT PFNWGLBINDDISPLAYCOLORTABLEEXTPROC 
+      __wglewBindDisplayColorTableEXT;
+01252 WGLEW_FUN_EXPORT PFNWGLCREATEDISPLAYCOLORTABLEEXTPROC 
+      __wglewCreateDisplayColorTableEXT;
+01253 WGLEW_FUN_EXPORT PFNWGLDESTROYDISPLAYCOLORTABLEEXTPROC 
+      __wglewDestroyDisplayColorTableEXT;
+01254 WGLEW_FUN_EXPORT PFNWGLLOADDISPLAYCOLORTABLEEXTPROC 
+      __wglewLoadDisplayColorTableEXT;
+01255 
+01256 WGLEW_FUN_EXPORT PFNWGLGETEXTENSIONSSTRINGEXTPROC __wglewGetExtensionsStringEXT;
+01257 
+01258 WGLEW_FUN_EXPORT PFNWGLGETCURRENTREADDCEXTPROC __wglewGetCurrentReadDCEXT;
+01259 WGLEW_FUN_EXPORT PFNWGLMAKECONTEXTCURRENTEXTPROC __wglewMakeContextCurrentEXT;
+01260 
+01261 WGLEW_FUN_EXPORT PFNWGLCREATEPBUFFEREXTPROC __wglewCreatePbufferEXT;
+01262 WGLEW_FUN_EXPORT PFNWGLDESTROYPBUFFEREXTPROC __wglewDestroyPbufferEXT;
+01263 WGLEW_FUN_EXPORT PFNWGLGETPBUFFERDCEXTPROC __wglewGetPbufferDCEXT;
+01264 WGLEW_FUN_EXPORT PFNWGLQUERYPBUFFEREXTPROC __wglewQueryPbufferEXT;
+01265 WGLEW_FUN_EXPORT PFNWGLRELEASEPBUFFERDCEXTPROC __wglewReleasePbufferDCEXT;
+01266 
+01267 WGLEW_FUN_EXPORT PFNWGLCHOOSEPIXELFORMATEXTPROC __wglewChoosePixelFormatEXT;
+01268 WGLEW_FUN_EXPORT PFNWGLGETPIXELFORMATATTRIBFVEXTPROC 
+      __wglewGetPixelFormatAttribfvEXT;
+01269 WGLEW_FUN_EXPORT PFNWGLGETPIXELFORMATATTRIBIVEXTPROC 
+      __wglewGetPixelFormatAttribivEXT;
+01270 
+01271 WGLEW_FUN_EXPORT PFNWGLGETSWAPINTERVALEXTPROC __wglewGetSwapIntervalEXT;
+01272 WGLEW_FUN_EXPORT PFNWGLSWAPINTERVALEXTPROC __wglewSwapIntervalEXT;
+01273 
+01274 WGLEW_FUN_EXPORT PFNWGLGETDIGITALVIDEOPARAMETERSI3DPROC 
+      __wglewGetDigitalVideoParametersI3D;
+01275 WGLEW_FUN_EXPORT PFNWGLSETDIGITALVIDEOPARAMETERSI3DPROC 
+      __wglewSetDigitalVideoParametersI3D;
+01276 
+01277 WGLEW_FUN_EXPORT PFNWGLGETGAMMATABLEI3DPROC __wglewGetGammaTableI3D;
+01278 WGLEW_FUN_EXPORT PFNWGLGETGAMMATABLEPARAMETERSI3DPROC 
+      __wglewGetGammaTableParametersI3D;
+01279 WGLEW_FUN_EXPORT PFNWGLSETGAMMATABLEI3DPROC __wglewSetGammaTableI3D;
+01280 WGLEW_FUN_EXPORT PFNWGLSETGAMMATABLEPARAMETERSI3DPROC 
+      __wglewSetGammaTableParametersI3D;
+01281 
+01282 WGLEW_FUN_EXPORT PFNWGLDISABLEGENLOCKI3DPROC __wglewDisableGenlockI3D;
+01283 WGLEW_FUN_EXPORT PFNWGLENABLEGENLOCKI3DPROC __wglewEnableGenlockI3D;
+01284 WGLEW_FUN_EXPORT PFNWGLGENLOCKSAMPLERATEI3DPROC __wglewGenlockSampleRateI3D;
+01285 WGLEW_FUN_EXPORT PFNWGLGENLOCKSOURCEDELAYI3DPROC __wglewGenlockSourceDelayI3D;
+01286 WGLEW_FUN_EXPORT PFNWGLGENLOCKSOURCEEDGEI3DPROC __wglewGenlockSourceEdgeI3D;
+01287 WGLEW_FUN_EXPORT PFNWGLGENLOCKSOURCEI3DPROC __wglewGenlockSourceI3D;
+01288 WGLEW_FUN_EXPORT PFNWGLGETGENLOCKSAMPLERATEI3DPROC 
+      __wglewGetGenlockSampleRateI3D;
+01289 WGLEW_FUN_EXPORT PFNWGLGETGENLOCKSOURCEDELAYI3DPROC 
+      __wglewGetGenlockSourceDelayI3D;
+01290 WGLEW_FUN_EXPORT PFNWGLGETGENLOCKSOURCEEDGEI3DPROC 
+      __wglewGetGenlockSourceEdgeI3D;
+01291 WGLEW_FUN_EXPORT PFNWGLGETGENLOCKSOURCEI3DPROC __wglewGetGenlockSourceI3D;
+01292 WGLEW_FUN_EXPORT PFNWGLISENABLEDGENLOCKI3DPROC __wglewIsEnabledGenlockI3D;
+01293 WGLEW_FUN_EXPORT PFNWGLQUERYGENLOCKMAXSOURCEDELAYI3DPROC 
+      __wglewQueryGenlockMaxSourceDelayI3D;
+01294 
+01295 WGLEW_FUN_EXPORT PFNWGLASSOCIATEIMAGEBUFFEREVENTSI3DPROC 
+      __wglewAssociateImageBufferEventsI3D;
+01296 WGLEW_FUN_EXPORT PFNWGLCREATEIMAGEBUFFERI3DPROC __wglewCreateImageBufferI3D;
+01297 WGLEW_FUN_EXPORT PFNWGLDESTROYIMAGEBUFFERI3DPROC __wglewDestroyImageBufferI3D;
+01298 WGLEW_FUN_EXPORT PFNWGLRELEASEIMAGEBUFFEREVENTSI3DPROC 
+      __wglewReleaseImageBufferEventsI3D;
+01299 
+01300 WGLEW_FUN_EXPORT PFNWGLDISABLEFRAMELOCKI3DPROC __wglewDisableFrameLockI3D;
+01301 WGLEW_FUN_EXPORT PFNWGLENABLEFRAMELOCKI3DPROC __wglewEnableFrameLockI3D;
+01302 WGLEW_FUN_EXPORT PFNWGLISENABLEDFRAMELOCKI3DPROC __wglewIsEnabledFrameLockI3D;
+01303 WGLEW_FUN_EXPORT PFNWGLQUERYFRAMELOCKMASTERI3DPROC 
+      __wglewQueryFrameLockMasterI3D;
+01304 
+01305 WGLEW_FUN_EXPORT PFNWGLBEGINFRAMETRACKINGI3DPROC __wglewBeginFrameTrackingI3D;
+01306 WGLEW_FUN_EXPORT PFNWGLENDFRAMETRACKINGI3DPROC __wglewEndFrameTrackingI3D;
+01307 WGLEW_FUN_EXPORT PFNWGLGETFRAMEUSAGEI3DPROC __wglewGetFrameUsageI3D;
+01308 WGLEW_FUN_EXPORT PFNWGLQUERYFRAMETRACKINGI3DPROC __wglewQueryFrameTrackingI3D;
+01309 
+01310 WGLEW_FUN_EXPORT PFNWGLDXCLOSEDEVICENVPROC __wglewDXCloseDeviceNV;
+01311 WGLEW_FUN_EXPORT PFNWGLDXLOCKOBJECTSNVPROC __wglewDXLockObjectsNV;
+01312 WGLEW_FUN_EXPORT PFNWGLDXOBJECTACCESSNVPROC __wglewDXObjectAccessNV;
+01313 WGLEW_FUN_EXPORT PFNWGLDXOPENDEVICENVPROC __wglewDXOpenDeviceNV;
+01314 WGLEW_FUN_EXPORT PFNWGLDXREGISTEROBJECTNVPROC __wglewDXRegisterObjectNV;
+01315 WGLEW_FUN_EXPORT PFNWGLDXSETRESOURCESHAREHANDLENVPROC 
+      __wglewDXSetResourceShareHandleNV;
+01316 WGLEW_FUN_EXPORT PFNWGLDXUNLOCKOBJECTSNVPROC __wglewDXUnlockObjectsNV;
+01317 WGLEW_FUN_EXPORT PFNWGLDXUNREGISTEROBJECTNVPROC __wglewDXUnregisterObjectNV;
+01318 
+01319 WGLEW_FUN_EXPORT PFNWGLCOPYIMAGESUBDATANVPROC __wglewCopyImageSubDataNV;
+01320 
+01321 WGLEW_FUN_EXPORT PFNWGLDELAYBEFORESWAPNVPROC __wglewDelayBeforeSwapNV;
+01322 
+01323 WGLEW_FUN_EXPORT PFNWGLCREATEAFFINITYDCNVPROC __wglewCreateAffinityDCNV;
+01324 WGLEW_FUN_EXPORT PFNWGLDELETEDCNVPROC __wglewDeleteDCNV;
+01325 WGLEW_FUN_EXPORT PFNWGLENUMGPUDEVICESNVPROC __wglewEnumGpuDevicesNV;
+01326 WGLEW_FUN_EXPORT PFNWGLENUMGPUSFROMAFFINITYDCNVPROC 
+      __wglewEnumGpusFromAffinityDCNV;
+01327 WGLEW_FUN_EXPORT PFNWGLENUMGPUSNVPROC __wglewEnumGpusNV;
+01328 
+01329 WGLEW_FUN_EXPORT PFNWGLBINDVIDEODEVICENVPROC __wglewBindVideoDeviceNV;
+01330 WGLEW_FUN_EXPORT PFNWGLENUMERATEVIDEODEVICESNVPROC 
+      __wglewEnumerateVideoDevicesNV;
+01331 WGLEW_FUN_EXPORT PFNWGLQUERYCURRENTCONTEXTNVPROC __wglewQueryCurrentContextNV;
+01332 
+01333 WGLEW_FUN_EXPORT PFNWGLBINDSWAPBARRIERNVPROC __wglewBindSwapBarrierNV;
+01334 WGLEW_FUN_EXPORT PFNWGLJOINSWAPGROUPNVPROC __wglewJoinSwapGroupNV;
+01335 WGLEW_FUN_EXPORT PFNWGLQUERYFRAMECOUNTNVPROC __wglewQueryFrameCountNV;
+01336 WGLEW_FUN_EXPORT PFNWGLQUERYMAXSWAPGROUPSNVPROC __wglewQueryMaxSwapGroupsNV;
+01337 WGLEW_FUN_EXPORT PFNWGLQUERYSWAPGROUPNVPROC __wglewQuerySwapGroupNV;
+01338 WGLEW_FUN_EXPORT PFNWGLRESETFRAMECOUNTNVPROC __wglewResetFrameCountNV;
+01339 
+01340 WGLEW_FUN_EXPORT PFNWGLALLOCATEMEMORYNVPROC __wglewAllocateMemoryNV;
+01341 WGLEW_FUN_EXPORT PFNWGLFREEMEMORYNVPROC __wglewFreeMemoryNV;
+01342 
+01343 WGLEW_FUN_EXPORT PFNWGLBINDVIDEOCAPTUREDEVICENVPROC 
+      __wglewBindVideoCaptureDeviceNV;
+01344 WGLEW_FUN_EXPORT PFNWGLENUMERATEVIDEOCAPTUREDEVICESNVPROC 
+      __wglewEnumerateVideoCaptureDevicesNV;
+01345 WGLEW_FUN_EXPORT PFNWGLLOCKVIDEOCAPTUREDEVICENVPROC 
+      __wglewLockVideoCaptureDeviceNV;
+01346 WGLEW_FUN_EXPORT PFNWGLQUERYVIDEOCAPTUREDEVICENVPROC 
+      __wglewQueryVideoCaptureDeviceNV;
+01347 WGLEW_FUN_EXPORT PFNWGLRELEASEVIDEOCAPTUREDEVICENVPROC 
+      __wglewReleaseVideoCaptureDeviceNV;
+01348 
+01349 WGLEW_FUN_EXPORT PFNWGLBINDVIDEOIMAGENVPROC __wglewBindVideoImageNV;
+01350 WGLEW_FUN_EXPORT PFNWGLGETVIDEODEVICENVPROC __wglewGetVideoDeviceNV;
+01351 WGLEW_FUN_EXPORT PFNWGLGETVIDEOINFONVPROC __wglewGetVideoInfoNV;
+01352 WGLEW_FUN_EXPORT PFNWGLRELEASEVIDEODEVICENVPROC __wglewReleaseVideoDeviceNV;
+01353 WGLEW_FUN_EXPORT PFNWGLRELEASEVIDEOIMAGENVPROC __wglewReleaseVideoImageNV;
+01354 WGLEW_FUN_EXPORT PFNWGLSENDPBUFFERTOVIDEONVPROC __wglewSendPbufferToVideoNV;
+01355 
+01356 WGLEW_FUN_EXPORT PFNWGLGETMSCRATEOMLPROC __wglewGetMscRateOML;
+01357 WGLEW_FUN_EXPORT PFNWGLGETSYNCVALUESOMLPROC __wglewGetSyncValuesOML;
+01358 WGLEW_FUN_EXPORT PFNWGLSWAPBUFFERSMSCOMLPROC __wglewSwapBuffersMscOML;
+01359 WGLEW_FUN_EXPORT PFNWGLSWAPLAYERBUFFERSMSCOMLPROC __wglewSwapLayerBuffersMscOML;
+01360 WGLEW_FUN_EXPORT PFNWGLWAITFORMSCOMLPROC __wglewWaitForMscOML;
+01361 WGLEW_FUN_EXPORT PFNWGLWAITFORSBCOMLPROC __wglewWaitForSbcOML;
+01362 WGLEW_VAR_EXPORT GLboolean __WGLEW_3DFX_multisample;
+01363 WGLEW_VAR_EXPORT GLboolean __WGLEW_3DL_stereo_control;
+01364 WGLEW_VAR_EXPORT GLboolean __WGLEW_AMD_gpu_association;
+01365 WGLEW_VAR_EXPORT GLboolean __WGLEW_ARB_buffer_region;
+01366 WGLEW_VAR_EXPORT GLboolean __WGLEW_ARB_context_flush_control;
+01367 WGLEW_VAR_EXPORT GLboolean __WGLEW_ARB_create_context;
+01368 WGLEW_VAR_EXPORT GLboolean __WGLEW_ARB_create_context_profile;
+01369 WGLEW_VAR_EXPORT GLboolean __WGLEW_ARB_create_context_robustness;
+01370 WGLEW_VAR_EXPORT GLboolean __WGLEW_ARB_extensions_string;
+01371 WGLEW_VAR_EXPORT GLboolean __WGLEW_ARB_framebuffer_sRGB;
+01372 WGLEW_VAR_EXPORT GLboolean __WGLEW_ARB_make_current_read;
+01373 WGLEW_VAR_EXPORT GLboolean __WGLEW_ARB_multisample;
+01374 WGLEW_VAR_EXPORT GLboolean __WGLEW_ARB_pbuffer;
+01375 WGLEW_VAR_EXPORT GLboolean __WGLEW_ARB_pixel_format;
+01376 WGLEW_VAR_EXPORT GLboolean __WGLEW_ARB_pixel_format_float;
+01377 WGLEW_VAR_EXPORT GLboolean __WGLEW_ARB_render_texture;
+01378 WGLEW_VAR_EXPORT GLboolean __WGLEW_ARB_robustness_application_isolation;
+01379 WGLEW_VAR_EXPORT GLboolean __WGLEW_ARB_robustness_share_group_isolation;
+01380 WGLEW_VAR_EXPORT GLboolean __WGLEW_ATI_pixel_format_float;
+01381 WGLEW_VAR_EXPORT GLboolean __WGLEW_ATI_render_texture_rectangle;
+01382 WGLEW_VAR_EXPORT GLboolean __WGLEW_EXT_create_context_es2_profile;
+01383 WGLEW_VAR_EXPORT GLboolean __WGLEW_EXT_create_context_es_profile;
+01384 WGLEW_VAR_EXPORT GLboolean __WGLEW_EXT_depth_float;
+01385 WGLEW_VAR_EXPORT GLboolean __WGLEW_EXT_display_color_table;
+01386 WGLEW_VAR_EXPORT GLboolean __WGLEW_EXT_extensions_string;
+01387 WGLEW_VAR_EXPORT GLboolean __WGLEW_EXT_framebuffer_sRGB;
+01388 WGLEW_VAR_EXPORT GLboolean __WGLEW_EXT_make_current_read;
+01389 WGLEW_VAR_EXPORT GLboolean __WGLEW_EXT_multisample;
+01390 WGLEW_VAR_EXPORT GLboolean __WGLEW_EXT_pbuffer;
+01391 WGLEW_VAR_EXPORT GLboolean __WGLEW_EXT_pixel_format;
+01392 WGLEW_VAR_EXPORT GLboolean __WGLEW_EXT_pixel_format_packed_float;
+01393 WGLEW_VAR_EXPORT GLboolean __WGLEW_EXT_swap_control;
+01394 WGLEW_VAR_EXPORT GLboolean __WGLEW_EXT_swap_control_tear;
+01395 WGLEW_VAR_EXPORT GLboolean __WGLEW_I3D_digital_video_control;
+01396 WGLEW_VAR_EXPORT GLboolean __WGLEW_I3D_gamma;
+01397 WGLEW_VAR_EXPORT GLboolean __WGLEW_I3D_genlock;
+01398 WGLEW_VAR_EXPORT GLboolean __WGLEW_I3D_image_buffer;
+01399 WGLEW_VAR_EXPORT GLboolean __WGLEW_I3D_swap_frame_lock;
+01400 WGLEW_VAR_EXPORT GLboolean __WGLEW_I3D_swap_frame_usage;
+01401 WGLEW_VAR_EXPORT GLboolean __WGLEW_NV_DX_interop;
+01402 WGLEW_VAR_EXPORT GLboolean __WGLEW_NV_DX_interop2;
+01403 WGLEW_VAR_EXPORT GLboolean __WGLEW_NV_copy_image;
+01404 WGLEW_VAR_EXPORT GLboolean __WGLEW_NV_delay_before_swap;
+01405 WGLEW_VAR_EXPORT GLboolean __WGLEW_NV_float_buffer;
+01406 WGLEW_VAR_EXPORT GLboolean __WGLEW_NV_gpu_affinity;
+01407 WGLEW_VAR_EXPORT GLboolean __WGLEW_NV_multisample_coverage;
+01408 WGLEW_VAR_EXPORT GLboolean __WGLEW_NV_present_video;
+01409 WGLEW_VAR_EXPORT GLboolean __WGLEW_NV_render_depth_texture;
+01410 WGLEW_VAR_EXPORT GLboolean __WGLEW_NV_render_texture_rectangle;
+01411 WGLEW_VAR_EXPORT GLboolean __WGLEW_NV_swap_group;
+01412 WGLEW_VAR_EXPORT GLboolean __WGLEW_NV_vertex_array_range;
+01413 WGLEW_VAR_EXPORT GLboolean __WGLEW_NV_video_capture;
+01414 WGLEW_VAR_EXPORT GLboolean __WGLEW_NV_video_output;
+01415 WGLEW_VAR_EXPORT GLboolean __WGLEW_OML_sync_control;
+01416 
+01417 \textcolor{preprocessor}{#ifdef GLEW\_MX}
+01418 \}; \textcolor{comment}{/* WGLEWContextStruct */}
+01419 \textcolor{preprocessor}{#endif }\textcolor{comment}{/* GLEW\_MX */}\textcolor{preprocessor}{}
+01420 
+01421 \textcolor{comment}{/* ------------------------------------------------------------------------- */}
+01422 
+01423 \textcolor{preprocessor}{#ifdef GLEW\_MX}
+01424 
+01425 \textcolor{keyword}{typedef} \textcolor{keyword}{struct }WGLEWContextStruct WGLEWContext;
+01426 GLEWAPI GLenum GLEWAPIENTRY wglewContextInit (WGLEWContext *ctx);
+01427 GLEWAPI GLboolean GLEWAPIENTRY wglewContextIsSupported (\textcolor{keyword}{const} WGLEWContext *ctx, \textcolor{keyword}{const} \textcolor{keywordtype}{char} *name);
+01428 
+01429 \textcolor{preprocessor}{#define wglewInit() wglewContextInit(wglewGetContext())}
+01430 \textcolor{preprocessor}{#define wglewIsSupported(x) wglewContextIsSupported(wglewGetContext(), x)}
+01431 
+01432 \textcolor{preprocessor}{#define WGLEW\_GET\_VAR(x) (*(const GLboolean*)&(wglewGetContext()->x))}
+01433 \textcolor{preprocessor}{#define WGLEW\_GET\_FUN(x) wglewGetContext()->x}
+01434 
+01435 \textcolor{preprocessor}{#else }\textcolor{comment}{/* GLEW\_MX */}\textcolor{preprocessor}{}
+01436 
+01437 GLEWAPI GLenum GLEWAPIENTRY wglewInit ();
+01438 GLEWAPI GLboolean GLEWAPIENTRY wglewIsSupported (\textcolor{keyword}{const} \textcolor{keywordtype}{char} *name);
+01439 
+01440 \textcolor{preprocessor}{#define WGLEW\_GET\_VAR(x) (*(const GLboolean*)&x)}
+01441 \textcolor{preprocessor}{#define WGLEW\_GET\_FUN(x) x}
+01442 
+01443 \textcolor{preprocessor}{#endif }\textcolor{comment}{/* GLEW\_MX */}\textcolor{preprocessor}{}
+01444 
+01445 GLEWAPI GLboolean GLEWAPIENTRY wglewGetExtension (\textcolor{keyword}{const} \textcolor{keywordtype}{char} *name);
+01446 
+01447 \textcolor{preprocessor}{#ifdef \_\_cplusplus}
+01448 \}
+01449 \textcolor{preprocessor}{#endif}
+01450 
+01451 \textcolor{preprocessor}{#undef GLEWAPI}
+01452 
+01453 \textcolor{preprocessor}{#endif }\textcolor{comment}{/* \_\_wglew\_h\_\_ */}\textcolor{preprocessor}{}
+\end{DoxyCode}

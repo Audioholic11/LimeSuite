@@ -1,0 +1,62 @@
+\subsection{lms7002\+\_\+pnl\+X\+B\+U\+F\+\_\+view.\+cpp}
+\label{lms7002__pnlXBUF__view_8cpp_source}\index{/home/erik/prefix/default/src/limesuite-\/dev/src/lms7002\+\_\+wxgui/lms7002\+\_\+pnl\+X\+B\+U\+F\+\_\+view.\+cpp@{/home/erik/prefix/default/src/limesuite-\/dev/src/lms7002\+\_\+wxgui/lms7002\+\_\+pnl\+X\+B\+U\+F\+\_\+view.\+cpp}}
+
+\begin{DoxyCode}
+00001 \textcolor{preprocessor}{#include "lms7002_pnlXBUF_view.h"}
+00002 \textcolor{preprocessor}{#include <map>}
+00003 \textcolor{preprocessor}{#include "lms7002_gui_utilities.h"}
+00004 
+00005 \textcolor{keyword}{using namespace }lime;
+00006 
+00007 lms7002_pnlXBUF_view::lms7002_pnlXBUF_view( wxWindow* parent )
+00008 :
+00009 pnlXBUF_view( parent )
+00010 \{
+00011 
+00012 \}
+00013 
+00014 lms7002_pnlXBUF_view::lms7002_pnlXBUF_view( wxWindow* parent, wxWindowID \textcolor{keywordtype}{id}, \textcolor{keyword}{const} wxPoint& pos, \textcolor{keyword}{const} 
+      wxSize& size, \textcolor{keywordtype}{long} style )
+00015     : pnlXBUF_view(parent, id, pos, size, style), lmsControl(nullptr)
+00016 \{
+00017     wndId2Enum[chkBYP_XBUF_RX] = LMS7param(BYP_XBUF_RX);
+00018     wndId2Enum[chkBYP_XBUF_TX] = LMS7param(BYP_XBUF_TX);
+00019     wndId2Enum[chkEN_G_XBUF] = LMS7param(EN_G_XBUF);
+00020     wndId2Enum[chkEN_OUT2_XBUF_TX] = LMS7param(EN_OUT2_XBUF_TX);
+00021     wndId2Enum[chkEN_TBUFIN_XBUF_RX] = LMS7param(EN_TBUFIN_XBUF_RX);
+00022     wndId2Enum[chkPD_XBUF_RX] = LMS7param(PD_XBUF_RX);
+00023     wndId2Enum[chkPD_XBUF_TX] = LMS7param(PD_XBUF_TX);
+00024     wndId2Enum[chkSLFB_XBUF_RX] = LMS7param(SLFB_XBUF_RX);
+00025     wndId2Enum[chkSLFB_XBUF_TX] = LMS7param(SLFB_XBUF_TX);
+00026 
+00027     LMS7002_WXGUI::UpdateTooltips(wndId2Enum, \textcolor{keyword}{true});
+00028 \}
+00029 
+00030 \textcolor{keywordtype}{void} lms7002_pnlXBUF_view::Initialize(lms_device_t* pControl)
+00031 \{
+00032     lmsControl = pControl;
+00033     assert(lmsControl != \textcolor{keyword}{nullptr});
+00034 \}
+00035 
+00036 \textcolor{keywordtype}{void} lms7002_pnlXBUF_view::ParameterChangeHandler(wxCommandEvent& event)
+00037 \{
+00038     assert(lmsControl != \textcolor{keyword}{nullptr});
+00039     LMS7Parameter parameter;
+00040     \textcolor{keywordflow}{try}
+00041     \{
+00042         parameter = wndId2Enum.at(reinterpret\_cast<wxWindow*>(event.GetEventObject()));
+00043     \}
+00044     \textcolor{keywordflow}{catch} (std::exception & e)
+00045     \{
+00046         std::cout << \textcolor{stringliteral}{"Control element(ID = "} << \textcolor{keyword}{event}.GetId() << \textcolor{stringliteral}{") don't have assigned LMS parameter."} << 
+      std::endl;
+00047         \textcolor{keywordflow}{return};
+00048     \}
+00049     LMS_WriteParam(lmsControl,parameter,event.GetInt());
+00050 \}
+00051 
+00052 \textcolor{keywordtype}{void} lms7002_pnlXBUF_view::UpdateGUI()
+00053 \{
+00054     LMS7002_WXGUI::UpdateControlsByMap(\textcolor{keyword}{this}, lmsControl, wndId2Enum);
+00055 \}
+\end{DoxyCode}

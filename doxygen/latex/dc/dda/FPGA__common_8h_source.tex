@@ -1,0 +1,68 @@
+\subsection{F\+P\+G\+A\+\_\+common.\+h}
+\label{FPGA__common_8h_source}\index{/home/erik/prefix/default/src/limesuite-\/dev/src/\+F\+P\+G\+A\+\_\+common/\+F\+P\+G\+A\+\_\+common.\+h@{/home/erik/prefix/default/src/limesuite-\/dev/src/\+F\+P\+G\+A\+\_\+common/\+F\+P\+G\+A\+\_\+common.\+h}}
+
+\begin{DoxyCode}
+00001 
+00007 \textcolor{preprocessor}{#ifndef FPGA\_COMMON\_H}
+00008 \textcolor{preprocessor}{#define FPGA\_COMMON\_H}
+00009 \textcolor{preprocessor}{#include "IConnection.h"}
+00010 \textcolor{preprocessor}{#include <stdint.h>}
+00011 \textcolor{preprocessor}{#include "dataTypes.h"}
+00012 \textcolor{preprocessor}{#include "Streamer.h"}
+00013 
+00014 \textcolor{keyword}{namespace }lime
+00015 \{
+00016      
+00017 \textcolor{keyword}{class }LIME_API FPGA
+00018 \{
+00019 \textcolor{keyword}{public}:
+00020     
+00021     FPGA()\{\};
+00022     \textcolor{keyword}{virtual} ~FPGA()\{\};
+00023     \textcolor{keywordtype}{void} SetConnection(IConnection* conn);
+00024     IConnection* GetConnection() \textcolor{keyword}{const};
+00025     \textcolor{keywordtype}{int} StartStreaming();
+00026     \textcolor{keywordtype}{int} StopStreaming();
+00027     \textcolor{keywordtype}{int} ResetTimestamp();
+00028     \textcolor{keyword}{virtual} \textcolor{keywordtype}{int} UploadWFM(\textcolor{keyword}{const} \textcolor{keywordtype}{void}* \textcolor{keyword}{const}* samples, uint8\_t chCount, \textcolor{keywordtype}{size\_t} 
+      sample_count, StreamConfig::StreamDataFormat format, \textcolor{keywordtype}{int} epIndex);
+00029     
+00030     \textcolor{keyword}{struct }FPGA_PLL_clock
+00031     \{
+00032         FPGA_PLL_clock()
+00033         \{
+00034            findPhase = \textcolor{keyword}{false};
+00035            bypass = \textcolor{keyword}{false};
+00036            phaseShift\_deg = 0;
+00037            index = 0;
+00038         \}
+00039         \textcolor{keywordtype}{double} outFrequency;
+00040         \textcolor{keywordtype}{double} phaseShift_deg;
+00041         uint8\_t index;
+00042         \textcolor{keywordtype}{bool} bypass;
+00043         \textcolor{keywordtype}{bool} findPhase;
+00044         \textcolor{keywordtype}{double} rd_actualFrequency;
+00045     \};
+00046 
+00047     \textcolor{keyword}{virtual} \textcolor{keywordtype}{int} SetInterfaceFreq(\textcolor{keywordtype}{double} f\_Tx\_Hz, \textcolor{keywordtype}{double} f\_Rx\_Hz, \textcolor{keywordtype}{double} txPhase, \textcolor{keywordtype}{double} rxPhase, \textcolor{keywordtype}{int} ch = 0
+      );
+00048     \textcolor{keyword}{virtual} \textcolor{keywordtype}{int} SetInterfaceFreq(\textcolor{keywordtype}{double} f\_Tx\_Hz, \textcolor{keywordtype}{double} f\_Rx\_Hz, \textcolor{keywordtype}{int} ch = 0);
+00049     \textcolor{keywordtype}{double} DetectRefClk(\textcolor{keywordtype}{double} fx3Clk = 100e6);
+00050 
+00051     \textcolor{keyword}{static} \textcolor{keywordtype}{int} FPGAPacketPayload2Samples(\textcolor{keyword}{const} uint8\_t* buffer, \textcolor{keywordtype}{int} bufLen, \textcolor{keywordtype}{bool} mimo, \textcolor{keywordtype}{bool} compressed, 
+      complex16_t** samples);
+00052     \textcolor{keyword}{static} \textcolor{keywordtype}{int} Samples2FPGAPacketPayload(\textcolor{keyword}{const} complex16_t* \textcolor{keyword}{const}* samples, \textcolor{keywordtype}{int} samplesCount, \textcolor{keywordtype}{bool} mimo, \textcolor{keywordtype}{
+      bool} compressed, uint8\_t* buffer);
+00053 \textcolor{keyword}{protected}:
+00054     \textcolor{keywordtype}{int} SetPllFrequency(uint8\_t pllIndex, \textcolor{keywordtype}{double} inputFreq, FPGA_PLL_clock* outputs, uint8\_t clockCount);
+00055     \textcolor{keywordtype}{int} SetDirectClocking(\textcolor{keywordtype}{int} clockIndex);
+00056     IConnection* connection;
+00057 \textcolor{keyword}{private}:
+00058     \textcolor{keyword}{virtual} \textcolor{keywordtype}{int} ReadRawStreamData(\textcolor{keywordtype}{char}* buffer, \textcolor{keywordtype}{unsigned} length, \textcolor{keywordtype}{int} epIndex, \textcolor{keywordtype}{int} 
+      timeout_ms);
+00059     \textcolor{keywordtype}{int} SetPllClock(\textcolor{keywordtype}{int} clockIndex, \textcolor{keywordtype}{int} nSteps, \textcolor{keywordtype}{bool} waitLock, uint16\_t &reg23val);
+00060 \};
+00061 
+00062 \}
+00063 \textcolor{preprocessor}{#endif // FPGA\_COMMON\_H}
+\end{DoxyCode}

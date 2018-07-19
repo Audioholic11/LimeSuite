@@ -1,0 +1,976 @@
+\subsection{fftviewer\+\_\+fr\+F\+F\+Tviewer Class Reference}
+\label{classfftviewer__frFFTviewer}\index{fftviewer\+\_\+fr\+F\+F\+Tviewer@{fftviewer\+\_\+fr\+F\+F\+Tviewer}}
+
+
+Implementing \doxyref{fr\+F\+F\+Tviewer}{p.}{db/d2f/classfrFFTviewer}.  
+
+
+
+
+{\ttfamily \#include $<$fftviewer\+\_\+fr\+F\+F\+Tviewer.\+h$>$}
+
+
+
+Inheritance diagram for fftviewer\+\_\+fr\+F\+F\+Tviewer\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=550pt]{d1/d6f/classfftviewer__frFFTviewer__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for fftviewer\+\_\+fr\+F\+F\+Tviewer\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{d6/d9b/classfftviewer__frFFTviewer__coll__graph}
+\end{center}
+\end{figure}
+\subsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct {\bf Data\+To\+G\+UI}
+\end{DoxyCompactItemize}
+\subsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+{\bf fftviewer\+\_\+fr\+F\+F\+Tviewer} (wx\+Window $\ast$parent)
+\begin{DoxyCompactList}\small\item\em Constructor. \end{DoxyCompactList}\item 
+{\bf $\sim$fftviewer\+\_\+fr\+F\+F\+Tviewer} ()
+\item 
+{\bf void} {\bf Initialize} ({\bf lms\+\_\+device\+\_\+t} $\ast$p\+Data\+Port)
+\item 
+{\bf void} {\bf Set\+Nyquist\+Frequency} ()
+\item 
+{\bf void} {\bf Start\+Streaming} ()
+\item 
+{\bf void} {\bf Stop\+Streaming} ()
+\item 
+{\bf void} {\bf Onbtn\+Capture\+Click} (wx\+Command\+Event \&event)
+\end{DoxyCompactItemize}
+\subsubsection*{Protected Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+{\bf void} {\bf On\+Window\+Function\+Changed} (wx\+Command\+Event \&event)
+\item 
+{\bf void} {\bf Onbtn\+Start\+Stop} (wx\+Command\+Event \&event)
+\item 
+{\bf void} {\bf On\+Channel\+Visibility\+Change} (wx\+Command\+Event \&event)
+\item 
+{\bf void} {\bf On\+Stream\+Change} (wx\+Command\+Event \&event)
+\item 
+{\bf void} {\bf On\+En\+Tx} (wx\+Command\+Event \&event)
+\item 
+{\bf void} {\bf On\+En\+Pwr} (wx\+Command\+Event \&event)
+\item 
+{\bf void} {\bf On\+Fmt\+Change} (wx\+Command\+Event \&event)
+\item 
+{\bf void} {\bf On\+Avg\+Change} (wx\+Spin\+Event \&event)
+\item 
+{\bf void} {\bf On\+Avg\+Change\+Enter} (wx\+Command\+Event \&event)
+\item 
+{\bf void} {\bf On\+Window\+Function\+Change} (wx\+Command\+Event \&event)
+\item 
+{\bf void} {\bf On\+Update\+Stats} (wx\+Timer\+Event \&event)
+\item 
+{\bf void} {\bf On\+Update\+Plots} (wx\+Thread\+Event \&event)
+\item 
+wx\+String {\bf print\+Data\+Rate} (float data\+Rate)
+\end{DoxyCompactItemize}
+\subsubsection*{Static Protected Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+static {\bf void} {\bf Streaming\+Loop} ({\bf fftviewer\+\_\+fr\+F\+F\+Tviewer} $\ast$pthis, const unsigned {\bf int} fft\+Size, const {\bf int} channels\+Count, const uint32\+\_\+t {\bf format})
+\end{DoxyCompactItemize}
+\subsubsection*{Protected Attributes}
+\begin{DoxyCompactItemize}
+\item 
+std\+::atomic$<$ bool $>$ {\bf enable\+Transmitter}
+\item 
+std\+::atomic$<$ {\bf int} $>$ {\bf window\+Function\+ID}
+\item 
+std\+::atomic$<$ bool $>$ {\bf capture\+Samples}
+\item 
+std\+::atomic$<$ {\bf int} $>$ {\bf average\+Count}
+\item 
+std\+::atomic$<$ bool $>$ {\bf update\+G\+UI}
+\item 
+std\+::atomic$<$ bool $>$ {\bf enable\+F\+FT}
+\item 
+std\+::string {\bf capture\+Filename}
+\item 
+struct {\bf fftviewer\+\_\+fr\+F\+F\+Tviewer\+::\+Data\+To\+G\+UI} {\bf stream\+Data}
+\item 
+{\bf std\+::vector}$<$ float $>$ {\bf fft\+Freq\+Axis}
+\item 
+{\bf std\+::vector}$<$ float $>$ {\bf time\+X\+Axis}
+\item 
+std\+::atomic$<$ bool $>$ {\bf m\+Stream\+Running}
+\item 
+std\+::atomic$<$ bool $>$ {\bf stop\+Processing}
+\item 
+std\+::thread {\bf thread\+Processing}
+\item 
+{\bf lms\+\_\+stream\+\_\+t} {\bf rx\+Streams} [{\bf c\+Max\+Ch\+Count}]
+\item 
+{\bf lms\+\_\+stream\+\_\+t} {\bf tx\+Streams} [{\bf c\+Max\+Ch\+Count}]
+\item 
+{\bf lms\+\_\+device\+\_\+t} $\ast$ {\bf lms\+Control}
+\item 
+wx\+Timer $\ast$ {\bf m\+G\+U\+Iupdater}
+\item 
+unsigned {\bf lms\+Index}
+\end{DoxyCompactItemize}
+\subsubsection*{Static Protected Attributes}
+\begin{DoxyCompactItemize}
+\item 
+static const {\bf int} {\bf c\+Max\+Ch\+Count} = 2
+\end{DoxyCompactItemize}
+
+
+\subsubsection{Detailed Description}
+Implementing \doxyref{fr\+F\+F\+Tviewer}{p.}{db/d2f/classfrFFTviewer}. 
+
+Definition at line {\bf 18} of file {\bf fftviewer\+\_\+fr\+F\+F\+Tviewer.\+h}.
+
+
+
+\subsubsection{Constructor \& Destructor Documentation}
+\index{fftviewer\+\_\+fr\+F\+F\+Tviewer@{fftviewer\+\_\+fr\+F\+F\+Tviewer}!fftviewer\+\_\+fr\+F\+F\+Tviewer@{fftviewer\+\_\+fr\+F\+F\+Tviewer}}
+\index{fftviewer\+\_\+fr\+F\+F\+Tviewer@{fftviewer\+\_\+fr\+F\+F\+Tviewer}!fftviewer\+\_\+fr\+F\+F\+Tviewer@{fftviewer\+\_\+fr\+F\+F\+Tviewer}}
+\paragraph[{fftviewer\+\_\+fr\+F\+F\+Tviewer(wx\+Window $\ast$parent)}]{\setlength{\rightskip}{0pt plus 5cm}fftviewer\+\_\+fr\+F\+F\+Tviewer\+::fftviewer\+\_\+fr\+F\+F\+Tviewer (
+\begin{DoxyParamCaption}
+\item[{wx\+Window $\ast$}]{parent}
+\end{DoxyParamCaption}
+)}\label{classfftviewer__frFFTviewer_a4bcd0ebcddfbe4227a156a426db9d5b9}
+
+
+Constructor. 
+
+
+
+Definition at line {\bf 52} of file {\bf fftviewer\+\_\+fr\+F\+F\+Tviewer.\+cpp}.
+
+
+
+References {\bf Open\+G\+L\+Graph\+::\+Add\+Serie()}, {\bf average\+Count}, {\bf capture\+Samples}, {\bf G\+L\+G\+\_\+\+L\+I\+NE}, {\bf G\+L\+G\+\_\+\+P\+O\+I\+N\+TS}, {\bf G\+L\+G\+\_\+settings\+::grid\+Xlines}, {\bf G\+L\+G\+\_\+settings\+::grid\+Xprec}, {\bf G\+L\+G\+\_\+settings\+::grid\+Ylines}, {\bf G\+L\+G\+\_\+settings\+::margin\+Left}, {\bf G\+L\+G\+\_\+settings\+::markers\+Enabled}, {\bf fr\+F\+F\+Tviewer\+::m\+Constelation\+Panel}, {\bf fr\+F\+F\+Tviewer\+::m\+F\+F\+Tpanel}, {\bf m\+G\+U\+Iupdater}, {\bf fr\+F\+F\+Tviewer\+::m\+Time\+Domain\+Panel}, {\bf On\+Channel\+Visibility\+Change()}, {\bf On\+Update\+Plots()}, {\bf On\+Update\+Stats()}, {\bf Open\+G\+L\+Graph\+::series}, {\bf Open\+G\+L\+Graph\+::\+Set\+Drawing\+Mode()}, {\bf Open\+G\+L\+Graph\+::\+Set\+Initial\+Display\+Area()}, {\bf Open\+G\+L\+Graph\+::settings}, {\bf fr\+F\+F\+Tviewer\+::spin\+Avg\+Count}, {\bf G\+L\+G\+\_\+settings\+::static\+Grid}, {\bf G\+L\+G\+\_\+settings\+::title}, {\bf G\+L\+G\+\_\+settings\+::title\+Xaxis}, {\bf G\+L\+G\+\_\+settings\+::title\+Yaxis}, {\bf update\+G\+UI}, {\bf G\+L\+G\+\_\+settings\+::use\+V\+BO}, and {\bf G\+L\+G\+\_\+settings\+::x\+Units}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{d5/d45/classfftviewer__frFFTviewer_a4bcd0ebcddfbe4227a156a426db9d5b9_cgraph}
+\end{center}
+\end{figure}
+
+
+\index{fftviewer\+\_\+fr\+F\+F\+Tviewer@{fftviewer\+\_\+fr\+F\+F\+Tviewer}!````~fftviewer\+\_\+fr\+F\+F\+Tviewer@{$\sim$fftviewer\+\_\+fr\+F\+F\+Tviewer}}
+\index{````~fftviewer\+\_\+fr\+F\+F\+Tviewer@{$\sim$fftviewer\+\_\+fr\+F\+F\+Tviewer}!fftviewer\+\_\+fr\+F\+F\+Tviewer@{fftviewer\+\_\+fr\+F\+F\+Tviewer}}
+\paragraph[{$\sim$fftviewer\+\_\+fr\+F\+F\+Tviewer()}]{\setlength{\rightskip}{0pt plus 5cm}fftviewer\+\_\+fr\+F\+F\+Tviewer\+::$\sim$fftviewer\+\_\+fr\+F\+F\+Tviewer (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}\label{classfftviewer__frFFTviewer_aed2fd272feb20110ee4baaba66435aa2}
+
+
+Definition at line {\bf 122} of file {\bf fftviewer\+\_\+fr\+F\+F\+Tviewer.\+cpp}.
+
+
+
+References {\bf m\+Stream\+Running}, and {\bf Stop\+Streaming()}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{d5/d45/classfftviewer__frFFTviewer_aed2fd272feb20110ee4baaba66435aa2_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+\subsubsection{Member Function Documentation}
+\index{fftviewer\+\_\+fr\+F\+F\+Tviewer@{fftviewer\+\_\+fr\+F\+F\+Tviewer}!Initialize@{Initialize}}
+\index{Initialize@{Initialize}!fftviewer\+\_\+fr\+F\+F\+Tviewer@{fftviewer\+\_\+fr\+F\+F\+Tviewer}}
+\paragraph[{Initialize(lms\+\_\+device\+\_\+t $\ast$p\+Data\+Port)}]{\setlength{\rightskip}{0pt plus 5cm}{\bf void} fftviewer\+\_\+fr\+F\+F\+Tviewer\+::\+Initialize (
+\begin{DoxyParamCaption}
+\item[{{\bf lms\+\_\+device\+\_\+t} $\ast$}]{p\+Data\+Port}
+\end{DoxyParamCaption}
+)}\label{classfftviewer__frFFTviewer_a19b2d47bd4b6f0c740c3efc3df578add}
+
+
+Definition at line {\bf 18} of file {\bf fftviewer\+\_\+fr\+F\+F\+Tviewer.\+cpp}.
+
+
+
+References {\bf i}, {\bf L\+M\+S\+\_\+\+Get\+Num\+Channels()}, and {\bf lms\+Control}.
+
+
+
+Referenced by {\bf L\+M\+S7\+Suite\+App\+Frame\+::\+On\+Show\+F\+F\+Tviewer()}, and {\bf L\+M\+S7\+Suite\+App\+Frame\+::\+Update\+Connections()}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{d5/d45/classfftviewer__frFFTviewer_a19b2d47bd4b6f0c740c3efc3df578add_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{d5/d45/classfftviewer__frFFTviewer_a19b2d47bd4b6f0c740c3efc3df578add_icgraph}
+\end{center}
+\end{figure}
+
+
+\index{fftviewer\+\_\+fr\+F\+F\+Tviewer@{fftviewer\+\_\+fr\+F\+F\+Tviewer}!On\+Avg\+Change@{On\+Avg\+Change}}
+\index{On\+Avg\+Change@{On\+Avg\+Change}!fftviewer\+\_\+fr\+F\+F\+Tviewer@{fftviewer\+\_\+fr\+F\+F\+Tviewer}}
+\paragraph[{On\+Avg\+Change(wx\+Spin\+Event \&event)}]{\setlength{\rightskip}{0pt plus 5cm}{\bf void} fftviewer\+\_\+fr\+F\+F\+Tviewer\+::\+On\+Avg\+Change (
+\begin{DoxyParamCaption}
+\item[{wx\+Spin\+Event \&}]{event}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [protected]}, {\ttfamily [virtual]}}\label{classfftviewer__frFFTviewer_a9e29ba18c856c93e387273a77500742b}
+
+
+Reimplemented from {\bf fr\+F\+F\+Tviewer} \doxyref{}{p.}{db/d2f/classfrFFTviewer_a4a769403e3168f8c532802ee05c4077d}.
+
+
+
+Definition at line {\bf 696} of file {\bf fftviewer\+\_\+fr\+F\+F\+Tviewer.\+cpp}.
+
+
+
+References {\bf average\+Count}, and {\bf fr\+F\+F\+Tviewer\+::spin\+Avg\+Count}.
+
+\index{fftviewer\+\_\+fr\+F\+F\+Tviewer@{fftviewer\+\_\+fr\+F\+F\+Tviewer}!On\+Avg\+Change\+Enter@{On\+Avg\+Change\+Enter}}
+\index{On\+Avg\+Change\+Enter@{On\+Avg\+Change\+Enter}!fftviewer\+\_\+fr\+F\+F\+Tviewer@{fftviewer\+\_\+fr\+F\+F\+Tviewer}}
+\paragraph[{On\+Avg\+Change\+Enter(wx\+Command\+Event \&event)}]{\setlength{\rightskip}{0pt plus 5cm}{\bf void} fftviewer\+\_\+fr\+F\+F\+Tviewer\+::\+On\+Avg\+Change\+Enter (
+\begin{DoxyParamCaption}
+\item[{wx\+Command\+Event \&}]{event}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [protected]}, {\ttfamily [virtual]}}\label{classfftviewer__frFFTviewer_ab3a0e9f553f7a51e6b4dd112df230e2b}
+
+
+Reimplemented from {\bf fr\+F\+F\+Tviewer} \doxyref{}{p.}{db/d2f/classfrFFTviewer_a4b88f5056528a8f8b972abff94f04b7e}.
+
+
+
+Definition at line {\bf 701} of file {\bf fftviewer\+\_\+fr\+F\+F\+Tviewer.\+cpp}.
+
+
+
+References {\bf average\+Count}, and {\bf fr\+F\+F\+Tviewer\+::spin\+Avg\+Count}.
+
+\index{fftviewer\+\_\+fr\+F\+F\+Tviewer@{fftviewer\+\_\+fr\+F\+F\+Tviewer}!Onbtn\+Capture\+Click@{Onbtn\+Capture\+Click}}
+\index{Onbtn\+Capture\+Click@{Onbtn\+Capture\+Click}!fftviewer\+\_\+fr\+F\+F\+Tviewer@{fftviewer\+\_\+fr\+F\+F\+Tviewer}}
+\paragraph[{Onbtn\+Capture\+Click(wx\+Command\+Event \&event)}]{\setlength{\rightskip}{0pt plus 5cm}{\bf void} fftviewer\+\_\+fr\+F\+F\+Tviewer\+::\+Onbtn\+Capture\+Click (
+\begin{DoxyParamCaption}
+\item[{wx\+Command\+Event \&}]{event}
+\end{DoxyParamCaption}
+)}\label{classfftviewer__frFFTviewer_a82ad55c1c2b49751e19736e1ee769543}
+\index{fftviewer\+\_\+fr\+F\+F\+Tviewer@{fftviewer\+\_\+fr\+F\+F\+Tviewer}!Onbtn\+Start\+Stop@{Onbtn\+Start\+Stop}}
+\index{Onbtn\+Start\+Stop@{Onbtn\+Start\+Stop}!fftviewer\+\_\+fr\+F\+F\+Tviewer@{fftviewer\+\_\+fr\+F\+F\+Tviewer}}
+\paragraph[{Onbtn\+Start\+Stop(wx\+Command\+Event \&event)}]{\setlength{\rightskip}{0pt plus 5cm}{\bf void} fftviewer\+\_\+fr\+F\+F\+Tviewer\+::\+Onbtn\+Start\+Stop (
+\begin{DoxyParamCaption}
+\item[{wx\+Command\+Event \&}]{event}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [protected]}, {\ttfamily [virtual]}}\label{classfftviewer__frFFTviewer_ab4c28bb34659ce6fc1774bec2c5d13b8}
+
+
+Reimplemented from {\bf fr\+F\+F\+Tviewer} \doxyref{}{p.}{db/d2f/classfrFFTviewer_ad9b91d11b4c1538befcde7ffc49ca6e5}.
+
+
+
+Definition at line {\bf 133} of file {\bf fftviewer\+\_\+fr\+F\+F\+Tviewer.\+cpp}.
+
+
+
+References {\bf Start\+Streaming()}, {\bf Stop\+Streaming()}, and {\bf thread\+Processing}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{d5/d45/classfftviewer__frFFTviewer_ab4c28bb34659ce6fc1774bec2c5d13b8_cgraph}
+\end{center}
+\end{figure}
+
+
+\index{fftviewer\+\_\+fr\+F\+F\+Tviewer@{fftviewer\+\_\+fr\+F\+F\+Tviewer}!On\+Channel\+Visibility\+Change@{On\+Channel\+Visibility\+Change}}
+\index{On\+Channel\+Visibility\+Change@{On\+Channel\+Visibility\+Change}!fftviewer\+\_\+fr\+F\+F\+Tviewer@{fftviewer\+\_\+fr\+F\+F\+Tviewer}}
+\paragraph[{On\+Channel\+Visibility\+Change(wx\+Command\+Event \&event)}]{\setlength{\rightskip}{0pt plus 5cm}{\bf void} fftviewer\+\_\+fr\+F\+F\+Tviewer\+::\+On\+Channel\+Visibility\+Change (
+\begin{DoxyParamCaption}
+\item[{wx\+Command\+Event \&}]{event}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [protected]}, {\ttfamily [virtual]}}\label{classfftviewer__frFFTviewer_ad1ab8146393c127d37d1c37c14f8dd19}
+
+
+Reimplemented from {\bf fr\+F\+F\+Tviewer} \doxyref{}{p.}{db/d2f/classfrFFTviewer_acbef6e86e14e4af8d8ac1445592507cf}.
+
+
+
+Definition at line {\bf 655} of file {\bf fftviewer\+\_\+fr\+F\+F\+Tviewer.\+cpp}.
+
+
+
+References {\bf c\+Max\+Ch\+Count}, {\bf fr\+F\+F\+Tviewer\+::cmb\+Stream\+Type}, {\bf fr\+F\+F\+Tviewer\+::m\+Constelation\+Panel}, {\bf fr\+F\+F\+Tviewer\+::m\+F\+F\+Tpanel}, {\bf fr\+F\+F\+Tviewer\+::m\+Time\+Domain\+Panel}, and {\bf Open\+G\+L\+Graph\+::series}.
+
+
+
+Referenced by {\bf fftviewer\+\_\+fr\+F\+F\+Tviewer()}.
+
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{d5/d45/classfftviewer__frFFTviewer_ad1ab8146393c127d37d1c37c14f8dd19_icgraph}
+\end{center}
+\end{figure}
+
+
+\index{fftviewer\+\_\+fr\+F\+F\+Tviewer@{fftviewer\+\_\+fr\+F\+F\+Tviewer}!On\+En\+Pwr@{On\+En\+Pwr}}
+\index{On\+En\+Pwr@{On\+En\+Pwr}!fftviewer\+\_\+fr\+F\+F\+Tviewer@{fftviewer\+\_\+fr\+F\+F\+Tviewer}}
+\paragraph[{On\+En\+Pwr(wx\+Command\+Event \&event)}]{\setlength{\rightskip}{0pt plus 5cm}{\bf void} fftviewer\+\_\+fr\+F\+F\+Tviewer\+::\+On\+En\+Pwr (
+\begin{DoxyParamCaption}
+\item[{wx\+Command\+Event \&}]{event}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [protected]}, {\ttfamily [virtual]}}\label{classfftviewer__frFFTviewer_a0c982785ffa9ec10ec99ea7ff01740f9}
+
+
+Reimplemented from {\bf fr\+F\+F\+Tviewer} \doxyref{}{p.}{db/d2f/classfrFFTviewer_ab9ba80a04bfa930e1c0c9eda45c3b611}.
+
+
+
+Definition at line {\bf 645} of file {\bf fftviewer\+\_\+fr\+F\+F\+Tviewer.\+cpp}.
+
+
+
+References {\bf fr\+F\+F\+Tviewer\+::txt\+B\+W1}, {\bf fr\+F\+F\+Tviewer\+::txt\+B\+W2}, {\bf fr\+F\+F\+Tviewer\+::txt\+Center\+Offset1}, and {\bf fr\+F\+F\+Tviewer\+::txt\+Center\+Offset2}.
+
+\index{fftviewer\+\_\+fr\+F\+F\+Tviewer@{fftviewer\+\_\+fr\+F\+F\+Tviewer}!On\+En\+Tx@{On\+En\+Tx}}
+\index{On\+En\+Tx@{On\+En\+Tx}!fftviewer\+\_\+fr\+F\+F\+Tviewer@{fftviewer\+\_\+fr\+F\+F\+Tviewer}}
+\paragraph[{On\+En\+Tx(wx\+Command\+Event \&event)}]{\setlength{\rightskip}{0pt plus 5cm}{\bf void} fftviewer\+\_\+fr\+F\+F\+Tviewer\+::\+On\+En\+Tx (
+\begin{DoxyParamCaption}
+\item[{wx\+Command\+Event \&}]{event}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [protected]}, {\ttfamily [virtual]}}\label{classfftviewer__frFFTviewer_a820c6a3582e6d332f65c340693b9e8cc}
+
+
+Reimplemented from {\bf fr\+F\+F\+Tviewer} \doxyref{}{p.}{db/d2f/classfrFFTviewer_a6917c7ff3365c0fe493172e94f584dbf}.
+
+
+
+Definition at line {\bf 640} of file {\bf fftviewer\+\_\+fr\+F\+F\+Tviewer.\+cpp}.
+
+
+
+References {\bf fr\+F\+F\+Tviewer\+::chk\+En\+Sync}.
+
+\index{fftviewer\+\_\+fr\+F\+F\+Tviewer@{fftviewer\+\_\+fr\+F\+F\+Tviewer}!On\+Fmt\+Change@{On\+Fmt\+Change}}
+\index{On\+Fmt\+Change@{On\+Fmt\+Change}!fftviewer\+\_\+fr\+F\+F\+Tviewer@{fftviewer\+\_\+fr\+F\+F\+Tviewer}}
+\paragraph[{On\+Fmt\+Change(wx\+Command\+Event \&event)}]{\setlength{\rightskip}{0pt plus 5cm}{\bf void} fftviewer\+\_\+fr\+F\+F\+Tviewer\+::\+On\+Fmt\+Change (
+\begin{DoxyParamCaption}
+\item[{wx\+Command\+Event \&}]{event}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [protected]}, {\ttfamily [virtual]}}\label{classfftviewer__frFFTviewer_a5d05e1c23d746034fd1c7d642e97855f}
+
+
+Reimplemented from {\bf fr\+F\+F\+Tviewer} \doxyref{}{p.}{db/d2f/classfrFFTviewer_a4ccf56a6dadd36d653e38e2399064337}.
+
+
+
+Definition at line {\bf 633} of file {\bf fftviewer\+\_\+fr\+F\+F\+Tviewer.\+cpp}.
+
+
+
+References {\bf fr\+F\+F\+Tviewer\+::m\+Constelation\+Panel}, {\bf fr\+F\+F\+Tviewer\+::m\+Time\+Domain\+Panel}, and {\bf Open\+G\+L\+Graph\+::\+Set\+Initial\+Display\+Area()}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{d5/d45/classfftviewer__frFFTviewer_a5d05e1c23d746034fd1c7d642e97855f_cgraph}
+\end{center}
+\end{figure}
+
+
+\index{fftviewer\+\_\+fr\+F\+F\+Tviewer@{fftviewer\+\_\+fr\+F\+F\+Tviewer}!On\+Stream\+Change@{On\+Stream\+Change}}
+\index{On\+Stream\+Change@{On\+Stream\+Change}!fftviewer\+\_\+fr\+F\+F\+Tviewer@{fftviewer\+\_\+fr\+F\+F\+Tviewer}}
+\paragraph[{On\+Stream\+Change(wx\+Command\+Event \&event)}]{\setlength{\rightskip}{0pt plus 5cm}{\bf void} fftviewer\+\_\+fr\+F\+F\+Tviewer\+::\+On\+Stream\+Change (
+\begin{DoxyParamCaption}
+\item[{wx\+Command\+Event \&}]{event}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [protected]}, {\ttfamily [virtual]}}\label{classfftviewer__frFFTviewer_a6cbdad6867fdd2d774d3f63cf4af0f7a}
+
+
+Reimplemented from {\bf fr\+F\+F\+Tviewer} \doxyref{}{p.}{db/d2f/classfrFFTviewer_ab607643058c9109b870f522b3192fbb9}.
+
+
+
+Definition at line {\bf 617} of file {\bf fftviewer\+\_\+fr\+F\+F\+Tviewer.\+cpp}.
+
+
+
+References {\bf fr\+F\+F\+Tviewer\+::cmb\+Channel\+Visibility}, {\bf fr\+F\+F\+Tviewer\+::cmb\+Stream\+Type}, and {\bf Set\+Nyquist\+Frequency()}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{d5/d45/classfftviewer__frFFTviewer_a6cbdad6867fdd2d774d3f63cf4af0f7a_cgraph}
+\end{center}
+\end{figure}
+
+
+\index{fftviewer\+\_\+fr\+F\+F\+Tviewer@{fftviewer\+\_\+fr\+F\+F\+Tviewer}!On\+Update\+Plots@{On\+Update\+Plots}}
+\index{On\+Update\+Plots@{On\+Update\+Plots}!fftviewer\+\_\+fr\+F\+F\+Tviewer@{fftviewer\+\_\+fr\+F\+F\+Tviewer}}
+\paragraph[{On\+Update\+Plots(wx\+Thread\+Event \&event)}]{\setlength{\rightskip}{0pt plus 5cm}{\bf void} fftviewer\+\_\+fr\+F\+F\+Tviewer\+::\+On\+Update\+Plots (
+\begin{DoxyParamCaption}
+\item[{wx\+Thread\+Event \&}]{event}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [protected]}}\label{classfftviewer__frFFTviewer_aa01d7b5ad35c15051574834869accae0}
+
+
+Definition at line {\bf 255} of file {\bf fftviewer\+\_\+fr\+F\+F\+Tviewer.\+cpp}.
+
+
+
+References {\bf bw}, {\bf fr\+F\+F\+Tviewer\+::chk\+En\+Pwr}, {\bf fr\+F\+F\+Tviewer\+::chk\+Freeze\+Constellation}, {\bf fr\+F\+F\+Tviewer\+::chk\+Freeze\+F\+FT}, {\bf fr\+F\+F\+Tviewer\+::chk\+Freeze\+Time\+Domain}, {\bf fr\+F\+F\+Tviewer\+::cmb\+Fmt}, {\bf Open\+G\+L\+Graph\+::\+Draw()}, {\bf enable\+F\+FT}, {\bf fftviewer\+\_\+fr\+F\+F\+Tviewer\+::\+Data\+To\+G\+U\+I\+::fft\+Bins}, {\bf fft\+Freq\+Axis}, {\bf i}, {\bf fr\+F\+F\+Tviewer\+::lbld\+Bc}, {\bf fr\+F\+F\+Tviewer\+::lbl\+Power1}, {\bf fr\+F\+F\+Tviewer\+::lbl\+Power2}, {\bf fr\+F\+F\+Tviewer\+::m\+Constelation\+Panel}, {\bf fr\+F\+F\+Tviewer\+::m\+F\+F\+Tpanel}, {\bf m\+Stream\+Running}, {\bf fr\+F\+F\+Tviewer\+::m\+Time\+Domain\+Panel}, {\bf fftviewer\+\_\+fr\+F\+F\+Tviewer\+::\+Data\+To\+G\+U\+I\+::samplesI}, {\bf fftviewer\+\_\+fr\+F\+F\+Tviewer\+::\+Data\+To\+G\+U\+I\+::samplesQ}, {\bf Open\+G\+L\+Graph\+::series}, {\bf stream\+Data}, {\bf time\+X\+Axis}, {\bf fr\+F\+F\+Tviewer\+::txt\+B\+W1}, {\bf fr\+F\+F\+Tviewer\+::txt\+B\+W2}, {\bf fr\+F\+F\+Tviewer\+::txt\+Center\+Offset1}, {\bf fr\+F\+F\+Tviewer\+::txt\+Center\+Offset2}, and {\bf update\+G\+UI}.
+
+
+
+Referenced by {\bf fftviewer\+\_\+fr\+F\+F\+Tviewer()}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=550pt]{d5/d45/classfftviewer__frFFTviewer_aa01d7b5ad35c15051574834869accae0_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=346pt]{d5/d45/classfftviewer__frFFTviewer_aa01d7b5ad35c15051574834869accae0_icgraph}
+\end{center}
+\end{figure}
+
+
+\index{fftviewer\+\_\+fr\+F\+F\+Tviewer@{fftviewer\+\_\+fr\+F\+F\+Tviewer}!On\+Update\+Stats@{On\+Update\+Stats}}
+\index{On\+Update\+Stats@{On\+Update\+Stats}!fftviewer\+\_\+fr\+F\+F\+Tviewer@{fftviewer\+\_\+fr\+F\+F\+Tviewer}}
+\paragraph[{On\+Update\+Stats(wx\+Timer\+Event \&event)}]{\setlength{\rightskip}{0pt plus 5cm}{\bf void} fftviewer\+\_\+fr\+F\+F\+Tviewer\+::\+On\+Update\+Stats (
+\begin{DoxyParamCaption}
+\item[{wx\+Timer\+Event \&}]{event}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [protected]}}\label{classfftviewer__frFFTviewer_ace218a9abe6b48842334911f0ce8d4cf}
+
+
+Definition at line {\bf 223} of file {\bf fftviewer\+\_\+fr\+F\+F\+Tviewer.\+cpp}.
+
+
+
+References {\bf lms\+\_\+stream\+\_\+status\+\_\+t\+::fifo\+Filled\+Count}, {\bf lms\+\_\+stream\+\_\+status\+\_\+t\+::fifo\+Size}, {\bf fr\+F\+F\+Tviewer\+::gauge\+Rx\+Buffer}, {\bf fr\+F\+F\+Tviewer\+::gauge\+Tx\+Buffer}, {\bf fr\+F\+F\+Tviewer\+::lbl\+Rx\+Data\+Rate}, {\bf fr\+F\+F\+Tviewer\+::lbl\+Tx\+Data\+Rate}, {\bf lms\+\_\+stream\+\_\+status\+\_\+t\+::link\+Rate}, {\bf L\+M\+S\+\_\+\+Get\+Stream\+Status()}, {\bf m\+Stream\+Running}, {\bf print\+Data\+Rate()}, {\bf rx\+Streams}, and {\bf tx\+Streams}.
+
+
+
+Referenced by {\bf fftviewer\+\_\+fr\+F\+F\+Tviewer()}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{d5/d45/classfftviewer__frFFTviewer_ace218a9abe6b48842334911f0ce8d4cf_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=346pt]{d5/d45/classfftviewer__frFFTviewer_ace218a9abe6b48842334911f0ce8d4cf_icgraph}
+\end{center}
+\end{figure}
+
+
+\index{fftviewer\+\_\+fr\+F\+F\+Tviewer@{fftviewer\+\_\+fr\+F\+F\+Tviewer}!On\+Window\+Function\+Change@{On\+Window\+Function\+Change}}
+\index{On\+Window\+Function\+Change@{On\+Window\+Function\+Change}!fftviewer\+\_\+fr\+F\+F\+Tviewer@{fftviewer\+\_\+fr\+F\+F\+Tviewer}}
+\paragraph[{On\+Window\+Function\+Change(wx\+Command\+Event \&event)}]{\setlength{\rightskip}{0pt plus 5cm}{\bf void} fftviewer\+\_\+fr\+F\+F\+Tviewer\+::\+On\+Window\+Function\+Change (
+\begin{DoxyParamCaption}
+\item[{wx\+Command\+Event \&}]{event}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [protected]}, {\ttfamily [virtual]}}\label{classfftviewer__frFFTviewer_a8da2717f0069fe503c5d627bf8aafedf}
+
+
+Reimplemented from {\bf fr\+F\+F\+Tviewer} \doxyref{}{p.}{db/d2f/classfrFFTviewer_a2b6f40814b215cf768209ff5f01ad314}.
+
+
+
+Definition at line {\bf 706} of file {\bf fftviewer\+\_\+fr\+F\+F\+Tviewer.\+cpp}.
+
+
+
+References {\bf fr\+F\+F\+Tviewer\+::cmb\+Window\+Func}, and {\bf window\+Function\+ID}.
+
+\index{fftviewer\+\_\+fr\+F\+F\+Tviewer@{fftviewer\+\_\+fr\+F\+F\+Tviewer}!On\+Window\+Function\+Changed@{On\+Window\+Function\+Changed}}
+\index{On\+Window\+Function\+Changed@{On\+Window\+Function\+Changed}!fftviewer\+\_\+fr\+F\+F\+Tviewer@{fftviewer\+\_\+fr\+F\+F\+Tviewer}}
+\paragraph[{On\+Window\+Function\+Changed(wx\+Command\+Event \&event)}]{\setlength{\rightskip}{0pt plus 5cm}{\bf void} fftviewer\+\_\+fr\+F\+F\+Tviewer\+::\+On\+Window\+Function\+Changed (
+\begin{DoxyParamCaption}
+\item[{wx\+Command\+Event \&}]{event}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [protected]}}\label{classfftviewer__frFFTviewer_a3561a8a32ad7413c455d392ae5bf7a1b}
+
+
+Definition at line {\bf 128} of file {\bf fftviewer\+\_\+fr\+F\+F\+Tviewer.\+cpp}.
+
+
+
+References {\bf fr\+F\+F\+Tviewer\+::cmb\+Window\+Func}, and {\bf window\+Function\+ID}.
+
+\index{fftviewer\+\_\+fr\+F\+F\+Tviewer@{fftviewer\+\_\+fr\+F\+F\+Tviewer}!print\+Data\+Rate@{print\+Data\+Rate}}
+\index{print\+Data\+Rate@{print\+Data\+Rate}!fftviewer\+\_\+fr\+F\+F\+Tviewer@{fftviewer\+\_\+fr\+F\+F\+Tviewer}}
+\paragraph[{print\+Data\+Rate(float data\+Rate)}]{\setlength{\rightskip}{0pt plus 5cm}wx\+String fftviewer\+\_\+fr\+F\+F\+Tviewer\+::print\+Data\+Rate (
+\begin{DoxyParamCaption}
+\item[{float}]{data\+Rate}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [protected]}}\label{classfftviewer__frFFTviewer_a1d763f3a32518b5aa70547942047f7b0}
+
+
+Definition at line {\bf 599} of file {\bf fftviewer\+\_\+fr\+F\+F\+Tviewer.\+cpp}.
+
+
+
+Referenced by {\bf On\+Update\+Stats()}.
+
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{d5/d45/classfftviewer__frFFTviewer_a1d763f3a32518b5aa70547942047f7b0_icgraph}
+\end{center}
+\end{figure}
+
+
+\index{fftviewer\+\_\+fr\+F\+F\+Tviewer@{fftviewer\+\_\+fr\+F\+F\+Tviewer}!Set\+Nyquist\+Frequency@{Set\+Nyquist\+Frequency}}
+\index{Set\+Nyquist\+Frequency@{Set\+Nyquist\+Frequency}!fftviewer\+\_\+fr\+F\+F\+Tviewer@{fftviewer\+\_\+fr\+F\+F\+Tviewer}}
+\paragraph[{Set\+Nyquist\+Frequency()}]{\setlength{\rightskip}{0pt plus 5cm}{\bf void} fftviewer\+\_\+fr\+F\+F\+Tviewer\+::\+Set\+Nyquist\+Frequency (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}\label{classfftviewer__frFFTviewer_a59a6a02ad1a3ce13b1b78cd41817bba6}
+
+
+Definition at line {\bf 609} of file {\bf fftviewer\+\_\+fr\+F\+F\+Tviewer.\+cpp}.
+
+
+
+References {\bf fr\+F\+F\+Tviewer\+::cmb\+Stream\+Type}, {\bf L\+M\+S\+\_\+\+C\+H\+\_\+\+RX}, {\bf L\+M\+S\+\_\+\+Get\+Sample\+Rate()}, {\bf lms\+Control}, {\bf fr\+F\+F\+Tviewer\+::m\+F\+F\+Tpanel}, {\bf Open\+G\+L\+Graph\+::\+Set\+Initial\+Display\+Area()}, and {\bf fr\+F\+F\+Tviewer\+::txt\+Nyquist\+Freq\+M\+Hz}.
+
+
+
+Referenced by {\bf On\+Stream\+Change()}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{d5/d45/classfftviewer__frFFTviewer_a59a6a02ad1a3ce13b1b78cd41817bba6_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=345pt]{d5/d45/classfftviewer__frFFTviewer_a59a6a02ad1a3ce13b1b78cd41817bba6_icgraph}
+\end{center}
+\end{figure}
+
+
+\index{fftviewer\+\_\+fr\+F\+F\+Tviewer@{fftviewer\+\_\+fr\+F\+F\+Tviewer}!Start\+Streaming@{Start\+Streaming}}
+\index{Start\+Streaming@{Start\+Streaming}!fftviewer\+\_\+fr\+F\+F\+Tviewer@{fftviewer\+\_\+fr\+F\+F\+Tviewer}}
+\paragraph[{Start\+Streaming()}]{\setlength{\rightskip}{0pt plus 5cm}{\bf void} fftviewer\+\_\+fr\+F\+F\+Tviewer\+::\+Start\+Streaming (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}\label{classfftviewer__frFFTviewer_a85fc31baba337dae5f523ef9702709f4}
+
+
+Definition at line {\bf 141} of file {\bf fftviewer\+\_\+fr\+F\+F\+Tviewer.\+cpp}.
+
+
+
+References {\bf fr\+F\+F\+Tviewer\+::btn\+Start\+Stop}, {\bf capture\+Filename}, {\bf capture\+Samples}, {\bf fr\+F\+F\+Tviewer\+::chk\+Capture\+To\+File}, {\bf fr\+F\+F\+Tviewer\+::chk\+En\+Sync}, {\bf fr\+F\+F\+Tviewer\+::chk\+En\+Tx}, {\bf fr\+F\+F\+Tviewer\+::cmb\+Channel\+Visibility}, {\bf fr\+F\+F\+Tviewer\+::cmb\+Fmt}, {\bf fr\+F\+F\+Tviewer\+::cmb\+Stream\+Type}, {\bf fft\+Freq\+Axis}, {\bf i}, {\bf lms\+Control}, {\bf lms\+Index}, {\bf m\+G\+U\+Iupdater}, {\bf m\+Stream\+Running}, {\bf fr\+F\+F\+Tviewer\+::spin\+Capture\+Count}, {\bf fr\+F\+F\+Tviewer\+::spin\+F\+F\+Tsize}, {\bf stop\+Processing}, {\bf Streaming\+Loop()}, {\bf thread\+Processing}, {\bf time\+X\+Axis}, {\bf fr\+F\+F\+Tviewer\+::txt\+Nyquist\+Freq\+M\+Hz}, and {\bf update\+G\+UI}.
+
+
+
+Referenced by {\bf Onbtn\+Start\+Stop()}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{d5/d45/classfftviewer__frFFTviewer_a85fc31baba337dae5f523ef9702709f4_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=340pt]{d5/d45/classfftviewer__frFFTviewer_a85fc31baba337dae5f523ef9702709f4_icgraph}
+\end{center}
+\end{figure}
+
+
+\index{fftviewer\+\_\+fr\+F\+F\+Tviewer@{fftviewer\+\_\+fr\+F\+F\+Tviewer}!Stop\+Streaming@{Stop\+Streaming}}
+\index{Stop\+Streaming@{Stop\+Streaming}!fftviewer\+\_\+fr\+F\+F\+Tviewer@{fftviewer\+\_\+fr\+F\+F\+Tviewer}}
+\paragraph[{Stop\+Streaming()}]{\setlength{\rightskip}{0pt plus 5cm}{\bf void} fftviewer\+\_\+fr\+F\+F\+Tviewer\+::\+Stop\+Streaming (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}\label{classfftviewer__frFFTviewer_ab8722e964959eb94089b9710d12dd639}
+
+
+Definition at line {\bf 204} of file {\bf fftviewer\+\_\+fr\+F\+F\+Tviewer.\+cpp}.
+
+
+
+References {\bf fr\+F\+F\+Tviewer\+::btn\+Start\+Stop}, {\bf fr\+F\+F\+Tviewer\+::chk\+Capture\+To\+File}, {\bf fr\+F\+F\+Tviewer\+::chk\+En\+Sync}, {\bf fr\+F\+F\+Tviewer\+::chk\+En\+Tx}, {\bf fr\+F\+F\+Tviewer\+::cmb\+Channel\+Visibility}, {\bf fr\+F\+F\+Tviewer\+::cmb\+Fmt}, {\bf fr\+F\+F\+Tviewer\+::cmb\+Stream\+Type}, {\bf m\+G\+U\+Iupdater}, {\bf m\+Stream\+Running}, {\bf fr\+F\+F\+Tviewer\+::spin\+Capture\+Count}, {\bf fr\+F\+F\+Tviewer\+::spin\+F\+F\+Tsize}, {\bf stop\+Processing}, {\bf thread\+Processing}, and {\bf fr\+F\+F\+Tviewer\+::txt\+Nyquist\+Freq\+M\+Hz}.
+
+
+
+Referenced by {\bf Onbtn\+Start\+Stop()}, {\bf L\+M\+S7\+Suite\+App\+Frame\+::\+On\+F\+F\+Tviewer\+Close()}, {\bf L\+M\+S7\+Suite\+App\+Frame\+::\+On\+Show\+Connection\+Settings()}, and {\bf $\sim$fftviewer\+\_\+fr\+F\+F\+Tviewer()}.
+
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{d5/d45/classfftviewer__frFFTviewer_ab8722e964959eb94089b9710d12dd639_icgraph}
+\end{center}
+\end{figure}
+
+
+\index{fftviewer\+\_\+fr\+F\+F\+Tviewer@{fftviewer\+\_\+fr\+F\+F\+Tviewer}!Streaming\+Loop@{Streaming\+Loop}}
+\index{Streaming\+Loop@{Streaming\+Loop}!fftviewer\+\_\+fr\+F\+F\+Tviewer@{fftviewer\+\_\+fr\+F\+F\+Tviewer}}
+\paragraph[{Streaming\+Loop(fftviewer\+\_\+fr\+F\+F\+Tviewer $\ast$pthis, const unsigned int fft\+Size, const int channels\+Count, const uint32\+\_\+t format)}]{\setlength{\rightskip}{0pt plus 5cm}{\bf void} fftviewer\+\_\+fr\+F\+F\+Tviewer\+::\+Streaming\+Loop (
+\begin{DoxyParamCaption}
+\item[{{\bf fftviewer\+\_\+fr\+F\+F\+Tviewer} $\ast$}]{pthis, }
+\item[{const unsigned {\bf int}}]{fft\+Size, }
+\item[{const {\bf int}}]{channels\+Count, }
+\item[{const uint32\+\_\+t}]{format}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [static]}, {\ttfamily [protected]}}\label{classfftviewer__frFFTviewer_a597151cc127f6b465e183b700ca1e41c}
+
+
+Definition at line {\bf 346} of file {\bf fftviewer\+\_\+fr\+F\+F\+Tviewer.\+cpp}.
+
+
+
+References {\bf average\+Count}, {\bf capture\+Filename}, {\bf capture\+Samples}, {\bf lms\+\_\+stream\+\_\+t\+::channel}, {\bf fr\+F\+F\+Tviewer\+::chk\+En\+Sync}, {\bf fr\+F\+F\+Tviewer\+::chk\+En\+Tx}, {\bf c\+Max\+Ch\+Count}, {\bf fr\+F\+F\+Tviewer\+::cmb\+Channel\+Visibility}, {\bf fr\+F\+F\+Tviewer\+::cmb\+Fmt}, {\bf lms\+\_\+stream\+\_\+t\+::data\+Fmt}, {\bf enable\+F\+FT}, {\bf fftviewer\+\_\+fr\+F\+F\+Tviewer\+::\+Data\+To\+G\+U\+I\+::fft\+Bins}, {\bf lms\+\_\+stream\+\_\+t\+::fifo\+Size}, {\bf filename}, {\bf lms\+\_\+stream\+\_\+meta\+\_\+t\+::flush\+Partial\+Packet}, {\bf Generate\+Window\+Coefficients()}, {\bf lms\+\_\+stream\+\_\+t\+::handle}, {\bf lime\+::complex16\+\_\+t\+::i}, {\bf i}, {\bf lms\+\_\+stream\+\_\+t\+::is\+Tx}, {\bf L\+M\+S\+\_\+\+Destroy\+Stream()}, {\bf lms\+\_\+stream\+\_\+t\+::\+L\+M\+S\+\_\+\+F\+M\+T\+\_\+\+I12}, {\bf lms\+\_\+stream\+\_\+t\+::\+L\+M\+S\+\_\+\+F\+M\+T\+\_\+\+I16}, {\bf L\+M\+S\+\_\+\+Get\+Num\+Channels()}, {\bf L\+M\+S\+\_\+\+Recv\+Stream()}, {\bf L\+M\+S\+\_\+\+Send\+Stream()}, {\bf L\+M\+S\+\_\+\+Setup\+Stream()}, {\bf L\+M\+S\+\_\+\+Start\+Stream()}, {\bf L\+M\+S\+\_\+\+Stop\+Stream()}, {\bf lms\+Control}, {\bf lms\+Index}, {\bf meta}, {\bf m\+Stream\+Running}, {\bf fftviewer\+\_\+fr\+F\+F\+Tviewer\+::\+Data\+To\+G\+U\+I\+::nyquist\+\_\+\+Hz}, {\bf lime\+::complex16\+\_\+t\+::q}, {\bf rx\+Streams}, {\bf fftviewer\+\_\+fr\+F\+F\+Tviewer\+::\+Data\+To\+G\+U\+I\+::samplesI}, {\bf fftviewer\+\_\+fr\+F\+F\+Tviewer\+::\+Data\+To\+G\+U\+I\+::samplesQ}, {\bf fr\+F\+F\+Tviewer\+::spin\+Avg\+Count}, {\bf fr\+F\+F\+Tviewer\+::spin\+Capture\+Count}, {\bf stop\+Processing}, {\bf stream\+Data}, {\bf lms\+\_\+stream\+\_\+t\+::throughput\+Vs\+Latency}, {\bf lms\+\_\+stream\+\_\+meta\+\_\+t\+::timestamp}, {\bf tx\+Streams}, {\bf update\+G\+UI}, {\bf lms\+\_\+stream\+\_\+meta\+\_\+t\+::wait\+For\+Timestamp}, and {\bf window\+Function\+ID}.
+
+
+
+Referenced by {\bf Start\+Streaming()}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{d5/d45/classfftviewer__frFFTviewer_a597151cc127f6b465e183b700ca1e41c_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{d5/d45/classfftviewer__frFFTviewer_a597151cc127f6b465e183b700ca1e41c_icgraph}
+\end{center}
+\end{figure}
+
+
+
+
+\subsubsection{Member Data Documentation}
+\index{fftviewer\+\_\+fr\+F\+F\+Tviewer@{fftviewer\+\_\+fr\+F\+F\+Tviewer}!average\+Count@{average\+Count}}
+\index{average\+Count@{average\+Count}!fftviewer\+\_\+fr\+F\+F\+Tviewer@{fftviewer\+\_\+fr\+F\+F\+Tviewer}}
+\paragraph[{average\+Count}]{\setlength{\rightskip}{0pt plus 5cm}std\+::atomic$<${\bf int}$>$ fftviewer\+\_\+fr\+F\+F\+Tviewer\+::average\+Count\hspace{0.3cm}{\ttfamily [protected]}}\label{classfftviewer__frFFTviewer_aba5219bc93d20986cf64301dbd720fe7}
+
+
+Definition at line {\bf 24} of file {\bf fftviewer\+\_\+fr\+F\+F\+Tviewer.\+h}.
+
+
+
+Referenced by {\bf fftviewer\+\_\+fr\+F\+F\+Tviewer()}, {\bf On\+Avg\+Change()}, {\bf On\+Avg\+Change\+Enter()}, and {\bf Streaming\+Loop()}.
+
+\index{fftviewer\+\_\+fr\+F\+F\+Tviewer@{fftviewer\+\_\+fr\+F\+F\+Tviewer}!capture\+Filename@{capture\+Filename}}
+\index{capture\+Filename@{capture\+Filename}!fftviewer\+\_\+fr\+F\+F\+Tviewer@{fftviewer\+\_\+fr\+F\+F\+Tviewer}}
+\paragraph[{capture\+Filename}]{\setlength{\rightskip}{0pt plus 5cm}std\+::string fftviewer\+\_\+fr\+F\+F\+Tviewer\+::capture\+Filename\hspace{0.3cm}{\ttfamily [protected]}}\label{classfftviewer__frFFTviewer_a84cf484b5a4ad9f7e36454636111d8a2}
+
+
+Definition at line {\bf 27} of file {\bf fftviewer\+\_\+fr\+F\+F\+Tviewer.\+h}.
+
+
+
+Referenced by {\bf Start\+Streaming()}, and {\bf Streaming\+Loop()}.
+
+\index{fftviewer\+\_\+fr\+F\+F\+Tviewer@{fftviewer\+\_\+fr\+F\+F\+Tviewer}!capture\+Samples@{capture\+Samples}}
+\index{capture\+Samples@{capture\+Samples}!fftviewer\+\_\+fr\+F\+F\+Tviewer@{fftviewer\+\_\+fr\+F\+F\+Tviewer}}
+\paragraph[{capture\+Samples}]{\setlength{\rightskip}{0pt plus 5cm}std\+::atomic$<$bool$>$ fftviewer\+\_\+fr\+F\+F\+Tviewer\+::capture\+Samples\hspace{0.3cm}{\ttfamily [protected]}}\label{classfftviewer__frFFTviewer_ab58bb6957f50996e4ed4b58d6fed91d6}
+
+
+Definition at line {\bf 23} of file {\bf fftviewer\+\_\+fr\+F\+F\+Tviewer.\+h}.
+
+
+
+Referenced by {\bf fftviewer\+\_\+fr\+F\+F\+Tviewer()}, {\bf Start\+Streaming()}, and {\bf Streaming\+Loop()}.
+
+\index{fftviewer\+\_\+fr\+F\+F\+Tviewer@{fftviewer\+\_\+fr\+F\+F\+Tviewer}!c\+Max\+Ch\+Count@{c\+Max\+Ch\+Count}}
+\index{c\+Max\+Ch\+Count@{c\+Max\+Ch\+Count}!fftviewer\+\_\+fr\+F\+F\+Tviewer@{fftviewer\+\_\+fr\+F\+F\+Tviewer}}
+\paragraph[{c\+Max\+Ch\+Count}]{\setlength{\rightskip}{0pt plus 5cm}const {\bf int} fftviewer\+\_\+fr\+F\+F\+Tviewer\+::c\+Max\+Ch\+Count = 2\hspace{0.3cm}{\ttfamily [static]}, {\ttfamily [protected]}}\label{classfftviewer__frFFTviewer_a10354a06522d9ce9bb377192889c023d}
+
+
+Definition at line {\bf 56} of file {\bf fftviewer\+\_\+fr\+F\+F\+Tviewer.\+h}.
+
+
+
+Referenced by {\bf On\+Channel\+Visibility\+Change()}, {\bf fftviewer\+\_\+fr\+F\+F\+Tviewer\+::\+Data\+To\+G\+U\+I\+::operator=()}, and {\bf Streaming\+Loop()}.
+
+\index{fftviewer\+\_\+fr\+F\+F\+Tviewer@{fftviewer\+\_\+fr\+F\+F\+Tviewer}!enable\+F\+FT@{enable\+F\+FT}}
+\index{enable\+F\+FT@{enable\+F\+FT}!fftviewer\+\_\+fr\+F\+F\+Tviewer@{fftviewer\+\_\+fr\+F\+F\+Tviewer}}
+\paragraph[{enable\+F\+FT}]{\setlength{\rightskip}{0pt plus 5cm}std\+::atomic$<$bool$>$ fftviewer\+\_\+fr\+F\+F\+Tviewer\+::enable\+F\+FT\hspace{0.3cm}{\ttfamily [protected]}}\label{classfftviewer__frFFTviewer_aa4e14ec934f4ec17abd0138f52c58228}
+
+
+Definition at line {\bf 26} of file {\bf fftviewer\+\_\+fr\+F\+F\+Tviewer.\+h}.
+
+
+
+Referenced by {\bf On\+Update\+Plots()}, and {\bf Streaming\+Loop()}.
+
+\index{fftviewer\+\_\+fr\+F\+F\+Tviewer@{fftviewer\+\_\+fr\+F\+F\+Tviewer}!enable\+Transmitter@{enable\+Transmitter}}
+\index{enable\+Transmitter@{enable\+Transmitter}!fftviewer\+\_\+fr\+F\+F\+Tviewer@{fftviewer\+\_\+fr\+F\+F\+Tviewer}}
+\paragraph[{enable\+Transmitter}]{\setlength{\rightskip}{0pt plus 5cm}std\+::atomic$<$bool$>$ fftviewer\+\_\+fr\+F\+F\+Tviewer\+::enable\+Transmitter\hspace{0.3cm}{\ttfamily [protected]}}\label{classfftviewer__frFFTviewer_a8156b185f603860a3adf5d8bab9002bb}
+
+
+Definition at line {\bf 21} of file {\bf fftviewer\+\_\+fr\+F\+F\+Tviewer.\+h}.
+
+\index{fftviewer\+\_\+fr\+F\+F\+Tviewer@{fftviewer\+\_\+fr\+F\+F\+Tviewer}!fft\+Freq\+Axis@{fft\+Freq\+Axis}}
+\index{fft\+Freq\+Axis@{fft\+Freq\+Axis}!fftviewer\+\_\+fr\+F\+F\+Tviewer@{fftviewer\+\_\+fr\+F\+F\+Tviewer}}
+\paragraph[{fft\+Freq\+Axis}]{\setlength{\rightskip}{0pt plus 5cm}{\bf std\+::vector}$<$float$>$ fftviewer\+\_\+fr\+F\+F\+Tviewer\+::fft\+Freq\+Axis\hspace{0.3cm}{\ttfamily [protected]}}\label{classfftviewer__frFFTviewer_a2b60210df63ef43d6882321d05642279}
+
+
+Definition at line {\bf 87} of file {\bf fftviewer\+\_\+fr\+F\+F\+Tviewer.\+h}.
+
+
+
+Referenced by {\bf On\+Update\+Plots()}, and {\bf Start\+Streaming()}.
+
+\index{fftviewer\+\_\+fr\+F\+F\+Tviewer@{fftviewer\+\_\+fr\+F\+F\+Tviewer}!lms\+Control@{lms\+Control}}
+\index{lms\+Control@{lms\+Control}!fftviewer\+\_\+fr\+F\+F\+Tviewer@{fftviewer\+\_\+fr\+F\+F\+Tviewer}}
+\paragraph[{lms\+Control}]{\setlength{\rightskip}{0pt plus 5cm}{\bf lms\+\_\+device\+\_\+t}$\ast$ fftviewer\+\_\+fr\+F\+F\+Tviewer\+::lms\+Control\hspace{0.3cm}{\ttfamily [protected]}}\label{classfftviewer__frFFTviewer_aacb213d089a672e7fee3a836486deeb5}
+
+
+Definition at line {\bf 97} of file {\bf fftviewer\+\_\+fr\+F\+F\+Tviewer.\+h}.
+
+
+
+Referenced by {\bf Set\+Nyquist\+Frequency()}, {\bf Start\+Streaming()}, and {\bf Streaming\+Loop()}.
+
+\index{fftviewer\+\_\+fr\+F\+F\+Tviewer@{fftviewer\+\_\+fr\+F\+F\+Tviewer}!lms\+Index@{lms\+Index}}
+\index{lms\+Index@{lms\+Index}!fftviewer\+\_\+fr\+F\+F\+Tviewer@{fftviewer\+\_\+fr\+F\+F\+Tviewer}}
+\paragraph[{lms\+Index}]{\setlength{\rightskip}{0pt plus 5cm}unsigned fftviewer\+\_\+fr\+F\+F\+Tviewer\+::lms\+Index\hspace{0.3cm}{\ttfamily [protected]}}\label{classfftviewer__frFFTviewer_a9e32e60822f9f2decfa0566680a1aa17}
+
+
+Definition at line {\bf 99} of file {\bf fftviewer\+\_\+fr\+F\+F\+Tviewer.\+h}.
+
+
+
+Referenced by {\bf Start\+Streaming()}, and {\bf Streaming\+Loop()}.
+
+\index{fftviewer\+\_\+fr\+F\+F\+Tviewer@{fftviewer\+\_\+fr\+F\+F\+Tviewer}!m\+G\+U\+Iupdater@{m\+G\+U\+Iupdater}}
+\index{m\+G\+U\+Iupdater@{m\+G\+U\+Iupdater}!fftviewer\+\_\+fr\+F\+F\+Tviewer@{fftviewer\+\_\+fr\+F\+F\+Tviewer}}
+\paragraph[{m\+G\+U\+Iupdater}]{\setlength{\rightskip}{0pt plus 5cm}wx\+Timer$\ast$ fftviewer\+\_\+fr\+F\+F\+Tviewer\+::m\+G\+U\+Iupdater\hspace{0.3cm}{\ttfamily [protected]}}\label{classfftviewer__frFFTviewer_a43513177974eef20bb64c3750e33a838}
+
+
+Definition at line {\bf 98} of file {\bf fftviewer\+\_\+fr\+F\+F\+Tviewer.\+h}.
+
+
+
+Referenced by {\bf fftviewer\+\_\+fr\+F\+F\+Tviewer()}, {\bf Start\+Streaming()}, and {\bf Stop\+Streaming()}.
+
+\index{fftviewer\+\_\+fr\+F\+F\+Tviewer@{fftviewer\+\_\+fr\+F\+F\+Tviewer}!m\+Stream\+Running@{m\+Stream\+Running}}
+\index{m\+Stream\+Running@{m\+Stream\+Running}!fftviewer\+\_\+fr\+F\+F\+Tviewer@{fftviewer\+\_\+fr\+F\+F\+Tviewer}}
+\paragraph[{m\+Stream\+Running}]{\setlength{\rightskip}{0pt plus 5cm}std\+::atomic$<$bool$>$ fftviewer\+\_\+fr\+F\+F\+Tviewer\+::m\+Stream\+Running\hspace{0.3cm}{\ttfamily [protected]}}\label{classfftviewer__frFFTviewer_a86a3f640bb0044adda6d3d199f577955}
+
+
+Definition at line {\bf 89} of file {\bf fftviewer\+\_\+fr\+F\+F\+Tviewer.\+h}.
+
+
+
+Referenced by {\bf On\+Update\+Plots()}, {\bf On\+Update\+Stats()}, {\bf Start\+Streaming()}, {\bf Stop\+Streaming()}, {\bf Streaming\+Loop()}, and {\bf $\sim$fftviewer\+\_\+fr\+F\+F\+Tviewer()}.
+
+\index{fftviewer\+\_\+fr\+F\+F\+Tviewer@{fftviewer\+\_\+fr\+F\+F\+Tviewer}!rx\+Streams@{rx\+Streams}}
+\index{rx\+Streams@{rx\+Streams}!fftviewer\+\_\+fr\+F\+F\+Tviewer@{fftviewer\+\_\+fr\+F\+F\+Tviewer}}
+\paragraph[{rx\+Streams}]{\setlength{\rightskip}{0pt plus 5cm}{\bf lms\+\_\+stream\+\_\+t} fftviewer\+\_\+fr\+F\+F\+Tviewer\+::rx\+Streams[{\bf c\+Max\+Ch\+Count}]\hspace{0.3cm}{\ttfamily [protected]}}\label{classfftviewer__frFFTviewer_a0a364f805779e63e71b5b31449f96bf3}
+
+
+Definition at line {\bf 94} of file {\bf fftviewer\+\_\+fr\+F\+F\+Tviewer.\+h}.
+
+
+
+Referenced by {\bf On\+Update\+Stats()}, and {\bf Streaming\+Loop()}.
+
+\index{fftviewer\+\_\+fr\+F\+F\+Tviewer@{fftviewer\+\_\+fr\+F\+F\+Tviewer}!stop\+Processing@{stop\+Processing}}
+\index{stop\+Processing@{stop\+Processing}!fftviewer\+\_\+fr\+F\+F\+Tviewer@{fftviewer\+\_\+fr\+F\+F\+Tviewer}}
+\paragraph[{stop\+Processing}]{\setlength{\rightskip}{0pt plus 5cm}std\+::atomic$<$bool$>$ fftviewer\+\_\+fr\+F\+F\+Tviewer\+::stop\+Processing\hspace{0.3cm}{\ttfamily [protected]}}\label{classfftviewer__frFFTviewer_aba5c1ebe060fb25590418f79012f42a5}
+
+
+Definition at line {\bf 90} of file {\bf fftviewer\+\_\+fr\+F\+F\+Tviewer.\+h}.
+
+
+
+Referenced by {\bf Start\+Streaming()}, {\bf Stop\+Streaming()}, and {\bf Streaming\+Loop()}.
+
+\index{fftviewer\+\_\+fr\+F\+F\+Tviewer@{fftviewer\+\_\+fr\+F\+F\+Tviewer}!stream\+Data@{stream\+Data}}
+\index{stream\+Data@{stream\+Data}!fftviewer\+\_\+fr\+F\+F\+Tviewer@{fftviewer\+\_\+fr\+F\+F\+Tviewer}}
+\paragraph[{stream\+Data}]{\setlength{\rightskip}{0pt plus 5cm}struct {\bf fftviewer\+\_\+fr\+F\+F\+Tviewer\+::\+Data\+To\+G\+UI} fftviewer\+\_\+fr\+F\+F\+Tviewer\+::stream\+Data\hspace{0.3cm}{\ttfamily [protected]}}\label{classfftviewer__frFFTviewer_a35a764911cb54c53df4e613ca1fea2eb}
+
+
+Referenced by {\bf On\+Update\+Plots()}, {\bf fftviewer\+\_\+fr\+F\+F\+Tviewer\+::\+Data\+To\+G\+U\+I\+::operator=()}, and {\bf Streaming\+Loop()}.
+
+\index{fftviewer\+\_\+fr\+F\+F\+Tviewer@{fftviewer\+\_\+fr\+F\+F\+Tviewer}!thread\+Processing@{thread\+Processing}}
+\index{thread\+Processing@{thread\+Processing}!fftviewer\+\_\+fr\+F\+F\+Tviewer@{fftviewer\+\_\+fr\+F\+F\+Tviewer}}
+\paragraph[{thread\+Processing}]{\setlength{\rightskip}{0pt plus 5cm}std\+::thread fftviewer\+\_\+fr\+F\+F\+Tviewer\+::thread\+Processing\hspace{0.3cm}{\ttfamily [protected]}}\label{classfftviewer__frFFTviewer_a6ace4cfd290d1afa2a8d5d5e674de41a}
+
+
+Definition at line {\bf 91} of file {\bf fftviewer\+\_\+fr\+F\+F\+Tviewer.\+h}.
+
+
+
+Referenced by {\bf Onbtn\+Start\+Stop()}, {\bf Start\+Streaming()}, and {\bf Stop\+Streaming()}.
+
+\index{fftviewer\+\_\+fr\+F\+F\+Tviewer@{fftviewer\+\_\+fr\+F\+F\+Tviewer}!time\+X\+Axis@{time\+X\+Axis}}
+\index{time\+X\+Axis@{time\+X\+Axis}!fftviewer\+\_\+fr\+F\+F\+Tviewer@{fftviewer\+\_\+fr\+F\+F\+Tviewer}}
+\paragraph[{time\+X\+Axis}]{\setlength{\rightskip}{0pt plus 5cm}{\bf std\+::vector}$<$float$>$ fftviewer\+\_\+fr\+F\+F\+Tviewer\+::time\+X\+Axis\hspace{0.3cm}{\ttfamily [protected]}}\label{classfftviewer__frFFTviewer_a18fb050bb148985f4ddaefb91ab9533d}
+
+
+Definition at line {\bf 88} of file {\bf fftviewer\+\_\+fr\+F\+F\+Tviewer.\+h}.
+
+
+
+Referenced by {\bf On\+Update\+Plots()}, and {\bf Start\+Streaming()}.
+
+\index{fftviewer\+\_\+fr\+F\+F\+Tviewer@{fftviewer\+\_\+fr\+F\+F\+Tviewer}!tx\+Streams@{tx\+Streams}}
+\index{tx\+Streams@{tx\+Streams}!fftviewer\+\_\+fr\+F\+F\+Tviewer@{fftviewer\+\_\+fr\+F\+F\+Tviewer}}
+\paragraph[{tx\+Streams}]{\setlength{\rightskip}{0pt plus 5cm}{\bf lms\+\_\+stream\+\_\+t} fftviewer\+\_\+fr\+F\+F\+Tviewer\+::tx\+Streams[{\bf c\+Max\+Ch\+Count}]\hspace{0.3cm}{\ttfamily [protected]}}\label{classfftviewer__frFFTviewer_ac0b8a6f72fa01757d61192bc486dc4e8}
+
+
+Definition at line {\bf 95} of file {\bf fftviewer\+\_\+fr\+F\+F\+Tviewer.\+h}.
+
+
+
+Referenced by {\bf On\+Update\+Stats()}, and {\bf Streaming\+Loop()}.
+
+\index{fftviewer\+\_\+fr\+F\+F\+Tviewer@{fftviewer\+\_\+fr\+F\+F\+Tviewer}!update\+G\+UI@{update\+G\+UI}}
+\index{update\+G\+UI@{update\+G\+UI}!fftviewer\+\_\+fr\+F\+F\+Tviewer@{fftviewer\+\_\+fr\+F\+F\+Tviewer}}
+\paragraph[{update\+G\+UI}]{\setlength{\rightskip}{0pt plus 5cm}std\+::atomic$<$bool$>$ fftviewer\+\_\+fr\+F\+F\+Tviewer\+::update\+G\+UI\hspace{0.3cm}{\ttfamily [protected]}}\label{classfftviewer__frFFTviewer_aa02660aa2cbb92a34b93c29c85e64bd3}
+
+
+Definition at line {\bf 25} of file {\bf fftviewer\+\_\+fr\+F\+F\+Tviewer.\+h}.
+
+
+
+Referenced by {\bf fftviewer\+\_\+fr\+F\+F\+Tviewer()}, {\bf On\+Update\+Plots()}, {\bf Start\+Streaming()}, and {\bf Streaming\+Loop()}.
+
+\index{fftviewer\+\_\+fr\+F\+F\+Tviewer@{fftviewer\+\_\+fr\+F\+F\+Tviewer}!window\+Function\+ID@{window\+Function\+ID}}
+\index{window\+Function\+ID@{window\+Function\+ID}!fftviewer\+\_\+fr\+F\+F\+Tviewer@{fftviewer\+\_\+fr\+F\+F\+Tviewer}}
+\paragraph[{window\+Function\+ID}]{\setlength{\rightskip}{0pt plus 5cm}std\+::atomic$<${\bf int}$>$ fftviewer\+\_\+fr\+F\+F\+Tviewer\+::window\+Function\+ID\hspace{0.3cm}{\ttfamily [protected]}}\label{classfftviewer__frFFTviewer_aaac877804bee2077271c1b12db6da3b9}
+
+
+Definition at line {\bf 22} of file {\bf fftviewer\+\_\+fr\+F\+F\+Tviewer.\+h}.
+
+
+
+Referenced by {\bf On\+Window\+Function\+Change()}, {\bf On\+Window\+Function\+Changed()}, and {\bf Streaming\+Loop()}.
+
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+/home/erik/prefix/default/src/limesuite-\/dev/src/fftviewer\+\_\+wxgui/{\bf fftviewer\+\_\+fr\+F\+F\+Tviewer.\+h}\item 
+/home/erik/prefix/default/src/limesuite-\/dev/src/fftviewer\+\_\+wxgui/{\bf fftviewer\+\_\+fr\+F\+F\+Tviewer.\+cpp}\end{DoxyCompactItemize}

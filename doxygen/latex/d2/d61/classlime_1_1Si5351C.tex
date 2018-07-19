@@ -1,0 +1,589 @@
+\subsection{lime\+:\+:Si5351C Class Reference}
+\label{classlime_1_1Si5351C}\index{lime\+::\+Si5351C@{lime\+::\+Si5351C}}
+
+
+{\ttfamily \#include $<$Si5351\+C.\+h$>$}
+
+
+
+Collaboration diagram for lime\+:\+:Si5351C\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=550pt]{d0/dbb/classlime_1_1Si5351C__coll__graph}
+\end{center}
+\end{figure}
+\subsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct {\bf Status\+Bits}
+\end{DoxyCompactItemize}
+\subsubsection*{Public Types}
+\begin{DoxyCompactItemize}
+\item 
+enum {\bf Status} \{ {\bf S\+U\+C\+C\+E\+SS}, 
+{\bf F\+A\+I\+L\+ED}
+ \}
+\end{DoxyCompactItemize}
+\subsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+{\bf Status\+Bits} {\bf Get\+Status\+Bits} ()
+\item 
+{\bf Status} {\bf Clear\+Status} ()
+\item 
+{\bf Si5351C} ()
+\item 
+{\bf $\sim$\+Si5351C} ()
+\item 
+{\bf void} {\bf Initialize} ({\bf I\+Connection} $\ast$mng)
+\begin{DoxyCompactList}\small\item\em Sets connection manager to use for data transferring \doxyref{Si5351C}{p.}{d2/d61/classlime_1_1Si5351C}. \end{DoxyCompactList}\item 
+bool {\bf Load\+Reg\+Values\+From\+File} (std\+::string F\+Name)
+\begin{DoxyCompactList}\small\item\em Loads register values for Si5356A from file. \end{DoxyCompactList}\item 
+{\bf void} {\bf Set\+P\+LL} (unsigned char {\bf id}, unsigned long C\+L\+K\+I\+N\+\_\+\+Hz, {\bf int} C\+L\+K\+\_\+\+S\+RC)
+\begin{DoxyCompactList}\small\item\em Sets P\+LL input frequency. \end{DoxyCompactList}\item 
+{\bf void} {\bf Set\+Clock} (unsigned char {\bf id}, unsigned long f\+Out\+\_\+\+Hz, bool {\bf enabled}=true, bool inverted=false)
+\begin{DoxyCompactList}\small\item\em Sets output clock parameters. \end{DoxyCompactList}\item 
+{\bf Status} {\bf Upload\+Configuration} ()
+\begin{DoxyCompactList}\small\item\em Sends Configuration to \doxyref{Si5351C}{p.}{d2/d61/classlime_1_1Si5351C}. \end{DoxyCompactList}\item 
+{\bf Status} {\bf Configure\+Clocks} ()
+\begin{DoxyCompactList}\small\item\em Modifies register map with clock settings. \end{DoxyCompactList}\item 
+{\bf void} {\bf Reset} ()
+\begin{DoxyCompactList}\small\item\em Resets configuration registers to default values. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsubsection*{Private Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+{\bf void} {\bf Find\+V\+CO} ({\bf Si5351\+\_\+\+Channel} $\ast$clocks, {\bf Si5351\+\_\+\+P\+LL} $\ast$plls, const unsigned long Fmin, const unsigned long Fmax)
+\begin{DoxyCompactList}\small\item\em Calculates multisynth dividers and V\+CO frequencies. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsubsection*{Private Attributes}
+\begin{DoxyCompactItemize}
+\item 
+{\bf I\+Connection} $\ast$ {\bf device}
+\item 
+{\bf int} {\bf addr\+Si5351}
+\item 
+{\bf Si5351\+\_\+\+P\+LL} {\bf P\+LL} [2]
+\item 
+{\bf Si5351\+\_\+\+Channel} {\bf C\+LK} [8]
+\item 
+unsigned char {\bf m\+\_\+new\+Configuration} [255]
+\end{DoxyCompactItemize}
+\subsubsection*{Static Private Attributes}
+\begin{DoxyCompactItemize}
+\item 
+static const unsigned char {\bf m\+\_\+default\+Configuration} [$\,$]
+\begin{DoxyCompactList}\small\item\em Default configuration. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsubsection{Detailed Description}
+
+
+Definition at line {\bf 48} of file {\bf Si5351\+C.\+h}.
+
+
+
+\subsubsection{Member Enumeration Documentation}
+\index{lime\+::\+Si5351C@{lime\+::\+Si5351C}!Status@{Status}}
+\index{Status@{Status}!lime\+::\+Si5351C@{lime\+::\+Si5351C}}
+\paragraph[{Status}]{\setlength{\rightskip}{0pt plus 5cm}enum {\bf lime\+::\+Si5351\+C\+::\+Status}}\label{classlime_1_1Si5351C_a232443a12bd02c1607bc10bcb1216126}
+\begin{Desc}
+\item[Enumerator]\par
+\begin{description}
+\index{S\+U\+C\+C\+E\+SS@{S\+U\+C\+C\+E\+SS}!lime\+::\+Si5351C@{lime\+::\+Si5351C}}\index{lime\+::\+Si5351C@{lime\+::\+Si5351C}!S\+U\+C\+C\+E\+SS@{S\+U\+C\+C\+E\+SS}}\item[{\em 
+S\+U\+C\+C\+E\+SS\label{classlime_1_1Si5351C_a232443a12bd02c1607bc10bcb1216126aad4aa4fa3ce5616716acf78fd1038f25}
+}]\index{F\+A\+I\+L\+ED@{F\+A\+I\+L\+ED}!lime\+::\+Si5351C@{lime\+::\+Si5351C}}\index{lime\+::\+Si5351C@{lime\+::\+Si5351C}!F\+A\+I\+L\+ED@{F\+A\+I\+L\+ED}}\item[{\em 
+F\+A\+I\+L\+ED\label{classlime_1_1Si5351C_a232443a12bd02c1607bc10bcb1216126a5e4aedbc618e39afe8012fb885a0f20c}
+}]\end{description}
+\end{Desc}
+
+
+Definition at line {\bf 51} of file {\bf Si5351\+C.\+h}.
+
+
+
+\subsubsection{Constructor \& Destructor Documentation}
+\index{lime\+::\+Si5351C@{lime\+::\+Si5351C}!Si5351C@{Si5351C}}
+\index{Si5351C@{Si5351C}!lime\+::\+Si5351C@{lime\+::\+Si5351C}}
+\paragraph[{Si5351\+C()}]{\setlength{\rightskip}{0pt plus 5cm}Si5351\+C\+::\+Si5351C (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}\label{classlime_1_1Si5351C_a26f3e08a6a05a4d9071248449d9b2643}
+
+
+Definition at line {\bf 279} of file {\bf Si5351\+C.\+cpp}.
+
+
+
+References {\bf device}, and {\bf i}.
+
+\index{lime\+::\+Si5351C@{lime\+::\+Si5351C}!````~Si5351C@{$\sim$\+Si5351C}}
+\index{````~Si5351C@{$\sim$\+Si5351C}!lime\+::\+Si5351C@{lime\+::\+Si5351C}}
+\paragraph[{$\sim$\+Si5351\+C()}]{\setlength{\rightskip}{0pt plus 5cm}Si5351\+C\+::$\sim$\+Si5351C (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}\label{classlime_1_1Si5351C_a6c02ee8bf702928a4e16c0126aafd2c1}
+
+
+Definition at line {\bf 290} of file {\bf Si5351\+C.\+cpp}.
+
+
+
+\subsubsection{Member Function Documentation}
+\index{lime\+::\+Si5351C@{lime\+::\+Si5351C}!Clear\+Status@{Clear\+Status}}
+\index{Clear\+Status@{Clear\+Status}!lime\+::\+Si5351C@{lime\+::\+Si5351C}}
+\paragraph[{Clear\+Status()}]{\setlength{\rightskip}{0pt plus 5cm}{\bf Si5351\+C\+::\+Status} Si5351\+C\+::\+Clear\+Status (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}\label{classlime_1_1Si5351C_a6c0f9b2da14a3eb57bd47012e825e24c}
+
+
+Definition at line {\bf 844} of file {\bf Si5351\+C.\+cpp}.
+
+
+
+References {\bf device}, and {\bf status}.
+
+
+
+Referenced by {\bf Si5351\+C\+\_\+wxgui\+::\+Onbtn\+Clear\+Status\+Click()}.
+
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{d2/d61/classlime_1_1Si5351C_a6c0f9b2da14a3eb57bd47012e825e24c_icgraph}
+\end{center}
+\end{figure}
+
+
+\index{lime\+::\+Si5351C@{lime\+::\+Si5351C}!Configure\+Clocks@{Configure\+Clocks}}
+\index{Configure\+Clocks@{Configure\+Clocks}!lime\+::\+Si5351C@{lime\+::\+Si5351C}}
+\paragraph[{Configure\+Clocks()}]{\setlength{\rightskip}{0pt plus 5cm}{\bf Si5351\+C\+::\+Status} Si5351\+C\+::\+Configure\+Clocks (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}\label{classlime_1_1Si5351C_af394834c4d7c8834ec6b30dd0be3646f}
+
+
+Modifies register map with clock settings. 
+
+\begin{DoxyReturn}{Returns}
+true if success 
+\end{DoxyReturn}
+
+
+Definition at line {\bf 626} of file {\bf Si5351\+C.\+cpp}.
+
+
+
+References {\bf lime\+::error()}, {\bf i}, {\bf lime\+::info()}, and {\bf real\+To\+Frac()}.
+
+
+
+Referenced by {\bf Si5351\+C\+\_\+wxgui\+::\+Onbtn\+Configure\+Clock\+Click()}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{d2/d61/classlime_1_1Si5351C_af394834c4d7c8834ec6b30dd0be3646f_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{d2/d61/classlime_1_1Si5351C_af394834c4d7c8834ec6b30dd0be3646f_icgraph}
+\end{center}
+\end{figure}
+
+
+\index{lime\+::\+Si5351C@{lime\+::\+Si5351C}!Find\+V\+CO@{Find\+V\+CO}}
+\index{Find\+V\+CO@{Find\+V\+CO}!lime\+::\+Si5351C@{lime\+::\+Si5351C}}
+\paragraph[{Find\+V\+C\+O(\+Si5351\+\_\+\+Channel $\ast$clocks, Si5351\+\_\+\+P\+L\+L $\ast$plls, const unsigned long Fmin, const unsigned long Fmax)}]{\setlength{\rightskip}{0pt plus 5cm}{\bf void} Si5351\+C\+::\+Find\+V\+CO (
+\begin{DoxyParamCaption}
+\item[{{\bf Si5351\+\_\+\+Channel} $\ast$}]{clocks, }
+\item[{{\bf Si5351\+\_\+\+P\+LL} $\ast$}]{plls, }
+\item[{const unsigned long}]{Fmin, }
+\item[{const unsigned long}]{Fmax}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [private]}}\label{classlime_1_1Si5351C_a358a039dab802adad46765f3d3e2a8df}
+
+
+Calculates multisynth dividers and V\+CO frequencies. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em clocks} & output clocks configuration \\
+\hline
+{\em plls} & plls configurations \\
+\hline
+{\em Fmin} & lowest V\+CO frequency \\
+\hline
+{\em Fmax} & highest V\+CO frequency \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line {\bf 385} of file {\bf Si5351\+C.\+cpp}.
+
+
+
+References {\bf lime\+::\+Si5351\+\_\+\+P\+L\+L\+::feedback\+Divider}, {\bf freq}, {\bf i}, {\bf lime\+::\+Si5351\+\_\+\+Channel\+::int\+\_\+mode}, {\bf lime\+::\+Si5351\+\_\+\+Channel\+::multisynth\+Divider}, {\bf lime\+::\+Si5351\+\_\+\+Channel\+::output\+Freq\+Hz}, {\bf lime\+::\+Si5351\+\_\+\+Channel\+::pll\+Source}, {\bf lime\+::\+Si5351\+\_\+\+Channel\+::powered}, and {\bf lime\+::\+Si5351\+\_\+\+P\+L\+L\+::\+V\+C\+O\+\_\+\+Hz}.
+
+\index{lime\+::\+Si5351C@{lime\+::\+Si5351C}!Get\+Status\+Bits@{Get\+Status\+Bits}}
+\index{Get\+Status\+Bits@{Get\+Status\+Bits}!lime\+::\+Si5351C@{lime\+::\+Si5351C}}
+\paragraph[{Get\+Status\+Bits()}]{\setlength{\rightskip}{0pt plus 5cm}{\bf Si5351\+C\+::\+Status\+Bits} Si5351\+C\+::\+Get\+Status\+Bits (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}\label{classlime_1_1Si5351C_a48bed14f1b88e9b377ec21dc61509488}
+
+
+Definition at line {\bf 818} of file {\bf Si5351\+C.\+cpp}.
+
+
+
+References {\bf device}, {\bf lime\+::\+Si5351\+C\+::\+Status\+Bits\+::lol\+\_\+a}, {\bf lime\+::\+Si5351\+C\+::\+Status\+Bits\+::lol\+\_\+a\+\_\+stky}, {\bf lime\+::\+Si5351\+C\+::\+Status\+Bits\+::lol\+\_\+b}, {\bf lime\+::\+Si5351\+C\+::\+Status\+Bits\+::lol\+\_\+b\+\_\+stky}, {\bf lime\+::\+Si5351\+C\+::\+Status\+Bits\+::los}, {\bf lime\+::\+Si5351\+C\+::\+Status\+Bits\+::los\+\_\+stky}, {\bf status}, {\bf lime\+::\+Si5351\+C\+::\+Status\+Bits\+::sys\+\_\+init}, and {\bf lime\+::\+Si5351\+C\+::\+Status\+Bits\+::sys\+\_\+init\+\_\+stky}.
+
+
+
+Referenced by {\bf Si5351\+C\+\_\+wxgui\+::\+Onbtn\+Read\+Status\+Click()}.
+
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{d2/d61/classlime_1_1Si5351C_a48bed14f1b88e9b377ec21dc61509488_icgraph}
+\end{center}
+\end{figure}
+
+
+\index{lime\+::\+Si5351C@{lime\+::\+Si5351C}!Initialize@{Initialize}}
+\index{Initialize@{Initialize}!lime\+::\+Si5351C@{lime\+::\+Si5351C}}
+\paragraph[{Initialize(\+I\+Connection $\ast$mng)}]{\setlength{\rightskip}{0pt plus 5cm}{\bf void} Si5351\+C\+::\+Initialize (
+\begin{DoxyParamCaption}
+\item[{{\bf I\+Connection} $\ast$}]{mng}
+\end{DoxyParamCaption}
+)}\label{classlime_1_1Si5351C_aaff6d23c89d4d277716e3482d05dca47}
+
+
+Sets connection manager to use for data transferring \doxyref{Si5351C}{p.}{d2/d61/classlime_1_1Si5351C}. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em mng} & connection manager for data transferring \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line {\bf 342} of file {\bf Si5351\+C.\+cpp}.
+
+
+
+References {\bf device}.
+
+
+
+Referenced by {\bf Si5351\+C\+\_\+wxgui\+::\+Onbtn\+Clear\+Status\+Click()}, {\bf Si5351\+C\+\_\+wxgui\+::\+Onbtn\+Configure\+Clock\+Click()}, {\bf Si5351\+C\+\_\+wxgui\+::\+Onbtn\+Load\+File\+Click()}, {\bf Si5351\+C\+\_\+wxgui\+::\+Onbtn\+Read\+Status\+Click()}, and {\bf Si5351\+C\+\_\+wxgui\+::\+Onbtn\+Reset\+To\+Defaults\+Click()}.
+
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{d2/d61/classlime_1_1Si5351C_aaff6d23c89d4d277716e3482d05dca47_icgraph}
+\end{center}
+\end{figure}
+
+
+\index{lime\+::\+Si5351C@{lime\+::\+Si5351C}!Load\+Reg\+Values\+From\+File@{Load\+Reg\+Values\+From\+File}}
+\index{Load\+Reg\+Values\+From\+File@{Load\+Reg\+Values\+From\+File}!lime\+::\+Si5351C@{lime\+::\+Si5351C}}
+\paragraph[{Load\+Reg\+Values\+From\+File(std\+::string F\+Name)}]{\setlength{\rightskip}{0pt plus 5cm}bool Si5351\+C\+::\+Load\+Reg\+Values\+From\+File (
+\begin{DoxyParamCaption}
+\item[{std\+::string}]{F\+Name}
+\end{DoxyParamCaption}
+)}\label{classlime_1_1Si5351C_a1faf28147d5faecd002fc7e4f032d520}
+
+
+Loads register values for Si5356A from file. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em F\+Name} & input filename \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line {\bf 353} of file {\bf Si5351\+C.\+cpp}.
+
+
+
+References {\bf len}.
+
+
+
+Referenced by {\bf Si5351\+C\+\_\+wxgui\+::\+Onbtn\+Load\+File\+Click()}.
+
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{d2/d61/classlime_1_1Si5351C_a1faf28147d5faecd002fc7e4f032d520_icgraph}
+\end{center}
+\end{figure}
+
+
+\index{lime\+::\+Si5351C@{lime\+::\+Si5351C}!Reset@{Reset}}
+\index{Reset@{Reset}!lime\+::\+Si5351C@{lime\+::\+Si5351C}}
+\paragraph[{Reset()}]{\setlength{\rightskip}{0pt plus 5cm}{\bf void} Si5351\+C\+::\+Reset (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}\label{classlime_1_1Si5351C_a75cf7f2cf1fc9ad188ebe85fd4a7473c}
+
+
+Resets configuration registers to default values. 
+
+
+
+Definition at line {\bf 809} of file {\bf Si5351\+C.\+cpp}.
+
+
+
+References {\bf i}.
+
+
+
+Referenced by {\bf Si5351\+C\+\_\+wxgui\+::\+Onbtn\+Reset\+To\+Defaults\+Click()}.
+
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{d2/d61/classlime_1_1Si5351C_a75cf7f2cf1fc9ad188ebe85fd4a7473c_icgraph}
+\end{center}
+\end{figure}
+
+
+\index{lime\+::\+Si5351C@{lime\+::\+Si5351C}!Set\+Clock@{Set\+Clock}}
+\index{Set\+Clock@{Set\+Clock}!lime\+::\+Si5351C@{lime\+::\+Si5351C}}
+\paragraph[{Set\+Clock(unsigned char id, unsigned long f\+Out\+\_\+\+Hz, bool enabled=true, bool inverted=false)}]{\setlength{\rightskip}{0pt plus 5cm}{\bf void} Si5351\+C\+::\+Set\+Clock (
+\begin{DoxyParamCaption}
+\item[{unsigned char}]{id, }
+\item[{unsigned long}]{f\+Out\+\_\+\+Hz, }
+\item[{bool}]{enabled = {\ttfamily true}, }
+\item[{bool}]{inverted = {\ttfamily false}}
+\end{DoxyParamCaption}
+)}\label{classlime_1_1Si5351C_ac74517b5f390d3b19487d379b7f9b7a3}
+
+
+Sets output clock parameters. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em id} & clock id 0-\/\+C\+L\+K0 1-\/\+C\+L\+K1 ... \\
+\hline
+{\em f\+Out\+\_\+\+Hz} & output frequency in Hz \\
+\hline
+{\em enabled} & is this output powered \\
+\hline
+{\em inverted} & invert clock \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line {\bf 779} of file {\bf Si5351\+C.\+cpp}.
+
+
+
+References {\bf enabled}, {\bf lime\+::error()}, and {\bf id}.
+
+
+
+Referenced by {\bf Si5351\+C\+\_\+wxgui\+::\+Onbtn\+Configure\+Clock\+Click()}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{d2/d61/classlime_1_1Si5351C_ac74517b5f390d3b19487d379b7f9b7a3_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{d2/d61/classlime_1_1Si5351C_ac74517b5f390d3b19487d379b7f9b7a3_icgraph}
+\end{center}
+\end{figure}
+
+
+\index{lime\+::\+Si5351C@{lime\+::\+Si5351C}!Set\+P\+LL@{Set\+P\+LL}}
+\index{Set\+P\+LL@{Set\+P\+LL}!lime\+::\+Si5351C@{lime\+::\+Si5351C}}
+\paragraph[{Set\+P\+L\+L(unsigned char id, unsigned long C\+L\+K\+I\+N\+\_\+\+Hz, int C\+L\+K\+\_\+\+S\+R\+C)}]{\setlength{\rightskip}{0pt plus 5cm}{\bf void} Si5351\+C\+::\+Set\+P\+LL (
+\begin{DoxyParamCaption}
+\item[{unsigned char}]{id, }
+\item[{unsigned long}]{C\+L\+K\+I\+N\+\_\+\+Hz, }
+\item[{{\bf int}}]{C\+L\+K\+\_\+\+S\+RC}
+\end{DoxyParamCaption}
+)}\label{classlime_1_1Si5351C_adab9ab82b3a0d6f776382cb9043bb96d}
+
+
+Sets P\+LL input frequency. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em id} & P\+LL id 0-\/\+P\+L\+LA 1-\/\+P\+L\+LB \\
+\hline
+{\em C\+L\+K\+I\+N\+\_\+\+Hz} & clock input in Hz \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line {\bf 798} of file {\bf Si5351\+C.\+cpp}.
+
+
+
+References {\bf id}.
+
+
+
+Referenced by {\bf Si5351\+C\+\_\+wxgui\+::\+Onbtn\+Configure\+Clock\+Click()}.
+
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{d2/d61/classlime_1_1Si5351C_adab9ab82b3a0d6f776382cb9043bb96d_icgraph}
+\end{center}
+\end{figure}
+
+
+\index{lime\+::\+Si5351C@{lime\+::\+Si5351C}!Upload\+Configuration@{Upload\+Configuration}}
+\index{Upload\+Configuration@{Upload\+Configuration}!lime\+::\+Si5351C@{lime\+::\+Si5351C}}
+\paragraph[{Upload\+Configuration()}]{\setlength{\rightskip}{0pt plus 5cm}{\bf Si5351\+C\+::\+Status} Si5351\+C\+::\+Upload\+Configuration (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}\label{classlime_1_1Si5351C_a6c52127f61e4b6a20f1a7fec6a25429f}
+
+
+Sends Configuration to \doxyref{Si5351C}{p.}{d2/d61/classlime_1_1Si5351C}. 
+
+
+
+Definition at line {\bf 297} of file {\bf Si5351\+C.\+cpp}.
+
+
+
+References {\bf device}, {\bf i}, and {\bf status}.
+
+
+
+Referenced by {\bf Si5351\+C\+\_\+wxgui\+::\+Onbtn\+Configure\+Clock\+Click()}, {\bf Si5351\+C\+\_\+wxgui\+::\+Onbtn\+Load\+File\+Click()}, and {\bf Si5351\+C\+\_\+wxgui\+::\+Onbtn\+Reset\+To\+Defaults\+Click()}.
+
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{d2/d61/classlime_1_1Si5351C_a6c52127f61e4b6a20f1a7fec6a25429f_icgraph}
+\end{center}
+\end{figure}
+
+
+
+
+\subsubsection{Member Data Documentation}
+\index{lime\+::\+Si5351C@{lime\+::\+Si5351C}!addr\+Si5351@{addr\+Si5351}}
+\index{addr\+Si5351@{addr\+Si5351}!lime\+::\+Si5351C@{lime\+::\+Si5351C}}
+\paragraph[{addr\+Si5351}]{\setlength{\rightskip}{0pt plus 5cm}{\bf int} lime\+::\+Si5351\+C\+::addr\+Si5351\hspace{0.3cm}{\ttfamily [private]}}\label{classlime_1_1Si5351C_abf518170c19deee1eb1aebd5d6a9509a}
+
+
+Definition at line {\bf 91} of file {\bf Si5351\+C.\+h}.
+
+\index{lime\+::\+Si5351C@{lime\+::\+Si5351C}!C\+LK@{C\+LK}}
+\index{C\+LK@{C\+LK}!lime\+::\+Si5351C@{lime\+::\+Si5351C}}
+\paragraph[{C\+LK}]{\setlength{\rightskip}{0pt plus 5cm}{\bf Si5351\+\_\+\+Channel} lime\+::\+Si5351\+C\+::\+C\+LK[8]\hspace{0.3cm}{\ttfamily [private]}}\label{classlime_1_1Si5351C_adf970cdb10f119b7f5ebcc07669e3326}
+
+
+Definition at line {\bf 94} of file {\bf Si5351\+C.\+h}.
+
+\index{lime\+::\+Si5351C@{lime\+::\+Si5351C}!device@{device}}
+\index{device@{device}!lime\+::\+Si5351C@{lime\+::\+Si5351C}}
+\paragraph[{device}]{\setlength{\rightskip}{0pt plus 5cm}{\bf I\+Connection}$\ast$ lime\+::\+Si5351\+C\+::device\hspace{0.3cm}{\ttfamily [private]}}\label{classlime_1_1Si5351C_aedecd945b4a01b69b4b3dac4b2f6bda4}
+
+
+Definition at line {\bf 90} of file {\bf Si5351\+C.\+h}.
+
+\index{lime\+::\+Si5351C@{lime\+::\+Si5351C}!m\+\_\+default\+Configuration@{m\+\_\+default\+Configuration}}
+\index{m\+\_\+default\+Configuration@{m\+\_\+default\+Configuration}!lime\+::\+Si5351C@{lime\+::\+Si5351C}}
+\paragraph[{m\+\_\+default\+Configuration}]{\setlength{\rightskip}{0pt plus 5cm}const unsigned char Si5351\+C\+::m\+\_\+default\+Configuration\hspace{0.3cm}{\ttfamily [static]}, {\ttfamily [private]}}\label{classlime_1_1Si5351C_a95c392f396409cfcc0b125c38637dcce}
+
+
+Default configuration. 
+
+
+
+Definition at line {\bf 96} of file {\bf Si5351\+C.\+h}.
+
+\index{lime\+::\+Si5351C@{lime\+::\+Si5351C}!m\+\_\+new\+Configuration@{m\+\_\+new\+Configuration}}
+\index{m\+\_\+new\+Configuration@{m\+\_\+new\+Configuration}!lime\+::\+Si5351C@{lime\+::\+Si5351C}}
+\paragraph[{m\+\_\+new\+Configuration}]{\setlength{\rightskip}{0pt plus 5cm}unsigned char lime\+::\+Si5351\+C\+::m\+\_\+new\+Configuration[255]\hspace{0.3cm}{\ttfamily [private]}}\label{classlime_1_1Si5351C_abfea7a16e3243701acca8e4dfa93a5cf}
+
+
+Definition at line {\bf 97} of file {\bf Si5351\+C.\+h}.
+
+\index{lime\+::\+Si5351C@{lime\+::\+Si5351C}!P\+LL@{P\+LL}}
+\index{P\+LL@{P\+LL}!lime\+::\+Si5351C@{lime\+::\+Si5351C}}
+\paragraph[{P\+LL}]{\setlength{\rightskip}{0pt plus 5cm}{\bf Si5351\+\_\+\+P\+LL} lime\+::\+Si5351\+C\+::\+P\+LL[2]\hspace{0.3cm}{\ttfamily [private]}}\label{classlime_1_1Si5351C_acf8759ffb6bdf51cdcdbe7faf5b40330}
+
+
+Definition at line {\bf 93} of file {\bf Si5351\+C.\+h}.
+
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+/home/erik/prefix/default/src/limesuite-\/dev/src/\+Si5351\+C/{\bf Si5351\+C.\+h}\item 
+/home/erik/prefix/default/src/limesuite-\/dev/src/\+Si5351\+C/{\bf Si5351\+C.\+cpp}\end{DoxyCompactItemize}

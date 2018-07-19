@@ -1,0 +1,235 @@
+\subsection{lime\+:\+:Connection\+Registry Class Reference}
+\label{classlime_1_1ConnectionRegistry}\index{lime\+::\+Connection\+Registry@{lime\+::\+Connection\+Registry}}
+
+
+{\ttfamily \#include $<$Connection\+Registry.\+h$>$}
+
+
+
+Collaboration diagram for lime\+:\+:Connection\+Registry\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=207pt]{d6/d5c/classlime_1_1ConnectionRegistry__coll__graph}
+\end{center}
+\end{figure}
+\subsubsection*{Static Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+static {\bf std\+::vector}$<$ {\bf Connection\+Handle} $>$ {\bf find\+Connections} (const {\bf Connection\+Handle} \&hint={\bf Connection\+Handle}())
+\item 
+static {\bf I\+Connection} $\ast$ {\bf make\+Connection} (const {\bf Connection\+Handle} \&handle)
+\item 
+static {\bf void} {\bf free\+Connection} ({\bf I\+Connection} $\ast$conn)
+\item 
+static {\bf std\+::vector}$<$ std\+::string $>$ {\bf module\+Names} ({\bf void})
+\begin{DoxyCompactList}\small\item\em Get a list of available registry entry modules by name. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsubsection{Detailed Description}
+The connection registry provides a way to register discovery methods and factories for known connections, and to query and instantiate available connections. 
+
+Definition at line {\bf 24} of file {\bf Connection\+Registry.\+h}.
+
+
+
+\subsubsection{Member Function Documentation}
+\index{lime\+::\+Connection\+Registry@{lime\+::\+Connection\+Registry}!find\+Connections@{find\+Connections}}
+\index{find\+Connections@{find\+Connections}!lime\+::\+Connection\+Registry@{lime\+::\+Connection\+Registry}}
+\paragraph[{find\+Connections(const Connection\+Handle \&hint=\+Connection\+Handle())}]{\setlength{\rightskip}{0pt plus 5cm}{\bf std\+::vector}$<$ {\bf Connection\+Handle} $>$ Connection\+Registry\+::find\+Connections (
+\begin{DoxyParamCaption}
+\item[{const {\bf Connection\+Handle} \&}]{hint = {\ttfamily {\bf Connection\+Handle}()}}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [static]}}\label{classlime_1_1ConnectionRegistry_acdc063f9df6336a9ea341fa9eddffab3}
+Discovery identifiers that can be used to create a connection. The hint may contain a connection type, serial number, ip address, etc. 
+\begin{DoxyParams}{Parameters}
+{\em hint} & an optional connection handle with some fields filled-\/in \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+a list of handles which can be used to make a connection 
+\end{DoxyReturn}
+
+
+Definition at line {\bf 33} of file {\bf Connection\+Registry.\+cpp}.
+
+
+
+References {\bf \+\_\+\+\_\+load\+All\+Connections()}, {\bf lime\+::\+Connection\+Handle\+::module}, and {\bf registry\+Mutex()}.
+
+
+
+Referenced by {\bf device\+Test\+Timing()}, {\bf find\+Devices()}, {\bf find\+I\+Connection()}, {\bf lime\+::\+L\+M\+S7\+\_\+\+Device\+::\+Get\+Device\+List()}, {\bf L\+M\+S\+\_\+\+Get\+Device\+List()}, {\bf L\+M\+S\+\_\+\+Open()}, {\bf main()}, {\bf program\+Firmware()}, {\bf program\+Gateware()}, {\bf program\+Update()}, and {\bf Streaming\+Fixture\+::\+Streaming\+Fixture()}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{df/d74/classlime_1_1ConnectionRegistry_acdc063f9df6336a9ea341fa9eddffab3_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{df/d74/classlime_1_1ConnectionRegistry_acdc063f9df6336a9ea341fa9eddffab3_icgraph}
+\end{center}
+\end{figure}
+
+
+\index{lime\+::\+Connection\+Registry@{lime\+::\+Connection\+Registry}!free\+Connection@{free\+Connection}}
+\index{free\+Connection@{free\+Connection}!lime\+::\+Connection\+Registry@{lime\+::\+Connection\+Registry}}
+\paragraph[{free\+Connection(\+I\+Connection $\ast$conn)}]{\setlength{\rightskip}{0pt plus 5cm}{\bf void} Connection\+Registry\+::free\+Connection (
+\begin{DoxyParamCaption}
+\item[{{\bf I\+Connection} $\ast$}]{conn}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [static]}}\label{classlime_1_1ConnectionRegistry_a2f3782ae6d14e98f861d1ae54510ac2d}
+Free an connection created by \doxyref{make\+Connection()}{p.}{df/d74/classlime_1_1ConnectionRegistry_a225378efe92275fc2ed267b89da8297e}. 
+
+Definition at line {\bf 79} of file {\bf Connection\+Registry.\+cpp}.
+
+
+
+References {\bf registry\+Mutex()}.
+
+
+
+Referenced by {\bf lime\+::\+L\+M\+S7\+\_\+\+Device\+::\+Create\+Device()}, {\bf device\+Test\+Timing()}, {\bf lime\+::\+L\+M\+S7\+\_\+\+Device\+::\+L\+M\+S7\+\_\+\+Device()}, {\bf main()}, {\bf make\+Device()}, {\bf program\+Firmware()}, {\bf program\+Gateware()}, {\bf program\+Update()}, {\bf Streaming\+Fixture\+::\+Streaming\+Fixture()}, {\bf lime\+::\+L\+M\+S7\+\_\+\+Device\+::$\sim$\+L\+M\+S7\+\_\+\+Device()}, and {\bf Streaming\+Fixture\+::$\sim$\+Streaming\+Fixture()}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=319pt]{df/d74/classlime_1_1ConnectionRegistry_a2f3782ae6d14e98f861d1ae54510ac2d_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{df/d74/classlime_1_1ConnectionRegistry_a2f3782ae6d14e98f861d1ae54510ac2d_icgraph}
+\end{center}
+\end{figure}
+
+
+\index{lime\+::\+Connection\+Registry@{lime\+::\+Connection\+Registry}!make\+Connection@{make\+Connection}}
+\index{make\+Connection@{make\+Connection}!lime\+::\+Connection\+Registry@{lime\+::\+Connection\+Registry}}
+\paragraph[{make\+Connection(const Connection\+Handle \&handle)}]{\setlength{\rightskip}{0pt plus 5cm}{\bf I\+Connection} $\ast$ Connection\+Registry\+::make\+Connection (
+\begin{DoxyParamCaption}
+\item[{const {\bf Connection\+Handle} \&}]{handle}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [static]}}\label{classlime_1_1ConnectionRegistry_a225378efe92275fc2ed267b89da8297e}
+Create a connection from an identifying handle. Return a null pointer when no factories are available. 
+\begin{DoxyParams}{Parameters}
+{\em handle} & a connection handle with fields filled-\/in \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+a pointer to a connection instance (or null) 
+\end{DoxyReturn}
+
+
+Definition at line {\bf 54} of file {\bf Connection\+Registry.\+cpp}.
+
+
+
+References {\bf \+\_\+\+\_\+load\+All\+Connections()}, {\bf lime\+::\+Connection\+Handle\+::module}, and {\bf registry\+Mutex()}.
+
+
+
+Referenced by {\bf lime\+::\+L\+M\+S7\+\_\+\+Device\+::\+Create\+Device()}, {\bf device\+Test\+Timing()}, {\bf main()}, {\bf make\+Device()}, {\bf program\+Firmware()}, {\bf program\+Gateware()}, {\bf program\+Update()}, and {\bf Streaming\+Fixture\+::\+Streaming\+Fixture()}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{df/d74/classlime_1_1ConnectionRegistry_a225378efe92275fc2ed267b89da8297e_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{df/d74/classlime_1_1ConnectionRegistry_a225378efe92275fc2ed267b89da8297e_icgraph}
+\end{center}
+\end{figure}
+
+
+\index{lime\+::\+Connection\+Registry@{lime\+::\+Connection\+Registry}!module\+Names@{module\+Names}}
+\index{module\+Names@{module\+Names}!lime\+::\+Connection\+Registry@{lime\+::\+Connection\+Registry}}
+\paragraph[{module\+Names(void)}]{\setlength{\rightskip}{0pt plus 5cm}{\bf std\+::vector}$<$ std\+::string $>$ Connection\+Registry\+::module\+Names (
+\begin{DoxyParamCaption}
+\item[{{\bf void}}]{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [static]}}\label{classlime_1_1ConnectionRegistry_a45a52caee56ade240c82d640eb5b561a}
+
+
+Get a list of available registry entry modules by name. 
+
+
+
+Definition at line {\bf 89} of file {\bf Connection\+Registry.\+cpp}.
+
+
+
+References {\bf \+\_\+\+\_\+load\+All\+Connections()}, and {\bf registry\+Mutex()}.
+
+
+
+Referenced by {\bf print\+Info()}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{df/d74/classlime_1_1ConnectionRegistry_a45a52caee56ade240c82d640eb5b561a_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{df/d74/classlime_1_1ConnectionRegistry_a45a52caee56ade240c82d640eb5b561a_icgraph}
+\end{center}
+\end{figure}
+
+
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+/home/erik/prefix/default/src/limesuite-\/dev/src/\+Connection\+Registry/{\bf Connection\+Registry.\+h}\item 
+/home/erik/prefix/default/src/limesuite-\/dev/src/\+Connection\+Registry/{\bf Connection\+Registry.\+cpp}\end{DoxyCompactItemize}

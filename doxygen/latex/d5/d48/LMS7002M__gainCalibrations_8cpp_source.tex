@@ -1,0 +1,139 @@
+\subsection{L\+M\+S7002\+M\+\_\+gain\+Calibrations.\+cpp}
+\label{LMS7002M__gainCalibrations_8cpp_source}\index{/home/erik/prefix/default/src/limesuite-\/dev/src/lms7002m/\+L\+M\+S7002\+M\+\_\+gain\+Calibrations.\+cpp@{/home/erik/prefix/default/src/limesuite-\/dev/src/lms7002m/\+L\+M\+S7002\+M\+\_\+gain\+Calibrations.\+cpp}}
+
+\begin{DoxyCode}
+00001 \textcolor{preprocessor}{#include "LMS7002M.h"}
+00002 \textcolor{preprocessor}{#include "Logger.h"}
+00003 \textcolor{keyword}{using namespace }lime;
+00004 
+00005 \textcolor{keywordtype}{int} LMS7002M::CalibrateTxGainSetup()
+00006 \{
+00007     \textcolor{keywordtype}{int} status;
+00008     \textcolor{keywordtype}{int} ch = Get_SPI_Reg_bits(LMS7param(MAC));
+00009 
+00010     uint16\_t value = SPI_read(0x0020);
+00011     \textcolor{keywordflow}{if}( (value & 3) == 1)
+00012         value = value | 0x0014;
+00013     \textcolor{keywordflow}{else}
+00014         value = value | 0x0028;
+00015     SPI_write(0x0020, value);
+00016 
+00017     \textcolor{comment}{//RxTSP}
+00018     SetDefaults(RxTSP);
+00019     SetDefaults(RxNCO);
+00020     Modify_SPI_Reg_bits(LMS7param(AGC_MODE_RXTSP), 1);
+00021     Modify_SPI_Reg_bits(LMS7param(AGC_AVG_RXTSP), 1);
+00022     Modify_SPI_Reg_bits(LMS7param(HBD_OVR_RXTSP), 1);
+00023     Modify_SPI_Reg_bits(LMS7param(CMIX_BYP_RXTSP), 1);
+00024 
+00025     \textcolor{comment}{//TBB}
+00026     Modify_SPI_Reg_bits(LMS7param(CG_IAMP_TBB), 1);
+00027     Modify_SPI_Reg_bits(LMS7param(LOOPB_TBB), 3);
+00028 
+00029     \textcolor{comment}{//RFE}
+00030     Modify_SPI_Reg_bits(LMS7param(EN_G_RFE), 0);
+00031     Modify_SPI_Reg_bits(0x010D, 4, 1, 0xF);
+00032 
+00033     \textcolor{comment}{//RBB}
+00034     SetDefaults(RBB);
+00035     Modify_SPI_Reg_bits(LMS7param(PD_LPFL_RBB), 1);
+00036     Modify_SPI_Reg_bits(LMS7param(INPUT_CTL_PGA_RBB), 3);
+00037     Modify_SPI_Reg_bits(LMS7param(G_PGA_RBB), 12);
+00038     Modify_SPI_Reg_bits(LMS7param(RCC_CTL_PGA_RBB), 23);
+00039 
+00040     \textcolor{comment}{//TRF}
+00041     Modify_SPI_Reg_bits(LMS7param(EN_G_TRF), 0);
+00042 
+00043     \textcolor{comment}{//AFE}
+00044     \textcolor{keyword}{const} \textcolor{keywordtype}{int} isel\_dac\_afe = Get_SPI_Reg_bits(LMS7param(ISEL_DAC_AFE));
+00045     SetDefaults(AFE);
+00046     Modify_SPI_Reg_bits(LMS7param(ISEL_DAC_AFE), isel\_dac\_afe);
+00047     \textcolor{keywordflow}{if}(ch == 2)
+00048     \{
+00049         Modify_SPI_Reg_bits(LMS7param(PD_RX_AFE2), 0);
+00050         Modify_SPI_Reg_bits(LMS7param(PD_TX_AFE2), 0);
+00051     \}
+00052 
+00053     \textcolor{comment}{//BIAS}
+00054     \textcolor{keyword}{const} \textcolor{keywordtype}{int} rp\_calib\_bias = Get_SPI_Reg_bits(LMS7param(RP_CALIB_BIAS));
+00055     SetDefaults(BIAS);
+00056     Modify_SPI_Reg_bits(LMS7param(RP_CALIB_BIAS), rp\_calib\_bias);
+00057 
+00058     \textcolor{comment}{//LDO}
+00059     \textcolor{comment}{//do nothing}
+00060 
+00061     \textcolor{comment}{//XBUF}
+00062     \textcolor{comment}{//use configured xbuf settings}
+00063 
+00064     \textcolor{comment}{//CGEN}
+00065     SetDefaults(CGEN);
+00066     status = SetFrequencyCGEN(61.44e6);
+00067     \textcolor{keywordflow}{if}(status != 0)
+00068         \textcolor{keywordflow}{return} status;
+00069 
+00070     \textcolor{comment}{//SXR}
+00071     Modify_SPI_Reg_bits(LMS7param(MAC), 1);
+00072     Modify_SPI_Reg_bits(LMS7param(PD_VCO), 1);
+00073 
+00074     Modify_SPI_Reg_bits(LMS7param(MAC), ch);
+00075 
+00076     \textcolor{comment}{//TxTSP}
+00077     \textcolor{keyword}{const} \textcolor{keywordtype}{int} isinc = Get_SPI_Reg_bits(LMS7param(ISINC_BYP_TXTSP));
+00078     \textcolor{keyword}{const} \textcolor{keywordtype}{int} txcmixGainLSB = Get_SPI_Reg_bits(LMS7param(CMIX_GAIN_TXTSP));
+00079     \textcolor{keyword}{const} \textcolor{keywordtype}{int} txcmixGainMSB = Get_SPI_Reg_bits(LMS7param(CMIX_GAIN_TXTSP_R3));
+00080     SetDefaults(TxTSP);
+00081     SetDefaults(TxNCO);
+00082     Modify_SPI_Reg_bits(LMS7param(CMIX_GAIN_TXTSP), txcmixGainLSB);
+00083     Modify_SPI_Reg_bits(LMS7param(CMIX_GAIN_TXTSP_R3), txcmixGainMSB);
+00084     Modify_SPI_Reg_bits(LMS7param(ISINC_BYP_TXTSP), isinc);
+00085     Modify_SPI_Reg_bits(LMS7param(TSGMODE_TXTSP), 1);
+00086     Modify_SPI_Reg_bits(LMS7param(INSEL_TXTSP), 1);
+00087     int16\_t tsgValue = 0x7FFF;
+00088     \textcolor{keywordflow}{if}(txcmixGainMSB == 0 && txcmixGainLSB == 1)
+00089         tsgValue = 0x3FFF;
+00090     \textcolor{keywordflow}{else} \textcolor{keywordflow}{if}(txcmixGainMSB == 1 && txcmixGainLSB == 0)
+00091         tsgValue = 0x5A85;
+00092     \textcolor{keywordflow}{else}
+00093         tsgValue = 0x7FFF;
+00094     LoadDC_REG_IQ(LMS7002M::Tx, tsgValue , tsgValue);
+00095     SetNCOFrequency(LMS7002M::Tx, 0, 0.5e6);
+00096 
+00097     \textcolor{keywordflow}{return} 0;
+00098 \}
+00099 
+00100 \textcolor{keywordtype}{int} LMS7002M::CalibrateTxGain(\textcolor{keywordtype}{float} maxGainOffset\_dBFS, \textcolor{keywordtype}{float} *actualGain\_dBFS)
+00101 \{
+00102     \textcolor{keywordflow}{if} (!controlPort)\{
+00103         lime::error(\textcolor{stringliteral}{"No device connected"});
+00104         \textcolor{keywordflow}{return} -1;
+00105     \}
+00106     \textcolor{keywordtype}{int} status;
+00107     \textcolor{keywordtype}{int} cg\_iamp;
+00108     \textcolor{keyword}{auto} registersBackup = BackupRegisterMap();
+00109     status = CalibrateTxGainSetup();
+00110     \textcolor{keywordflow}{if}(status == 0)
+00111     \{
+00112         cg\_iamp = Get_SPI_Reg_bits(LMS7param(CG_IAMP_TBB));
+00113         \textcolor{keywordflow}{while}(GetRSSI() < 0x7FFF)
+00114         \{
+00115             \textcolor{keywordflow}{if}(++cg\_iamp > 63)
+00116                 \textcolor{keywordflow}{break};
+00117             Modify_SPI_Reg_bits(LMS7param(CG_IAMP_TBB), cg\_iamp);
+00118         \}
+00119     \}
+00120     RestoreRegisterMap(registersBackup);
+00121 
+00122     \textcolor{keywordtype}{int} ind = this->GetActiveChannelIndex()%2;
+00123     opt_gain_tbb[ind] = cg\_iamp > 1 ? cg\_iamp-1 : 1;
+00124 
+00125     \textcolor{keywordflow}{if} (status == 0)
+00126         Modify_SPI_Reg_bits(LMS7param(CG_IAMP_TBB), opt_gain_tbb[ind]);
+00127     \textcolor{comment}{//logic reset}
+00128     Modify_SPI_Reg_bits(LMS7param(LRST_TX_A), 0);
+00129     Modify_SPI_Reg_bits(LMS7param(LRST\_TX\_B), 0);
+00130     Modify_SPI_Reg_bits(LMS7param(LRST_TX_A), 1);
+00131     Modify_SPI_Reg_bits(LMS7param(LRST\_TX\_B), 1);
+00132 
+00133     \textcolor{keywordflow}{return} status;
+00134 \}
+\end{DoxyCode}

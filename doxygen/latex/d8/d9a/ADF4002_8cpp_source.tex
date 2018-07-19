@@ -1,0 +1,365 @@
+\subsection{A\+D\+F4002.\+cpp}
+\label{ADF4002_8cpp_source}\index{/home/erik/prefix/default/src/limesuite-\/dev/src/\+A\+D\+F4002/\+A\+D\+F4002.\+cpp@{/home/erik/prefix/default/src/limesuite-\/dev/src/\+A\+D\+F4002/\+A\+D\+F4002.\+cpp}}
+
+\begin{DoxyCode}
+00001 
+00007 \textcolor{preprocessor}{#include "ADF4002.h"}
+00008 
+00009 \textcolor{preprocessor}{#include <cmath>}
+00010 \textcolor{preprocessor}{#include <string.h>}
+00011 
+00012 \textcolor{keyword}{using namespace }lime;
+00013 
+00014 ADF4002::ADF4002()
+00015 \{
+00016 \}
+00017 
+00018 ADF4002::~ADF4002()
+00019 \{
+00020 \}
+00021 
+00024 \textcolor{keywordtype}{void} ADF4002::SetDefaults()
+00025 \{
+00026     \textcolor{comment}{//Reference Counter Latch}
+00027     cmbLDP = 0;
+00028     cmbABW = 0;
+00029     txtRCnt = 125;
+00030 
+00031     \textcolor{comment}{//N Counter Latch}
+00032     cmbCPG = 0;
+00033     txtNCnt = 384;
+00034 
+00035     \textcolor{comment}{//Function Latch}
+00036     rgrPD2_f = 0;
+00037     cmbCS2_f = 7;
+00038     cmbCS1_f = 7;
+00039     cmbTC_f = 0;
+00040     cmbFL_f = 0;
+00041     rgrCPS_f = 0;
+00042     rgrPDP_f = 1;
+00043     cmbMOC_f = 1;
+00044     rgrPD1_f = 0;
+00045     rgrCR_f = 0;
+00046 
+00047     \textcolor{comment}{//Initialization Latch}
+00048     rgrPD2_i = 0;
+00049     cmbCS2_i = 7;
+00050     cmbCS1_i = 7;
+00051     cmbTC_i = 0;
+00052     cmbFL_i = 0;
+00053     rgrCPS_i = 0;
+00054     rgrPDP_i = 1;
+00055     cmbMOC_i = 1;
+00056     rgrPD1_i = 0;
+00057     rgrCR_i = 0;
+00058 
+00059     CalculateRN();
+00060 \}
+00061 
+00064 \textcolor{keywordtype}{void} ADF4002::MakeData()
+00065 \{
+00066     memset(m_registers, 0, 12);
+00067     \textcolor{keywordtype}{char} btmp;
+00068     \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{int} itmp;
+00069 
+00070     \textcolor{comment}{//======= register addr 0x00 =======}
+00071     m_registers[0x00] = 0x00;
+00072     \textcolor{comment}{//R Value LSB}
+00073     itmp = txtRCnt;
+00074     btmp = (char)itmp;
+00075     btmp = btmp << 2;
+00076     m_registers[0x00] |= btmp;
+00077     \textcolor{comment}{//Addr}
+00078     btmp = 0x00;
+00079     btmp = btmp << 0;
+00080     m_registers[0x00] |= btmp;
+00081 
+00082     \textcolor{comment}{//======= register addr 0x01 =======}
+00083     m_registers[0x01] = 0x00;
+00084     \textcolor{comment}{//R Value MSB}
+00085     btmp = (char)(itmp >> 6);
+00086     btmp = btmp << 0;
+00087     m_registers[0x01] |= btmp;
+00088 
+00089     \textcolor{comment}{//======= register addr 0x02 =======}
+00090     m_registers[0x02] = 0x00;
+00091     \textcolor{comment}{//Anti-Backlash}
+00092     btmp = (char)cmbABW;
+00093     \textcolor{keywordflow}{if}(btmp > 0) btmp++;
+00094     btmp = btmp << 0;
+00095     m_registers[0x02] |= btmp;
+00096     \textcolor{comment}{//Lock Detact Precision}
+00097     btmp = (char)cmbLDP;
+00098     btmp = btmp << 4;
+00099     m_registers[0x02] |= btmp;
+00100 
+00101 
+00102 
+00103     \textcolor{comment}{//======= register addr 0x03 =======}
+00104     m_registers[0x03] = 0x00;
+00105     \textcolor{comment}{//Addr}
+00106     btmp = 0x01;
+00107     btmp = btmp << 0;
+00108     m_registers[0x03] |= btmp;
+00109 
+00110     \textcolor{comment}{//======= register addr 0x04 =======}
+00111     m_registers[0x04] = 0x00;
+00112     \textcolor{comment}{//N Value LSB}
+00113     itmp = txtNCnt;
+00114     btmp = (char)itmp;
+00115     btmp = btmp << 0;
+00116     m_registers[0x04] |= btmp;
+00117 
+00118     \textcolor{comment}{//======= register addr 0x05 =======}
+00119     m_registers[0x05] = 0x00;
+00120     \textcolor{comment}{//N Value MSB}
+00121     itmp = txtNCnt;
+00122     btmp = (char)(itmp >> 8);
+00123     btmp = btmp << 0;
+00124     m_registers[0x05] |= btmp;
+00125     \textcolor{comment}{//CP Gain}
+00126     btmp = (char)cmbCPG;
+00127     btmp = btmp << 5;
+00128     m_registers[0x05] |= btmp;
+00129 
+00130 
+00131 
+00132 
+00133     \textcolor{comment}{//======= register addr 0x06 =======}
+00134     m_registers[0x06] = 0x00;
+00135     \textcolor{comment}{//Addr}
+00136     btmp = 0x02;
+00137     btmp = btmp << 0;
+00138     m_registers[0x06] |= btmp;
+00139     \textcolor{comment}{//Counter Reset}
+00140     btmp = (char)rgrCR_f;
+00141     btmp = btmp << 2;
+00142     m_registers[0x06] |= btmp;
+00143     \textcolor{comment}{//PD 1}
+00144     btmp = (char)rgrPD1_f;
+00145     btmp = btmp << 3;
+00146     m_registers[0x06] |= btmp;
+00147     \textcolor{comment}{//Muxout Control}
+00148     btmp = (char)cmbMOC_f;
+00149     btmp = btmp << 4;
+00150     m_registers[0x06] |= btmp;
+00151     \textcolor{comment}{//PD Polarity}
+00152     btmp = (char)rgrPDP_f;
+00153     btmp = btmp << 7;
+00154     m_registers[0x06] |= btmp;
+00155 
+00156     \textcolor{comment}{//======= register addr 0x07 =======}
+00157     m_registers[0x07] = 0x00;
+00158     \textcolor{comment}{//CP State}
+00159     btmp = (char)rgrCPS_f;
+00160     btmp = btmp << 0;
+00161     m_registers[0x07] |= btmp;
+00162     \textcolor{comment}{//Fastlock}
+00163     btmp = (char)cmbFL_f;
+00164     \textcolor{keywordflow}{if}(btmp > 0) btmp++;
+00165     btmp = btmp << 1;
+00166     m_registers[0x07] |= btmp;
+00167     \textcolor{comment}{//Timer Counter}
+00168     btmp = (char)cmbTC_f;
+00169     btmp = btmp << 3;
+00170     m_registers[0x07] |= btmp;
+00171     \textcolor{comment}{//Current Setting 1 MSB}
+00172     btmp = (char)cmbCS1_f;
+00173     btmp = btmp << 7;
+00174     m_registers[0x07] |= btmp;
+00175 
+00176     \textcolor{comment}{//======= register addr 0x08 =======}
+00177     m_registers[0x08] = 0x00;
+00178     \textcolor{comment}{//Current Setting 1 LSB}
+00179     btmp = (char)cmbCS1_f;
+00180     btmp = btmp >> 1;
+00181     m_registers[0x08] |= btmp;
+00182     \textcolor{comment}{//Current Setting 2}
+00183     btmp = (char)cmbCS2_f;
+00184     btmp = btmp << 2;
+00185     m_registers[0x08] |= btmp;
+00186     \textcolor{comment}{//PD 2}
+00187     btmp = (char)rgrPD2_f;
+00188     btmp = btmp << 5;
+00189     m_registers[0x08] |= btmp;
+00190 
+00191 
+00192 
+00193     \textcolor{comment}{//======= register addr 0x09 =======}
+00194     m_registers[0x09] = 0x00;
+00195     \textcolor{comment}{//Addr}
+00196     btmp = 0x03;
+00197     btmp = btmp << 0;
+00198     m_registers[0x09] |= btmp;
+00199     \textcolor{comment}{//Counter Reset}
+00200     btmp = (char)rgrCR_i;
+00201     btmp = btmp << 2;
+00202     m_registers[0x09] |= btmp;
+00203     \textcolor{comment}{//PD 1}
+00204     btmp = (char)rgrPD1_i;
+00205     btmp = btmp << 3;
+00206     m_registers[0x09] |= btmp;
+00207     \textcolor{comment}{//Muxout Control}
+00208     btmp = (char)cmbMOC_i;
+00209     btmp = btmp << 4;
+00210     m_registers[0x09] |= btmp;
+00211     \textcolor{comment}{//PD Polarity}
+00212     btmp = (char)rgrPDP_i;
+00213     btmp = btmp << 7;
+00214     m_registers[0x09] |= btmp;
+00215 
+00216     \textcolor{comment}{//======= register addr 0x0A =======}
+00217     m_registers[0x0A] = 0x00;
+00218     \textcolor{comment}{//CP State}
+00219     btmp = (char)rgrCPS_i;
+00220     btmp = btmp << 0;
+00221     m_registers[0x0A] |= btmp;
+00222     \textcolor{comment}{//Fastlock}
+00223     btmp = (char)cmbFL_i;
+00224     \textcolor{keywordflow}{if}(btmp > 0) btmp++;
+00225     btmp = btmp << 1;
+00226     m_registers[0x0A] |= btmp;
+00227     \textcolor{comment}{//Timer Counter}
+00228     btmp = (char)cmbTC_i;
+00229     btmp = btmp << 3;
+00230     m_registers[0x0A] |= btmp;
+00231     \textcolor{comment}{//Current Setting 1 MSB}
+00232     btmp = (char)cmbCS1_i;
+00233     btmp = btmp << 7;
+00234     m_registers[0x0A] |= btmp;
+00235 
+00236     \textcolor{comment}{//======= register addr 0x0B =======}
+00237     m_registers[0x0B] = 0x00;
+00238     \textcolor{comment}{//Current Setting 1 LSB}
+00239     btmp = (char)cmbCS1_i;
+00240     btmp = btmp >> 1;
+00241     m_registers[0x0B] |= btmp;
+00242     \textcolor{comment}{//Current Setting 2}
+00243     btmp = (char)cmbCS2_i;
+00244     btmp = btmp << 2;
+00245     m_registers[0x0B] |= btmp;
+00246     \textcolor{comment}{//PD 2}
+00247     btmp = (char)rgrPD2_i;
+00248     btmp = btmp << 5;
+00249     m_registers[0x0B] |= btmp;
+00250 
+00251     \textcolor{comment}{//change array order}
+00252     \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{char} ctemp = m_registers[0];
+00253     m_registers[0] = m_registers[2];
+00254     m_registers[1] = m_registers[1];
+00255     m_registers[2] = ctemp;
+00256 
+00257     ctemp = m_registers[3];
+00258     m_registers[3] = m_registers[5];
+00259     m_registers[4] = m_registers[4];
+00260     m_registers[5] = ctemp;
+00261 
+00262     ctemp = m_registers[6];
+00263     m_registers[6] = m_registers[8];
+00264     m_registers[7] = m_registers[7];
+00265     m_registers[8] = ctemp;
+00266 
+00267     ctemp = m_registers[9];
+00268     m_registers[9] = m_registers[11];
+00269     m_registers[10] = m_registers[10];
+00270     m_registers[11] = ctemp;
+00271 \}
+00272 
+00275 \textcolor{keywordtype}{void} ADF4002::CalculateRN()
+00276 \{
+00277 
+00278     \textcolor{keywordtype}{double} x = txtFref*1000000;
+00279     \textcolor{keywordtype}{double} y = txtFvco*1000000;
+00280     \textcolor{keywordtype}{double} Fcomp;
+00281     \textcolor{keywordflow}{while}((x!=0) && (y!=0))
+00282     \{
+00283         \textcolor{keywordflow}{if}(x >= y)
+00284         \{
+00285             x = fmod(x, y);
+00286         \}
+00287         \textcolor{keywordflow}{else}
+00288         \{
+00289             y = fmod(y, x);
+00290         \};
+00291     \};
+00292 
+00293     Fcomp = (x + y)/1000000.0;
+00294     \textcolor{keywordtype}{int} R = (int)((txtFref/Fcomp)+0.5);
+00295     \textcolor{keywordtype}{int} N = (int)((txtFvco / Fcomp) + 0.5);
+00296 
+00297     txtRCnt = R;
+00298     txtNCnt = N;
+00299 
+00300     lblFcomp = Fcomp;
+00301     \textcolor{keywordtype}{double} dFvco = 0;
+00302     \textcolor{keywordflow}{if}(txtRCnt != 0)
+00303         dFvco = txtNCnt * (txtFref)/txtRCnt;
+00304     lblFvco = dFvco;
+00305 \}
+00306 
+00309 \textcolor{keywordtype}{void} ADF4002::GetConfig(\textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{char} data[12])
+00310 \{
+00311     MakeData();
+00312     memcpy(&data[0], &m_registers[9], 3);
+00313     memcpy(&data[3], &m_registers[6], 3);
+00314     memcpy(&data[6], &m_registers[0], 3);
+00315     memcpy(&data[9], &m_registers[3], 3);
+00316 \}
+00317 
+00318 \textcolor{keywordtype}{void} ADF4002::SetFrefFvco(\textcolor{keywordtype}{double} Fref, \textcolor{keywordtype}{double} Fvco, \textcolor{keywordtype}{int} &rcount, \textcolor{keywordtype}{int} &ncount)
+00319 \{
+00320     txtFref = Fref;
+00321     txtFvco = Fvco;
+00322     CalculateRN();
+00323     rcount = txtRCnt;
+00324     ncount = txtNCnt;
+00325 \}
+00326 
+00327 \textcolor{keywordtype}{void} ADF4002::SetReferenceCounterLatch(\textcolor{keywordtype}{int} Ldp, \textcolor{keywordtype}{int} Abw, \textcolor{keywordtype}{int} refCounter)
+00328 \{
+00329     cmbLDP = Ldp;
+00330     cmbABW = Abw;
+00331     txtRCnt = refCounter;
+00332 \}
+00333 
+00334 \textcolor{keywordtype}{void} ADF4002::SetNCounterLatch(\textcolor{keywordtype}{int} CPgain, \textcolor{keywordtype}{int} NCounter)
+00335 \{
+00336     cmbCPG = CPgain;
+00337     txtNCnt = NCounter;
+00338 \}
+00339 
+00340 \textcolor{keywordtype}{void} ADF4002::SetFunctionLatch(\textcolor{keywordtype}{int} currentSetting1, \textcolor{keywordtype}{int} currentSetting2, \textcolor{keywordtype}{int} timerCounter, \textcolor{keywordtype}{int} fastLock, \textcolor{keywordtype}{
+      int} muxoutControl)
+00341 \{
+00342     cmbCS1_f = currentSetting1;
+00343     cmbCS2_f = currentSetting2;
+00344     cmbTC_f = timerCounter;
+00345     cmbFL_f = fastLock;
+00346     cmbMOC_f = muxoutControl;
+00347 \}
+00348 \textcolor{keywordtype}{void} ADF4002::SetFunctionLatchRgr(\textcolor{keywordtype}{int} pdPol, \textcolor{keywordtype}{int} pd1, \textcolor{keywordtype}{int} pd2, \textcolor{keywordtype}{int} counterReset, \textcolor{keywordtype}{int} cpState)
+00349 \{
+00350     rgrPD1_f = pd1;
+00351     rgrPD2_f = pd2;
+00352     rgrPDP_f = pdPol;
+00353     rgrCR_f = counterReset;
+00354     rgrCPS_f = cpState;
+00355 \}
+00356 \textcolor{keywordtype}{void} ADF4002::SetInitializationLatch(\textcolor{keywordtype}{int} currentSetting1, \textcolor{keywordtype}{int} currentSetting2, \textcolor{keywordtype}{int} timerCounter, \textcolor{keywordtype}{int} 
+      fastLock, \textcolor{keywordtype}{int} muxoutControl)
+00357 \{
+00358     cmbCS1_i = currentSetting1;
+00359     cmbCS2_i = currentSetting2;
+00360     cmbTC_i = timerCounter;
+00361     cmbFL_i = fastLock;
+00362     cmbMOC_i = muxoutControl;
+00363 \}
+00364 \textcolor{keywordtype}{void} ADF4002::SetInitializationLatchRgr(\textcolor{keywordtype}{int} pdPol, \textcolor{keywordtype}{int} pd1, \textcolor{keywordtype}{int} pd2, \textcolor{keywordtype}{int} counterReset, \textcolor{keywordtype}{int} cpState)
+00365 \{
+00366     rgrPD1_i = pd1;
+00367     rgrPD2_i = pd2;
+00368     rgrPDP_i = pdPol;
+00369     rgrCR_i = counterReset;
+00370     rgrCPS_i = cpState;
+00371 \}
+\end{DoxyCode}

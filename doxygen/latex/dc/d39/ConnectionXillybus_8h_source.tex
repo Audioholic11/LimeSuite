@@ -1,0 +1,117 @@
+\subsection{Connection\+Xillybus.\+h}
+\label{ConnectionXillybus_8h_source}\index{/home/erik/prefix/default/src/limesuite-\/dev/src/\+Connection\+Xillybus/\+Connection\+Xillybus.\+h@{/home/erik/prefix/default/src/limesuite-\/dev/src/\+Connection\+Xillybus/\+Connection\+Xillybus.\+h}}
+
+\begin{DoxyCode}
+00001 
+00007 \textcolor{preprocessor}{#pragma once}
+00008 \textcolor{preprocessor}{#include <ConnectionRegistry.h>}
+00009 \textcolor{preprocessor}{#include "LMS64CProtocol.h"}
+00010 \textcolor{preprocessor}{#include <vector>}
+00011 \textcolor{preprocessor}{#include <string>}
+00012 \textcolor{preprocessor}{#include <atomic>}
+00013 \textcolor{preprocessor}{#include <memory>}
+00014 \textcolor{preprocessor}{#include <thread>}
+00015 
+00016 \textcolor{preprocessor}{#ifndef \_\_unix\_\_}
+00017 \textcolor{preprocessor}{#include "windows.h"}
+00018 \textcolor{preprocessor}{#else}
+00019 \textcolor{preprocessor}{#include <mutex>}
+00020 \textcolor{preprocessor}{#include <condition\_variable>}
+00021 \textcolor{preprocessor}{#include <chrono>}
+00022 \textcolor{preprocessor}{#endif}
+00023 
+00024 \textcolor{keyword}{namespace }lime\{
+00025 
+00026 \textcolor{keyword}{class }ConnectionXillybus : \textcolor{keyword}{public} LMS64CProtocol
+00027 \{
+00028 \textcolor{keyword}{public}:
+00029     ConnectionXillybus(\textcolor{keyword}{const} \textcolor{keywordtype}{unsigned} index);
+00030     ~ConnectionXillybus(\textcolor{keywordtype}{void});
+00031 
+00032     \textcolor{keywordtype}{int} Open(\textcolor{keyword}{const} \textcolor{keywordtype}{unsigned} index);
+00033     \textcolor{keywordtype}{void} Close();
+00034     \textcolor{keywordtype}{bool} IsOpen();
+00035     \textcolor{keywordtype}{int} GetOpenedIndex();
+00036 
+00037     \textcolor{keywordtype}{int} Write(\textcolor{keyword}{const} \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{char} *buffer, \textcolor{keywordtype}{int} length, \textcolor{keywordtype}{int} timeout_ms = 100) \textcolor{keyword}{override};
+00038     \textcolor{keywordtype}{int} Read(\textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{char} *buffer, \textcolor{keywordtype}{int} length, \textcolor{keywordtype}{int} timeout_ms = 100) \textcolor{keyword}{override};
+00039 ;
+00040 \textcolor{preprocessor}{#ifdef \_\_unix\_\_}
+00041     \textcolor{keywordtype}{int} TransferPacket(GenericPacket &pkt) \textcolor{keyword}{override};
+00042     \textcolor{keywordtype}{int} ProgramWrite(\textcolor{keyword}{const} \textcolor{keywordtype}{char} *data\_src, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} length, \textcolor{keyword}{const} \textcolor{keywordtype}{int} prog\_mode, \textcolor{keyword}{const} \textcolor{keywordtype}{int} 
+      device, ProgrammingCallback callback)\textcolor{keyword}{override};
+00043 \textcolor{preprocessor}{#endif}
+00044 \textcolor{keyword}{protected}:
+00045     \textcolor{keywordtype}{int} GetBuffersCount() \textcolor{keyword}{const override};
+00046     \textcolor{keywordtype}{int} CheckStreamSize(\textcolor{keywordtype}{int} size) \textcolor{keyword}{const override};
+00047     
+00048     \textcolor{keywordtype}{int} ReceiveData(\textcolor{keywordtype}{char}* buffer, \textcolor{keywordtype}{int} length, \textcolor{keywordtype}{int} epIndex, \textcolor{keywordtype}{int} timeout = 100) \textcolor{keyword}{override};
+00049     \textcolor{keywordtype}{int} SendData(\textcolor{keyword}{const} \textcolor{keywordtype}{char}* buffer, \textcolor{keywordtype}{int} length, \textcolor{keywordtype}{int} epIndex, \textcolor{keywordtype}{int} timeout = 100) \textcolor{keyword}{override};
+00050     
+00051     \textcolor{keywordtype}{int} BeginDataReading(\textcolor{keywordtype}{char}* buffer, uint32\_t length, \textcolor{keywordtype}{int} ep) \textcolor{keyword}{override};
+00052     \textcolor{keywordtype}{bool} WaitForReading(\textcolor{keywordtype}{int} contextHandle, \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{int} timeout_ms) \textcolor{keyword}{override};
+00053     \textcolor{keywordtype}{int} FinishDataReading(\textcolor{keywordtype}{char}* buffer, uint32\_t length, \textcolor{keywordtype}{int} contextHandle) \textcolor{keyword}{override};
+00054     \textcolor{keywordtype}{void} AbortReading(\textcolor{keywordtype}{int} epIndex);
+00055 
+00056     \textcolor{keywordtype}{int} BeginDataSending(\textcolor{keyword}{const} \textcolor{keywordtype}{char}* buffer, uint32\_t length, \textcolor{keywordtype}{int} ep) \textcolor{keyword}{override};
+00057     \textcolor{keywordtype}{bool} WaitForSending(\textcolor{keywordtype}{int} contextHandle, uint32\_t timeout\_ms) \textcolor{keyword}{override};
+00058     \textcolor{keywordtype}{int} FinishDataSending(\textcolor{keyword}{const} \textcolor{keywordtype}{char}* buffer, uint32\_t length, \textcolor{keywordtype}{int} contextHandle) \textcolor{keyword}{override};
+00059     \textcolor{keywordtype}{void} AbortSending(\textcolor{keywordtype}{int} epIndex);
+00060 
+00061 \textcolor{keyword}{private}:
+00062     \textcolor{keyword}{static} \textcolor{keyword}{const} \textcolor{keywordtype}{int} MAX_EP_CNT = 3;
+00063     \textcolor{keyword}{struct }EPConfig
+00064     \{
+00065         std::string ctrlRead;
+00066         std::string ctrlWrite;
+00067         std::string streamRead[MAX_EP_CNT];
+00068         std::string streamWrite[MAX_EP_CNT];
+00069     \};
+00070 
+00071     \textcolor{keyword}{static} \textcolor{keyword}{const} EPConfig deviceConfigs[];
+00072     eConnectionType GetType(\textcolor{keywordtype}{void}) \{\textcolor{keywordflow}{return} PCIE_PORT;\}
+00073 
+00074     std::string m_hardwareName;
+00075     \textcolor{keywordtype}{int} m_hardwareVer;
+00076 
+00077     \textcolor{keywordtype}{bool} isConnected;
+00078     std::mutex mTransferLock;
+00079 \textcolor{preprocessor}{#ifndef \_\_unix\_\_}
+00080     HANDLE hWrite;
+00081     HANDLE hRead;
+00082     HANDLE hWriteStream[MAX_EP_CNT];
+00083     HANDLE hReadStream[MAX_EP_CNT];
+00084 \textcolor{preprocessor}{#else}
+00085     \textcolor{keywordtype}{int} OpenControl();
+00086     \textcolor{keywordtype}{void} CloseControl();
+00087     \textcolor{keywordtype}{int} hWrite;
+00088     \textcolor{keywordtype}{int} hRead;
+00089     \textcolor{keywordtype}{int} hWriteStream[MAX_EP_CNT];
+00090     \textcolor{keywordtype}{int} hReadStream[MAX_EP_CNT];
+00091 \textcolor{preprocessor}{#endif}
+00092     std::string writeCtrlPort;
+00093     std::string readCtrlPort;
+00094     std::string writeStreamPort[MAX_EP_CNT];
+00095     std::string readStreamPort[MAX_EP_CNT];
+00096 \};
+00097 
+00098 \textcolor{keyword}{class }ConnectionXillybusEntry : \textcolor{keyword}{public} ConnectionRegistryEntry
+00099 \{
+00100 \textcolor{keyword}{public}:
+00101     ConnectionXillybusEntry(\textcolor{keywordtype}{void});
+00102 
+00103     ~ConnectionXillybusEntry(\textcolor{keywordtype}{void});
+00104 
+00105     std::vector<ConnectionHandle> enumerate(\textcolor{keyword}{const} ConnectionHandle &hint);
+00106 
+00107     IConnection *make(\textcolor{keyword}{const} ConnectionHandle &handle);
+00108 
+00109 \textcolor{keyword}{private}:
+00110 \textcolor{preprocessor}{    #ifndef \_\_unix\_\_}
+00111     std::string DeviceName(\textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{int} index);
+00112 \textcolor{preprocessor}{    #else}
+00113 \textcolor{preprocessor}{    #endif}
+00114 \};
+00115 
+00116 \}
+\end{DoxyCode}

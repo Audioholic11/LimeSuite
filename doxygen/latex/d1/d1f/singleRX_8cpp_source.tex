@@ -1,0 +1,208 @@
+\subsection{single\+R\+X.\+cpp}
+\label{singleRX_8cpp_source}\index{/home/erik/prefix/default/src/limesuite-\/dev/src/examples/single\+R\+X.\+cpp@{/home/erik/prefix/default/src/limesuite-\/dev/src/examples/single\+R\+X.\+cpp}}
+
+\begin{DoxyCode}
+00001 
+00006 \textcolor{preprocessor}{#include "lime/LimeSuite.h"}
+00007 \textcolor{preprocessor}{#include <iostream>}
+00008 \textcolor{preprocessor}{#include <chrono>}
+00009 \textcolor{preprocessor}{#ifdef USE\_GNU\_PLOT}
+00010 \textcolor{preprocessor}{#include "gnuPlotPipe.h"}
+00011 \textcolor{preprocessor}{#endif}
+00012 
+00013 \textcolor{keyword}{using namespace }std;
+00014 
+00015 \textcolor{comment}{//Device structure, should be initialize to NULL}
+00016 lms_device_t* device = NULL;
+00017 
+00018 \textcolor{keywordtype}{int} error()
+00019 \{
+00020     \textcolor{keywordflow}{if} (device != NULL)
+00021         LMS_Close(device);
+00022     exit(-1);
+00023 \}
+00024 
+00025 \textcolor{keywordtype}{int} main(\textcolor{keywordtype}{int} argc, \textcolor{keywordtype}{char}** argv)
+00026 \{
+00027     \textcolor{comment}{//Find devices}
+00028     \textcolor{comment}{//First we find number of devices, then allocate large enough list,  and then populate the list}
+00029     \textcolor{keywordtype}{int} n;
+00030     \textcolor{keywordflow}{if} ((n = LMS_GetDeviceList(NULL)) < 0)\textcolor{comment}{//Pass NULL to only obtain number of devices}
+00031         error();
+00032     cout << \textcolor{stringliteral}{"Devices found: "} << n << endl;
+00033     \textcolor{keywordflow}{if} (n < 1)
+00034         \textcolor{keywordflow}{return} -1;
+00035 
+00036     lms_info_str_t* list = \textcolor{keyword}{new} lms_info_str_t[n];   \textcolor{comment}{//allocate device list}
+00037 
+00038     \textcolor{keywordflow}{if} (LMS_GetDeviceList(list) < 0)                \textcolor{comment}{//Populate device list}
+00039         error();
+00040 
+00041     \textcolor{keywordflow}{for} (\textcolor{keywordtype}{int} i = 0; i < n; i++)                     \textcolor{comment}{//print device list}
+00042         cout << i << \textcolor{stringliteral}{": "} << list[i] << endl;
+00043     cout << endl;
+00044 
+00045     \textcolor{comment}{//Open the first device}
+00046     \textcolor{keywordflow}{if} (LMS_Open(&device, list[0], NULL))
+00047         error();
+00048 
+00049     \textcolor{keyword}{delete} [] list;                                 \textcolor{comment}{//free device list}
+00050 
+00051     \textcolor{comment}{//Initialize device with default configuration}
+00052     \textcolor{comment}{//Do not use if you want to keep existing configuration}
+00053     \textcolor{comment}{//Use LMS\_LoadConfig(device, "/path/to/file.ini") to load config from INI}
+00054     \textcolor{keywordflow}{if} (LMS_Init(device) != 0)
+00055         error();
+00056 
+00057     \textcolor{comment}{//Enable RX channel}
+00058     \textcolor{comment}{//Channels are numbered starting at 0}
+00059     \textcolor{keywordflow}{if} (LMS_EnableChannel(device, LMS_CH_RX, 0, \textcolor{keyword}{true}) != 0)
+00060         error();
+00061 
+00062     \textcolor{comment}{//Set center frequency to 800 MHz}
+00063     \textcolor{keywordflow}{if} (LMS_SetLOFrequency(device, LMS_CH_RX, 0, 800e6) != 0)
+00064         error();
+00065 
+00066     \textcolor{comment}{//print currently set center frequency}
+00067     float_type freq;
+00068     \textcolor{keywordflow}{if} (LMS_GetLOFrequency(device, LMS_CH_RX, 0, &freq) != 0)
+00069         error();
+00070     cout << \textcolor{stringliteral}{"\(\backslash\)nCenter frequency: "} << freq / 1e6 << \textcolor{stringliteral}{" MHz\(\backslash\)n"};
+00071 
+00072     \textcolor{comment}{//select antenna port}
+00073     lms_name_t antenna\_list[10];    \textcolor{comment}{//large enough list for antenna names.}
+00074                                     \textcolor{comment}{//Alternatively, NULL can be passed to LMS\_GetAntennaList() to obtain
+       number of antennae}
+00075     \textcolor{keywordflow}{if} ((n = LMS_GetAntennaList(device, LMS_CH_RX, 0, antenna\_list)) < 0)
+00076         error();
+00077 
+00078     cout << \textcolor{stringliteral}{"Available antennae:\(\backslash\)n"};            \textcolor{comment}{//print available antennae names}
+00079     \textcolor{keywordflow}{for} (\textcolor{keywordtype}{int} i = 0; i < n; i++)
+00080         cout << i << \textcolor{stringliteral}{": "} << antenna\_list[i] << endl;
+00081 
+00082     \textcolor{keywordflow}{if} ((n = LMS_GetAntenna(device, LMS_CH_RX, 0)) < 0) \textcolor{comment}{//get currently selected antenna index}
+00083         error();
+00084     \textcolor{comment}{//print antenna index and name}
+00085     cout << \textcolor{stringliteral}{"Automatically selected antenna: "} << n << \textcolor{stringliteral}{": "} << antenna\_list[n] << endl;
+00086 
+00087     \textcolor{keywordflow}{if} (LMS_SetAntenna(device, LMS_CH_RX, 0, LMS_PATH_LNAW) != 0) \textcolor{comment}{// manually select antenna}
+00088         error();
+00089 
+00090     \textcolor{keywordflow}{if} ((n = LMS_GetAntenna(device, LMS_CH_RX, 0)) < 0) \textcolor{comment}{//get currently selected antenna index}
+00091         error();
+00092    \textcolor{comment}{//print antenna index and name}
+00093     cout << \textcolor{stringliteral}{"Manually selected antenna: "} << n << \textcolor{stringliteral}{": "} << antenna\_list[n] << endl;
+00094 
+00095     \textcolor{comment}{//Set sample rate to 8 MHz, preferred oversampling in RF 8x}
+00096     \textcolor{comment}{//This set sampling rate for all channels}
+00097     \textcolor{keywordflow}{if} (LMS_SetSampleRate(device, 8e6, 8) != 0)
+00098         error();
+00099     \textcolor{comment}{//print resulting sampling rates (interface to host , and ADC)}
+00100     float_type rate, rf\_rate;
+00101     \textcolor{keywordflow}{if} (LMS_GetSampleRate(device, LMS_CH_RX, 0, &rate, &rf\_rate) != 0)  \textcolor{comment}{//NULL can be passed}
+00102         error();
+00103     cout << \textcolor{stringliteral}{"\(\backslash\)nHost interface sample rate: "} << rate / 1e6 << \textcolor{stringliteral}{" MHz\(\backslash\)nRF ADC sample rate: "} << rf\_rate / 1e6
+       << \textcolor{stringliteral}{"MHz\(\backslash\)n\(\backslash\)n"};
+00104 
+00105     \textcolor{comment}{//Example of getting allowed parameter value range}
+00106     \textcolor{comment}{//There are also functions to get other parameter ranges (check LimeSuite.h)}
+00107 
+00108     \textcolor{comment}{//Get allowed LPF bandwidth range}
+00109     lms_range_t range;
+00110     \textcolor{keywordflow}{if} (LMS_GetLPFBWRange(device,LMS_CH_RX,&range)!=0)
+00111         error();
+00112 
+00113     cout << \textcolor{stringliteral}{"RX LPF bandwitdh range: "} << range.min / 1e6 << \textcolor{stringliteral}{" - "} << range.max / 1e6 << \textcolor{stringliteral}{" MHz\(\backslash\)n\(\backslash\)n"};
+00114 
+00115     \textcolor{comment}{//Configure LPF, bandwidth 8 MHz}
+00116     \textcolor{keywordflow}{if} (LMS_SetLPFBW(device, LMS_CH_RX, 0, 8e6) != 0)
+00117         error();
+00118 
+00119     \textcolor{comment}{//Set RX gain}
+00120     \textcolor{keywordflow}{if} (LMS_SetNormalizedGain(device, LMS_CH_RX, 0, 0.7) != 0)
+00121         error();
+00122     \textcolor{comment}{//Print RX gain}
+00123     float_type gain; \textcolor{comment}{//normalized gain}
+00124     \textcolor{keywordflow}{if} (LMS_GetNormalizedGain(device, LMS_CH_RX, 0, &gain) != 0)
+00125         error();
+00126     cout << \textcolor{stringliteral}{"Normalized RX Gain: "} << gain << endl;
+00127 
+00128     \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{int} gaindB; \textcolor{comment}{//gain in dB}
+00129     \textcolor{keywordflow}{if} (LMS_GetGaindB(device, LMS_CH_RX, 0, &gaindB) != 0)
+00130         error();
+00131     cout << \textcolor{stringliteral}{"RX Gain: "} << gaindB << \textcolor{stringliteral}{" dB"} << endl;
+00132 
+00133     \textcolor{comment}{//Perform automatic calibration}
+00134     \textcolor{keywordflow}{if} (LMS_Calibrate(device, LMS_CH_RX, 0, 8e6, 0) != 0)
+00135         error();
+00136 
+00137     \textcolor{comment}{//Enable test signal generation}
+00138     \textcolor{comment}{//To receive data from RF, remove this line or change signal to LMS\_TESTSIG\_NONE}
+00139     \textcolor{keywordflow}{if} (LMS_SetTestSignal(device, LMS_CH_RX, 0, LMS_TESTSIG_NCODIV8, 0, 0) != 0)
+00140         error();
+00141 
+00142     \textcolor{comment}{//Streaming Setup}
+00143 
+00144     \textcolor{comment}{//Initialize stream}
+00145     lms_stream_t streamId;
+00146     streamId.channel = 0; \textcolor{comment}{//channel number}
+00147     streamId.fifoSize = 1024 * 1024; \textcolor{comment}{//fifo size in samples}
+00148     streamId.throughputVsLatency = 1.0; \textcolor{comment}{//optimize for max throughput}
+00149     streamId.isTx = \textcolor{keyword}{false}; \textcolor{comment}{//RX channel}
+00150     streamId.dataFmt = lms_stream_t::LMS_FMT_F32; \textcolor{comment}{//32-bit floats}
+00151     \textcolor{keywordflow}{if} (LMS_SetupStream(device, &streamId) != 0)
+00152         error();
+00153 
+00154     \textcolor{comment}{//Data buffers}
+00155     \textcolor{keyword}{const} \textcolor{keywordtype}{int} bufersize = 10000; \textcolor{comment}{//complex samples per buffer}
+00156     \textcolor{keywordtype}{float} buffer[bufersize * 2]; \textcolor{comment}{//must hold I+Q values of each sample}
+00157     \textcolor{comment}{//Start streaming}
+00158     LMS_StartStream(&streamId);
+00159 
+00160 \textcolor{preprocessor}{#ifdef USE\_GNU\_PLOT}
+00161     GNUPlotPipe gp;
+00162     gp.write(\textcolor{stringliteral}{"set size square\(\backslash\)n set xrange[-1:1]\(\backslash\)n set yrange[-1:1]\(\backslash\)n"});
+00163 \textcolor{preprocessor}{#endif}
+00164     \textcolor{keyword}{auto} t1 = chrono::high\_resolution\_clock::now();
+00165     \textcolor{keyword}{auto} t2 = t1;
+00166 
+00167     \textcolor{keywordflow}{while} (chrono::high\_resolution\_clock::now() - t1 < chrono::seconds(10)) \textcolor{comment}{//run for 10 seconds}
+00168     \{
+00169         \textcolor{keywordtype}{int} samplesRead;
+00170         \textcolor{comment}{//Receive samples}
+00171         samplesRead = LMS_RecvStream(&streamId, buffer, bufersize, NULL, 1000);
+00172         \textcolor{comment}{//I and Q samples are interleaved in buffer: IQIQIQ...}
+00173     \textcolor{comment}{/*}
+00174 \textcolor{comment}{        INSERT CODE FOR PROCESSING RECEIVED SAMPLES}
+00175 \textcolor{comment}{    */}
+00176         \textcolor{comment}{//Plot samples}
+00177 \textcolor{preprocessor}{#ifdef USE\_GNU\_PLOT}
+00178         gp.write(\textcolor{stringliteral}{"plot '-' with points\(\backslash\)n"});
+00179         \textcolor{keywordflow}{for} (\textcolor{keywordtype}{int} j = 0; j < samplesRead; ++j)
+00180             gp.writef(\textcolor{stringliteral}{"%f %f\(\backslash\)n"}, buffer[2 * j], buffer[2 * j + 1]);
+00181         gp.write(\textcolor{stringliteral}{"e\(\backslash\)n"});
+00182         gp.flush();
+00183 \textcolor{preprocessor}{#endif}
+00184         \textcolor{comment}{//Print stats (once per second)}
+00185         \textcolor{keywordflow}{if} (chrono::high\_resolution\_clock::now() - t2 > chrono::seconds(1))
+00186         \{
+00187             t2 = chrono::high\_resolution\_clock::now();
+00188             lms_stream_status_t status;
+00189             \textcolor{comment}{//Get stream status}
+00190             LMS_GetStreamStatus(&streamId, &status);
+00191             cout << \textcolor{stringliteral}{"RX data rate: "} << status.linkRate / 1e6 << \textcolor{stringliteral}{" MB/s\(\backslash\)n"}; \textcolor{comment}{//link data rate}
+00192             cout << \textcolor{stringliteral}{"RX fifo: "} << 100 * status.fifoFilledCount / status.
+      fifoSize << \textcolor{stringliteral}{"%"} << endl; \textcolor{comment}{//percentage of FIFO filled}
+00193         \}
+00194     \}
+00195 
+00196     \textcolor{comment}{//Stop streaming}
+00197     LMS_StopStream(&streamId); \textcolor{comment}{//stream is stopped but can be started again with LMS\_StartStream()}
+00198     LMS_DestroyStream(device, &streamId); \textcolor{comment}{//stream is deallocated and can no longer be used}
+00199 
+00200     \textcolor{comment}{//Close device}
+00201     LMS_Close(device);
+00202 
+00203     \textcolor{keywordflow}{return} 0;
+00204 \}
+\end{DoxyCode}

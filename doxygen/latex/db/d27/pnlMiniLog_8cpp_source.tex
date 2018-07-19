@@ -1,0 +1,81 @@
+\subsection{pnl\+Mini\+Log.\+cpp}
+\label{pnlMiniLog_8cpp_source}\index{/home/erik/prefix/default/src/limesuite-\/dev/src/utilities\+\_\+gui/pnl\+Mini\+Log.\+cpp@{/home/erik/prefix/default/src/limesuite-\/dev/src/utilities\+\_\+gui/pnl\+Mini\+Log.\+cpp}}
+
+\begin{DoxyCode}
+00001 \textcolor{preprocessor}{#include "pnlMiniLog.h"}
+00002 \textcolor{preprocessor}{#include "dlgFullMessageLog.h"}
+00003 
+00004 pnlMiniLog::pnlMiniLog(wxWindow* parent, wxWindowID \textcolor{keywordtype}{id}, \textcolor{keyword}{const} wxPoint& pos, \textcolor{keyword}{const} wxSize& 
+      size, \textcolor{keywordtype}{long} style)
+00005     : pnlMiniLog_view( parent, id, pos, size, style ),
+00006         log_level(3)
+00007 \{
+00008     mDefaultStyle = txtMessageField->GetDefaultStyle();
+00009     wxUpdateUIEvent::SetUpdateInterval(100);
+00010 \}
+00011 
+00012 \textcolor{keywordtype}{void} pnlMiniLog::HandleMessage(wxCommandEvent &event)
+00013 \{
+00014     \textcolor{keyword}{auto} level = lime::LogLevel(event.GetInt());
+00015     \textcolor{keywordflow}{if} (level > log_level)
+00016         \textcolor{keywordflow}{return};
+00017     time\_t rawtime;
+00018     \textcolor{keyword}{struct }tm * timeinfo;
+00019     \textcolor{keywordtype}{char} buffer[80];
+00020     \textcolor{comment}{//add time stamp}
+00021     time(&rawtime);
+00022     timeinfo = localtime(&rawtime);
+00023     strftime(buffer, 80, \textcolor{stringliteral}{"%H:%M:%S"}, timeinfo);
+00024     wxString line(wxString::Format(\textcolor{stringliteral}{"[%s] %s: %s"}, buffer, lime::logLevelToName(level), event.GetString()));
+00025 
+00026     mAllMessages.push\_back(line);
+00027     \textcolor{keyword}{const} \textcolor{keywordtype}{int} allMessageLimit = 3000;
+00028     \textcolor{keywordflow}{if} (mAllMessages.size() > allMessageLimit)
+00029         mAllMessages.pop\_front();
+00030 
+00031     \textcolor{keyword}{const} \textcolor{keywordtype}{int} miniLogMessageLimit = 800;
+00032     wxTextAttr style = mDefaultStyle;
+00033     \textcolor{keywordflow}{switch}(level)
+00034     \{
+00035         \textcolor{keywordflow}{case} lime::LOG_LEVEL_CRITICAL:
+00036         \textcolor{keywordflow}{case} lime::LOG_LEVEL_ERROR:
+00037                 style.SetTextColour(*wxRED);
+00038                 \textcolor{keywordflow}{break};
+00039         \textcolor{keywordflow}{case} lime::LOG_LEVEL_WARNING:
+00040                 style.SetBackgroundColour(*wxYELLOW);
+00041                 style.SetTextColour(*wxBLACK);
+00042                 \textcolor{keywordflow}{break};
+00043         \textcolor{keywordflow}{default}: \textcolor{keywordflow}{break};
+00044     \}
+00045     txtMessageField->SetDefaultStyle(style);
+00046     txtMessageField->AppendText(line);
+00047     txtMessageField->SetDefaultStyle(mDefaultStyle);
+00048     txtMessageField->AppendText(\_(\textcolor{stringliteral}{"\(\backslash\)n"}));
+00049     \textcolor{keywordflow}{if} (mAllMessages.size() > miniLogMessageLimit)
+00050         txtMessageField->Remove(0,txtMessageField->GetLineLength(0)+1);
+00051 \}
+00052 
+00053 \textcolor{keywordtype}{void} pnlMiniLog::OnUpdateGUI(wxUpdateUIEvent& event)
+00054 \{
+00055 
+00056 \}
+00057 
+00058 \textcolor{keywordtype}{void} pnlMiniLog::OnBtnClearClicked(wxCommandEvent& event)
+00059 \{
+00060     mMessageList.clear();
+00061     txtMessageField->Clear();
+00062     mAllMessages.clear();
+00063 \}
+00064 
+00065 \textcolor{keywordtype}{void} pnlMiniLog::OnShowFullLog(wxCommandEvent& event)
+00066 \{
+00067     dlgFullMessageLog *dlg = \textcolor{keyword}{new} dlgFullMessageLog(\textcolor{keyword}{this});
+00068     dlg->AddMessages(mAllMessages);
+00069     dlg->ShowModal();
+00070 \}
+00071 
+00072 \textcolor{keywordtype}{void} pnlMiniLog::onLogLvlChange(wxCommandEvent& event)
+00073 \{
+00074     log_level = 1+\textcolor{keyword}{event}.GetInt();
+00075 \}
+\end{DoxyCode}

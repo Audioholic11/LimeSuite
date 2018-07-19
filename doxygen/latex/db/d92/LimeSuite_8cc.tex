@@ -1,0 +1,603 @@
+\subsection{/home/erik/prefix/default/src/limesuite-\/dev/octave/\+Lime\+Suite.cc File Reference}
+\label{LimeSuite_8cc}\index{/home/erik/prefix/default/src/limesuite-\/dev/octave/\+Lime\+Suite.\+cc@{/home/erik/prefix/default/src/limesuite-\/dev/octave/\+Lime\+Suite.\+cc}}
+{\ttfamily \#include $<$octave/oct.\+h$>$}\\*
+{\ttfamily \#include $<$octave/\+Cell.\+h$>$}\\*
+{\ttfamily \#include $<$vector$>$}\\*
+{\ttfamily \#include $<$string$>$}\\*
+{\ttfamily \#include \char`\"{}Lime\+Suite.\+h\char`\"{}}\\*
+Include dependency graph for Lime\+Suite.\+cc\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{d9/d4d/LimeSuite_8cc__incl}
+\end{center}
+\end{figure}
+\subsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct {\bf complex16\+\_\+t}
+\item 
+class {\bf Resource\+Deallocator}
+\end{DoxyCompactItemize}
+\subsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+{\bf void} {\bf Free\+Resources} ()
+\item 
+{\bf void} {\bf Stop\+Stream} ()
+\item 
+{\bf void} {\bf Print\+Device\+Info} ({\bf lms\+\_\+device\+\_\+t} $\ast${\bf port})
+\item 
+{\bf D\+E\+F\+U\+N\+\_\+\+D\+LD} (Lime\+Get\+Device\+List, {\bf args}, nargout,\char`\"{}L\+I\+ST = Lime\+Get\+Device\+List() -\/ Returns available {\bf device} {\bf list}\char`\"{})
+\item 
+{\bf D\+E\+F\+U\+N\+\_\+\+D\+LD} ({\bf Lime\+Initialize}, {\bf args}, nargout,\char`\"{}Lime\+Initialize(D\+EV) -\/ connect to {\bf device} and allocate {\bf buffer} memory\textbackslash{}n\textbackslash{}
+D\+EV [optional] -\/ {\bf device} {\bf name} to connect, obtained via Lime\+Get\+Device\+List()\char`\"{})
+\item 
+{\bf D\+E\+F\+U\+N\+\_\+\+D\+LD} ({\bf Lime\+Destroy}, {\bf args}, nargout,\char`\"{}Lime\+Destroy() -\/ Stop {\bf all} streams, deallocate memory and disconnect {\bf device}\char`\"{})
+\item 
+{\bf D\+E\+F\+U\+N\+\_\+\+D\+LD} ({\bf Lime\+Load\+Config}, {\bf args}, nargout,\char`\"{}Lime\+Load\+Config(F\+I\+L\+E\+N\+A\+ME) -\/ Load configuration from file F\+I\+L\+E\+N\+A\+ME\char`\"{})
+\item 
+{\bf D\+E\+F\+U\+N\+\_\+\+D\+LD} ({\bf Lime\+Start\+Streaming}, {\bf args}, nargout,\char`\"{}Lime\+Start\+Streaming(F\+I\+F\+O\+S\+I\+ZE, C\+H\+A\+N\+N\+E\+LS) -\/ starts sample streaming from selected channels\textbackslash{}n\textbackslash{}
+ F\+I\+F\+O\+S\+I\+ZE [optional] -\/ {\bf buffer} {\bf size} in {\bf samples} to be used by library (default\+: 4 M\+Samples)\textbackslash{}
+ C\+H\+A\+N\+N\+E\+LS [optional] -\/ array of channels to be used [rx0 ; rx1 ; tx0 ; tx1] (deafult\+: rx0)\char`\"{})
+\item 
+{\bf D\+E\+F\+U\+N\+\_\+\+D\+LD} ({\bf Lime\+Stop\+Streaming}, {\bf args}, nargout,\char`\"{}Lime\+Stop\+Streaming() -\/ Stop Receiver and Transmitter threads\char`\"{})
+\item 
+{\bf D\+E\+F\+U\+N\+\_\+\+D\+LD} (Lime\+Receive\+Samples, {\bf args},,\char`\"{}S\+I\+G\+N\+AL = Lime\+Receive\+Samples\+Large( N, CH) -\/ receive N {\bf samples} from Rx channel C\+H.\textbackslash{}n\textbackslash{}
+CH parameter is optional, valid values are 0 and 1\char`\"{})
+\item 
+{\bf D\+E\+F\+U\+N\+\_\+\+D\+LD} (Lime\+Transmit\+Samples, {\bf args},,\char`\"{}Lime\+Transmit\+Samples( S\+I\+G\+N\+AL, CH) -\/ sends normalized complex S\+I\+G\+N\+AL to Tx cahnnel C\+H\textbackslash{}n\textbackslash{}
+CH parameter is optional, valid values are 0 and 1\char`\"{})
+\item 
+{\bf D\+E\+F\+U\+N\+\_\+\+D\+LD} ({\bf Lime\+Loop\+W\+F\+M\+Start}, {\bf args},,\char`\"{}Lime\+Loop\+W\+F\+M\+Start(S\+I\+G\+N\+AL) -\/ upload S\+I\+G\+N\+AL to {\bf device} {\bf R\+AM} for repeated transmitting\char`\"{})
+\item 
+{\bf D\+E\+F\+U\+N\+\_\+\+D\+LD} ({\bf Lime\+Loop\+W\+F\+M\+Stop}, {\bf args},,\char`\"{}Lime\+Tx\+Loop\+W\+F\+M\+Stop() -\/ stop transmitting {\bf samples} from {\bf device} {\bf R\+AM}\char`\"{})
+\end{DoxyCompactItemize}
+\subsubsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+const {\bf int} {\bf max\+Ch\+Cnt} = 2
+\item 
+const float {\bf scale\+Factor} = 32768.\+0f
+\item 
+{\bf lms\+\_\+device\+\_\+t} $\ast$ {\bf lms\+Dev} = N\+U\+LL
+\item 
+{\bf lms\+\_\+stream\+\_\+t} {\bf stream\+Rx} [{\bf max\+Ch\+Cnt}]
+\item 
+{\bf lms\+\_\+stream\+\_\+t} {\bf stream\+Tx} [{\bf max\+Ch\+Cnt}]
+\item 
+bool {\bf W\+F\+Mrunning} = false
+\item 
+{\bf complex16\+\_\+t} $\ast$ {\bf rxbuffers} = N\+U\+LL
+\item 
+{\bf complex16\+\_\+t} $\ast$ {\bf txbuffers} = N\+U\+LL
+\item 
+{\bf Resource\+Deallocator} {\bf g\+Resources}
+\end{DoxyCompactItemize}
+
+
+\subsubsection{Function Documentation}
+\index{Lime\+Suite.\+cc@{Lime\+Suite.\+cc}!D\+E\+F\+U\+N\+\_\+\+D\+LD@{D\+E\+F\+U\+N\+\_\+\+D\+LD}}
+\index{D\+E\+F\+U\+N\+\_\+\+D\+LD@{D\+E\+F\+U\+N\+\_\+\+D\+LD}!Lime\+Suite.\+cc@{Lime\+Suite.\+cc}}
+\paragraph[{D\+E\+F\+U\+N\+\_\+\+D\+L\+D(\+Lime\+Get\+Device\+List, args, nargout,""L\+I\+S\+T = Lime\+Get\+Device\+List() -\/ Returns available device list"")}]{\setlength{\rightskip}{0pt plus 5cm}D\+E\+F\+U\+N\+\_\+\+D\+LD (
+\begin{DoxyParamCaption}
+\item[{Lime\+Get\+Device\+List}]{, }
+\item[{{\bf args}}]{, }
+\item[{nargout}]{}
+\end{DoxyParamCaption}
+)}\label{LimeSuite_8cc_acdb100f1d59f9528e315c81b3a748ff4}
+
+
+Definition at line {\bf 63} of file {\bf Lime\+Suite.\+cc}.
+
+
+
+References {\bf args}, {\bf i}, and {\bf L\+M\+S\+\_\+\+Get\+Device\+List()}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{db/d92/LimeSuite_8cc_acdb100f1d59f9528e315c81b3a748ff4_cgraph}
+\end{center}
+\end{figure}
+
+
+\index{Lime\+Suite.\+cc@{Lime\+Suite.\+cc}!D\+E\+F\+U\+N\+\_\+\+D\+LD@{D\+E\+F\+U\+N\+\_\+\+D\+LD}}
+\index{D\+E\+F\+U\+N\+\_\+\+D\+LD@{D\+E\+F\+U\+N\+\_\+\+D\+LD}!Lime\+Suite.\+cc@{Lime\+Suite.\+cc}}
+\paragraph[{D\+E\+F\+U\+N\+\_\+\+D\+L\+D(\+Lime\+Initialize, args, nargout,""Lime\+Initialize(\+D\+E\+V) -\/ connect to device and allocate buffer memory\textbackslash{}n\textbackslash{}
+\+D\+E\+V [optional] -\/ device name to connect, obtained via Lime\+Get\+Device\+List()"")}]{\setlength{\rightskip}{0pt plus 5cm}D\+E\+F\+U\+N\+\_\+\+D\+LD (
+\begin{DoxyParamCaption}
+\item[{{\bf Lime\+Initialize}}]{, }
+\item[{{\bf args}}]{, }
+\item[{nargout}]{, }
+\item[{\char`\"{}Lime\+Initialize(D\+EV) -\/ connect to {\bf device} and allocate {\bf buffer} memory\textbackslash{}n\textbackslash{}\+D\+EV  -\/ {\bf device} {\bf name} to}]{connect[optional], }
+\item[{obtained via Lime\+Get\+Device\+List()\char`\"{}}]{}
+\end{DoxyParamCaption}
+)}\label{LimeSuite_8cc_a8264622f1c2c5bfc25727870d85ee938}
+
+
+Definition at line {\bf 85} of file {\bf Lime\+Suite.\+cc}.
+
+
+
+References {\bf args}, {\bf Free\+Resources()}, {\bf lms\+\_\+stream\+\_\+t\+::handle}, {\bf i}, {\bf L\+M\+S\+\_\+\+Get\+Last\+Error\+Message()}, {\bf L\+M\+S\+\_\+\+Open()}, {\bf L\+M\+S\+\_\+\+Synchronize()}, {\bf lms\+Dev}, {\bf max\+Ch\+Cnt}, {\bf Print\+Device\+Info()}, and {\bf status}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{db/d92/LimeSuite_8cc_a8264622f1c2c5bfc25727870d85ee938_cgraph}
+\end{center}
+\end{figure}
+
+
+\index{Lime\+Suite.\+cc@{Lime\+Suite.\+cc}!D\+E\+F\+U\+N\+\_\+\+D\+LD@{D\+E\+F\+U\+N\+\_\+\+D\+LD}}
+\index{D\+E\+F\+U\+N\+\_\+\+D\+LD@{D\+E\+F\+U\+N\+\_\+\+D\+LD}!Lime\+Suite.\+cc@{Lime\+Suite.\+cc}}
+\paragraph[{D\+E\+F\+U\+N\+\_\+\+D\+L\+D(\+Lime\+Destroy, args, nargout,""Lime\+Destroy() -\/ Stop all streams, deallocate memory and disconnect device"")}]{\setlength{\rightskip}{0pt plus 5cm}D\+E\+F\+U\+N\+\_\+\+D\+LD (
+\begin{DoxyParamCaption}
+\item[{{\bf Lime\+Destroy}}]{, }
+\item[{{\bf args}}]{, }
+\item[{nargout}]{, }
+\item[{\char`\"{}Lime\+Destroy() -\/ Stop {\bf all}}]{streams, }
+\item[{deallocate memory and disconnect {\bf device}\char`\"{}}]{}
+\end{DoxyParamCaption}
+)}\label{LimeSuite_8cc_ae7ac4f2a699969cc3227172938e99482}
+
+
+Definition at line {\bf 125} of file {\bf Lime\+Suite.\+cc}.
+
+
+
+References {\bf Free\+Resources()}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{db/d92/LimeSuite_8cc_ae7ac4f2a699969cc3227172938e99482_cgraph}
+\end{center}
+\end{figure}
+
+
+\index{Lime\+Suite.\+cc@{Lime\+Suite.\+cc}!D\+E\+F\+U\+N\+\_\+\+D\+LD@{D\+E\+F\+U\+N\+\_\+\+D\+LD}}
+\index{D\+E\+F\+U\+N\+\_\+\+D\+LD@{D\+E\+F\+U\+N\+\_\+\+D\+LD}!Lime\+Suite.\+cc@{Lime\+Suite.\+cc}}
+\paragraph[{D\+E\+F\+U\+N\+\_\+\+D\+L\+D(\+Lime\+Load\+Config, args, nargout,""Lime\+Load\+Config(\+F\+I\+L\+E\+N\+A\+M\+E) -\/ Load configuration from file F\+I\+L\+E\+N\+A\+ME"")}]{\setlength{\rightskip}{0pt plus 5cm}D\+E\+F\+U\+N\+\_\+\+D\+LD (
+\begin{DoxyParamCaption}
+\item[{{\bf Lime\+Load\+Config}}]{, }
+\item[{{\bf args}}]{, }
+\item[{nargout}]{, }
+\item[{\char`\"{}Lime\+Load\+Config(F\+I\+L\+E\+N\+A\+ME) -\/ Load configuration from file F\+I\+L\+E\+N\+A\+ME\char`\"{}}]{}
+\end{DoxyParamCaption}
+)}\label{LimeSuite_8cc_a81ec1d0ca6ee2dcd6041916a53abc49d}
+
+
+Definition at line {\bf 132} of file {\bf Lime\+Suite.\+cc}.
+
+
+
+References {\bf args}, {\bf filename}, {\bf L\+M\+S\+\_\+\+Get\+Last\+Error\+Message()}, {\bf L\+M\+S\+\_\+\+Load\+Config()}, and {\bf lms\+Dev}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{db/d92/LimeSuite_8cc_a81ec1d0ca6ee2dcd6041916a53abc49d_cgraph}
+\end{center}
+\end{figure}
+
+
+\index{Lime\+Suite.\+cc@{Lime\+Suite.\+cc}!D\+E\+F\+U\+N\+\_\+\+D\+LD@{D\+E\+F\+U\+N\+\_\+\+D\+LD}}
+\index{D\+E\+F\+U\+N\+\_\+\+D\+LD@{D\+E\+F\+U\+N\+\_\+\+D\+LD}!Lime\+Suite.\+cc@{Lime\+Suite.\+cc}}
+\paragraph[{D\+E\+F\+U\+N\+\_\+\+D\+L\+D(\+Lime\+Start\+Streaming, args, nargout,""Lime\+Start\+Streaming(\+F\+I\+F\+O\+S\+I\+Z\+E, C\+H\+A\+N\+N\+E\+L\+S) -\/ starts sample streaming from selected channels\textbackslash{}n\textbackslash{}
+ F\+I\+F\+O\+S\+I\+Z\+E [optional] -\/ buffer size in samples to be used by library (default\+: 4 M\+Samples)\textbackslash{}
+ C\+H\+A\+N\+N\+E\+L\+S [optional] -\/ array of channels to be used [rx0 ; rx1 ; tx0 ; tx1] (deafult\+: rx0)"")}]{\setlength{\rightskip}{0pt plus 5cm}D\+E\+F\+U\+N\+\_\+\+D\+LD (
+\begin{DoxyParamCaption}
+\item[{{\bf Lime\+Start\+Streaming}}]{, }
+\item[{{\bf args}}]{, }
+\item[{nargout}]{, }
+\item[{\char`\"{}Lime\+Start\+Streaming(F\+I\+F\+O\+S\+I\+ZE, C\+H\+A\+N\+N\+E\+LS) -\/ starts sample streaming from selected channels\textbackslash{}n\textbackslash{} F\+I\+F\+O\+S\+I\+ZE  -\/ {\bf buffer} {\bf size} in {\bf samples} to be used by library (default\+: 4 M\+Samples)\textbackslash{} C\+H\+A\+N\+N\+E\+LS  -\/ array of channels to be used  (deafult\+: rx0)\char`\"{}}]{[optional][optional][rx0;rx1;tx0;tx1]}
+\end{DoxyParamCaption}
+)}\label{LimeSuite_8cc_afdbb783175627d9e8b78083bbb9bc0f0}
+
+
+Definition at line {\bf 161} of file {\bf Lime\+Suite.\+cc}.
+
+
+
+References {\bf args}, {\bf lms\+\_\+stream\+\_\+t\+::channel}, {\bf lms\+\_\+stream\+\_\+t\+::data\+Fmt}, {\bf lms\+\_\+stream\+\_\+t\+::fifo\+Size}, {\bf i}, {\bf lms\+\_\+stream\+\_\+t\+::is\+Tx}, {\bf lms\+\_\+stream\+\_\+t\+::\+L\+M\+S\+\_\+\+F\+M\+T\+\_\+\+I16}, {\bf L\+M\+S\+\_\+\+Get\+Last\+Error\+Message()}, {\bf L\+M\+S\+\_\+\+Setup\+Stream()}, {\bf L\+M\+S\+\_\+\+Start\+Stream()}, {\bf lms\+Dev}, {\bf max\+Ch\+Cnt}, {\bf lms\+\_\+stream\+\_\+t\+::throughput\+Vs\+Latency}, and {\bf tx}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{db/d92/LimeSuite_8cc_afdbb783175627d9e8b78083bbb9bc0f0_cgraph}
+\end{center}
+\end{figure}
+
+
+\index{Lime\+Suite.\+cc@{Lime\+Suite.\+cc}!D\+E\+F\+U\+N\+\_\+\+D\+LD@{D\+E\+F\+U\+N\+\_\+\+D\+LD}}
+\index{D\+E\+F\+U\+N\+\_\+\+D\+LD@{D\+E\+F\+U\+N\+\_\+\+D\+LD}!Lime\+Suite.\+cc@{Lime\+Suite.\+cc}}
+\paragraph[{D\+E\+F\+U\+N\+\_\+\+D\+L\+D(\+Lime\+Stop\+Streaming, args, nargout,""Lime\+Stop\+Streaming() -\/ Stop Receiver and Transmitter threads"")}]{\setlength{\rightskip}{0pt plus 5cm}D\+E\+F\+U\+N\+\_\+\+D\+LD (
+\begin{DoxyParamCaption}
+\item[{{\bf Lime\+Stop\+Streaming}}]{, }
+\item[{{\bf args}}]{, }
+\item[{nargout}]{, }
+\item[{\char`\"{}Lime\+Stop\+Streaming() -\/ Stop Receiver and Transmitter threads\char`\"{}}]{}
+\end{DoxyParamCaption}
+)}\label{LimeSuite_8cc_a410a6c47d4cbc9c0e993e2da170c0651}
+
+
+Definition at line {\bf 256} of file {\bf Lime\+Suite.\+cc}.
+
+
+
+References {\bf args}, {\bf lms\+Dev}, and {\bf Stop\+Stream()}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{db/d92/LimeSuite_8cc_a410a6c47d4cbc9c0e993e2da170c0651_cgraph}
+\end{center}
+\end{figure}
+
+
+\index{Lime\+Suite.\+cc@{Lime\+Suite.\+cc}!D\+E\+F\+U\+N\+\_\+\+D\+LD@{D\+E\+F\+U\+N\+\_\+\+D\+LD}}
+\index{D\+E\+F\+U\+N\+\_\+\+D\+LD@{D\+E\+F\+U\+N\+\_\+\+D\+LD}!Lime\+Suite.\+cc@{Lime\+Suite.\+cc}}
+\paragraph[{D\+E\+F\+U\+N\+\_\+\+D\+L\+D(\+Lime\+Receive\+Samples, args,,""S\+I\+G\+N\+A\+L = Lime\+Receive\+Samples\+Large( N, C\+H) -\/ receive N samples from Rx channel C\+H.\textbackslash{}n\textbackslash{}
+\+C\+H parameter is optional, valid values are 0 and 1"")}]{\setlength{\rightskip}{0pt plus 5cm}D\+E\+F\+U\+N\+\_\+\+D\+LD (
+\begin{DoxyParamCaption}
+\item[{Lime\+Receive\+Samples}]{, }
+\item[{{\bf args}}]{, }
+\item[{\char`\"{}}]{S\+I\+G\+N\+AL = {\ttfamily LimeReceiveSamplesLarge(~N,~CH)~-\/~receive~N~{\bf samples}~from~Rx~channel~CH.\textbackslash{}n\textbackslash{}CH~parameter~is~optional}, }
+\item[{valid values are 0 and 1\char`\"{}}]{}
+\end{DoxyParamCaption}
+)}\label{LimeSuite_8cc_a633f4bc3f55a3467061ce674972e4fcd}
+
+
+Definition at line {\bf 270} of file {\bf Lime\+Suite.\+cc}.
+
+
+
+References {\bf args}, {\bf lms\+\_\+stream\+\_\+t\+::fifo\+Size}, {\bf i}, {\bf L\+M\+S\+\_\+\+Recv\+Stream()}, {\bf max\+Ch\+Cnt}, {\bf meta}, {\bf scale\+Factor}, {\bf timeout\+\_\+ms}, and {\bf val}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{db/d92/LimeSuite_8cc_a633f4bc3f55a3467061ce674972e4fcd_cgraph}
+\end{center}
+\end{figure}
+
+
+\index{Lime\+Suite.\+cc@{Lime\+Suite.\+cc}!D\+E\+F\+U\+N\+\_\+\+D\+LD@{D\+E\+F\+U\+N\+\_\+\+D\+LD}}
+\index{D\+E\+F\+U\+N\+\_\+\+D\+LD@{D\+E\+F\+U\+N\+\_\+\+D\+LD}!Lime\+Suite.\+cc@{Lime\+Suite.\+cc}}
+\paragraph[{D\+E\+F\+U\+N\+\_\+\+D\+L\+D(\+Lime\+Transmit\+Samples, args,,""Lime\+Transmit\+Samples( S\+I\+G\+N\+A\+L, C\+H) -\/ sends normalized complex S\+I\+G\+N\+A\+L to Tx cahnnel C\+H\textbackslash{}n\textbackslash{}
+\+C\+H parameter is optional, valid values are 0 and 1"")}]{\setlength{\rightskip}{0pt plus 5cm}D\+E\+F\+U\+N\+\_\+\+D\+LD (
+\begin{DoxyParamCaption}
+\item[{Lime\+Transmit\+Samples}]{, }
+\item[{{\bf args}}]{, }
+\item[{\char`\"{}Lime\+Transmit\+Samples( S\+I\+G\+N\+AL, CH) -\/ sends normalized complex S\+I\+G\+N\+AL to Tx cahnnel C\+H\textbackslash{}n\textbackslash{}\+CH parameter is}]{optional, }
+\item[{valid values are 0 and 1\char`\"{}}]{}
+\end{DoxyParamCaption}
+)}\label{LimeSuite_8cc_af256d4911ee06398fd4d3f90b45227c5}
+
+
+Definition at line {\bf 334} of file {\bf Lime\+Suite.\+cc}.
+
+
+
+References {\bf args}, {\bf i}, {\bf complex16\+\_\+t\+::i}, {\bf L\+M\+S\+\_\+\+Send\+Stream()}, {\bf max\+Ch\+Cnt}, {\bf meta}, {\bf complex16\+\_\+t\+::q}, {\bf scale\+Factor}, {\bf timeout\+\_\+ms}, {\bf lms\+\_\+stream\+\_\+meta\+\_\+t\+::timestamp}, and {\bf lms\+\_\+stream\+\_\+meta\+\_\+t\+::wait\+For\+Timestamp}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{db/d92/LimeSuite_8cc_af256d4911ee06398fd4d3f90b45227c5_cgraph}
+\end{center}
+\end{figure}
+
+
+\index{Lime\+Suite.\+cc@{Lime\+Suite.\+cc}!D\+E\+F\+U\+N\+\_\+\+D\+LD@{D\+E\+F\+U\+N\+\_\+\+D\+LD}}
+\index{D\+E\+F\+U\+N\+\_\+\+D\+LD@{D\+E\+F\+U\+N\+\_\+\+D\+LD}!Lime\+Suite.\+cc@{Lime\+Suite.\+cc}}
+\paragraph[{D\+E\+F\+U\+N\+\_\+\+D\+L\+D(\+Lime\+Loop\+W\+F\+M\+Start, args,,""Lime\+Loop\+W\+F\+M\+Start(\+S\+I\+G\+N\+A\+L) -\/ upload S\+I\+G\+N\+A\+L to device R\+A\+M for repeated transmitting"")}]{\setlength{\rightskip}{0pt plus 5cm}D\+E\+F\+U\+N\+\_\+\+D\+LD (
+\begin{DoxyParamCaption}
+\item[{{\bf Lime\+Loop\+W\+F\+M\+Start}}]{, }
+\item[{{\bf args}}]{, }
+\item[{\char`\"{}Lime\+Loop\+W\+F\+M\+Start(S\+I\+G\+N\+AL) -\/ upload S\+I\+G\+N\+AL to {\bf device} {\bf R\+AM} for repeated transmitting\char`\"{}}]{}
+\end{DoxyParamCaption}
+)}\label{LimeSuite_8cc_ab4d4f98a87a4940ae5b5b0b36335ac6e}
+
+
+Definition at line {\bf 393} of file {\bf Lime\+Suite.\+cc}.
+
+
+
+References {\bf args}, {\bf ch\+Count}, {\bf i}, {\bf complex16\+\_\+t\+::i}, {\bf L\+M\+S\+\_\+\+Enable\+Tx\+W\+F\+M()}, {\bf L\+M\+S\+\_\+\+Upload\+W\+F\+M()}, {\bf lms\+Dev}, {\bf complex16\+\_\+t\+::q}, {\bf timeout\+\_\+ms}, and {\bf W\+F\+Mrunning}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{db/d92/LimeSuite_8cc_ab4d4f98a87a4940ae5b5b0b36335ac6e_cgraph}
+\end{center}
+\end{figure}
+
+
+\index{Lime\+Suite.\+cc@{Lime\+Suite.\+cc}!D\+E\+F\+U\+N\+\_\+\+D\+LD@{D\+E\+F\+U\+N\+\_\+\+D\+LD}}
+\index{D\+E\+F\+U\+N\+\_\+\+D\+LD@{D\+E\+F\+U\+N\+\_\+\+D\+LD}!Lime\+Suite.\+cc@{Lime\+Suite.\+cc}}
+\paragraph[{D\+E\+F\+U\+N\+\_\+\+D\+L\+D(\+Lime\+Loop\+W\+F\+M\+Stop, args,,""Lime\+Tx\+Loop\+W\+F\+M\+Stop() -\/ stop transmitting samples from device R\+AM"")}]{\setlength{\rightskip}{0pt plus 5cm}D\+E\+F\+U\+N\+\_\+\+D\+LD (
+\begin{DoxyParamCaption}
+\item[{{\bf Lime\+Loop\+W\+F\+M\+Stop}}]{, }
+\item[{{\bf args}}]{, }
+\item[{\char`\"{}Lime\+Tx\+Loop\+W\+F\+M\+Stop() -\/ stop transmitting {\bf samples} from {\bf device} {\bf R\+AM}\char`\"{}}]{}
+\end{DoxyParamCaption}
+)}\label{LimeSuite_8cc_aa545319d6732de0db0e1386862df5619}
+
+
+Definition at line {\bf 441} of file {\bf Lime\+Suite.\+cc}.
+
+
+
+References {\bf L\+M\+S\+\_\+\+Enable\+Tx\+W\+F\+M()}, {\bf lms\+Dev}, and {\bf W\+F\+Mrunning}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{db/d92/LimeSuite_8cc_aa545319d6732de0db0e1386862df5619_cgraph}
+\end{center}
+\end{figure}
+
+
+\index{Lime\+Suite.\+cc@{Lime\+Suite.\+cc}!Free\+Resources@{Free\+Resources}}
+\index{Free\+Resources@{Free\+Resources}!Lime\+Suite.\+cc@{Lime\+Suite.\+cc}}
+\paragraph[{Free\+Resources()}]{\setlength{\rightskip}{0pt plus 5cm}{\bf void} Free\+Resources (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}\label{LimeSuite_8cc_a600901608dd432caf717ac1d4f09c6aa}
+
+
+Definition at line {\bf 455} of file {\bf Lime\+Suite.\+cc}.
+
+
+
+References {\bf L\+M\+S\+\_\+\+Close()}, {\bf L\+M\+S\+\_\+\+Enable\+Tx\+W\+F\+M()}, {\bf lms\+Dev}, {\bf rxbuffers}, {\bf Stop\+Stream()}, {\bf txbuffers}, and {\bf W\+F\+Mrunning}.
+
+
+
+Referenced by {\bf D\+E\+F\+U\+N\+\_\+\+D\+L\+D()}, and {\bf Resource\+Deallocator\+::$\sim$\+Resource\+Deallocator()}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{db/d92/LimeSuite_8cc_a600901608dd432caf717ac1d4f09c6aa_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=319pt]{db/d92/LimeSuite_8cc_a600901608dd432caf717ac1d4f09c6aa_icgraph}
+\end{center}
+\end{figure}
+
+
+\index{Lime\+Suite.\+cc@{Lime\+Suite.\+cc}!Print\+Device\+Info@{Print\+Device\+Info}}
+\index{Print\+Device\+Info@{Print\+Device\+Info}!Lime\+Suite.\+cc@{Lime\+Suite.\+cc}}
+\paragraph[{Print\+Device\+Info(lms\+\_\+device\+\_\+t $\ast$port)}]{\setlength{\rightskip}{0pt plus 5cm}{\bf void} Print\+Device\+Info (
+\begin{DoxyParamCaption}
+\item[{{\bf lms\+\_\+device\+\_\+t} $\ast$}]{port}
+\end{DoxyParamCaption}
+)}\label{LimeSuite_8cc_ab0d65a7462daf4ea21cb0a45e5060a38}
+
+
+Definition at line {\bf 47} of file {\bf Lime\+Suite.\+cc}.
+
+
+
+References {\bf lms\+\_\+dev\+\_\+info\+\_\+t\+::device\+Name}, {\bf lms\+\_\+dev\+\_\+info\+\_\+t\+::firmware\+Version}, {\bf lms\+\_\+dev\+\_\+info\+\_\+t\+::gateware\+Version}, {\bf lms\+\_\+dev\+\_\+info\+\_\+t\+::hardware\+Version}, {\bf info}, {\bf L\+M\+S\+\_\+\+Get\+Device\+Info()}, {\bf lms\+Dev}, and {\bf lms\+\_\+dev\+\_\+info\+\_\+t\+::protocol\+Version}.
+
+
+
+Referenced by {\bf D\+E\+F\+U\+N\+\_\+\+D\+L\+D()}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{db/d92/LimeSuite_8cc_ab0d65a7462daf4ea21cb0a45e5060a38_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=277pt]{db/d92/LimeSuite_8cc_ab0d65a7462daf4ea21cb0a45e5060a38_icgraph}
+\end{center}
+\end{figure}
+
+
+\index{Lime\+Suite.\+cc@{Lime\+Suite.\+cc}!Stop\+Stream@{Stop\+Stream}}
+\index{Stop\+Stream@{Stop\+Stream}!Lime\+Suite.\+cc@{Lime\+Suite.\+cc}}
+\paragraph[{Stop\+Stream()}]{\setlength{\rightskip}{0pt plus 5cm}{\bf void} Stop\+Stream (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}\label{LimeSuite_8cc_ae9fa7397859788c89a68774cf5b4e1f6}
+
+
+Definition at line {\bf 30} of file {\bf Lime\+Suite.\+cc}.
+
+
+
+References {\bf lms\+\_\+stream\+\_\+t\+::handle}, {\bf i}, {\bf L\+M\+S\+\_\+\+Destroy\+Stream()}, {\bf L\+M\+S\+\_\+\+Stop\+Stream()}, {\bf lms\+Dev}, and {\bf max\+Ch\+Cnt}.
+
+
+
+Referenced by {\bf D\+E\+F\+U\+N\+\_\+\+D\+L\+D()}, and {\bf Free\+Resources()}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{db/d92/LimeSuite_8cc_ae9fa7397859788c89a68774cf5b4e1f6_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{db/d92/LimeSuite_8cc_ae9fa7397859788c89a68774cf5b4e1f6_icgraph}
+\end{center}
+\end{figure}
+
+
+
+
+\subsubsection{Variable Documentation}
+\index{Lime\+Suite.\+cc@{Lime\+Suite.\+cc}!g\+Resources@{g\+Resources}}
+\index{g\+Resources@{g\+Resources}!Lime\+Suite.\+cc@{Lime\+Suite.\+cc}}
+\paragraph[{g\+Resources}]{\setlength{\rightskip}{0pt plus 5cm}{\bf Resource\+Deallocator} g\+Resources}\label{LimeSuite_8cc_a706c66226c59ad0b9600d04cd0b55eb4}
+
+
+Definition at line {\bf 487} of file {\bf Lime\+Suite.\+cc}.
+
+\index{Lime\+Suite.\+cc@{Lime\+Suite.\+cc}!lms\+Dev@{lms\+Dev}}
+\index{lms\+Dev@{lms\+Dev}!Lime\+Suite.\+cc@{Lime\+Suite.\+cc}}
+\paragraph[{lms\+Dev}]{\setlength{\rightskip}{0pt plus 5cm}{\bf lms\+\_\+device\+\_\+t}$\ast$ lms\+Dev = N\+U\+LL}\label{LimeSuite_8cc_a84e0218009f9f62d338a67e37c690032}
+
+
+Definition at line {\bf 16} of file {\bf Lime\+Suite.\+cc}.
+
+
+
+Referenced by {\bf D\+E\+F\+U\+N\+\_\+\+D\+L\+D()}, {\bf Free\+Resources()}, {\bf Print\+Device\+Info()}, and {\bf Stop\+Stream()}.
+
+\index{Lime\+Suite.\+cc@{Lime\+Suite.\+cc}!max\+Ch\+Cnt@{max\+Ch\+Cnt}}
+\index{max\+Ch\+Cnt@{max\+Ch\+Cnt}!Lime\+Suite.\+cc@{Lime\+Suite.\+cc}}
+\paragraph[{max\+Ch\+Cnt}]{\setlength{\rightskip}{0pt plus 5cm}const {\bf int} max\+Ch\+Cnt = 2}\label{LimeSuite_8cc_a43aa0299f3616688ee23658212705a56}
+
+
+Definition at line {\bf 13} of file {\bf Lime\+Suite.\+cc}.
+
+
+
+Referenced by {\bf D\+E\+F\+U\+N\+\_\+\+D\+L\+D()}, and {\bf Stop\+Stream()}.
+
+\index{Lime\+Suite.\+cc@{Lime\+Suite.\+cc}!rxbuffers@{rxbuffers}}
+\index{rxbuffers@{rxbuffers}!Lime\+Suite.\+cc@{Lime\+Suite.\+cc}}
+\paragraph[{rxbuffers}]{\setlength{\rightskip}{0pt plus 5cm}{\bf complex16\+\_\+t}$\ast$ rxbuffers = N\+U\+LL}\label{LimeSuite_8cc_a76d82923ef282f50de352ddfbf5ff91f}
+
+
+Definition at line {\bf 27} of file {\bf Lime\+Suite.\+cc}.
+
+
+
+Referenced by {\bf Free\+Resources()}.
+
+\index{Lime\+Suite.\+cc@{Lime\+Suite.\+cc}!scale\+Factor@{scale\+Factor}}
+\index{scale\+Factor@{scale\+Factor}!Lime\+Suite.\+cc@{Lime\+Suite.\+cc}}
+\paragraph[{scale\+Factor}]{\setlength{\rightskip}{0pt plus 5cm}const float scale\+Factor = 32768.\+0f}\label{LimeSuite_8cc_acff94a5577c5386eb23a1788be62463a}
+
+
+Definition at line {\bf 14} of file {\bf Lime\+Suite.\+cc}.
+
+
+
+Referenced by {\bf D\+E\+F\+U\+N\+\_\+\+D\+L\+D()}.
+
+\index{Lime\+Suite.\+cc@{Lime\+Suite.\+cc}!stream\+Rx@{stream\+Rx}}
+\index{stream\+Rx@{stream\+Rx}!Lime\+Suite.\+cc@{Lime\+Suite.\+cc}}
+\paragraph[{stream\+Rx}]{\setlength{\rightskip}{0pt plus 5cm}{\bf lms\+\_\+stream\+\_\+t} stream\+Rx[{\bf max\+Ch\+Cnt}]}\label{LimeSuite_8cc_a11d0794dde3138c5dbec2571fe3768f6}
+
+
+Definition at line {\bf 17} of file {\bf Lime\+Suite.\+cc}.
+
+\index{Lime\+Suite.\+cc@{Lime\+Suite.\+cc}!stream\+Tx@{stream\+Tx}}
+\index{stream\+Tx@{stream\+Tx}!Lime\+Suite.\+cc@{Lime\+Suite.\+cc}}
+\paragraph[{stream\+Tx}]{\setlength{\rightskip}{0pt plus 5cm}{\bf lms\+\_\+stream\+\_\+t} stream\+Tx[{\bf max\+Ch\+Cnt}]}\label{LimeSuite_8cc_aab7df223656caa0e951e16ffdadb212e}
+
+
+Definition at line {\bf 18} of file {\bf Lime\+Suite.\+cc}.
+
+\index{Lime\+Suite.\+cc@{Lime\+Suite.\+cc}!txbuffers@{txbuffers}}
+\index{txbuffers@{txbuffers}!Lime\+Suite.\+cc@{Lime\+Suite.\+cc}}
+\paragraph[{txbuffers}]{\setlength{\rightskip}{0pt plus 5cm}{\bf complex16\+\_\+t}$\ast$ txbuffers = N\+U\+LL}\label{LimeSuite_8cc_adf30cee7147b3c3ba5055bef95772989}
+
+
+Definition at line {\bf 28} of file {\bf Lime\+Suite.\+cc}.
+
+
+
+Referenced by {\bf Free\+Resources()}.
+
+\index{Lime\+Suite.\+cc@{Lime\+Suite.\+cc}!W\+F\+Mrunning@{W\+F\+Mrunning}}
+\index{W\+F\+Mrunning@{W\+F\+Mrunning}!Lime\+Suite.\+cc@{Lime\+Suite.\+cc}}
+\paragraph[{W\+F\+Mrunning}]{\setlength{\rightskip}{0pt plus 5cm}bool W\+F\+Mrunning = false}\label{LimeSuite_8cc_a91ea74fc7686fbc5a5ad25bc5c487343}
+
+
+Definition at line {\bf 26} of file {\bf Lime\+Suite.\+cc}.
+
+
+
+Referenced by {\bf D\+E\+F\+U\+N\+\_\+\+D\+L\+D()}, and {\bf Free\+Resources()}.
+

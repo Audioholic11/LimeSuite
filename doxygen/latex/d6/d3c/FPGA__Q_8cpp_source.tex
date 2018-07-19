@@ -1,0 +1,175 @@
+\subsection{F\+P\+G\+A\+\_\+\+Q.\+cpp}
+\label{FPGA__Q_8cpp_source}\index{/home/erik/prefix/default/src/limesuite-\/dev/src/\+F\+P\+G\+A\+\_\+common/\+F\+P\+G\+A\+\_\+\+Q.\+cpp@{/home/erik/prefix/default/src/limesuite-\/dev/src/\+F\+P\+G\+A\+\_\+common/\+F\+P\+G\+A\+\_\+\+Q.\+cpp}}
+
+\begin{DoxyCode}
+00001 \textcolor{preprocessor}{#include "FPGA_Q.h"}
+00002 \textcolor{preprocessor}{#include "IConnection.h"}
+00003 \textcolor{preprocessor}{#include "Logger.h"}
+00004 \textcolor{preprocessor}{#include "LMS64CProtocol.h"}
+00005 \textcolor{preprocessor}{#include <ciso646>}
+00006 \textcolor{preprocessor}{#include <vector>}
+00007 \textcolor{preprocessor}{#include <map>}
+00008 \textcolor{preprocessor}{#include <math.h>}
+00009 
+00010 \textcolor{keyword}{namespace }lime
+00011 \{
+00012 
+00013 FPGA_Q::FPGA_Q() : FPGA()\{\};
+00016 \textcolor{keywordtype}{int} FPGA_Q::SetInterfaceFreq(\textcolor{keywordtype}{double} txRate\_Hz, \textcolor{keywordtype}{double} rxRate\_Hz, \textcolor{keywordtype}{double} txPhase, \textcolor{keywordtype}{double} rxPhase, \textcolor{keywordtype}{int} 
+      channel)
+00017 \{
+00018     lime::FPGA::FPGA_PLL_clock clocks[2];
+00019 
+00020     \textcolor{keywordflow}{if} (channel == 2)
+00021     \{
+00022         clocks[0].index = 0;
+00023         clocks[0].outFrequency = rxRate\_Hz;
+00024         clocks[1].index = 1;
+00025         clocks[1].outFrequency = txRate\_Hz;
+00026         \textcolor{keywordflow}{return} SetPllFrequency(4, 30.72e6, clocks, 2);
+00027     \}
+00028 
+00029     \textcolor{keyword}{const} \textcolor{keywordtype}{int} pll\_ind = (channel == 1) ? 2 : 0;
+00030 
+00031     clocks[0].index = 0;
+00032     clocks[0].outFrequency = rxRate\_Hz;
+00033     clocks[1].index = 1;
+00034     clocks[1].outFrequency = rxRate\_Hz;
+00035     clocks[1].phaseShift_deg = rxPhase;
+00036     \textcolor{keywordflow}{if} (SetPllFrequency(pll\_ind+1, rxRate\_Hz, clocks, 2)!=0)
+00037         \textcolor{keywordflow}{return} -1;
+00038 
+00039     clocks[0].index = 0;
+00040     clocks[0].outFrequency = txRate\_Hz;
+00041     clocks[1].index = 1;
+00042     clocks[1].outFrequency = txRate\_Hz;
+00043     clocks[1].phaseShift_deg = txPhase;
+00044     \textcolor{keywordflow}{if} (SetPllFrequency(pll\_ind, txRate\_Hz, clocks, 2)!=0)
+00045         \textcolor{keywordflow}{return} -1;
+00046 
+00047     \textcolor{keywordflow}{return} 0;
+00048 \}
+00049 
+00052 \textcolor{comment}{/*}
+00053 \textcolor{comment}{int FPGA\_Q::SetInterfaceFreq(double txRate\_Hz, double rxRate\_Hz, int channel)}
+00054 \textcolor{comment}{\{}
+00055 \textcolor{comment}{    const int pll\_ind = (channel == 1) ? 2 : 0;}
+00056 \textcolor{comment}{    int status = 0;}
+00057 \textcolor{comment}{    uint32\_t reg20;}
+00058 \textcolor{comment}{    const double rxPhC1[] = \{ 91.08, 89.46 \};}
+00059 \textcolor{comment}{    const double rxPhC2[] = \{ -1 / 6e6, 1.24e-6 \};}
+00060 \textcolor{comment}{    const double txPhC1[] = \{ 89.75, 89.61 \};}
+00061 \textcolor{comment}{    const double txPhC2[] = \{ -3.0e-7, 2.71e-7 \};}
+00062 \textcolor{comment}{}
+00063 \textcolor{comment}{    const std::vector<uint32\_t> spiAddr = \{ 0x021, 0x022, 0x023, 0x024, 0x027, 0x02A,}
+00064 \textcolor{comment}{                                            0x400, 0x40C, 0x40B, 0x400, 0x40B, 0x400\};}
+00065 \textcolor{comment}{    const int bakRegCnt = spiAddr.size() - 4;}
+00066 \textcolor{comment}{    }
+00067 \textcolor{comment}{    std::vector<uint32\_t> dataWr;}
+00068 \textcolor{comment}{    dataWr.push\_back(uint32\_t(0x002F) << 16);}
+00069 \textcolor{comment}{    uint32\_t chipVersion=0;}
+00070 \textcolor{comment}{    connection->ReadLMS7002MSPI(dataWr.data(), &chipVersion, 1, channel);}
+00071 \textcolor{comment}{    dataWr.clear(); }
+00072 \textcolor{comment}{    //auto info = GetDeviceInfo();}
+00073 \textcolor{comment}{    bool phaseSearch = false;}
+00074 \textcolor{comment}{}
+00075 \textcolor{comment}{    std::vector<uint32\_t> dataRd;}
+00076 \textcolor{comment}{}
+00077 \textcolor{comment}{    if (phaseSearch)}
+00078 \textcolor{comment}{    \{}
+00079 \textcolor{comment}{        dataWr.resize(spiAddr.size());}
+00080 \textcolor{comment}{        dataRd.resize(spiAddr.size());}
+00081 \textcolor{comment}{        //backup registers}
+00082 \textcolor{comment}{        dataWr[0] = (uint32\_t(0x0020) << 16);}
+00083 \textcolor{comment}{        connection->ReadLMS7002MSPI(dataWr.data(), &reg20, 1, channel);}
+00084 \textcolor{comment}{}
+00085 \textcolor{comment}{        dataWr[0] = (1 << 31) | (uint32\_t(0x0020) << 16) | 0xFFFD; //msbit 1=SPI write}
+00086 \textcolor{comment}{        connection->WriteLMS7002MSPI(dataWr.data(), 1, channel);}
+00087 \textcolor{comment}{}
+00088 \textcolor{comment}{        for (int i = 0; i < bakRegCnt; ++i)}
+00089 \textcolor{comment}{            dataWr[i] = (spiAddr[i] << 16);}
+00090 \textcolor{comment}{        connection->ReadLMS7002MSPI(dataWr.data(),dataRd.data(), bakRegCnt, channel);}
+00091 \textcolor{comment}{    \}}
+00092 \textcolor{comment}{}
+00093 \textcolor{comment}{    if(rxRate\_Hz >= 5e6)}
+00094 \textcolor{comment}{    \{}
+00095 \textcolor{comment}{        if (phaseSearch)}
+00096 \textcolor{comment}{        \{}
+00097 \textcolor{comment}{            const std::vector<uint32\_t> spiData = \{ 0x0E9F, 0x07FF, 0x5550, 0xE4E4, 0xE4E4, 0x0086,}
+00098 \textcolor{comment}{                                                    0x028D, 0x00FF, 0x5555, 0x02CD, 0xAAAA, 0x02ED\};}
+00099 \textcolor{comment}{            //Load test config}
+00100 \textcolor{comment}{            const int setRegCnt = spiData.size();}
+00101 \textcolor{comment}{            for (int i = 0; i < setRegCnt; ++i)}
+00102 \textcolor{comment}{                dataWr[i] = (1 << 31) | (uint32\_t(spiAddr[i]) << 16) | spiData[i]; //msbit 1=SPI write}
+00103 \textcolor{comment}{            connection->WriteLMS7002MSPI(dataWr.data(), setRegCnt, channel);}
+00104 \textcolor{comment}{        \}}
+00105 \textcolor{comment}{        lime::FPGA::FPGA\_PLL\_clock clocks[2];}
+00106 \textcolor{comment}{        clocks[0].index = 0;}
+00107 \textcolor{comment}{        clocks[0].outFrequency = rxRate\_Hz;}
+00108 \textcolor{comment}{        clocks[1].index = 1;}
+00109 \textcolor{comment}{        clocks[1].outFrequency = rxRate\_Hz;}
+00110 \textcolor{comment}{        if (chipVersion == 0x3841)}
+00111 \textcolor{comment}{            clocks[1].phaseShift\_deg = rxPhC1[1] + rxPhC2[1] * rxRate\_Hz;}
+00112 \textcolor{comment}{        else}
+00113 \textcolor{comment}{            clocks[1].phaseShift\_deg = rxPhC1[0] + rxPhC2[0] * rxRate\_Hz;}
+00114 \textcolor{comment}{        if (phaseSearch)}
+00115 \textcolor{comment}{            clocks[1].findPhase = true;}
+00116 \textcolor{comment}{        status = SetPllFrequency(pll\_ind+1, rxRate\_Hz, clocks, 2);}
+00117 \textcolor{comment}{    \}}
+00118 \textcolor{comment}{    else}
+00119 \textcolor{comment}{        status = SetDirectClocking(pll\_ind+1);}
+00120 \textcolor{comment}{}
+00121 \textcolor{comment}{    if(txRate\_Hz >= 5e6)}
+00122 \textcolor{comment}{    \{}
+00123 \textcolor{comment}{        if (phaseSearch)}
+00124 \textcolor{comment}{        \{}
+00125 \textcolor{comment}{            const std::vector<uint32\_t> spiData = \{0x0E9F, 0x07FF, 0x5550, 0xE4E4, 0xE4E4, 0x0484\};}
+00126 \textcolor{comment}{            connection->WriteRegister(0x000A, 0x0000);}
+00127 \textcolor{comment}{            //Load test config}
+00128 \textcolor{comment}{            const int setRegCnt = spiData.size();}
+00129 \textcolor{comment}{            for (int i = 0; i < setRegCnt; ++i)}
+00130 \textcolor{comment}{                dataWr[i] = (1 << 31) | (uint32\_t(spiAddr[i]) << 16) | spiData[i]; //msbit 1=SPI write}
+00131 \textcolor{comment}{            connection->WriteLMS7002MSPI(dataWr.data(), setRegCnt, channel);}
+00132 \textcolor{comment}{        \}}
+00133 \textcolor{comment}{}
+00134 \textcolor{comment}{        lime::FPGA::FPGA\_PLL\_clock clocks[2];}
+00135 \textcolor{comment}{        clocks[0].index = 0;}
+00136 \textcolor{comment}{        clocks[0].outFrequency = txRate\_Hz;}
+00137 \textcolor{comment}{        clocks[0].phaseShift\_deg = 0;}
+00138 \textcolor{comment}{        clocks[1].index = 1;}
+00139 \textcolor{comment}{        clocks[1].outFrequency = txRate\_Hz;}
+00140 \textcolor{comment}{        if (chipVersion == 0x3841)}
+00141 \textcolor{comment}{            clocks[1].phaseShift\_deg = txPhC1[1] + txPhC2[1] * txRate\_Hz;}
+00142 \textcolor{comment}{        else}
+00143 \textcolor{comment}{            clocks[1].phaseShift\_deg = txPhC1[0] + txPhC2[0] * txRate\_Hz;}
+00144 \textcolor{comment}{}
+00145 \textcolor{comment}{        if (phaseSearch)}
+00146 \textcolor{comment}{        \{}
+00147 \textcolor{comment}{            clocks[1].findPhase = true;}
+00148 \textcolor{comment}{            connection->WriteRegister(0x000A, 0x0200);}
+00149 \textcolor{comment}{        \}}
+00150 \textcolor{comment}{        status = SetPllFrequency(pll\_ind, txRate\_Hz, clocks, 2);}
+00151 \textcolor{comment}{    \}}
+00152 \textcolor{comment}{    else}
+00153 \textcolor{comment}{        status = SetDirectClocking(pll\_ind);}
+00154 \textcolor{comment}{}
+00155 \textcolor{comment}{    if (phaseSearch)}
+00156 \textcolor{comment}{    \{}
+00157 \textcolor{comment}{        //Restore registers}
+00158 \textcolor{comment}{        for (int i = 0; i < bakRegCnt; ++i)}
+00159 \textcolor{comment}{            dataWr[i] = (1 << 31) | (uint32\_t(spiAddr[i]) << 16) | dataRd[i]; //msbit 1=SPI write}
+00160 \textcolor{comment}{        connection->WriteLMS7002MSPI(dataWr.data(), bakRegCnt, channel);}
+00161 \textcolor{comment}{        dataWr[0] = (1 << 31) | (uint32\_t(0x0020) << 16) | reg20; //msbit 1=SPI write}
+00162 \textcolor{comment}{        connection->WriteLMS7002MSPI(dataWr.data(), 1, channel);}
+00163 \textcolor{comment}{        connection->WriteRegister(0x000A, 0);}
+00164 \textcolor{comment}{    \}}
+00165 \textcolor{comment}{    return status;}
+00166 \textcolor{comment}{\}}
+00167 \textcolor{comment}{}
+00168 \textcolor{comment}{}
+00169 \textcolor{comment}{*/}
+00170 
+00171 
+00172 
+00173 \} \textcolor{comment}{//namespace lime}
+\end{DoxyCode}

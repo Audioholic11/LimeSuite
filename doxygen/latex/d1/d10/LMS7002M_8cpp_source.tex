@@ -1,0 +1,2637 @@
+\subsection{L\+M\+S7002\+M.\+cpp}
+\label{LMS7002M_8cpp_source}\index{/home/erik/prefix/default/src/limesuite-\/dev/src/lms7002m/\+L\+M\+S7002\+M.\+cpp@{/home/erik/prefix/default/src/limesuite-\/dev/src/lms7002m/\+L\+M\+S7002\+M.\+cpp}}
+
+\begin{DoxyCode}
+00001 
+00007 \textcolor{preprocessor}{#define \_USE\_MATH\_DEFINES}
+00008 \textcolor{preprocessor}{#include <cmath>}
+00009 \textcolor{preprocessor}{#include <ciso646>}
+00010 
+00011 \textcolor{preprocessor}{#include "LMS7002M.h"}
+00012 \textcolor{preprocessor}{#include <stdio.h>}
+00013 \textcolor{preprocessor}{#include <set>}
+00014 \textcolor{preprocessor}{#include "IConnection.h"}
+00015 \textcolor{preprocessor}{#include "INI.h"}
+00016 \textcolor{preprocessor}{#include <cmath>}
+00017 \textcolor{preprocessor}{#include <iostream>}
+00018 \textcolor{preprocessor}{#include <fstream>}
+00019 \textcolor{preprocessor}{#include <algorithm>}
+00020 \textcolor{preprocessor}{#include "LMS7002M_RegistersMap.h"}
+00021 \textcolor{preprocessor}{#include <math.h>}
+00022 \textcolor{preprocessor}{#include <assert.h>}
+00023 \textcolor{preprocessor}{#include <chrono>}
+00024 \textcolor{preprocessor}{#include <thread>}
+00025 \textcolor{preprocessor}{#include "Logger.h"}
+00026 \textcolor{preprocessor}{#include "mcu_programs.h"}
+00027 
+00028 \textcolor{preprocessor}{#include "MCU_BD.h"}
+00029 
+00030 \textcolor{keyword}{using namespace }std;
+00031 \textcolor{keyword}{using namespace }lime;
+00032 
+00033 \textcolor{preprocessor}{#include "MCU_BD.h"}
+00034 
+00035 float_type LMS7002M::gVCO\_frequency\_table[3][2] = \{ \{ 3800e6, 5222e6 \}, \{ 4961e6, 6754e6 \}, \{6306e6, 7714e6
+      \} \};
+00036 float_type LMS7002M::gCGEN\_VCO\_frequencies[2] = \{1930e6, 2940e6\};
+00037 
+00039 \textcolor{keyword}{extern} std::vector<const LMS7Parameter*> LMS7parameterList;
+00040 
+00041 \textcolor{comment}{//module addresses needs to be sorted in ascending order}
+00042 \textcolor{keyword}{const} uint16\_t LMS7002M::readOnlyRegisters[] =      \{ 0x002F, 0x008C, 0x00A8, 0x00A9, 0x00AA, 0x00AB, 
+      0x00AC, 0x0123, 0x0209, 0x020A, 0x020B, 0x040E, 0x040F \};
+00043 \textcolor{keyword}{const} uint16\_t LMS7002M::readOnlyRegistersMasks[] = \{ 0x0000, 0x0FFF, 0x007F, 0x0000, 0x0000, 0x0000, 
+      0x0000, 0x003F, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000 \};
+00044 
+00049 \textcolor{keywordtype}{void} LMS7002M::Log(\textcolor{keyword}{const} \textcolor{keywordtype}{char}* text, LogType type)
+00050 \{
+00051     \textcolor{keywordflow}{switch}(type)
+00052     \{
+00053     \textcolor{keywordflow}{case} LOG\_INFO:
+00054         lime::info(text);
+00055         \textcolor{keywordflow}{if}(log\_callback)
+00056             log\_callback(text, type);
+00057         \textcolor{keywordflow}{break};
+00058     \textcolor{keywordflow}{case} LOG\_WARNING:
+00059         lime::warning(text);
+00060         \textcolor{keywordflow}{if}(log\_callback)
+00061             log\_callback(text, type);
+00062         \textcolor{keywordflow}{break};
+00063     \textcolor{keywordflow}{case} LOG\_ERROR:
+00064         lime::error(text);
+00065         \textcolor{keywordflow}{if}(log\_callback)
+00066             log\_callback(text, type);
+00067         \textcolor{keywordflow}{break};
+00068     \textcolor{keywordflow}{case} LOG\_DATA:
+00069         lime::debug(text);
+00070         \textcolor{keywordflow}{if}(log\_callback)
+00071             log\_callback(text, type);
+00072         \textcolor{keywordflow}{break};
+00073     \}
+00074 \}
+00075 
+00076 \textcolor{comment}{//Compatibility for vasprintf under MSVC}
+00077 \textcolor{preprocessor}{#ifdef \_MSC\_VER}
+00078 \textcolor{keywordtype}{int} vasprintf(\textcolor{keywordtype}{char} **strp, \textcolor{keyword}{const} \textcolor{keywordtype}{char} *fmt, va\_list ap)
+00079 \{
+00080     \textcolor{keywordtype}{int} r = \_vscprintf(fmt, ap);
+00081     \textcolor{keywordflow}{if} (r < 0) \textcolor{keywordflow}{return} r;
+00082     *strp = (\textcolor{keywordtype}{char} *)malloc(r+1);
+00083     \textcolor{keywordflow}{return} vsprintf\_s(*strp, r+1, fmt, ap);
+00084 \}
+00085 \textcolor{preprocessor}{#endif}
+00086 
+00087 \textcolor{keywordtype}{void} LMS7002M::Log(LogType type, \textcolor{keyword}{const} \textcolor{keywordtype}{char} *format, va\_list argList)
+00088 \{
+00089     \textcolor{keywordtype}{char} *message = NULL;
+00090     \textcolor{keywordflow}{if} (vasprintf(&message, format, argList) != -1)
+00091     \{
+00092         Log(message, type);
+00093         free(message);
+00094     \}
+00095 \}
+00096 
+00099 \textcolor{keywordtype}{void} LMS7002M::SetConnection(IConnection* port, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} devIndex)
+00100 \{
+00101     controlPort = port;
+00102     mdevIndex = devIndex;
+00103 
+00104     \textcolor{keywordflow}{if} (controlPort != \textcolor{keyword}{nullptr})
+00105     \{
+00106         \textcolor{keywordtype}{unsigned} byte\_array\_size = 0;
+00107         \textcolor{keywordflow}{if} (controlPort->IsOpen())
+00108         \{
+00109             \textcolor{keywordtype}{unsigned} chipRev = this->Get_SPI_Reg_bits(LMS7_MASK, \textcolor{keyword}{true});
+00110             \textcolor{keywordflow}{if} (chipRev >= 1)
+00111                 byte\_array\_size = 1024 * 16;
+00112             \textcolor{keywordflow}{else}
+00113                 byte\_array\_size = 1024 * 8;
+00114         \}
+00115         mcuControl->Initialize(port, mdevIndex, byte\_array\_size);
+00116     \}
+00117 \}
+00118 
+00122 LMS7002M::LMS7002M() :
+00123     useCache(0),
+00124     mRegistersMap(new LMS7002M_RegistersMap()),
+00125     controlPort(nullptr),
+00126     mdevIndex(0),
+00127     mSelfCalDepth(0),
+00128     \_cachedRefClockRate(30.72e6)
+00129 \{
+00130     mCalibrationByMCU = \textcolor{keyword}{true};
+00131     opt_gain_tbb[0] = -1;
+00132     opt_gain_tbb[1] = -1;
+00133     \textcolor{comment}{//memory intervals for registers tests and calibration algorithms}
+00134     MemorySectionAddresses[LimeLight][0] = 0x0020;
+00135     MemorySectionAddresses[LimeLight][1] = 0x002F;
+00136     MemorySectionAddresses[EN_DIR][0] = 0x0081;
+00137     MemorySectionAddresses[EN_DIR][1] = 0x0081;
+00138     MemorySectionAddresses[AFE][0] = 0x0082;
+00139     MemorySectionAddresses[AFE][1] = 0x0082;
+00140     MemorySectionAddresses[BIAS][0] = 0x0084;
+00141     MemorySectionAddresses[BIAS][1] = 0x0084;
+00142     MemorySectionAddresses[XBUF][0] = 0x0085;
+00143     MemorySectionAddresses[XBUF][1] = 0x0085;
+00144     MemorySectionAddresses[CGEN][0] = 0x0086;
+00145     MemorySectionAddresses[CGEN][1] = 0x008C;
+00146     MemorySectionAddresses[LDO][0] = 0x0092;
+00147     MemorySectionAddresses[LDO][1] = 0x00A7;
+00148     MemorySectionAddresses[BIST][0] = 0x00A8;
+00149     MemorySectionAddresses[BIST][1] = 0x00AC;
+00150     MemorySectionAddresses[CDS][0] = 0x00AD;
+00151     MemorySectionAddresses[CDS][1] = 0x00AE;
+00152     MemorySectionAddresses[TRF][0] = 0x0100;
+00153     MemorySectionAddresses[TRF][1] = 0x0104;
+00154     MemorySectionAddresses[TBB][0] = 0x0105;
+00155     MemorySectionAddresses[TBB][1] = 0x010B;
+00156     MemorySectionAddresses[RFE][0] = 0x010C;
+00157     MemorySectionAddresses[RFE][1] = 0x0114;
+00158     MemorySectionAddresses[RBB][0] = 0x0115;
+00159     MemorySectionAddresses[RBB][1] = 0x011A;
+00160     MemorySectionAddresses[SX][0] = 0x011C;
+00161     MemorySectionAddresses[SX][1] = 0x0124;
+00162     MemorySectionAddresses[TRX_GAIN][0] = 0x0125;
+00163     MemorySectionAddresses[TRX_GAIN][1] = 0x0126;
+00164     MemorySectionAddresses[TxTSP][0] = 0x0200;
+00165     MemorySectionAddresses[TxTSP][1] = 0x020C;
+00166     MemorySectionAddresses[TxNCO][0] = 0x0240;
+00167     MemorySectionAddresses[TxNCO][1] = 0x0261;
+00168     MemorySectionAddresses[TxGFIR1][0] = 0x0280;
+00169     MemorySectionAddresses[TxGFIR1][1] = 0x02A7;
+00170     MemorySectionAddresses[TxGFIR2][0] = 0x02C0;
+00171     MemorySectionAddresses[TxGFIR2][1] = 0x02E7;
+00172     MemorySectionAddresses[TxGFIR3a][0] = 0x0300;
+00173     MemorySectionAddresses[TxGFIR3a][1] = 0x0327;
+00174     MemorySectionAddresses[TxGFIR3b][0] = 0x0340;
+00175     MemorySectionAddresses[TxGFIR3b][1] = 0x0367;
+00176     MemorySectionAddresses[TxGFIR3c][0] = 0x0380;
+00177     MemorySectionAddresses[TxGFIR3c][1] = 0x03A7;
+00178     MemorySectionAddresses[RxTSP][0] = 0x0400;
+00179     MemorySectionAddresses[RxTSP][1] = 0x040F;
+00180     MemorySectionAddresses[RxNCO][0] = 0x0440;
+00181     MemorySectionAddresses[RxNCO][1] = 0x0461;
+00182     MemorySectionAddresses[RxGFIR1][0] = 0x0480;
+00183     MemorySectionAddresses[RxGFIR1][1] = 0x04A7;
+00184     MemorySectionAddresses[RxGFIR2][0] = 0x04C0;
+00185     MemorySectionAddresses[RxGFIR2][1] = 0x04E7;
+00186     MemorySectionAddresses[RxGFIR3a][0] = 0x0500;
+00187     MemorySectionAddresses[RxGFIR3a][1] = 0x0527;
+00188     MemorySectionAddresses[RxGFIR3b][0] = 0x0540;
+00189     MemorySectionAddresses[RxGFIR3b][1] = 0x0567;
+00190     MemorySectionAddresses[RxGFIR3c][0] = 0x0580;
+00191     MemorySectionAddresses[RxGFIR3c][1] = 0x05A7;
+00192     MemorySectionAddresses[RSSI_DC_CALIBRATION][0] = 0x05C0;
+00193     MemorySectionAddresses[RSSI_DC_CALIBRATION][1] = 0x05CC;
+00194     MemorySectionAddresses[RSSI_PDET_TEMP_CONFIG][0] = 0x0600;
+00195     MemorySectionAddresses[RSSI_PDET_TEMP_CONFIG][1] = 0x0606;
+00196     MemorySectionAddresses[RSSI_DC_CONFIG][0] = 0x0640;
+00197     MemorySectionAddresses[RSSI_DC_CONFIG][1] = 0x0641;
+00198 
+00199     mRegistersMap->InitializeDefaultValues(LMS7parameterList);
+00200     mcuControl = \textcolor{keyword}{new} MCU_BD();
+00201     mcuControl->Initialize(\textcolor{keyword}{nullptr});
+00202 \}
+00203 
+00204 LMS7002M::~LMS7002M()
+00205 \{
+00206     \textcolor{keyword}{delete} mcuControl;
+00207     \textcolor{keyword}{delete} mRegistersMap;
+00208 \}
+00209 
+00210 \textcolor{keywordtype}{void} LMS7002M::SetActiveChannel(\textcolor{keyword}{const} Channel ch)
+00211 \{
+00212     \textcolor{keywordflow}{if} (ch == this->GetActiveChannel(\textcolor{keyword}{false})) \textcolor{keywordflow}{return};
+00213     this->Modify_SPI_Reg_bits(LMS7param(MAC), \textcolor{keywordtype}{int}(ch));
+00214 \}
+00215 
+00216 LMS7002M::Channel LMS7002M::GetActiveChannel(\textcolor{keywordtype}{bool} fromChip)
+00217 \{
+00218     \textcolor{keyword}{auto} ch = Get_SPI_Reg_bits(LMS7param(MAC), fromChip);
+00219     \textcolor{keywordflow}{return} Channel(ch);
+00220 \}
+00221 
+00222 \textcolor{keywordtype}{size\_t} LMS7002M::GetActiveChannelIndex(\textcolor{keywordtype}{bool} fromChip)
+00223 \{
+00224     \textcolor{keywordflow}{switch} (this->GetActiveChannel(fromChip))
+00225     \{
+00226     \textcolor{keywordflow}{case} ChB: \textcolor{keywordflow}{return} mdevIndex*2 + 1;
+00227     \textcolor{keywordflow}{default}: \textcolor{keywordflow}{return} mdevIndex*2 + 0;
+00228     \}
+00229 \}
+00230 
+00231 \textcolor{keywordtype}{int} LMS7002M::EnableChannel(\textcolor{keyword}{const} \textcolor{keywordtype}{bool} isTx, \textcolor{keyword}{const} \textcolor{keywordtype}{bool} enable)
+00232 \{
+00233     Channel ch = this->GetActiveChannel();
+00234 
+00235     \textcolor{comment}{//--- LML ---}
+00236     \textcolor{keywordflow}{if} (ch == ChA)
+00237     \{
+00238         \textcolor{keywordflow}{if} (isTx) this->Modify_SPI_Reg_bits(LMS7param(TXEN_A), enable?1:0);
+00239         \textcolor{keywordflow}{else}      this->Modify_SPI_Reg_bits(LMS7param(RXEN_A), enable?1:0);
+00240     \}
+00241     \textcolor{keywordflow}{else}
+00242     \{
+00243         \textcolor{keywordflow}{if} (isTx) this->Modify_SPI_Reg_bits(LMS7param(TXEN_B), enable?1:0);
+00244         \textcolor{keywordflow}{else}      this->Modify_SPI_Reg_bits(LMS7param(RXEN_B), enable?1:0);
+00245     \}
+00246 
+00247     \textcolor{comment}{//--- ADC/DAC ---}
+00248     Modify_SPI_Reg_bits(LMS7param(EN_DIR_AFE), 1);
+00249 
+00250     \textcolor{keywordflow}{if} (!enable)
+00251     \{
+00252         \textcolor{keywordtype}{bool} disable;
+00253         \textcolor{keywordflow}{if} (ch == ChA)
+00254             disable = Get_SPI_Reg_bits(isTx ? LMS7_TXEN_B : LMS7_RXEN_B)==0;
+00255         \textcolor{keywordflow}{else}
+00256             disable = Get_SPI_Reg_bits(isTx ? LMS7_TXEN_A : LMS7_RXEN_A)==0;
+00257         Modify_SPI_Reg_bits(isTx ? LMS7_PD_TX_AFE1 : LMS7_PD_RX_AFE1, disable);
+00258     \}
+00259     \textcolor{keywordflow}{else}
+00260         Modify_SPI_Reg_bits(isTx ? LMS7_PD_TX_AFE1 : LMS7_PD_RX_AFE1, 0);
+00261 
+00262     \textcolor{keywordflow}{if} (ch == ChB)
+00263         Modify_SPI_Reg_bits(isTx ? LMS7_PD_TX_AFE2 : LMS7_PD_RX_AFE2, enable?0:1);
+00264 
+00265     \textcolor{keywordtype}{int} disabledChannels = (Get_SPI_Reg_bits(LMS7_PD_AFE.address,4,1)&0xF);\textcolor{comment}{//check if all channels are
+       disabled}
+00266     Modify_SPI_Reg_bits(LMS7param(EN_G_AFE),disabledChannels==0xF ? 0 : 1);
+00267     Modify_SPI_Reg_bits(LMS7param(PD_AFE), disabledChannels==0xF ? 1 : 0);
+00268 
+00269     \textcolor{comment}{//--- digital ---}
+00270     \textcolor{keywordflow}{if} (isTx)
+00271     \{
+00272         this->Modify_SPI_Reg_bits(LMS7param(EN_TXTSP), enable?1:0);
+00273         this->Modify_SPI_Reg_bits(LMS7param(ISINC_BYP_TXTSP), enable?0:1);
+00274         this->Modify_SPI_Reg_bits(LMS7param(GFIR3_BYP_TXTSP), 1);
+00275         this->Modify_SPI_Reg_bits(LMS7param(GFIR2_BYP_TXTSP), 1);
+00276         this->Modify_SPI_Reg_bits(LMS7param(GFIR1_BYP_TXTSP), 1);
+00277 
+00278         \textcolor{keywordflow}{if} (!enable)
+00279         \{
+00280             this->Modify_SPI_Reg_bits(LMS7param(CMIX_BYP_TXTSP), 1);
+00281             this->Modify_SPI_Reg_bits(LMS7param(DC_BYP_TXTSP), 1);
+00282             this->Modify_SPI_Reg_bits(LMS7param(GC_BYP_TXTSP), 1);
+00283             this->Modify_SPI_Reg_bits(LMS7param(PH_BYP_TXTSP), 1);
+00284         \}
+00285     \}
+00286     \textcolor{keywordflow}{else}
+00287     \{
+00288         this->Modify_SPI_Reg_bits(LMS7param(EN_RXTSP), enable?1:0);
+00289         this->Modify_SPI_Reg_bits(LMS7param(DC_BYP_RXTSP), enable?0:1);
+00290         this->Modify_SPI_Reg_bits(LMS7param(DCLOOP\_STOP), enable?0:1);
+00291         this->Modify_SPI_Reg_bits(LMS7param(AGC_MODE_RXTSP), 2); \textcolor{comment}{//bypass}
+00292         this->Modify_SPI_Reg_bits(LMS7param(AGC_BYP_RXTSP), 1);
+00293         this->Modify_SPI_Reg_bits(LMS7param(GFIR3_BYP_RXTSP), 1);
+00294         this->Modify_SPI_Reg_bits(LMS7param(GFIR2_BYP_RXTSP), 1);
+00295         this->Modify_SPI_Reg_bits(LMS7param(GFIR1_BYP_RXTSP), 1);
+00296         \textcolor{keywordflow}{if} (!enable)
+00297         \{
+00298             this->Modify_SPI_Reg_bits(LMS7param(CMIX_BYP_RXTSP), 1);
+00299             this->Modify_SPI_Reg_bits(LMS7param(GC_BYP_RXTSP), 1);
+00300             this->Modify_SPI_Reg_bits(LMS7param(PH_BYP_RXTSP), 1);
+00301         \}
+00302     \}
+00303 
+00304     \textcolor{comment}{//--- baseband ---}
+00305     \textcolor{keywordflow}{if} (isTx)
+00306     \{
+00307         this->Modify_SPI_Reg_bits(LMS7param(EN_DIR_TBB), 1);
+00308         this->Modify_SPI_Reg_bits(LMS7param(EN_G_TBB), enable?1:0);
+00309         this->Modify_SPI_Reg_bits(LMS7param(PD_LPFH_TBB), enable?0:1);
+00310         this->Modify_SPI_Reg_bits(LMS7param(PD_LPFIAMP_TBB), enable?0:1);
+00311     \}
+00312     \textcolor{keywordflow}{else}
+00313     \{
+00314         this->Modify_SPI_Reg_bits(LMS7param(EN_DIR_RBB), 1);
+00315         this->Modify_SPI_Reg_bits(LMS7param(EN_G_RBB), enable?1:0);
+00316         this->Modify_SPI_Reg_bits(LMS7param(PD_PGA_RBB), enable?0:1);
+00317         this->Modify_SPI_Reg_bits(LMS7param(PD_LPFL_RBB), enable?0:1);
+00318     \}
+00319 
+00320     \textcolor{comment}{//--- frontend ---}
+00321     \textcolor{keywordflow}{if} (isTx)
+00322     \{
+00323         this->Modify_SPI_Reg_bits(LMS7param(EN_DIR_TRF), 1);
+00324         this->Modify_SPI_Reg_bits(LMS7param(EN_G_TRF), enable?1:0);
+00325         this->Modify_SPI_Reg_bits(LMS7param(PD_TLOBUF_TRF), enable?0:1);
+00326         this->Modify_SPI_Reg_bits(LMS7param(PD_TXPAD_TRF), enable?0:1);
+00327     \}
+00328     \textcolor{keywordflow}{else}
+00329     \{
+00330         this->Modify_SPI_Reg_bits(LMS7param(EN_DIR_RFE), 1);
+00331         this->Modify_SPI_Reg_bits(LMS7param(EN_G_RFE), enable?1:0);
+00332         this->Modify_SPI_Reg_bits(LMS7param(PD_MXLOBUF_RFE), enable?0:1);
+00333         this->Modify_SPI_Reg_bits(LMS7param(PD_QGEN_RFE), enable?0:1);
+00334         this->Modify_SPI_Reg_bits(LMS7param(PD_TIA_RFE), enable?0:1);
+00335         this->Modify_SPI_Reg_bits(LMS7param(PD_LNA_RFE), enable?0:1);
+00336     \}
+00337 
+00338     \textcolor{comment}{//--- synthesizers ---}
+00339     \textcolor{keywordflow}{if} (isTx)
+00340     \{
+00341         this->SetActiveChannel(ChSXT);
+00342         this->Modify_SPI_Reg_bits(LMS7param(EN_DIR_SXRSXT), 1);
+00343         this->Modify_SPI_Reg_bits(LMS7param(EN_G), (disabledChannels&3) == 3?0:1);
+00344         \textcolor{keywordflow}{if} (ch == ChB) \textcolor{comment}{//enable LO to channel B}
+00345         \{
+00346             this->SetActiveChannel(ChA);
+00347             this->Modify_SPI_Reg_bits(LMS7param(EN_NEXTTX_TRF), enable?1:0);
+00348         \}
+00349     \}
+00350     \textcolor{keywordflow}{else}
+00351     \{
+00352         this->SetActiveChannel(ChSXR);
+00353         this->Modify_SPI_Reg_bits(LMS7param(EN_DIR_SXRSXT), 1);
+00354         this->Modify_SPI_Reg_bits(LMS7param(EN_G), (disabledChannels&0xC)==0xC?0:1);
+00355         \textcolor{keywordflow}{if} (ch == ChB) \textcolor{comment}{//enable LO to channel B}
+00356         \{
+00357             this->SetActiveChannel(ChA);
+00358             this->Modify_SPI_Reg_bits(LMS7param(EN_NEXTRX_RFE), enable?1:0);
+00359         \}
+00360     \}
+00361     this->SetActiveChannel(ch);
+00362 
+00363     \textcolor{keywordflow}{return} 0;
+00364 \}
+00365 
+00366 
+00370 \textcolor{keywordtype}{int} LMS7002M::ResetChip()
+00371 \{
+00372     \textcolor{keywordtype}{int} status = 0;
+00373     \textcolor{keywordflow}{if} (controlPort)
+00374         status = controlPort->DeviceReset(mdevIndex);
+00375     \textcolor{keywordflow}{else}
+00376         lime::warning(\textcolor{stringliteral}{"No device connected"});
+00377     mRegistersMap->InitializeDefaultValues(LMS7parameterList);
+00378     status |= Modify_SPI_Reg_bits(LMS7param(MIMO_SISO), 0); \textcolor{comment}{//enable B channel after reset}
+00379     \textcolor{keywordflow}{return} status;
+00380 \}
+00381 
+00382 \textcolor{keywordtype}{int} LMS7002M::SoftReset()
+00383 \{
+00384     \textcolor{keyword}{auto} reg\_0x0020 = this->SPI_read(0x0020, \textcolor{keyword}{true});
+00385     \textcolor{keyword}{auto} reg\_0x002E = this->SPI_read(0x002E, \textcolor{keyword}{true});
+00386     this->SPI_write(0x0020, 0x0);
+00387     this->SPI_write(0x0020, reg\_0x0020);
+00388     this->SPI_write(0x002E, reg\_0x002E);\textcolor{comment}{//must write}
+00389     \textcolor{keywordflow}{return} 0;
+00390 \}
+00391 
+00392 \textcolor{keywordtype}{int} LMS7002M::LoadConfigLegacyFile(\textcolor{keyword}{const} \textcolor{keywordtype}{char}* filename)
+00393 \{
+00394     ifstream f(filename);
+00395     \textcolor{keywordflow}{if} (f.good() == \textcolor{keyword}{false}) \textcolor{comment}{//file not found}
+00396     \{
+00397         f.close();
+00398         \textcolor{keywordflow}{return} ReportError(ENOENT, \textcolor{stringliteral}{"LoadConfigLegacyFile(%s) - file not found"}, filename);
+00399     \}
+00400     f.close();
+00401 
+00402     uint16\_t addr = 0;
+00403     uint16\_t value = 0;
+00404     Channel ch = this->GetActiveChannel(); \textcolor{comment}{//remember used channel}
+00405     \textcolor{keywordtype}{int} status;
+00406     \textcolor{keyword}{typedef} INI<string, string, string> ini\_t;
+00407     ini\_t parser(filename, \textcolor{keyword}{true});
+00408     \textcolor{keywordflow}{if} (parser.select(\textcolor{stringliteral}{"FILE INFO"}) == \textcolor{keyword}{false})
+00409         \textcolor{keywordflow}{return} ReportError(EINVAL, \textcolor{stringliteral}{"LoadConfigLegacyFile(%s) - invalid format, missing FILE INFO section"}, 
+      filename);
+00410 
+00411     \textcolor{keywordtype}{string} type = \textcolor{stringliteral}{""};
+00412     type = parser.get(\textcolor{stringliteral}{"type"}, \textcolor{stringliteral}{"undefined"});
+00413     stringstream ss;
+00414     \textcolor{keywordflow}{if} (type.find(\textcolor{stringliteral}{"LMS7002 configuration"}) == string::npos)
+00415     \{
+00416         ss << \textcolor{stringliteral}{"File "} << filename << \textcolor{stringliteral}{" not recognized"} << endl;
+00417         \textcolor{keywordflow}{return} ReportError(EINVAL, \textcolor{stringliteral}{"LoadConfigLegacyFile(%s) - invalid format, missing LMS7002
+       configuration"}, filename);
+00418     \}
+00419 
+00420     \textcolor{keywordtype}{int} fileVersion = 0;
+00421     fileVersion = parser.get(\textcolor{stringliteral}{"version"}, 0);
+00422 
+00423     vector<uint16\_t> addrToWrite;
+00424     vector<uint16\_t> dataToWrite;
+00425     \textcolor{keywordflow}{if} (fileVersion == 1)
+00426     \{
+00427         \textcolor{keywordflow}{if} (parser.select(\textcolor{stringliteral}{"Reference clocks"}))
+00428         \{
+00429             this->SetReferenceClk_SX(Rx, parser.get(\textcolor{stringliteral}{"SXR reference frequency MHz"}, 30.72) * 1e6);
+00430             this->SetReferenceClk_SX(Tx, parser.get(\textcolor{stringliteral}{"SXT reference frequency MHz"}, 30.72) * 1e6);
+00431         \}
+00432 
+00433         \textcolor{keywordflow}{if} (parser.select(\textcolor{stringliteral}{"LMS7002 registers ch.A"}) == \textcolor{keyword}{true})
+00434         \{
+00435             ini\_t::sectionsit\_t section = parser.sections.find(\textcolor{stringliteral}{"LMS7002 registers ch.A"});
+00436 
+00437             uint16\_t x0020\_value = 0;
+00438             this->SetActiveChannel(ChA); \textcolor{comment}{//select A channel}
+00439             \textcolor{keywordflow}{for} (ini\_t::keysit\_t pairs = section->second->begin(); pairs != section->second->end(); pairs++
+      )
+00440             \{
+00441                 sscanf(pairs->first.c\_str(), \textcolor{stringliteral}{"%hx"}, &addr);
+00442                 sscanf(pairs->second.c\_str(), \textcolor{stringliteral}{"%hx"}, &value);
+00443                 \textcolor{keywordflow}{if} (addr == LMS7param(MAC).address) \textcolor{comment}{//skip register containing channel selection}
+00444                 \{
+00445                     x0020\_value = value;
+00446                     \textcolor{keywordflow}{continue};
+00447                 \}
+00448                 addrToWrite.push\_back(addr);
+00449                 dataToWrite.push\_back(value);
+00450             \}
+00451             status = SPI_write_batch(&addrToWrite[0], &dataToWrite[0], addrToWrite.size(), \textcolor{keyword}{true});
+00452             \textcolor{keywordflow}{if} (status != 0 && controlPort != \textcolor{keyword}{nullptr})
+00453                 \textcolor{keywordflow}{return} status;
+00454 
+00455             \textcolor{comment}{//parse FCW or PHO}
+00456             \textcolor{keywordflow}{if} (parser.select(\textcolor{stringliteral}{"NCO Rx ch.A"}) == \textcolor{keyword}{true})
+00457             \{
+00458                 \textcolor{keywordtype}{char} varname[64];
+00459                 \textcolor{keywordtype}{int} mode = Get_SPI_Reg_bits(LMS7param(MODE_RX));
+00460                 \textcolor{keywordflow}{if} (mode == 0) \textcolor{comment}{//FCW}
+00461                 \{
+00462                     \textcolor{keywordflow}{for} (\textcolor{keywordtype}{int} i = 0; i < 16; ++i)
+00463                     \{
+00464                         sprintf(varname, \textcolor{stringliteral}{"FCW%02i"}, i);
+00465                         SetNCOFrequency(LMS7002M::Rx, i, parser.get(varname, 0.0));
+00466                     \}
+00467                 \}
+00468                 \textcolor{keywordflow}{else}
+00469                 \{
+00470                     \textcolor{keywordflow}{for} (\textcolor{keywordtype}{int} i = 0; i < 16; ++i)
+00471                     \{
+00472                         sprintf(varname, \textcolor{stringliteral}{"PHO%02i"}, i);
+00473                         SetNCOPhaseOffset(LMS7002M::Rx, i, parser.get(varname, 0.0));
+00474                     \}
+00475                 \}
+00476             \}
+00477             \textcolor{keywordflow}{if} (parser.select(\textcolor{stringliteral}{"NCO Tx ch.A"}) == \textcolor{keyword}{true})
+00478             \{
+00479                 \textcolor{keywordtype}{char} varname[64];
+00480                 \textcolor{keywordtype}{int} mode = Get_SPI_Reg_bits(LMS7param(MODE_TX));
+00481                 \textcolor{keywordflow}{if} (mode == 0) \textcolor{comment}{//FCW}
+00482                 \{
+00483                     \textcolor{keywordflow}{for} (\textcolor{keywordtype}{int} i = 0; i < 16; ++i)
+00484                     \{
+00485                         sprintf(varname, \textcolor{stringliteral}{"FCW%02i"}, i);
+00486                         SetNCOFrequency(LMS7002M::Tx, i, parser.get(varname, 0.0));
+00487                     \}
+00488                 \}
+00489                 \textcolor{keywordflow}{else}
+00490                 \{
+00491                     \textcolor{keywordflow}{for} (\textcolor{keywordtype}{int} i = 0; i < 16; ++i)
+00492                     \{
+00493                         sprintf(varname, \textcolor{stringliteral}{"PHO%02i"}, i);
+00494                         SetNCOPhaseOffset(LMS7002M::Tx, i, parser.get(varname, 0.0));
+00495                     \}
+00496                 \}
+00497             \}
+00498             status = SPI_write(0x0020, x0020\_value);
+00499             \textcolor{keywordflow}{if} (status != 0 && controlPort != \textcolor{keyword}{nullptr})
+00500                 \textcolor{keywordflow}{return} status;
+00501         \}
+00502 
+00503         this->SetActiveChannel(ChB);
+00504 
+00505         \textcolor{keywordflow}{if} (parser.select(\textcolor{stringliteral}{"LMS7002 registers ch.B"}) == \textcolor{keyword}{true})
+00506         \{
+00507             addrToWrite.clear();
+00508             dataToWrite.clear();
+00509             ini\_t::sectionsit\_t section = parser.sections.find(\textcolor{stringliteral}{"LMS7002 registers ch.B"});
+00510             \textcolor{keywordflow}{for} (ini\_t::keysit\_t pairs = section->second->begin(); pairs != section->second->end(); pairs++
+      )
+00511             \{
+00512                 sscanf(pairs->first.c\_str(), \textcolor{stringliteral}{"%hx"}, &addr);
+00513                 sscanf(pairs->second.c\_str(), \textcolor{stringliteral}{"%hx"}, &value);
+00514                 addrToWrite.push\_back(addr);
+00515                 dataToWrite.push\_back(value);
+00516             \}
+00517             this->SetActiveChannel(ChB); \textcolor{comment}{//select B channel}
+00518             status = SPI_write_batch(&addrToWrite[0], &dataToWrite[0], addrToWrite.size(), \textcolor{keyword}{true});
+00519             \textcolor{keywordflow}{if} (status != 0 && controlPort != \textcolor{keyword}{nullptr})
+00520                 \textcolor{keywordflow}{return} status;
+00521 
+00522             \textcolor{comment}{//parse FCW or PHO}
+00523             \textcolor{keywordflow}{if} (parser.select(\textcolor{stringliteral}{"NCO Rx ch.B"}) == \textcolor{keyword}{true})
+00524             \{
+00525                 \textcolor{keywordtype}{char} varname[64];
+00526                 \textcolor{keywordtype}{int} mode = Get_SPI_Reg_bits(LMS7param(MODE_RX));
+00527                 \textcolor{keywordflow}{if} (mode == 0) \textcolor{comment}{//FCW}
+00528                 \{
+00529                     \textcolor{keywordflow}{for} (\textcolor{keywordtype}{int} i = 0; i < 16; ++i)
+00530                     \{
+00531                         sprintf(varname, \textcolor{stringliteral}{"FCW%02i"}, i);
+00532                         SetNCOFrequency(LMS7002M::Rx, i, parser.get(varname, 0.0));
+00533                     \}
+00534                 \}
+00535                 \textcolor{keywordflow}{else}
+00536                 \{
+00537                     \textcolor{keywordflow}{for} (\textcolor{keywordtype}{int} i = 0; i < 16; ++i)
+00538                     \{
+00539                         sprintf(varname, \textcolor{stringliteral}{"PHO%02i"}, i);
+00540                         SetNCOPhaseOffset(LMS7002M::Rx, i, parser.get(varname, 0.0));
+00541                     \}
+00542                 \}
+00543             \}
+00544             \textcolor{keywordflow}{if} (parser.select(\textcolor{stringliteral}{"NCO Tx ch.A"}) == \textcolor{keyword}{true})
+00545             \{
+00546                 \textcolor{keywordtype}{char} varname[64];
+00547                 \textcolor{keywordtype}{int} mode = Get_SPI_Reg_bits(LMS7param(MODE_TX));
+00548                 \textcolor{keywordflow}{if} (mode == 0) \textcolor{comment}{//FCW}
+00549                 \{
+00550                     \textcolor{keywordflow}{for} (\textcolor{keywordtype}{int} i = 0; i < 16; ++i)
+00551                     \{
+00552                         sprintf(varname, \textcolor{stringliteral}{"FCW%02i"}, i);
+00553                         SetNCOFrequency(LMS7002M::Tx, i, parser.get(varname, 0.0));
+00554                     \}
+00555                 \}
+00556                 \textcolor{keywordflow}{else}
+00557                 \{
+00558                     \textcolor{keywordflow}{for} (\textcolor{keywordtype}{int} i = 0; i < 16; ++i)
+00559                     \{
+00560                         sprintf(varname, \textcolor{stringliteral}{"PHO%02i"}, i);
+00561                         SetNCOPhaseOffset(LMS7002M::Tx, i, parser.get(varname, 0.0));
+00562                     \}
+00563                 \}
+00564             \}
+00565         \}
+00566         this->SetActiveChannel(ch);
+00567         \textcolor{keywordflow}{return} 0;
+00568     \}
+00569     \textcolor{keywordflow}{return} ReportError(EINVAL, \textcolor{stringliteral}{"LoadConfigLegacyFile(%s) - invalid format"}, filename);
+00570 \}
+00571 
+00576 \textcolor{keywordtype}{int} LMS7002M::LoadConfig(\textcolor{keyword}{const} \textcolor{keywordtype}{char}* filename)
+00577 \{
+00578     ifstream f(filename);
+00579     \textcolor{keywordflow}{if} (f.good() == \textcolor{keyword}{false}) \textcolor{comment}{//file not found}
+00580     \{
+00581         f.close();
+00582         \textcolor{keywordflow}{return} ReportError(ENOENT, \textcolor{stringliteral}{"LoadConfig(%s) - file not found"}, filename);
+00583     \}
+00584     f.close();
+00585 
+00586     uint16\_t addr = 0;
+00587     uint16\_t value = 0;
+00588     Channel ch = this->GetActiveChannel(); \textcolor{comment}{//remember used channel}
+00589 
+00590     \textcolor{keywordtype}{int} status;
+00591     \textcolor{keyword}{typedef} INI<string, string, string> ini\_t;
+00592     ini\_t parser(filename, \textcolor{keyword}{true});
+00593     \textcolor{keywordflow}{if} (parser.select(\textcolor{stringliteral}{"file\_info"}) == \textcolor{keyword}{false})
+00594     \{
+00595         \textcolor{comment}{//try loading as legacy format}
+00596         status = LoadConfigLegacyFile(filename);
+00597         this->SetActiveChannel(ChA);
+00598         \textcolor{keywordflow}{return} status;
+00599     \}
+00600     \textcolor{keywordtype}{string} type = \textcolor{stringliteral}{""};
+00601     type = parser.get(\textcolor{stringliteral}{"type"}, \textcolor{stringliteral}{"undefined"});
+00602     stringstream ss;
+00603     \textcolor{keywordflow}{if} (type.find(\textcolor{stringliteral}{"lms7002m\_minimal\_config"}) == string::npos)
+00604     \{
+00605         ss << \textcolor{stringliteral}{"File "} << filename << \textcolor{stringliteral}{" not recognized"} << endl;
+00606         \textcolor{keywordflow}{return} ReportError(EINVAL, \textcolor{stringliteral}{"LoadConfig(%s) - invalid format, missing lms7002m\_minimal\_config"}, 
+      filename);
+00607     \}
+00608 
+00609     \textcolor{keywordtype}{int} fileVersion = 0;
+00610     fileVersion = parser.get(\textcolor{stringliteral}{"version"}, 0);
+00611 
+00612     vector<uint16\_t> addrToWrite;
+00613     vector<uint16\_t> dataToWrite;
+00614 
+00615     \textcolor{keywordflow}{if} (fileVersion == 1)
+00616     \{
+00617         \textcolor{keywordflow}{if}(parser.select(\textcolor{stringliteral}{"lms7002\_registers\_a"}) == \textcolor{keyword}{true})
+00618         \{
+00619             ini\_t::sectionsit\_t section = parser.sections.find(\textcolor{stringliteral}{"lms7002\_registers\_a"});
+00620 
+00621             uint16\_t x0020\_value = 0;
+00622             this->SetActiveChannel(ChA); \textcolor{comment}{//select A channel}
+00623             \textcolor{keywordflow}{for} (ini\_t::keysit\_t pairs = section->second->begin(); pairs != section->second->end(); pairs++
+      )
+00624             \{
+00625                 sscanf(pairs->first.c\_str(), \textcolor{stringliteral}{"%hx"}, &addr);
+00626                 sscanf(pairs->second.c\_str(), \textcolor{stringliteral}{"%hx"}, &value);
+00627                 \textcolor{keywordflow}{if} (addr == LMS7param(MAC).address) \textcolor{comment}{//skip register containing channel selection}
+00628                 \{
+00629                     x0020\_value = value;
+00630                     \textcolor{keywordflow}{continue};
+00631                 \}
+00632                 addrToWrite.push\_back(addr);
+00633                 dataToWrite.push\_back(value);
+00634             \}
+00635             status = SPI_write_batch(&addrToWrite[0], &dataToWrite[0], addrToWrite.size(), \textcolor{keyword}{true});
+00636             \textcolor{keywordflow}{if} (status != 0 && controlPort != \textcolor{keyword}{nullptr})
+00637                 \textcolor{keywordflow}{return} status;
+00638             status = SPI_write(0x0020, x0020\_value);
+00639             \textcolor{keywordflow}{if} (status != 0 && controlPort != \textcolor{keyword}{nullptr})
+00640                 \textcolor{keywordflow}{return} status;
+00641             this->SetActiveChannel(ChB);
+00642             \textcolor{keywordflow}{if} (status != 0 && controlPort != \textcolor{keyword}{nullptr})
+00643                 \textcolor{keywordflow}{return} status;
+00644         \}
+00645 
+00646         \textcolor{keywordflow}{if} (parser.select(\textcolor{stringliteral}{"lms7002\_registers\_b"}) == \textcolor{keyword}{true})
+00647         \{
+00648             addrToWrite.clear();
+00649             dataToWrite.clear();
+00650             ini\_t::sectionsit\_t section = parser.sections.find(\textcolor{stringliteral}{"lms7002\_registers\_b"});
+00651             \textcolor{keywordflow}{for} (ini\_t::keysit\_t pairs = section->second->begin(); pairs != section->second->end(); pairs++
+      )
+00652             \{
+00653                 sscanf(pairs->first.c\_str(), \textcolor{stringliteral}{"%hx"}, &addr);
+00654                 sscanf(pairs->second.c\_str(), \textcolor{stringliteral}{"%hx"}, &value);
+00655                 addrToWrite.push\_back(addr);
+00656                 dataToWrite.push\_back(value);
+00657             \}
+00658             this->SetActiveChannel(ChB); \textcolor{comment}{//select B channel}
+00659             status = SPI_write_batch(&addrToWrite[0], &dataToWrite[0], addrToWrite.size(), \textcolor{keyword}{true});
+00660             \textcolor{keywordflow}{if} (status != 0 && controlPort != \textcolor{keyword}{nullptr})
+00661                 \textcolor{keywordflow}{return} status;
+00662         \}
+00663         this->SetActiveChannel(ch);
+00664 
+00665         parser.select(\textcolor{stringliteral}{"reference\_clocks"});
+00666         this->SetReferenceClk_SX(Rx, parser.get(\textcolor{stringliteral}{"sxr\_ref\_clk\_mhz"}, 30.72) * 1e6);
+00667         this->SetReferenceClk_SX(Tx, parser.get(\textcolor{stringliteral}{"sxt\_ref\_clk\_mhz"}, 30.72) * 1e6);
+00668     \}
+00669 
+00670     this->SetActiveChannel(ChA);
+00671     \textcolor{keywordflow}{return} 0;
+00672 \}
+00673 
+00678 \textcolor{keywordtype}{int} LMS7002M::SaveConfig(\textcolor{keyword}{const} \textcolor{keywordtype}{char}* filename)
+00679 \{
+00680     ofstream fout;
+00681     fout.open(filename);
+00682     fout << \textcolor{stringliteral}{"[file\_info]"} << endl;
+00683     fout << \textcolor{stringliteral}{"type=lms7002m\_minimal\_config"} << endl;
+00684     fout << \textcolor{stringliteral}{"version=1"} << endl;
+00685 
+00686     \textcolor{keywordtype}{char} addr[80];
+00687     \textcolor{keywordtype}{char} value[80];
+00688 
+00689     Channel ch = this->GetActiveChannel();
+00690 
+00691     vector<uint16\_t> addrToRead;
+00692     \textcolor{keywordflow}{for} (uint8\_t i = 0; i < MEMORY_SECTIONS_COUNT; ++i)
+00693         \textcolor{keywordflow}{for} (uint16\_t addr = MemorySectionAddresses[i][0]; addr <= 
+      MemorySectionAddresses[i][1]; ++addr)
+00694             addrToRead.push\_back(addr);
+00695     vector<uint16\_t> dataReceived;
+00696     dataReceived.resize(addrToRead.size(), 0);
+00697 
+00698     fout << \textcolor{stringliteral}{"[lms7002\_registers\_a]"} << endl;
+00699     this->SetActiveChannel(ChA);
+00700     \textcolor{keywordflow}{for} (uint16\_t i = 0; i < addrToRead.size(); ++i)
+00701     \{
+00702         dataReceived[i] = Get_SPI_Reg_bits(addrToRead[i], 15, 0, \textcolor{keyword}{false});
+00703         sprintf(addr, \textcolor{stringliteral}{"0x%04X"}, addrToRead[i]);
+00704         sprintf(value, \textcolor{stringliteral}{"0x%04X"}, dataReceived[i]);
+00705         fout << addr << \textcolor{stringliteral}{"="} << value << endl;
+00706     \}
+00707 
+00708     fout << \textcolor{stringliteral}{"[lms7002\_registers\_b]"} << endl;
+00709     addrToRead.clear(); \textcolor{comment}{//add only B channel addresses}
+00710     \textcolor{keywordflow}{for} (uint8\_t i = 0; i < MEMORY_SECTIONS_COUNT; ++i)
+00711         \textcolor{keywordflow}{if} (i != RSSI_DC_CALIBRATION)
+00712             \textcolor{keywordflow}{for} (uint16\_t addr = MemorySectionAddresses[i][0]; addr <= 
+      MemorySectionAddresses[i][1]; ++addr)
+00713                 \textcolor{keywordflow}{if} (addr >= 0x0100)
+00714                     addrToRead.push\_back(addr);
+00715 
+00716     this->SetActiveChannel(ChB);
+00717     \textcolor{keywordflow}{for} (uint16\_t i = 0; i < addrToRead.size(); ++i)
+00718     \{
+00719         dataReceived[i] = Get_SPI_Reg_bits(addrToRead[i], 15, 0, \textcolor{keyword}{false});
+00720         sprintf(addr, \textcolor{stringliteral}{"0x%04X"}, addrToRead[i]);
+00721         sprintf(value, \textcolor{stringliteral}{"0x%04X"}, dataReceived[i]);
+00722         fout << addr << \textcolor{stringliteral}{"="} << value << endl;
+00723     \}
+00724 
+00725     this->SetActiveChannel(ch); \textcolor{comment}{//retore previously used channel}
+00726 
+00727     fout << \textcolor{stringliteral}{"[reference\_clocks]"} << endl;
+00728     fout << \textcolor{stringliteral}{"sxt\_ref\_clk\_mhz="} << this->GetReferenceClk_SX(Tx) / 1e6 << endl;
+00729     fout << \textcolor{stringliteral}{"sxr\_ref\_clk\_mhz="} << this->GetReferenceClk_SX(Rx) / 1e6 << endl;
+00730     fout.close();
+00731     \textcolor{keywordflow}{return} 0;
+00732 \}
+00733 
+00734 \textcolor{keywordtype}{int} LMS7002M::SetRBBPGA_dB(\textcolor{keyword}{const} float_type value)
+00735 \{
+00736     \textcolor{keywordtype}{int} g\_pga\_rbb = (int)(value + 12.5);
+00737     \textcolor{keywordflow}{if} (g\_pga\_rbb > 0x1f) g\_pga\_rbb = 0x1f;
+00738     \textcolor{keywordflow}{if} (g\_pga\_rbb < 0) g\_pga\_rbb = 0;
+00739     \textcolor{keywordtype}{int} ret = this->Modify_SPI_Reg_bits(LMS7param(G_PGA_RBB), g\_pga\_rbb);
+00740 
+00741     \textcolor{keywordtype}{int} rcc\_ctl\_pga\_rbb = (430.0*pow(0.65, (g\_pga\_rbb/10.0))-110.35)/20.4516 + 16;
+00742 
+00743     \textcolor{keywordtype}{int} c\_ctl\_pga\_rbb = 0;
+00744     \textcolor{keywordflow}{if} (0 <= g\_pga\_rbb && g\_pga\_rbb < 8) c\_ctl\_pga\_rbb = 3;
+00745     \textcolor{keywordflow}{if} (8 <= g\_pga\_rbb && g\_pga\_rbb < 13) c\_ctl\_pga\_rbb = 2;
+00746     \textcolor{keywordflow}{if} (13 <= g\_pga\_rbb && g\_pga\_rbb < 21) c\_ctl\_pga\_rbb = 1;
+00747     \textcolor{keywordflow}{if} (21 <= g\_pga\_rbb) c\_ctl\_pga\_rbb = 0;
+00748 
+00749     ret |= this->Modify_SPI_Reg_bits(LMS7param(RCC_CTL_PGA_RBB), rcc\_ctl\_pga\_rbb);
+00750     ret |= this->Modify_SPI_Reg_bits(LMS7param(C_CTL_PGA_RBB), c\_ctl\_pga\_rbb);
+00751     \textcolor{keywordflow}{return} ret;
+00752 \}
+00753 
+00754 float_type LMS7002M::GetRBBPGA_dB(\textcolor{keywordtype}{void})
+00755 \{
+00756     \textcolor{keyword}{auto} g\_pga\_rbb = this->Get_SPI_Reg_bits(LMS7param(G_PGA_RBB));
+00757     \textcolor{keywordflow}{return} g\_pga\_rbb - 12;
+00758 \}
+00759 
+00760 \textcolor{keywordtype}{int} LMS7002M::SetRFELNA_dB(\textcolor{keyword}{const} float_type value)
+00761 \{
+00762     \textcolor{keyword}{const} \textcolor{keywordtype}{double} gmax = 30;
+00763     \textcolor{keywordtype}{double} val = value - gmax;
+00764 
+00765     \textcolor{keywordtype}{int} g\_lna\_rfe = 0;
+00766     \textcolor{keywordflow}{if} (val >= 0) g\_lna\_rfe = 15;
+00767     \textcolor{keywordflow}{else} \textcolor{keywordflow}{if} (val >= -1) g\_lna\_rfe = 14;
+00768     \textcolor{keywordflow}{else} \textcolor{keywordflow}{if} (val >= -2) g\_lna\_rfe = 13;
+00769     \textcolor{keywordflow}{else} \textcolor{keywordflow}{if} (val >= -3) g\_lna\_rfe = 12;
+00770     \textcolor{keywordflow}{else} \textcolor{keywordflow}{if} (val >= -4) g\_lna\_rfe = 11;
+00771     \textcolor{keywordflow}{else} \textcolor{keywordflow}{if} (val >= -5) g\_lna\_rfe = 10;
+00772     \textcolor{keywordflow}{else} \textcolor{keywordflow}{if} (val >= -6) g\_lna\_rfe = 9;
+00773     \textcolor{keywordflow}{else} \textcolor{keywordflow}{if} (val >= -9) g\_lna\_rfe = 8;
+00774     \textcolor{keywordflow}{else} \textcolor{keywordflow}{if} (val >= -12) g\_lna\_rfe = 7;
+00775     \textcolor{keywordflow}{else} \textcolor{keywordflow}{if} (val >= -15) g\_lna\_rfe = 6;
+00776     \textcolor{keywordflow}{else} \textcolor{keywordflow}{if} (val >= -18) g\_lna\_rfe = 5;
+00777     \textcolor{keywordflow}{else} \textcolor{keywordflow}{if} (val >= -21) g\_lna\_rfe = 4;
+00778     \textcolor{keywordflow}{else} \textcolor{keywordflow}{if} (val >= -24) g\_lna\_rfe = 3;
+00779     \textcolor{keywordflow}{else} \textcolor{keywordflow}{if} (val >= -27) g\_lna\_rfe = 2;
+00780     \textcolor{keywordflow}{else} g\_lna\_rfe = 1;
+00781 
+00782     \textcolor{keywordflow}{return} this->Modify_SPI_Reg_bits(LMS7param(G_LNA_RFE), g\_lna\_rfe);
+00783 \}
+00784 
+00785 float_type LMS7002M::GetRFELNA_dB(\textcolor{keywordtype}{void})
+00786 \{
+00787     \textcolor{keyword}{const} \textcolor{keywordtype}{double} gmax = 30;
+00788     \textcolor{keyword}{auto} g\_lna\_rfe = this->Get_SPI_Reg_bits(LMS7param(G_LNA_RFE));
+00789     \textcolor{keywordflow}{switch} (g\_lna\_rfe)
+00790     \{
+00791     \textcolor{keywordflow}{case} 15: \textcolor{keywordflow}{return} gmax-0;
+00792     \textcolor{keywordflow}{case} 14: \textcolor{keywordflow}{return} gmax-1;
+00793     \textcolor{keywordflow}{case} 13: \textcolor{keywordflow}{return} gmax-2;
+00794     \textcolor{keywordflow}{case} 12: \textcolor{keywordflow}{return} gmax-3;
+00795     \textcolor{keywordflow}{case} 11: \textcolor{keywordflow}{return} gmax-4;
+00796     \textcolor{keywordflow}{case} 10: \textcolor{keywordflow}{return} gmax-5;
+00797     \textcolor{keywordflow}{case} 9: \textcolor{keywordflow}{return} gmax-6;
+00798     \textcolor{keywordflow}{case} 8: \textcolor{keywordflow}{return} gmax-9;
+00799     \textcolor{keywordflow}{case} 7: \textcolor{keywordflow}{return} gmax-12;
+00800     \textcolor{keywordflow}{case} 6: \textcolor{keywordflow}{return} gmax-15;
+00801     \textcolor{keywordflow}{case} 5: \textcolor{keywordflow}{return} gmax-18;
+00802     \textcolor{keywordflow}{case} 4: \textcolor{keywordflow}{return} gmax-21;
+00803     \textcolor{keywordflow}{case} 3: \textcolor{keywordflow}{return} gmax-24;
+00804     \textcolor{keywordflow}{case} 2: \textcolor{keywordflow}{return} gmax-27;
+00805     \textcolor{keywordflow}{case} 1: \textcolor{keywordflow}{return} gmax-30;
+00806     \}
+00807     \textcolor{keywordflow}{return} 0.0;
+00808 \}
+00809 
+00810 \textcolor{keywordtype}{int} LMS7002M::SetRFELoopbackLNA_dB(\textcolor{keyword}{const} float_type gain)
+00811 \{
+00812     \textcolor{keyword}{const} \textcolor{keywordtype}{double} gmax = 40;
+00813     \textcolor{keywordtype}{double} val = gain - gmax;
+00814 
+00815     \textcolor{keywordtype}{int} g\_rxloopb\_rfe = 0;
+00816     \textcolor{keywordflow}{if} (val >= 0) g\_rxloopb\_rfe = 15;
+00817     \textcolor{keywordflow}{else} \textcolor{keywordflow}{if} (val >= -0.5) g\_rxloopb\_rfe = 14;
+00818     \textcolor{keywordflow}{else} \textcolor{keywordflow}{if} (val >= -1) g\_rxloopb\_rfe = 13;
+00819     \textcolor{keywordflow}{else} \textcolor{keywordflow}{if} (val >= -1.6) g\_rxloopb\_rfe = 12;
+00820     \textcolor{keywordflow}{else} \textcolor{keywordflow}{if} (val >= -2.4) g\_rxloopb\_rfe = 11;
+00821     \textcolor{keywordflow}{else} \textcolor{keywordflow}{if} (val >= -3) g\_rxloopb\_rfe = 10;
+00822     \textcolor{keywordflow}{else} \textcolor{keywordflow}{if} (val >= -4) g\_rxloopb\_rfe = 9;
+00823     \textcolor{keywordflow}{else} \textcolor{keywordflow}{if} (val >= -5) g\_rxloopb\_rfe = 8;
+00824     \textcolor{keywordflow}{else} \textcolor{keywordflow}{if} (val >= -6.2) g\_rxloopb\_rfe = 7;
+00825     \textcolor{keywordflow}{else} \textcolor{keywordflow}{if} (val >= -7.5) g\_rxloopb\_rfe = 6;
+00826     \textcolor{keywordflow}{else} \textcolor{keywordflow}{if} (val >= -9) g\_rxloopb\_rfe = 5;
+00827     \textcolor{keywordflow}{else} \textcolor{keywordflow}{if} (val >= -11) g\_rxloopb\_rfe = 4;
+00828     \textcolor{keywordflow}{else} \textcolor{keywordflow}{if} (val >= -14) g\_rxloopb\_rfe = 3;
+00829     \textcolor{keywordflow}{else} \textcolor{keywordflow}{if} (val >= -17) g\_rxloopb\_rfe = 2;
+00830     \textcolor{keywordflow}{else} \textcolor{keywordflow}{if} (val >= -24) g\_rxloopb\_rfe = 1;
+00831     \textcolor{keywordflow}{else} g\_rxloopb\_rfe = 0;
+00832 
+00833     \textcolor{keywordflow}{return} this->Modify_SPI_Reg_bits(LMS7param(G_RXLOOPB_RFE), g\_rxloopb\_rfe);
+00834 \}
+00835 
+00836 float_type LMS7002M::GetRFELoopbackLNA_dB(\textcolor{keywordtype}{void})
+00837 \{
+00838     \textcolor{keyword}{const} \textcolor{keywordtype}{double} gmax = 40;
+00839     \textcolor{keyword}{auto} g\_rxloopb\_rfe = this->Get_SPI_Reg_bits(LMS7param(G_RXLOOPB_RFE));
+00840     \textcolor{keywordflow}{switch} (g\_rxloopb\_rfe)
+00841     \{
+00842     \textcolor{keywordflow}{case} 15: \textcolor{keywordflow}{return} gmax-0;
+00843     \textcolor{keywordflow}{case} 14: \textcolor{keywordflow}{return} gmax-0.5;
+00844     \textcolor{keywordflow}{case} 13: \textcolor{keywordflow}{return} gmax-1;
+00845     \textcolor{keywordflow}{case} 12: \textcolor{keywordflow}{return} gmax-1.6;
+00846     \textcolor{keywordflow}{case} 11: \textcolor{keywordflow}{return} gmax-2.4;
+00847     \textcolor{keywordflow}{case} 10: \textcolor{keywordflow}{return} gmax-3;
+00848     \textcolor{keywordflow}{case} 9: \textcolor{keywordflow}{return} gmax-4;
+00849     \textcolor{keywordflow}{case} 8: \textcolor{keywordflow}{return} gmax-5;
+00850     \textcolor{keywordflow}{case} 7: \textcolor{keywordflow}{return} gmax-6.2;
+00851     \textcolor{keywordflow}{case} 6: \textcolor{keywordflow}{return} gmax-7.5;
+00852     \textcolor{keywordflow}{case} 5: \textcolor{keywordflow}{return} gmax-9;
+00853     \textcolor{keywordflow}{case} 4: \textcolor{keywordflow}{return} gmax-11;
+00854     \textcolor{keywordflow}{case} 3: \textcolor{keywordflow}{return} gmax-14;
+00855     \textcolor{keywordflow}{case} 2: \textcolor{keywordflow}{return} gmax-17;
+00856     \textcolor{keywordflow}{case} 1: \textcolor{keywordflow}{return} gmax-24;
+00857     \}
+00858     \textcolor{keywordflow}{return} 0.0;
+00859 \}
+00860 
+00861 \textcolor{keywordtype}{int} LMS7002M::SetRFETIA_dB(\textcolor{keyword}{const} float_type value)
+00862 \{
+00863     \textcolor{keyword}{const} \textcolor{keywordtype}{double} gmax = 12;
+00864     \textcolor{keywordtype}{double} val = value - gmax;
+00865 
+00866     \textcolor{keywordtype}{int} g\_tia\_rfe = 0;
+00867     \textcolor{keywordflow}{if} (val >= 0) g\_tia\_rfe = 3;
+00868     \textcolor{keywordflow}{else} \textcolor{keywordflow}{if} (val >= -3) g\_tia\_rfe = 2;
+00869     \textcolor{keywordflow}{else} g\_tia\_rfe = 1;
+00870 
+00871     \textcolor{keywordflow}{return} this->Modify_SPI_Reg_bits(LMS7param(G_TIA_RFE), g\_tia\_rfe);
+00872 \}
+00873 
+00874 float_type LMS7002M::GetRFETIA_dB(\textcolor{keywordtype}{void})
+00875 \{
+00876     \textcolor{keyword}{const} \textcolor{keywordtype}{double} gmax = 12;
+00877     \textcolor{keyword}{auto} g\_tia\_rfe = this->Get_SPI_Reg_bits(LMS7param(G_TIA_RFE));
+00878     \textcolor{keywordflow}{switch} (g\_tia\_rfe)
+00879     \{
+00880     \textcolor{keywordflow}{case} 3: \textcolor{keywordflow}{return} gmax-0;
+00881     \textcolor{keywordflow}{case} 2: \textcolor{keywordflow}{return} gmax-3;
+00882     \textcolor{keywordflow}{case} 1: \textcolor{keywordflow}{return} gmax-12;
+00883     \}
+00884     \textcolor{keywordflow}{return} 0.0;
+00885 \}
+00886 
+00887 \textcolor{keywordtype}{int} LMS7002M::SetTRFPAD_dB(\textcolor{keyword}{const} float_type value)
+00888 \{
+00889     \textcolor{keyword}{const} \textcolor{keywordtype}{double} pmax = 52;
+00890     \textcolor{keywordtype}{int} loss\_int = (pmax-value)+0.5;
+00891 
+00892     \textcolor{comment}{//different scaling realm}
+00893     \textcolor{keywordflow}{if} (loss\_int > 10) loss\_int = (loss\_int+10)/2;
+00894 
+00895     \textcolor{comment}{//clip}
+00896     \textcolor{keywordflow}{if} (loss\_int > 31) loss\_int = 31;
+00897     \textcolor{keywordflow}{if} (loss\_int < 0) loss\_int = 0;
+00898 
+00899     \textcolor{keywordtype}{int} ret = 0;
+00900     ret |= this->Modify_SPI_Reg_bits(LMS7param(LOSS_LIN_TXPAD_TRF), loss\_int);
+00901     ret |= this->Modify_SPI_Reg_bits(LMS7param(LOSS_MAIN_TXPAD_TRF), loss\_int);
+00902     \textcolor{keywordflow}{return} ret;
+00903 \}
+00904 
+00905 float_type LMS7002M::GetTRFPAD_dB(\textcolor{keywordtype}{void})
+00906 \{
+00907     \textcolor{keyword}{const} \textcolor{keywordtype}{double} pmax = 52;
+00908     \textcolor{keyword}{auto} loss\_int = this->Get_SPI_Reg_bits(LMS7param(LOSS_LIN_TXPAD_TRF));
+00909     \textcolor{keywordflow}{if} (loss\_int > 10) \textcolor{keywordflow}{return} pmax-10-2*(loss\_int-10);
+00910     \textcolor{keywordflow}{return} pmax-loss\_int;
+00911 \}
+00912 
+00913 \textcolor{keywordtype}{int} LMS7002M::SetTRFLoopbackPAD_dB(\textcolor{keyword}{const} float_type gain)
+00914 \{
+00915     \textcolor{comment}{//there are 4 discrete gain values, use the midpoints}
+00916     \textcolor{keywordtype}{int} val = 0;
+00917     \textcolor{keywordflow}{if}      (gain >= (-1.4-0)/2)   val = 0;
+00918     \textcolor{keywordflow}{else} \textcolor{keywordflow}{if} (gain >= (-1.4-3.3)/2) val = 1;
+00919     \textcolor{keywordflow}{else} \textcolor{keywordflow}{if} (gain >= (-3.3-4.3)/2) val = 2;
+00920     \textcolor{keywordflow}{else}                           val = 3;
+00921 
+00922     \textcolor{keywordflow}{return} this->Modify_SPI_Reg_bits(LMS7param(L_LOOPB_TXPAD_TRF), val);
+00923 \}
+00924 
+00925 float_type LMS7002M::GetTRFLoopbackPAD_dB(\textcolor{keywordtype}{void})
+00926 \{
+00927     \textcolor{keywordflow}{switch} (this->Get_SPI_Reg_bits(LMS7param(L_LOOPB_TXPAD_TRF)))
+00928     \{
+00929     \textcolor{keywordflow}{case} 0: \textcolor{keywordflow}{return} 0.0;
+00930     \textcolor{keywordflow}{case} 1: \textcolor{keywordflow}{return} -1.4;
+00931     \textcolor{keywordflow}{case} 2: \textcolor{keywordflow}{return} -3.3;
+00932     \textcolor{keywordflow}{case} 3: \textcolor{keywordflow}{return} -4.3;
+00933     \}
+00934     \textcolor{keywordflow}{return} 0.0;
+00935 \}
+00936 
+00937 \textcolor{keywordtype}{int} LMS7002M::SetTBBIAMP_dB(\textcolor{keyword}{const} float_type gain)
+00938 \{
+00939     \textcolor{keywordtype}{int} ind = this->GetActiveChannelIndex()%2;
+00940     \textcolor{keywordflow}{if} (opt_gain_tbb[ind] <= 0)
+00941     \{
+00942         \textcolor{keywordflow}{if} (CalibrateTxGain(0,\textcolor{keyword}{nullptr})!=0) \textcolor{comment}{//set optimal BB gain}
+00943             \textcolor{keywordflow}{return} -1;
+00944     \}
+00945 
+00946     \textcolor{keywordflow}{if} (gain != 0)
+00947     \{
+00948           \textcolor{keywordtype}{int} g\_iamp = (float_type)opt_gain_tbb[ind]*pow(10.0,gain/20.0)+0.4;
+00949           Modify_SPI_Reg_bits(LMS7param(CG_IAMP_TBB),g\_iamp > 63 ? 63 : g\_iamp, \textcolor{keyword}{true});
+00950     \}
+00951     \textcolor{keywordflow}{return} 0;
+00952 \}
+00953 
+00954 float_type LMS7002M::GetTBBIAMP_dB(\textcolor{keywordtype}{void})
+00955 \{
+00956     \textcolor{keywordtype}{int} g\_current = Get_SPI_Reg_bits(LMS7param(CG_IAMP_TBB),\textcolor{keyword}{true});
+00957     \textcolor{keywordtype}{int} ind = this->GetActiveChannelIndex()%2;
+00958 
+00959     \textcolor{keywordflow}{if} (opt_gain_tbb[ind] <= 0)
+00960     \{
+00961         \textcolor{keywordflow}{if} (CalibrateTxGain(0,\textcolor{keyword}{nullptr})==0)
+00962             \textcolor{keywordflow}{return} 0.0;
+00963         Modify_SPI_Reg_bits(LMS7param(CG_IAMP_TBB),g\_current, \textcolor{keyword}{true}); \textcolor{comment}{//restore}
+00964     \}
+00965     \textcolor{keywordflow}{return} 20.0*log10((float_type)g\_current / (float_type) opt_gain_tbb[ind]);
+00966 \}
+00967 
+00968 
+00969 \textcolor{keywordtype}{int} LMS7002M::SetPathRFE(PathRFE path)
+00970 \{
+00971     \textcolor{keywordtype}{int} sel\_path\_rfe;
+00972     \textcolor{keywordtype}{int} pd\_lb1 = 1;
+00973     \textcolor{keywordtype}{int} pd\_lb2 = 1;
+00974     \textcolor{keywordflow}{switch} (path)
+00975     \{
+00976         \textcolor{keywordflow}{case} PATH_RFE_LNAH: sel\_path\_rfe = 1; \textcolor{keywordflow}{break};
+00977         \textcolor{keywordflow}{case} PATH_RFE_LB2: pd\_lb2 = 0;
+00978         \textcolor{keywordflow}{case} PATH_RFE_LNAL: sel\_path\_rfe = 2; \textcolor{keywordflow}{break};
+00979         \textcolor{keywordflow}{case} PATH_RFE_LB1: pd\_lb1 = 0;
+00980         \textcolor{keywordflow}{case} PATH_RFE_LNAW: sel\_path\_rfe = 3; \textcolor{keywordflow}{break};
+00981         \textcolor{keywordflow}{default}: sel\_path\_rfe = 0; \textcolor{keywordflow}{break};
+00982     \}
+00983 
+00984     Modify_SPI_Reg_bits(LMS7param(SEL_PATH_RFE), sel\_path\_rfe);
+00985 
+00986     \textcolor{keywordtype}{int} pd\_lna\_rfe = (path == PATH_RFE_LB2 || path == PATH_RFE_LB1 || sel\_path\_rfe == 0) ? 1 : 0;
+00987     Modify_SPI_Reg_bits(LMS7param(PD_LNA_RFE), pd\_lna\_rfe);
+00988 
+00989     Modify_SPI_Reg_bits(LMS7param(PD_RLOOPB_1_RFE), pd\_lb1);
+00990     Modify_SPI_Reg_bits(LMS7param(PD_RLOOPB_2_RFE), pd\_lb2);
+00991     Modify_SPI_Reg_bits(LMS7param(EN_INSHSW_LB1_RFE), pd\_lb1);
+00992     Modify_SPI_Reg_bits(LMS7param(EN_INSHSW_LB2_RFE), pd\_lb2);
+00993     Modify_SPI_Reg_bits(LMS7param(EN_INSHSW_L_RFE), (path == PATH_RFE_LNAL)?0:1);
+00994     Modify_SPI_Reg_bits(LMS7param(EN_INSHSW_W_RFE), (path == PATH_RFE_LNAW)?0:1);
+00995 
+00996     \textcolor{comment}{//enable/disable the loopback path}
+00997     \textcolor{keyword}{const} \textcolor{keywordtype}{bool} loopback = (path == PATH_RFE_LB1) or (path == PATH_RFE_LB2);
+00998     Modify_SPI_Reg_bits(LMS7param(EN_LOOPB_TXPAD_TRF), loopback?1:0);
+00999 
+01000     \textcolor{keywordflow}{return} 0;
+01001 \}
+01002 
+01003 LMS7002M::PathRFE LMS7002M::GetPathRFE(\textcolor{keywordtype}{void})
+01004 \{
+01005     \textcolor{keyword}{const} \textcolor{keywordtype}{int} sel\_path\_rfe = this->Get_SPI_Reg_bits(LMS7param(SEL_PATH_RFE));
+01006     \textcolor{keywordflow}{if} (this->Get_SPI_Reg_bits(LMS7param(EN_INSHSW_LB1_RFE)) == 0 && sel\_path\_rfe == 3) \textcolor{keywordflow}{return} 
+      PATH_RFE_LB1;
+01007     \textcolor{keywordflow}{if} (this->Get_SPI_Reg_bits(LMS7param(EN_INSHSW_LB2_RFE)) == 0 && sel\_path\_rfe == 2) \textcolor{keywordflow}{return} 
+      PATH_RFE_LB2;
+01008     \textcolor{keywordflow}{if} (this->Get_SPI_Reg_bits(LMS7param(EN_INSHSW_L_RFE)) == 0 && sel\_path\_rfe == 2) \textcolor{keywordflow}{return} 
+      PATH_RFE_LNAL;
+01009     \textcolor{keywordflow}{if} (this->Get_SPI_Reg_bits(LMS7param(EN_INSHSW_W_RFE)) == 0 && sel\_path\_rfe == 3) \textcolor{keywordflow}{return} 
+      PATH_RFE_LNAW;
+01010     \textcolor{keywordflow}{if} (sel\_path\_rfe == 1) \textcolor{keywordflow}{return} PATH_RFE_LNAH;
+01011     \textcolor{keywordflow}{return} PATH_RFE_NONE;
+01012 \}
+01013 
+01014 \textcolor{keywordtype}{int} LMS7002M::SetBandTRF(\textcolor{keyword}{const} \textcolor{keywordtype}{int} band)
+01015 \{
+01016     this->Modify_SPI_Reg_bits(LMS7param(SEL_BAND1_TRF), (band==1)?1:0);
+01017     this->Modify_SPI_Reg_bits(LMS7param(SEL_BAND2_TRF), (band==2)?1:0);
+01018 
+01019     \textcolor{keywordflow}{return} 0;
+01020 \}
+01021 
+01022 \textcolor{keywordtype}{int} LMS7002M::GetBandTRF(\textcolor{keywordtype}{void})
+01023 \{
+01024     \textcolor{keywordflow}{if} (this->Get_SPI_Reg_bits(LMS7param(SEL_BAND1_TRF)) == 1) \textcolor{keywordflow}{return} 1;
+01025     \textcolor{keywordflow}{if} (this->Get_SPI_Reg_bits(LMS7param(SEL_BAND2_TRF)) == 1) \textcolor{keywordflow}{return} 2;
+01026     \textcolor{keywordflow}{return} 0;
+01027 \}
+01028 
+01029 
+01030 \textcolor{keywordtype}{int} LMS7002M::SetReferenceClk_SX(\textcolor{keywordtype}{bool} tx, float_type freq\_Hz)
+01031 \{
+01032     _cachedRefClockRate=freq\_Hz;
+01033     \textcolor{keywordflow}{return} 0;
+01034 \}
+01035 
+01039 float_type LMS7002M::GetReferenceClk_SX(\textcolor{keywordtype}{bool} tx)
+01040 \{
+01041     \textcolor{keywordflow}{return} _cachedRefClockRate;
+01042 \}
+01043 
+01047 float_type LMS7002M::GetFrequencyCGEN()
+01048 \{
+01049     float_type dMul = (GetReferenceClk_SX(Rx)/2.0)/(Get_SPI_Reg_bits(LMS7param(
+      DIV_OUTCH_CGEN), \textcolor{keyword}{true})+1); \textcolor{comment}{//DIV\_OUTCH\_CGEN}
+01050     uint16\_t gINT = Get_SPI_Reg_bits(0x0088, 13, 0, \textcolor{keyword}{true}); \textcolor{comment}{//read whole register to reduce SPI transfers}
+01051     uint32\_t gFRAC = ((gINT & 0xF) * 65536) | Get_SPI_Reg_bits(0x0087, 15, 0, \textcolor{keyword}{true});
+01052     \textcolor{keywordflow}{return} dMul * (((gINT>>4) + 1 + gFRAC/1048576.0));
+01053 \}
+01054 
+01059 float_type LMS7002M::GetReferenceClk_TSP(\textcolor{keywordtype}{bool} tx)
+01060 \{
+01061     float_type cgenFreq = GetFrequencyCGEN();
+01062     float_type clklfreq = cgenFreq/pow(2.0, Get_SPI_Reg_bits(LMS7param(
+      CLKH_OV_CLKL_CGEN),\textcolor{keyword}{true}));
+01063     \textcolor{keywordflow}{if}(Get_SPI_Reg_bits(LMS7param(EN_ADCCLKH_CLKGN),\textcolor{keyword}{true}) == 0)
+01064         \textcolor{keywordflow}{return} tx ? clklfreq : cgenFreq/4.0;
+01065     \textcolor{keywordflow}{else}
+01066         \textcolor{keywordflow}{return} tx ? cgenFreq : clklfreq/4.0;
+01067 \}
+01068 
+01075 \textcolor{keywordtype}{int} LMS7002M::SetFrequencyCGEN(\textcolor{keyword}{const} float_type freq\_Hz, \textcolor{keyword}{const} \textcolor{keywordtype}{bool} retainNCOfrequencies, 
+      CGEN_details* output)
+01076 \{
+01077     float_type dFvco;
+01078     float_type dFrac;
+01079 
+01080     \textcolor{comment}{//remember NCO frequencies}
+01081     Channel chBck = this->GetActiveChannel();
+01082     vector<vector<float\_type> > rxNCO(2);
+01083     vector<vector<float\_type> > txNCO(2);
+01084     \textcolor{keywordtype}{bool} rxModeNCO = \textcolor{keyword}{false};
+01085     \textcolor{keywordtype}{bool} txModeNCO = \textcolor{keyword}{false};
+01086     \textcolor{keywordflow}{if}(retainNCOfrequencies)
+01087     \{
+01088         rxModeNCO = Get_SPI_Reg_bits(LMS7param(MODE_RX), \textcolor{keyword}{true});
+01089         txModeNCO = Get_SPI_Reg_bits(LMS7param(MODE_TX), \textcolor{keyword}{true});
+01090         \textcolor{keywordflow}{for} (\textcolor{keywordtype}{int} ch = 0; ch < 2; ++ch)
+01091         \{
+01092             this->SetActiveChannel((ch == 0)?ChA:ChB);
+01093             \textcolor{keywordflow}{for} (\textcolor{keywordtype}{int} i = 0; i < 16 && rxModeNCO == 0; ++i)
+01094                 rxNCO[ch].push\_back(GetNCOFrequency(LMS7002M::Rx, i, \textcolor{keyword}{false}));
+01095             \textcolor{keywordflow}{for} (\textcolor{keywordtype}{int} i = 0; i < 16 && txModeNCO == 0; ++i)
+01096                 txNCO[ch].push\_back(GetNCOFrequency(LMS7002M::Tx, i, \textcolor{keyword}{false}));
+01097         \}
+01098     \}
+01099     \textcolor{comment}{//VCO frequency selection according to F\_CLKH}
+01100     uint8\_t iHdiv\_high = (2.94e9/2 / freq\_Hz)-1;
+01101     uint8\_t iHdiv\_low = (1.93e9/2 / freq\_Hz);
+01102     uint8\_t iHdiv = (iHdiv\_low + iHdiv\_high)/2;
+01103     dFvco = 2 * (iHdiv+1) * freq\_Hz;
+01104     \textcolor{keywordflow}{if} (dFvco <= gCGEN_VCO_frequencies[0] || dFvco >= gCGEN_VCO_frequencies[1])
+01105         \textcolor{keywordflow}{return} ReportError(ERANGE, \textcolor{stringliteral}{"SetFrequencyCGEN(%g MHz) - cannot deliver requested frequency"}, freq\_Hz
+       / 1e6);
+01106     \textcolor{comment}{//Integer division}
+01107     uint16\_t gINT = (uint16\_t)(dFvco/GetReferenceClk_SX(Rx) - 1);
+01108 
+01109     \textcolor{comment}{//Fractional division}
+01110     dFrac = dFvco/GetReferenceClk_SX(Rx) - (uint32\_t)(dFvco/GetReferenceClk_SX(
+      Rx));
+01111     uint32\_t gFRAC = (uint32\_t)(dFrac * 1048576);
+01112 
+01113     Modify_SPI_Reg_bits(LMS7param(INT_SDM_CGEN), gINT); \textcolor{comment}{//INT\_SDM\_CGEN}
+01114     Modify_SPI_Reg_bits(0x0087, 15, 0, gFRAC&0xFFFF); \textcolor{comment}{//INT\_SDM\_CGEN[15:0]}
+01115     Modify_SPI_Reg_bits(0x0088, 3, 0, gFRAC>>16); \textcolor{comment}{//INT\_SDM\_CGEN[19:16]}
+01116     Modify_SPI_Reg_bits(LMS7param(DIV_OUTCH_CGEN), iHdiv); \textcolor{comment}{//DIV\_OUTCH\_CGEN}
+01117 
+01118     lime::debug(\textcolor{stringliteral}{"INT %d, FRAC %d, DIV\_OUTCH\_CGEN %d"}, gINT, gFRAC, (uint16\_t)iHdiv);
+01119     lime::debug(\textcolor{stringliteral}{"VCO %.2f MHz, RefClk %.2f MHz"}, dFvco/1e6, GetReferenceClk_SX(
+      Rx)/1e6);
+01120 
+01121     \textcolor{keywordflow}{if} (output)
+01122     \{
+01123         output->frequency = freq\_Hz;
+01124         output->frequencyVCO = dFvco;
+01125         output->referenceClock = GetReferenceClk_SX(LMS7002M::Rx);
+01126         output->INT = gINT;
+01127         output->FRAC = gFRAC;
+01128         output->div_outch_cgen = iHdiv;
+01129         output->success = \textcolor{keyword}{true};
+01130     \}
+01131 
+01132     \textcolor{comment}{//recalculate NCO}
+01133     \textcolor{keywordflow}{for} (\textcolor{keywordtype}{int} ch = 0; ch < 2 && retainNCOfrequencies; ++ch)
+01134     \{
+01135         this->SetActiveChannel((ch == 0)?ChA:ChB);
+01136         \textcolor{keywordflow}{for} (\textcolor{keywordtype}{int} i = 0; i < 16 && rxModeNCO == 0; ++i)
+01137             SetNCOFrequency(LMS7002M::Rx, i, rxNCO[ch][i]);
+01138         \textcolor{keywordflow}{for} (\textcolor{keywordtype}{int} i = 0; i < 16 && txModeNCO == 0; ++i)
+01139             SetNCOFrequency(LMS7002M::Tx, i, txNCO[ch][i]);
+01140     \}
+01141     this->SetActiveChannel(chBck);
+01142 \textcolor{preprocessor}{#ifndef NDEBUG}
+01143     printf(\textcolor{stringliteral}{"CGEN: Freq=%g MHz, VCO=%g GHz, INT=%i, FRAC=%i, DIV\_OUTCH\_CGEN=%i\(\backslash\)n"}, freq\_Hz/1e6, dFvco/1e9, 
+      gINT, gFRAC, iHdiv);
+01144 \textcolor{preprocessor}{#endif // NDEBUG}
+01145     \textcolor{keywordflow}{if}(TuneVCO(VCO_CGEN) != 0)
+01146     \{
+01147         \textcolor{keywordflow}{if} (output)
+01148         \{
+01149             output->success = \textcolor{keyword}{false};
+01150             output->csw = Get_SPI_Reg_bits(LMS7param(CSW_VCO_CGEN));
+01151         \}
+01152         \textcolor{keywordflow}{return} ReportError(\textcolor{stringliteral}{"SetFrequencyCGEN(%g MHz) failed"}, freq\_Hz/1e6);
+01153     \}
+01154     \textcolor{keywordflow}{if} (output)
+01155         output->csw = Get_SPI_Reg_bits(LMS7param(CSW_VCO_CGEN));
+01156     \textcolor{keywordflow}{return} 0;
+01157 \}
+01158 
+01159 \textcolor{keywordtype}{bool} LMS7002M::GetCGENLocked(\textcolor{keywordtype}{void})
+01160 \{
+01161     \textcolor{keywordflow}{return} (Get_SPI_Reg_bits(LMS7param(VCO_CMPHO_CGEN).address, 13, 12, \textcolor{keyword}{true}) & 0x3) == 2;
+01162 \}
+01163 
+01164 \textcolor{keywordtype}{bool} LMS7002M::GetSXLocked(\textcolor{keywordtype}{bool} tx)
+01165 \{
+01166     SetActiveChannel(tx?ChSXT:ChSXR);
+01167     \textcolor{keywordflow}{return} (Get_SPI_Reg_bits(LMS7param(VCO_CMPHO).address, 13, 12, \textcolor{keyword}{true}) & 0x3) == 2;
+01168 \}
+01169 
+01173 \textcolor{keywordtype}{int} LMS7002M::TuneCGENVCO()
+01174 \{
+01175 \textcolor{preprocessor}{#ifndef NDEBUG}
+01176     lime::debug(\textcolor{stringliteral}{"ICT\_VCO\_CGEN: %d"}, Get_SPI_Reg_bits(LMS7param(ICT_VCO_CGEN)));
+01177 \textcolor{preprocessor}{#endif}
+01178     \textcolor{comment}{// Initialization activate VCO and comparator}
+01179     \textcolor{keywordflow}{if}(\textcolor{keywordtype}{int} status = Modify_SPI_Reg_bits (LMS7_PD_VCO_CGEN.address, 2, 1, 0) != 0)
+01180         \textcolor{keywordflow}{return} status;
+01181 
+01182     \textcolor{keyword}{auto} checkCSW = [\textcolor{keyword}{this}] (\textcolor{keywordtype}{int} cswVal)\{
+01183             Modify_SPI_Reg_bits (LMS7_CSW_VCO_CGEN, cswVal);    \textcolor{comment}{//write CSW value}
+01184             this\_thread::sleep\_for(chrono::microseconds(50)); \textcolor{comment}{//comparator settling time}
+01185             \textcolor{keywordflow}{return} Get_SPI_Reg_bits(LMS7_VCO_CMPHO_CGEN.address, 13, 12, \textcolor{keyword}{true}); \textcolor{comment}{//read comparators}
+01186         \};
+01187     \textcolor{comment}{//find lock}
+01188     \textcolor{keywordtype}{int} csw = 127;
+01189     \textcolor{keywordflow}{for} (\textcolor{keywordtype}{int} step = 64; step > 0; step>>=1)
+01190     \{
+01191         \textcolor{keyword}{auto} cmphl = checkCSW(csw);
+01192         \textcolor{keywordflow}{if} (cmphl == 0)
+01193             csw += step;
+01194         \textcolor{keywordflow}{else} \textcolor{keywordflow}{if} (cmphl == 3)
+01195             csw -= step;
+01196         \textcolor{keywordflow}{else}
+01197             \textcolor{keywordflow}{break};
+01198     \}
+01199     \textcolor{comment}{//search around (+/-7) to determine lock interval}
+01200     \textcolor{comment}{//number of iterations could be reduced in some cases by narrowing down the search interval in find
+       lock phase}
+01201     \textcolor{keywordtype}{int} cswLow = csw, cswHigh = csw;
+01202     \textcolor{keywordflow}{for} (\textcolor{keywordtype}{int} step = 4; step > 0; step>>=1)
+01203         \textcolor{keywordflow}{if} (checkCSW(cswLow-step) != 0)
+01204             cswLow = cswLow-step;
+01205     \textcolor{keywordflow}{for} (\textcolor{keywordtype}{int} step = 4; step > 0; step>>=1)
+01206         \textcolor{keywordflow}{if} (checkCSW(cswHigh+step) == 2)
+01207             cswHigh = cswHigh+step;
+01208 
+01209     lime::debug(\textcolor{stringliteral}{"csw %d; interval [%d, %d]"}, (cswHigh+cswLow)/2, cswLow, cswHigh);
+01210     \textcolor{keyword}{auto} cmphl = checkCSW((cswHigh+cswLow)/2);
+01211     \textcolor{keywordflow}{if}(cmphl == 2)
+01212         \textcolor{keywordflow}{return} 0;
+01213     lime::error(\textcolor{stringliteral}{"TuneVCO(CGEN) - failed to lock (cmphl!=%d)"}, cmphl);
+01214     \textcolor{keywordflow}{return} -1;
+01215 \}
+01216 
+01221 \textcolor{keywordtype}{int} LMS7002M::TuneVCO(VCO_Module module) \textcolor{comment}{// 0-cgen, 1-SXR, 2-SXT}
+01222 \{
+01223     \textcolor{keywordflow}{if} (module == VCO_CGEN)
+01224         \textcolor{keywordflow}{return} TuneCGENVCO();
+01225     \textcolor{keyword}{auto} settlingTime = chrono::microseconds(50); \textcolor{comment}{//can be lower}
+01226     \textcolor{keyword}{struct }CSWInteval
+01227     \{
+01228         int16\_t high;
+01229         int16\_t low;
+01230     \};
+01231     CSWInteval cswSearch[2];
+01232     \textcolor{keyword}{const} \textcolor{keywordtype}{char}* moduleName = (module == VCO_CGEN) ? \textcolor{stringliteral}{"CGEN"} : ((module == VCO_SXR) ? \textcolor{stringliteral}{"SXR"} : \textcolor{stringliteral}{"SXT"});
+01233     uint8\_t cmphl; \textcolor{comment}{//comparators}
+01234     uint16\_t addrVCOpd; \textcolor{comment}{// VCO power down address}
+01235     uint16\_t addrCSW\_VCO;
+01236     uint16\_t addrCMP; \textcolor{comment}{//comparator address}
+01237     uint8\_t lsb; \textcolor{comment}{//SWC lsb index}
+01238     uint8\_t msb; \textcolor{comment}{//SWC msb index}
+01239 
+01240     Channel ch = this->GetActiveChannel(); \textcolor{comment}{//remember used channel}
+01241 
+01242     \textcolor{keywordflow}{if}(module != VCO_CGEN) \textcolor{comment}{//set addresses to SX module}
+01243     \{
+01244         this->SetActiveChannel(Channel(module));
+01245         addrVCOpd = LMS7param(PD_VCO).address;
+01246         addrCSW\_VCO = LMS7param(CSW_VCO).address;
+01247         lsb = LMS7param(CSW_VCO).lsb;
+01248         msb = LMS7param(CSW_VCO).msb;
+01249         addrCMP = LMS7param(VCO_CMPHO).address;
+01250         lime::debug(\textcolor{stringliteral}{"ICT\_VCO: %d"}, Get_SPI_Reg_bits(LMS7param(ICT_VCO)));
+01251     \}
+01252     \textcolor{keywordflow}{else} \textcolor{comment}{//set addresses to CGEN module}
+01253     \{
+01254         addrVCOpd = LMS7param(PD_VCO_CGEN).address;
+01255         addrCSW\_VCO = LMS7param(CSW_VCO_CGEN).address;
+01256         lsb = LMS7param(CSW_VCO_CGEN).lsb;
+01257         msb = LMS7param(CSW_VCO_CGEN).msb;
+01258         addrCMP = LMS7param(VCO_CMPHO_CGEN).address;
+01259         lime::debug(\textcolor{stringliteral}{"ICT\_VCO\_CGEN: %d"}, Get_SPI_Reg_bits(LMS7param(ICT_VCO_CGEN)));
+01260     \}
+01261     \textcolor{comment}{// Initialization activate VCO and comparator}
+01262     \textcolor{keywordflow}{if}(\textcolor{keywordtype}{int} status = Modify_SPI_Reg_bits (addrVCOpd, 2, 1, 0) != 0)
+01263         \textcolor{keywordflow}{return} status;
+01264     \textcolor{keywordflow}{if} (Get_SPI_Reg_bits(addrVCOpd, 2, 1) != 0)
+01265         \textcolor{keywordflow}{return} ReportError(\textcolor{stringliteral}{"TuneVCO(%s) - VCO is powered down"}, moduleName);
+01266 
+01267     \textcolor{comment}{//check if lock is within VCO range}
+01268     \{
+01269         Modify_SPI_Reg_bits (addrCSW\_VCO , msb, lsb , 0);
+01270         this\_thread::sleep\_for(settlingTime);
+01271         cmphl = (uint8\_t)Get_SPI_Reg_bits(addrCMP, 13, 12, \textcolor{keyword}{true});
+01272         \textcolor{keywordflow}{if}(cmphl == 3) \textcolor{comment}{//VCO too high}
+01273         \{
+01274             this->SetActiveChannel(ch); \textcolor{comment}{//restore previously used channel}
+01275             lime::debug(\textcolor{stringliteral}{"TuneVCO(%s) - VCO too high"}, moduleName);
+01276             \textcolor{keywordflow}{return} -1;
+01277         \}
+01278         Modify_SPI_Reg_bits (addrCSW\_VCO , msb, lsb , 255);
+01279         this\_thread::sleep\_for(settlingTime);
+01280         cmphl = (uint8\_t)Get_SPI_Reg_bits(addrCMP, 13, 12, \textcolor{keyword}{true});
+01281         \textcolor{keywordflow}{if}(cmphl == 0) \textcolor{comment}{//VCO too low}
+01282         \{
+01283             this->SetActiveChannel(ch); \textcolor{comment}{//restore previously used channel}
+01284             lime::debug(\textcolor{stringliteral}{"TuneVCO(%s) - VCO too low"}, moduleName);
+01285             \textcolor{keywordflow}{return} -1;
+01286         \}
+01287     \}
+01288 
+01289     \textcolor{comment}{//search intervals [0-127][128-255]}
+01290     \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} t=0; t<2; ++t)
+01291         \{
+01292         cswSearch[t].low = 128*(t+1);
+01293         cswSearch[t].high = 128*t; \textcolor{comment}{//search interval lowest value}
+01294         Modify_SPI_Reg_bits (addrCSW\_VCO , msb, lsb , cswSearch[t].high);
+01295         \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} i=6; i>=0; --i)
+01296         \{
+01297             cswSearch[t].high |= 1 << i; \textcolor{comment}{//CSW\_VCO<i>=1}
+01298             Modify_SPI_Reg_bits (addrCSW\_VCO, msb, lsb, cswSearch[t].high);
+01299             this\_thread::sleep\_for(settlingTime);
+01300             cmphl = (uint8\_t)Get_SPI_Reg_bits(addrCMP, 13, 12, \textcolor{keyword}{true});
+01301             lime::debug (\textcolor{stringliteral}{"csw=%d\(\backslash\)tcmphl=%d"}, cswSearch[t].high,(int16\_t)cmphl);
+01302             \textcolor{keywordflow}{if}(cmphl & 0x01) \textcolor{comment}{// reduce CSW}
+01303                 cswSearch[t].high &= ~(1 << i); \textcolor{comment}{//CSW\_VCO<i>=0}
+01304             \textcolor{keywordflow}{if}(cmphl == 2 && cswSearch[t].high < cswSearch[t].low)
+01305                 cswSearch[t].low = cswSearch[t].high;
+01306         \}
+01307         \textcolor{keywordflow}{while}(cswSearch[t].low <= cswSearch[t].high && cswSearch[t].low > t*128)
+01308         \{
+01309             --cswSearch[t].low;
+01310             Modify_SPI_Reg_bits(addrCSW\_VCO, msb, lsb, cswSearch[t].low);
+01311             this\_thread::sleep\_for(settlingTime);
+01312             \textcolor{keywordflow}{if}(Get_SPI_Reg_bits(addrCMP, 13, 12, \textcolor{keyword}{true}) != 2)
+01313             \{
+01314                 ++cswSearch[t].low;
+01315             \textcolor{keywordflow}{break};
+01316         \}
+01317     \}
+01318         \textcolor{keywordflow}{if}(cmphl == 2)
+01319     \{
+01320             lime::debug(\textcolor{stringliteral}{"CSW: lowest=%d, highest=%d, selected=%d"},
+01321                         cswSearch[t].low,
+01322                         cswSearch[t].high,
+01323                         cswSearch[t].low+(cswSearch[t].high-cswSearch[t].low)/2);
+01324         \}
+01325         \textcolor{keywordflow}{else}
+01326             lime::debug(\textcolor{stringliteral}{"Failed to lock"});
+01327     \}
+01328 
+01329     \textcolor{comment}{//check if the intervals are joined}
+01330     int16\_t cswHigh, cswLow;
+01331     \textcolor{keywordflow}{if}(cswSearch[0].high == cswSearch[1].low-1)
+01332     \{
+01333         cswHigh = cswSearch[1].high;
+01334         cswLow = cswSearch[0].low;
+01335     \}
+01336     \textcolor{comment}{//compare which interval is wider}
+01337         \textcolor{keywordflow}{else}
+01338     \{
+01339         uint8\_t intervalIndex = (cswSearch[1].high-cswSearch[1].low > cswSearch[0].high-cswSearch[0].low);
+01340         cswHigh = cswSearch[intervalIndex].high;
+01341         cswLow = cswSearch[intervalIndex].low;
+01342     \}
+01343 
+01344     \textcolor{keywordflow}{if}(cswHigh-cswLow == 1)
+01345     \{
+01346         \textcolor{comment}{//check which of two values really locks}
+01347         Modify_SPI_Reg_bits(addrCSW\_VCO, msb, lsb, cswLow);
+01348         this\_thread::sleep\_for(settlingTime);
+01349         cmphl = (uint8\_t)Get_SPI_Reg_bits(addrCMP, 13, 12, \textcolor{keyword}{true});
+01350         \textcolor{keywordflow}{if}(cmphl != 2)
+01351             Modify_SPI_Reg_bits(addrCSW\_VCO, msb, lsb, cswHigh);
+01352     \}
+01353     \textcolor{keywordflow}{else}
+01354         Modify_SPI_Reg_bits(addrCSW\_VCO, msb, lsb, cswLow+(cswHigh-cswLow)/2);
+01355     this\_thread::sleep\_for(settlingTime);
+01356     cmphl = (uint8\_t)Get_SPI_Reg_bits(addrCMP, 13, 12, \textcolor{keyword}{true});
+01357     lime::debug(\textcolor{stringliteral}{"cmphl=%d"},(uint16\_t)cmphl);
+01358     this->SetActiveChannel(ch); \textcolor{comment}{//restore previously used channel}
+01359     \textcolor{keywordflow}{if}(cmphl == 2)
+01360         \textcolor{keywordflow}{return} 0;
+01361     lime::debug(\textcolor{stringliteral}{"TuneVCO(%s) - failed to lock (cmphl!=2)"}, moduleName);
+01362     \textcolor{keywordflow}{return} -1;
+01363 \}
+01364 
+01370 uint16\_t LMS7002M::Get_SPI_Reg_bits(\textcolor{keyword}{const} LMS7Parameter &param, \textcolor{keywordtype}{bool} fromChip)
+01371 \{
+01372     \textcolor{keywordflow}{return} Get_SPI_Reg_bits(param.address, param.msb, param.lsb, fromChip);
+01373 \}
+01374 
+01382 uint16\_t LMS7002M::Get_SPI_Reg_bits(uint16\_t address, uint8\_t msb, uint8\_t lsb, \textcolor{keywordtype}{bool} fromChip)
+01383 \{
+01384     \textcolor{keywordflow}{return} (SPI_read(address, fromChip) & (~(~0<<(msb+1)))) >> lsb; \textcolor{comment}{//shift bits to LSB}
+01385 \}
+01386 
+01392 \textcolor{keywordtype}{int} LMS7002M::Modify_SPI_Reg_bits(\textcolor{keyword}{const} LMS7Parameter &param, \textcolor{keyword}{const} uint16\_t value, \textcolor{keywordtype}{bool} fromChip)
+01393 \{
+01394     \textcolor{keywordflow}{return} Modify_SPI_Reg_bits(param.address, param.msb, param.lsb, value, fromChip);
+01395 \}
+01396 
+01402 \textcolor{keywordtype}{int} LMS7002M::Modify_SPI_Reg_bits(\textcolor{keyword}{const} uint16\_t address, \textcolor{keyword}{const} uint8\_t msb, \textcolor{keyword}{const} uint8\_t lsb, \textcolor{keyword}{const} 
+      uint16\_t value, \textcolor{keywordtype}{bool} fromChip)
+01403 \{
+01404     uint16\_t spiDataReg = SPI_read(address, fromChip); \textcolor{comment}{//read current SPI reg data}
+01405     uint16\_t spiMask = (~(~0 << (msb - lsb + 1))) << (lsb); \textcolor{comment}{// creates bit mask}
+01406     spiDataReg = (spiDataReg & (~spiMask)) | ((value << lsb) & spiMask);\textcolor{comment}{//clear bits}
+01407     \textcolor{keywordflow}{return} SPI_write(address, spiDataReg); \textcolor{comment}{//write modified data back to SPI reg}
+01408 \}
+01409 
+01417 \textcolor{keywordtype}{int} LMS7002M::Modify_SPI_Reg_mask(\textcolor{keyword}{const} uint16\_t *addr, \textcolor{keyword}{const} uint16\_t *masks, \textcolor{keyword}{const} uint16\_t *values, 
+      uint8\_t start, uint8\_t stop)
+01418 \{
+01419     \textcolor{keywordtype}{int} status;
+01420     uint16\_t reg\_data;
+01421     vector<uint16\_t> addresses;
+01422     vector<uint16\_t> data;
+01423     \textcolor{keywordflow}{while} (start <= stop)
+01424     \{
+01425         reg\_data = SPI_read(addr[start], \textcolor{keyword}{true}, &status); \textcolor{comment}{//read current SPI reg data}
+01426         reg\_data &= ~masks[start];\textcolor{comment}{//clear bits}
+01427         reg\_data |= (values[start] & masks[start]);
+01428         addresses.push\_back(addr[start]);
+01429         data.push\_back(reg\_data);
+01430         ++start;
+01431     \}
+01432     \textcolor{keywordflow}{if} (status != 0)
+01433         \textcolor{keywordflow}{return} status;
+01434     SPI_write_batch(&addresses[0], &data[0], addresses.size());
+01435     \textcolor{keywordflow}{return} status;
+01436 \}
+01437 
+01441 \textcolor{keyword}{const} LMS7Parameter* LMS7002M::GetParam(\textcolor{keyword}{const} std::string &name)
+01442 \{
+01443     \textcolor{keywordflow}{for}(\textcolor{keyword}{const} LMS7Parameter* parameter : LMS7parameterList)
+01444         \textcolor{keywordflow}{if} (std::string(parameter->name) == name)
+01445             \textcolor{keywordflow}{return} parameter;
+01446     \textcolor{keywordflow}{return} \textcolor{keyword}{nullptr};
+01447 \}
+01448 
+01455 \textcolor{keywordtype}{int} LMS7002M::SetFrequencySX(\textcolor{keywordtype}{bool} tx, float_type freq\_Hz, SX_details* output)
+01456 \{
+01457     \textcolor{keyword}{static} map<float\_type, int8\_t> tuning\_cache\_sel\_vco;
+01458     \textcolor{keyword}{static} map<float\_type, int16\_t> tuning\_cache\_csw\_value;
+01459 
+01460     \textcolor{keyword}{const} \textcolor{keywordtype}{char}* vcoNames[] = \{\textcolor{stringliteral}{"VCOL"}, \textcolor{stringliteral}{"VCOM"}, \textcolor{stringliteral}{"VCOH"}\};
+01461     \textcolor{keyword}{const} uint8\_t sxVCO\_N = 2; \textcolor{comment}{//number of entries in VCO frequencies}
+01462     \textcolor{keyword}{const} float_type m\_dThrF = 5500e6; \textcolor{comment}{//threshold to enable additional divider}
+01463     float_type VCOfreq;
+01464     int8\_t div\_loch;
+01465     int8\_t sel\_vco;
+01466     \textcolor{keywordtype}{bool} canDeliverFrequency = \textcolor{keyword}{false};
+01467     uint16\_t integerPart;
+01468     uint32\_t fractionalPart;
+01469     int16\_t csw\_value;
+01470 
+01471     \textcolor{comment}{//find required VCO frequency}
+01472     \textcolor{keywordflow}{for} (div\_loch = 6; div\_loch >= 0; --div\_loch)
+01473     \{
+01474         VCOfreq = (1 << (div\_loch + 1)) * freq\_Hz;
+01475         \textcolor{keywordflow}{if} ((VCOfreq >= gVCO_frequency_table[0][0]) && (VCOfreq <= 
+      gVCO_frequency_table[2][sxVCO\_N - 1]))
+01476         \{
+01477             canDeliverFrequency = \textcolor{keyword}{true};
+01478             \textcolor{keywordflow}{break};
+01479         \}
+01480     \}
+01481     \textcolor{keywordflow}{if} (canDeliverFrequency == \textcolor{keyword}{false})
+01482         \textcolor{keywordflow}{return} ReportError(ERANGE, \textcolor{stringliteral}{"SetFrequencySX%s(%g MHz) - required VCO frequency is out of range
+       [%g-%g] MHz"},
+01483                             tx?\textcolor{stringliteral}{"T"}:\textcolor{stringliteral}{"R"}, freq\_Hz / 1e6,
+01484                             gVCO_frequency_table[0][0]/1e6,
+01485                             gVCO_frequency_table[2][sxVCO\_N - 1]/1e6);
+01486 
+01487     \textcolor{keyword}{const} float_type refClk\_Hz = GetReferenceClk_SX(tx);
+01488     integerPart = (uint16\_t)(VCOfreq / (refClk\_Hz * (1 + (VCOfreq > m\_dThrF))) - 4);
+01489     fractionalPart = (uint32\_t)((VCOfreq / (refClk\_Hz * (1 + (VCOfreq > m\_dThrF))) - (uint32\_t)(VCOfreq / (
+      refClk\_Hz * (1 + (VCOfreq > m\_dThrF))))) * 1048576);
+01490 
+01491     Channel ch = this->GetActiveChannel();
+01492     this->SetActiveChannel(tx?ChSXT:ChSXR);
+01493     Modify_SPI_Reg_bits(LMS7param(EN_INTONLY_SDM), 0);
+01494     Modify_SPI_Reg_bits(LMS7param(INT_SDM), integerPart); \textcolor{comment}{//INT\_SDM}
+01495     Modify_SPI_Reg_bits(0x011D, 15, 0, fractionalPart & 0xFFFF); \textcolor{comment}{//FRAC\_SDM[15:0]}
+01496     Modify_SPI_Reg_bits(0x011E, 3, 0, (fractionalPart >> 16)); \textcolor{comment}{//FRAC\_SDM[19:16]}
+01497     Modify_SPI_Reg_bits(LMS7param(DIV_LOCH), div\_loch); \textcolor{comment}{//DIV\_LOCH}
+01498     Modify_SPI_Reg_bits(LMS7param(EN_DIV2_DIVPROG), (VCOfreq > m\_dThrF)); \textcolor{comment}{//EN\_DIV2\_DIVPROG}
+01499 
+01500     lime::debug(\textcolor{stringliteral}{"INT %d, FRAC %d, DIV\_LOCH %d, EN\_DIV2\_DIVPROG %d"},
+01501                 integerPart,
+01502                 fractionalPart,
+01503                 (int16\_t)div\_loch,
+01504                 (VCOfreq > m\_dThrF));
+01505     lime::debug(\textcolor{stringliteral}{"VCO %.2f MHz, RefClk %.2f MHz"}, VCOfreq/1e6, refClk\_Hz/1e6);
+01506 
+01507     \textcolor{keywordflow}{if} (output)
+01508     \{
+01509         output->frequency = freq\_Hz;
+01510         output->frequencyVCO = VCOfreq;
+01511         output->referenceClock = GetReferenceClk_SX(tx);
+01512         output->INT = integerPart;
+01513         output->FRAC = fractionalPart;
+01514         output->en_div2_divprog = (VCOfreq > m\_dThrF);
+01515         output->div_loch = div\_loch;
+01516     \}
+01517 
+01518     \textcolor{comment}{// turn on VCO and comparator}
+01519     Modify_SPI_Reg_bits(LMS7param(PD_VCO), 0); \textcolor{comment}{//}
+01520     Modify_SPI_Reg_bits(LMS7param(PD_VCO_COMP), 0);
+01521 
+01522     \textcolor{comment}{// try setting tuning values from the cache, if it fails perform full tuning}
+01523     \textcolor{keywordflow}{if}  (useCache && tuning\_cache\_sel\_vco.count(freq\_Hz) > 0)
+01524     \{
+01525         Modify_SPI_Reg_bits(LMS7param(SEL_VCO), tuning\_cache\_sel\_vco[freq\_Hz]);
+01526         Modify_SPI_Reg_bits(LMS7param(CSW_VCO).address, LMS7param(CSW_VCO).msb, 
+      LMS7param(CSW_VCO).lsb, tuning\_cache\_csw\_value[freq\_Hz]);
+01527         this\_thread::sleep\_for(chrono::microseconds(50)); \textcolor{comment}{// probably no need for this as the interface is
+       already very slow..}
+01528         \textcolor{keyword}{auto} cmphl = (uint8\_t)Get_SPI_Reg_bits(LMS7param(VCO_CMPHO).address, 13, 12, \textcolor{keyword}{true});
+01529         \textcolor{keywordflow}{if}(cmphl == 2) \{
+01530             lime::info(\textcolor{stringliteral}{"Fast Tune success; vco=%d value=%d"}, tuning\_cache\_sel\_vco[freq\_Hz], 
+      tuning\_cache\_csw\_value[freq\_Hz]);
+01531             this->SetActiveChannel(ch); \textcolor{comment}{//restore used channel}
+01532             \textcolor{keywordflow}{if} (output)
+01533             \{
+01534                 output->success = \textcolor{keyword}{true};
+01535                 output->sel_vco = sel\_vco;
+01536                 output->csw = csw\_value;
+01537             \}
+01538             \textcolor{keywordflow}{return} 0;
+01539         \}
+01540     \}
+01541 
+01542     canDeliverFrequency = \textcolor{keyword}{false};
+01543     \textcolor{keywordtype}{int} tuneScore[] = \{ -128, -128, -128 \}; \textcolor{comment}{//best is closest to 0}
+01544     \textcolor{keywordflow}{for} (sel\_vco = 0; sel\_vco < 3; ++sel\_vco)
+01545     \{
+01546         Modify_SPI_Reg_bits(LMS7param(SEL_VCO), sel\_vco);
+01547         \textcolor{keywordtype}{int} status = TuneVCO(tx ? VCO_SXT : VCO_SXR);
+01548         \textcolor{keywordflow}{if}(status == 0)
+01549         \{
+01550             tuneScore[sel\_vco] = -128 + Get_SPI_Reg_bits(LMS7param(CSW_VCO), \textcolor{keyword}{true});
+01551             canDeliverFrequency = \textcolor{keyword}{true};
+01552         \}
+01553         lime::debug(\textcolor{stringliteral}{"%s : csw=%d %s"},
+01554                     vcoNames[sel\_vco],
+01555                     tuneScore[sel\_vco]+128,
+01556                     (status == 0 ? \textcolor{stringliteral}{"tune ok"} : \textcolor{stringliteral}{"tune fail"}));
+01557     \}
+01558     \textcolor{keywordflow}{if} (abs(tuneScore[0]) < abs(tuneScore[1]))
+01559     \{
+01560         \textcolor{keywordflow}{if} (abs(tuneScore[0]) < abs(tuneScore[2]))
+01561             sel\_vco = 0;
+01562         \textcolor{keywordflow}{else}
+01563             sel\_vco = 2;
+01564     \}
+01565     \textcolor{keywordflow}{else}
+01566     \{
+01567         \textcolor{keywordflow}{if} (abs(tuneScore[1]) < abs(tuneScore[2]))
+01568             sel\_vco = 1;
+01569         \textcolor{keywordflow}{else}
+01570             sel\_vco = 2;
+01571     \}
+01572     csw\_value = tuneScore[sel\_vco] + 128;
+01573     lime::debug(\textcolor{stringliteral}{"Selected: %s"}, vcoNames[sel\_vco]);
+01574 
+01575 
+01576     \textcolor{keywordflow}{if} (output)
+01577     \{
+01578         \textcolor{keywordflow}{if} (canDeliverFrequency)
+01579             output->success = \textcolor{keyword}{true};
+01580         output->sel_vco = sel\_vco;
+01581         output->csw = csw\_value;
+01582     \}
+01583     Modify_SPI_Reg_bits(LMS7param(SEL_VCO), sel\_vco);
+01584     Modify_SPI_Reg_bits(LMS7param(CSW_VCO), csw\_value);
+01585 
+01586     \textcolor{comment}{// save successful tuning results in cache}
+01587     \textcolor{keywordflow}{if} (useCache && canDeliverFrequency) \{
+01588         tuning\_cache\_sel\_vco[freq\_Hz] = sel\_vco;
+01589         tuning\_cache\_csw\_value[freq\_Hz] = csw\_value;
+01590     \}
+01591 
+01592     this->SetActiveChannel(ch); \textcolor{comment}{//restore used channel}
+01593 
+01594     \textcolor{keywordflow}{if} (canDeliverFrequency == \textcolor{keyword}{false})
+01595         \textcolor{keywordflow}{return} ReportError(\textcolor{stringliteral}{"SetFrequencySX%s(%g MHz) - cannot deliver frequency"},
+01596                             tx?\textcolor{stringliteral}{"T"}:\textcolor{stringliteral}{"R"},
+01597                             freq\_Hz / 1e6);
+01598     \textcolor{keywordflow}{return} 0;
+01599 \}
+01600 
+01606 \textcolor{keywordtype}{int} LMS7002M::SetFrequencySXWithSpurCancelation(\textcolor{keywordtype}{bool} tx, float_type freq\_Hz, 
+      float_type BW)
+01607 \{
+01608     \textcolor{keyword}{const} \textcolor{keywordtype}{float} BWOffset = 2e6;
+01609     BW += BWOffset; \textcolor{comment}{//offset to avoid ref clock on BW edge}
+01610     \textcolor{keywordtype}{bool} needCancelation = \textcolor{keyword}{false};
+01611     float_type refClk = GetReferenceClk_SX(\textcolor{keyword}{false});
+01612     \textcolor{keywordtype}{int} low = (freq\_Hz-BW/2)/refClk;
+01613     \textcolor{keywordtype}{int} high = (freq\_Hz+BW/2)/refClk;
+01614     \textcolor{keywordflow}{if}(low != high)
+01615         needCancelation = \textcolor{keyword}{true};
+01616 
+01617     \textcolor{keywordtype}{int} status;
+01618     \textcolor{keywordtype}{float} newFreq(0);
+01619     \textcolor{keywordflow}{if}(needCancelation)
+01620     \{
+01621         newFreq = (int)(freq\_Hz/refClk+0.5)*refClk;
+01622         TuneRxFilter(BW-BWOffset+2*abs(freq\_Hz-newFreq));
+01623         status = SetFrequencySX(tx, newFreq);
+01624     \}
+01625     \textcolor{keywordflow}{else}
+01626         status = SetFrequencySX(tx, freq\_Hz);
+01627     \textcolor{keywordflow}{if}(status != 0)
+01628         \textcolor{keywordflow}{return} status;
+01629     \textcolor{keyword}{const} \textcolor{keywordtype}{int} ch = Get_SPI_Reg_bits(LMS7param(MAC));
+01630     \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} i=0; i<2; ++i)
+01631     \{
+01632         Modify_SPI_Reg_bits(LMS7param(MAC), i+1);
+01633         SetNCOFrequency(LMS7002M::Rx, 15, 0);
+01634     \}
+01635     \textcolor{keywordflow}{if}(needCancelation)
+01636     \{
+01637         Modify_SPI_Reg_bits(LMS7param(MAC), ch);
+01638         Modify_SPI_Reg_bits(LMS7param(EN_INTONLY_SDM), 1);
+01639 
+01640         \textcolor{comment}{/*uint16\_t gINT = Get\_SPI\_Reg\_bits(0x011E, 13, 0);  // read whole register to reduce SPI transfers}
+01641 \textcolor{comment}{        uint32\_t gFRAC = ((gINT&0xF) * 65536) | Get\_SPI\_Reg\_bits(0x011D, 15, 0);}
+01642 \textcolor{comment}{        bool upconvert = gFRAC > (1 << 19);}
+01643 \textcolor{comment}{        gINT = gINT >> 4;}
+01644 \textcolor{comment}{        if(upconvert)}
+01645 \textcolor{comment}{        \{}
+01646 \textcolor{comment}{            gINT+=;}
+01647 \textcolor{comment}{            Modify\_SPI\_Reg\_bits(LMS7param(INT\_SDM), gINT);}
+01648 \textcolor{comment}{        \}}
+01649 \textcolor{comment}{        Modify\_SPI\_Reg\_bits(0x011D, 15, 0, 0);}
+01650 \textcolor{comment}{        Modify\_SPI\_Reg\_bits(0x011E, 3, 0, 0);*/}
+01651         \textcolor{comment}{//const float\_type refClk\_Hz = GetReferenceClk\_SX(tx);}
+01652         \textcolor{comment}{//float actualFreq = (float\_type)refClk\_Hz / (1 << (Get\_SPI\_Reg\_bits(LMS7param(DIV\_LOCH)) + 1));}
+01653         \textcolor{comment}{//actualFreq *= (gINT + 4) * (Get\_SPI\_Reg\_bits(LMS7param(EN\_DIV2\_DIVPROG)) + 1);}
+01654         \textcolor{keywordtype}{float} actualFreq = newFreq;
+01655         \textcolor{keywordtype}{float} userFreq = freq\_Hz;
+01656         \textcolor{keywordtype}{bool} upconvert = actualFreq > userFreq;
+01657         \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} i=0; i<2; ++i)
+01658         \{
+01659             Modify_SPI_Reg_bits(LMS7param(MAC), i+1);
+01660             Modify_SPI_Reg_bits(LMS7param(CMIX_SC_RXTSP), !upconvert);
+01661             Modify_SPI_Reg_bits(LMS7param(CMIX_BYP_RXTSP), 0);
+01662             Modify_SPI_Reg_bits(LMS7param(SEL_RX), 15);
+01663             Modify_SPI_Reg_bits(LMS7param(CMIX_GAIN_RXTSP), 1);
+01664             SetNCOFrequency(LMS7002M::Rx, 14, 0);
+01665             SetNCOFrequency(LMS7002M::Rx, 15, abs(actualFreq-userFreq));
+01666         \}
+01667     \}
+01668 
+01669     Modify_SPI_Reg_bits(LMS7param(MAC), ch);
+01670     \textcolor{keywordflow}{return} 0;
+01671 \}
+01672 
+01676 float_type LMS7002M::GetFrequencySX(\textcolor{keywordtype}{bool} tx)
+01677 \{
+01678     Channel ch = this->GetActiveChannel(); \textcolor{comment}{//remember previously used channel}
+01679     float_type dMul;
+01680     this->SetActiveChannel(tx?ChSXT:ChSXR);
+01681     uint16\_t gINT = Get_SPI_Reg_bits(0x011E, 13, 0);    \textcolor{comment}{// read whole register to reduce SPI transfers}
+01682     uint32\_t gFRAC = ((gINT&0xF) * 65536) | Get_SPI_Reg_bits(0x011D, 15, 0);
+01683 
+01684     \textcolor{keyword}{const} float_type refClk\_Hz = GetReferenceClk_SX(tx);
+01685     dMul = (float_type)refClk\_Hz / (1 << (Get_SPI_Reg_bits(LMS7param(DIV_LOCH)) + 1));
+01686     \textcolor{comment}{//Calculate real frequency according to the calculated parameters}
+01687     dMul = dMul * ((gINT >> 4) + 4 + (float_type)gFRAC / 1048576.0) * (
+      Get_SPI_Reg_bits(LMS7param(EN_DIV2_DIVPROG)) + 1);
+01688     this->SetActiveChannel(ch); \textcolor{comment}{//restore used channel}
+01689     \textcolor{keywordflow}{return} dMul;
+01690 \}
+01691 
+01698 \textcolor{keywordtype}{int} LMS7002M::SetNCOFrequency(\textcolor{keywordtype}{bool} tx, uint8\_t index, float_type freq\_Hz)
+01699 \{
+01700     \textcolor{keywordflow}{if}(index > 15)
+01701         \textcolor{keywordflow}{return} ReportError(ERANGE, \textcolor{stringliteral}{"SetNCOFrequency(index = %d) - index out of range [0, 15]"}, \textcolor{keywordtype}{int}(index));
+01702     float_type refClk\_Hz = GetReferenceClk_TSP(tx);
+01703     \textcolor{keywordflow}{if}(freq\_Hz < 0 || freq\_Hz/refClk\_Hz > 0.5)
+01704         \textcolor{keywordflow}{return} ReportError(ERANGE, \textcolor{stringliteral}{"SetNCOFrequency(index = %d) - Frequency(%g MHz) out of range [0-%g) MHz
+      "}, \textcolor{keywordtype}{int}(index), freq\_Hz/1e6, refClk\_Hz/2e6);
+01705     uint16\_t addr = tx ? 0x0240 : 0x0440;
+01706     uint32\_t fcw = uint32\_t((freq\_Hz/refClk\_Hz)*4294967296);
+01707     SPI_write(addr+2+index*2, (fcw >> 16)); \textcolor{comment}{//NCO frequency control word register MSB part.}
+01708     SPI_write(addr+3+index*2, fcw); \textcolor{comment}{//NCO frequency control word register LSB part.}
+01709     \textcolor{keywordflow}{return} 0;
+01710 \}
+01711 
+01718 float_type LMS7002M::GetNCOFrequency(\textcolor{keywordtype}{bool} tx, uint8\_t index, \textcolor{keywordtype}{bool} fromChip)
+01719 \{
+01720     \textcolor{keywordflow}{if}(index > 15)
+01721         \textcolor{keywordflow}{return} ReportError(ERANGE, \textcolor{stringliteral}{"GetNCOFrequency\_MHz(index = %d) - index out of range [0, 15]"}, \textcolor{keywordtype}{int}(
+      index));
+01722     float_type refClk\_Hz = GetReferenceClk_TSP(tx);
+01723     uint16\_t addr = tx ? 0x0240 : 0x0440;
+01724     uint32\_t fcw = 0;
+01725     fcw |= SPI_read(addr + 2 + index * 2, fromChip) << 16; \textcolor{comment}{//NCO frequency control word register MSB part.}
+01726     fcw |= SPI_read(addr + 3 + index * 2, fromChip); \textcolor{comment}{//NCO frequency control word register LSB part.}
+01727     \textcolor{keywordflow}{return} refClk\_Hz*(fcw/4294967296.0);
+01728 \}
+01729 
+01735 \textcolor{keywordtype}{int} LMS7002M::SetNCOPhaseOffsetForMode0(\textcolor{keywordtype}{bool} tx, float_type angle\_deg)
+01736 \{
+01737     uint16\_t addr = tx ? 0x0241 : 0x0441;
+01738     uint16\_t pho = (uint16\_t)(65536 * (angle\_deg / 360 ));
+01739     SPI_write(addr, pho);
+01740     \textcolor{keywordflow}{return} 0;
+01741 \}
+01742 
+01749 \textcolor{keywordtype}{int} LMS7002M::SetNCOPhaseOffset(\textcolor{keywordtype}{bool} tx, uint8\_t index, float_type angle\_deg)
+01750 \{
+01751     \textcolor{keywordflow}{if}(index > 15)
+01752         \textcolor{keywordflow}{return} ReportError(ERANGE, \textcolor{stringliteral}{"SetNCOPhaseOffset(index = %d) - index out of range [0, 15]"}, \textcolor{keywordtype}{int}(index)
+      );
+01753     uint16\_t addr = tx ? 0x0244 : 0x0444;
+01754     uint16\_t pho = (uint16\_t)(65536*(angle\_deg / 360));
+01755     SPI_write(addr+index, pho);
+01756     \textcolor{keywordflow}{return} 0;
+01757 \}
+01758 
+01764 float_type LMS7002M::GetNCOPhaseOffset_Deg(\textcolor{keywordtype}{bool} tx, uint8\_t index)
+01765 \{
+01766     \textcolor{keywordflow}{if}(index > 15)
+01767         \textcolor{keywordflow}{return} ReportError(ERANGE, \textcolor{stringliteral}{"GetNCOPhaseOffset\_Deg(index = %d) - index out of range [0, 15]"}, \textcolor{keywordtype}{int}(
+      index));
+01768     uint16\_t addr = tx ? 0x0244 : 0x0444;
+01769     uint16\_t pho = SPI_read(addr+index);
+01770     float_type angle = 360*pho/65536.0;
+01771     \textcolor{keywordflow}{return} angle;
+01772 \}
+01773 
+01783 \textcolor{keywordtype}{int} LMS7002M::SetGFIRCoefficients(\textcolor{keywordtype}{bool} tx, uint8\_t GFIR\_index, \textcolor{keyword}{const} int16\_t *
+      coef, uint8\_t coefCount)
+01784 \{
+01785     uint8\_t index;
+01786     uint8\_t coefLimit;
+01787     uint16\_t startAddr;
+01788     \textcolor{keywordflow}{if} (GFIR\_index == 0)
+01789         startAddr = 0x0280;
+01790     \textcolor{keywordflow}{else} \textcolor{keywordflow}{if} (GFIR\_index == 1)
+01791         startAddr = 0x02C0;
+01792     \textcolor{keywordflow}{else}
+01793         startAddr = 0x0300;
+01794 
+01795     \textcolor{keywordflow}{if} (tx == \textcolor{keyword}{false})
+01796         startAddr += 0x0200;
+01797     \textcolor{keywordflow}{if} (GFIR\_index < 2)
+01798         coefLimit = 40;
+01799     \textcolor{keywordflow}{else}
+01800         coefLimit = 120;
+01801     \textcolor{keywordflow}{if} (coefCount > coefLimit)
+01802         \textcolor{keywordflow}{return} ReportError(ERANGE, \textcolor{stringliteral}{"SetGFIRCoefficients(coefCount=%d) - exceeds coefLimit=%d"}, \textcolor{keywordtype}{int}(
+      coefCount), \textcolor{keywordtype}{int}(coefLimit));
+01803     vector<uint16\_t> addresses;
+01804     \textcolor{keywordflow}{for} (index = 0; index < coefCount; ++index)
+01805         addresses.push\_back(startAddr + index + 24 * (index / 40));
+01806     SPI_write_batch(&addresses[0], (uint16\_t*)coef, coefCount, \textcolor{keyword}{true});
+01807     \textcolor{keywordflow}{return} 0;
+01808 \}
+01809 
+01817 \textcolor{keywordtype}{int} LMS7002M::GetGFIRCoefficients(\textcolor{keywordtype}{bool} tx, uint8\_t GFIR\_index, int16\_t *coef, uint8\_t coefCount)
+01818 \{
+01819     \textcolor{keywordtype}{int} status = -1;
+01820     uint8\_t index;
+01821     uint8\_t coefLimit;
+01822     uint16\_t startAddr;
+01823     \textcolor{keywordflow}{if}(GFIR\_index == 0)
+01824         startAddr = 0x0280;
+01825     \textcolor{keywordflow}{else} \textcolor{keywordflow}{if} (GFIR\_index == 1)
+01826         startAddr = 0x02C0;
+01827     \textcolor{keywordflow}{else}
+01828         startAddr = 0x0300;
+01829 
+01830     \textcolor{keywordflow}{if} (tx == \textcolor{keyword}{false})
+01831         startAddr += 0x0200;
+01832     \textcolor{keywordflow}{if} (GFIR\_index < 2)
+01833         coefLimit = 40;
+01834     \textcolor{keywordflow}{else}
+01835         coefLimit = 120;
+01836     \textcolor{keywordflow}{if} (coefCount > coefLimit)
+01837         \textcolor{keywordflow}{return} ReportError(ERANGE, \textcolor{stringliteral}{"GetGFIRCoefficients(coefCount=%d) - exceeds coefLimit=%d"}, \textcolor{keywordtype}{int}(
+      coefCount), \textcolor{keywordtype}{int}(coefLimit));
+01838 
+01839     std::vector<uint16\_t> addresses;
+01840     \textcolor{keywordflow}{for} (index = 0; index < coefCount; ++index)
+01841         addresses.push\_back(startAddr + index + 24 * (index / 40));
+01842     uint16\_t spiData[120];
+01843     memset(spiData, 0, 120 * \textcolor{keyword}{sizeof}(uint16\_t));
+01844     \textcolor{keywordflow}{if} (controlPort && controlPort->IsOpen())
+01845     \{
+01846         status = SPI_read_batch(&addresses[0], spiData, coefCount);
+01847         \textcolor{keywordflow}{for} (index = 0; index < coefCount; ++index)
+01848             coef[index] = spiData[index];
+01849     \}
+01850     \textcolor{keywordflow}{else}
+01851     \{
+01852         \textcolor{keyword}{const} \textcolor{keywordtype}{int} channel = Get_SPI_Reg_bits(LMS7param(MAC), \textcolor{keyword}{false}) > 1 ? 1 : 0;
+01853         \textcolor{keywordflow}{for} (index = 0; index < coefCount; ++index)
+01854             coef[index] = mRegistersMap->GetValue(channel, addresses[index]);
+01855         status = 0;
+01856     \}
+01857 
+01858     \textcolor{keywordflow}{return} status;
+01859 
+01860 \}
+01866 \textcolor{keywordtype}{int} LMS7002M::SPI_write(uint16\_t address, uint16\_t data, \textcolor{keywordtype}{bool} toChip)
+01867 \{
+01868     \textcolor{keywordflow}{if}(address == 0x0640 || address == 0x0641)
+01869     \{
+01870         MCU_BD* mcu = GetMCUControls();
+01871         mcu->RunProcedure(MCU_FUNCTION_GET_PROGRAM_ID);
+01872         \textcolor{keywordflow}{if}(mcu->WaitForMCU(100) != MCU_ID_CALIBRATIONS_SINGLE_IMAGE)
+01873             mcu->Program_MCU(mcu_program_lms7_dc_iq_calibration_bin, IConnection::MCU\_PROG\_MODE::SRAM);
+01874         SPI_write(0x002D, address);
+01875         SPI_write(0x020C, data);
+01876         mcu->RunProcedure(7);
+01877         mcu->WaitForMCU(50);
+01878         \textcolor{keywordflow}{return} SPI_read(0x040B) == data ? 0 : -1;
+01879     \}
+01880     \textcolor{keywordflow}{else}
+01881         \textcolor{keywordflow}{return} this->SPI_write_batch(&address, &data, 1, toChip);
+01882 \}
+01883 
+01890 uint16\_t LMS7002M::SPI_read(uint16\_t address, \textcolor{keywordtype}{bool} fromChip, \textcolor{keywordtype}{int} *status)
+01891 \{
+01892     fromChip |= !useCache;
+01893     \textcolor{comment}{//registers containing read only registers, which values can change}
+01894     \textcolor{keyword}{const} uint16\_t readOnlyRegs[] = \{ 0, 1, 2, 3, 4, 5, 6, 0x002F, 0x008C, 0x00A8, 0x00A9, 0x00AA, 0x00AB, 
+      0x00AC, 0x0123, 0x0209, 0x020A, 0x020B, 0x040E, 0x040F, 0x05C3, 0x05C4, 0x05C5, 0x05C6, 0x05C7, 0x05C8, 
+      0x05C9, 0x05CA\};
+01895     \textcolor{keywordflow}{for} (\textcolor{keywordtype}{unsigned} i = 0; i < \textcolor{keyword}{sizeof}(readOnlyRegs) / \textcolor{keyword}{sizeof}(uint16\_t); ++i)
+01896         \textcolor{keywordflow}{if} (address == readOnlyRegs[i])
+01897         \{
+01898             fromChip = \textcolor{keyword}{true};
+01899             \textcolor{keywordflow}{break};
+01900         \}
+01901     \textcolor{keywordflow}{if} (!controlPort || fromChip == \textcolor{keyword}{false})
+01902     \{
+01903         \textcolor{keywordflow}{if} (status && !controlPort)
+01904             *status = ReportError(\textcolor{stringliteral}{"chip not connected"});
+01905         \textcolor{keywordtype}{int} mac = mRegistersMap->GetValue(0, LMS7param(MAC).address) & 0x0003;
+01906         \textcolor{keywordtype}{int} regNo = (mac == 2)? 1 : 0; \textcolor{comment}{//only when MAC is B -> use register space B}
+01907         \textcolor{keywordflow}{if} (address < 0x0100) regNo = 0; \textcolor{comment}{//force A when below MAC mapped register space}
+01908         \textcolor{keywordflow}{return} mRegistersMap->GetValue(regNo, address);
+01909     \}
+01910     \textcolor{keywordflow}{if}(controlPort)
+01911     \{
+01912         uint16\_t data = 0;
+01913         \textcolor{keywordtype}{int} st;
+01914         \textcolor{keywordflow}{if}(address == 0x0640 || address == 0x0641)
+01915         \{
+01916             MCU_BD* mcu = GetMCUControls();
+01917             mcu->RunProcedure(MCU_FUNCTION_GET_PROGRAM_ID);
+01918             \textcolor{keywordflow}{if}(mcu->WaitForMCU(100) != MCU_ID_CALIBRATIONS_SINGLE_IMAGE)
+01919                 mcu->Program_MCU(mcu_program_lms7_dc_iq_calibration_bin, IConnection::MCU\_PROG\_MODE::SRAM);
+01920             SPI_write(0x002D, address);
+01921             mcu->RunProcedure(8);
+01922             mcu->WaitForMCU(50);
+01923             uint16\_t rdVal = SPI_read(0x040B, \textcolor{keyword}{true}, status);
+01924             \textcolor{keywordflow}{return} rdVal;
+01925         \}
+01926         \textcolor{keywordflow}{else}
+01927             st = this->SPI_read_batch(&address, &data, 1);
+01928         \textcolor{keywordflow}{if} (status != \textcolor{keyword}{nullptr}) *status = st;
+01929         \textcolor{keywordflow}{return} data;
+01930     \}
+01931     \textcolor{keywordflow}{return} 0;
+01932 \}
+01933 
+01941 \textcolor{keywordtype}{int} LMS7002M::SPI_write_batch(\textcolor{keyword}{const} uint16\_t* spiAddr, \textcolor{keyword}{const} uint16\_t* spiData, uint16\_t cnt, \textcolor{keywordtype}{bool} 
+      toChip)
+01942 \{
+01943     toChip |= !useCache;
+01944     \textcolor{keywordtype}{int} mac = mRegistersMap->GetValue(0, LMS7param(MAC).address) & 0x0003;
+01945     std::vector<uint32\_t> data;
+01946     \textcolor{keywordflow}{for} (\textcolor{keywordtype}{size\_t} i = 0; i < cnt; ++i) \{
+01947         \textcolor{comment}{//write which register cache based on MAC bits}
+01948         \textcolor{comment}{//or always when below the MAC mapped register space}
+01949         \textcolor{keywordtype}{bool} wr0 = ((mac & 0x1) != 0) || (spiAddr[i] < 0x0100);
+01950         \textcolor{keywordtype}{bool} wr1 = ((mac & 0x2) != 0) && (spiAddr[i] >= 0x0100);
+01951 
+01952         \textcolor{keywordflow}{if} (!toChip) \{
+01953             \textcolor{keywordflow}{if} (wr0 && (mRegistersMap->GetValue(0, spiAddr[i]) == spiData[i]))
+01954                 wr0 = \textcolor{keyword}{false};
+01955             \textcolor{keywordflow}{if} (wr1 && (mRegistersMap->GetValue(1, spiAddr[i]) == spiData[i]))
+01956                 wr1 = \textcolor{keyword}{false};
+01957             \textcolor{keywordflow}{if} (!(wr0 || wr1))
+01958                 \textcolor{keywordflow}{continue};
+01959         \}
+01960 
+01961         data.push\_back ((1 << 31) | (uint32\_t(spiAddr[i]) << 16) | spiData[i]); \textcolor{comment}{//msbit 1=SPI write}
+01962         \textcolor{keywordflow}{if} (wr0) mRegistersMap->SetValue(0, spiAddr[i], spiData[i]);
+01963         \textcolor{keywordflow}{if} (wr1) mRegistersMap->SetValue(1, spiAddr[i], spiData[i]);
+01964 
+01965         \textcolor{comment}{//refresh mac, because batch might also change active channel}
+01966         \textcolor{keywordflow}{if}(spiAddr[i] == LMS7param(MAC).address)
+01967             mac = mRegistersMap->GetValue(0, LMS7param(MAC).address) & 0x0003;
+01968     \}
+01969 
+01970     \textcolor{keywordflow}{if} (data.size() == 0)
+01971         \textcolor{keywordflow}{return} 0;
+01972     \textcolor{keywordflow}{if} (!controlPort)
+01973     \{
+01974         \textcolor{keywordflow}{if} (useCache) \textcolor{keywordflow}{return} 0;
+01975         lime::error(\textcolor{stringliteral}{"No device connected"});
+01976         \textcolor{keywordflow}{return} -1;
+01977     \}
+01978     \textcolor{keywordflow}{return} controlPort->WriteLMS7002MSPI(data.data(), data.size(), mdevIndex);
+01979 \}
+01980 
+01987 \textcolor{keywordtype}{int} LMS7002M::SPI_read_batch(\textcolor{keyword}{const} uint16\_t* spiAddr, uint16\_t* spiData, uint16\_t cnt)
+01988 \{
+01989     \textcolor{keywordflow}{if} (!controlPort)
+01990     \{
+01991         lime::error(\textcolor{stringliteral}{"No device connected"});
+01992         \textcolor{keywordflow}{return} -1;
+01993     \}
+01994 
+01995     std::vector<uint32\_t> dataWr(cnt);
+01996     std::vector<uint32\_t> dataRd(cnt);
+01997     \textcolor{keywordflow}{for} (\textcolor{keywordtype}{size\_t} i = 0; i < cnt; ++i)
+01998     \{
+01999         dataWr[i] = (uint32\_t(spiAddr[i]) << 16);
+02000     \}
+02001 
+02002 
+02003     \textcolor{keywordtype}{int} status = controlPort->ReadLMS7002MSPI(dataWr.data(), dataRd.data(), cnt,
+      mdevIndex);
+02004     \textcolor{keywordflow}{if} (status != 0) \textcolor{keywordflow}{return} status;
+02005 
+02006     \textcolor{keywordtype}{int} mac = mRegistersMap->GetValue(0, LMS7param(MAC).address) & 0x0003;
+02007 
+02008     \textcolor{keywordflow}{for} (\textcolor{keywordtype}{size\_t} i = 0; i < cnt; ++i)
+02009     \{
+02010         spiData[i] = dataRd[i] & 0xffff;
+02011 
+02012         \textcolor{comment}{//write which register cache based on MAC bits}
+02013         \textcolor{comment}{//or always when below the MAC mapped register space}
+02014         \textcolor{keywordtype}{bool} wr0 = ((mac & 0x1) != 0) or (spiAddr[i] < 0x0100);
+02015         \textcolor{keywordtype}{bool} wr1 = ((mac & 0x2) != 0) and (spiAddr[i] >= 0x0100);
+02016 
+02017         \textcolor{keywordflow}{if} (wr0) mRegistersMap->SetValue(0, spiAddr[i], spiData[i]);
+02018         \textcolor{keywordflow}{if} (wr1) mRegistersMap->SetValue(1, spiAddr[i], spiData[i]);
+02019     \}
+02020     \textcolor{keywordflow}{return} 0;
+02021 \}
+02022 
+02026 \textcolor{keywordtype}{int} LMS7002M::RegistersTest(\textcolor{keyword}{const} \textcolor{keywordtype}{char}* fileName)
+02027 \{
+02028     \textcolor{keywordtype}{char} chex[16];
+02029     \textcolor{keywordflow}{if} (!controlPort)
+02030     \{
+02031         lime::error(\textcolor{stringliteral}{"No device connected"});
+02032         \textcolor{keywordflow}{return} -1;
+02033     \}
+02034 
+02035     \textcolor{keywordtype}{int} status;
+02036     Channel ch = this->GetActiveChannel();
+02037 
+02038     \textcolor{comment}{//backup both channel data for restoration after test}
+02039     vector<uint16\_t> ch1Addresses;
+02040     \textcolor{keywordflow}{for} (uint8\_t i = 0; i < MEMORY_SECTIONS_COUNT; ++i)
+02041         \textcolor{keywordflow}{for} (uint16\_t addr = MemorySectionAddresses[i][0]; addr <= 
+      MemorySectionAddresses[i][1]; ++addr)
+02042             ch1Addresses.push\_back(addr);
+02043     vector<uint16\_t> ch1Data;
+02044     ch1Data.resize(ch1Addresses.size(), 0);
+02045 
+02046     \textcolor{comment}{//backup A channel}
+02047     this->SetActiveChannel(ChA);
+02048     status = SPI_read_batch(&ch1Addresses[0], &ch1Data[0], ch1Addresses.size());
+02049     \textcolor{keywordflow}{if} (status != 0)
+02050         \textcolor{keywordflow}{return} status;
+02051 
+02052     vector<uint16\_t> ch2Addresses;
+02053     \textcolor{keywordflow}{for} (uint8\_t i = 0; i < MEMORY_SECTIONS_COUNT; ++i)
+02054         \textcolor{keywordflow}{for} (uint16\_t addr = MemorySectionAddresses[i][0]; addr <= 
+      MemorySectionAddresses[i][1]; ++addr)
+02055             \textcolor{keywordflow}{if} (addr >= 0x0100)
+02056                 ch2Addresses.push\_back(addr);
+02057     vector<uint16\_t> ch2Data;
+02058     ch2Data.resize(ch2Addresses.size(), 0);
+02059 
+02060     this->SetActiveChannel(ChB);
+02061     status = SPI_read_batch(&ch2Addresses[0], &ch2Data[0], ch2Addresses.size());
+02062     \textcolor{keywordflow}{if} (status != 0)
+02063         \textcolor{keywordflow}{return} status;
+02064 
+02065     \textcolor{comment}{//test registers}
+02066     ResetChip();
+02067     Modify_SPI_Reg_bits(LMS7param(MIMO_SISO), 0);
+02068     Modify_SPI_Reg_bits(LMS7param(PD_RX_AFE2), 0);
+02069     Modify_SPI_Reg_bits(LMS7param(PD_TX_AFE2), 0);
+02070     this->SetActiveChannel(ChA);
+02071 
+02072     stringstream ss;
+02073 
+02074     \textcolor{comment}{//check single channel memory sections}
+02075     vector<MemorySection> modulesToCheck = \{ AFE, BIAS, XBUF, CGEN, BIST, CDS, 
+      TRF, TBB, RFE, RBB, SX,
+02076         TxTSP, TxNCO, TxGFIR1, TxGFIR2, TxGFIR3a, TxGFIR3b, TxGFIR3c,
+02077         RxTSP, RxNCO, RxGFIR1, RxGFIR2, RxGFIR3a, RxGFIR3b, RxGFIR3c, LimeLight, 
+      LDO \};
+02078     \textcolor{keyword}{const} \textcolor{keywordtype}{char}* moduleNames[] = \{ \textcolor{stringliteral}{"AFE"}, \textcolor{stringliteral}{"BIAS"}, \textcolor{stringliteral}{"XBUF"}, \textcolor{stringliteral}{"CGEN"}, \textcolor{stringliteral}{"BIST"}, \textcolor{stringliteral}{"CDS"}, \textcolor{stringliteral}{"TRF"}, \textcolor{stringliteral}{"TBB"}, \textcolor{stringliteral}{"RFE"}, \textcolor{stringliteral}{"RBB"},
+       \textcolor{stringliteral}{"SX"},
+02079         \textcolor{stringliteral}{"TxTSP"}, \textcolor{stringliteral}{"TxNCO"}, \textcolor{stringliteral}{"TxGFIR1"}, \textcolor{stringliteral}{"TxGFIR2"}, \textcolor{stringliteral}{"TxGFIR3a"}, \textcolor{stringliteral}{"TxGFIR3b"}, \textcolor{stringliteral}{"TxGFIR3c"},
+02080         \textcolor{stringliteral}{"RxTSP"}, \textcolor{stringliteral}{"RxNCO"}, \textcolor{stringliteral}{"RxGFIR1"}, \textcolor{stringliteral}{"RxGFIR2"}, \textcolor{stringliteral}{"RxGFIR3a"}, \textcolor{stringliteral}{"RxGFIR3b"}, \textcolor{stringliteral}{"RxGFIR3c"}, \textcolor{stringliteral}{"LimeLight"}, \textcolor{stringliteral}{"LDO"}\};
+02081 
+02082     \textcolor{keyword}{const} uint16\_t patterns[] = \{ 0xAAAA, 0x5555 \};
+02083     \textcolor{keyword}{const} uint8\_t patternsCount = 2;
+02084 
+02085     \textcolor{keywordtype}{bool} allTestSuccess = \textcolor{keyword}{true};
+02086 
+02087     \textcolor{keywordflow}{for} (\textcolor{keywordtype}{unsigned} i = 0; i < modulesToCheck.size(); ++i)
+02088     \{
+02089         \textcolor{keywordtype}{bool} moduleTestsSuccess = \textcolor{keyword}{true};
+02090         uint16\_t startAddr = MemorySectionAddresses[modulesToCheck[i]][0];
+02091         uint16\_t endAddr = MemorySectionAddresses[modulesToCheck[i]][1];
+02092         uint8\_t channelCount = startAddr >= 0x0100 ? 2 : 1;
+02093         \textcolor{keywordflow}{for} (\textcolor{keywordtype}{int} cc = 1; cc <= channelCount; ++cc)
+02094         \{
+02095             Modify_SPI_Reg_bits(LMS7param(MAC), cc);
+02096             sprintf(chex, \textcolor{stringliteral}{"0x%04X"}, startAddr);
+02097             ss << moduleNames[i] << \textcolor{stringliteral}{"  ["} << chex << \textcolor{stringliteral}{":"};
+02098             sprintf(chex, \textcolor{stringliteral}{"0x%04X"}, endAddr);
+02099             ss << chex << \textcolor{stringliteral}{"]"};
+02100             \textcolor{keywordflow}{if} (startAddr >= 0x0100) \{
+02101                 ss << \textcolor{stringliteral}{" Ch."} << (cc == 1 ? \textcolor{stringliteral}{"A"} : \textcolor{stringliteral}{"B"});
+02102         \}
+02103             ss << endl;
+02104             \textcolor{keywordflow}{for} (uint8\_t p = 0; p < patternsCount; ++p)
+02105                 moduleTestsSuccess &= RegistersTestInterval(startAddr, endAddr, patterns[p], ss) == 0;
+02106         \}
+02107         allTestSuccess &= moduleTestsSuccess;
+02108     \}
+02109 
+02110     \textcolor{comment}{//restore register values}
+02111     this->SetActiveChannel(ChA);
+02112     SPI_write_batch(&ch1Addresses[0], &ch1Data[0], ch1Addresses.size(), \textcolor{keyword}{true});
+02113     this->SetActiveChannel(ChB);
+02114     SPI_write_batch(&ch2Addresses[0], &ch2Data[0], ch2Addresses.size(), \textcolor{keyword}{true});
+02115     this->SetActiveChannel(ch);
+02116 
+02117     \textcolor{keywordflow}{if} (fileName)
+02118     \{
+02119         fstream fout;
+02120         fout.open(fileName, ios::out);
+02121         fout << ss.str() << endl;
+02122         fout.close();
+02123     \}
+02124 
+02125     \textcolor{keywordflow}{if} (allTestSuccess) \textcolor{keywordflow}{return} 0;
+02126     lime::error(\textcolor{stringliteral}{"RegistersTest() failed"});
+02127     \textcolor{keywordflow}{return} -1;
+02128 \}
+02129 
+02136 \textcolor{keywordtype}{int} LMS7002M::RegistersTestInterval(uint16\_t startAddr, uint16\_t endAddr, uint16\_t pattern, stringstream &
+      ss)
+02137 \{
+02138     vector<uint16\_t> addrToWrite;
+02139     vector<uint16\_t> dataToWrite;
+02140     vector<uint16\_t> dataReceived;
+02141     vector<uint16\_t> dataMasks;
+02142 
+02143     \textcolor{keywordflow}{for} (uint16\_t addr = startAddr; addr <= endAddr; ++addr)
+02144     \{
+02145         addrToWrite.push\_back(addr);
+02146     \}
+02147     dataMasks.resize(addrToWrite.size(), 0xFFFF);
+02148     \textcolor{keywordflow}{for} (uint16\_t j = 0; j < \textcolor{keyword}{sizeof}(readOnlyRegisters)/\textcolor{keyword}{sizeof}(uint16\_t); ++j)
+02149         \textcolor{keywordflow}{for} (uint16\_t k = 0; k < addrToWrite.size(); ++k)
+02150             \textcolor{keywordflow}{if} (readOnlyRegisters[j] == addrToWrite[k])
+02151             \{
+02152                 dataMasks[k] = readOnlyRegistersMasks[j];
+02153                 \textcolor{keywordflow}{break};
+02154             \}
+02155 
+02156     dataToWrite.clear();
+02157     dataReceived.clear();
+02158     \textcolor{keywordflow}{for} (uint16\_t j = 0; j < addrToWrite.size(); ++j)
+02159     \{
+02160         \textcolor{keywordflow}{if} (addrToWrite[j] == 0x00A6)
+02161             dataToWrite.push\_back(0x1 | (pattern & ~0x2));
+02162         \textcolor{keywordflow}{else} \textcolor{keywordflow}{if} (addrToWrite[j] == 0x0084)
+02163             dataToWrite.push\_back(pattern & ~0x19);
+02164         \textcolor{keywordflow}{else}
+02165             dataToWrite.push\_back(pattern & dataMasks[j]);
+02166     \}
+02167     dataReceived.resize(addrToWrite.size(), 0);
+02168     \textcolor{keywordtype}{int} status;
+02169     status = SPI_write_batch(&addrToWrite[0], &dataToWrite[0], addrToWrite.size(), \textcolor{keyword}{true});
+02170     \textcolor{keywordflow}{if} (status != 0)
+02171         \textcolor{keywordflow}{return} status;
+02172     status = SPI_read_batch(&addrToWrite[0], &dataReceived[0], addrToWrite.size());
+02173     \textcolor{keywordflow}{if} (status != 0)
+02174         \textcolor{keywordflow}{return} status;
+02175     \textcolor{keywordtype}{bool} registersMatch = \textcolor{keyword}{true};
+02176     \textcolor{keywordtype}{char} ctemp[16];
+02177     \textcolor{keywordflow}{for} (uint16\_t j = 0; j < dataToWrite.size(); ++j)
+02178     \{
+02179         \textcolor{keywordflow}{if} (dataToWrite[j] != (dataReceived[j] & dataMasks[j]))
+02180         \{
+02181             registersMatch = \textcolor{keyword}{false};
+02182             sprintf(ctemp, \textcolor{stringliteral}{"0x%04X"}, addrToWrite[j]);
+02183             ss << \textcolor{stringliteral}{"\(\backslash\)t"} << ctemp << \textcolor{stringliteral}{"(wr/rd): "};
+02184             sprintf(ctemp, \textcolor{stringliteral}{"0x%04X"}, dataToWrite[j]);
+02185             ss << ctemp << \textcolor{stringliteral}{"/"};
+02186             sprintf(ctemp, \textcolor{stringliteral}{"0x%04X"}, dataReceived[j]);
+02187             ss << ctemp << endl;
+02188         \}
+02189     \}
+02190     \textcolor{keywordflow}{if} (registersMatch)
+02191     \{
+02192         sprintf(ctemp, \textcolor{stringliteral}{"0x%04X"}, pattern);
+02193         ss << \textcolor{stringliteral}{"\(\backslash\)tRegisters OK ("} << ctemp << \textcolor{stringliteral}{")\(\backslash\)n"};
+02194     \}
+02195     \textcolor{keywordflow}{if} (registersMatch) \textcolor{keywordflow}{return} 0;
+02196     \textcolor{keywordflow}{return} ReportError(-1, \textcolor{stringliteral}{"RegistersTestInterval(startAddr=0x%x, endAddr=0x%x) - failed"}, startAddr, 
+      endAddr);
+02197 \}
+02198 
+02201 \textcolor{keywordtype}{void} LMS7002M::SetRxDCOFF(int8\_t offsetI, int8\_t offsetQ)
+02202 \{
+02203     uint16\_t valToSend = 0;
+02204     \textcolor{keywordflow}{if} (offsetI < 0)
+02205         valToSend |= 0x40;
+02206     valToSend |= labs(offsetI);
+02207     valToSend = valToSend << 7;
+02208     \textcolor{keywordflow}{if} (offsetQ < 0)
+02209         valToSend |= 0x40;
+02210     valToSend |= labs(offsetQ);
+02211     SPI_write(0x010E, valToSend);
+02212 \}
+02213 
+02217 \textcolor{keywordtype}{int} LMS7002M::SetDefaults(MemorySection module)
+02218 \{
+02219     \textcolor{keywordtype}{int} status = 0;
+02220     vector<uint16\_t> addrs;
+02221     vector<uint16\_t> values;
+02222     \textcolor{keywordflow}{for}(uint32\_t address = MemorySectionAddresses[module][0]; address <= 
+      MemorySectionAddresses[module][1]; ++address)
+02223     \{
+02224         addrs.push\_back(address);
+02225         values.push\_back(mRegistersMap->GetDefaultValue(address));
+02226     \}
+02227     status = SPI_write_batch(&addrs[0], &values[0], addrs.size());
+02228     \textcolor{keywordflow}{return} status;
+02229 \}
+02230 
+02233 \textcolor{keywordtype}{bool} LMS7002M::IsSynced()
+02234 \{
+02235     \textcolor{keywordflow}{if} (!controlPort || controlPort->IsOpen() == \textcolor{keyword}{false})
+02236         \textcolor{keywordflow}{return} \textcolor{keyword}{false};
+02237     \textcolor{keywordtype}{bool} isSynced = \textcolor{keyword}{true};
+02238     \textcolor{keywordtype}{int} status;
+02239 
+02240     Channel ch = this->GetActiveChannel();
+02241 
+02242     vector<uint16\_t> addrToRead = mRegistersMap->GetUsedAddresses(0);
+02243     vector<uint16\_t> dataReceived;
+02244     dataReceived.resize(addrToRead.size(), 0);
+02245 
+02246     this->SetActiveChannel(ChA);
+02247     std::vector<uint32\_t> dataWr(addrToRead.size());
+02248     std::vector<uint32\_t> dataRd(addrToRead.size());
+02249     \textcolor{keywordflow}{for}(\textcolor{keywordtype}{size\_t} i = 0; i < addrToRead.size(); ++i)
+02250         dataWr[i] = (uint32\_t(addrToRead[i]) << 16);
+02251     status = controlPort->ReadLMS7002MSPI(dataWr.data(),  dataRd.data(), dataWr.size(),
+      mdevIndex);
+02252 
+02253     \textcolor{keywordflow}{for}(\textcolor{keywordtype}{size\_t} i=0; i<addrToRead.size(); ++i)
+02254         dataReceived[i] = dataRd[i] & 0xFFFF;
+02255     \textcolor{keywordflow}{if} (status != 0)
+02256     \{
+02257         isSynced = \textcolor{keyword}{false};
+02258         \textcolor{keywordflow}{goto} isSyncedEnding;
+02259     \}
+02260 
+02261     \textcolor{comment}{//check if local copy matches chip}
+02262     \textcolor{keywordflow}{for} (uint16\_t i = 0; i < addrToRead.size(); ++i)
+02263     \{
+02264         uint16\_t regValue = mRegistersMap->GetValue(0, addrToRead[i]);
+02265         \textcolor{keywordflow}{if}(addrToRead[i] <= readOnlyRegisters[\textcolor{keyword}{sizeof}(readOnlyRegisters)/\textcolor{keyword}{sizeof}(uint16\_t)-1] && addrToRead[i
+      ] >= readOnlyRegisters[0])
+02266         \{
+02267             \textcolor{comment}{//mask out readonly bits}
+02268             \textcolor{keywordflow}{for} (uint16\_t j = 0; j < \textcolor{keyword}{sizeof}(readOnlyRegisters) / \textcolor{keyword}{sizeof}(uint16\_t); ++j)
+02269                 \textcolor{keywordflow}{if} (readOnlyRegisters[j] == addrToRead[i])
+02270                 \{
+02271                     dataReceived[i] &= readOnlyRegistersMasks[j];
+02272                     regValue &= readOnlyRegistersMasks[j];
+02273                     \textcolor{keywordflow}{break};
+02274                 \}
+02275         \}
+02276         \textcolor{keywordflow}{if} (dataReceived[i] != regValue)
+02277         \{
+02278             lime::debug(\textcolor{stringliteral}{"Addr: 0x%04X  gui: 0x%04X  chip: 0x%04X"}, addrToRead[i], regValue, dataReceived[i]
+      );
+02279             isSynced = \textcolor{keyword}{false};
+02280             \textcolor{keywordflow}{goto} isSyncedEnding;
+02281         \}
+02282     \}
+02283 
+02284     addrToRead.clear(); \textcolor{comment}{//add only B channel addresses}
+02285     addrToRead = mRegistersMap->GetUsedAddresses(1);
+02286     dataWr.resize(addrToRead.size());
+02287     dataRd.resize(addrToRead.size());
+02288     \textcolor{keywordflow}{for}(\textcolor{keywordtype}{size\_t} i = 0; i < addrToRead.size(); ++i)
+02289         dataWr[i] = (uint32\_t(addrToRead[i]) << 16);
+02290     status = controlPort->ReadLMS7002MSPI(dataWr.data(),  dataRd.data(), dataWr.size(),
+      mdevIndex);
+02291     \textcolor{keywordflow}{for}(\textcolor{keywordtype}{size\_t} i=0; i<addrToRead.size(); ++i)
+02292         dataReceived[i] = dataRd[i] & 0xFFFF;
+02293     \textcolor{keywordflow}{if} (status != 0)
+02294     \{
+02295         isSynced = \textcolor{keyword}{false};
+02296         \textcolor{keywordflow}{goto} isSyncedEnding;
+02297     \}
+02298     this->SetActiveChannel(ChB);
+02299 
+02300     \textcolor{comment}{//check if local copy matches chip}
+02301     \textcolor{keywordflow}{for} (uint16\_t i = 0; i < addrToRead.size(); ++i)
+02302     \{
+02303         uint16\_t regValue = mRegistersMap->GetValue(1, addrToRead[i]);
+02304         \textcolor{keywordflow}{if}(addrToRead[i] <= readOnlyRegisters[\textcolor{keyword}{sizeof}(readOnlyRegisters)/\textcolor{keyword}{sizeof}(uint16\_t)-1] && addrToRead[i
+      ] >= readOnlyRegisters[0])
+02305         \{
+02306             \textcolor{comment}{//mask out readonly bits}
+02307             \textcolor{keywordflow}{for} (uint16\_t j = 0; j < \textcolor{keyword}{sizeof}(readOnlyRegisters) / \textcolor{keyword}{sizeof}(uint16\_t); ++j)
+02308                 \textcolor{keywordflow}{if} (readOnlyRegisters[j] == addrToRead[i])
+02309                 \{
+02310                     dataReceived[i] &= readOnlyRegistersMasks[j];
+02311                     regValue &= readOnlyRegistersMasks[j];
+02312                     \textcolor{keywordflow}{break};
+02313                 \}
+02314         \}
+02315         \textcolor{keywordflow}{if} (dataReceived[i] != regValue)
+02316         \{
+02317             lime::debug(\textcolor{stringliteral}{"Addr: 0x%04X  gui: 0x%04X  chip: 0x%04X"}, addrToRead[i], regValue, dataReceived[i]
+      );
+02318             isSynced = \textcolor{keyword}{false};
+02319             \textcolor{keywordflow}{goto} isSyncedEnding;
+02320         \}
+02321     \}
+02322 isSyncedEnding:
+02323     this->SetActiveChannel(ch); \textcolor{comment}{//restore previously used channel}
+02324     \textcolor{keywordflow}{return} isSynced;
+02325 \}
+02326 
+02330 \textcolor{keywordtype}{int} LMS7002M::UploadAll()
+02331 \{
+02332     \textcolor{keywordflow}{if} (!controlPort) \{
+02333         lime::error(\textcolor{stringliteral}{"No device connected"});
+02334         \textcolor{keywordflow}{return} -1;
+02335     \}
+02336 
+02337     Channel ch = this->GetActiveChannel(); \textcolor{comment}{//remember used channel}
+02338 
+02339     \textcolor{keywordtype}{int} status;
+02340 
+02341     vector<uint16\_t> addrToWrite;
+02342     vector<uint16\_t> dataToWrite;
+02343 
+02344     uint16\_t x0020\_value = mRegistersMap->GetValue(0, 0x0020);
+02345     this->SetActiveChannel(ChA); \textcolor{comment}{//select A channel}
+02346 
+02347     addrToWrite = mRegistersMap->GetUsedAddresses(0);
+02348     \textcolor{comment}{//remove 0x0020 register from list, to not change MAC}
+02349     addrToWrite.erase( find(addrToWrite.begin(), addrToWrite.end(), 0x0020) );
+02350     \textcolor{keywordflow}{for} (\textcolor{keyword}{auto} address : addrToWrite)
+02351         dataToWrite.push\_back(mRegistersMap->GetValue(0, address));
+02352 
+02353     status = SPI_write_batch(&addrToWrite[0], &dataToWrite[0], addrToWrite.size(), \textcolor{keyword}{true});
+02354     \textcolor{keywordflow}{if} (status != 0)
+02355         \textcolor{keywordflow}{return} status;
+02356     \textcolor{comment}{//after all channel A registers have been written, update 0x0020 register value}
+02357     status = SPI_write(0x0020, x0020\_value);
+02358     \textcolor{keywordflow}{if} (status != 0)
+02359         \textcolor{keywordflow}{return} status;
+02360     this->SetActiveChannel(ChB);
+02361     \textcolor{keywordflow}{if} (status != 0)
+02362         \textcolor{keywordflow}{return} status;
+02363 
+02364     addrToWrite = mRegistersMap->GetUsedAddresses(1);
+02365     dataToWrite.clear();
+02366     \textcolor{keywordflow}{for} (\textcolor{keyword}{auto} address : addrToWrite)
+02367     \{
+02368         dataToWrite.push\_back(mRegistersMap->GetValue(1, address));
+02369     \}
+02370     this->SetActiveChannel(ChB); \textcolor{comment}{//select B channel}
+02371     status = SPI_write_batch(&addrToWrite[0], &dataToWrite[0], addrToWrite.size(), \textcolor{keyword}{true});
+02372     \textcolor{keywordflow}{if} (status != 0)
+02373         \textcolor{keywordflow}{return} status;
+02374     this->SetActiveChannel(ch); \textcolor{comment}{//restore last used channel}
+02375 
+02376     \textcolor{keywordflow}{return} 0;
+02377 \}
+02378 
+02382 \textcolor{keywordtype}{int} LMS7002M::DownloadAll()
+02383 \{
+02384     \textcolor{keywordflow}{if} (!controlPort) \{
+02385         lime::error(\textcolor{stringliteral}{"No device connected"});
+02386         \textcolor{keywordflow}{return} -1;
+02387     \}
+02388     \textcolor{keywordtype}{int} status;
+02389     Channel ch = this->GetActiveChannel(\textcolor{keyword}{false});
+02390 
+02391     vector<uint16\_t> addrToRead = mRegistersMap->GetUsedAddresses(0);
+02392     vector<uint16\_t> dataReceived;
+02393     dataReceived.resize(addrToRead.size(), 0);
+02394     this->SetActiveChannel(ChA);
+02395     status = SPI_read_batch(&addrToRead[0], &dataReceived[0], addrToRead.size());
+02396     \textcolor{keywordflow}{if} (status != 0)
+02397         \textcolor{keywordflow}{return} status;
+02398 
+02399     \textcolor{keywordflow}{for} (uint16\_t i = 0; i < addrToRead.size(); ++i)
+02400     \{
+02401         mRegistersMap->SetValue(0, addrToRead[i], dataReceived[i]);
+02402     \}
+02403 
+02404     addrToRead.clear(); \textcolor{comment}{//add only B channel addresses}
+02405     addrToRead = mRegistersMap->GetUsedAddresses(1);
+02406     dataReceived.resize(addrToRead.size(), 0);
+02407 
+02408     this->SetActiveChannel(ChB);
+02409     status = SPI_read_batch(&addrToRead[0], &dataReceived[0], addrToRead.size());
+02410     \textcolor{keywordflow}{if} (status != 0)
+02411         \textcolor{keywordflow}{return} status;
+02412     \textcolor{keywordflow}{for} (uint16\_t i = 0; i < addrToRead.size(); ++i)
+02413         mRegistersMap->SetValue(1, addrToRead[i], dataReceived[i]);
+02414 
+02415     this->SetActiveChannel(ch); \textcolor{comment}{//retore previously used channel}
+02416 
+02417     \textcolor{keywordflow}{return} 0;
+02418 \}
+02419 
+02424 \textcolor{keywordtype}{int} LMS7002M::SetInterfaceFrequency(float_type cgen\_freq\_Hz, \textcolor{keyword}{const} uint8\_t interpolation, \textcolor{keyword}{const} uint8\_t 
+      decimation)
+02425 \{
+02426     \textcolor{keywordtype}{int} status = 0;
+02427     status = Modify_SPI_Reg_bits(LMS7param(HBD_OVR_RXTSP), decimation);
+02428     \textcolor{keywordflow}{if}(status != 0)
+02429         \textcolor{keywordflow}{return} status;
+02430     Modify_SPI_Reg_bits(LMS7param(HBI_OVR_TXTSP), interpolation);
+02431 
+02432     \textcolor{comment}{//clock rate already set because the readback frequency is pretty-close,}
+02433     \textcolor{comment}{//dont set the cgen frequency again to save time due to VCO selection}
+02434     \textcolor{comment}{//const auto freqDiff = std::abs(this->GetFrequencyCGEN() - cgen\_freq\_Hz);}
+02435     \textcolor{comment}{//if (not this->GetCGENLocked() or freqDiff > 10.0)}
+02436     \{
+02437         status = SetFrequencyCGEN(cgen\_freq\_Hz);
+02438         \textcolor{keywordflow}{if} (status != 0) \textcolor{keywordflow}{return} status;
+02439     \}
+02440     \textcolor{keyword}{auto} siso =  Get_SPI_Reg_bits(LMS7_LML2_SISODDR);
+02441     \textcolor{keywordtype}{int} mclk2src = Get_SPI_Reg_bits(LMS7param(MCLK2SRC));
+02442     \textcolor{keywordflow}{if} (decimation == 7 || (decimation == 0 && siso == 0)) \textcolor{comment}{//bypass}
+02443     \{
+02444         Modify_SPI_Reg_bits(LMS7param(RXTSPCLKA_DIV), 0);
+02445         Modify_SPI_Reg_bits(LMS7param(RXDIVEN), \textcolor{keyword}{false});
+02446         Modify_SPI_Reg_bits(LMS7param(MCLK2SRC), (mclk2src & 1) | 0x2);
+02447     \}
+02448     \textcolor{keywordflow}{else}
+02449     \{
+02450         uint8\_t divider = (uint8\_t)pow(2.0, decimation+siso);
+02451         \textcolor{keywordflow}{if} (divider > 1)
+02452             Modify_SPI_Reg_bits(LMS7param(RXTSPCLKA_DIV), (divider / 2) - 1);
+02453         \textcolor{keywordflow}{else}
+02454             Modify_SPI_Reg_bits(LMS7param(RXTSPCLKA_DIV), 0);
+02455         Modify_SPI_Reg_bits(LMS7param(RXDIVEN), \textcolor{keyword}{true});
+02456         Modify_SPI_Reg_bits(LMS7param(MCLK2SRC), mclk2src & 1);
+02457     \}
+02458 
+02459     \textcolor{keywordflow}{if} (Get_SPI_Reg_bits(LMS7param(RX_MUX)) == 0)
+02460     \{
+02461         \textcolor{keywordtype}{bool} mimoBypass = (decimation == 7) && (siso == 0);
+02462         Modify_SPI_Reg_bits(LMS7param(RXRDCLK_MUX),mimoBypass ? 3 : 1);
+02463         Modify_SPI_Reg_bits(LMS7param(RXWRCLK_MUX),mimoBypass ? 1 : 2);
+02464     \}
+02465 
+02466     siso =  Get_SPI_Reg_bits(LMS7_LML1_SISODDR);
+02467     \textcolor{keywordtype}{int} mclk1src = Get_SPI_Reg_bits(LMS7param(MCLK1SRC));
+02468     \textcolor{keywordflow}{if} (interpolation == 7 || (interpolation == 0 && siso == 0)) \textcolor{comment}{//bypass}
+02469     \{
+02470         Modify_SPI_Reg_bits(LMS7param(TXTSPCLKA_DIV), 0);
+02471         Modify_SPI_Reg_bits(LMS7param(TXDIVEN), \textcolor{keyword}{false});
+02472         Modify_SPI_Reg_bits(LMS7param(MCLK1SRC), (mclk1src & 1) | 0x2);
+02473     \}
+02474     \textcolor{keywordflow}{else}
+02475     \{
+02476         uint8\_t divider = (uint8\_t)pow(2.0, interpolation+siso);
+02477         \textcolor{keywordflow}{if} (divider > 1)
+02478             Modify_SPI_Reg_bits(LMS7param(TXTSPCLKA_DIV), (divider / 2) - 1);
+02479         \textcolor{keywordflow}{else}
+02480             Modify_SPI_Reg_bits(LMS7param(TXTSPCLKA_DIV), 0);
+02481         Modify_SPI_Reg_bits(LMS7param(TXDIVEN), \textcolor{keyword}{true});
+02482         Modify_SPI_Reg_bits(LMS7param(MCLK1SRC), mclk1src & 1);
+02483     \}
+02484 
+02485     \textcolor{keywordflow}{if} (Get_SPI_Reg_bits(LMS7param(TX_MUX)) == 0)
+02486     \{
+02487         \textcolor{keywordtype}{bool} mimoBypass = (interpolation == 7) && (siso == 0);
+02488         Modify_SPI_Reg_bits(LMS7param(TXRDCLK_MUX),mimoBypass ? 0 : 2);
+02489         Modify_SPI_Reg_bits(LMS7param(TXWRCLK_MUX), 0);
+02490     \}
+02491 
+02492     \textcolor{keywordflow}{return} status;
+02493 \}
+02494 
+02495 float_type LMS7002M::GetSampleRate(\textcolor{keywordtype}{bool} tx, Channel ch)
+02496 \{
+02497     float_type interface\_Hz;
+02498     \textcolor{keywordtype}{int} ratio;
+02499     \textcolor{keyword}{auto} chBck = GetActiveChannel();
+02500     SetActiveChannel(ch);
+02501     \textcolor{comment}{//if decimation/interpolation is 0(2^1) or 7(bypass), interface clocks should not be divided}
+02502     \textcolor{keywordflow}{if} (tx)
+02503     \{
+02504         ratio = Get_SPI_Reg_bits(LMS7param(HBI_OVR_TXTSP),\textcolor{keyword}{true});
+02505         interface\_Hz = GetReferenceClk_TSP(lime::LMS7002M::Tx);
+02506     \}
+02507     \textcolor{keywordflow}{else}
+02508     \{
+02509         ratio = Get_SPI_Reg_bits(LMS7param(HBD_OVR_RXTSP),\textcolor{keyword}{true});
+02510         interface\_Hz = GetReferenceClk_TSP(lime::LMS7002M::Rx);
+02511     \}
+02512     SetActiveChannel(chBck);
+02513     \textcolor{keywordflow}{if} (ratio != 7)
+02514         interface\_Hz /= pow(2.0, ratio);
+02515     \textcolor{keywordflow}{return} interface\_Hz/2.0;
+02516 \}
+02517 
+02518 \textcolor{keywordtype}{void} LMS7002M::ConfigureLML_RF2BB(
+02519     \textcolor{keyword}{const} LMLSampleSource s0,
+02520     \textcolor{keyword}{const} LMLSampleSource s1,
+02521     \textcolor{keyword}{const} LMLSampleSource s2,
+02522     \textcolor{keyword}{const} LMLSampleSource s3)
+02523 \{
+02524     \textcolor{comment}{//map a sample source to a position}
+02525     std::map<LMLSampleSource, int> m;
+02526     m[AI] = 1;
+02527     m[AQ] = 0;
+02528     m[BI] = 3;
+02529     m[BQ] = 2;
+02530 
+02531     \textcolor{comment}{//load the same config on both LMLs}
+02532     \textcolor{comment}{//only one will get used based on direction}
+02533     this->Modify_SPI_Reg_bits(LMS7param(LML1_S3S), m[s3]);
+02534     this->Modify_SPI_Reg_bits(LMS7param(LML1_S2S), m[s2]);
+02535     this->Modify_SPI_Reg_bits(LMS7param(LML1_S1S), m[s1]);
+02536     this->Modify_SPI_Reg_bits(LMS7param(LML1_S0S), m[s0]);
+02537 
+02538     this->Modify_SPI_Reg_bits(LMS7param(LML2_S3S), m[s3]);
+02539     this->Modify_SPI_Reg_bits(LMS7param(LML2_S2S), m[s2]);
+02540     this->Modify_SPI_Reg_bits(LMS7param(LML2_S1S), m[s1]);
+02541     this->Modify_SPI_Reg_bits(LMS7param(LML2_S0S), m[s0]);
+02542 \}
+02543 
+02544 \textcolor{keywordtype}{void} LMS7002M::ConfigureLML_BB2RF(
+02545     \textcolor{keyword}{const} LMLSampleSource s0,
+02546     \textcolor{keyword}{const} LMLSampleSource s1,
+02547     \textcolor{keyword}{const} LMLSampleSource s2,
+02548     \textcolor{keyword}{const} LMLSampleSource s3)
+02549 \{
+02550     \textcolor{comment}{//map a sample source to a position}
+02551     std::map<LMLSampleSource, int> m;
+02552     m[s3] = 2;
+02553     m[s2] = 3;
+02554     m[s0] = 1;
+02555     m[s1] = 0;
+02556 
+02557     \textcolor{comment}{//load the same config on both LMLs}
+02558     \textcolor{comment}{//only one will get used based on direction}
+02559     this->Modify_SPI_Reg_bits(LMS7param(LML1_BQP), m[BQ]);
+02560     this->Modify_SPI_Reg_bits(LMS7param(LML1_BIP), m[BI]);
+02561     this->Modify_SPI_Reg_bits(LMS7param(LML1_AQP), m[AQ]);
+02562     this->Modify_SPI_Reg_bits(LMS7param(LML1_AIP), m[AI]);
+02563 
+02564     this->Modify_SPI_Reg_bits(LMS7param(LML2_BQP), m[BQ]);
+02565     this->Modify_SPI_Reg_bits(LMS7param(LML2_BIP), m[BI]);
+02566     this->Modify_SPI_Reg_bits(LMS7param(LML2_AQP), m[AQ]);
+02567     this->Modify_SPI_Reg_bits(LMS7param(LML2_AIP), m[AI]);
+02568 \}
+02569 
+02570 \textcolor{keywordtype}{int} LMS7002M::SetRxDCRemoval(\textcolor{keyword}{const} \textcolor{keywordtype}{bool} enable)
+02571 \{
+02572     this->Modify_SPI_Reg_bits(LMS7param(DC_BYP_RXTSP), enable?0:1);
+02573     this->Modify_SPI_Reg_bits(LMS7param(DCCORR_AVG_RXTSP), 0x7);
+02574     \textcolor{keywordflow}{return} 0;
+02575 \}
+02576 
+02577 \textcolor{keywordtype}{int} LMS7002M::EnableSXTDD(\textcolor{keywordtype}{bool} tdd)
+02578 \{
+02579     Modify_SPI_Reg_bits(LMS7_MAC, 2);
+02580     Modify_SPI_Reg_bits(LMS7_PD_LOCH_T2RBUF, tdd ? 0 : 1);
+02581     Modify_SPI_Reg_bits(LMS7_MAC, 1);
+02582     \textcolor{keywordflow}{return} Modify_SPI_Reg_bits(LMS7_PD_VCO, tdd ? 1 : 0);
+02583 \}
+02584 
+02585 \textcolor{keywordtype}{bool} LMS7002M::GetRxDCRemoval(\textcolor{keywordtype}{void})
+02586 \{
+02587     \textcolor{keywordflow}{return} this->Get_SPI_Reg_bits(LMS7param(DC_BYP_RXTSP)) == 0;
+02588 \}
+02589 
+02590 \textcolor{keywordtype}{int} LMS7002M::SetTxDCOffset(\textcolor{keyword}{const} float_type I, \textcolor{keyword}{const} float_type Q)
+02591 \{
+02592     \textcolor{keyword}{const} \textcolor{keywordtype}{bool} bypass = I == 0.0 and Q == 0.0;
+02593     this->Modify_SPI_Reg_bits(LMS7param(DC_BYP_TXTSP), bypass?1:0);
+02594     this->Modify_SPI_Reg_bits(LMS7param(DCCORRI_TXTSP), std::lrint(I*128));
+02595     this->Modify_SPI_Reg_bits(LMS7param(DCCORRQ_TXTSP), std::lrint(Q*128));
+02596     \textcolor{keywordflow}{return} 0;
+02597 \}
+02598 
+02599 \textcolor{keywordtype}{void} LMS7002M::GetTxDCOffset(float_type &I, float_type &Q)
+02600 \{
+02601     I = int8\_t(this->Get_SPI_Reg_bits(LMS7param(DCCORRI_TXTSP)))/128.0; \textcolor{comment}{//signed 8-bit}
+02602     Q = int8\_t(this->Get_SPI_Reg_bits(LMS7param(DCCORRQ_TXTSP)))/128.0; \textcolor{comment}{//signed 8-bit}
+02603 \}
+02604 
+02605 \textcolor{keywordtype}{int} LMS7002M::SetIQBalance(\textcolor{keyword}{const} \textcolor{keywordtype}{bool} tx, \textcolor{keyword}{const} float_type phase, \textcolor{keyword}{const} 
+      float_type gainI, \textcolor{keyword}{const} float_type gainQ)
+02606 \{
+02607     \textcolor{keyword}{const} \textcolor{keywordtype}{bool} bypassPhase = (phase == 0.0);
+02608     \textcolor{keyword}{const} \textcolor{keywordtype}{bool} bypassGain = ((gainI == 1.0) and (gainQ == 1.0)) or ((gainI == 0.0) and (gainQ == 0.0));
+02609     \textcolor{keywordtype}{int} iqcorr = std::lrint(2047*(phase/(M\_PI/2)));
+02610     \textcolor{keywordtype}{int} gcorri = std::lrint(2047*gainI);
+02611     \textcolor{keywordtype}{int} gcorrq = std::lrint(2047*gainQ);
+02612 
+02613     this->Modify_SPI_Reg_bits(tx?LMS7param(PH_BYP_TXTSP):LMS7param(PH_BYP_RXTSP), bypassPhase?1:0);
+02614     this->Modify_SPI_Reg_bits(tx?LMS7param(GC_BYP_TXTSP):LMS7param(GC_BYP_RXTSP), bypassGain?1:0);
+02615     this->Modify_SPI_Reg_bits(tx?LMS7param(IQCORR_TXTSP):LMS7param(IQCORR_RXTSP), iqcorr);
+02616     this->Modify_SPI_Reg_bits(tx?LMS7param(GCORRI_TXTSP):LMS7param(GCORRI_RXTSP), gcorri);
+02617     this->Modify_SPI_Reg_bits(tx?LMS7param(GCORRQ_TXTSP):LMS7param(GCORRQ_RXTSP), gcorrq);
+02618     \textcolor{keywordflow}{return} 0;
+02619 \}
+02620 
+02621 \textcolor{keywordtype}{void} LMS7002M::GetIQBalance(\textcolor{keyword}{const} \textcolor{keywordtype}{bool} tx, float_type &phase, float_type &gainI, 
+      float_type &gainQ)
+02622 \{
+02623     \textcolor{keywordtype}{int} iqcorr = int16\_t(this->Get_SPI_Reg_bits(tx?LMS7param(IQCORR_TXTSP):
+      LMS7param(IQCORR_RXTSP)) << 4) >> 4; \textcolor{comment}{//sign extend 12-bit}
+02624     \textcolor{keywordtype}{int} gcorri = int16\_t(this->Get_SPI_Reg_bits(tx?LMS7param(GCORRI_TXTSP):
+      LMS7param(GCORRI_RXTSP))); \textcolor{comment}{//unsigned 11-bit}
+02625     \textcolor{keywordtype}{int} gcorrq = int16\_t(this->Get_SPI_Reg_bits(tx?LMS7param(GCORRQ_TXTSP):
+      LMS7param(GCORRQ_RXTSP))); \textcolor{comment}{//unsigned 11-bit}
+02626 
+02627     phase = (M\_PI/2)*iqcorr/2047.0;
+02628     gainI = gcorri/2047.0;
+02629     gainQ = gcorrq/2047.0;
+02630 \}
+02631 
+02632 \textcolor{keywordtype}{void} LMS7002M::EnableValuesCache(\textcolor{keywordtype}{bool} enabled)
+02633 \{
+02634     useCache = enabled;
+02635 \}
+02636 
+02637 \textcolor{keywordtype}{bool} LMS7002M::IsValuesCacheEnabled()
+02638 \{
+02639     \textcolor{keywordflow}{return} useCache;
+02640 \}
+02641 
+02642 MCU_BD* LMS7002M::GetMCUControls()\textcolor{keyword}{ const}
+02643 \textcolor{keyword}{}\{
+02644     \textcolor{keywordflow}{return} mcuControl;
+02645 \}
+02646 
+02647 \textcolor{keywordtype}{void} LMS7002M::EnableCalibrationByMCU(\textcolor{keywordtype}{bool} enabled)
+02648 \{
+02649     mCalibrationByMCU = enabled;
+02650 \}
+02651 
+02652 float_type LMS7002M::GetTemperature()
+02653 \{
+02654     CalibrateInternalADC(32);
+02655     Modify_SPI_Reg_bits(LMS7_RSSI_PD, 0);
+02656     Modify_SPI_Reg_bits(LMS7_RSSI_RSSIMODE, 0);
+02657     uint16\_t biasMux = Get_SPI_Reg_bits(LMS7_MUX_BIAS_OUT);
+02658     Modify_SPI_Reg_bits(LMS7_MUX_BIAS_OUT, 2);
+02659 
+02660     this\_thread::sleep\_for(chrono::microseconds(250));
+02661     \textcolor{keyword}{const} uint16\_t reg606 = SPI_read(0x0606, \textcolor{keyword}{true});
+02662     \textcolor{keywordtype}{float} Vtemp = (reg606 >> 8) & 0xFF;
+02663     Vtemp *= 1.84;
+02664     \textcolor{keywordtype}{float} Vptat = reg606 & 0xFF;
+02665     Vptat *= 1.84;
+02666     \textcolor{keywordtype}{float} Vdiff = Vptat-Vtemp;
+02667     Vdiff /= 3.9;
+02668     \textcolor{keywordtype}{float} temperature = 50.7+Vdiff;
+02669     Modify_SPI_Reg_bits(LMS7_MUX_BIAS_OUT, biasMux);
+02670     lime::debug(\textcolor{stringliteral}{"Vtemp 0x%04X, Vptat 0x%04X, Vdiff = %.2f, temp= %.3f"}, (reg606 >> 8) & 0xFF, reg606 & 0xFF
+      , Vdiff, temperature);
+02671     \textcolor{keywordflow}{return} temperature;
+02672 \}
+02673 
+02674 \textcolor{keywordtype}{void} LMS7002M::SetLogCallback(std::function<\textcolor{keywordtype}{void}(\textcolor{keyword}{const} \textcolor{keywordtype}{char}*, \textcolor{keywordtype}{int})> callback)
+02675 \{
+02676     log_callback = callback;
+02677 \}
+02678 
+02679 \textcolor{keywordtype}{int} LMS7002M::CopyChannelRegisters(\textcolor{keyword}{const} Channel src, \textcolor{keyword}{const} Channel dest, \textcolor{keyword}{const} \textcolor{keywordtype}{bool} copySX)
+02680 \{
+02681     Channel ch = this->GetActiveChannel(); \textcolor{comment}{//remember used channel}
+02682 
+02683     vector<uint16\_t> addrToWrite;
+02684     addrToWrite = mRegistersMap->GetUsedAddresses(1);
+02685     \textcolor{keywordflow}{if}(!copySX)
+02686     \{
+02687         \textcolor{keywordflow}{for}(uint32\_t address = MemorySectionAddresses[SX][0]; address <= 
+      MemorySectionAddresses[SX][1]; ++address)
+02688             addrToWrite.erase( find(addrToWrite.begin(), addrToWrite.end(), 
+      address));
+02689     \}
+02690     \textcolor{keywordflow}{for} (\textcolor{keyword}{auto} address : addrToWrite)
+02691     \{
+02692         uint16\_t data = mRegistersMap->GetValue(src == ChA ? 0 : 1, address);
+02693         mRegistersMap->SetValue(dest == ChA ? 0 : 1, address, data);
+02694     \}
+02695     \textcolor{keywordflow}{if}(controlPort)
+02696         UploadAll();
+02697     this->SetActiveChannel(ch);
+02698     \textcolor{keywordflow}{return} 0;
+02699 \}
+02700 
+02701 \textcolor{keywordtype}{int} LMS7002M::CalibrateAnalogRSSI_DC_Offset()
+02702 \{
+02703     Modify_SPI_Reg_bits(LMS7_EN_INSHSW_W_RFE, 1);
+02704     CalibrateInternalADC(0);
+02705     Modify_SPI_Reg_bits(LMS7param(PD_RSSI_RFE), 0);
+02706     Modify_SPI_Reg_bits(LMS7param(PD_TIA_RFE), 0);
+02707 
+02708     \textcolor{comment}{/*Modify\_SPI\_Reg\_bits(LMS7param(RSSIDC\_RSEL), 22);}
+02709 \textcolor{comment}{    Modify\_SPI\_Reg\_bits(LMS7param(RSSIDC\_HYSCMP), 0);}
+02710 \textcolor{comment}{    Modify\_SPI\_Reg\_bits(LMS7param(RSSIDC\_PD), 0);*/}
+02711     SPI_write(0x0640, 22 << 4);
+02712 
+02713     Modify_SPI_Reg_bits(LMS7param(RSSIDC\_DCO2), 0);
+02714 
+02715     \textcolor{keywordtype}{int} value = -63;
+02716     uint8\_t wrValue = abs(value);
+02717     \textcolor{keywordflow}{if}(value < 0)
+02718         wrValue |= 0x40;
+02719     Modify_SPI_Reg_bits(LMS7param(RSSIDC\_DCO1), wrValue, \textcolor{keyword}{true});
+02720     uint8\_t cmp = Get_SPI_Reg_bits(LMS7param(RSSIDC\_CMPSTATUS), \textcolor{keyword}{true});
+02721     uint8\_t cmpPrev = cmp;
+02722     vector<int8\_t> edges;
+02723     \textcolor{keywordflow}{for}(value = -63; value < 64; ++value)
+02724     \{
+02725         wrValue = abs(value);
+02726         \textcolor{keywordflow}{if}(value < 0)
+02727             wrValue |= 0x40;
+02728         Modify_SPI_Reg_bits(LMS7param(RSSIDC\_DCO1), wrValue, \textcolor{keyword}{true});
+02729         this\_thread::sleep\_for(chrono::microseconds(5));
+02730         cmp = Get_SPI_Reg_bits(LMS7param(RSSIDC\_CMPSTATUS), \textcolor{keyword}{true});
+02731         \textcolor{keywordflow}{if}(cmp != cmpPrev)
+02732         \{
+02733             edges.push\_back(value);
+02734             cmpPrev = cmp;
+02735         \}
+02736         \textcolor{keywordflow}{if}(edges.size() > 1)
+02737             \textcolor{keywordflow}{break};
+02738     \}
+02739     \textcolor{keywordflow}{if}(edges.size() != 2)
+02740     \{
+02741         lime::debug(\textcolor{stringliteral}{"Not found"});
+02742         \textcolor{keywordflow}{return} ReportError(EINVAL, \textcolor{stringliteral}{"Failed to find value"});
+02743     \}
+02744     int8\_t found = (edges[0]+edges[1])/2;
+02745     wrValue = abs(found);
+02746     \textcolor{keywordflow}{if}(found < 0)
+02747         wrValue |= 0x40;
+02748     Modify_SPI_Reg_bits(LMS7param(RSSIDC\_DCO1), wrValue, \textcolor{keyword}{true});
+02749     lime::debug(\textcolor{stringliteral}{"Found %i"}, found);
+02750     Modify_SPI_Reg_bits(LMS7_EN_INSHSW_W_RFE, 0);
+02751     \textcolor{keywordflow}{return} 0;
+02752 \}
+\end{DoxyCode}
