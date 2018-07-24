@@ -1,0 +1,52 @@
+\subsection{calc\+\_\+fmcw\+\_\+peaks.\+py}
+\label{calc__fmcw__peaks_8py_source}\index{/home/erik/prefix/default/src/gr-\/radar-\/dev/examples/setup/calc\+\_\+fmcw\+\_\+peaks.\+py@{/home/erik/prefix/default/src/gr-\/radar-\/dev/examples/setup/calc\+\_\+fmcw\+\_\+peaks.\+py}}
+
+\begin{DoxyCode}
+00001 c\_light = 3e8
+00002 
+00003 center\_freq = 5.7e9 \textcolor{comment}{# center frequency [Hz]}
+00004 samp\_rate = 10000000 \textcolor{comment}{# sample frequency [Hz]}
+00005 sweep\_freq = samp\_rate \textcolor{comment}{# sweep frequency FMCW chirp}
+00006 
+00007 samp\_cw = 2**14 \textcolor{comment}{# samples CW block}
+00008 samp\_up = 2**14 \textcolor{comment}{# samples up-chirp}
+00009 samp\_down = samp\_up \textcolor{comment}{# samples down-chirp}
+00010 
+00011 r = 100 \textcolor{comment}{# range [m]}
+00012 v = 0 \textcolor{comment}{# velocity [m/s]}
+00013 
+00014 freq\_cw = 2*v*center\_freq/c\_light
+00015 freq\_up = 2*r*sweep\_freq*samp\_rate/samp\_up/c\_light - freq\_cw
+00016 freq\_down = -2*r*sweep\_freq*samp\_rate/samp\_down/c\_light - freq\_cw
+00017 
+00018 res\_v = samp\_rate/samp\_cw*c\_light/2/center\_freq
+00019 res\_r = c\_light/2/sweep\_freq
+00020 res\_t = (float)(samp\_cw+samp\_up+samp\_down)/samp\_rate
+00021 
+00022 res\_f\_cw = samp\_rate/samp\_cw
+00023 res\_f\_up = samp\_rate/samp\_up
+00024 res\_f\_down = samp\_rate/samp\_down
+00025 
+00026 trans\_rate = samp\_rate*8.0/1024.0/1024.0
+00027 dec\_fac = 12
+00028 trans\_rate\_res = trans\_rate/dec\_fac
+00029 samp\_rate\_res = samp\_rate/dec\_fac
+00030 
+00031 \textcolor{keywordflow}{print} \textcolor{stringliteral}{"// FMCW peaks"}
+00032 \textcolor{keywordflow}{print} \textcolor{stringliteral}{"CW:"}, freq\_cw, \textcolor{stringliteral}{"Hz"}
+00033 \textcolor{keywordflow}{print} \textcolor{stringliteral}{"up-chirp:"}, freq\_up, \textcolor{stringliteral}{"Hz"}
+00034 \textcolor{keywordflow}{print} \textcolor{stringliteral}{"down-chirp:"}, freq\_down, \textcolor{stringliteral}{"Hz"}
+00035 \textcolor{keywordflow}{print}
+00036 \textcolor{keywordflow}{print} \textcolor{stringliteral}{"// FMCW resolutions"}
+00037 \textcolor{keywordflow}{print} \textcolor{stringliteral}{"res freq fft (cw, up, down):"}, res\_f\_cw, res\_f\_up, res\_f\_down, \textcolor{stringliteral}{"Hz"}
+00038 \textcolor{keywordflow}{print} \textcolor{stringliteral}{"res v:"}, res\_v, \textcolor{stringliteral}{"m/s"}
+00039 \textcolor{keywordflow}{print} \textcolor{stringliteral}{"res r:"}, res\_r, \textcolor{stringliteral}{"m"}
+00040 \textcolor{keywordflow}{print} \textcolor{stringliteral}{"res t:"}, res\_t, \textcolor{stringliteral}{"s"}
+00041 \textcolor{keywordflow}{print}
+00042 \textcolor{keywordflow}{print} \textcolor{stringliteral}{"// Transfer rate"}
+00043 \textcolor{keywordflow}{print} \textcolor{stringliteral}{"bandwith: "}, samp\_rate/1000.0, \textcolor{stringliteral}{"kHz"}
+00044 \textcolor{keywordflow}{print} \textcolor{stringliteral}{"rate:"}, trans\_rate, \textcolor{stringliteral}{"MByte/s"}
+00045 \textcolor{keywordflow}{print} \textcolor{stringliteral}{"resampler decimation:"}, dec\_fac
+00046 \textcolor{keywordflow}{print} \textcolor{stringliteral}{"bandwith after resampling:"}, samp\_rate\_res/1000, \textcolor{stringliteral}{"kHz"}
+00047 \textcolor{keywordflow}{print} \textcolor{stringliteral}{"rate after resampling:"}, trans\_rate\_res, \textcolor{stringliteral}{"MByte/s"}
+\end{DoxyCode}

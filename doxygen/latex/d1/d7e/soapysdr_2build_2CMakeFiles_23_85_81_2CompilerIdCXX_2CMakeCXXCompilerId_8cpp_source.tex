@@ -1,0 +1,539 @@
+\subsection{C\+Make\+C\+X\+X\+Compiler\+Id.\+cpp}
+\label{soapysdr_2build_2CMakeFiles_23_85_81_2CompilerIdCXX_2CMakeCXXCompilerId_8cpp_source}\index{/home/erik/prefix/default/src/soapysdr/build/\+C\+Make\+Files/3.\+5.\+1/\+Compiler\+Id\+C\+X\+X/\+C\+Make\+C\+X\+X\+Compiler\+Id.\+cpp@{/home/erik/prefix/default/src/soapysdr/build/\+C\+Make\+Files/3.\+5.\+1/\+Compiler\+Id\+C\+X\+X/\+C\+Make\+C\+X\+X\+Compiler\+Id.\+cpp}}
+
+\begin{DoxyCode}
+00001 \textcolor{comment}{/* This source file must have a .cpp extension so that all C++ compilers}
+00002 \textcolor{comment}{   recognize the extension without flags.  Borland does not know .cxx for}
+00003 \textcolor{comment}{   example.  */}
+00004 \textcolor{preprocessor}{#ifndef \_\_cplusplus}
+00005 \textcolor{preprocessor}{# error "A C compiler has been selected for C++."}
+00006 \textcolor{preprocessor}{#endif}
+00007 
+00008 
+00009 \textcolor{comment}{/* Version number components: V=Version, R=Revision, P=Patch}
+00010 \textcolor{comment}{   Version date components:   YYYY=Year, MM=Month,   DD=Day  */}
+00011 
+00012 \textcolor{preprocessor}{#if defined(\_\_COMO\_\_)}
+00013 \textcolor{preprocessor}{# define COMPILER\_ID "Comeau"}
+00014   \textcolor{comment}{/* \_\_COMO\_VERSION\_\_ = VRR */}
+00015 \textcolor{preprocessor}{# define COMPILER\_VERSION\_MAJOR DEC(\_\_COMO\_VERSION\_\_ / 100)}
+00016 \textcolor{preprocessor}{# define COMPILER\_VERSION\_MINOR DEC(\_\_COMO\_VERSION\_\_ % 100)}
+00017 
+00018 \textcolor{preprocessor}{#elif defined(\_\_INTEL\_COMPILER) || defined(\_\_ICC)}
+00019 \textcolor{preprocessor}{# define COMPILER\_ID "Intel"}
+00020 \textcolor{preprocessor}{# if defined(\_MSC\_VER)}
+00021 \textcolor{preprocessor}{#  define SIMULATE\_ID "MSVC"}
+00022 \textcolor{preprocessor}{# endif}
+00023   \textcolor{comment}{/* \_\_INTEL\_COMPILER = VRP */}
+00024 \textcolor{preprocessor}{# define COMPILER\_VERSION\_MAJOR DEC(\_\_INTEL\_COMPILER/100)}
+00025 \textcolor{preprocessor}{# define COMPILER\_VERSION\_MINOR DEC(\_\_INTEL\_COMPILER/10 % 10)}
+00026 \textcolor{preprocessor}{# if defined(\_\_INTEL\_COMPILER\_UPDATE)}
+00027 \textcolor{preprocessor}{#  define COMPILER\_VERSION\_PATCH DEC(\_\_INTEL\_COMPILER\_UPDATE)}
+00028 \textcolor{preprocessor}{# else}
+00029 \textcolor{preprocessor}{#  define COMPILER\_VERSION\_PATCH DEC(\_\_INTEL\_COMPILER   % 10)}
+00030 \textcolor{preprocessor}{# endif}
+00031 \textcolor{preprocessor}{# if defined(\_\_INTEL\_COMPILER\_BUILD\_DATE)}
+00032   \textcolor{comment}{/* \_\_INTEL\_COMPILER\_BUILD\_DATE = YYYYMMDD */}
+00033 \textcolor{preprocessor}{#  define COMPILER\_VERSION\_TWEAK DEC(\_\_INTEL\_COMPILER\_BUILD\_DATE)}
+00034 \textcolor{preprocessor}{# endif}
+00035 \textcolor{preprocessor}{# if defined(\_MSC\_VER)}
+00036    \textcolor{comment}{/* \_MSC\_VER = VVRR */}
+00037 \textcolor{preprocessor}{#  define SIMULATE\_VERSION\_MAJOR DEC(\_MSC\_VER / 100)}
+00038 \textcolor{preprocessor}{#  define SIMULATE\_VERSION\_MINOR DEC(\_MSC\_VER % 100)}
+00039 \textcolor{preprocessor}{# endif}
+00040 
+00041 \textcolor{preprocessor}{#elif defined(\_\_PATHCC\_\_)}
+00042 \textcolor{preprocessor}{# define COMPILER\_ID "PathScale"}
+00043 \textcolor{preprocessor}{# define COMPILER\_VERSION\_MAJOR DEC(\_\_PATHCC\_\_)}
+00044 \textcolor{preprocessor}{# define COMPILER\_VERSION\_MINOR DEC(\_\_PATHCC\_MINOR\_\_)}
+00045 \textcolor{preprocessor}{# if defined(\_\_PATHCC\_PATCHLEVEL\_\_)}
+00046 \textcolor{preprocessor}{#  define COMPILER\_VERSION\_PATCH DEC(\_\_PATHCC\_PATCHLEVEL\_\_)}
+00047 \textcolor{preprocessor}{# endif}
+00048 
+00049 \textcolor{preprocessor}{#elif defined(\_\_BORLANDC\_\_) && defined(\_\_CODEGEARC\_VERSION\_\_)}
+00050 \textcolor{preprocessor}{# define COMPILER\_ID "Embarcadero"}
+00051 \textcolor{preprocessor}{# define COMPILER\_VERSION\_MAJOR HEX(\_\_CODEGEARC\_VERSION\_\_>>24 & 0x00FF)}
+00052 \textcolor{preprocessor}{# define COMPILER\_VERSION\_MINOR HEX(\_\_CODEGEARC\_VERSION\_\_>>16 & 0x00FF)}
+00053 \textcolor{preprocessor}{# define COMPILER\_VERSION\_PATCH DEC(\_\_CODEGEARC\_VERSION\_\_     & 0xFFFF)}
+00054 
+00055 \textcolor{preprocessor}{#elif defined(\_\_BORLANDC\_\_)}
+00056 \textcolor{preprocessor}{# define COMPILER\_ID "Borland"}
+00057   \textcolor{comment}{/* \_\_BORLANDC\_\_ = 0xVRR */}
+00058 \textcolor{preprocessor}{# define COMPILER\_VERSION\_MAJOR HEX(\_\_BORLANDC\_\_>>8)}
+00059 \textcolor{preprocessor}{# define COMPILER\_VERSION\_MINOR HEX(\_\_BORLANDC\_\_ & 0xFF)}
+00060 
+00061 \textcolor{preprocessor}{#elif defined(\_\_WATCOMC\_\_) && \_\_WATCOMC\_\_ < 1200}
+00062 \textcolor{preprocessor}{# define COMPILER\_ID "Watcom"}
+00063    \textcolor{comment}{/* \_\_WATCOMC\_\_ = VVRR */}
+00064 \textcolor{preprocessor}{# define COMPILER\_VERSION\_MAJOR DEC(\_\_WATCOMC\_\_ / 100)}
+00065 \textcolor{preprocessor}{# define COMPILER\_VERSION\_MINOR DEC((\_\_WATCOMC\_\_ / 10) % 10)}
+00066 \textcolor{preprocessor}{# if (\_\_WATCOMC\_\_ % 10) > 0}
+00067 \textcolor{preprocessor}{#  define COMPILER\_VERSION\_PATCH DEC(\_\_WATCOMC\_\_ % 10)}
+00068 \textcolor{preprocessor}{# endif}
+00069 
+00070 \textcolor{preprocessor}{#elif defined(\_\_WATCOMC\_\_)}
+00071 \textcolor{preprocessor}{# define COMPILER\_ID "OpenWatcom"}
+00072    \textcolor{comment}{/* \_\_WATCOMC\_\_ = VVRP + 1100 */}
+00073 \textcolor{preprocessor}{# define COMPILER\_VERSION\_MAJOR DEC((\_\_WATCOMC\_\_ - 1100) / 100)}
+00074 \textcolor{preprocessor}{# define COMPILER\_VERSION\_MINOR DEC((\_\_WATCOMC\_\_ / 10) % 10)}
+00075 \textcolor{preprocessor}{# if (\_\_WATCOMC\_\_ % 10) > 0}
+00076 \textcolor{preprocessor}{#  define COMPILER\_VERSION\_PATCH DEC(\_\_WATCOMC\_\_ % 10)}
+00077 \textcolor{preprocessor}{# endif}
+00078 
+00079 \textcolor{preprocessor}{#elif defined(\_\_SUNPRO\_CC)}
+00080 \textcolor{preprocessor}{# define COMPILER\_ID "SunPro"}
+00081 \textcolor{preprocessor}{# if \_\_SUNPRO\_CC >= 0x5100}
+00082    \textcolor{comment}{/* \_\_SUNPRO\_CC = 0xVRRP */}
+00083 \textcolor{preprocessor}{#  define COMPILER\_VERSION\_MAJOR HEX(\_\_SUNPRO\_CC>>12)}
+00084 \textcolor{preprocessor}{#  define COMPILER\_VERSION\_MINOR HEX(\_\_SUNPRO\_CC>>4 & 0xFF)}
+00085 \textcolor{preprocessor}{#  define COMPILER\_VERSION\_PATCH HEX(\_\_SUNPRO\_CC    & 0xF)}
+00086 \textcolor{preprocessor}{# else}
+00087    \textcolor{comment}{/* \_\_SUNPRO\_CC = 0xVRP */}
+00088 \textcolor{preprocessor}{#  define COMPILER\_VERSION\_MAJOR HEX(\_\_SUNPRO\_CC>>8)}
+00089 \textcolor{preprocessor}{#  define COMPILER\_VERSION\_MINOR HEX(\_\_SUNPRO\_CC>>4 & 0xF)}
+00090 \textcolor{preprocessor}{#  define COMPILER\_VERSION\_PATCH HEX(\_\_SUNPRO\_CC    & 0xF)}
+00091 \textcolor{preprocessor}{# endif}
+00092 
+00093 \textcolor{preprocessor}{#elif defined(\_\_HP\_aCC)}
+00094 \textcolor{preprocessor}{# define COMPILER\_ID "HP"}
+00095   \textcolor{comment}{/* \_\_HP\_aCC = VVRRPP */}
+00096 \textcolor{preprocessor}{# define COMPILER\_VERSION\_MAJOR DEC(\_\_HP\_aCC/10000)}
+00097 \textcolor{preprocessor}{# define COMPILER\_VERSION\_MINOR DEC(\_\_HP\_aCC/100 % 100)}
+00098 \textcolor{preprocessor}{# define COMPILER\_VERSION\_PATCH DEC(\_\_HP\_aCC     % 100)}
+00099 
+00100 \textcolor{preprocessor}{#elif defined(\_\_DECCXX)}
+00101 \textcolor{preprocessor}{# define COMPILER\_ID "Compaq"}
+00102   \textcolor{comment}{/* \_\_DECCXX\_VER = VVRRTPPPP */}
+00103 \textcolor{preprocessor}{# define COMPILER\_VERSION\_MAJOR DEC(\_\_DECCXX\_VER/10000000)}
+00104 \textcolor{preprocessor}{# define COMPILER\_VERSION\_MINOR DEC(\_\_DECCXX\_VER/100000  % 100)}
+00105 \textcolor{preprocessor}{# define COMPILER\_VERSION\_PATCH DEC(\_\_DECCXX\_VER         % 10000)}
+00106 
+00107 \textcolor{preprocessor}{#elif defined(\_\_IBMCPP\_\_) && defined(\_\_COMPILER\_VER\_\_)}
+00108 \textcolor{preprocessor}{# define COMPILER\_ID "zOS"}
+00109   \textcolor{comment}{/* \_\_IBMCPP\_\_ = VRP */}
+00110 \textcolor{preprocessor}{# define COMPILER\_VERSION\_MAJOR DEC(\_\_IBMCPP\_\_/100)}
+00111 \textcolor{preprocessor}{# define COMPILER\_VERSION\_MINOR DEC(\_\_IBMCPP\_\_/10 % 10)}
+00112 \textcolor{preprocessor}{# define COMPILER\_VERSION\_PATCH DEC(\_\_IBMCPP\_\_    % 10)}
+00113 
+00114 \textcolor{preprocessor}{#elif defined(\_\_IBMCPP\_\_) && !defined(\_\_COMPILER\_VER\_\_) && \_\_IBMCPP\_\_ >= 800}
+00115 \textcolor{preprocessor}{# define COMPILER\_ID "XL"}
+00116   \textcolor{comment}{/* \_\_IBMCPP\_\_ = VRP */}
+00117 \textcolor{preprocessor}{# define COMPILER\_VERSION\_MAJOR DEC(\_\_IBMCPP\_\_/100)}
+00118 \textcolor{preprocessor}{# define COMPILER\_VERSION\_MINOR DEC(\_\_IBMCPP\_\_/10 % 10)}
+00119 \textcolor{preprocessor}{# define COMPILER\_VERSION\_PATCH DEC(\_\_IBMCPP\_\_    % 10)}
+00120 
+00121 \textcolor{preprocessor}{#elif defined(\_\_IBMCPP\_\_) && !defined(\_\_COMPILER\_VER\_\_) && \_\_IBMCPP\_\_ < 800}
+00122 \textcolor{preprocessor}{# define COMPILER\_ID "VisualAge"}
+00123   \textcolor{comment}{/* \_\_IBMCPP\_\_ = VRP */}
+00124 \textcolor{preprocessor}{# define COMPILER\_VERSION\_MAJOR DEC(\_\_IBMCPP\_\_/100)}
+00125 \textcolor{preprocessor}{# define COMPILER\_VERSION\_MINOR DEC(\_\_IBMCPP\_\_/10 % 10)}
+00126 \textcolor{preprocessor}{# define COMPILER\_VERSION\_PATCH DEC(\_\_IBMCPP\_\_    % 10)}
+00127 
+00128 \textcolor{preprocessor}{#elif defined(\_\_PGI)}
+00129 \textcolor{preprocessor}{# define COMPILER\_ID "PGI"}
+00130 \textcolor{preprocessor}{# define COMPILER\_VERSION\_MAJOR DEC(\_\_PGIC\_\_)}
+00131 \textcolor{preprocessor}{# define COMPILER\_VERSION\_MINOR DEC(\_\_PGIC\_MINOR\_\_)}
+00132 \textcolor{preprocessor}{# if defined(\_\_PGIC\_PATCHLEVEL\_\_)}
+00133 \textcolor{preprocessor}{#  define COMPILER\_VERSION\_PATCH DEC(\_\_PGIC\_PATCHLEVEL\_\_)}
+00134 \textcolor{preprocessor}{# endif}
+00135 
+00136 \textcolor{preprocessor}{#elif defined(\_CRAYC)}
+00137 \textcolor{preprocessor}{# define COMPILER\_ID "Cray"}
+00138 \textcolor{preprocessor}{# define COMPILER\_VERSION\_MAJOR DEC(\_RELEASE\_MAJOR)}
+00139 \textcolor{preprocessor}{# define COMPILER\_VERSION\_MINOR DEC(\_RELEASE\_MINOR)}
+00140 
+00141 \textcolor{preprocessor}{#elif defined(\_\_TI\_COMPILER\_VERSION\_\_)}
+00142 \textcolor{preprocessor}{# define COMPILER\_ID "TI"}
+00143   \textcolor{comment}{/* \_\_TI\_COMPILER\_VERSION\_\_ = VVVRRRPPP */}
+00144 \textcolor{preprocessor}{# define COMPILER\_VERSION\_MAJOR DEC(\_\_TI\_COMPILER\_VERSION\_\_/1000000)}
+00145 \textcolor{preprocessor}{# define COMPILER\_VERSION\_MINOR DEC(\_\_TI\_COMPILER\_VERSION\_\_/1000   % 1000)}
+00146 \textcolor{preprocessor}{# define COMPILER\_VERSION\_PATCH DEC(\_\_TI\_COMPILER\_VERSION\_\_        % 1000)}
+00147 
+00148 \textcolor{preprocessor}{#elif defined(\_\_FUJITSU) || defined(\_\_FCC\_VERSION) || defined(\_\_fcc\_version)}
+00149 \textcolor{preprocessor}{# define COMPILER\_ID "Fujitsu"}
+00150 
+00151 \textcolor{preprocessor}{#elif defined(\_\_SCO\_VERSION\_\_)}
+00152 \textcolor{preprocessor}{# define COMPILER\_ID "SCO"}
+00153 
+00154 \textcolor{preprocessor}{#elif defined(\_\_clang\_\_) && defined(\_\_apple\_build\_version\_\_)}
+00155 \textcolor{preprocessor}{# define COMPILER\_ID "AppleClang"}
+00156 \textcolor{preprocessor}{# if defined(\_MSC\_VER)}
+00157 \textcolor{preprocessor}{#  define SIMULATE\_ID "MSVC"}
+00158 \textcolor{preprocessor}{# endif}
+00159 \textcolor{preprocessor}{# define COMPILER\_VERSION\_MAJOR DEC(\_\_clang\_major\_\_)}
+00160 \textcolor{preprocessor}{# define COMPILER\_VERSION\_MINOR DEC(\_\_clang\_minor\_\_)}
+00161 \textcolor{preprocessor}{# define COMPILER\_VERSION\_PATCH DEC(\_\_clang\_patchlevel\_\_)}
+00162 \textcolor{preprocessor}{# if defined(\_MSC\_VER)}
+00163    \textcolor{comment}{/* \_MSC\_VER = VVRR */}
+00164 \textcolor{preprocessor}{#  define SIMULATE\_VERSION\_MAJOR DEC(\_MSC\_VER / 100)}
+00165 \textcolor{preprocessor}{#  define SIMULATE\_VERSION\_MINOR DEC(\_MSC\_VER % 100)}
+00166 \textcolor{preprocessor}{# endif}
+00167 \textcolor{preprocessor}{# define COMPILER\_VERSION\_TWEAK DEC(\_\_apple\_build\_version\_\_)}
+00168 
+00169 \textcolor{preprocessor}{#elif defined(\_\_clang\_\_)}
+00170 \textcolor{preprocessor}{# define COMPILER\_ID "Clang"}
+00171 \textcolor{preprocessor}{# if defined(\_MSC\_VER)}
+00172 \textcolor{preprocessor}{#  define SIMULATE\_ID "MSVC"}
+00173 \textcolor{preprocessor}{# endif}
+00174 \textcolor{preprocessor}{# define COMPILER\_VERSION\_MAJOR DEC(\_\_clang\_major\_\_)}
+00175 \textcolor{preprocessor}{# define COMPILER\_VERSION\_MINOR DEC(\_\_clang\_minor\_\_)}
+00176 \textcolor{preprocessor}{# define COMPILER\_VERSION\_PATCH DEC(\_\_clang\_patchlevel\_\_)}
+00177 \textcolor{preprocessor}{# if defined(\_MSC\_VER)}
+00178    \textcolor{comment}{/* \_MSC\_VER = VVRR */}
+00179 \textcolor{preprocessor}{#  define SIMULATE\_VERSION\_MAJOR DEC(\_MSC\_VER / 100)}
+00180 \textcolor{preprocessor}{#  define SIMULATE\_VERSION\_MINOR DEC(\_MSC\_VER % 100)}
+00181 \textcolor{preprocessor}{# endif}
+00182 
+00183 \textcolor{preprocessor}{#elif defined(\_\_GNUC\_\_)}
+00184 \textcolor{preprocessor}{# define COMPILER\_ID "GNU"}
+00185 \textcolor{preprocessor}{# define COMPILER\_VERSION\_MAJOR DEC(\_\_GNUC\_\_)}
+00186 \textcolor{preprocessor}{# if defined(\_\_GNUC\_MINOR\_\_)}
+00187 \textcolor{preprocessor}{#  define COMPILER\_VERSION\_MINOR DEC(\_\_GNUC\_MINOR\_\_)}
+00188 \textcolor{preprocessor}{# endif}
+00189 \textcolor{preprocessor}{# if defined(\_\_GNUC\_PATCHLEVEL\_\_)}
+00190 \textcolor{preprocessor}{#  define COMPILER\_VERSION\_PATCH DEC(\_\_GNUC\_PATCHLEVEL\_\_)}
+00191 \textcolor{preprocessor}{# endif}
+00192 
+00193 \textcolor{preprocessor}{#elif defined(\_MSC\_VER)}
+00194 \textcolor{preprocessor}{# define COMPILER\_ID "MSVC"}
+00195   \textcolor{comment}{/* \_MSC\_VER = VVRR */}
+00196 \textcolor{preprocessor}{# define COMPILER\_VERSION\_MAJOR DEC(\_MSC\_VER / 100)}
+00197 \textcolor{preprocessor}{# define COMPILER\_VERSION\_MINOR DEC(\_MSC\_VER % 100)}
+00198 \textcolor{preprocessor}{# if defined(\_MSC\_FULL\_VER)}
+00199 \textcolor{preprocessor}{#  if \_MSC\_VER >= 1400}
+00200     \textcolor{comment}{/* \_MSC\_FULL\_VER = VVRRPPPPP */}
+00201 \textcolor{preprocessor}{#   define COMPILER\_VERSION\_PATCH DEC(\_MSC\_FULL\_VER % 100000)}
+00202 \textcolor{preprocessor}{#  else}
+00203     \textcolor{comment}{/* \_MSC\_FULL\_VER = VVRRPPPP */}
+00204 \textcolor{preprocessor}{#   define COMPILER\_VERSION\_PATCH DEC(\_MSC\_FULL\_VER % 10000)}
+00205 \textcolor{preprocessor}{#  endif}
+00206 \textcolor{preprocessor}{# endif}
+00207 \textcolor{preprocessor}{# if defined(\_MSC\_BUILD)}
+00208 \textcolor{preprocessor}{#  define COMPILER\_VERSION\_TWEAK DEC(\_MSC\_BUILD)}
+00209 \textcolor{preprocessor}{# endif}
+00210 
+00211 \textcolor{preprocessor}{#elif defined(\_\_VISUALDSPVERSION\_\_) || defined(\_\_ADSPBLACKFIN\_\_) || defined(\_\_ADSPTS\_\_) ||
+       defined(\_\_ADSP21000\_\_)}
+00212 \textcolor{preprocessor}{# define COMPILER\_ID "ADSP"}
+00213 \textcolor{preprocessor}{#if defined(\_\_VISUALDSPVERSION\_\_)}
+00214   \textcolor{comment}{/* \_\_VISUALDSPVERSION\_\_ = 0xVVRRPP00 */}
+00215 \textcolor{preprocessor}{# define COMPILER\_VERSION\_MAJOR HEX(\_\_VISUALDSPVERSION\_\_>>24)}
+00216 \textcolor{preprocessor}{# define COMPILER\_VERSION\_MINOR HEX(\_\_VISUALDSPVERSION\_\_>>16 & 0xFF)}
+00217 \textcolor{preprocessor}{# define COMPILER\_VERSION\_PATCH HEX(\_\_VISUALDSPVERSION\_\_>>8  & 0xFF)}
+00218 \textcolor{preprocessor}{#endif}
+00219 
+00220 \textcolor{preprocessor}{#elif defined(\_\_IAR\_SYSTEMS\_ICC\_\_ ) || defined(\_\_IAR\_SYSTEMS\_ICC)}
+00221 \textcolor{preprocessor}{# define COMPILER\_ID "IAR"}
+00222 
+00223 \textcolor{preprocessor}{#elif defined(\_\_ARMCC\_VERSION)}
+00224 \textcolor{preprocessor}{# define COMPILER\_ID "ARMCC"}
+00225 \textcolor{preprocessor}{#if \_\_ARMCC\_VERSION >= 1000000}
+00226   \textcolor{comment}{/* \_\_ARMCC\_VERSION = VRRPPPP */}
+00227 \textcolor{preprocessor}{  # define COMPILER\_VERSION\_MAJOR DEC(\_\_ARMCC\_VERSION/1000000)}
+00228 \textcolor{preprocessor}{  # define COMPILER\_VERSION\_MINOR DEC(\_\_ARMCC\_VERSION/10000 % 100)}
+00229 \textcolor{preprocessor}{  # define COMPILER\_VERSION\_PATCH DEC(\_\_ARMCC\_VERSION     % 10000)}
+00230 \textcolor{preprocessor}{#else}
+00231   \textcolor{comment}{/* \_\_ARMCC\_VERSION = VRPPPP */}
+00232 \textcolor{preprocessor}{  # define COMPILER\_VERSION\_MAJOR DEC(\_\_ARMCC\_VERSION/100000)}
+00233 \textcolor{preprocessor}{  # define COMPILER\_VERSION\_MINOR DEC(\_\_ARMCC\_VERSION/10000 % 10)}
+00234 \textcolor{preprocessor}{  # define COMPILER\_VERSION\_PATCH DEC(\_\_ARMCC\_VERSION    % 10000)}
+00235 \textcolor{preprocessor}{#endif}
+00236 
+00237 
+00238 \textcolor{preprocessor}{#elif defined(\_SGI\_COMPILER\_VERSION) || defined(\_COMPILER\_VERSION)}
+00239 \textcolor{preprocessor}{# define COMPILER\_ID "MIPSpro"}
+00240 \textcolor{preprocessor}{# if defined(\_SGI\_COMPILER\_VERSION)}
+00241   \textcolor{comment}{/* \_SGI\_COMPILER\_VERSION = VRP */}
+00242 \textcolor{preprocessor}{#  define COMPILER\_VERSION\_MAJOR DEC(\_SGI\_COMPILER\_VERSION/100)}
+00243 \textcolor{preprocessor}{#  define COMPILER\_VERSION\_MINOR DEC(\_SGI\_COMPILER\_VERSION/10 % 10)}
+00244 \textcolor{preprocessor}{#  define COMPILER\_VERSION\_PATCH DEC(\_SGI\_COMPILER\_VERSION    % 10)}
+00245 \textcolor{preprocessor}{# else}
+00246   \textcolor{comment}{/* \_COMPILER\_VERSION = VRP */}
+00247 \textcolor{preprocessor}{#  define COMPILER\_VERSION\_MAJOR DEC(\_COMPILER\_VERSION/100)}
+00248 \textcolor{preprocessor}{#  define COMPILER\_VERSION\_MINOR DEC(\_COMPILER\_VERSION/10 % 10)}
+00249 \textcolor{preprocessor}{#  define COMPILER\_VERSION\_PATCH DEC(\_COMPILER\_VERSION    % 10)}
+00250 \textcolor{preprocessor}{# endif}
+00251 
+00252 
+00253 \textcolor{comment}{/* These compilers are either not known or too old to define an}
+00254 \textcolor{comment}{  identification macro.  Try to identify the platform and guess that}
+00255 \textcolor{comment}{  it is the native compiler.  */}
+00256 \textcolor{preprocessor}{#elif defined(\_\_sgi)}
+00257 \textcolor{preprocessor}{# define COMPILER\_ID "MIPSpro"}
+00258 
+00259 \textcolor{preprocessor}{#elif defined(\_\_hpux) || defined(\_\_hpua)}
+00260 \textcolor{preprocessor}{# define COMPILER\_ID "HP"}
+00261 
+00262 \textcolor{preprocessor}{#else }\textcolor{comment}{/* unknown compiler */}\textcolor{preprocessor}{}
+00263 \textcolor{preprocessor}{# define COMPILER\_ID ""}
+00264 \textcolor{preprocessor}{#endif}
+00265 
+00266 \textcolor{comment}{/* Construct the string literal in pieces to prevent the source from}
+00267 \textcolor{comment}{   getting matched.  Store it in a pointer rather than an array}
+00268 \textcolor{comment}{   because some compilers will just produce instructions to fill the}
+00269 \textcolor{comment}{   array rather than assigning a pointer to a static array.  */}
+00270 \textcolor{keywordtype}{char} \textcolor{keyword}{const}* info_compiler = \textcolor{stringliteral}{"INFO"} \textcolor{stringliteral}{":"} \textcolor{stringliteral}{"compiler["} COMPILER_ID \textcolor{stringliteral}{"]"};
+00271 \textcolor{preprocessor}{#ifdef SIMULATE\_ID}
+00272 \textcolor{keywordtype}{char} \textcolor{keyword}{const}* info\_simulate = \textcolor{stringliteral}{"INFO"} \textcolor{stringliteral}{":"} \textcolor{stringliteral}{"simulate["} SIMULATE\_ID \textcolor{stringliteral}{"]"};
+00273 \textcolor{preprocessor}{#endif}
+00274 
+00275 \textcolor{preprocessor}{#ifdef \_\_QNXNTO\_\_}
+00276 \textcolor{keywordtype}{char} \textcolor{keyword}{const}* qnxnto = \textcolor{stringliteral}{"INFO"} \textcolor{stringliteral}{":"} \textcolor{stringliteral}{"qnxnto[]"};
+00277 \textcolor{preprocessor}{#endif}
+00278 
+00279 \textcolor{preprocessor}{#if defined(\_\_CRAYXE) || defined(\_\_CRAYXC)}
+00280 \textcolor{keywordtype}{char} \textcolor{keyword}{const} *info\_cray = \textcolor{stringliteral}{"INFO"} \textcolor{stringliteral}{":"} \textcolor{stringliteral}{"compiler\_wrapper[CrayPrgEnv]"};
+00281 \textcolor{preprocessor}{#endif}
+00282 
+00283 \textcolor{preprocessor}{#define STRINGIFY\_HELPER(X) #X}
+00284 \textcolor{preprocessor}{#define STRINGIFY(X) STRINGIFY\_HELPER(X)}
+00285 
+00286 \textcolor{comment}{/* Identify known platforms by name.  */}
+00287 \textcolor{preprocessor}{#if defined(\_\_linux) || defined(\_\_linux\_\_) || defined(linux)}
+00288 \textcolor{preprocessor}{# define PLATFORM\_ID "Linux"}
+00289 
+00290 \textcolor{preprocessor}{#elif defined(\_\_CYGWIN\_\_)}
+00291 \textcolor{preprocessor}{# define PLATFORM\_ID "Cygwin"}
+00292 
+00293 \textcolor{preprocessor}{#elif defined(\_\_MINGW32\_\_)}
+00294 \textcolor{preprocessor}{# define PLATFORM\_ID "MinGW"}
+00295 
+00296 \textcolor{preprocessor}{#elif defined(\_\_APPLE\_\_)}
+00297 \textcolor{preprocessor}{# define PLATFORM\_ID "Darwin"}
+00298 
+00299 \textcolor{preprocessor}{#elif defined(\_WIN32) || defined(\_\_WIN32\_\_) || defined(WIN32)}
+00300 \textcolor{preprocessor}{# define PLATFORM\_ID "Windows"}
+00301 
+00302 \textcolor{preprocessor}{#elif defined(\_\_FreeBSD\_\_) || defined(\_\_FreeBSD)}
+00303 \textcolor{preprocessor}{# define PLATFORM\_ID "FreeBSD"}
+00304 
+00305 \textcolor{preprocessor}{#elif defined(\_\_NetBSD\_\_) || defined(\_\_NetBSD)}
+00306 \textcolor{preprocessor}{# define PLATFORM\_ID "NetBSD"}
+00307 
+00308 \textcolor{preprocessor}{#elif defined(\_\_OpenBSD\_\_) || defined(\_\_OPENBSD)}
+00309 \textcolor{preprocessor}{# define PLATFORM\_ID "OpenBSD"}
+00310 
+00311 \textcolor{preprocessor}{#elif defined(\_\_sun) || defined(sun)}
+00312 \textcolor{preprocessor}{# define PLATFORM\_ID "SunOS"}
+00313 
+00314 \textcolor{preprocessor}{#elif defined(\_AIX) || defined(\_\_AIX) || defined(\_\_AIX\_\_) || defined(\_\_aix) || defined(\_\_aix\_\_)}
+00315 \textcolor{preprocessor}{# define PLATFORM\_ID "AIX"}
+00316 
+00317 \textcolor{preprocessor}{#elif defined(\_\_sgi) || defined(\_\_sgi\_\_) || defined(\_SGI)}
+00318 \textcolor{preprocessor}{# define PLATFORM\_ID "IRIX"}
+00319 
+00320 \textcolor{preprocessor}{#elif defined(\_\_hpux) || defined(\_\_hpux\_\_)}
+00321 \textcolor{preprocessor}{# define PLATFORM\_ID "HP-UX"}
+00322 
+00323 \textcolor{preprocessor}{#elif defined(\_\_HAIKU\_\_)}
+00324 \textcolor{preprocessor}{# define PLATFORM\_ID "Haiku"}
+00325 
+00326 \textcolor{preprocessor}{#elif defined(\_\_BeOS) || defined(\_\_BEOS\_\_) || defined(\_BEOS)}
+00327 \textcolor{preprocessor}{# define PLATFORM\_ID "BeOS"}
+00328 
+00329 \textcolor{preprocessor}{#elif defined(\_\_QNX\_\_) || defined(\_\_QNXNTO\_\_)}
+00330 \textcolor{preprocessor}{# define PLATFORM\_ID "QNX"}
+00331 
+00332 \textcolor{preprocessor}{#elif defined(\_\_tru64) || defined(\_tru64) || defined(\_\_TRU64\_\_)}
+00333 \textcolor{preprocessor}{# define PLATFORM\_ID "Tru64"}
+00334 
+00335 \textcolor{preprocessor}{#elif defined(\_\_riscos) || defined(\_\_riscos\_\_)}
+00336 \textcolor{preprocessor}{# define PLATFORM\_ID "RISCos"}
+00337 
+00338 \textcolor{preprocessor}{#elif defined(\_\_sinix) || defined(\_\_sinix\_\_) || defined(\_\_SINIX\_\_)}
+00339 \textcolor{preprocessor}{# define PLATFORM\_ID "SINIX"}
+00340 
+00341 \textcolor{preprocessor}{#elif defined(\_\_UNIX\_SV\_\_)}
+00342 \textcolor{preprocessor}{# define PLATFORM\_ID "UNIX\_SV"}
+00343 
+00344 \textcolor{preprocessor}{#elif defined(\_\_bsdos\_\_)}
+00345 \textcolor{preprocessor}{# define PLATFORM\_ID "BSDOS"}
+00346 
+00347 \textcolor{preprocessor}{#elif defined(\_MPRAS) || defined(MPRAS)}
+00348 \textcolor{preprocessor}{# define PLATFORM\_ID "MP-RAS"}
+00349 
+00350 \textcolor{preprocessor}{#elif defined(\_\_osf) || defined(\_\_osf\_\_)}
+00351 \textcolor{preprocessor}{# define PLATFORM\_ID "OSF1"}
+00352 
+00353 \textcolor{preprocessor}{#elif defined(\_SCO\_SV) || defined(SCO\_SV) || defined(sco\_sv)}
+00354 \textcolor{preprocessor}{# define PLATFORM\_ID "SCO\_SV"}
+00355 
+00356 \textcolor{preprocessor}{#elif defined(\_\_ultrix) || defined(\_\_ultrix\_\_) || defined(\_ULTRIX)}
+00357 \textcolor{preprocessor}{# define PLATFORM\_ID "ULTRIX"}
+00358 
+00359 \textcolor{preprocessor}{#elif defined(\_\_XENIX\_\_) || defined(\_XENIX) || defined(XENIX)}
+00360 \textcolor{preprocessor}{# define PLATFORM\_ID "Xenix"}
+00361 
+00362 \textcolor{preprocessor}{#elif defined(\_\_WATCOMC\_\_)}
+00363 \textcolor{preprocessor}{# if defined(\_\_LINUX\_\_)}
+00364 \textcolor{preprocessor}{#  define PLATFORM\_ID "Linux"}
+00365 
+00366 \textcolor{preprocessor}{# elif defined(\_\_DOS\_\_)}
+00367 \textcolor{preprocessor}{#  define PLATFORM\_ID "DOS"}
+00368 
+00369 \textcolor{preprocessor}{# elif defined(\_\_OS2\_\_)}
+00370 \textcolor{preprocessor}{#  define PLATFORM\_ID "OS2"}
+00371 
+00372 \textcolor{preprocessor}{# elif defined(\_\_WINDOWS\_\_)}
+00373 \textcolor{preprocessor}{#  define PLATFORM\_ID "Windows3x"}
+00374 
+00375 \textcolor{preprocessor}{# else }\textcolor{comment}{/* unknown platform */}\textcolor{preprocessor}{}
+00376 \textcolor{preprocessor}{#  define PLATFORM\_ID ""}
+00377 \textcolor{preprocessor}{# endif}
+00378 
+00379 \textcolor{preprocessor}{#else }\textcolor{comment}{/* unknown platform */}\textcolor{preprocessor}{}
+00380 \textcolor{preprocessor}{# define PLATFORM\_ID ""}
+00381 
+00382 \textcolor{preprocessor}{#endif}
+00383 
+00384 \textcolor{comment}{/* For windows compilers MSVC and Intel we can determine}
+00385 \textcolor{comment}{   the architecture of the compiler being used.  This is because}
+00386 \textcolor{comment}{   the compilers do not have flags that can change the architecture,}
+00387 \textcolor{comment}{   but rather depend on which compiler is being used}
+00388 \textcolor{comment}{*/}
+00389 \textcolor{preprocessor}{#if defined(\_WIN32) && defined(\_MSC\_VER)}
+00390 \textcolor{preprocessor}{# if defined(\_M\_IA64)}
+00391 \textcolor{preprocessor}{#  define ARCHITECTURE\_ID "IA64"}
+00392 
+00393 \textcolor{preprocessor}{# elif defined(\_M\_X64) || defined(\_M\_AMD64)}
+00394 \textcolor{preprocessor}{#  define ARCHITECTURE\_ID "x64"}
+00395 
+00396 \textcolor{preprocessor}{# elif defined(\_M\_IX86)}
+00397 \textcolor{preprocessor}{#  define ARCHITECTURE\_ID "X86"}
+00398 
+00399 \textcolor{preprocessor}{# elif defined(\_M\_ARM)}
+00400 \textcolor{preprocessor}{#  if \_M\_ARM == 4}
+00401 \textcolor{preprocessor}{#   define ARCHITECTURE\_ID "ARMV4I"}
+00402 \textcolor{preprocessor}{#  elif \_M\_ARM == 5}
+00403 \textcolor{preprocessor}{#   define ARCHITECTURE\_ID "ARMV5I"}
+00404 \textcolor{preprocessor}{#  else}
+00405 \textcolor{preprocessor}{#   define ARCHITECTURE\_ID "ARMV" STRINGIFY(\_M\_ARM)}
+00406 \textcolor{preprocessor}{#  endif}
+00407 
+00408 \textcolor{preprocessor}{# elif defined(\_M\_MIPS)}
+00409 \textcolor{preprocessor}{#  define ARCHITECTURE\_ID "MIPS"}
+00410 
+00411 \textcolor{preprocessor}{# elif defined(\_M\_SH)}
+00412 \textcolor{preprocessor}{#  define ARCHITECTURE\_ID "SHx"}
+00413 
+00414 \textcolor{preprocessor}{# else }\textcolor{comment}{/* unknown architecture */}\textcolor{preprocessor}{}
+00415 \textcolor{preprocessor}{#  define ARCHITECTURE\_ID ""}
+00416 \textcolor{preprocessor}{# endif}
+00417 
+00418 \textcolor{preprocessor}{#elif defined(\_\_WATCOMC\_\_)}
+00419 \textcolor{preprocessor}{# if defined(\_M\_I86)}
+00420 \textcolor{preprocessor}{#  define ARCHITECTURE\_ID "I86"}
+00421 
+00422 \textcolor{preprocessor}{# elif defined(\_M\_IX86)}
+00423 \textcolor{preprocessor}{#  define ARCHITECTURE\_ID "X86"}
+00424 
+00425 \textcolor{preprocessor}{# else }\textcolor{comment}{/* unknown architecture */}\textcolor{preprocessor}{}
+00426 \textcolor{preprocessor}{#  define ARCHITECTURE\_ID ""}
+00427 \textcolor{preprocessor}{# endif}
+00428 
+00429 \textcolor{preprocessor}{#else}
+00430 \textcolor{preprocessor}{#  define ARCHITECTURE\_ID ""}
+00431 \textcolor{preprocessor}{#endif}
+00432 
+00433 \textcolor{comment}{/* Convert integer to decimal digit literals.  */}
+00434 \textcolor{preprocessor}{#define DEC(n)                   \(\backslash\)}
+00435 \textcolor{preprocessor}{  ('0' + (((n) / 10000000)%10)), \(\backslash\)}
+00436 \textcolor{preprocessor}{  ('0' + (((n) / 1000000)%10)),  \(\backslash\)}
+00437 \textcolor{preprocessor}{  ('0' + (((n) / 100000)%10)),   \(\backslash\)}
+00438 \textcolor{preprocessor}{  ('0' + (((n) / 10000)%10)),    \(\backslash\)}
+00439 \textcolor{preprocessor}{  ('0' + (((n) / 1000)%10)),     \(\backslash\)}
+00440 \textcolor{preprocessor}{  ('0' + (((n) / 100)%10)),      \(\backslash\)}
+00441 \textcolor{preprocessor}{  ('0' + (((n) / 10)%10)),       \(\backslash\)}
+00442 \textcolor{preprocessor}{  ('0' +  ((n) % 10))}
+00443 
+00444 \textcolor{comment}{/* Convert integer to hex digit literals.  */}
+00445 \textcolor{preprocessor}{#define HEX(n)             \(\backslash\)}
+00446 \textcolor{preprocessor}{  ('0' + ((n)>>28 & 0xF)), \(\backslash\)}
+00447 \textcolor{preprocessor}{  ('0' + ((n)>>24 & 0xF)), \(\backslash\)}
+00448 \textcolor{preprocessor}{  ('0' + ((n)>>20 & 0xF)), \(\backslash\)}
+00449 \textcolor{preprocessor}{  ('0' + ((n)>>16 & 0xF)), \(\backslash\)}
+00450 \textcolor{preprocessor}{  ('0' + ((n)>>12 & 0xF)), \(\backslash\)}
+00451 \textcolor{preprocessor}{  ('0' + ((n)>>8  & 0xF)), \(\backslash\)}
+00452 \textcolor{preprocessor}{  ('0' + ((n)>>4  & 0xF)), \(\backslash\)}
+00453 \textcolor{preprocessor}{  ('0' + ((n)     & 0xF))}
+00454 
+00455 \textcolor{comment}{/* Construct a string literal encoding the version number components. */}
+00456 \textcolor{preprocessor}{#ifdef COMPILER\_VERSION\_MAJOR}
+00457 \textcolor{keywordtype}{char} \textcolor{keyword}{const} info\_version[] = \{
+00458   \textcolor{charliteral}{'I'}, \textcolor{charliteral}{'N'}, \textcolor{charliteral}{'F'}, \textcolor{charliteral}{'O'}, \textcolor{charliteral}{':'},
+00459   \textcolor{charliteral}{'c'},\textcolor{charliteral}{'o'},\textcolor{charliteral}{'m'},\textcolor{charliteral}{'p'},\textcolor{charliteral}{'i'},\textcolor{charliteral}{'l'},\textcolor{charliteral}{'e'},\textcolor{charliteral}{'r'},\textcolor{charliteral}{'\_'},\textcolor{charliteral}{'v'},\textcolor{charliteral}{'e'},\textcolor{charliteral}{'r'},\textcolor{charliteral}{'s'},\textcolor{charliteral}{'i'},\textcolor{charliteral}{'o'},\textcolor{charliteral}{'n'},\textcolor{charliteral}{'['},
+00460   COMPILER\_VERSION\_MAJOR,
+00461 \textcolor{preprocessor}{# ifdef COMPILER\_VERSION\_MINOR}
+00462   \textcolor{charliteral}{'.'}, COMPILER\_VERSION\_MINOR,
+00463 \textcolor{preprocessor}{#  ifdef COMPILER\_VERSION\_PATCH}
+00464    \textcolor{charliteral}{'.'}, COMPILER\_VERSION\_PATCH,
+00465 \textcolor{preprocessor}{#   ifdef COMPILER\_VERSION\_TWEAK}
+00466     \textcolor{charliteral}{'.'}, COMPILER\_VERSION\_TWEAK,
+00467 \textcolor{preprocessor}{#   endif}
+00468 \textcolor{preprocessor}{#  endif}
+00469 \textcolor{preprocessor}{# endif}
+00470   \textcolor{charliteral}{']'},\textcolor{charliteral}{'\(\backslash\)0'}\};
+00471 \textcolor{preprocessor}{#endif}
+00472 
+00473 \textcolor{comment}{/* Construct a string literal encoding the version number components. */}
+00474 \textcolor{preprocessor}{#ifdef SIMULATE\_VERSION\_MAJOR}
+00475 \textcolor{keywordtype}{char} \textcolor{keyword}{const} info\_simulate\_version[] = \{
+00476   \textcolor{charliteral}{'I'}, \textcolor{charliteral}{'N'}, \textcolor{charliteral}{'F'}, \textcolor{charliteral}{'O'}, \textcolor{charliteral}{':'},
+00477   \textcolor{charliteral}{'s'},\textcolor{charliteral}{'i'},\textcolor{charliteral}{'m'},\textcolor{charliteral}{'u'},\textcolor{charliteral}{'l'},\textcolor{charliteral}{'a'},\textcolor{charliteral}{'t'},\textcolor{charliteral}{'e'},\textcolor{charliteral}{'\_'},\textcolor{charliteral}{'v'},\textcolor{charliteral}{'e'},\textcolor{charliteral}{'r'},\textcolor{charliteral}{'s'},\textcolor{charliteral}{'i'},\textcolor{charliteral}{'o'},\textcolor{charliteral}{'n'},\textcolor{charliteral}{'['},
+00478   SIMULATE\_VERSION\_MAJOR,
+00479 \textcolor{preprocessor}{# ifdef SIMULATE\_VERSION\_MINOR}
+00480   \textcolor{charliteral}{'.'}, SIMULATE\_VERSION\_MINOR,
+00481 \textcolor{preprocessor}{#  ifdef SIMULATE\_VERSION\_PATCH}
+00482    \textcolor{charliteral}{'.'}, SIMULATE\_VERSION\_PATCH,
+00483 \textcolor{preprocessor}{#   ifdef SIMULATE\_VERSION\_TWEAK}
+00484     \textcolor{charliteral}{'.'}, SIMULATE\_VERSION\_TWEAK,
+00485 \textcolor{preprocessor}{#   endif}
+00486 \textcolor{preprocessor}{#  endif}
+00487 \textcolor{preprocessor}{# endif}
+00488   \textcolor{charliteral}{']'},\textcolor{charliteral}{'\(\backslash\)0'}\};
+00489 \textcolor{preprocessor}{#endif}
+00490 
+00491 \textcolor{comment}{/* Construct the string literal in pieces to prevent the source from}
+00492 \textcolor{comment}{   getting matched.  Store it in a pointer rather than an array}
+00493 \textcolor{comment}{   because some compilers will just produce instructions to fill the}
+00494 \textcolor{comment}{   array rather than assigning a pointer to a static array.  */}
+00495 \textcolor{keywordtype}{char} \textcolor{keyword}{const}* info_platform = \textcolor{stringliteral}{"INFO"} \textcolor{stringliteral}{":"} \textcolor{stringliteral}{"platform["} PLATFORM_ID \textcolor{stringliteral}{"]"};
+00496 \textcolor{keywordtype}{char} \textcolor{keyword}{const}* info_arch = \textcolor{stringliteral}{"INFO"} \textcolor{stringliteral}{":"} \textcolor{stringliteral}{"arch["} ARCHITECTURE_ID \textcolor{stringliteral}{"]"};
+00497 
+00498 
+00499 
+00500 
+00501 \textcolor{keyword}{const} \textcolor{keywordtype}{char}* info_language_dialect_default = \textcolor{stringliteral}{"INFO"} \textcolor{stringliteral}{":"} \textcolor{stringliteral}{"dialect\_default["}
+00502 \textcolor{preprocessor}{#if \_\_cplusplus >= 201402L}
+00503   \textcolor{stringliteral}{"14"}
+00504 \textcolor{preprocessor}{#elif \_\_cplusplus >= 201103L}
+00505   \textcolor{stringliteral}{"11"}
+00506 \textcolor{preprocessor}{#else}
+00507   \textcolor{stringliteral}{"98"}
+00508 \textcolor{preprocessor}{#endif}
+00509 \textcolor{stringliteral}{"]"};
+00510 
+00511 \textcolor{comment}{/*--------------------------------------------------------------------------*/}
+00512 
+00513 \textcolor{keywordtype}{int} main(\textcolor{keywordtype}{int} argc, \textcolor{keywordtype}{char}* argv[])
+00514 \{
+00515   \textcolor{keywordtype}{int} require = 0;
+00516   require += info_compiler[argc];
+00517   require += info_platform[argc];
+00518 \textcolor{preprocessor}{#ifdef COMPILER\_VERSION\_MAJOR}
+00519   require += info\_version[argc];
+00520 \textcolor{preprocessor}{#endif}
+00521 \textcolor{preprocessor}{#ifdef SIMULATE\_ID}
+00522   require += info\_simulate[argc];
+00523 \textcolor{preprocessor}{#endif}
+00524 \textcolor{preprocessor}{#ifdef SIMULATE\_VERSION\_MAJOR}
+00525   require += info\_simulate\_version[argc];
+00526 \textcolor{preprocessor}{#endif}
+00527 \textcolor{preprocessor}{#if defined(\_\_CRAYXE) || defined(\_\_CRAYXC)}
+00528   require += info\_cray[argc];
+00529 \textcolor{preprocessor}{#endif}
+00530   require += info_language_dialect_default[argc];
+00531   (void)argv;
+00532   \textcolor{keywordflow}{return} require;
+00533 \}
+\end{DoxyCode}

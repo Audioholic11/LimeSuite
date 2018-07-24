@@ -1,0 +1,236 @@
+\subsection{msg\+\_\+gate\+\_\+impl.\+cc}
+\label{msg__gate__impl_8cc_source}\index{/home/erik/prefix/default/src/gr-\/radar-\/dev/lib/msg\+\_\+gate\+\_\+impl.\+cc@{/home/erik/prefix/default/src/gr-\/radar-\/dev/lib/msg\+\_\+gate\+\_\+impl.\+cc}}
+
+\begin{DoxyCode}
+00001 \textcolor{comment}{/* -*- c++ -*- */}
+00002 \textcolor{comment}{/* }
+00003 \textcolor{comment}{ * Copyright 2014 Communications Engineering Lab, KIT.}
+00004 \textcolor{comment}{ * }
+00005 \textcolor{comment}{ * This is free software; you can redistribute it and/or modify}
+00006 \textcolor{comment}{ * it under the terms of the GNU General Public License as published by}
+00007 \textcolor{comment}{ * the Free Software Foundation; either version 3, or (at your option)}
+00008 \textcolor{comment}{ * any later version.}
+00009 \textcolor{comment}{ * }
+00010 \textcolor{comment}{ * This software is distributed in the hope that it will be useful,}
+00011 \textcolor{comment}{ * but WITHOUT ANY WARRANTY; without even the implied warranty of}
+00012 \textcolor{comment}{ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the}
+00013 \textcolor{comment}{ * GNU General Public License for more details.}
+00014 \textcolor{comment}{ * }
+00015 \textcolor{comment}{ * You should have received a copy of the GNU General Public License}
+00016 \textcolor{comment}{ * along with this software; see the file COPYING.  If not, write to}
+00017 \textcolor{comment}{ * the Free Software Foundation, Inc., 51 Franklin Street,}
+00018 \textcolor{comment}{ * Boston, MA 02110-1301, USA.}
+00019 \textcolor{comment}{ */}
+00020  
+00021 \textcolor{preprocessor}{#ifdef HAVE\_CONFIG\_H}
+00022 \textcolor{preprocessor}{#include "config.h"}
+00023 \textcolor{preprocessor}{#endif}
+00024 
+00025 \textcolor{preprocessor}{#include <gnuradio/io\_signature.h>}
+00026 \textcolor{preprocessor}{#include "msg_gate_impl.h"}
+00027 \textcolor{preprocessor}{#include <algorithm>} \textcolor{comment}{// needed for std::find}
+00028 
+00029 \textcolor{keyword}{namespace }gr \{
+00030   \textcolor{keyword}{namespace }radar \{
+00031 
+00032     msg_gate::sptr
+00033     msg_gate::make(std::vector<std::string> keys, std::vector<float> val\_min, std::vector<float> val\_max)
+00034     \{
+00035       \textcolor{keywordflow}{return} gnuradio::get\_initial\_sptr
+00036         (\textcolor{keyword}{new} msg_gate_impl(keys, val\_min, val\_max));
+00037     \}
+00038 
+00039     \textcolor{comment}{/*}
+00040 \textcolor{comment}{     * The private constructor}
+00041 \textcolor{comment}{     */}
+00042     msg_gate_impl::msg_gate_impl(std::vector<std::string> keys, std::vector<float> val\_min, 
+      std::vector<float> val\_max)
+00043       : gr::block(\textcolor{stringliteral}{"msg\_gate"},
+00044               gr::io\_signature::make(0,0,0),
+00045               gr::io\_signature::make(0,0,0))
+00046     \{
+00047         d_keys = keys;
+00048         d_val_min = val\_min;
+00049         d_val_max = val\_max;
+00050         
+00051         \textcolor{comment}{// Register input message port}
+00052         d_port_id_in = pmt::mp(\textcolor{stringliteral}{"Msg in"});
+00053         message\_port\_register\_in(d_port_id_in);
+00054         set\_msg\_handler(d_port_id_in, boost::bind(&msg_gate_impl::handle_msg, \textcolor{keyword}{this}, \_1));
+00055         
+00056         \textcolor{comment}{// Register output message port}
+00057         d_port_id_out = pmt::mp(\textcolor{stringliteral}{"Msg out"});
+00058         message\_port\_register\_out(d_port_id_out);
+00059     \}
+00060     
+00061     \textcolor{keywordtype}{void}
+00062     msg_gate_impl::handle_msg(pmt::pmt\_t msg)\{
+00063         \textcolor{comment}{// FIXME: remake me, pretty bad code}
+00064         \textcolor{keywordtype}{size\_t} msg\_size = pmt::length(msg);
+00065         std::vector<pmt::pmt\_t> msg\_parts\_f32\_key;
+00066         std::vector<std::vector<float> > msg\_parts\_f32\_val; \textcolor{comment}{// take f32 vectors of msg}
+00067         std::vector<pmt::pmt\_t> msg\_parts\_rest; \textcolor{comment}{// take rest}
+00068         std::vector<int> index\_remove\_items;
+00069         
+00070         \textcolor{comment}{// Push back float32 vectors in msg to separate vectors (only valid type for data) // FIXME: allow
+       other data types?}
+00071         \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} k=0; k<msg\_size; k++)\{
+00072             \textcolor{keywordflow}{if}(pmt::is\_f32vector(pmt::nth(1,pmt::nth(k,msg))))\{
+00073                 msg\_parts\_f32\_key.push\_back(pmt::nth(0,pmt::nth(k,msg))); \textcolor{comment}{// save key (pmt symbol)}
+00074                 msg\_parts\_f32\_val.push\_back(pmt::f32vector\_elements(pmt::nth(1,pmt::nth(
+      k,msg)))); \textcolor{comment}{// save value of f32 vec}
+00075             \}
+00076             \textcolor{keywordflow}{else}\{
+00077                 msg\_parts\_rest.push\_back(pmt::nth(k,msg));
+00078             \}
+00079         \}
+00080         
+00081         \textcolor{keywordflow}{if}(msg\_parts\_f32\_key.size()!=0)\{
+00082         
+00083         \textcolor{comment}{// Filter f32 vectors with string keys and save index of items out of boundries}
+00084         \textcolor{keywordtype}{size\_t} key\_size;
+00085         key\_size = d_keys.size();
+00086         \textcolor{keywordtype}{size\_t} counter, size\_vec;
+00087         \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} k=0; k<msg\_parts\_f32\_key.size(); k++)\{ \textcolor{comment}{// go through msg\_parts keys}
+00088             \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} p=0; p<key\_size; p++)\{ \textcolor{comment}{// go through string keys}
+00089                 \textcolor{keywordflow}{if}(d_keys[p]==pmt::symbol\_to\_string(msg\_parts\_f32\_key[k]))\{ \textcolor{comment}{// if matching key is found
+       apply filter}
+00090                     \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} q=0; q<msg\_parts\_f32\_val[k].size(); q++)\{ \textcolor{comment}{// look for items out of boundries
+       and store index}
+00091                         \textcolor{keywordflow}{if}(msg\_parts\_f32\_val[k][q]<d_val_min[p] || msg\_parts\_f32\_val[k][q]>
+      d_val_max[p])\{
+00092                             \textcolor{keywordflow}{if}(index\_remove\_items.end()==std::find(index\_remove\_items.begin(), 
+      index\_remove\_items.end(), q))\{ \textcolor{comment}{// check if item is not already in vector}
+00093                                 index\_remove\_items.push\_back(q);
+00094                             \}
+00095                         \}
+00096                     \}
+00097                 \}
+00098             \}
+00099         \}
+00100         
+00101         \textcolor{comment}{// Copy valid items from f32 vectors}
+00102         std::vector<std::vector<float> > f32\_hold;
+00103         f32\_hold.resize(msg\_parts\_f32\_val.size());
+00104         
+00105         \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} p=0; p<msg\_parts\_f32\_val[0].size(); p++)\{
+00106             \textcolor{keywordflow}{if}(index\_remove\_items.end()==std::find(index\_remove\_items.begin(), index\_remove\_items.end(), 
+      p))\{ \textcolor{comment}{// if index is not in vector for removed items}
+00107                 \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} k=0; k<msg\_parts\_f32\_val.size(); k++)\{
+00108                     f32\_hold[k].push\_back(msg\_parts\_f32\_val[k][p]);
+00109                 \}
+00110             \}
+00111         \}
+00112         
+00113         \textcolor{keywordflow}{if}(f32\_hold[0].size()!=0)\{ \textcolor{comment}{// if there is any item left after filtering}
+00114             \textcolor{comment}{// Repack msg}
+00115             pmt::pmt\_t msg\_out\_rest, msg\_out\_f32, msg\_out;
+00116             std::vector<pmt::pmt\_t > f32\_hold\_pmt;
+00117             \textcolor{keywordtype}{bool} is\_msg\_rest;
+00118             is\_msg\_rest = \textcolor{keyword}{true};
+00119             
+00120             \textcolor{comment}{// Repack rest pmts (not f32)}
+00121             \textcolor{keywordflow}{if}(msg\_parts\_rest.size()!=0)\{
+00122                 msg\_out\_rest = pmt::list1(msg\_parts\_rest[0]);
+00123                 \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} k=1; k<msg\_parts\_rest.size(); k++)\{
+00124                     msg\_out\_rest = pmt::list\_add(msg\_out\_rest,msg\_parts\_rest[k]);
+00125                 \}
+00126             \}
+00127             
+00128             \textcolor{comment}{// Repack f32 pmts}
+00129             f32\_hold\_pmt.resize(f32\_hold.size());
+00130             \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} k=0; k<f32\_hold.size(); k++)\{
+00131                 f32\_hold\_pmt[k] = list2(msg\_parts\_f32\_key[k],pmt::init\_f32vector(f32\_hold[k].
+      size(),f32\_hold[k]));
+00132             \}
+00133             \textcolor{keywordflow}{if}(is\_msg\_rest)\{
+00134                 msg\_out = msg\_out\_rest;
+00135                 \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} k=0; k<f32\_hold\_pmt.size(); k++)\{
+00136                     msg\_out = list\_add(msg\_out,f32\_hold\_pmt[k]);
+00137                 \}
+00138             \}
+00139             \textcolor{keywordflow}{else}\{
+00140                 msg\_out = list1(f32\_hold\_pmt[0]);
+00141                 \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} k=1; k<f32\_hold\_pmt.size(); k++)\{
+00142                     msg\_out = pmt::list\_add(msg\_out,f32\_hold\_pmt[k]);
+00143                 \}
+00144             \}
+00145         
+00146             message\_port\_pub(d_port_id_out,msg\_out);
+00147         \}
+00148         
+00149         \} \textcolor{comment}{// end if msg\_parts\_f32.size() != 0}
+00150     \}
+00151     
+00152     \textcolor{comment}{/*}
+00153 \textcolor{comment}{    void}
+00154 \textcolor{comment}{    msg\_gate\_impl::handle\_msg(pmt::pmt\_t msg)\{}
+00155 \textcolor{comment}{        d\_msg\_size = pmt::length(msg);}
+00156 \textcolor{comment}{        d\_msg\_part\_hold.clear();}
+00157 \textcolor{comment}{        d\_msg\_part\_hold.resize(0);}
+00158 \textcolor{comment}{        }
+00159 \textcolor{comment}{        for(int k=0; k<d\_msg\_size; k++)\{ // go through msg}
+00160 \textcolor{comment}{            d\_msg\_part = pmt::nth(k,msg);}
+00161 \textcolor{comment}{            d\_msg\_key = pmt::symbol\_to\_string(pmt::nth(0,d\_msg\_part)); // get key}
+00162 \textcolor{comment}{            d\_key\_found = false;}
+00163 \textcolor{comment}{            for(int l=0; l<d\_keys.size(); l++)\{ // search for key in input keys}
+00164 \textcolor{comment}{                if(d\_msg\_key==d\_keys[l])\{}
+00165 \textcolor{comment}{                    // If key is found check for vector and repack msg}
+00166 \textcolor{comment}{                    d\_key\_found = true;}
+00167 \textcolor{comment}{                    if(pmt::is\_f32vector(pmt::nth(1,d\_msg\_part)))\{ // only f32 vector works}
+00168 \textcolor{comment}{                        d\_vec\_size = pmt::length(pmt::nth(1,d\_msg\_part));}
+00169 \textcolor{comment}{                        d\_val\_store.clear();}
+00170 \textcolor{comment}{                        d\_val\_store.resize(d\_vec\_size);}
+00171 \textcolor{comment}{                        d\_val\_store = pmt::f32vector\_elements(pmt::nth(1,d\_msg\_part));}
+00172 \textcolor{comment}{                        // Check if element is in boundries}
+00173 \textcolor{comment}{                        d\_val\_accept.clear();}
+00174 \textcolor{comment}{                        d\_val\_accept.resize(0);}
+00175 \textcolor{comment}{                        for(int m=0; m<d\_vec\_size; m++)\{}
+00176 \textcolor{comment}{                            if((d\_val\_store[m]>=d\_val\_min[l])&&(d\_val\_store[m]<=d\_val\_max[l]))\{}
+00177 \textcolor{comment}{                                d\_val\_accept.push\_back(d\_val\_store[m]);}
+00178 \textcolor{comment}{                            \}}
+00179 \textcolor{comment}{                        \}}
+00180 \textcolor{comment}{                    \}}
+00181 \textcolor{comment}{                    else\{}
+00182 \textcolor{comment}{                        1; // FIXME: throw warning for wrong datatype}
+00183 \textcolor{comment}{                    \}}
+00184 \textcolor{comment}{                \} // end repacking}
+00185 \textcolor{comment}{            \} // end checking keys}
+00186 \textcolor{comment}{            }
+00187 \textcolor{comment}{            // Store pmt}
+00188 \textcolor{comment}{            if(d\_key\_found)\{}
+00189 \textcolor{comment}{                
+      d\_msg\_part\_hold.push\_back(pmt::list2(pmt::nth(0,d\_msg\_part),pmt::init\_f32vector(d\_val\_accept.size(),d\_val\_accept))); // push back new pmt if key is found}
+00190 \textcolor{comment}{            \}}
+00191 \textcolor{comment}{            else\{}
+00192 \textcolor{comment}{                d\_msg\_part\_hold.push\_back(d\_msg\_part); // push back old msg part if not}
+00193 \textcolor{comment}{            \}}
+00194 \textcolor{comment}{            }
+00195 \textcolor{comment}{        \} // end check msg}
+00196 \textcolor{comment}{        }
+00197 \textcolor{comment}{        // Rebuild msg and push to output}
+00198 \textcolor{comment}{        pmt::pmt\_t msg\_out;}
+00199 \textcolor{comment}{        if(d\_msg\_part\_hold.size()==1)\{}
+00200 \textcolor{comment}{            msg\_out = list1(d\_msg\_part\_hold[0]);}
+00201 \textcolor{comment}{        \}}
+00202 \textcolor{comment}{        else if(d\_msg\_part\_hold.size()==2)\{}
+00203 \textcolor{comment}{            msg\_out = pmt::list2(d\_msg\_part\_hold[0],d\_msg\_part\_hold[1]);}
+00204 \textcolor{comment}{        \}}
+00205 \textcolor{comment}{        else if(d\_msg\_part\_hold.size()==3)\{}
+00206 \textcolor{comment}{            msg\_out = pmt::list3(d\_msg\_part\_hold[0],d\_msg\_part\_hold[1],d\_msg\_part\_hold[2]);}
+00207 \textcolor{comment}{        \}}
+00208 \textcolor{comment}{        message\_port\_pub(d\_port\_id\_out,msg\_out);}
+00209 \textcolor{comment}{    \}}
+00210 \textcolor{comment}{    */}
+00211     
+00212     \textcolor{comment}{/*}
+00213 \textcolor{comment}{     * Our virtual destructor.}
+00214 \textcolor{comment}{     */}
+00215     msg_gate_impl::~msg_gate_impl()
+00216     \{
+00217     \}
+00218 
+00219   \} \textcolor{comment}{/* namespace radar */}
+00220 \} \textcolor{comment}{/* namespace gr */}
+00221 
+\end{DoxyCode}

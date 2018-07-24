@@ -1,0 +1,131 @@
+\subsection{signal\+\_\+generator\+\_\+sync\+\_\+pulse\+\_\+c\+\_\+impl.\+cc}
+\label{signal__generator__sync__pulse__c__impl_8cc_source}\index{/home/erik/prefix/default/src/gr-\/radar-\/dev/lib/signal\+\_\+generator\+\_\+sync\+\_\+pulse\+\_\+c\+\_\+impl.\+cc@{/home/erik/prefix/default/src/gr-\/radar-\/dev/lib/signal\+\_\+generator\+\_\+sync\+\_\+pulse\+\_\+c\+\_\+impl.\+cc}}
+
+\begin{DoxyCode}
+00001 \textcolor{comment}{/* -*- c++ -*- */}
+00002 \textcolor{comment}{/* }
+00003 \textcolor{comment}{ * Copyright 2014 Communications Engineering Lab, KIT.}
+00004 \textcolor{comment}{ * }
+00005 \textcolor{comment}{ * This is free software; you can redistribute it and/or modify}
+00006 \textcolor{comment}{ * it under the terms of the GNU General Public License as published by}
+00007 \textcolor{comment}{ * the Free Software Foundation; either version 3, or (at your option)}
+00008 \textcolor{comment}{ * any later version.}
+00009 \textcolor{comment}{ * }
+00010 \textcolor{comment}{ * This software is distributed in the hope that it will be useful,}
+00011 \textcolor{comment}{ * but WITHOUT ANY WARRANTY; without even the implied warranty of}
+00012 \textcolor{comment}{ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the}
+00013 \textcolor{comment}{ * GNU General Public License for more details.}
+00014 \textcolor{comment}{ * }
+00015 \textcolor{comment}{ * You should have received a copy of the GNU General Public License}
+00016 \textcolor{comment}{ * along with this software; see the file COPYING.  If not, write to}
+00017 \textcolor{comment}{ * the Free Software Foundation, Inc., 51 Franklin Street,}
+00018 \textcolor{comment}{ * Boston, MA 02110-1301, USA.}
+00019 \textcolor{comment}{ */}
+00020 
+00021 \textcolor{preprocessor}{#ifdef HAVE\_CONFIG\_H}
+00022 \textcolor{preprocessor}{#include "config.h"}
+00023 \textcolor{preprocessor}{#endif}
+00024 
+00025 \textcolor{preprocessor}{#include <gnuradio/io\_signature.h>}
+00026 \textcolor{preprocessor}{#include "signal_generator_sync_pulse_c_impl.h"}
+00027 
+00028 \textcolor{keyword}{namespace }gr \{
+00029   \textcolor{keyword}{namespace }radar \{
+00030 
+00031     signal_generator_sync_pulse_c::sptr
+00032     signal_generator_sync_pulse_c::make(\textcolor{keywordtype}{int} packet\_len, std::vector<int> pulse\_len, std::vector<int> 
+      pulse\_pause, \textcolor{keywordtype}{float} pulse\_amplitude, \textcolor{keyword}{const} std::string len\_key)
+00033     \{
+00034       \textcolor{keywordflow}{return} gnuradio::get\_initial\_sptr
+00035         (\textcolor{keyword}{new} signal_generator_sync_pulse_c_impl(packet\_len, pulse\_len, pulse\_pause, pulse\_amplitude, 
+      len\_key));
+00036     \}
+00037 
+00038     \textcolor{comment}{/*}
+00039 \textcolor{comment}{     * The private constructor}
+00040 \textcolor{comment}{     */}
+00041     signal_generator_sync_pulse_c_impl::signal_generator_sync_pulse_c_impl(\textcolor{keywordtype}{int} packet\_len, std::vector<int>
+       pulse\_len, std::vector<int> pulse\_pause, \textcolor{keywordtype}{float} pulse\_amplitude, \textcolor{keyword}{const} 
+      std::string len\_key)
+00042       : gr::sync\_block(\textcolor{stringliteral}{"signal\_generator\_sync\_pulse\_c"},
+00043               gr::io\_signature::make(0, 0, 0),
+00044               gr::io\_signature::make(1, 1, sizeof(gr\_complex)))
+00045     \{
+00046         d_packet_len = packet\_len;
+00047         
+00048         d_key = pmt::string\_to\_symbol(len\_key); \textcolor{comment}{// set tag identifier for tagged stream}
+00049         d_value = pmt::from\_long(packet\_len); \textcolor{comment}{// set length of 1 cw packet as tagged stream}
+00050         d_srcid = pmt::string\_to\_symbol(\textcolor{stringliteral}{"sig\_gen\_sync"}); \textcolor{comment}{// set block identifier}
+00051         
+00052         \textcolor{comment}{// Set counter to zero}
+00053         d_counter = 0;
+00054         
+00055         \textcolor{comment}{// Setup output buffer}
+00056         \textcolor{comment}{// Use alternating pulse\_pause (zeros) and pulse\_len (amplitude), fill with zeros at the end up to
+       packet\_len}
+00057         d_out_buffer.resize(packet\_len);
+00058         \textcolor{keywordtype}{int} pulse\_send = 0;
+00059         \textcolor{keywordtype}{int} pulse\_wait = 0;
+00060         \textcolor{keywordtype}{int} k=0;
+00061         \textcolor{keywordflow}{while}(pulse\_wait<pulse\_pause.size() || pulse\_send<pulse\_len.size())\{
+00062             \textcolor{keywordflow}{if}(pulse\_wait<pulse\_pause.size())\{ \textcolor{comment}{// Setup wait samples}
+00063                 \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} p=0; p<pulse\_pause[pulse\_wait]; p++) d_out_buffer[k+p] = 0+1j*0;
+00064                 k += pulse\_pause[pulse\_wait];
+00065                 pulse\_wait++;
+00066             \}
+00067             \textcolor{keywordflow}{if}(pulse\_send<pulse\_len.size())\{ \textcolor{comment}{// Setup pulse samples}
+00068                 \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} p=0; p<pulse\_len[pulse\_send]; p++) d_out_buffer[k+p] = pulse\_amplitude+1j*0;
+00069                 k += pulse\_len[pulse\_send];
+00070                 pulse\_send++;
+00071             \}
+00072         \}
+00073         \textcolor{keywordflow}{if}(k<packet\_len)\{ \textcolor{comment}{// fill with zeros}
+00074             \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} p=0; p<packet\_len-k; p++)\{
+00075                 d_out_buffer[k+p] = 0+1j*0;
+00076             \}
+00077         \}
+00078     \}
+00079 
+00080     \textcolor{comment}{/*}
+00081 \textcolor{comment}{     * Our virtual destructor.}
+00082 \textcolor{comment}{     */}
+00083     signal_generator_sync_pulse_c_impl::~signal_generator_sync_pulse_c_impl()
+00084     \{
+00085     \}
+00086 
+00087     \textcolor{keywordtype}{int}
+00088     signal_generator_sync_pulse_c_impl::work(\textcolor{keywordtype}{int} noutput\_items,
+00089               gr\_vector\_const\_void\_star &input\_items,
+00090               gr\_vector\_void\_star &output\_items)
+00091     \{
+00092         gr\_complex *out = (gr\_complex *) output\_items[0];
+00093         
+00094         \textcolor{comment}{// Set output to zero}
+00095         std::memset(out, 0, noutput\_items*\textcolor{keyword}{sizeof}(gr\_complex));
+00096         
+00097         \textcolor{comment}{// Push output buffer to out}
+00098         \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} i=0; i<noutput\_items; i++)\{
+00099             \textcolor{comment}{// Set tag on every packet\_len-th item}
+00100             \textcolor{keywordflow}{if}((nitems\_written(0)+i)%d_packet_len==0) add\_item\_tag(0, nitems\_written(0)+
+      i, d_key, d_value, d_srcid);
+00101             
+00102             \textcolor{comment}{// Write sample}
+00103             \textcolor{keywordflow}{if}(d_counter<d_packet_len)\{
+00104                 out[i] = d_out_buffer[d_counter];
+00105                 d_counter++;
+00106             \}
+00107             \textcolor{keywordflow}{else}\{
+00108                 out[i] = d_out_buffer[0];
+00109                 d_counter = 1;
+00110                 
+00111             \}
+00112         \}
+00113 
+00114         \textcolor{comment}{// Tell runtime system how many output items we produced.}
+00115         \textcolor{keywordflow}{return} noutput\_items;
+00116     \}
+00117 
+00118   \} \textcolor{comment}{/* namespace radar */}
+00119 \} \textcolor{comment}{/* namespace gr */}
+00120 
+\end{DoxyCode}

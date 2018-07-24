@@ -1,0 +1,355 @@
+\subsection{Soapy\+S\+DR\+:\+:Converter\+Registry Class Reference}
+\label{classSoapySDR_1_1ConverterRegistry}\index{Soapy\+S\+D\+R\+::\+Converter\+Registry@{Soapy\+S\+D\+R\+::\+Converter\+Registry}}
+
+
+{\ttfamily \#include $<$Converter\+Registry.\+hpp$>$}
+
+
+
+Collaboration diagram for Soapy\+S\+DR\+:\+:Converter\+Registry\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=232pt]{db/de9/classSoapySDR_1_1ConverterRegistry__coll__graph}
+\end{center}
+\end{figure}
+\subsubsection*{Public Types}
+\begin{DoxyCompactItemize}
+\item 
+enum {\bf Function\+Priority} \{ {\bf G\+E\+N\+E\+R\+IC} = 0, 
+{\bf V\+E\+C\+T\+O\+R\+I\+Z\+ED} = 3, 
+{\bf C\+U\+S\+T\+OM} = 5
+ \}
+\item 
+typedef {\bf void}($\ast$ {\bf Converter\+Function}) (const {\bf void} $\ast$, {\bf void} $\ast$, const size\+\_\+t, const double)
+\item 
+typedef std\+::map$<$ {\bf Function\+Priority}, {\bf Converter\+Function} $>$ {\bf Target\+Format\+Converter\+Priority}
+\item 
+typedef std\+::map$<$ {\bf std\+::string}, {\bf Target\+Format\+Converter\+Priority} $>$ {\bf Target\+Format\+Converters}
+\item 
+typedef std\+::map$<$ {\bf std\+::string}, {\bf Target\+Format\+Converters} $>$ {\bf Format\+Converters}
+\end{DoxyCompactItemize}
+\subsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+{\bf Converter\+Registry} (const {\bf std\+::string} \&source\+Format, const {\bf std\+::string} \&target\+Format, const {\bf Function\+Priority} \&priority, {\bf Converter\+Function} converter)
+\end{DoxyCompactItemize}
+\subsubsection*{Static Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+static {\bf std\+::vector}$<$ {\bf std\+::string} $>$ {\bf list\+Target\+Formats} (const {\bf std\+::string} \&source\+Format)
+\item 
+static {\bf std\+::vector}$<$ {\bf std\+::string} $>$ {\bf list\+Source\+Formats} (const {\bf std\+::string} \&target\+Format)
+\item 
+static {\bf std\+::vector}$<$ {\bf Function\+Priority} $>$ {\bf list\+Priorities} (const {\bf std\+::string} \&source\+Format, const {\bf std\+::string} \&target\+Format)
+\item 
+static {\bf Converter\+Function} {\bf get\+Function} (const {\bf std\+::string} \&source\+Format, const {\bf std\+::string} \&target\+Format)
+\item 
+static {\bf Converter\+Function} {\bf get\+Function} (const {\bf std\+::string} \&source\+Format, const {\bf std\+::string} \&target\+Format, const {\bf Function\+Priority} \&priority)
+\item 
+static {\bf std\+::vector}$<$ {\bf std\+::string} $>$ {\bf list\+Available\+Source\+Formats} ({\bf void})
+\end{DoxyCompactItemize}
+
+
+\subsubsection{Detailed Description}
+
+
+Definition at line {\bf 23} of file {\bf Converter\+Registry.\+hpp}.
+
+
+
+\subsubsection{Member Typedef Documentation}
+\index{Soapy\+S\+D\+R\+::\+Converter\+Registry@{Soapy\+S\+D\+R\+::\+Converter\+Registry}!Converter\+Function@{Converter\+Function}}
+\index{Converter\+Function@{Converter\+Function}!Soapy\+S\+D\+R\+::\+Converter\+Registry@{Soapy\+S\+D\+R\+::\+Converter\+Registry}}
+\paragraph[{Converter\+Function}]{\setlength{\rightskip}{0pt plus 5cm}typedef {\bf void}($\ast$ Soapy\+S\+D\+R\+::\+Converter\+Registry\+::\+Converter\+Function) (const {\bf void} $\ast$, {\bf void} $\ast$, const size\+\_\+t, const double)}\label{classSoapySDR_1_1ConverterRegistry_a49e1383cfdbcd16e65de5673d89e500d}
+A typedef for a conversion function pointer. A conversion function converts an input buffer into an output buffer. The parameters are (input pointer, output pointer, number of elements, optional scalar) 
+
+Definition at line {\bf 31} of file {\bf Converter\+Registry.\+hpp}.
+
+\index{Soapy\+S\+D\+R\+::\+Converter\+Registry@{Soapy\+S\+D\+R\+::\+Converter\+Registry}!Format\+Converters@{Format\+Converters}}
+\index{Format\+Converters@{Format\+Converters}!Soapy\+S\+D\+R\+::\+Converter\+Registry@{Soapy\+S\+D\+R\+::\+Converter\+Registry}}
+\paragraph[{Format\+Converters}]{\setlength{\rightskip}{0pt plus 5cm}typedef std\+::map$<${\bf std\+::string}, {\bf Target\+Format\+Converters}$>$ {\bf Soapy\+S\+D\+R\+::\+Converter\+Registry\+::\+Format\+Converters}}\label{classSoapySDR_1_1ConverterRegistry_a818ebc51b1e57b0182098912abc444e7}
+Format\+Converters\+: a map of possible conversion functions for a given Source/\+Target Format. 
+
+Definition at line {\bf 55} of file {\bf Converter\+Registry.\+hpp}.
+
+\index{Soapy\+S\+D\+R\+::\+Converter\+Registry@{Soapy\+S\+D\+R\+::\+Converter\+Registry}!Target\+Format\+Converter\+Priority@{Target\+Format\+Converter\+Priority}}
+\index{Target\+Format\+Converter\+Priority@{Target\+Format\+Converter\+Priority}!Soapy\+S\+D\+R\+::\+Converter\+Registry@{Soapy\+S\+D\+R\+::\+Converter\+Registry}}
+\paragraph[{Target\+Format\+Converter\+Priority}]{\setlength{\rightskip}{0pt plus 5cm}typedef std\+::map$<${\bf Function\+Priority}, {\bf Converter\+Function}$>$ {\bf Soapy\+S\+D\+R\+::\+Converter\+Registry\+::\+Target\+Format\+Converter\+Priority}}\label{classSoapySDR_1_1ConverterRegistry_ad873a90d8ba27fab3ac9754fd6bffb4f}
+Target\+Format\+Converter\+Priority\+: a map of possible conversion functions for a given Priority. 
+
+Definition at line {\bf 45} of file {\bf Converter\+Registry.\+hpp}.
+
+\index{Soapy\+S\+D\+R\+::\+Converter\+Registry@{Soapy\+S\+D\+R\+::\+Converter\+Registry}!Target\+Format\+Converters@{Target\+Format\+Converters}}
+\index{Target\+Format\+Converters@{Target\+Format\+Converters}!Soapy\+S\+D\+R\+::\+Converter\+Registry@{Soapy\+S\+D\+R\+::\+Converter\+Registry}}
+\paragraph[{Target\+Format\+Converters}]{\setlength{\rightskip}{0pt plus 5cm}typedef std\+::map$<${\bf std\+::string}, {\bf Target\+Format\+Converter\+Priority}$>$ {\bf Soapy\+S\+D\+R\+::\+Converter\+Registry\+::\+Target\+Format\+Converters}}\label{classSoapySDR_1_1ConverterRegistry_a8e44dc70158214c3a358efa2445a50db}
+Target\+Format\+Converters\+: a map of possible conversion functions for a given Target/\+Priority Format. 
+
+Definition at line {\bf 50} of file {\bf Converter\+Registry.\+hpp}.
+
+
+
+\subsubsection{Member Enumeration Documentation}
+\index{Soapy\+S\+D\+R\+::\+Converter\+Registry@{Soapy\+S\+D\+R\+::\+Converter\+Registry}!Function\+Priority@{Function\+Priority}}
+\index{Function\+Priority@{Function\+Priority}!Soapy\+S\+D\+R\+::\+Converter\+Registry@{Soapy\+S\+D\+R\+::\+Converter\+Registry}}
+\paragraph[{Function\+Priority}]{\setlength{\rightskip}{0pt plus 5cm}enum {\bf Soapy\+S\+D\+R\+::\+Converter\+Registry\+::\+Function\+Priority}}\label{classSoapySDR_1_1ConverterRegistry_a93a150b8e96ffd99ff6fa3da63e1c75d}
+Format\+Converter\+Priority\+: allow selection of a converter function with a given source and target format \begin{Desc}
+\item[Enumerator]\par
+\begin{description}
+\index{G\+E\+N\+E\+R\+IC@{G\+E\+N\+E\+R\+IC}!Soapy\+S\+D\+R\+::\+Converter\+Registry@{Soapy\+S\+D\+R\+::\+Converter\+Registry}}\index{Soapy\+S\+D\+R\+::\+Converter\+Registry@{Soapy\+S\+D\+R\+::\+Converter\+Registry}!G\+E\+N\+E\+R\+IC@{G\+E\+N\+E\+R\+IC}}\item[{\em 
+G\+E\+N\+E\+R\+IC\label{classSoapySDR_1_1ConverterRegistry_a93a150b8e96ffd99ff6fa3da63e1c75dae84ba59a0bdec911bc2784d99b62807a}
+}]\index{V\+E\+C\+T\+O\+R\+I\+Z\+ED@{V\+E\+C\+T\+O\+R\+I\+Z\+ED}!Soapy\+S\+D\+R\+::\+Converter\+Registry@{Soapy\+S\+D\+R\+::\+Converter\+Registry}}\index{Soapy\+S\+D\+R\+::\+Converter\+Registry@{Soapy\+S\+D\+R\+::\+Converter\+Registry}!V\+E\+C\+T\+O\+R\+I\+Z\+ED@{V\+E\+C\+T\+O\+R\+I\+Z\+ED}}\item[{\em 
+V\+E\+C\+T\+O\+R\+I\+Z\+ED\label{classSoapySDR_1_1ConverterRegistry_a93a150b8e96ffd99ff6fa3da63e1c75da01db734895ce3de4526af6756710f6b1}
+}]\index{C\+U\+S\+T\+OM@{C\+U\+S\+T\+OM}!Soapy\+S\+D\+R\+::\+Converter\+Registry@{Soapy\+S\+D\+R\+::\+Converter\+Registry}}\index{Soapy\+S\+D\+R\+::\+Converter\+Registry@{Soapy\+S\+D\+R\+::\+Converter\+Registry}!C\+U\+S\+T\+OM@{C\+U\+S\+T\+OM}}\item[{\em 
+C\+U\+S\+T\+OM\label{classSoapySDR_1_1ConverterRegistry_a93a150b8e96ffd99ff6fa3da63e1c75da8b91af0b17d0ab8960829605e5fdd9e1}
+}]\end{description}
+\end{Desc}
+
+
+Definition at line {\bf 36} of file {\bf Converter\+Registry.\+hpp}.
+
+
+
+\subsubsection{Constructor \& Destructor Documentation}
+\index{Soapy\+S\+D\+R\+::\+Converter\+Registry@{Soapy\+S\+D\+R\+::\+Converter\+Registry}!Converter\+Registry@{Converter\+Registry}}
+\index{Converter\+Registry@{Converter\+Registry}!Soapy\+S\+D\+R\+::\+Converter\+Registry@{Soapy\+S\+D\+R\+::\+Converter\+Registry}}
+\paragraph[{Converter\+Registry(const std\+::string \&source\+Format, const std\+::string \&target\+Format, const Function\+Priority \&priority, Converter\+Function converter)}]{\setlength{\rightskip}{0pt plus 5cm}Soapy\+S\+D\+R\+::\+Converter\+Registry\+::\+Converter\+Registry (
+\begin{DoxyParamCaption}
+\item[{const {\bf std\+::string} \&}]{source\+Format, }
+\item[{const {\bf std\+::string} \&}]{target\+Format, }
+\item[{const {\bf Function\+Priority} \&}]{priority, }
+\item[{{\bf Converter\+Function}}]{converter}
+\end{DoxyParamCaption}
+)}\label{classSoapySDR_1_1ConverterRegistry_adccc33d07d68ba9f6befdc17b0c97b88}
+Class constructor for managing the Converter \doxyref{Registry}{p.}{d6/d07/classSoapySDR_1_1Registry}. refuses to register converter and logs error if a source/target/priority entry already exists 
+\begin{DoxyParams}{Parameters}
+{\em source\+Format} & the source format markup string \\
+\hline
+{\em target\+Format} & the target format markup string \\
+\hline
+{\em priority} & the Function\+Priority of the converter to register \\
+\hline
+{\em converter} & function to register \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line {\bf 10} of file {\bf Converter\+Registry.\+cpp}.
+
+
+
+References {\bf format\+Converters}, {\bf Soapy\+S\+D\+R\+::logf()}, and {\bf Soapy\+S\+D\+R\+::\+S\+O\+A\+P\+Y\+\_\+\+S\+D\+R\+\_\+\+E\+R\+R\+OR}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{dc/daf/classSoapySDR_1_1ConverterRegistry_adccc33d07d68ba9f6befdc17b0c97b88_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+\subsubsection{Member Function Documentation}
+\index{Soapy\+S\+D\+R\+::\+Converter\+Registry@{Soapy\+S\+D\+R\+::\+Converter\+Registry}!get\+Function@{get\+Function}}
+\index{get\+Function@{get\+Function}!Soapy\+S\+D\+R\+::\+Converter\+Registry@{Soapy\+S\+D\+R\+::\+Converter\+Registry}}
+\paragraph[{get\+Function(const std\+::string \&source\+Format, const std\+::string \&target\+Format)}]{\setlength{\rightskip}{0pt plus 5cm}{\bf Soapy\+S\+D\+R\+::\+Converter\+Registry\+::\+Converter\+Function} Soapy\+S\+D\+R\+::\+Converter\+Registry\+::get\+Function (
+\begin{DoxyParamCaption}
+\item[{const {\bf std\+::string} \&}]{source\+Format, }
+\item[{const {\bf std\+::string} \&}]{target\+Format}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [static]}}\label{classSoapySDR_1_1ConverterRegistry_abf30f578c1e90a22a71fdd5c0dd56105}
+Get a converter between a source and target format. 
+\begin{DoxyExceptions}{Exceptions}
+{\em invalid\+\_\+argument} & when the conversion does not exist and logs error \\
+\hline
+\end{DoxyExceptions}
+
+\begin{DoxyParams}{Parameters}
+{\em source\+Format} & the source format markup string \\
+\hline
+{\em target\+Format} & the target format markup string \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+a conversion function pointer 
+\end{DoxyReturn}
+
+
+Definition at line {\bf 82} of file {\bf Converter\+Registry.\+cpp}.
+
+
+
+References {\bf format\+Converters}.
+
+\index{Soapy\+S\+D\+R\+::\+Converter\+Registry@{Soapy\+S\+D\+R\+::\+Converter\+Registry}!get\+Function@{get\+Function}}
+\index{get\+Function@{get\+Function}!Soapy\+S\+D\+R\+::\+Converter\+Registry@{Soapy\+S\+D\+R\+::\+Converter\+Registry}}
+\paragraph[{get\+Function(const std\+::string \&source\+Format, const std\+::string \&target\+Format, const Function\+Priority \&priority)}]{\setlength{\rightskip}{0pt plus 5cm}{\bf Soapy\+S\+D\+R\+::\+Converter\+Registry\+::\+Converter\+Function} Soapy\+S\+D\+R\+::\+Converter\+Registry\+::get\+Function (
+\begin{DoxyParamCaption}
+\item[{const {\bf std\+::string} \&}]{source\+Format, }
+\item[{const {\bf std\+::string} \&}]{target\+Format, }
+\item[{const {\bf Function\+Priority} \&}]{priority}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [static]}}\label{classSoapySDR_1_1ConverterRegistry_af54e97450cea981a1c1f34a81af4bedb}
+
+
+Definition at line {\bf 105} of file {\bf Converter\+Registry.\+cpp}.
+
+
+
+References {\bf format\+Converters}.
+
+\index{Soapy\+S\+D\+R\+::\+Converter\+Registry@{Soapy\+S\+D\+R\+::\+Converter\+Registry}!list\+Available\+Source\+Formats@{list\+Available\+Source\+Formats}}
+\index{list\+Available\+Source\+Formats@{list\+Available\+Source\+Formats}!Soapy\+S\+D\+R\+::\+Converter\+Registry@{Soapy\+S\+D\+R\+::\+Converter\+Registry}}
+\paragraph[{list\+Available\+Source\+Formats(void)}]{\setlength{\rightskip}{0pt plus 5cm}{\bf std\+::vector}$<$ {\bf std\+::string} $>$ Soapy\+S\+D\+R\+::\+Converter\+Registry\+::list\+Available\+Source\+Formats (
+\begin{DoxyParamCaption}
+\item[{{\bf void}}]{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [static]}}\label{classSoapySDR_1_1ConverterRegistry_ad022e30ed1533ea09f8cb4057595a93c}
+Get a list of known source formats in the registry. 
+
+Definition at line {\bf 128} of file {\bf Converter\+Registry.\+cpp}.
+
+
+
+References {\bf format\+Converters}.
+
+
+
+Referenced by {\bf print\+Info()}.
+
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{dc/daf/classSoapySDR_1_1ConverterRegistry_ad022e30ed1533ea09f8cb4057595a93c_icgraph}
+\end{center}
+\end{figure}
+
+
+\index{Soapy\+S\+D\+R\+::\+Converter\+Registry@{Soapy\+S\+D\+R\+::\+Converter\+Registry}!list\+Priorities@{list\+Priorities}}
+\index{list\+Priorities@{list\+Priorities}!Soapy\+S\+D\+R\+::\+Converter\+Registry@{Soapy\+S\+D\+R\+::\+Converter\+Registry}}
+\paragraph[{list\+Priorities(const std\+::string \&source\+Format, const std\+::string \&target\+Format)}]{\setlength{\rightskip}{0pt plus 5cm}{\bf std\+::vector}$<$ {\bf Soapy\+S\+D\+R\+::\+Converter\+Registry\+::\+Function\+Priority} $>$ Soapy\+S\+D\+R\+::\+Converter\+Registry\+::list\+Priorities (
+\begin{DoxyParamCaption}
+\item[{const {\bf std\+::string} \&}]{source\+Format, }
+\item[{const {\bf std\+::string} \&}]{target\+Format}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [static]}}\label{classSoapySDR_1_1ConverterRegistry_aaee0eca983b5d027b8cc437edcd4848a}
+Get a list of available converter priorities for a given source and target format. 
+\begin{DoxyParams}{Parameters}
+{\em source\+Format} & the source format markup string \\
+\hline
+{\em target\+Format} & the target format markup string \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+a vector of priorities or an empty vector if none found 
+\end{DoxyReturn}
+
+
+Definition at line {\bf 59} of file {\bf Converter\+Registry.\+cpp}.
+
+
+
+References {\bf format\+Converters}.
+
+\index{Soapy\+S\+D\+R\+::\+Converter\+Registry@{Soapy\+S\+D\+R\+::\+Converter\+Registry}!list\+Source\+Formats@{list\+Source\+Formats}}
+\index{list\+Source\+Formats@{list\+Source\+Formats}!Soapy\+S\+D\+R\+::\+Converter\+Registry@{Soapy\+S\+D\+R\+::\+Converter\+Registry}}
+\paragraph[{list\+Source\+Formats(const std\+::string \&target\+Format)}]{\setlength{\rightskip}{0pt plus 5cm}{\bf std\+::vector}$<$ {\bf std\+::string} $>$ Soapy\+S\+D\+R\+::\+Converter\+Registry\+::list\+Source\+Formats (
+\begin{DoxyParamCaption}
+\item[{const {\bf std\+::string} \&}]{target\+Format}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [static]}}\label{classSoapySDR_1_1ConverterRegistry_a9dc9020bc6e130d510fafb76d3735a90}
+Get a list of formats to which we can convert the target format from. There is a registered conversion function from every source format returned in the result vector to the specified target format. 
+\begin{DoxyParams}{Parameters}
+{\em target\+Format} & the target format markup string \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+a vector of source formats or an empty vector if none found 
+\end{DoxyReturn}
+
+
+Definition at line {\bf 44} of file {\bf Converter\+Registry.\+cpp}.
+
+
+
+References {\bf format\+Converters}, and {\bf string()}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{dc/daf/classSoapySDR_1_1ConverterRegistry_a9dc9020bc6e130d510fafb76d3735a90_cgraph}
+\end{center}
+\end{figure}
+
+
+\index{Soapy\+S\+D\+R\+::\+Converter\+Registry@{Soapy\+S\+D\+R\+::\+Converter\+Registry}!list\+Target\+Formats@{list\+Target\+Formats}}
+\index{list\+Target\+Formats@{list\+Target\+Formats}!Soapy\+S\+D\+R\+::\+Converter\+Registry@{Soapy\+S\+D\+R\+::\+Converter\+Registry}}
+\paragraph[{list\+Target\+Formats(const std\+::string \&source\+Format)}]{\setlength{\rightskip}{0pt plus 5cm}{\bf std\+::vector}$<$ {\bf std\+::string} $>$ Soapy\+S\+D\+R\+::\+Converter\+Registry\+::list\+Target\+Formats (
+\begin{DoxyParamCaption}
+\item[{const {\bf std\+::string} \&}]{source\+Format}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [static]}}\label{classSoapySDR_1_1ConverterRegistry_a5285bc04fed950d0982e0d4e1dd01153}
+Get a list of formats to which we can convert the source format into. There is a registered conversion function from the specified source format to every target format returned in the result vector. 
+\begin{DoxyParams}{Parameters}
+{\em source\+Format} & the source format markup string \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+a vector of target formats or an empty vector if none found 
+\end{DoxyReturn}
+
+
+Definition at line {\bf 27} of file {\bf Converter\+Registry.\+cpp}.
+
+
+
+References {\bf format\+Converters}, and {\bf string()}.
+
+
+
+Referenced by {\bf print\+Info()}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{dc/daf/classSoapySDR_1_1ConverterRegistry_a5285bc04fed950d0982e0d4e1dd01153_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{dc/daf/classSoapySDR_1_1ConverterRegistry_a5285bc04fed950d0982e0d4e1dd01153_icgraph}
+\end{center}
+\end{figure}
+
+
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+/home/erik/prefix/default/src/soapysdr/include/\+Soapy\+S\+D\+R/{\bf Converter\+Registry.\+hpp}\item 
+/home/erik/prefix/default/src/soapysdr/lib/{\bf Converter\+Registry.\+cpp}\end{DoxyCompactItemize}

@@ -54,9 +54,9 @@ virtual {\bf int} {\bf Write\+L\+M\+S7002\+M\+S\+PI} (const uint32\+\_\+t $\ast$
 \item 
 virtual {\bf int} {\bf Read\+L\+M\+S7002\+M\+S\+PI} (const uint32\+\_\+t $\ast$write\+Data, uint32\+\_\+t $\ast$read\+Data, size\+\_\+t {\bf size}, unsigned periph\+ID=0)=0
 \item 
-virtual {\bf int} {\bf Write\+I2C} (const {\bf int} addr, const std\+::string \&{\bf data})
+virtual {\bf int} {\bf Write\+I2C} (const {\bf int} addr, const {\bf std\+::string} \&{\bf data})
 \item 
-virtual {\bf int} {\bf Read\+I2C} (const {\bf int} addr, const size\+\_\+t num\+Bytes, std\+::string \&{\bf data})
+virtual {\bf int} {\bf Read\+I2C} (const {\bf int} addr, const size\+\_\+t num\+Bytes, {\bf std\+::string} \&{\bf data})
 \item 
 virtual {\bf int} {\bf Device\+Reset} ({\bf int} {\bf ind}=0)
 \item 
@@ -108,9 +108,9 @@ virtual {\bf int} {\bf Read\+Registers} (const uint32\+\_\+t $\ast$addrs, uint32
 \begin{DoxyCompactList}\small\item\em Bulk read device registers. \end{DoxyCompactList}\item 
 {\footnotesize template$<$typename Read\+Type $>$ }\\{\bf int} {\bf Read\+Register} (const uint32\+\_\+t addr, Read\+Type \&{\bf data})
 \begin{DoxyCompactList}\small\item\em Read a single device register. \end{DoxyCompactList}\item 
-virtual {\bf int} {\bf Custom\+Parameter\+Write} (const uint8\+\_\+t $\ast${\bf ids}, const double $\ast$values, const size\+\_\+t {\bf count}, const std\+::string \&{\bf units})
+virtual {\bf int} {\bf Custom\+Parameter\+Write} (const uint8\+\_\+t $\ast${\bf ids}, const double $\ast$values, const size\+\_\+t {\bf count}, const {\bf std\+::string} \&{\bf units})
 \begin{DoxyCompactList}\small\item\em Sets custom on board control to given value units. \end{DoxyCompactList}\item 
-virtual {\bf int} {\bf Custom\+Parameter\+Read} (const uint8\+\_\+t $\ast${\bf ids}, double $\ast$values, const size\+\_\+t {\bf count}, std\+::string $\ast${\bf units})
+virtual {\bf int} {\bf Custom\+Parameter\+Read} (const uint8\+\_\+t $\ast${\bf ids}, double $\ast$values, const size\+\_\+t {\bf count}, {\bf std\+::string} $\ast${\bf units})
 \begin{DoxyCompactList}\small\item\em Returns value of custom on board control. \end{DoxyCompactList}\item 
 {\bf void} {\bf Set\+Data\+Log\+Callback} (std\+::function$<$ {\bf void}(bool, const unsigned char $\ast$, const unsigned {\bf int})$>$ {\bf callback})
 \begin{DoxyCompactList}\small\item\em Sets callback function which gets called each time data is sent or received. \end{DoxyCompactList}\end{DoxyCompactItemize}
@@ -387,7 +387,7 @@ Here is the caller graph for this function\+:
 \item[{const uint8\+\_\+t $\ast$}]{ids, }
 \item[{double $\ast$}]{values, }
 \item[{const size\+\_\+t}]{count, }
-\item[{std\+::string $\ast$}]{units}
+\item[{{\bf std\+::string} $\ast$}]{units}
 \end{DoxyParamCaption}
 )\hspace{0.3cm}{\ttfamily [virtual]}}\label{classlime_1_1IConnection_aea7e5a3c5733772afd2c9eb80231f5e5}
 
@@ -455,7 +455,7 @@ Here is the caller graph for this function\+:
 \item[{const uint8\+\_\+t $\ast$}]{ids, }
 \item[{const double $\ast$}]{values, }
 \item[{const size\+\_\+t}]{count, }
-\item[{const std\+::string \&}]{units}
+\item[{const {\bf std\+::string} \&}]{units}
 \end{DoxyParamCaption}
 )\hspace{0.3cm}{\ttfamily [virtual]}}\label{classlime_1_1IConnection_a3a07677ca9eec0527bd9782f44aa2a0c}
 
@@ -1205,7 +1205,7 @@ Here is the caller graph for this function\+:
 \begin{DoxyParamCaption}
 \item[{const {\bf int}}]{addr, }
 \item[{const size\+\_\+t}]{num\+Bytes, }
-\item[{std\+::string \&}]{data}
+\item[{{\bf std\+::string} \&}]{data}
 \end{DoxyParamCaption}
 )\hspace{0.3cm}{\ttfamily [virtual]}}\label{classlime_1_1IConnection_af6938b707f320aaf2132f183cc4e298d}
 Read from an available I2C slave. The data parameter can be used to pass optional write data. Some implementations can combine a write + read transaction. If the device contains multiple I2C masters, the address bits can encode which master. 
@@ -1629,7 +1629,7 @@ Here is the caller graph for this function\+:
 \paragraph[{Write\+I2\+C(const int addr, const std\+::string \&data)}]{\setlength{\rightskip}{0pt plus 5cm}{\bf int} I\+Connection\+::\+Write\+I2C (
 \begin{DoxyParamCaption}
 \item[{const {\bf int}}]{addr, }
-\item[{const std\+::string \&}]{data}
+\item[{const {\bf std\+::string} \&}]{data}
 \end{DoxyParamCaption}
 )\hspace{0.3cm}{\ttfamily [virtual]}}\label{classlime_1_1IConnection_ab25d2a5719501fa53cca6e4b57ad6d61}
 Write to an available I2C slave. 
@@ -1717,7 +1717,7 @@ References {\bf Write\+Registers()}.
 
 
 
-Referenced by {\bf lime\+::\+Streamer\+::\+Align\+Quadrature()}, {\bf lime\+::\+Streamer\+::\+Align\+Rx\+R\+F()}, {\bf lime\+::\+Streamer\+::\+Align\+Rx\+T\+S\+P()}, {\bf lime\+::\+Streamer\+::\+Get\+Hardware\+Timestamp()}, {\bf lime\+::\+F\+P\+G\+A\+\_\+\+Mini\+::\+Read\+Raw\+Stream\+Data()}, {\bf lime\+::\+Connection\+Novena\+R\+F7\+::\+Receive\+Packets\+Loop()}, {\bf Set\+Ext\+Loopback()}, {\bf lime\+::\+F\+P\+G\+A\+\_\+\+Mini\+::\+Set\+Interface\+Freq()}, {\bf lime\+::\+L\+M\+S7\+\_\+\+Lime\+S\+D\+R\+\_\+mini\+::\+Set\+Path()}, {\bf lime\+::\+Streamer\+::\+Update\+Threads()}, and {\bf Soapy\+L\+M\+S7\+::write\+Register()}.
+Referenced by {\bf lime\+::\+Streamer\+::\+Align\+Quadrature()}, {\bf lime\+::\+Streamer\+::\+Align\+Rx\+R\+F()}, {\bf lime\+::\+Streamer\+::\+Align\+Rx\+T\+S\+P()}, {\bf lime\+::\+Streamer\+::\+Get\+Chirp\+Time\+Period()}, {\bf lime\+::\+Streamer\+::\+Get\+Chirp\+Time\+Stamp()}, {\bf lime\+::\+Streamer\+::\+Get\+Hardware\+Timestamp()}, {\bf lime\+::\+F\+P\+G\+A\+\_\+\+Mini\+::\+Read\+Raw\+Stream\+Data()}, {\bf lime\+::\+Connection\+Novena\+R\+F7\+::\+Receive\+Packets\+Loop()}, {\bf Set\+Ext\+Loopback()}, {\bf lime\+::\+F\+P\+G\+A\+\_\+\+Mini\+::\+Set\+Interface\+Freq()}, {\bf lime\+::\+L\+M\+S7\+\_\+\+Lime\+S\+D\+R\+\_\+mini\+::\+Set\+Path()}, {\bf lime\+::\+Streamer\+::\+Update\+Threads()}, and {\bf Soapy\+L\+M\+S7\+::write\+Register()}.
 
 
 

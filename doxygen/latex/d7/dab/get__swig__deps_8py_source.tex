@@ -1,0 +1,35 @@
+\subsection{get\+\_\+swig\+\_\+deps.\+py}
+\label{get__swig__deps_8py_source}\index{/home/erik/prefix/default/src/gr-\/radar-\/dev/build/get\+\_\+swig\+\_\+deps.\+py@{/home/erik/prefix/default/src/gr-\/radar-\/dev/build/get\+\_\+swig\+\_\+deps.\+py}}
+
+\begin{DoxyCode}
+00001 
+00002 
+00003 \textcolor{keyword}{import} os, sys, re
+00004 
+00005 i\_include\_matcher = re.compile(\textcolor{stringliteral}{'%(include|import)\(\backslash\)s*[<|"](.*)[>|"]'})
+00006 h\_include\_matcher = re.compile(\textcolor{stringliteral}{'#(include)\(\backslash\)s*[<|"](.*)[>|"]'})
+00007 include\_dirs = sys.argv[2].split(\textcolor{stringliteral}{';'})
+00008 
+00009 \textcolor{keyword}{def }get_swig_incs(file\_path):
+00010     \textcolor{keywordflow}{if} file\_path.endswith(\textcolor{stringliteral}{'.i'}): matcher = i\_include\_matcher
+00011     \textcolor{keywordflow}{else}: matcher = h\_include\_matcher
+00012     file\_contents = open(file\_path, \textcolor{stringliteral}{'r').read()}
+00013 \textcolor{stringliteral}{    }\textcolor{keywordflow}{return} matcher.findall(file\_contents, re.MULTILINE)
+00014 
+00015 \textcolor{keyword}{def }get_swig_deps(file\_path, level):
+00016     deps = [file\_path]
+00017     \textcolor{keywordflow}{if} level == 0: \textcolor{keywordflow}{return} deps
+00018     \textcolor{keywordflow}{for} keyword, inc\_file \textcolor{keywordflow}{in} get_swig_incs(file\_path):
+00019         \textcolor{keywordflow}{for} inc\_dir \textcolor{keywordflow}{in} include\_dirs:
+00020             inc\_path = os.path.join(inc\_dir, inc\_file)
+00021             \textcolor{keywordflow}{if} \textcolor{keywordflow}{not} os.path.exists(inc\_path): \textcolor{keywordflow}{continue}
+00022             deps.extend(get_swig_deps(inc\_path, level-1))
+00023             \textcolor{keywordflow}{break} \textcolor{comment}{#found, we dont search in lower prio inc dirs}
+00024     \textcolor{keywordflow}{return} deps
+00025 
+00026 \textcolor{keywordflow}{if} \_\_name\_\_ == \textcolor{stringliteral}{'\_\_main\_\_'}:
+00027     ifiles = sys.argv[1].split(\textcolor{stringliteral}{';'})
+00028     deps = sum([get_swig_deps(ifile, 3) \textcolor{keywordflow}{for} ifile \textcolor{keywordflow}{in} ifiles], [])
+00029     \textcolor{comment}{#sys.stderr.write(';'.join(set(deps)) + '\(\backslash\)n\(\backslash\)n')}
+00030     print(\textcolor{stringliteral}{';'}.join(set(deps)))
+\end{DoxyCode}

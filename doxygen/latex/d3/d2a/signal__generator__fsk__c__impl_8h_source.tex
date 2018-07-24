@@ -1,0 +1,63 @@
+\subsection{signal\+\_\+generator\+\_\+fsk\+\_\+c\+\_\+impl.\+h}
+\label{signal__generator__fsk__c__impl_8h_source}\index{/home/erik/prefix/default/src/gr-\/radar-\/dev/lib/signal\+\_\+generator\+\_\+fsk\+\_\+c\+\_\+impl.\+h@{/home/erik/prefix/default/src/gr-\/radar-\/dev/lib/signal\+\_\+generator\+\_\+fsk\+\_\+c\+\_\+impl.\+h}}
+
+\begin{DoxyCode}
+00001 \textcolor{comment}{/* -*- c++ -*- */}
+00002 \textcolor{comment}{/* }
+00003 \textcolor{comment}{ * Copyright 2014 Communications Engineering Lab, KIT.}
+00004 \textcolor{comment}{ * }
+00005 \textcolor{comment}{ * This is free software; you can redistribute it and/or modify}
+00006 \textcolor{comment}{ * it under the terms of the GNU General Public License as published by}
+00007 \textcolor{comment}{ * the Free Software Foundation; either version 3, or (at your option)}
+00008 \textcolor{comment}{ * any later version.}
+00009 \textcolor{comment}{ * }
+00010 \textcolor{comment}{ * This software is distributed in the hope that it will be useful,}
+00011 \textcolor{comment}{ * but WITHOUT ANY WARRANTY; without even the implied warranty of}
+00012 \textcolor{comment}{ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the}
+00013 \textcolor{comment}{ * GNU General Public License for more details.}
+00014 \textcolor{comment}{ * }
+00015 \textcolor{comment}{ * You should have received a copy of the GNU General Public License}
+00016 \textcolor{comment}{ * along with this software; see the file COPYING.  If not, write to}
+00017 \textcolor{comment}{ * the Free Software Foundation, Inc., 51 Franklin Street,}
+00018 \textcolor{comment}{ * Boston, MA 02110-1301, USA.}
+00019 \textcolor{comment}{ */}
+00020  
+00021 \textcolor{preprocessor}{#ifndef INCLUDED\_RADAR\_SIGNAL\_GENERATOR\_FSK\_C\_IMPL\_H}
+00022 \textcolor{preprocessor}{#define INCLUDED\_RADAR\_SIGNAL\_GENERATOR\_FSK\_C\_IMPL\_H}
+00023 
+00024 \textcolor{preprocessor}{#include <radar/signal_generator_fsk_c.h>}
+00025 
+00026 \textcolor{keyword}{namespace }gr \{
+00027   \textcolor{keyword}{namespace }radar \{
+00028 
+00029     \textcolor{keyword}{class }signal_generator_fsk_c_impl : \textcolor{keyword}{public} signal_generator_fsk_c
+00030     \{
+00031      \textcolor{keyword}{private}:
+00032       \textcolor{comment}{// Nothing to declare in this block.}
+00033 
+00034      \textcolor{keyword}{public}:
+00035       signal_generator_fsk_c_impl(\textcolor{keywordtype}{int} samp_rate, \textcolor{keywordtype}{int} samp_per_freq, \textcolor{keywordtype}{int} 
+      blocks_per_tag, \textcolor{keywordtype}{float} freq\_low, \textcolor{keywordtype}{float} freq\_high, \textcolor{keywordtype}{float} amplitude, \textcolor{keyword}{const} 
+      std::string& len\_key);
+00036       ~signal_generator_fsk_c_impl();
+00037       
+00038       \textcolor{keywordtype}{int} d_samp_rate, d_samp_per_freq, d_blocks_per_tag, d_packet_len;
+00039       \textcolor{keywordtype}{float} d_freq_low, d_freq_high, d_amplitude;
+00040       
+00041       pmt::pmt\_t d_key, d_value, d_srcid;
+00042       gr\_complex d_phase_high, d_phase_low;
+00043       
+00044       \textcolor{keywordtype}{bool} d_state;
+00045 
+00046       \textcolor{comment}{// Where all the action really happens}
+00047       \textcolor{keywordtype}{int} work(\textcolor{keywordtype}{int} noutput\_items,
+00048            gr\_vector\_const\_void\_star &input\_items,
+00049            gr\_vector\_void\_star &output\_items);
+00050     \};
+00051 
+00052   \} \textcolor{comment}{// namespace radar}
+00053 \} \textcolor{comment}{// namespace gr}
+00054 
+00055 \textcolor{preprocessor}{#endif }\textcolor{comment}{/* INCLUDED\_RADAR\_SIGNAL\_GENERATOR\_FSK\_C\_IMPL\_H */}\textcolor{preprocessor}{}
+00056 
+\end{DoxyCode}

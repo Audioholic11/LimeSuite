@@ -1,0 +1,95 @@
+\subsection{qa\+\_\+msg\+\_\+gate.\+py}
+\label{qa__msg__gate_8py_source}\index{/home/erik/prefix/default/src/gr-\/radar-\/dev/python/qa\+\_\+msg\+\_\+gate.\+py@{/home/erik/prefix/default/src/gr-\/radar-\/dev/python/qa\+\_\+msg\+\_\+gate.\+py}}
+
+\begin{DoxyCode}
+00001 \textcolor{comment}{#!/usr/bin/env python}
+00002 \textcolor{comment}{# -*- coding: utf-8 -*-}
+00003 \textcolor{comment}{# }
+00004 \textcolor{comment}{# Copyright 2014 Communications Engineering Lab, KIT.}
+00005 \textcolor{comment}{# }
+00006 \textcolor{comment}{# This is free software; you can redistribute it and/or modify}
+00007 \textcolor{comment}{# it under the terms of the GNU General Public License as published by}
+00008 \textcolor{comment}{# the Free Software Foundation; either version 3, or (at your option)}
+00009 \textcolor{comment}{# any later version.}
+00010 \textcolor{comment}{# }
+00011 \textcolor{comment}{# This software is distributed in the hope that it will be useful,}
+00012 \textcolor{comment}{# but WITHOUT ANY WARRANTY; without even the implied warranty of}
+00013 \textcolor{comment}{# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the}
+00014 \textcolor{comment}{# GNU General Public License for more details.}
+00015 \textcolor{comment}{# }
+00016 \textcolor{comment}{# You should have received a copy of the GNU General Public License}
+00017 \textcolor{comment}{# along with this software; see the file COPYING.  If not, write to}
+00018 \textcolor{comment}{# the Free Software Foundation, Inc., 51 Franklin Street,}
+00019 \textcolor{comment}{# Boston, MA 02110-1301, USA.}
+00020 \textcolor{comment}{# }
+00021 
+00022 \textcolor{keyword}{from} gnuradio \textcolor{keyword}{import} gr, gr\_unittest
+00023 \textcolor{keyword}{from} gnuradio \textcolor{keyword}{import} blocks
+00024 \textcolor{keyword}{import} radar\_swig \textcolor{keyword}{as} radar
+00025 \textcolor{keyword}{from} time \textcolor{keyword}{import} sleep
+00026 \textcolor{keyword}{import} pmt
+00027 
+00028 \textcolor{keyword}{class }qa_msg_gate (gr\_unittest.TestCase):
+00029 
+00030     \textcolor{keyword}{def }setUp (self):
+00031         self.tb = gr.top\_block ()
+00032 
+00033     \textcolor{keyword}{def }tearDown (self):
+00034         self.tb = \textcolor{keywordtype}{None}
+00035 
+00036     \textcolor{keyword}{def }test_001_t (self):
+00037         \textcolor{comment}{# set up fg}
+00038         test\_len = 1024
+00039 
+00040         packet\_len = test\_len
+00041         samp\_rate = 2000
+00042         
+00043         center\_freq = 1e9
+00044         velocity = (5,15,20)
+00045 
+00046         src = radar.signal\_generator\_cw\_c(packet\_len,samp\_rate,(0,0),1)
+00047         head = blocks.head(8,test\_len)
+00048         sim = radar.static\_target\_simulator\_cc((10,10,10),velocity,(1e12,1e12,1e12),(0,0,0),(0,),samp\_rate,
+      center\_freq,1,\textcolor{keyword}{True},\textcolor{keyword}{False})
+00049         mult = blocks.multiply\_cc()
+00050         fft = radar.ts\_fft\_cc(packet\_len)
+00051         cfar = radar.os\_cfar\_c(samp\_rate, 5, 0, 0.78, 10, \textcolor{keyword}{True})
+00052         est = radar.estimator\_cw(center\_freq)
+00053         res1 = radar.print\_results()
+00054         res2 = radar.print\_results()
+00055         gate = radar.msg\_gate((\textcolor{stringliteral}{'velocity'},\textcolor{stringliteral}{'bla'}),(8,8),(17,17))
+00056         debug1 = blocks.message\_debug()
+00057         debug2 = blocks.message\_debug()
+00058 
+00059         self.tb.connect(src,head,(mult,1))
+00060         self.tb.connect(head,sim,(mult,0))
+00061         self.tb.connect(mult,fft,cfar)
+00062         self.tb.msg\_connect(cfar,\textcolor{stringliteral}{'Msg out'},est,\textcolor{stringliteral}{'Msg in'})
+00063         self.tb.msg\_connect(est,\textcolor{stringliteral}{'Msg out'},res1,\textcolor{stringliteral}{'Msg in'})
+00064         self.tb.msg\_connect(est,\textcolor{stringliteral}{'Msg out'},debug1,\textcolor{stringliteral}{'store'})
+00065         self.tb.msg\_connect(est,\textcolor{stringliteral}{'Msg out'},gate,\textcolor{stringliteral}{'Msg in'})
+00066         self.tb.msg\_connect(gate,\textcolor{stringliteral}{'Msg out'},debug2,\textcolor{stringliteral}{'store'})
+00067         self.tb.msg\_connect(gate,\textcolor{stringliteral}{'Msg out'},res2,\textcolor{stringliteral}{'Msg in'})
+00068 
+00069         self.tb.start()
+00070         sleep(0.5)
+00071         self.tb.stop()
+00072         self.tb.wait()
+00073         
+00074         \textcolor{comment}{# check data}
+00075         msg1 = debug1.get\_message(0) \textcolor{comment}{# msg without gate}
+00076         msg2 = debug2.get\_message(0) \textcolor{comment}{# msg with gate}
+00077         self.assertEqual( \textcolor{stringliteral}{"velocity"}, pmt.symbol\_to\_string(pmt.nth(0,(pmt.nth(1,msg1)))) ) \textcolor{comment}{# check velocity
+       message part (symbol), 1}
+00078         self.assertEqual( \textcolor{stringliteral}{"velocity"}, pmt.symbol\_to\_string(pmt.nth(0,(pmt.nth(1,msg2)))) ) \textcolor{comment}{# check velocity
+       message part (symbol), 2}
+00079         self.assertEqual(pmt.length(pmt.nth(1,pmt.nth(1,msg1))),3) \textcolor{comment}{# check number of targets without gate}
+00080         self.assertEqual(pmt.length(pmt.nth(1,pmt.nth(1,msg2))),1) \textcolor{comment}{# check nubmer of targets with gate}
+00081         self.assertAlmostEqual( 1, velocity[1]/pmt.f32vector\_ref(pmt.nth(1,(pmt.nth(1,msg2))),0), 1 ) \textcolor{comment}{#
+       check velocity value}
+00082 
+00083 
+00084 \textcolor{keywordflow}{if} \_\_name\_\_ == \textcolor{stringliteral}{'\_\_main\_\_'}:
+00085     \textcolor{comment}{#raw\_input('Block for running gdb',)}
+00086     gr\_unittest.run(qa\_msg\_gate)\textcolor{comment}{#, "qa\_msg\_gate.xml")}
+\end{DoxyCode}

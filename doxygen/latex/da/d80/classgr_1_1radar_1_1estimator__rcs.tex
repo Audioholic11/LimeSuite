@@ -1,0 +1,220 @@
+\subsection{gr\+:\+:radar\+:\+:estimator\+\_\+rcs Class Reference}
+\label{classgr_1_1radar_1_1estimator__rcs}\index{gr\+::radar\+::estimator\+\_\+rcs@{gr\+::radar\+::estimator\+\_\+rcs}}
+
+
+Basic R\+CS block for estimating the R\+CS of a single target. Some hardware specs need to be known for calculating R\+CS values, see parameters for details. The radar equation is used to calculate the R\+CS\+: R\+CS = Pr$\ast$(4pi)$^\wedge$3$\ast$\+R$^\wedge$4/(Pt$\ast$\+Gt$\ast$\+Gr$\ast$lamda$^\wedge$2). The Rx power (Pr) and the distance (R) are being estimated, while the other parameters are given in the flowgraph. It is possible to average a number of samples by setting the num\+\_\+mean value $>$ 1. The R\+CS will be 0 until enough samples are collected to calculate the mean value (be patient). The Tx power (Pt) needs to be calibrated with external hardware. I recommend to calibrate for the wanted power and not to change the parameters in the flowgraph on the Tx side after that. The R\+CS block needs the Rx power, to estimate the R\+CS. For that, the input power of the block needs to be determined analytically and altered via the corr\+\_\+factor and exponent values, to fit the following equation\+: Pr = P\+\_\+input $^\wedge$ (exponent) $\ast$ corr\+\_\+factor / Pt. In addition, the F\+F\+Ts need to be normalized for correct power calculation.  
+
+
+
+
+{\ttfamily \#include $<$estimator\+\_\+rcs.\+h$>$}
+
+
+
+Inheritance diagram for gr\+:\+:radar\+:\+:estimator\+\_\+rcs\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=550pt]{d8/d6c/classgr_1_1radar_1_1estimator__rcs__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for gr\+:\+:radar\+:\+:estimator\+\_\+rcs\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=202pt]{da/d21/classgr_1_1radar_1_1estimator__rcs__coll__graph}
+\end{center}
+\end{figure}
+\subsubsection*{Public Types}
+\begin{DoxyCompactItemize}
+\item 
+typedef boost\+::shared\+\_\+ptr$<$ {\bf estimator\+\_\+rcs} $>$ {\bf sptr}
+\end{DoxyCompactItemize}
+\subsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+virtual {\bf void} {\bf set\+\_\+num\+\_\+mean} ({\bf int} {\bf val})=0
+\item 
+virtual {\bf void} {\bf set\+\_\+center\+\_\+freq} (float {\bf val})=0
+\item 
+virtual {\bf void} {\bf set\+\_\+antenna\+\_\+gain\+\_\+tx} (float {\bf val})=0
+\item 
+virtual {\bf void} {\bf set\+\_\+antenna\+\_\+gain\+\_\+rx} (float {\bf val})=0
+\item 
+virtual {\bf void} {\bf set\+\_\+usrp\+\_\+gain\+\_\+rx} (float {\bf val})=0
+\item 
+virtual {\bf void} {\bf set\+\_\+power\+\_\+tx} (float {\bf val})=0
+\item 
+virtual {\bf void} {\bf set\+\_\+corr\+\_\+factor} (float {\bf val})=0
+\end{DoxyCompactItemize}
+\subsubsection*{Static Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+static {\bf sptr} {\bf make} ({\bf int} num\+\_\+mean, float center\+\_\+freq, float antenna\+\_\+gain\+\_\+tx, float antenna\+\_\+gain\+\_\+rx, float usrp\+\_\+gain\+\_\+rx, float power\+\_\+tx, float corr\+\_\+factor, float exponent=1)
+\begin{DoxyCompactList}\small\item\em Return a shared\+\_\+ptr to a new instance of \doxyref{radar\+::estimator\+\_\+rcs}{p.}{da/d80/classgr_1_1radar_1_1estimator__rcs}. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsubsection{Detailed Description}
+Basic R\+CS block for estimating the R\+CS of a single target. Some hardware specs need to be known for calculating R\+CS values, see parameters for details. The radar equation is used to calculate the R\+CS\+: R\+CS = Pr$\ast$(4pi)$^\wedge$3$\ast$\+R$^\wedge$4/(Pt$\ast$\+Gt$\ast$\+Gr$\ast$lamda$^\wedge$2). The Rx power (Pr) and the distance (R) are being estimated, while the other parameters are given in the flowgraph. It is possible to average a number of samples by setting the num\+\_\+mean value $>$ 1. The R\+CS will be 0 until enough samples are collected to calculate the mean value (be patient). The Tx power (Pt) needs to be calibrated with external hardware. I recommend to calibrate for the wanted power and not to change the parameters in the flowgraph on the Tx side after that. The R\+CS block needs the Rx power, to estimate the R\+CS. For that, the input power of the block needs to be determined analytically and altered via the corr\+\_\+factor and exponent values, to fit the following equation\+: Pr = P\+\_\+input $^\wedge$ (exponent) $\ast$ corr\+\_\+factor / Pt. In addition, the F\+F\+Ts need to be normalized for correct power calculation. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em num\+\_\+mean} & Number of samples taken into account for calculating mean value (1 for no mean calculation) \\
+\hline
+{\em center\+\_\+freq} & Center frequency of radar \\
+\hline
+{\em antenna\+\_\+gain\+\_\+tx} & Antenna Gain of the Tx antenna \\
+\hline
+{\em antenna\+\_\+gain\+\_\+rx} & Antenna Gain of the Rx antenna \\
+\hline
+{\em usrp\+\_\+gain\+\_\+rx} & Rx gain of U\+S\+RP set in flowgraph \\
+\hline
+{\em power\+\_\+tx} & Tx power of radar signal. Needs to be measured one time! \\
+\hline
+{\em corr\+\_\+factor} & Correction factor for the R\+CS to calibrate system to a known target or special signal paths \\
+\hline
+{\em exponent} & Exponent of the input power to calculate Rx power, depends on signal path (calculate analytically) \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line {\bf 51} of file {\bf estimator\+\_\+rcs.\+h}.
+
+
+
+\subsubsection{Member Typedef Documentation}
+\index{gr\+::radar\+::estimator\+\_\+rcs@{gr\+::radar\+::estimator\+\_\+rcs}!sptr@{sptr}}
+\index{sptr@{sptr}!gr\+::radar\+::estimator\+\_\+rcs@{gr\+::radar\+::estimator\+\_\+rcs}}
+\paragraph[{sptr}]{\setlength{\rightskip}{0pt plus 5cm}typedef boost\+::shared\+\_\+ptr$<${\bf estimator\+\_\+rcs}$>$ {\bf gr\+::radar\+::estimator\+\_\+rcs\+::sptr}}\label{classgr_1_1radar_1_1estimator__rcs_a9ad3e6aca43f27ebb0319f89cebe8837}
+
+
+Definition at line {\bf 54} of file {\bf estimator\+\_\+rcs.\+h}.
+
+
+
+\subsubsection{Member Function Documentation}
+\index{gr\+::radar\+::estimator\+\_\+rcs@{gr\+::radar\+::estimator\+\_\+rcs}!make@{make}}
+\index{make@{make}!gr\+::radar\+::estimator\+\_\+rcs@{gr\+::radar\+::estimator\+\_\+rcs}}
+\paragraph[{make(int num\+\_\+mean, float center\+\_\+freq, float antenna\+\_\+gain\+\_\+tx, float antenna\+\_\+gain\+\_\+rx, float usrp\+\_\+gain\+\_\+rx, float power\+\_\+tx, float corr\+\_\+factor, float exponent=1)}]{\setlength{\rightskip}{0pt plus 5cm}{\bf estimator\+\_\+rcs\+::sptr} gr\+::radar\+::estimator\+\_\+rcs\+::make (
+\begin{DoxyParamCaption}
+\item[{{\bf int}}]{num\+\_\+mean, }
+\item[{float}]{center\+\_\+freq, }
+\item[{float}]{antenna\+\_\+gain\+\_\+tx, }
+\item[{float}]{antenna\+\_\+gain\+\_\+rx, }
+\item[{float}]{usrp\+\_\+gain\+\_\+rx, }
+\item[{float}]{power\+\_\+tx, }
+\item[{float}]{corr\+\_\+factor, }
+\item[{float}]{exponent = {\ttfamily 1}}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [static]}}\label{classgr_1_1radar_1_1estimator__rcs_a1da8641a5701cd42f10f1ce892104a68}
+
+
+Return a shared\+\_\+ptr to a new instance of \doxyref{radar\+::estimator\+\_\+rcs}{p.}{da/d80/classgr_1_1radar_1_1estimator__rcs}. 
+
+To avoid accidental use of raw pointers, \doxyref{radar\+::estimator\+\_\+rcs}{p.}{da/d80/classgr_1_1radar_1_1estimator__rcs}\textquotesingle{}s constructor is in a private implementation class. \doxyref{radar\+::estimator\+\_\+rcs\+::make}{p.}{da/d80/classgr_1_1radar_1_1estimator__rcs_a1da8641a5701cd42f10f1ce892104a68} is the public interface for creating new instances. 
+
+Definition at line {\bf 34} of file {\bf estimator\+\_\+rcs\+\_\+impl.\+cc}.
+
+
+
+Referenced by {\bf \+\_\+wrap\+\_\+estimator\+\_\+rcs\+\_\+make()}.
+
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{da/d80/classgr_1_1radar_1_1estimator__rcs_a1da8641a5701cd42f10f1ce892104a68_icgraph}
+\end{center}
+\end{figure}
+
+
+\index{gr\+::radar\+::estimator\+\_\+rcs@{gr\+::radar\+::estimator\+\_\+rcs}!set\+\_\+antenna\+\_\+gain\+\_\+rx@{set\+\_\+antenna\+\_\+gain\+\_\+rx}}
+\index{set\+\_\+antenna\+\_\+gain\+\_\+rx@{set\+\_\+antenna\+\_\+gain\+\_\+rx}!gr\+::radar\+::estimator\+\_\+rcs@{gr\+::radar\+::estimator\+\_\+rcs}}
+\paragraph[{set\+\_\+antenna\+\_\+gain\+\_\+rx(float val)=0}]{\setlength{\rightskip}{0pt plus 5cm}virtual {\bf void} gr\+::radar\+::estimator\+\_\+rcs\+::set\+\_\+antenna\+\_\+gain\+\_\+rx (
+\begin{DoxyParamCaption}
+\item[{float}]{val}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [pure virtual]}}\label{classgr_1_1radar_1_1estimator__rcs_ad9ebb848f3469f215f67da4b15987f5b}
+
+
+Implemented in {\bf gr\+::radar\+::estimator\+\_\+rcs\+\_\+impl} \doxyref{}{p.}{d1/dd9/classgr_1_1radar_1_1estimator__rcs__impl_a0b3a9b167004f0ffb74aa3f9f8efc086}.
+
+\index{gr\+::radar\+::estimator\+\_\+rcs@{gr\+::radar\+::estimator\+\_\+rcs}!set\+\_\+antenna\+\_\+gain\+\_\+tx@{set\+\_\+antenna\+\_\+gain\+\_\+tx}}
+\index{set\+\_\+antenna\+\_\+gain\+\_\+tx@{set\+\_\+antenna\+\_\+gain\+\_\+tx}!gr\+::radar\+::estimator\+\_\+rcs@{gr\+::radar\+::estimator\+\_\+rcs}}
+\paragraph[{set\+\_\+antenna\+\_\+gain\+\_\+tx(float val)=0}]{\setlength{\rightskip}{0pt plus 5cm}virtual {\bf void} gr\+::radar\+::estimator\+\_\+rcs\+::set\+\_\+antenna\+\_\+gain\+\_\+tx (
+\begin{DoxyParamCaption}
+\item[{float}]{val}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [pure virtual]}}\label{classgr_1_1radar_1_1estimator__rcs_aecc3880ca248046653fcaf7e777fb218}
+
+
+Implemented in {\bf gr\+::radar\+::estimator\+\_\+rcs\+\_\+impl} \doxyref{}{p.}{d1/dd9/classgr_1_1radar_1_1estimator__rcs__impl_ae2b47459a8acb2f6ad5ab149fe5f5228}.
+
+\index{gr\+::radar\+::estimator\+\_\+rcs@{gr\+::radar\+::estimator\+\_\+rcs}!set\+\_\+center\+\_\+freq@{set\+\_\+center\+\_\+freq}}
+\index{set\+\_\+center\+\_\+freq@{set\+\_\+center\+\_\+freq}!gr\+::radar\+::estimator\+\_\+rcs@{gr\+::radar\+::estimator\+\_\+rcs}}
+\paragraph[{set\+\_\+center\+\_\+freq(float val)=0}]{\setlength{\rightskip}{0pt plus 5cm}virtual {\bf void} gr\+::radar\+::estimator\+\_\+rcs\+::set\+\_\+center\+\_\+freq (
+\begin{DoxyParamCaption}
+\item[{float}]{val}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [pure virtual]}}\label{classgr_1_1radar_1_1estimator__rcs_a5ba2347c3c7da68597cefacc8678a6d7}
+
+
+Implemented in {\bf gr\+::radar\+::estimator\+\_\+rcs\+\_\+impl} \doxyref{}{p.}{d1/dd9/classgr_1_1radar_1_1estimator__rcs__impl_ad34eebc929430f1fb8fd1945d9e67bf1}.
+
+\index{gr\+::radar\+::estimator\+\_\+rcs@{gr\+::radar\+::estimator\+\_\+rcs}!set\+\_\+corr\+\_\+factor@{set\+\_\+corr\+\_\+factor}}
+\index{set\+\_\+corr\+\_\+factor@{set\+\_\+corr\+\_\+factor}!gr\+::radar\+::estimator\+\_\+rcs@{gr\+::radar\+::estimator\+\_\+rcs}}
+\paragraph[{set\+\_\+corr\+\_\+factor(float val)=0}]{\setlength{\rightskip}{0pt plus 5cm}virtual {\bf void} gr\+::radar\+::estimator\+\_\+rcs\+::set\+\_\+corr\+\_\+factor (
+\begin{DoxyParamCaption}
+\item[{float}]{val}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [pure virtual]}}\label{classgr_1_1radar_1_1estimator__rcs_a4d8e9ee5668aded45ba8b64ca7517526}
+
+
+Implemented in {\bf gr\+::radar\+::estimator\+\_\+rcs\+\_\+impl} \doxyref{}{p.}{d1/dd9/classgr_1_1radar_1_1estimator__rcs__impl_ab8d6d5ae12721ffb48abbc659a36a696}.
+
+\index{gr\+::radar\+::estimator\+\_\+rcs@{gr\+::radar\+::estimator\+\_\+rcs}!set\+\_\+num\+\_\+mean@{set\+\_\+num\+\_\+mean}}
+\index{set\+\_\+num\+\_\+mean@{set\+\_\+num\+\_\+mean}!gr\+::radar\+::estimator\+\_\+rcs@{gr\+::radar\+::estimator\+\_\+rcs}}
+\paragraph[{set\+\_\+num\+\_\+mean(int val)=0}]{\setlength{\rightskip}{0pt plus 5cm}virtual {\bf void} gr\+::radar\+::estimator\+\_\+rcs\+::set\+\_\+num\+\_\+mean (
+\begin{DoxyParamCaption}
+\item[{{\bf int}}]{val}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [pure virtual]}}\label{classgr_1_1radar_1_1estimator__rcs_a920dd6f0c3aa3b3ce7df578855756842}
+
+
+Implemented in {\bf gr\+::radar\+::estimator\+\_\+rcs\+\_\+impl} \doxyref{}{p.}{d1/dd9/classgr_1_1radar_1_1estimator__rcs__impl_a175908cc93d18e8be95f13b0c6590ac2}.
+
+\index{gr\+::radar\+::estimator\+\_\+rcs@{gr\+::radar\+::estimator\+\_\+rcs}!set\+\_\+power\+\_\+tx@{set\+\_\+power\+\_\+tx}}
+\index{set\+\_\+power\+\_\+tx@{set\+\_\+power\+\_\+tx}!gr\+::radar\+::estimator\+\_\+rcs@{gr\+::radar\+::estimator\+\_\+rcs}}
+\paragraph[{set\+\_\+power\+\_\+tx(float val)=0}]{\setlength{\rightskip}{0pt plus 5cm}virtual {\bf void} gr\+::radar\+::estimator\+\_\+rcs\+::set\+\_\+power\+\_\+tx (
+\begin{DoxyParamCaption}
+\item[{float}]{val}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [pure virtual]}}\label{classgr_1_1radar_1_1estimator__rcs_a7da0b25a1868d83de02ea3ceec51d8f8}
+
+
+Implemented in {\bf gr\+::radar\+::estimator\+\_\+rcs\+\_\+impl} \doxyref{}{p.}{d1/dd9/classgr_1_1radar_1_1estimator__rcs__impl_ad50b327669b1e1d09ed79d440cbab284}.
+
+\index{gr\+::radar\+::estimator\+\_\+rcs@{gr\+::radar\+::estimator\+\_\+rcs}!set\+\_\+usrp\+\_\+gain\+\_\+rx@{set\+\_\+usrp\+\_\+gain\+\_\+rx}}
+\index{set\+\_\+usrp\+\_\+gain\+\_\+rx@{set\+\_\+usrp\+\_\+gain\+\_\+rx}!gr\+::radar\+::estimator\+\_\+rcs@{gr\+::radar\+::estimator\+\_\+rcs}}
+\paragraph[{set\+\_\+usrp\+\_\+gain\+\_\+rx(float val)=0}]{\setlength{\rightskip}{0pt plus 5cm}virtual {\bf void} gr\+::radar\+::estimator\+\_\+rcs\+::set\+\_\+usrp\+\_\+gain\+\_\+rx (
+\begin{DoxyParamCaption}
+\item[{float}]{val}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [pure virtual]}}\label{classgr_1_1radar_1_1estimator__rcs_abdbbb3353c0bd226c3af1c98c1e2f5b2}
+
+
+Implemented in {\bf gr\+::radar\+::estimator\+\_\+rcs\+\_\+impl} \doxyref{}{p.}{d1/dd9/classgr_1_1radar_1_1estimator__rcs__impl_a7f53dc08005273787ef0a53e6d70f911}.
+
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+/home/erik/prefix/default/src/gr-\/radar-\/dev/include/radar/{\bf estimator\+\_\+rcs.\+h}\item 
+/home/erik/prefix/default/src/gr-\/radar-\/dev/lib/{\bf estimator\+\_\+rcs\+\_\+impl.\+cc}\end{DoxyCompactItemize}

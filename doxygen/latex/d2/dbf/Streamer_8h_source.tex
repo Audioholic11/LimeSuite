@@ -8,7 +8,7 @@
 00004 \textcolor{comment}{ * and open the template in the editor.}
 00005 \textcolor{comment}{ */}
 00006 
-00007 \textcolor{comment}{/* }
+00007 \textcolor{comment}{/*}
 00008 \textcolor{comment}{ * File:   Streamer.h}
 00009 \textcolor{comment}{ * Author: ignas}
 00010 \textcolor{comment}{ *}
@@ -24,7 +24,7 @@
 00020 
 00021 \textcolor{keyword}{namespace }lime
 00022 \{
-00023    
+00023 
 00024 \textcolor{keyword}{class }IConnection;
 00025 \textcolor{keyword}{class }FPGA;
 00026 \textcolor{keyword}{class }Streamer;
@@ -54,7 +54,7 @@
 00068     StreamDataFormat linkFormat;
 00069 \};
 00070 
-00071 \textcolor{keyword}{class }LIME_API StreamChannel 
+00071 \textcolor{keyword}{class }LIME_API StreamChannel
 00072 \{
 00073 \textcolor{keyword}{public}:
 00074     \textcolor{keyword}{struct }Frame
@@ -63,97 +63,102 @@
 00077         \textcolor{keyword}{static} \textcolor{keyword}{const} uint16\_t samplesCount = samples12InPkt;
 00078         complex16_t samples[samplesCount];
 00079     \};
-00080     
+00080 
 00081     \textcolor{keyword}{struct }Metadata
 00082     \{
 00083         uint64\_t timestamp;
 00084         uint32\_t flags;
-00085     \};
-00086     
-00087     \textcolor{keyword}{struct }Info
-00088     \{
-00089         \textcolor{keywordtype}{int} fifoSize;
-00090         \textcolor{keywordtype}{int} fifoItemsCount;
-00091         \textcolor{keywordtype}{int} overrun;
-00092         \textcolor{keywordtype}{int} underrun;
-00093         \textcolor{keywordtype}{bool} active;
-00094         \textcolor{keywordtype}{float} linkRate;
-00095         \textcolor{keywordtype}{int} droppedPackets;
-00096         uint64\_t timestamp;
-00097     \};
-00098     
-00099     StreamChannel(Streamer* streamer);
-00100     ~StreamChannel();
-00101     
-00102     
-00103     \textcolor{keywordtype}{void} Setup(StreamConfig conf);
-00104     \textcolor{keywordtype}{void} Close();
-00105     \textcolor{keywordtype}{int} Read(\textcolor{keywordtype}{void}* samples, \textcolor{keyword}{const} uint32\_t count, Metadata* meta, \textcolor{keyword}{const} int32\_t 
+00085         uint64\_t lastchirp_timestamp;
+00086         uint64\_t chirptime;
+00087     \};
+00088 
+00089     \textcolor{keyword}{struct }Info
+00090     \{
+00091         \textcolor{keywordtype}{int} fifoSize;
+00092         \textcolor{keywordtype}{int} fifoItemsCount;
+00093         \textcolor{keywordtype}{int} overrun;
+00094         \textcolor{keywordtype}{int} underrun;
+00095         \textcolor{keywordtype}{bool} active;
+00096         \textcolor{keywordtype}{float} linkRate;
+00097         \textcolor{keywordtype}{int} droppedPackets;
+00098         uint64\_t timestamp;
+00099     \};
+00100 
+00101     StreamChannel(Streamer* streamer);
+00102     ~StreamChannel();
+00103 
+00104 
+00105     \textcolor{keywordtype}{void} Setup(StreamConfig conf);
+00106     \textcolor{keywordtype}{void} Close();
+00107     \textcolor{keywordtype}{int} Read(\textcolor{keywordtype}{void}* samples, \textcolor{keyword}{const} uint32\_t count, Metadata* meta, \textcolor{keyword}{const} int32\_t 
       timeout_ms = 100);
-00106     \textcolor{keywordtype}{int} Write(\textcolor{keyword}{const} \textcolor{keywordtype}{void}* samples, \textcolor{keyword}{const} uint32\_t count, \textcolor{keyword}{const} Metadata* meta, \textcolor{keyword}{const} int32\_t 
+00108     \textcolor{keywordtype}{int} Write(\textcolor{keyword}{const} \textcolor{keywordtype}{void}* samples, \textcolor{keyword}{const} uint32\_t count, \textcolor{keyword}{const} Metadata* meta, \textcolor{keyword}{const} int32\_t 
       timeout_ms = 100);
-00107     StreamChannel::Info GetInfo();
-00108     \textcolor{keywordtype}{int} GetStreamSize();
-00109 
-00110     \textcolor{keywordtype}{bool} IsActive() \textcolor{keyword}{const};
-00111     \textcolor{keywordtype}{int} Start();
-00112     \textcolor{keywordtype}{int} Stop();
-00113     StreamConfig config;
-00114     Streamer* mStreamer;
-00115     \textcolor{keywordtype}{unsigned} overflow;
-00116     \textcolor{keywordtype}{unsigned} underflow;
-00117     \textcolor{keywordtype}{unsigned} pktLost;
-00118     \textcolor{keywordtype}{bool} mActive;
-00119     \textcolor{keywordtype}{bool} used;
-00120        
-00121 \textcolor{keyword}{protected}:
-00122     RingFIFO* fifo;  
-00123 \};
-00124     
-00125 \textcolor{keyword}{class }Streamer
-00126 \{
-00127 \textcolor{keyword}{public}:
-00128     Streamer(FPGA* f, LMS7002M* chip, \textcolor{keywordtype}{int} \textcolor{keywordtype}{id});
-00129     ~Streamer();
-00130 
-00131     StreamChannel* SetupStream(\textcolor{keyword}{const} StreamConfig& config);
-00132     \textcolor{keywordtype}{int} GetStreamSize(\textcolor{keywordtype}{bool} tx);
-00133 
-00134     uint64\_t GetHardwareTimestamp(\textcolor{keywordtype}{void});
-00135     \textcolor{keywordtype}{void} SetHardwareTimestamp(\textcolor{keyword}{const} uint64\_t now);
-00136     \textcolor{keywordtype}{int} UpdateThreads(\textcolor{keywordtype}{bool} stopAll = \textcolor{keyword}{false});
-00137 
-00138     std::atomic<uint32\_t> rxDataRate_Bps;
-00139     std::atomic<uint32\_t> txDataRate_Bps;
-00140     IConnection* dataPort;
-00141     std::thread rxThread;
-00142     std::thread txThread;
-00143     std::atomic<bool> terminateRx;
-00144     std::atomic<bool> terminateTx;
-00145 
-00146     std::vector<StreamChannel> mRxStreams;
-00147     std::vector<StreamChannel> mTxStreams;
-00148     std::atomic<uint64\_t> rxLastTimestamp;
-00149     std::atomic<uint64\_t> txLastTimestamp;
-00150     uint64\_t mTimestampOffset;
-00151     \textcolor{keywordtype}{int} streamSize;
-00152     \textcolor{keywordtype}{unsigned} txBatchSize;
-00153     \textcolor{keywordtype}{unsigned} rxBatchSize;
-00154     StreamConfig::StreamDataFormat dataLinkFormat;
-00155     \textcolor{keywordtype}{void} ReceivePacketsLoop();
-00156     \textcolor{keywordtype}{void} TransmitPacketsLoop();
-00157 \textcolor{keyword}{private}:
-00158     \textcolor{keywordtype}{void} AlignRxTSP();
-00159     \textcolor{keywordtype}{void} AlignRxRF(\textcolor{keywordtype}{bool} restoreValues);
-00160     \textcolor{keywordtype}{void} AlignQuadrature(\textcolor{keywordtype}{bool} restoreValues);
-00161     \textcolor{keywordtype}{void} RstRxIQGen();
-00162     \textcolor{keywordtype}{double} GetPhaseOffset(\textcolor{keywordtype}{int} bin);
-00163     FPGA* fpga;
-00164     LMS7002M* lms;
-00165     \textcolor{keywordtype}{int} chipId;
-00166 \};
-00167 \}
-00168 
-00169 \textcolor{preprocessor}{#endif }\textcolor{comment}{/* STREAMER\_H */}\textcolor{preprocessor}{}
-00170 
+00109     StreamChannel::Info GetInfo();
+00110     \textcolor{keywordtype}{int} GetStreamSize();
+00111 
+00112     \textcolor{keywordtype}{bool} IsActive() \textcolor{keyword}{const};
+00113     \textcolor{keywordtype}{int} Start();
+00114     \textcolor{keywordtype}{int} Stop();
+00115     StreamConfig config;
+00116     Streamer* mStreamer;
+00117     \textcolor{keywordtype}{unsigned} overflow;
+00118     \textcolor{keywordtype}{unsigned} underflow;
+00119     \textcolor{keywordtype}{unsigned} pktLost;
+00120     \textcolor{keywordtype}{bool} mActive;
+00121     \textcolor{keywordtype}{bool} used;
+00122 
+00123 \textcolor{keyword}{protected}:
+00124     RingFIFO* fifo;
+00125 \};
+00126 
+00127 \textcolor{keyword}{class }Streamer
+00128 \{
+00129 \textcolor{keyword}{public}:
+00130     Streamer(FPGA* f, LMS7002M* chip, \textcolor{keywordtype}{int} \textcolor{keywordtype}{id});
+00131     ~Streamer();
+00132 
+00133     StreamChannel* SetupStream(\textcolor{keyword}{const} StreamConfig& config);
+00134     \textcolor{keywordtype}{int} GetStreamSize(\textcolor{keywordtype}{bool} tx);
+00135 
+00136     uint64\_t GetHardwareTimestamp(\textcolor{keywordtype}{void});
+00137     \textcolor{keywordtype}{void} SetHardwareTimestamp(\textcolor{keyword}{const} uint64\_t now);
+00138     uint64\_t GetChirpTimePeriod(\textcolor{keywordtype}{void});
+00139     uint64\_t GetChirpTimeStamp(\textcolor{keywordtype}{void});
+00140     \textcolor{keywordtype}{int} UpdateThreads(\textcolor{keywordtype}{bool} stopAll = \textcolor{keyword}{false});
+00141 
+00142     std::atomic<uint32\_t> rxDataRate_Bps;
+00143     std::atomic<uint32\_t> txDataRate_Bps;
+00144     IConnection* dataPort;
+00145     std::thread rxThread;
+00146     std::thread txThread;
+00147     std::atomic<bool> terminateRx;
+00148     std::atomic<bool> terminateTx;
+00149 
+00150     std::vector<StreamChannel> mRxStreams;
+00151     std::vector<StreamChannel> mTxStreams;
+00152     std::atomic<uint64\_t> rxLastTimestamp;
+00153     std::atomic<uint64\_t> txLastTimestamp;
+00154     std::atomic<uint64\_t> chirpLastTimeStamp;
+00155     std::atomic<uint64\_t> chirpLastTimePeriod;
+00156     uint64\_t mTimestampOffset;
+00157     \textcolor{keywordtype}{int} streamSize;
+00158     \textcolor{keywordtype}{unsigned} txBatchSize;
+00159     \textcolor{keywordtype}{unsigned} rxBatchSize;
+00160     StreamConfig::StreamDataFormat dataLinkFormat;
+00161     \textcolor{keywordtype}{void} ReceivePacketsLoop();
+00162     \textcolor{keywordtype}{void} TransmitPacketsLoop();
+00163 \textcolor{keyword}{private}:
+00164     \textcolor{keywordtype}{void} AlignRxTSP();
+00165     \textcolor{keywordtype}{void} AlignRxRF(\textcolor{keywordtype}{bool} restoreValues);
+00166     \textcolor{keywordtype}{void} AlignQuadrature(\textcolor{keywordtype}{bool} restoreValues);
+00167     \textcolor{keywordtype}{void} RstRxIQGen();
+00168     \textcolor{keywordtype}{double} GetPhaseOffset(\textcolor{keywordtype}{int} bin);
+00169     FPGA* fpga;
+00170     LMS7002M* lms;
+00171     \textcolor{keywordtype}{int} chipId;
+00172 \};
+00173 \}
+00174 
+00175 \textcolor{preprocessor}{#endif }\textcolor{comment}{/* STREAMER\_H */}\textcolor{preprocessor}{}
 \end{DoxyCode}

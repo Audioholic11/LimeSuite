@@ -1,0 +1,138 @@
+\subsection{estimator\+\_\+fsk\+\_\+impl.\+cc}
+\label{estimator__fsk__impl_8cc_source}\index{/home/erik/prefix/default/src/gr-\/radar-\/dev/lib/estimator\+\_\+fsk\+\_\+impl.\+cc@{/home/erik/prefix/default/src/gr-\/radar-\/dev/lib/estimator\+\_\+fsk\+\_\+impl.\+cc}}
+
+\begin{DoxyCode}
+00001 \textcolor{comment}{/* -*- c++ -*- */}
+00002 \textcolor{comment}{/* }
+00003 \textcolor{comment}{ * Copyright 2014 Communications Engineering Lab, KIT.}
+00004 \textcolor{comment}{ * }
+00005 \textcolor{comment}{ * This is free software; you can redistribute it and/or modify}
+00006 \textcolor{comment}{ * it under the terms of the GNU General Public License as published by}
+00007 \textcolor{comment}{ * the Free Software Foundation; either version 3, or (at your option)}
+00008 \textcolor{comment}{ * any later version.}
+00009 \textcolor{comment}{ * }
+00010 \textcolor{comment}{ * This software is distributed in the hope that it will be useful,}
+00011 \textcolor{comment}{ * but WITHOUT ANY WARRANTY; without even the implied warranty of}
+00012 \textcolor{comment}{ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the}
+00013 \textcolor{comment}{ * GNU General Public License for more details.}
+00014 \textcolor{comment}{ * }
+00015 \textcolor{comment}{ * You should have received a copy of the GNU General Public License}
+00016 \textcolor{comment}{ * along with this software; see the file COPYING.  If not, write to}
+00017 \textcolor{comment}{ * the Free Software Foundation, Inc., 51 Franklin Street,}
+00018 \textcolor{comment}{ * Boston, MA 02110-1301, USA.}
+00019 \textcolor{comment}{ */}
+00020  
+00021 \textcolor{preprocessor}{#ifdef HAVE\_CONFIG\_H}
+00022 \textcolor{preprocessor}{#include "config.h"}
+00023 \textcolor{preprocessor}{#endif}
+00024 
+00025 \textcolor{preprocessor}{#include <gnuradio/io\_signature.h>}
+00026 \textcolor{preprocessor}{#include "estimator_fsk_impl.h"}
+00027 
+00028 \textcolor{keyword}{namespace }gr \{
+00029   \textcolor{keyword}{namespace }radar \{
+00030 
+00031     estimator_fsk::sptr
+00032     estimator_fsk::make(\textcolor{keywordtype}{float} center_freq, \textcolor{keywordtype}{float} delta\_freq, \textcolor{keywordtype}{bool} push\_power)
+00033     \{
+00034       \textcolor{keywordflow}{return} gnuradio::get\_initial\_sptr
+00035         (\textcolor{keyword}{new} estimator_fsk_impl(center\_freq, delta\_freq, push\_power));
+00036     \}
+00037 
+00038     \textcolor{comment}{/*}
+00039 \textcolor{comment}{     * The private constructor}
+00040 \textcolor{comment}{     */}
+00041     estimator_fsk_impl::estimator_fsk_impl(\textcolor{keywordtype}{float} center_freq, \textcolor{keywordtype}{float} delta\_freq, \textcolor{keywordtype}{bool} push\_power)
+00042       : gr::block(\textcolor{stringliteral}{"estimator\_fsk"},
+00043               gr::io\_signature::make(0,0,0),
+00044               gr::io\_signature::make(0,0,0))
+00045     \{
+00046         d_center_freq = center_freq;
+00047         d_delta_freq = delta\_freq;
+00048         d_push_power = push\_power;
+00049         
+00050         \textcolor{comment}{// Register input message port}
+00051         d_port_id_in = pmt::mp(\textcolor{stringliteral}{"Msg in"});
+00052         message\_port\_register\_in(d_port_id_in);
+00053         set\_msg\_handler(d_port_id_in, boost::bind(&
+      estimator_fsk_impl::handle_msg, \textcolor{keyword}{this}, \_1));
+00054         
+00055         \textcolor{comment}{// Register output message port}
+00056         d_port_id_out = pmt::mp(\textcolor{stringliteral}{"Msg out"});
+00057         message\_port\_register\_out(d_port_id_out);
+00058     \}
+00059 
+00060     \textcolor{comment}{/*}
+00061 \textcolor{comment}{     * Our virtual destructor.}
+00062 \textcolor{comment}{     */}
+00063     estimator_fsk_impl::~estimator_fsk_impl()
+00064     \{
+00065     \}
+00066     
+00067     \textcolor{keywordtype}{void}
+00068     estimator_fsk_impl::handle_msg(pmt::pmt\_t msg)
+00069     \{
+00070         \textcolor{comment}{// Read msg from peak detector}
+00071         pmt::pmt\_t msg\_part;
+00072         \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} k=0; k<pmt::length(msg); k++)\{
+00073             msg\_part = pmt::nth(k,msg);
+00074             \textcolor{keywordflow}{if}(pmt::symbol\_to\_string(pmt::nth(0,msg\_part))==\textcolor{stringliteral}{"frequency"})\{
+00075                 d_pfreq = pmt::nth(1,msg\_part);
+00076             \}
+00077             \textcolor{keywordflow}{else} \textcolor{keywordflow}{if}(pmt::symbol\_to\_string(pmt::nth(0,msg\_part))==\textcolor{stringliteral}{"phase"})\{
+00078                 d_pphase = pmt::nth(1,msg\_part);
+00079             \}
+00080             \textcolor{keywordflow}{else} \textcolor{keywordflow}{if}(pmt::symbol\_to\_string(pmt::nth(0,msg\_part))==\textcolor{stringliteral}{"power"})\{
+00081                 d_ppower = msg\_part;
+00082             \}
+00083             \textcolor{keywordflow}{else} \textcolor{keywordflow}{if}(pmt::symbol\_to\_string(pmt::nth(0,msg\_part))==\textcolor{stringliteral}{"rx\_time"})\{
+00084                 d_ptimestamp = msg\_part;
+00085             \}
+00086         \}
+00087         
+00088         d_freq = pmt::f32vector\_elements(d_pfreq);
+00089         d_phase = pmt::f32vector\_elements(d_pphase);
+00090         
+00091         \textcolor{comment}{// Check read data}
+00092         \textcolor{keywordflow}{if}(d_phase.size()==0 && d_freq.size()!=0) std::runtime\_error(\textcolor{stringliteral}{"Frequency but no phase found in
+       message"});
+00093         
+00094         \textcolor{comment}{// Calc velocities and write to vector}
+00095         d_vel.clear();
+00096         \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} k=0; k<d_freq.size(); k++)\{
+00097             d_vel.push\_back(d_freq[k]*c_light/2/d_center_freq); \textcolor{comment}{// calc with doppler formula}
+00098         \}
+00099         
+00100         \textcolor{comment}{// Calc ranges and write to vector}
+00101         d_range.clear();
+00102         \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} k=0; k<d_phase.size(); k++)\{
+00103             \textcolor{keywordflow}{if}(d_phase[k]>=0) d_range.push\_back((d_phase[k])*c_light/4/M\_PI/
+      d_delta_freq); \textcolor{comment}{// calc with fsk range formula}
+00104             \textcolor{keywordflow}{else} \textcolor{keywordflow}{if}(d_phase[k]<0) d_range.push\_back((2*M\_PI+d_phase[k])*c_light/4/M\_PI/
+      d_delta_freq); \textcolor{comment}{// phase jumps from pi to -pi}
+00105         \}
+00106         
+00107         \textcolor{comment}{// Push pmt to output msg port}
+00108         d_vel_key = pmt::string\_to\_symbol(\textcolor{stringliteral}{"velocity"}); \textcolor{comment}{// identifier velocity}
+00109         d_vel_value = pmt::init\_f32vector(d_vel.size(), d_vel); \textcolor{comment}{// vector to pmt}
+00110         d_vel_pack = pmt::list2(d_vel_key, d_vel_value); \textcolor{comment}{// make list for velocity information}
+00111         
+00112         d_range_key = pmt::string\_to\_symbol(\textcolor{stringliteral}{"range"}); \textcolor{comment}{// identifier range}
+00113         d_range_value = pmt::init\_f32vector(d_range.size(), d_range); \textcolor{comment}{// vector to pmt}
+00114         d_range_pack = pmt::list2(d_range_key, d_range_value); \textcolor{comment}{// make list for range information}
+00115         
+00116         \textcolor{keywordflow}{if}(d_push_power)\{ \textcolor{comment}{// if power of peaks shall be pushed through}
+00117             d_value = pmt::list4(d_ptimestamp, d\_vel\_pack, d\_range\_pack, 
+      d_ppower); \textcolor{comment}{// all information to one pmt list}
+00118         \}
+00119         \textcolor{keywordflow}{else}\{
+00120             d_value = pmt::list3(d_ptimestamp, d\_vel\_pack, d\_range\_pack);
+00121         \}
+00122         
+00123         message\_port\_pub(d_port_id_out,d_value); \textcolor{comment}{// publish message}
+00124     \}
+00125 
+00126   \} \textcolor{comment}{/* namespace radar */}
+00127 \} \textcolor{comment}{/* namespace gr */}
+00128 
+\end{DoxyCode}

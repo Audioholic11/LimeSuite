@@ -1,0 +1,54 @@
+Simple like your girlfriend, fast, lightweight, header, portable \doxyref{I\+NI}{p.}{d4/d92/classINI} parser for A\+N\+SI C++.
+
+Why use feather-\/ini-\/parser? It\textquotesingle{}s a fast, intuitive, uses C++, supports native data types, wide char support (enable), converting to data types simply by setting a default value or providing the type as a template parameter.
+
+\subsubsection*{Methods}
+
+\tabulinesep=1mm
+\begin{longtabu} spread 0pt [c]{*2{|X[-1]}|}
+\hline
+\rowcolor{\tableheadbgcolor}{\bf Statement }&{\bf Return Type  }\\\cline{1-2}
+\endfirsthead
+\hline
+\endfoot
+\hline
+\rowcolor{\tableheadbgcolor}{\bf Statement }&{\bf Return Type  }\\\cline{1-2}
+\endhead
+ini(filename, do\+Parse)&constructor \\\cline{1-2}
+ini(data, data\+Size, do\+Parse)&constructor \\\cline{1-2}
+\doxyref{ini.\+parse()}{p.}{db/d1e/namespacedoxyxml_1_1generated_1_1compound_af9a7f0566f73835a92149ab9aa04a945}&bool \\\cline{1-2}
+ini.\+merge(other I\+N\+I, retain\+Values)&void \\\cline{1-2}
+ini.\+create(section)&bool \\\cline{1-2}
+ini.\+select(section)&bool \\\cline{1-2}
+ini.\+set(key, value)&bool \\\cline{1-2}
+ini.\+get(key, dvalue = value\+\_\+t())&dvalue\+\_\+t \\\cline{1-2}
+ini.\+save(filename = \char`\"{}\char`\"{})&bool \\\cline{1-2}
+ini.\+clear()&bool \\\cline{1-2}
+ini[section][key]&value\+\_\+t\& \\\cline{1-2}
+ini[section]&keys\+\_\+t\& \\\cline{1-2}
+\end{longtabu}
+\#\#\+Example 
+\begin{DoxyCode}
+00001 #include <iostream>
+00002 #include "INI.h"
+00003 
+00004 using namespace std;
+\end{DoxyCode}
+ ... 
+\begin{DoxyCode}
+00001 typedef INI<> ini\_t;
+00002 //or
+00003 //typedef INI<section\_t, key\_t, value\_t> ini\_t;
+00004 
+00005 ini\_t ini("filename.ini", true);
+00006 ini.create("section1"); //Create and select section1
+00007 ini.set("key", "value");
+00008 cout << ini.get("keynumeric", -1) << endl;
+00009 ini["section2"]["key"] = "value";
+00010 ini.save();
+\end{DoxyCode}
+
+
+\subsubsection*{More}
+
+Please see the example .cpp file and Code\+::\+Blocks .cbp project for a compilable G\+CC and V\+S\+C++ example. Additionally includes enabling wide char support and iterating through contents. 

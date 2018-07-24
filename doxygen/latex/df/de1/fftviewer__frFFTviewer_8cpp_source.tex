@@ -7,7 +7,7 @@
 00003 \textcolor{preprocessor}{#include <vector>}
 00004 \textcolor{preprocessor}{#include "OpenGLGraph.h"}
 00005 \textcolor{preprocessor}{#include <LMSBoards.h>}
-00006 \textcolor{preprocessor}{#include "kiss\_fft.h"}
+00006 \textcolor{preprocessor}{#include "kiss_fft.h"}
 00007 \textcolor{preprocessor}{#include "IConnection.h"}
 00008 \textcolor{preprocessor}{#include "dataTypes.h"}
 00009 \textcolor{preprocessor}{#include "LMS7002M.h"}
@@ -33,20 +33,20 @@
 00029     \textcolor{keyword}{const} \textcolor{keywordtype}{int} num\_ch = LMS_GetNumChannels(lmsControl, \textcolor{keyword}{false});
 00030     \textcolor{keywordflow}{if} (num\_ch>2)
 00031     \{
-00032         cmbStreamType->Append(\_T(\textcolor{stringliteral}{"LMS1 SISO"}));
-00033         cmbStreamType->Append(\_T(\textcolor{stringliteral}{"LMS1 MIMO"}));
-00034         cmbStreamType->Append(\_T(\textcolor{stringliteral}{"LMS2 SISO"}));
-00035         cmbStreamType->Append(\_T(\textcolor{stringliteral}{"LMS2 MIMO"}));
-00036         cmbStreamType->Append(\_T(\textcolor{stringliteral}{"Ext. ADC/DAC"}));
+00032         cmbStreamType->Append(_T(\textcolor{stringliteral}{"LMS1 SISO"}));
+00033         cmbStreamType->Append(_T(\textcolor{stringliteral}{"LMS1 MIMO"}));
+00034         cmbStreamType->Append(_T(\textcolor{stringliteral}{"LMS2 SISO"}));
+00035         cmbStreamType->Append(_T(\textcolor{stringliteral}{"LMS2 MIMO"}));
+00036         cmbStreamType->Append(_T(\textcolor{stringliteral}{"Ext. ADC/DAC"}));
 00037     \}
 00038     \textcolor{keywordflow}{else} \textcolor{keywordflow}{if} (num\_ch == 2)
 00039     \{
-00040         cmbStreamType->Append(\_T(\textcolor{stringliteral}{"LMS SISO"}));
-00041         cmbStreamType->Append(\_T(\textcolor{stringliteral}{"LMS MIMO"}));
+00040         cmbStreamType->Append(_T(\textcolor{stringliteral}{"LMS SISO"}));
+00041         cmbStreamType->Append(_T(\textcolor{stringliteral}{"LMS MIMO"}));
 00042     \}
 00043     \textcolor{keywordflow}{else}
 00044     \{
-00045         cmbStreamType->Append(\_T(\textcolor{stringliteral}{"LMS SISO"}));
+00045         cmbStreamType->Append(_T(\textcolor{stringliteral}{"LMS SISO"}));
 00046     \}
 00047     cmbStreamType->SetSelection(0);
 00048     SetNyquistFrequency();
@@ -426,9 +426,9 @@
 00408             LMS_SetupStream(pthis->lmsControl, &pthis->txStreams[i]);
 00409     \}
 00410 
-00411     kiss\_fft\_cfg m\_fftCalcPlan = kiss\_fft\_alloc(fftSize, 0, 0, 0);
-00412     kiss\_fft\_cpx* m\_fftCalcIn = \textcolor{keyword}{new} kiss\_fft\_cpx[fftSize];
-00413     kiss\_fft\_cpx* m\_fftCalcOut = \textcolor{keyword}{new} kiss\_fft\_cpx[fftSize];
+00411     kiss_fft_cfg m\_fftCalcPlan = kiss_fft_alloc(fftSize, 0, 0, 0);
+00412     kiss_fft_cpx* m\_fftCalcIn = \textcolor{keyword}{new} kiss_fft_cpx[fftSize];
+00413     kiss_fft_cpx* m\_fftCalcOut = \textcolor{keyword}{new} kiss_fft_cpx[fftSize];
 00414 
 00415     \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} i=0; i<channelsCount; ++i)
 00416     \{
@@ -510,7 +510,7 @@
 00490                         \}
 00491                     \}
 00492 
-00493                     kiss\_fft(m\_fftCalcPlan, m\_fftCalcIn, m\_fftCalcOut);
+00493                     kiss_fft(m\_fftCalcPlan, m\_fftCalcIn, m\_fftCalcOut);
 00494 
 00495                     \textcolor{keywordtype}{int} output\_index = 0;
 00496                     \textcolor{keywordflow}{for} (\textcolor{keywordtype}{unsigned} i = fftSize / 2 + 1; i < fftSize; ++i)
@@ -597,7 +597,7 @@
 00574         \}
 00575     \}
 00576 
-00577     kiss\_fft\_free(m\_fftCalcPlan);
+00577     kiss_fft_free(m\_fftCalcPlan);
 00578     pthis->stopProcessing.store(\textcolor{keyword}{true});
 00579     pthis->mStreamRunning.store(\textcolor{keyword}{false});
 00580     \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} i=0; i<channelsCount; ++i)
@@ -644,10 +644,10 @@
 00621 
 00622     \textcolor{keywordtype}{int} tmp = cmbChannelVisibility->GetSelection();
 00623     cmbChannelVisibility->Clear();
-00624     cmbChannelVisibility->Append(\_T(\textcolor{stringliteral}{"A"}));
-00625     cmbChannelVisibility->Append(\_T(\textcolor{stringliteral}{"B"}));
+00624     cmbChannelVisibility->Append(_T(\textcolor{stringliteral}{"A"}));
+00625     cmbChannelVisibility->Append(_T(\textcolor{stringliteral}{"B"}));
 00626     \textcolor{keywordflow}{if} (cmbStreamType->GetSelection()%2==1)
-00627         cmbChannelVisibility->Append(\_T(\textcolor{stringliteral}{"A&B"}));
+00627         cmbChannelVisibility->Append(_T(\textcolor{stringliteral}{"A&B"}));
 00628     \textcolor{keywordflow}{else} \textcolor{keywordflow}{if} (tmp > 1)
 00629         tmp = 0;
 00630     cmbChannelVisibility->SetSelection(tmp);

@@ -1,0 +1,103 @@
+\subsection{Lime\+S\+D\+R\+Test.\+h}
+\label{LimeSDRTest_8h_source}\index{/home/erik/prefix/default/src/limesuite-\/dev/\+Quick\+Test/\+Lime\+S\+D\+R\+Test.\+h@{/home/erik/prefix/default/src/limesuite-\/dev/\+Quick\+Test/\+Lime\+S\+D\+R\+Test.\+h}}
+
+\begin{DoxyCode}
+00001 \textcolor{comment}{/*}
+00002 \textcolor{comment}{ * To change this license header, choose License Headers in Project Properties.}
+00003 \textcolor{comment}{ * To change this template file, choose Tools | Templates}
+00004 \textcolor{comment}{ * and open the template in the editor.}
+00005 \textcolor{comment}{ */}
+00006 
+00007 \textcolor{comment}{/*}
+00008 \textcolor{comment}{ * File:   LimeSDRTest.h}
+00009 \textcolor{comment}{ * Author: ignas}
+00010 \textcolor{comment}{ *}
+00011 \textcolor{comment}{ * Created on August 25, 2016, 9:50 AM}
+00012 \textcolor{comment}{ */}
+00013 
+00014 \textcolor{preprocessor}{#ifndef LIMESDRTEST\_H}
+00015 \textcolor{preprocessor}{#define LIMESDRTEST\_H}
+00016 
+00017 \textcolor{preprocessor}{#include "lms7_device.h"}
+00018 \textcolor{preprocessor}{#include <IConnection.h>}
+00019 \textcolor{preprocessor}{#include <atomic>}
+00020 \textcolor{preprocessor}{#include "Logger.h"}
+00021 
+00022 \textcolor{preprocessor}{#define LMS\_TEST\_FAIL       -1}
+00023 \textcolor{preprocessor}{#define LMS\_TEST\_SUCCESS    0}
+00024 \textcolor{preprocessor}{#define LMS\_TEST\_INFO       1}
+00025 \textcolor{preprocessor}{#define LMS\_TEST\_LOGFILE    4}
+00026 
+00027 \textcolor{keyword}{extern} \textcolor{keyword}{const} std::vector<std::string>testNames;
+00028 
+00029 \textcolor{keyword}{class }LimeSDRTest
+00030 \{
+00031     \textcolor{keyword}{typedef} std::function<int(int testID, int event, const char* msg)> 
+      TestCallback;
+00032 
+00033 \textcolor{keyword}{public}:
+00034     \textcolor{keyword}{static} \textcolor{keywordtype}{int} RunTests(TestCallback cb, \textcolor{keywordtype}{bool} nonblock = \textcolor{keyword}{true});
+00035     \textcolor{keyword}{static} \textcolor{keywordtype}{int} CheckDevice(std::string &str);
+00036     
+00037 \textcolor{keyword}{protected}:
+00038     
+00039     \textcolor{keyword}{struct }RFTestData
+00040     \{
+00041         \textcolor{keywordtype}{float} rxfreq;
+00042         \textcolor{keywordtype}{float} txfreq;
+00043         \textcolor{keywordtype}{float} peakval;
+00044         \textcolor{keywordtype}{float} peakfreq;
+00045         \textcolor{keywordtype}{int} ch;
+00046     \};
+00047     
+00048     LimeSDRTest(lime::LMS7_Device* dev);
+00049     \textcolor{keyword}{virtual} ~LimeSDRTest();
+00050     \textcolor{keyword}{static} \textcolor{keywordtype}{void} UpdateStatus(\textcolor{keywordtype}{int} event, \textcolor{keyword}{const} \textcolor{keywordtype}{char}* msg = \textcolor{keyword}{nullptr});
+00051     \textcolor{keywordtype}{int} InitFPGATest(\textcolor{keywordtype}{unsigned} test, \textcolor{keywordtype}{double} timeout);
+00052     \textcolor{keywordtype}{int} GPIFClkTest();
+00053     \textcolor{keywordtype}{int} VCTCXOTest();
+00054     \textcolor{keywordtype}{bool} RunTest(\textcolor{keywordtype}{float} &peakval, \textcolor{keywordtype}{float} &peakFreq, \textcolor{keywordtype}{int} ch = 0);
+00055     \textcolor{keyword}{static} std::string RFTestInfo(\textcolor{keyword}{const} RFTestData& data, \textcolor{keywordtype}{bool} passed); 
+00056     lime::LMS7_Device* device;
+00057     
+00058 \textcolor{keyword}{private}:
+00059     
+00060     \textcolor{keyword}{static} LimeSDRTest* Connect();
+00061     \textcolor{keywordtype}{int} FPGA_EEPROM_Test();
+00062     \textcolor{keyword}{virtual} \textcolor{keywordtype}{int} ClockNetworkTest()=0;
+00063     \textcolor{keyword}{virtual} \textcolor{keywordtype}{int} RFTest() = 0;
+00064     \textcolor{keywordtype}{int} LMS7002mTest();
+00065     \textcolor{keywordtype}{int} Reg_write(uint16\_t address, uint16\_t data);
+00066     uint16\_t Reg_read(uint16\_t address);
+00067 
+00068     \textcolor{keyword}{static} \textcolor{keywordtype}{int} step;
+00069     \textcolor{keyword}{static} TestCallback callback;
+00070     \textcolor{keywordtype}{int} Perform_tests();
+00071     \textcolor{keywordtype}{int} TransferLMS64C(\textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{char}* packet);
+00072 
+00073     \textcolor{keyword}{static} std::atomic<bool> running;
+00074     \textcolor{keyword}{static} std::chrono::steady\_clock::time\_point tp_start;
+00075     \textcolor{keyword}{static} \textcolor{keywordtype}{void} OnLogEvent(\textcolor{keyword}{const} lime::LogLevel level, \textcolor{keyword}{const} \textcolor{keywordtype}{char} *message);
+00076 \};
+00077 
+00078 \textcolor{keyword}{class }LimeSDRTest_Mini : \textcolor{keyword}{public} LimeSDRTest
+00079 \{
+00080     \textcolor{keyword}{friend} \textcolor{keyword}{class }LimeSDRTest;
+00081     LimeSDRTest_Mini(lime::LMS7_Device* dev):LimeSDRTest(dev)\{\};
+00082     \textcolor{keywordtype}{int} ClockNetworkTest() \textcolor{keyword}{override};
+00083     \textcolor{keywordtype}{int} RFTest() \textcolor{keyword}{override};
+00084 \};
+00085 
+00086 \textcolor{keyword}{class }LimeSDRTest_USB : \textcolor{keyword}{public} LimeSDRTest
+00087 \{
+00088     \textcolor{keyword}{friend} \textcolor{keyword}{class }LimeSDRTest;
+00089     LimeSDRTest_USB(lime::LMS7_Device* dev):LimeSDRTest(dev)\{\};
+00090     \textcolor{keywordtype}{int} ClockNetworkTest() \textcolor{keyword}{override};
+00091     \textcolor{keywordtype}{int} RFTest() \textcolor{keyword}{override};
+00092     \textcolor{keywordtype}{int} Si5351CTest();
+00093     \textcolor{keywordtype}{int} ADF4002Test();
+00094 \};
+00095 
+00096 \textcolor{preprocessor}{#endif }\textcolor{comment}{/* LIMESDRTEST\_H */}\textcolor{preprocessor}{}
+00097 
+\end{DoxyCode}

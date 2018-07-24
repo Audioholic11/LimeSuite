@@ -1,0 +1,218 @@
+\subsection{os\+\_\+cfar\+\_\+2d\+\_\+vc\+\_\+impl.\+cc}
+\label{os__cfar__2d__vc__impl_8cc_source}\index{/home/erik/prefix/default/src/gr-\/radar-\/dev/lib/os\+\_\+cfar\+\_\+2d\+\_\+vc\+\_\+impl.\+cc@{/home/erik/prefix/default/src/gr-\/radar-\/dev/lib/os\+\_\+cfar\+\_\+2d\+\_\+vc\+\_\+impl.\+cc}}
+
+\begin{DoxyCode}
+00001 \textcolor{comment}{/* -*- c++ -*- */}
+00002 \textcolor{comment}{/* }
+00003 \textcolor{comment}{ * Copyright 2014 Communications Engineering Lab, KIT.}
+00004 \textcolor{comment}{ * }
+00005 \textcolor{comment}{ * This is free software; you can redistribute it and/or modify}
+00006 \textcolor{comment}{ * it under the terms of the GNU General Public License as published by}
+00007 \textcolor{comment}{ * the Free Software Foundation; either version 3, or (at your option)}
+00008 \textcolor{comment}{ * any later version.}
+00009 \textcolor{comment}{ * }
+00010 \textcolor{comment}{ * This software is distributed in the hope that it will be useful,}
+00011 \textcolor{comment}{ * but WITHOUT ANY WARRANTY; without even the implied warranty of}
+00012 \textcolor{comment}{ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the}
+00013 \textcolor{comment}{ * GNU General Public License for more details.}
+00014 \textcolor{comment}{ * }
+00015 \textcolor{comment}{ * You should have received a copy of the GNU General Public License}
+00016 \textcolor{comment}{ * along with this software; see the file COPYING.  If not, write to}
+00017 \textcolor{comment}{ * the Free Software Foundation, Inc., 51 Franklin Street,}
+00018 \textcolor{comment}{ * Boston, MA 02110-1301, USA.}
+00019 \textcolor{comment}{ */}
+00020 
+00021 \textcolor{preprocessor}{#ifdef HAVE\_CONFIG\_H}
+00022 \textcolor{preprocessor}{#include "config.h"}
+00023 \textcolor{preprocessor}{#endif}
+00024 
+00025 \textcolor{preprocessor}{#include <gnuradio/io\_signature.h>}
+00026 \textcolor{preprocessor}{#include "os_cfar_2d_vc_impl.h"}
+00027 
+00028 \textcolor{keyword}{namespace }gr \{
+00029   \textcolor{keyword}{namespace }radar \{
+00030 
+00031     os_cfar_2d_vc::sptr
+00032     os_cfar_2d_vc::make(\textcolor{keywordtype}{int} vlen, std::vector<int> samp\_compare, std::vector<int> samp\_protect, \textcolor{keywordtype}{float} 
+      rel\_threshold, \textcolor{keywordtype}{float} mult\_threshold, \textcolor{keyword}{const} std::string& len\_key)
+00033     \{
+00034       \textcolor{keywordflow}{return} gnuradio::get\_initial\_sptr
+00035         (\textcolor{keyword}{new} os_cfar_2d_vc_impl(vlen, samp\_compare, samp\_protect, rel\_threshold, mult\_threshold, len\_key));
+00036     \}
+00037 
+00038     \textcolor{comment}{/*}
+00039 \textcolor{comment}{     * The private constructor}
+00040 \textcolor{comment}{     */}
+00041     os_cfar_2d_vc_impl::os_cfar_2d_vc_impl(\textcolor{keywordtype}{int} vlen, std::vector<int> samp\_compare, std::vector<int> 
+      samp\_protect, \textcolor{keywordtype}{float} rel\_threshold, \textcolor{keywordtype}{float} mult\_threshold, \textcolor{keyword}{const} std::string& len\_key)
+00042       : gr::tagged\_stream\_block(\textcolor{stringliteral}{"os\_cfar\_2d\_vc"},
+00043               gr::io\_signature::make(1, 1, sizeof(gr\_complex)*vlen),
+00044               gr::io\_signature::make(0, 0, 0), len\_key)
+00045     \{
+00046         d_vlen = vlen;
+00047         d_samp_compare = samp\_compare;
+00048         d_samp_protect = samp\_protect;
+00049         d_rel_threshold = rel\_threshold;
+00050         d_mult_threshold = mult\_threshold;
+00051         
+00052         \textcolor{comment}{// Register message port}
+00053         d_port_id = pmt::mp(\textcolor{stringliteral}{"Msg out"});
+00054         message\_port\_register\_out(d_port_id);
+00055     \}
+00056 
+00057     \textcolor{comment}{/*}
+00058 \textcolor{comment}{     * Our virtual destructor.}
+00059 \textcolor{comment}{     */}
+00060     os_cfar_2d_vc_impl::~os_cfar_2d_vc_impl()
+00061     \{
+00062     \}
+00063 
+00064     \textcolor{keywordtype}{int}
+00065     os_cfar_2d_vc_impl::calculate_output_stream_length(\textcolor{keyword}{const} gr\_vector\_int &ninput\_items)
+00066     \{
+00067       \textcolor{keywordtype}{int} noutput\_items = 0;
+00068       \textcolor{keywordflow}{return} noutput\_items ;
+00069     \}
+00070     
+00071     \textcolor{keywordtype}{void}
+00072     os_cfar_2d_vc_impl::set_rel_threshold(\textcolor{keywordtype}{float} inp)\{
+00073         d_rel_threshold = inp;
+00074     \}
+00075     
+00076     \textcolor{keywordtype}{void}
+00077     os_cfar_2d_vc_impl::set_mult_threshold(\textcolor{keywordtype}{float} inp)\{
+00078         d_mult_threshold = inp;
+00079     \}
+00080     
+00081     \textcolor{keywordtype}{void}
+00082     os_cfar_2d_vc_impl::set_samp_compare(std::vector<int> inp)\{
+00083         d_samp_compare = inp;
+00084     \}
+00085     
+00086     \textcolor{keywordtype}{void}
+00087     os_cfar_2d_vc_impl::set_samp_protect(std::vector<int> inp)\{
+00088         d_samp_protect = inp;
+00089     \}
+00090 
+00091     \textcolor{keywordtype}{int}
+00092     os_cfar_2d_vc_impl::work (\textcolor{keywordtype}{int} noutput\_items,
+00093                        gr\_vector\_int &ninput\_items,
+00094                        gr\_vector\_const\_void\_star &input\_items,
+00095                        gr\_vector\_void\_star &output\_items)
+00096     \{
+00097         \textcolor{keyword}{const} gr\_complex *in = (\textcolor{keyword}{const} gr\_complex *) input\_items[0];
+00098 
+00099         \textcolor{comment}{// OS-CFAR detection (2D)}
+00100         
+00101         \textcolor{comment}{// Get mean power}
+00102         \textcolor{keywordtype}{int} ylen = ninput\_items[0]; \textcolor{comment}{// size of y axis}
+00103         \textcolor{keywordtype}{float} mean\_power = 0;
+00104         \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} x=0; x<d_vlen; x++)\{ \textcolor{comment}{// go through x axis}
+00105             \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} y=0; y<ylen; y++)\{ \textcolor{comment}{// go through y axis}
+00106                 mean\_power += std::pow(std::abs(in[x+d\_vlen*y]),2);
+00107             \}
+00108         \}
+00109         mean\_power = mean\_power/d\_vlen/ylen;
+00110         
+00111         \textcolor{comment}{// Go through matrix and select CUT (cell under test)}
+00112         d_x.clear();
+00113         d_y.clear();
+00114         d_power.clear();
+00115         std::vector<float> hold\_samp; \textcolor{comment}{// vector for holding samples}
+00116         \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} x=0; x<d_vlen; x++)\{ \textcolor{comment}{// go through x axis}
+00117             \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} y=0; y<ylen; y++)\{ \textcolor{comment}{// go through y axis}
+00118                 
+00119                 \textcolor{comment}{// Gather samples around CUT, logarithmic values are not possible!}
+00120                 hold\_samp.clear();
+00121                 \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} kx=1; kx<d_samp_compare[0]+1; kx++)\{ \textcolor{comment}{// go through compare samples on x axis}
+00122                     \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} ky=1; ky<d\_samp\_compare[1]+1; ky++)\{ \textcolor{comment}{// go through compare samples on y axis}
+00123                         
+00124                         \textcolor{comment}{// Do not evaluate CUT}
+00125                         \textcolor{keywordflow}{if}(kx==0 && ky==0) \textcolor{keywordflow}{continue};
+00126                         
+00127                         \textcolor{comment}{// Check lower right corner of the compare field}
+00128                         \textcolor{keywordflow}{if}(x+kx+d\_samp\_compare[0]>=d\_vlen || y+ky+d\_samp\_compare[1]>=ylen)\{ \textcolor{comment}{// push back
+       mean\_power if not in matrix}
+00129                             hold\_samp.push\_back(mean\_power);
+00130                         \}
+00131                         \textcolor{keywordflow}{else}\{ \textcolor{comment}{// push back value of the matrix}
+00132                             hold\_samp.push\_back(std::pow(std::abs(in[x+kx+d\_samp\_compare[0]+d\_vlen*(
+      y+ky+d\_samp\_compare[1])]),2));
+00133                         \}
+00134                         
+00135                         \textcolor{comment}{// Check upper right corner of the compare field}
+00136                         \textcolor{keywordflow}{if}(x+kx+d\_samp\_compare[0]>=d\_vlen || y-ky-d\_samp\_compare[1]<0)\{ \textcolor{comment}{// push back
+       mean\_power if not in matrix}
+00137                             hold\_samp.push\_back(mean\_power);
+00138                         \}
+00139                         \textcolor{keywordflow}{else}\{ \textcolor{comment}{// push back value of the matrix}
+00140                             hold\_samp.push\_back(std::pow(std::abs(in[x+kx+d\_samp\_compare[0]+d\_vlen*(
+      y-ky-d\_samp\_compare[1])]),2));
+00141                         \}
+00142                         
+00143                         \textcolor{comment}{// Check upper left corner of the compare field}
+00144                         \textcolor{keywordflow}{if}(x-kx-d\_samp\_compare[0]<0 || y-ky-d\_samp\_compare[1]<0)\{ \textcolor{comment}{// push back mean\_power
+       if not in matrix}
+00145                             hold\_samp.push\_back(mean\_power);
+00146                         \}
+00147                         \textcolor{keywordflow}{else}\{ \textcolor{comment}{// push back value of the matrix}
+00148                             hold\_samp.push\_back(std::pow(std::abs(in[x-kx-d\_samp\_compare[0]+d\_vlen*(
+      y-ky-d\_samp\_compare[1])]),2));
+00149                         \}
+00150                         
+00151                         \textcolor{comment}{// Check lower left corner of the compare field}
+00152                         \textcolor{keywordflow}{if}(x-kx-d\_samp\_compare[0]<0 || y+ky+d\_samp\_compare[1]>=ylen)\{ \textcolor{comment}{// push back
+       mean\_power if not in matrix}
+00153                             hold\_samp.push\_back(mean\_power);
+00154                         \}
+00155                         \textcolor{keywordflow}{else}\{ \textcolor{comment}{// push back value of the matrix as abs-square}
+00156                             hold\_samp.push\_back(std::pow(std::abs(in[x-kx-d\_samp\_compare[0]+d\_vlen*(
+      y+ky+d\_samp\_compare[1])]),2));
+00157                         \}
+00158                         
+00159                     \}
+00160                 \}
+00161                 
+00162                 \textcolor{comment}{// Sort d\_hold vector}
+00163                 std::sort(hold\_samp.begin(),hold\_samp.end());
+00164                 
+00165                 \textcolor{comment}{// Accept CUT if pow(abs(sort\_vector[len\_sort\_vector*rel\_threshold]*mult\_threshold),2) <
+       pow(abs(value\_CUT),2)}
+00166                 \textcolor{keywordtype}{float} compare\_value = hold\_samp[int((hold\_samp.size()-1)*
+      d_rel_threshold)]*d_mult_threshold;
+00167                 \textcolor{keywordflow}{if}(compare\_value < std::pow(std::abs(in[x+d\_vlen*y]),2))\{
+00168                     d_x.push\_back(x);
+00169                     d_y.push\_back(y);
+00170                     d_power.push\_back(std::pow(std::abs(in[x+d\_vlen*y]),2));
+00171                 \}
+00172                 
+00173             \}
+00174         \}
+00175         
+00176         \textcolor{comment}{// Get rx\_time tag}
+00177         get\_tags\_in\_range(d_tags,0,nitems\_read(0),nitems\_read(0)+1,pmt::string\_to\_symbol(\textcolor{stringliteral}{"rx\_time"}));
+00178         
+00179         \textcolor{comment}{// Setup output msg}
+00180         \textcolor{keywordflow}{if}(d_tags.size()>0) d_ptimestamp = pmt::list2(pmt::string\_to\_symbol(\textcolor{stringliteral}{"rx\_time"}),
+      d_tags[0].value);
+00181         \textcolor{keywordflow}{else} d_ptimestamp = pmt::list2(pmt::string\_to\_symbol(\textcolor{stringliteral}{"rx\_time"}),pmt::make\_tuple(pmt::from\_uint64(0)
+      ,pmt::from\_double(-1))); \textcolor{comment}{// if no timetag is found, set to 0 and frac\_sec to -1}
+00182         d_ppower = pmt::list2(pmt::string\_to\_symbol(\textcolor{stringliteral}{"power"}),pmt::init\_f32vector(
+      d_power.size(),d_power));
+00183         d_px = pmt::list2(pmt::string\_to\_symbol(\textcolor{stringliteral}{"axis\_x"}),pmt::init\_f32vector(
+      d_x.size(),d_x));
+00184         d_py = pmt::list2(pmt::string\_to\_symbol(\textcolor{stringliteral}{"axis\_y"}),pmt::init\_f32vector(
+      d_y.size(),d_y));
+00185         d_value = pmt::list4(d_ptimestamp,d_px,d_py,d_ppower);
+00186         
+00187         \textcolor{comment}{// Publish message}
+00188         message\_port\_pub(d_port_id,d_value);
+00189 
+00190         \textcolor{comment}{// Tell runtime system how many output items we produced.}
+00191         \textcolor{keywordflow}{return} 0;
+00192     \}
+00193 
+00194   \} \textcolor{comment}{/* namespace radar */}
+00195 \} \textcolor{comment}{/* namespace gr */}
+00196 
+\end{DoxyCode}

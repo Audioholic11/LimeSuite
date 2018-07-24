@@ -1,0 +1,84 @@
+\subsection{Types.\+h}
+\label{Types_8h_source}\index{/home/erik/prefix/default/src/soapysdr/include/\+Soapy\+S\+D\+R/\+Types.\+h@{/home/erik/prefix/default/src/soapysdr/include/\+Soapy\+S\+D\+R/\+Types.\+h}}
+
+\begin{DoxyCode}
+00001 
+00011 \textcolor{preprocessor}{#pragma once}
+00012 \textcolor{preprocessor}{#include <SoapySDR/Config.h>}
+00013 \textcolor{preprocessor}{#include <stddef.h>} \textcolor{comment}{//size\_t}
+00014 
+00015 \textcolor{preprocessor}{#ifdef \_\_cplusplus}
+00016 \textcolor{keyword}{extern} \textcolor{stringliteral}{"C"} \{
+00017 \textcolor{preprocessor}{#endif}
+00018 
+00020 \textcolor{keyword}{typedef} \textcolor{keyword}{struct}
+00021 \{
+00022     \textcolor{keywordtype}{double} minimum;
+00023     \textcolor{keywordtype}{double} maximum;
+00024     \textcolor{keywordtype}{double} step;
+00025 \} SoapySDRRange;
+00026 
+00028 \textcolor{keyword}{typedef} \textcolor{keyword}{struct}
+00029 \{
+00030     \textcolor{keywordtype}{size\_t} size;
+00031     \textcolor{keywordtype}{char} **keys;
+00032     \textcolor{keywordtype}{char} **vals;
+00033 \} SoapySDRKwargs;
+00034 
+00039 SOAPY_SDR_API SoapySDRKwargs SoapySDRKwargs_fromString(\textcolor{keyword}{const} \textcolor{keywordtype}{char} *markup);
+00040 
+00045 SOAPY_SDR_API \textcolor{keywordtype}{char} *SoapySDRKwargs_toString(\textcolor{keyword}{const} SoapySDRKwargs *args);
+00046 
+00048 \textcolor{keyword}{typedef} \textcolor{keyword}{enum}
+00049 \{
+00050     SOAPY_SDR_ARG_INFO_BOOL,
+00051     SOAPY_SDR_ARG_INFO_INT,
+00052     SOAPY_SDR_ARG_INFO_FLOAT,
+00053     SOAPY_SDR_ARG_INFO_STRING
+00054 \} SoapySDRArgInfoType;
+00055 
+00057 \textcolor{keyword}{typedef} \textcolor{keyword}{struct}
+00058 \{
+00060     \textcolor{keywordtype}{char} *key;
+00061 
+00067     \textcolor{keywordtype}{char} *value;
+00068 
+00070     \textcolor{keywordtype}{char} *name;
+00071 
+00073     \textcolor{keywordtype}{char} *description;
+00074 
+00076     \textcolor{keywordtype}{char} *units;
+00077 
+00079     SoapySDRArgInfoType type;
+00080 
+00086     SoapySDRRange range;
+00087 
+00089     \textcolor{keywordtype}{size\_t} numOptions;
+00090 
+00095     \textcolor{keywordtype}{char} **options;
+00096 
+00101     \textcolor{keywordtype}{char} **optionNames;
+00102 
+00103 \} SoapySDRArgInfo;
+00104 
+00109 SOAPY_SDR_API \textcolor{keywordtype}{void} SoapySDRStrings_clear(\textcolor{keywordtype}{char} ***elems, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} length);
+00110 
+00114 SOAPY_SDR_API \textcolor{keywordtype}{void} SoapySDRKwargs_set(SoapySDRKwargs *args, \textcolor{keyword}{const} \textcolor{keywordtype}{char} *key, \textcolor{keyword}{const} \textcolor{keywordtype}{char} *
+      val);
+00115 
+00120 SOAPY_SDR_API \textcolor{keyword}{const} \textcolor{keywordtype}{char} *SoapySDRKwargs_get(SoapySDRKwargs *args, \textcolor{keyword}{const} \textcolor{keywordtype}{char} *key);
+00121 
+00126 SOAPY_SDR_API \textcolor{keywordtype}{void} SoapySDRKwargs_clear(SoapySDRKwargs *args);
+00127 
+00132 SOAPY_SDR_API \textcolor{keywordtype}{void} SoapySDRKwargsList_clear(SoapySDRKwargs *args, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} 
+      length);
+00133 
+00138 SOAPY_SDR_API \textcolor{keywordtype}{void} SoapySDRArgInfo_clear(SoapySDRArgInfo *info);
+00139 
+00144 SOAPY_SDR_API \textcolor{keywordtype}{void} SoapySDRArgInfoList_clear(SoapySDRArgInfo *info, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} 
+      length);
+00145 
+00146 \textcolor{preprocessor}{#ifdef \_\_cplusplus}
+00147 \}
+00148 \textcolor{preprocessor}{#endif}
+\end{DoxyCode}

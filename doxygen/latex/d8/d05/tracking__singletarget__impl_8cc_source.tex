@@ -1,0 +1,388 @@
+\subsection{tracking\+\_\+singletarget\+\_\+impl.\+cc}
+\label{tracking__singletarget__impl_8cc_source}\index{/home/erik/prefix/default/src/gr-\/radar-\/dev/lib/tracking\+\_\+singletarget\+\_\+impl.\+cc@{/home/erik/prefix/default/src/gr-\/radar-\/dev/lib/tracking\+\_\+singletarget\+\_\+impl.\+cc}}
+
+\begin{DoxyCode}
+00001 \textcolor{comment}{/* -*- c++ -*- */}
+00002 \textcolor{comment}{/* }
+00003 \textcolor{comment}{ * Copyright 2014 Communications Engineering Lab, KIT.}
+00004 \textcolor{comment}{ * }
+00005 \textcolor{comment}{ * This is free software; you can redistribute it and/or modify}
+00006 \textcolor{comment}{ * it under the terms of the GNU General Public License as published by}
+00007 \textcolor{comment}{ * the Free Software Foundation; either version 3, or (at your option)}
+00008 \textcolor{comment}{ * any later version.}
+00009 \textcolor{comment}{ * }
+00010 \textcolor{comment}{ * This software is distributed in the hope that it will be useful,}
+00011 \textcolor{comment}{ * but WITHOUT ANY WARRANTY; without even the implied warranty of}
+00012 \textcolor{comment}{ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the}
+00013 \textcolor{comment}{ * GNU General Public License for more details.}
+00014 \textcolor{comment}{ * }
+00015 \textcolor{comment}{ * You should have received a copy of the GNU General Public License}
+00016 \textcolor{comment}{ * along with this software; see the file COPYING.  If not, write to}
+00017 \textcolor{comment}{ * the Free Software Foundation, Inc., 51 Franklin Street,}
+00018 \textcolor{comment}{ * Boston, MA 02110-1301, USA.}
+00019 \textcolor{comment}{ */}
+00020 
+00021 \textcolor{preprocessor}{#ifdef HAVE\_CONFIG\_H}
+00022 \textcolor{preprocessor}{#include "config.h"}
+00023 \textcolor{preprocessor}{#endif}
+00024 
+00025 \textcolor{preprocessor}{#include <gnuradio/io\_signature.h>}
+00026 \textcolor{preprocessor}{#include "tracking_singletarget_impl.h"}
+00027 \textcolor{preprocessor}{#include <time.h>}
+00028 
+00029 \textcolor{keyword}{namespace }gr \{
+00030   \textcolor{keyword}{namespace }radar \{
+00031 
+00032     tracking_singletarget::sptr
+00033     tracking_singletarget::make(\textcolor{keywordtype}{int} num\_particle, \textcolor{keywordtype}{float} std\_range\_meas, \textcolor{keywordtype}{float} std\_velocity\_meas, \textcolor{keywordtype}{float} 
+      std\_accel\_sys, \textcolor{keywordtype}{float} threshold\_track, \textcolor{keywordtype}{int} threshold\_lost, std::string filter)
+00034     \{
+00035       \textcolor{keywordflow}{return} gnuradio::get\_initial\_sptr
+00036         (\textcolor{keyword}{new} tracking_singletarget_impl(num\_particle, std\_range\_meas, std\_velocity\_meas, std\_accel\_sys, 
+      threshold\_track, threshold\_lost, filter));
+00037     \}
+00038 
+00039     \textcolor{comment}{/*}
+00040 \textcolor{comment}{     * The private constructor}
+00041 \textcolor{comment}{     */}
+00042     tracking_singletarget_impl::tracking_singletarget_impl(\textcolor{keywordtype}{int} num\_particle, \textcolor{keywordtype}{float} std\_range\_meas, \textcolor{keywordtype}{float} 
+      std\_velocity\_meas, \textcolor{keywordtype}{float} std\_accel\_sys, \textcolor{keywordtype}{float} threshold\_track, \textcolor{keywordtype}{int} threshold\_lost, 
+      std::string filter)
+00043       : gr::block(\textcolor{stringliteral}{"tracking\_singletarget"},
+00044               gr::io\_signature::make(0,0,0),
+00045               gr::io\_signature::make(0,0,0))
+00046     \{
+00047         d_num_particle = num\_particle;
+00048         d_std_range_meas = std\_range\_meas;
+00049         d_std_velocity_meas = std\_velocity\_meas;
+00050         d_std_accel_sys = std\_accel\_sys;
+00051         d_threshold_track = threshold\_track;
+00052         d_threshold_lost = threshold\_lost;
+00053         d_filter = filter;
+00054         
+00055         \textcolor{comment}{// Register input message port}
+00056         d_port_id_in = pmt::mp(\textcolor{stringliteral}{"Msg in"});
+00057         message\_port\_register\_in(d_port_id_in);
+00058         set\_msg\_handler(d_port_id_in, boost::bind(&
+      tracking_singletarget_impl::handle_msg, \textcolor{keyword}{this}, \_1));
+00059         
+00060         \textcolor{comment}{// Register output message port}
+00061         d_port_id_out = pmt::mp(\textcolor{stringliteral}{"Msg out"});
+00062         message\_port\_register\_out(d_port_id_out);
+00063         
+00064         \textcolor{comment}{// Setup random numbers (seed)}
+00065         std::srand(time(NULL));
+00066         
+00067         \textcolor{comment}{// Setup tracker}
+00068         d_particle_range.resize(num\_particle); \textcolor{comment}{// num particles}
+00069         d_particle_velocity.resize(num\_particle);
+00070         d_particle_weight.resize(num\_particle);
+00071         
+00072         \textcolor{keywordtype}{int} matrix\_size = 2; \textcolor{comment}{// setup matrix}
+00073         Q.resize(matrix\_size); R.resize(matrix\_size); R_inv.resize(matrix\_size), 
+      P.resize(matrix\_size), K.resize(matrix\_size);
+00074         \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} k=0; k<matrix\_size; k++)\{
+00075             Q[k].resize(matrix\_size);
+00076             R[k].resize(matrix\_size);
+00077             R_inv[k].resize(matrix\_size);
+00078             P[k].resize(matrix\_size);
+00079             K[k].resize(matrix\_size);
+00080         \}
+00081         
+00082         d_lost = 0; \textcolor{comment}{// number of lost tracks}
+00083         d_is_track = \textcolor{keyword}{false}; \textcolor{comment}{// is a track active}
+00084         
+00085         \textcolor{comment}{// Setup measurement variance}
+00086         R[0][0] = d_std_range_meas*d_std_range_meas;
+00087         R[1][1] = std\_velocity\_meas*std\_velocity\_meas;
+00088         
+00089         R_det = R[0][0]*R[1][1];
+00090         R_inv[0][0] = R[1][1]/R_det;
+00091         R_inv[1][1] = R[0][0]/R_det;
+00092     \}
+00093 
+00094     \textcolor{comment}{/*}
+00095 \textcolor{comment}{     * Our virtual destructor.}
+00096 \textcolor{comment}{     */}
+00097     tracking_singletarget_impl::~tracking_singletarget_impl()
+00098     \{
+00099     \}
+00100     
+00101     \textcolor{keywordtype}{void}
+00102     tracking_singletarget_impl::handle_msg(pmt::pmt\_t msg)
+00103     \{   
+00104         \textcolor{keywordtype}{size\_t} size\_msg;
+00105         \textcolor{keywordtype}{bool} range\_found, velocity\_found, time\_found;
+00106         range\_found = \textcolor{keyword}{false};
+00107         velocity\_found = \textcolor{keyword}{false};
+00108         time\_found = \textcolor{keyword}{false};
+00109         std::vector<pmt::pmt\_t> store\_msg;
+00110         
+00111         size\_msg = pmt::length(msg);
+00112         pmt::pmt\_t msg\_part;
+00113         \textcolor{comment}{// Go through msg and search for key symbols "range" and "velocity" (or other keys!) and get data}
+00114         \textcolor{comment}{// This is singletarget tracker! Taken only first item of vector}
+00115         \textcolor{comment}{// FIXME: error handling for false input? e.g. multi target input (throw warning)}
+00116         std::vector<float> vec\_pmt;
+00117         d_is_empty = \textcolor{keyword}{false}; \textcolor{comment}{// check if range or velocity is empty}
+00118         \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} k=0; k<size\_msg; k++)\{ \textcolor{comment}{// FIXME: errorhandling for wrong input?}
+00119             msg\_part = pmt::nth(k,msg);
+00120             \textcolor{keywordflow}{if}(pmt::symbol\_to\_string(pmt::nth(0,msg\_part))==\textcolor{stringliteral}{"range"})\{
+00121                 vec\_pmt = (pmt::f32vector\_elements(pmt::nth(1,msg\_part)));
+00122                 \textcolor{keywordflow}{if}(vec\_pmt.size()!=0)d_range_meas = vec\_pmt[0];
+00123                 \textcolor{keywordflow}{else} d_is_empty = \textcolor{keyword}{true};
+00124                 range\_found = \textcolor{keyword}{true};
+00125             \}
+00126             \textcolor{keywordflow}{else} \textcolor{keywordflow}{if}(pmt::symbol\_to\_string(pmt::nth(0,msg\_part))==\textcolor{stringliteral}{"velocity"})\{
+00127                 vec\_pmt = (pmt::f32vector\_elements(pmt::nth(1,msg\_part)));
+00128                 \textcolor{keywordflow}{if}(vec\_pmt.size()!=0) d_velocity_meas = vec\_pmt[0];
+00129                 \textcolor{keywordflow}{else} d_is_empty = \textcolor{keyword}{true};
+00130                 velocity\_found = \textcolor{keyword}{true};
+00131             \}
+00132             \textcolor{keywordflow}{else} \textcolor{keywordflow}{if}(pmt::symbol\_to\_string(pmt::nth(0,msg\_part))==\textcolor{stringliteral}{"rx\_time"})\{
+00133                 d_time = (float)pmt::to\_uint64(pmt::tuple\_ref(pmt::nth(1,msg\_part),0)) + pmt::to\_double(
+      pmt::tuple\_ref(pmt::nth(1,msg\_part),1));
+00134                 time\_found = \textcolor{keyword}{true};
+00135                 store\_msg.push\_back(msg\_part); \textcolor{comment}{// store msg, will not be changed}
+00136             \}
+00137             \textcolor{keywordflow}{else}\{
+00138                 \textcolor{comment}{// Store msg part for repacking if no symbol is found}
+00139                 store\_msg.push\_back(msg\_part);
+00140             \}
+00141         \}
+00142         
+00143         \textcolor{comment}{// Do tracking if both variables are found, else throw error}
+00144         \textcolor{keywordtype}{bool} state\_tracking;
+00145         \textcolor{keywordflow}{if}(range\_found&&velocity\_found&&time\_found) state\_tracking = tracking();
+00146         \textcolor{keywordflow}{else} \textcolor{keywordflow}{throw} std::runtime\_error(\textcolor{stringliteral}{"range or velocity or time not found"});
+00147         
+00148         \textcolor{keywordflow}{if}(state\_tracking)\{
+00149             \textcolor{comment}{// Repack msg}
+00150             pmt::pmt\_t msg\_out;
+00151             \textcolor{keywordflow}{if}(store\_msg.size()!=0)\{ \textcolor{comment}{// if msgs are stored add them}
+00152                 msg\_out = pmt::list1(store\_msg[0]);
+00153                 \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} k=1; k<store\_msg.size(); k++)\{
+00154                     msg\_out = pmt::list\_add(msg\_out, store\_msg[k]);
+00155                 \}
+00156             \}
+00157             pmt::pmt\_t msg\_val;
+00158             std::vector<float> f32\_val;
+00159             \textcolor{comment}{// Add velocity}
+00160             f32\_val.push\_back(d_velocity_est);
+00161             msg\_val = pmt::list2(pmt::string\_to\_symbol(\textcolor{stringliteral}{"velocity"}),pmt::init\_f32vector(f32\_val.size(), 
+      f32\_val));
+00162             \textcolor{keywordflow}{if}(store\_msg.size()!=0)\{ \textcolor{comment}{// if a pmt list is created before}
+00163                 msg\_out = pmt::list\_add(msg\_out, msg\_val);
+00164             \}\textcolor{keywordflow}{else}\{ \textcolor{comment}{// if msg\_out is not a pmt list}
+00165                 msg\_out = pmt::list1(msg\_val);
+00166             \}
+00167             \textcolor{comment}{// Add range}
+00168             f32\_val.clear();
+00169             f32\_val.push\_back(d_range_est);
+00170             msg\_val = pmt::list2(pmt::string\_to\_symbol(\textcolor{stringliteral}{"range"}),pmt::init\_f32vector(f32\_val.size(), f32\_val
+      ));
+00171             msg\_out = pmt::list\_add(msg\_out, msg\_val);
+00172             
+00173             \textcolor{comment}{// Publish msg}
+00174             message\_port\_pub(d_port_id_out,msg\_out);
+00175         \}
+00176     \}
+00177     
+00178     \textcolor{keywordtype}{float}
+00179     tracking_singletarget_impl::random_normal(\textcolor{keywordtype}{float} mean, \textcolor{keywordtype}{float} std)\{
+00180         \textcolor{keywordtype}{int} num\_range = 1000000;
+00181         \textcolor{keywordtype}{float} v1 = (rand()%num\_range)/(\textcolor{keywordtype}{float})num\_range;
+00182         \textcolor{keywordtype}{float} v2 = (rand()%num\_range)/(\textcolor{keywordtype}{float})num\_range;
+00183         \textcolor{keywordflow}{return} mean+std*std::sqrt(-2*std::log(v1)) * std::cos(2*M\_PI*v2);
+00184     \}
+00185     
+00186     \textcolor{keywordtype}{void} \textcolor{comment}{// begin kalman-filter}
+00187     tracking_singletarget_impl::filter_kalman()\{
+00188         \textcolor{keywordtype}{float} a, b, c, d, factor;
+00189         \textcolor{comment}{/* predection based on system-model */}
+00190         d_range_est = d_range_est - d_delta_t * d_velocity_est; \textcolor{comment}{// r\_k = r\_k-1 + delta\_T * v\_k-1 // v\_k =
+       v\_k-1 }
+00191         \textcolor{comment}{// calc state-covariance matrix}
+00192         P[0][0] = P[0][0]+P[1][0]*d_delta_t+d_delta_t*(P[0][1]+d_delta_t*P[1][1])+
+      Q[0][0];
+00193         P[0][1] = P[0][1]+d_delta_t*P[1][1]+Q[0][1];
+00194         P[1][0] = P[1][0]+d_delta_t*P[1][1]+Q[1][0];
+00195         P[1][1] = P[1][1] + Q[1][1];
+00196         
+00197         \textcolor{comment}{/*  filtering based on new measurement */}
+00198         \textcolor{comment}{// calc Kalman-Gain: K = P*H'/(H*P*H'+R) here: K = P/(P+R)}
+00199         a = P[0][0]+R[0][0];
+00200         b = P[0][1]+R[0][1];
+00201         c = P[1][0]+R[1][0];
+00202         d = P[1][1]+R[1][1];
+00203         factor = 1/(a*d-b*c); \textcolor{comment}{// for 2x2 matrix invers}
+00204         K[0][0] = factor * (d*P[0][0] - c*P[0][1]);
+00205         K[0][1] = factor * (a*P[0][1] - b*P[0][0]);
+00206         K[1][0] = factor * (d*P[1][0] - c*P[1][1]);
+00207         K[1][1] = factor * (a*P[1][1] - b*P[1][0]);
+00208         \textcolor{comment}{// updated state}
+00209         d_range_est = d\_range\_est + K[0][0]*(d_range_meas - d_range_est) + K[0][1]*(
+      d_velocity_meas - d\_velocity\_est);
+00210         d\_velocity\_est = d\_velocity\_est + K[1][0]*(d_range_meas - d_range_est) + K[1][1]*(
+      d_velocity_meas - d\_velocity\_est);
+00211         \textcolor{comment}{// update state-covariance matrix}
+00212         P[0][0] = (1-K[0][0])*P[0][0] - P[1][0]*K[0][1];
+00213         P[0][1] = (1-K[0][0])*P[0][1] - P[1][1]*K[0][1];
+00214         P[1][0] = (1-K[1][1])*P[1][0] - P[0][0]*K[1][0];
+00215         P[1][1] = (1-K[1][1])*P[1][1] - P[0][1]*K[1][0];
+00216     \} \textcolor{comment}{// end kalman-filter}
+00217     
+00218     \textcolor{keywordtype}{void} \textcolor{comment}{// begin particle filter}
+00219     tracking_singletarget_impl::filter_particle()\{
+00220         \textcolor{keywordtype}{float} lh, range\_dif, velocity\_dif;
+00221         \textcolor{keywordtype}{float} sum\_weight, sum\_weight\_square;
+00222         sum\_weight = 0;
+00223         sum\_weight\_square = 0;
+00224         \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} k=0; k<d_num_particle; k++)\{
+00225             \textcolor{comment}{// sample particles from time prosecution}
+00226             d_particle_range[k] = random_normal(d_particle_range[k]-
+      d_particle_velocity[k]*d_delta_t, std::sqrt(Q[0][0]));
+00227             d_particle_velocity[k] = random_normal(d_particle_velocity[k], std::sqrt(
+      Q[1][1]));
+00228             range\_dif = d_range_meas-d_particle_range[k];
+00229             velocity\_dif = d_velocity_meas-d_particle_velocity[k];
+00230             lh = std::exp(-0.5*(range\_dif*range\_dif*R_inv[0][0]+velocity\_dif*velocity\_dif*
+      R_inv[1][1]))/2/M\_PI/std::sqrt(R_det); \textcolor{comment}{// get likelihood}
+00231             d_particle_weight[k] = d_particle_weight[k]*lh;
+00232             \textcolor{comment}{// calc sum of weights and sum of weight square}
+00233             sum\_weight = sum\_weight + d_particle_weight[k];
+00234             sum\_weight\_square = sum\_weight\_square + d\_particle\_weight[k]*d\_particle\_weight[
+      k];
+00235         \}
+00236         \textcolor{comment}{// normalize particle-weight ( sum(particle\_weight =! 1))}
+00237         \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} k=0; k<d_num_particle; k++) d_particle_weight[k] = 
+      d_particle_weight[k]/sum\_weight;
+00238         \textcolor{keywordtype}{float} n\_eff = 1/(float)sum\_weight\_square; \textcolor{comment}{// measure of degeneracy}
+00239         \textcolor{keywordflow}{if}(n\_eff<d\_num\_particle/(\textcolor{keywordtype}{float})2)\{ \textcolor{comment}{// if degeneracy is to high --> systematic resampling}
+00240             \textcolor{keywordtype}{int} num\_range = 1000000;
+00241             \textcolor{keywordtype}{float} u1 = (rand()%num\_range)/(\textcolor{keywordtype}{float})num\_range; \textcolor{comment}{// sample random starting index ...}
+00242             u1 = u1/d_num_particle; \textcolor{comment}{// ... and normalize}
+00243             std::vector<float> cum\_weight;
+00244             cum\_weight.resize(d\_num\_particle);
+00245             cum\_weight[0] = d_particle_weight[0];
+00246             \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} k=1; k<d_num_particle; k++)\{ \textcolor{comment}{// calc cummulativ sum of all particles}
+00247                 cum\_weight[k] = cum\_weight[k-1]+d_particle_weight[k];
+00248             \}
+00249             \textcolor{keywordtype}{int} i = 0;
+00250             std::vector<float> u;
+00251             u.resize(d\_num\_particle);
+00252             std::vector<int> index;
+00253             index.resize(d\_num\_particle);
+00254             \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} k=0; k<d_num_particle; k++)\{
+00255                 u[k] = u1+k/(float)d\_num\_particle;
+00256                 \textcolor{keywordflow}{while}(u[k]>cum\_weight[i])\{
+00257                     i++;
+00258                 \}
+00259                 index[k] = i; \textcolor{comment}{// chose particle indexes with high weight}
+00260             \}
+00261             \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} k=0; k<d_num_particle; k++)\{
+00262                 d_particle_range[k] = d_particle_range[index[k]]; \textcolor{comment}{// resample only those particles with
+       high weight ...}
+00263                 d_particle_velocity[k] = d_particle_velocity[index[k]];
+00264                 d_particle_weight[k] = 1/(float)d\_num\_particle; \textcolor{comment}{// ... and set particle\_weight to the same
+       value}
+00265             \}
+00266         \}
+00267         
+00268         d_range_est = 0;
+00269         d_velocity_est = 0;
+00270         \textcolor{comment}{// calc mean of all weighted particles to get the estimated state}
+00271         \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} k=0; k<d_num_particle; k++)\{
+00272             d_range_est += d_particle_range[k]*d_particle_weight[k];
+00273             d_velocity_est += d_particle_velocity[k]*d\_particle\_weight[k];
+00274         \}
+00275     \} \textcolor{comment}{// end particle filter}
+00276     
+00277     \textcolor{keywordtype}{bool}
+00278     tracking_singletarget_impl::tracking()\{ 
+00279         \textcolor{keywordtype}{bool} is\_valid = not(d_is_empty); \textcolor{comment}{// measurement is valid if vectors are not empty}
+00280             
+00281         \textcolor{comment}{// Calc time difference and matrix Q}
+00282         d_delta_t = d_time-d_time_last; \textcolor{comment}{// time difference}
+00283         d\_time\_last = d_time;
+00284         
+00285         Q[0][0] = 0.25*std::pow(d_delta_t,4)*d_std_accel_sys*d_std_accel_sys;
+00286         Q[0][1] = 0.5*std::pow(d_delta_t,3)*d\_std\_accel\_sys*d_std_accel_sys;
+00287         Q[1][0] = 0.5*std::pow(d_delta_t,3)*d\_std\_accel\_sys*d_std_accel_sys;
+00288         Q[1][1] = std::pow(d_delta_t,2)*d\_std\_accel\_sys*d_std_accel_sys;
+00289         
+00290         \textcolor{comment}{// Do tracking}
+00291         \textcolor{keywordflow}{if}(d_is_track)\{ \textcolor{comment}{// check if track is available}
+00292             \textcolor{keywordflow}{if}(is\_valid)\{ \textcolor{comment}{// check if measurement is valid}
+00293                 \textcolor{keywordtype}{float} range\_dif, velocity\_dif;
+00294                 range\_dif = d_range_meas-d_range_est;
+00295                 velocity\_dif = d_velocity_meas-d_velocity_est;
+00296                 \textcolor{keywordtype}{float} lh = std::exp(-0.5*(range\_dif*range\_dif*R_inv[0][0]+velocity\_dif*velocity\_dif*
+      R_inv[1][1]))/2/M\_PI/std::sqrt(R_det); \textcolor{comment}{// calc likelihood}
+00297                 
+00298                 \textcolor{keywordflow}{if}(d_threshold_track<lh)\{ \textcolor{comment}{// if new sample is accepted as track}
+00299                     \textcolor{keywordflow}{if}(d_filter == \textcolor{stringliteral}{"particle"}) filter_particle();
+00300                     \textcolor{keywordflow}{else} \textcolor{keywordflow}{if}(d_filter == \textcolor{stringliteral}{"kalman"}) filter_kalman();
+00301                     \textcolor{keywordflow}{else} \textcolor{keywordflow}{throw} std::runtime\_error(\textcolor{stringliteral}{"No suitable filter found for given identifier."});
+00302                     d_lost = 0;
+00303                 \}
+00304                 \textcolor{keywordflow}{else}\{ \textcolor{comment}{// if sample is rejected, do simple estimation based on system model (v=const,
+       R=v*dt)}
+00305                     d\_range\_est = d\_range\_est-d\_velocity\_est*d_delta_t; \textcolor{comment}{// velocity < 0 for movement to
+       radar; v=const.}
+00306                     d_lost++;
+00307                     \textcolor{keywordflow}{if}(d_lost>d_threshold_lost)\{
+00308                         d_is_track = \textcolor{keyword}{false};
+00309                         \textcolor{keywordflow}{return} \textcolor{keyword}{false}; \textcolor{comment}{// tracking is not successfull}
+00310                     \}
+00311                 \}
+00312             \}
+00313             \textcolor{keywordflow}{else}\{ \textcolor{comment}{// if sample is rejected, do simple estimation based on system model (v=const, R=v*dt)}
+00314                 d_range_est = d_range_est-d_velocity_est*d_delta_t; \textcolor{comment}{// velocity < 0 for movement to radar;
+       v=const.}
+00315                 d_lost++;
+00316                 \textcolor{keywordflow}{if}(d_lost>d_threshold_lost)\{
+00317                     d_is_track = \textcolor{keyword}{false};
+00318                     \textcolor{keywordflow}{return} \textcolor{keyword}{false}; \textcolor{comment}{// tracking is not successfull}
+00319                 \}
+00320             \}
+00321         \}
+00322         \textcolor{keywordflow}{else}\{ \textcolor{comment}{// if track is not available}
+00323             \textcolor{keywordflow}{if}(is\_valid)\{ \textcolor{comment}{// if measurement is valid, do initializiation; else do nothing}
+00324                 \textcolor{keywordflow}{if}(d_filter == \textcolor{stringliteral}{"particle"})\{ \textcolor{comment}{// initialize particle filter}
+00325                     \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} k=0; k<d_num_particle; k++)\{
+00326                         \textcolor{comment}{// samle particles from importance density based on first measurement}
+00327                         d_particle_range[k] = random_normal(d_range_meas, 
+      d_std_range_meas);
+00328                         d_particle_velocity[k] = random_normal(d_velocity_meas, 
+      d_std_velocity_meas);
+00329                         d_particle_weight[k] = 1/float(d\_num\_particle); \textcolor{comment}{// set all particle\_weights to the
+       same value}
+00330                     \}
+00331                 \}
+00332                 \textcolor{keywordflow}{else} \textcolor{keywordflow}{if}(d_filter == \textcolor{stringliteral}{"kalman"})\{ \textcolor{comment}{// initialize state-covariance matrix for the kalman filter}
+00333                     P[0][0] = d_std_range_meas * d_std_range_meas;
+00334                     P[0][1] = 0;
+00335                     P[1][0] = 0;
+00336                     P[1][1] = d_std_velocity_meas * d_std_velocity_meas;
+00337                 \}
+00338                 \textcolor{keywordflow}{else} \textcolor{keywordflow}{throw} std::runtime\_error(\textcolor{stringliteral}{"No suitable filter found for given identifier."});                    
+00339                 \textcolor{comment}{// use first range & velocity measurement to intialize the state}
+00340                 d_range_est = d_range_meas;
+00341                 d_velocity_est = d_velocity_meas;
+00342                 d_is_track = \textcolor{keyword}{true};
+00343                 d_lost = 0;
+00344             \}
+00345             \textcolor{keywordflow}{else}\{
+00346                 d_is_track = \textcolor{keyword}{false};
+00347                 d_lost = 0;
+00348                 \textcolor{keywordflow}{return} \textcolor{keyword}{false};
+00349             \}
+00350         \}
+00351         \textcolor{keywordflow}{return} \textcolor{keyword}{true}; \textcolor{comment}{// tracking is successfull}
+00352     \}
+00353 
+00354   \} \textcolor{comment}{/* namespace radar */}
+00355 \} \textcolor{comment}{/* namespace gr */}
+00356 
+\end{DoxyCode}

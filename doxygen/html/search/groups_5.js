@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['message_20logging_20level',['Message logging level',['../d2/d60/group__LMS__LOG__LEVEL.html',1,'']]]
+  ['low_2dlevel_20control_20functions',['Low-Level control functions',['../d3/d0a/group__FN__LOW__LVL.html',1,'']]]
 ];

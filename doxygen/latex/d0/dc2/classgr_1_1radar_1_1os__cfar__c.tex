@@ -1,0 +1,178 @@
+\subsection{gr\+:\+:radar\+:\+:os\+\_\+cfar\+\_\+c Class Reference}
+\label{classgr_1_1radar_1_1os__cfar__c}\index{gr\+::radar\+::os\+\_\+cfar\+\_\+c@{gr\+::radar\+::os\+\_\+cfar\+\_\+c}}
+
+
+This block estimates peaks of a given F\+FT spectrum as tagged stream. Multi peak detection is implemented with the O\+S-\/\+C\+F\+AR algorithm. The algorithm uses around the cell under test (C\+UT) on each side samp\+\_\+compare samples to estimate the noise floor. This relative threshold is defined by the bin of the vector within the sorted samp\+\_\+compare samples. A standard value is rel\+\_\+threshold = 0.\+78. The value of this bin is multiplied by mult\+\_\+threshold and compared with the C\+UT. samp\+\_\+protect samples are a protected are which is not used for acquiring compare samples. If consecutive bins are detected as valid peaks it is possible to merge these detections with merge\+\_\+consecutive = true. Output data are f32vectors with the information of frequency, power and phase. The identifiers (symbols) are \textquotesingle{}frequency\textquotesingle{}, \textquotesingle{}power\textquotesingle{} and \textquotesingle{}phase\textquotesingle{}.  
+
+
+
+
+{\ttfamily \#include $<$os\+\_\+cfar\+\_\+c.\+h$>$}
+
+
+
+Inheritance diagram for gr\+:\+:radar\+:\+:os\+\_\+cfar\+\_\+c\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=550pt]{d7/dc8/classgr_1_1radar_1_1os__cfar__c__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for gr\+:\+:radar\+:\+:os\+\_\+cfar\+\_\+c\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=197pt]{d0/d91/classgr_1_1radar_1_1os__cfar__c__coll__graph}
+\end{center}
+\end{figure}
+\subsubsection*{Public Types}
+\begin{DoxyCompactItemize}
+\item 
+typedef boost\+::shared\+\_\+ptr$<$ {\bf os\+\_\+cfar\+\_\+c} $>$ {\bf sptr}
+\end{DoxyCompactItemize}
+\subsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+virtual {\bf void} {\bf set\+\_\+rel\+\_\+threshold} (float inp)=0
+\item 
+virtual {\bf void} {\bf set\+\_\+mult\+\_\+threshold} (float inp)=0
+\item 
+virtual {\bf void} {\bf set\+\_\+samp\+\_\+compare} ({\bf int} inp)=0
+\item 
+virtual {\bf void} {\bf set\+\_\+samp\+\_\+protect} ({\bf int} inp)=0
+\end{DoxyCompactItemize}
+\subsubsection*{Static Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+static {\bf sptr} {\bf make} ({\bf int} samp\+\_\+rate, {\bf int} samp\+\_\+compare, {\bf int} samp\+\_\+protect, float rel\+\_\+threshold, float mult\+\_\+threshold, bool merge\+\_\+consecutive=true, const {\bf std\+::string} \&len\+\_\+key=\char`\"{}packet\+\_\+len\char`\"{})
+\begin{DoxyCompactList}\small\item\em Return a shared\+\_\+ptr to a new instance of \doxyref{radar\+::os\+\_\+cfar\+\_\+c}{p.}{d0/dc2/classgr_1_1radar_1_1os__cfar__c}. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsubsection{Detailed Description}
+This block estimates peaks of a given F\+FT spectrum as tagged stream. Multi peak detection is implemented with the O\+S-\/\+C\+F\+AR algorithm. The algorithm uses around the cell under test (C\+UT) on each side samp\+\_\+compare samples to estimate the noise floor. This relative threshold is defined by the bin of the vector within the sorted samp\+\_\+compare samples. A standard value is rel\+\_\+threshold = 0.\+78. The value of this bin is multiplied by mult\+\_\+threshold and compared with the C\+UT. samp\+\_\+protect samples are a protected are which is not used for acquiring compare samples. If consecutive bins are detected as valid peaks it is possible to merge these detections with merge\+\_\+consecutive = true. Output data are f32vectors with the information of frequency, power and phase. The identifiers (symbols) are \textquotesingle{}frequency\textquotesingle{}, \textquotesingle{}power\textquotesingle{} and \textquotesingle{}phase\textquotesingle{}. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em samp\+\_\+rate} & Sample rate \\
+\hline
+{\em samp\+\_\+compare} & Sample to be compared with each other \\
+\hline
+{\em samp\+\_\+protect} & Samples which are protected and not used for peak detection \\
+\hline
+{\em rel\+\_\+threshold} & Relative threshold \\
+\hline
+{\em mult\+\_\+threshold} & Multiplier threshold \\
+\hline
+{\em merge\+\_\+consectuive} & Toggle merging consecutive detected peaks \\
+\hline
+{\em len\+\_\+key} & Packet length key for tagged stream \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line {\bf 44} of file {\bf os\+\_\+cfar\+\_\+c.\+h}.
+
+
+
+\subsubsection{Member Typedef Documentation}
+\index{gr\+::radar\+::os\+\_\+cfar\+\_\+c@{gr\+::radar\+::os\+\_\+cfar\+\_\+c}!sptr@{sptr}}
+\index{sptr@{sptr}!gr\+::radar\+::os\+\_\+cfar\+\_\+c@{gr\+::radar\+::os\+\_\+cfar\+\_\+c}}
+\paragraph[{sptr}]{\setlength{\rightskip}{0pt plus 5cm}typedef boost\+::shared\+\_\+ptr$<${\bf os\+\_\+cfar\+\_\+c}$>$ {\bf gr\+::radar\+::os\+\_\+cfar\+\_\+c\+::sptr}}\label{classgr_1_1radar_1_1os__cfar__c_a97b7a4703ccd900a4759e48c53be47ed}
+
+
+Definition at line {\bf 47} of file {\bf os\+\_\+cfar\+\_\+c.\+h}.
+
+
+
+\subsubsection{Member Function Documentation}
+\index{gr\+::radar\+::os\+\_\+cfar\+\_\+c@{gr\+::radar\+::os\+\_\+cfar\+\_\+c}!make@{make}}
+\index{make@{make}!gr\+::radar\+::os\+\_\+cfar\+\_\+c@{gr\+::radar\+::os\+\_\+cfar\+\_\+c}}
+\paragraph[{make(int samp\+\_\+rate, int samp\+\_\+compare, int samp\+\_\+protect, float rel\+\_\+threshold, float mult\+\_\+threshold, bool merge\+\_\+consecutive=true, const std\+::string \&len\+\_\+key=""packet\+\_\+len"")}]{\setlength{\rightskip}{0pt plus 5cm}{\bf os\+\_\+cfar\+\_\+c\+::sptr} gr\+::radar\+::os\+\_\+cfar\+\_\+c\+::make (
+\begin{DoxyParamCaption}
+\item[{{\bf int}}]{samp\+\_\+rate, }
+\item[{{\bf int}}]{samp\+\_\+compare, }
+\item[{{\bf int}}]{samp\+\_\+protect, }
+\item[{float}]{rel\+\_\+threshold, }
+\item[{float}]{mult\+\_\+threshold, }
+\item[{bool}]{merge\+\_\+consecutive = {\ttfamily true}, }
+\item[{const {\bf std\+::string} \&}]{len\+\_\+key = {\ttfamily \char`\"{}packet\+\_\+len\char`\"{}}}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [static]}}\label{classgr_1_1radar_1_1os__cfar__c_a22c2281a27c799cee6b77c2e43228510}
+
+
+Return a shared\+\_\+ptr to a new instance of \doxyref{radar\+::os\+\_\+cfar\+\_\+c}{p.}{d0/dc2/classgr_1_1radar_1_1os__cfar__c}. 
+
+To avoid accidental use of raw pointers, \doxyref{radar\+::os\+\_\+cfar\+\_\+c}{p.}{d0/dc2/classgr_1_1radar_1_1os__cfar__c}\textquotesingle{}s constructor is in a private implementation class. \doxyref{radar\+::os\+\_\+cfar\+\_\+c\+::make}{p.}{d0/dc2/classgr_1_1radar_1_1os__cfar__c_a22c2281a27c799cee6b77c2e43228510} is the public interface for creating new instances. 
+
+Definition at line {\bf 32} of file {\bf os\+\_\+cfar\+\_\+c\+\_\+impl.\+cc}.
+
+
+
+Referenced by {\bf \+\_\+wrap\+\_\+os\+\_\+cfar\+\_\+c\+\_\+make()}.
+
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=327pt]{d0/dc2/classgr_1_1radar_1_1os__cfar__c_a22c2281a27c799cee6b77c2e43228510_icgraph}
+\end{center}
+\end{figure}
+
+
+\index{gr\+::radar\+::os\+\_\+cfar\+\_\+c@{gr\+::radar\+::os\+\_\+cfar\+\_\+c}!set\+\_\+mult\+\_\+threshold@{set\+\_\+mult\+\_\+threshold}}
+\index{set\+\_\+mult\+\_\+threshold@{set\+\_\+mult\+\_\+threshold}!gr\+::radar\+::os\+\_\+cfar\+\_\+c@{gr\+::radar\+::os\+\_\+cfar\+\_\+c}}
+\paragraph[{set\+\_\+mult\+\_\+threshold(float inp)=0}]{\setlength{\rightskip}{0pt plus 5cm}virtual {\bf void} gr\+::radar\+::os\+\_\+cfar\+\_\+c\+::set\+\_\+mult\+\_\+threshold (
+\begin{DoxyParamCaption}
+\item[{float}]{inp}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [pure virtual]}}\label{classgr_1_1radar_1_1os__cfar__c_ab54a405c844312f8fb9eeb62b3c4409e}
+
+
+Implemented in {\bf gr\+::radar\+::os\+\_\+cfar\+\_\+c\+\_\+impl} \doxyref{}{p.}{d4/d37/classgr_1_1radar_1_1os__cfar__c__impl_a76de588ab4e26491c86d52774ffc9ce6}.
+
+\index{gr\+::radar\+::os\+\_\+cfar\+\_\+c@{gr\+::radar\+::os\+\_\+cfar\+\_\+c}!set\+\_\+rel\+\_\+threshold@{set\+\_\+rel\+\_\+threshold}}
+\index{set\+\_\+rel\+\_\+threshold@{set\+\_\+rel\+\_\+threshold}!gr\+::radar\+::os\+\_\+cfar\+\_\+c@{gr\+::radar\+::os\+\_\+cfar\+\_\+c}}
+\paragraph[{set\+\_\+rel\+\_\+threshold(float inp)=0}]{\setlength{\rightskip}{0pt plus 5cm}virtual {\bf void} gr\+::radar\+::os\+\_\+cfar\+\_\+c\+::set\+\_\+rel\+\_\+threshold (
+\begin{DoxyParamCaption}
+\item[{float}]{inp}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [pure virtual]}}\label{classgr_1_1radar_1_1os__cfar__c_a228c699ffb518d6c1e3c15a37e4ad225}
+
+
+Implemented in {\bf gr\+::radar\+::os\+\_\+cfar\+\_\+c\+\_\+impl} \doxyref{}{p.}{d4/d37/classgr_1_1radar_1_1os__cfar__c__impl_a39e6f6e7364a9c2693e086b24c107b4b}.
+
+\index{gr\+::radar\+::os\+\_\+cfar\+\_\+c@{gr\+::radar\+::os\+\_\+cfar\+\_\+c}!set\+\_\+samp\+\_\+compare@{set\+\_\+samp\+\_\+compare}}
+\index{set\+\_\+samp\+\_\+compare@{set\+\_\+samp\+\_\+compare}!gr\+::radar\+::os\+\_\+cfar\+\_\+c@{gr\+::radar\+::os\+\_\+cfar\+\_\+c}}
+\paragraph[{set\+\_\+samp\+\_\+compare(int inp)=0}]{\setlength{\rightskip}{0pt plus 5cm}virtual {\bf void} gr\+::radar\+::os\+\_\+cfar\+\_\+c\+::set\+\_\+samp\+\_\+compare (
+\begin{DoxyParamCaption}
+\item[{{\bf int}}]{inp}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [pure virtual]}}\label{classgr_1_1radar_1_1os__cfar__c_ae9762c0ae9e9e58b89ff86b58e539da1}
+
+
+Implemented in {\bf gr\+::radar\+::os\+\_\+cfar\+\_\+c\+\_\+impl} \doxyref{}{p.}{d4/d37/classgr_1_1radar_1_1os__cfar__c__impl_a8f686347a258633cb6dd82014d8e656b}.
+
+\index{gr\+::radar\+::os\+\_\+cfar\+\_\+c@{gr\+::radar\+::os\+\_\+cfar\+\_\+c}!set\+\_\+samp\+\_\+protect@{set\+\_\+samp\+\_\+protect}}
+\index{set\+\_\+samp\+\_\+protect@{set\+\_\+samp\+\_\+protect}!gr\+::radar\+::os\+\_\+cfar\+\_\+c@{gr\+::radar\+::os\+\_\+cfar\+\_\+c}}
+\paragraph[{set\+\_\+samp\+\_\+protect(int inp)=0}]{\setlength{\rightskip}{0pt plus 5cm}virtual {\bf void} gr\+::radar\+::os\+\_\+cfar\+\_\+c\+::set\+\_\+samp\+\_\+protect (
+\begin{DoxyParamCaption}
+\item[{{\bf int}}]{inp}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [pure virtual]}}\label{classgr_1_1radar_1_1os__cfar__c_af426bc0ddc593c41138f8622ce1e76a0}
+
+
+Implemented in {\bf gr\+::radar\+::os\+\_\+cfar\+\_\+c\+\_\+impl} \doxyref{}{p.}{d4/d37/classgr_1_1radar_1_1os__cfar__c__impl_a31b484b37e381e02a76544b89186a340}.
+
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+/home/erik/prefix/default/src/gr-\/radar-\/dev/include/radar/{\bf os\+\_\+cfar\+\_\+c.\+h}\item 
+/home/erik/prefix/default/src/gr-\/radar-\/dev/lib/{\bf os\+\_\+cfar\+\_\+c\+\_\+impl.\+cc}\end{DoxyCompactItemize}

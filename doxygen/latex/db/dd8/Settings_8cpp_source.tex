@@ -37,16 +37,16 @@
 00037     sampleRate(0.0)
 00038 \{
 00039     \textcolor{comment}{//connect}
-00040     SoapySDR::logf(SOAPY\_SDR\_INFO, \textcolor{stringliteral}{"Make connection: '%s'"}, handle.ToString().c\_str());
+00040     SoapySDR::logf(SOAPY_SDR_INFO, \textcolor{stringliteral}{"Make connection: '%s'"}, handle.ToString().c\_str());
 00041 
 00042     lms7Device = LMS7\_Device::CreateDevice(handle);
 00043     \textcolor{keywordflow}{if} (lms7Device == \textcolor{keyword}{nullptr}) \textcolor{keywordflow}{throw} std::runtime\_error(
 00044         \textcolor{stringliteral}{"Failed to make connection with '"} + handle.serialize() + \textcolor{stringliteral}{"'"});
-00045     
-00046     \textcolor{keyword}{const} \textcolor{keyword}{auto} devInfo = lms7Device->GetInfo();  
+00045 
+00046     \textcolor{keyword}{const} \textcolor{keyword}{auto} devInfo = lms7Device->GetInfo();
 00047     \textcolor{comment}{//quick summary}
-00048     SoapySDR::logf(SOAPY\_SDR\_INFO, \textcolor{stringliteral}{"Device name: %s"}, devInfo->deviceName);
-00049     SoapySDR::logf(SOAPY\_SDR\_INFO, \textcolor{stringliteral}{"Reference: %g MHz"}, lms7Device->GetClockFreq(
+00048     SoapySDR::logf(SOAPY_SDR_INFO, \textcolor{stringliteral}{"Device name: %s"}, devInfo->deviceName);
+00049     SoapySDR::logf(SOAPY_SDR_INFO, \textcolor{stringliteral}{"Reference: %g MHz"}, lms7Device->GetClockFreq(
       LMS_CLOCK_REF)/1e6);
 00050 
 00051     lms7Device->Init();
@@ -54,7 +54,7 @@
 00053     \textcolor{comment}{//enable all channels}
 00054     \textcolor{keywordflow}{for} (\textcolor{keywordtype}{size\_t} channel = 0; channel < lms7Device->GetNumChannels(); channel++)
 00055     \{
-00056         lms7Device->EnableChannel(\textcolor{keyword}{true}, channel, \textcolor{keyword}{true});   
+00056         lms7Device->EnableChannel(\textcolor{keyword}{true}, channel, \textcolor{keyword}{true});
 00057         lms7Device->EnableChannel(\textcolor{keyword}{false}, channel, \textcolor{keyword}{true});
 00058     \}
 00059 
@@ -62,7 +62,7 @@
 00061     \textcolor{comment}{//or specify args[cacheCalibrations] == 0 to disable}
 00062     \textcolor{keyword}{const} \textcolor{keywordtype}{bool} cacheEnable = args.count(\textcolor{stringliteral}{"cacheCalibrations"}) and std::stoi(args.at(\textcolor{stringliteral}{"cacheCalibrations"})) !=
        0;
-00063     SoapySDR::logf(SOAPY\_SDR\_INFO, \textcolor{stringliteral}{"LMS7002M calibration values caching %s"}, cacheEnable?\textcolor{stringliteral}{"Enable"}:\textcolor{stringliteral}{"Disable"}
+00063     SoapySDR::logf(SOAPY_SDR_INFO, \textcolor{stringliteral}{"LMS7002M calibration values caching %s"}, cacheEnable?\textcolor{stringliteral}{"Enable"}:\textcolor{stringliteral}{"Disable"}
       );
 00064     lms7Device->EnableCalibCache(cacheEnable);
 00065 
@@ -72,10 +72,10 @@
 00069     this->setMasterClockRate(defaultClockRate);
 00070     \textcolor{keywordflow}{for} (\textcolor{keywordtype}{size\_t} channel = 0; channel < lms7Device->GetNumChannels(); channel++)
 00071     \{
-00072         this->setGain(SOAPY\_SDR\_RX, channel, \textcolor{stringliteral}{"LNA"}, 0);
-00073         this->setGain(SOAPY\_SDR\_TX, channel, \textcolor{stringliteral}{"PAD"}, 0);
-00074         _actualBw[SOAPY\_SDR\_RX][channel] = 30e6;
-00075         _actualBw[SOAPY\_SDR\_TX][channel] = 60e6;
+00072         this->setGain(SOAPY_SDR_RX, channel, \textcolor{stringliteral}{"LNA"}, 0);
+00073         this->setGain(SOAPY_SDR_TX, channel, \textcolor{stringliteral}{"PAD"}, 0);
+00074         _actualBw[SOAPY_SDR_RX][channel] = 30e6;
+00075         _actualBw[SOAPY_SDR_TX][channel] = 60e6;
 00076     \}
 00077 
 00078     _channelsToCal.clear();
@@ -86,7 +86,7 @@
 00083     \textcolor{comment}{//power down all channels}
 00084     \textcolor{keywordflow}{for} (\textcolor{keywordtype}{size\_t} channel = 0; channel < lms7Device->GetNumChannels(); channel++)
 00085     \{
-00086         lms7Device->EnableChannel(\textcolor{keyword}{true}, channel, \textcolor{keyword}{false});   
+00086         lms7Device->EnableChannel(\textcolor{keyword}{true}, channel, \textcolor{keyword}{false});
 00087         lms7Device->EnableChannel(\textcolor{keyword}{false}, channel, \textcolor{keyword}{false});
 00088     \}
 00089     \textcolor{keyword}{delete} lms7Device;
@@ -143,18 +143,18 @@
 00140 
 00141 std::vector<std::string> SoapyLMS7::listAntennas(\textcolor{keyword}{const} \textcolor{keywordtype}{int} direction, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} \textcolor{comment}{/*channel*/})\textcolor{keyword}{ const}
 00142 \textcolor{keyword}{}\{
-00143     \textcolor{keywordflow}{return} lms7Device->GetPathNames(direction == SOAPY\_SDR\_TX);
+00143     \textcolor{keywordflow}{return} lms7Device->GetPathNames(direction == SOAPY_SDR_TX);
 00144 \}
 00145 
-00146 \textcolor{keywordtype}{void} SoapyLMS7::setAntenna(\textcolor{keyword}{const} \textcolor{keywordtype}{int} direction, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} channel, \textcolor{keyword}{const} std::string &
-      name)
+00146 \textcolor{keywordtype}{void} SoapyLMS7::setAntenna(\textcolor{keyword}{const} \textcolor{keywordtype}{int} direction, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} channel, \textcolor{keyword}{const} 
+      std::string &name)
 00147 \{
 00148     std::unique\_lock<std::recursive\_mutex> lock(_accessMutex);
-00149     
-00150     SoapySDR::logf(SOAPY\_SDR\_DEBUG, \textcolor{stringliteral}{"SoapyLMS7::setAntenna(%s, %d, %s)"}, dirName, \textcolor{keywordtype}{int}(channel), name.c\_str(
+00149 
+00150     SoapySDR::logf(SOAPY_SDR_DEBUG, \textcolor{stringliteral}{"SoapyLMS7::setAntenna(%s, %d, %s)"}, dirName, \textcolor{keywordtype}{int}(channel), name.c\_str(
       ));
-00151     
-00152     \textcolor{keywordtype}{bool} tx = direction == SOAPY\_SDR\_TX;
+00151 
+00152     \textcolor{keywordtype}{bool} tx = direction == SOAPY_SDR_TX;
 00153     std::vector<std::string> nameList = lms7Device->GetPathNames(tx);
 00154     \textcolor{keywordflow}{for} (\textcolor{keywordtype}{unsigned} path = 0; path < nameList.size(); path++)
 00155         \textcolor{keywordflow}{if} (nameList[path] == name)
@@ -163,18 +163,18 @@
 00158             _channelsToCal.emplace(direction, channel);
 00159             \textcolor{keywordflow}{return};
 00160         \}
-00161     
+00161 
 00162     \textcolor{keywordflow}{throw} std::runtime\_error(\textcolor{stringliteral}{"SoapyLMS7::setAntenna(TX, "}+name+\textcolor{stringliteral}{") - unknown antenna name"});
 00163 \}
 00164 
 00165 std::string SoapyLMS7::getAntenna(\textcolor{keyword}{const} \textcolor{keywordtype}{int} direction, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} channel)\textcolor{keyword}{ const}
 00166 \textcolor{keyword}{}\{
 00167     std::unique\_lock<std::recursive\_mutex> lock(_accessMutex);
-00168     \textcolor{keywordtype}{bool} tx = direction == SOAPY\_SDR\_TX;
+00168     \textcolor{keywordtype}{bool} tx = direction == SOAPY_SDR_TX;
 00169     \textcolor{keywordtype}{int} path = lms7Device->GetPath(tx,channel);
 00170     \textcolor{keywordflow}{if} (path < 0)
 00171         \textcolor{keywordflow}{return} \textcolor{stringliteral}{""};
-00172    
+00172 
 00173     std::vector<std::string> nameList = lms7Device->GetPathNames(tx);
 00174     \textcolor{keywordflow}{return} (\textcolor{keywordtype}{unsigned})path < nameList.size() ? nameList[path] : \textcolor{stringliteral}{""};
 00175 \}
@@ -185,20 +185,20 @@
 00180 
 00181 \textcolor{keywordtype}{bool} SoapyLMS7::hasDCOffsetMode(\textcolor{keyword}{const} \textcolor{keywordtype}{int} direction, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} \textcolor{comment}{/*channel*/})\textcolor{keyword}{ const}
 00182 \textcolor{keyword}{}\{
-00183     \textcolor{keywordflow}{return} (direction == SOAPY\_SDR\_RX);
+00183     \textcolor{keywordflow}{return} (direction == SOAPY_SDR_RX);
 00184 \}
 00185 
 00186 \textcolor{keywordtype}{void} SoapyLMS7::setDCOffsetMode(\textcolor{keyword}{const} \textcolor{keywordtype}{int} direction, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} channel, \textcolor{keyword}{const} \textcolor{keywordtype}{bool} automatic)
 00187 \{
 00188     std::unique\_lock<std::recursive\_mutex> lock(_accessMutex);
-00189     \textcolor{keywordflow}{if} (direction == SOAPY\_SDR\_RX)
+00189     \textcolor{keywordflow}{if} (direction == SOAPY_SDR_RX)
 00190         lms7Device->WriteParam(LMS7param(DC_BYP_RXTSP),automatic == 0, channel);
 00191 \}
 00192 
 00193 \textcolor{keywordtype}{bool} SoapyLMS7::getDCOffsetMode(\textcolor{keyword}{const} \textcolor{keywordtype}{int} direction, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} channel)\textcolor{keyword}{ const}
 00194 \textcolor{keyword}{}\{
-00195     std::unique\_lock<std::recursive\_mutex> lock(_accessMutex); 
-00196     \textcolor{keywordflow}{if} (direction == SOAPY\_SDR\_RX)
+00195     std::unique\_lock<std::recursive\_mutex> lock(_accessMutex);
+00196     \textcolor{keywordflow}{if} (direction == SOAPY_SDR_RX)
 00197         \textcolor{keywordflow}{return} lms7Device->ReadParam(LMS7param(DC_BYP_RXTSP),channel) == 0;
 00198     \textcolor{keywordflow}{return} \textcolor{keyword}{false};
 00199 \}
@@ -220,13 +220,13 @@
 00215 std::vector<std::string> SoapyLMS7::listGains(\textcolor{keyword}{const} \textcolor{keywordtype}{int} direction, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} \textcolor{comment}{/*channel*/})\textcolor{keyword}{ const}
 00216 \textcolor{keyword}{}\{
 00217     std::vector<std::string> gains;
-00218     \textcolor{keywordflow}{if} (direction == SOAPY\_SDR\_RX)
+00218     \textcolor{keywordflow}{if} (direction == SOAPY_SDR_RX)
 00219     \{
 00220         gains.push\_back(\textcolor{stringliteral}{"TIA"});
 00221         gains.push\_back(\textcolor{stringliteral}{"LNA"});
 00222         gains.push\_back(\textcolor{stringliteral}{"PGA"});
 00223     \}
-00224     \textcolor{keywordflow}{if} (direction == SOAPY\_SDR\_TX)
+00224     \textcolor{keywordflow}{if} (direction == SOAPY_SDR_TX)
 00225     \{
 00226         gains.push\_back(\textcolor{stringliteral}{"PAD"});
 00227         gains.push\_back(\textcolor{stringliteral}{"IAMP"});
@@ -237,48 +237,48 @@
 00232 \textcolor{keywordtype}{void} SoapyLMS7::setGain(\textcolor{keyword}{const} \textcolor{keywordtype}{int} direction, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} channel, \textcolor{keyword}{const} \textcolor{keywordtype}{double} value)
 00233 \{
 00234     std::unique\_lock<std::recursive\_mutex> lock(_accessMutex);
-00235     SoapySDR::logf(SOAPY\_SDR\_DEBUG, \textcolor{stringliteral}{"SoapyLMS7::setGain(%s, %d, %g dB)"}, dirName, \textcolor{keywordtype}{int}(channel), value);
-00236     lms7Device->SetGain(direction==SOAPY\_SDR\_TX,channel,value);
-00237     SoapySDR::logf(SOAPY\_SDR\_DEBUG, \textcolor{stringliteral}{"Actual %s[%d] gain %g dB"}, dirName, \textcolor{keywordtype}{int}(channel), this->
+00235     SoapySDR::logf(SOAPY_SDR_DEBUG, \textcolor{stringliteral}{"SoapyLMS7::setGain(%s, %d, %g dB)"}, dirName, \textcolor{keywordtype}{int}(channel), value);
+00236     lms7Device->SetGain(direction==SOAPY_SDR_TX,channel,value);
+00237     SoapySDR::logf(SOAPY_SDR_DEBUG, \textcolor{stringliteral}{"Actual %s[%d] gain %g dB"}, dirName, \textcolor{keywordtype}{int}(channel), this->
       getGain(direction, channel));
 00238 \}
 00239 
 00240 \textcolor{keywordtype}{double} SoapyLMS7::getGain(\textcolor{keyword}{const} \textcolor{keywordtype}{int} direction, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} channel)\textcolor{keyword}{ const}
 00241 \textcolor{keyword}{}\{
-00242     \textcolor{keywordflow}{return} lms7Device->GetGain(direction==SOAPY\_SDR\_TX, channel);
+00242     \textcolor{keywordflow}{return} lms7Device->GetGain(direction==SOAPY_SDR_TX, channel);
 00243 \}
 00244 
-00245 \textcolor{keywordtype}{void} SoapyLMS7::setGain(\textcolor{keyword}{const} \textcolor{keywordtype}{int} direction, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} channel, \textcolor{keyword}{const} std::string &
-      name, \textcolor{keyword}{const} \textcolor{keywordtype}{double} value)
+00245 \textcolor{keywordtype}{void} SoapyLMS7::setGain(\textcolor{keyword}{const} \textcolor{keywordtype}{int} direction, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} channel, \textcolor{keyword}{const} 
+      std::string &name, \textcolor{keyword}{const} \textcolor{keywordtype}{double} value)
 00246 \{
 00247     std::unique\_lock<std::recursive\_mutex> lock(_accessMutex);
-00248     SoapySDR::logf(SOAPY\_SDR\_DEBUG, \textcolor{stringliteral}{"SoapyLMS7::setGain(%s, %d, %s, %g dB)"}, 
+00248     SoapySDR::logf(SOAPY_SDR_DEBUG, \textcolor{stringliteral}{"SoapyLMS7::setGain(%s, %d, %s, %g dB)"}, 
       dirName, \textcolor{keywordtype}{int}(channel), name.c\_str(), value);
-00249     
-00250     lms7Device->SetGain(direction==SOAPY\_SDR\_TX, channel, value, name);
+00249 
+00250     lms7Device->SetGain(direction==SOAPY_SDR_TX, channel, value, name);
 00251 
-00252     SoapySDR::logf(SOAPY\_SDR\_DEBUG, \textcolor{stringliteral}{"Actual %s%s[%d] gain %g dB"}, dirName, name.c\_str(), 
+00252     SoapySDR::logf(SOAPY_SDR_DEBUG, \textcolor{stringliteral}{"Actual %s%s[%d] gain %g dB"}, dirName, name.c\_str(), 
       int(channel), this->getGain(direction, channel, name));
 00253 \}
 00254 
-00255 \textcolor{keywordtype}{double} SoapyLMS7::getGain(\textcolor{keyword}{const} \textcolor{keywordtype}{int} direction, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} channel, \textcolor{keyword}{const} std::string &
-      name)\textcolor{keyword}{ const}
+00255 \textcolor{keywordtype}{double} SoapyLMS7::getGain(\textcolor{keyword}{const} \textcolor{keywordtype}{int} direction, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} channel, \textcolor{keyword}{const} 
+      std::string &name)\textcolor{keyword}{ const}
 00256 \textcolor{keyword}{}\{
 00257     std::unique\_lock<std::recursive\_mutex> lock(_accessMutex);
 00258 
-00259     \textcolor{keywordflow}{return} lms7Device->GetGain(direction==SOAPY\_SDR\_TX, channel, name);
+00259     \textcolor{keywordflow}{return} lms7Device->GetGain(direction==SOAPY_SDR_TX, channel, name);
 00260 \}
 00261 
 00262 SoapySDR::Range SoapyLMS7::getGainRange(\textcolor{keyword}{const} \textcolor{keywordtype}{int} direction, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} channel)\textcolor{keyword}{ const}
 00263 \textcolor{keyword}{}\{
-00264     \textcolor{keyword}{auto} range = lms7Device->GetGainRange(direction==SOAPY\_SDR\_TX, channel);
+00264     \textcolor{keyword}{auto} range = lms7Device->GetGainRange(direction==SOAPY_SDR_TX, channel);
 00265     \textcolor{keywordflow}{return} SoapySDR::Range(range.min, range.max);
 00266 \}
 00267 
-00268 SoapySDR::Range SoapyLMS7::getGainRange(\textcolor{keyword}{const} \textcolor{keywordtype}{int} direction, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} channel, \textcolor{keyword}{const} std::string &
-      name)\textcolor{keyword}{ const}
+00268 SoapySDR::Range SoapyLMS7::getGainRange(\textcolor{keyword}{const} \textcolor{keywordtype}{int} direction, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} channel, \textcolor{keyword}{const} 
+      std::string &name)\textcolor{keyword}{ const}
 00269 \textcolor{keyword}{}\{
-00270     \textcolor{keyword}{auto} range = lms7Device->GetGainRange(direction==SOAPY\_SDR\_TX, channel, name);
+00270     \textcolor{keyword}{auto} range = lms7Device->GetGainRange(direction==SOAPY_SDR_TX, channel, name);
 00271     \textcolor{keywordflow}{return} SoapySDR::Range(range.min, range.max);
 00272 \}
 00273 
@@ -290,23 +290,23 @@
 00279     \textcolor{keywordflow}{return} SoapySDR::Device::getFrequencyArgsInfo(direction, channel);
 00280 \}
 00281 
-00282 \textcolor{keywordtype}{void} SoapyLMS7::setFrequency(\textcolor{keywordtype}{int} direction, \textcolor{keywordtype}{size\_t} channel, \textcolor{keywordtype}{double} frequency, \textcolor{keyword}{const} SoapySDR::Kwargs &
-      args)
+00282 \textcolor{keywordtype}{void} SoapyLMS7::setFrequency(\textcolor{keywordtype}{int} direction, \textcolor{keywordtype}{size\_t} channel, \textcolor{keywordtype}{double} frequency, \textcolor{keyword}{const} 
+      SoapySDR::Kwargs &args)
 00283 \{
 00284     std::unique\_lock<std::recursive\_mutex> lock(_accessMutex);
-00285     lms7Device->SetFrequency(direction == SOAPY\_SDR\_TX, channel, frequency);
+00285     lms7Device->SetFrequency(direction == SOAPY_SDR_TX, channel, frequency);
 00286 \}
 00287 
-00288 \textcolor{keywordtype}{void} SoapyLMS7::setFrequency(\textcolor{keyword}{const} \textcolor{keywordtype}{int} direction, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} channel, \textcolor{keyword}{const} std::string &
-      name, \textcolor{keyword}{const} \textcolor{keywordtype}{double} frequency, \textcolor{keyword}{const} SoapySDR::Kwargs &args)
+00288 \textcolor{keywordtype}{void} SoapyLMS7::setFrequency(\textcolor{keyword}{const} \textcolor{keywordtype}{int} direction, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} channel, \textcolor{keyword}{const} 
+      std::string &name, \textcolor{keyword}{const} \textcolor{keywordtype}{double} frequency, \textcolor{keyword}{const} SoapySDR::Kwargs &args)
 00289 \{
 00290     std::unique\_lock<std::recursive\_mutex> lock(_accessMutex);
-00291     SoapySDR::logf(SOAPY\_SDR\_DEBUG, \textcolor{stringliteral}{"SoapyLMS7::setFrequency(%s, %d, %s, %g MHz)"}, 
+00291     SoapySDR::logf(SOAPY_SDR_DEBUG, \textcolor{stringliteral}{"SoapyLMS7::setFrequency(%s, %d, %s, %g MHz)"}, 
       dirName, \textcolor{keywordtype}{int}(channel), name.c\_str(), frequency/1e6);
-00292     \textcolor{keywordtype}{bool} isTx = direction == SOAPY\_SDR\_TX;
+00292     \textcolor{keywordtype}{bool} isTx = direction == SOAPY_SDR_TX;
 00293     \textcolor{keywordflow}{if} (name == \textcolor{stringliteral}{"RF"})
 00294     \{
-00295         \textcolor{keyword}{const} \textcolor{keyword}{auto} clkId = (direction == SOAPY\_SDR\_TX)? LMS_CLOCK_SXT : 
+00295         \textcolor{keyword}{const} \textcolor{keyword}{auto} clkId = (direction == SOAPY_SDR_TX)? LMS_CLOCK_SXT : 
       LMS_CLOCK_SXR;
 00296         lms7Device->SetClockFreq(clkId, frequency, channel);
 00297         _channelsToCal.emplace(direction, channel);
@@ -314,29 +314,30 @@
 00299     \}
 00300 
 00301     \textcolor{keywordflow}{if} (name == \textcolor{stringliteral}{"BB"})
-00302     \{     
-00303         lms7Device->SetNCOFreq(isTx, channel, 0, direction == SOAPY\_SDR\_TX ? frequency : -frequency);
+00302     \{
+00303         lms7Device->SetNCOFreq(isTx, channel, 0, direction == SOAPY_SDR_TX ? 
+      frequency : -frequency);
 00304         \textcolor{keywordflow}{return};
 00305     \}
 00306 
 00307     \textcolor{keywordflow}{throw} std::runtime\_error(\textcolor{stringliteral}{"SoapyLMS7::setFrequency("}+name+\textcolor{stringliteral}{") unknown name"});
 00308 \}
 00309 
-00310 \textcolor{keywordtype}{double} SoapyLMS7::getFrequency(\textcolor{keyword}{const} \textcolor{keywordtype}{int} direction, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} channel, \textcolor{keyword}{const} std::string &
-      name)\textcolor{keyword}{ const}
+00310 \textcolor{keywordtype}{double} SoapyLMS7::getFrequency(\textcolor{keyword}{const} \textcolor{keywordtype}{int} direction, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} channel, \textcolor{keyword}{const} 
+      std::string &name)\textcolor{keyword}{ const}
 00311 \textcolor{keyword}{}\{
 00312     std::unique\_lock<std::recursive\_mutex> lock(_accessMutex);
 00313 
 00314     \textcolor{keywordflow}{if} (name == \textcolor{stringliteral}{"RF"})
 00315     \{
-00316         \textcolor{keyword}{const} \textcolor{keyword}{auto} clkId = (direction == SOAPY\_SDR\_TX)? LMS_CLOCK_SXT : 
+00316         \textcolor{keyword}{const} \textcolor{keyword}{auto} clkId = (direction == SOAPY_SDR_TX)? LMS_CLOCK_SXT : 
       LMS_CLOCK_SXR;
 00317         \textcolor{keywordflow}{return} lms7Device->GetClockFreq(clkId,channel);
 00318     \}
 00319 
 00320     \textcolor{keywordflow}{if} (name == \textcolor{stringliteral}{"BB"})
 00321     \{
-00322         \textcolor{keyword}{const} \textcolor{keywordtype}{bool} isTx = (direction == SOAPY\_SDR\_TX);
+00322         \textcolor{keyword}{const} \textcolor{keywordtype}{bool} isTx = (direction == SOAPY_SDR_TX);
 00323         \textcolor{keywordtype}{double} freq = lms7Device->GetNCOFreq(isTx, channel, 0);
 00324         \textcolor{keywordflow}{return} isTx ? freq : -freq;
 00325     \}
@@ -347,7 +348,7 @@
 00330 \textcolor{keywordtype}{double} SoapyLMS7::getFrequency(\textcolor{keyword}{const} \textcolor{keywordtype}{int} direction, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} channel)\textcolor{keyword}{ const}
 00331 \textcolor{keyword}{}\{
 00332     std::unique\_lock<std::recursive\_mutex> lock(_accessMutex);
-00333     \textcolor{keywordflow}{return} lms7Device->GetFrequency(direction == SOAPY\_SDR\_TX, channel);
+00333     \textcolor{keywordflow}{return} lms7Device->GetFrequency(direction == SOAPY_SDR_TX, channel);
 00334 \}
 00335 
 00336 std::vector<std::string> SoapyLMS7::listFrequencies(\textcolor{keyword}{const} \textcolor{keywordtype}{int} \textcolor{comment}{/*direction*/}, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} \textcolor{comment}{/*channel*/})\textcolor{keyword}{
@@ -371,7 +372,7 @@
 00352     \}
 00353     \textcolor{keywordflow}{if} (name == \textcolor{stringliteral}{"BB"})
 00354     \{
-00355         \textcolor{keyword}{const} \textcolor{keyword}{auto} lmsDir = (direction == SOAPY\_SDR\_TX)?LMS_CLOCK_TXTSP:
+00355         \textcolor{keyword}{const} \textcolor{keyword}{auto} lmsDir = (direction == SOAPY_SDR_TX)?LMS_CLOCK_TXTSP:
       LMS_CLOCK_RXTSP;
 00356         \textcolor{keyword}{const} \textcolor{keywordtype}{double} dspRate = lms7Device->GetClockFreq(lmsDir,channel);
 00357         ranges.push\_back(SoapySDR::Range(-dspRate/2, dspRate/2));
@@ -395,7 +396,7 @@
 00374 \{
 00375     std::unique\_lock<std::recursive\_mutex> lock(_accessMutex);
 00376     sampleRate = rate;
-00377     lms7Device->SetRate(direction == SOAPY\_SDR\_TX,rate);
+00377     lms7Device->SetRate(direction == SOAPY_SDR_TX,rate);
 00378     \textcolor{keywordflow}{return};
 00379 \}
 00380 
@@ -403,7 +404,7 @@
 00382 \textcolor{keyword}{}\{
 00383     std::unique\_lock<std::recursive\_mutex> lock(_accessMutex);
 00384 
-00385     \textcolor{keywordflow}{return} lms7Device->GetRate((direction == SOAPY\_SDR\_TX),channel);
+00385     \textcolor{keywordflow}{return} lms7Device->GetRate((direction == SOAPY_SDR_TX),channel);
 00386 \}
 00387 
 00388 std::vector<double> SoapyLMS7::listSampleRates(\textcolor{keyword}{const} \textcolor{keywordtype}{int} direction, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} channel)\textcolor{keyword}{ const}
@@ -426,26 +427,26 @@
 00404     \textcolor{keywordflow}{if} (bw == 0.0) \textcolor{keywordflow}{return}; \textcolor{comment}{//special ignore value}
 00405 
 00406     std::unique\_lock<std::recursive\_mutex> lock(_accessMutex);
-00407     SoapySDR::logf(SOAPY\_SDR\_DEBUG, \textcolor{stringliteral}{"SoapyLMS7::setBandwidth(%s, %d, %g MHz)"}, 
+00407     SoapySDR::logf(SOAPY_SDR_DEBUG, \textcolor{stringliteral}{"SoapyLMS7::setBandwidth(%s, %d, %g MHz)"}, 
       dirName, \textcolor{keywordtype}{int}(channel), bw/1e6);
 00408 
 00409     _actualBw[direction][channel] = bw;
 00410 
-00411     \textcolor{keywordflow}{if} (direction == SOAPY\_SDR\_RX)
-00412     \{        
+00411     \textcolor{keywordflow}{if} (direction == SOAPY_SDR_RX)
+00412     \{
 00413         \textcolor{keywordflow}{if} (lms7Device->SetLPF(\textcolor{keyword}{false},channel,\textcolor{keyword}{true},bw) != 0)
 00414         \{
-00415             SoapySDR::logf(SOAPY\_SDR\_ERROR, \textcolor{stringliteral}{"setBandwidth(Rx, %d, %g MHz) Failed - %s"}, \textcolor{keywordtype}{int}(channel), bw/1
+00415             SoapySDR::logf(SOAPY_SDR_ERROR, \textcolor{stringliteral}{"setBandwidth(Rx, %d, %g MHz) Failed - %s"}, \textcolor{keywordtype}{int}(channel), bw/1
       e6, lime::GetLastErrorMessage());
 00416             \textcolor{keywordflow}{throw} std::runtime\_error(lime::GetLastErrorMessage());
 00417         \}
 00418     \}
 00419 
-00420     \textcolor{keywordflow}{if} (direction == SOAPY\_SDR\_TX)
+00420     \textcolor{keywordflow}{if} (direction == SOAPY_SDR_TX)
 00421     \{
 00422         \textcolor{keywordflow}{if} (lms7Device->SetLPF(\textcolor{keyword}{true},channel,\textcolor{keyword}{true},bw) != 0)
 00423         \{
-00424             SoapySDR::logf(SOAPY\_SDR\_ERROR, \textcolor{stringliteral}{"setBandwidth(Tx, %d, %g MHz) Failed - %s"}, \textcolor{keywordtype}{int}(channel), bw/1
+00424             SoapySDR::logf(SOAPY_SDR_ERROR, \textcolor{stringliteral}{"setBandwidth(Tx, %d, %g MHz) Failed - %s"}, \textcolor{keywordtype}{int}(channel), bw/1
       e6, lime::GetLastErrorMessage());
 00425             \textcolor{keywordflow}{throw} std::runtime\_error(lime::GetLastErrorMessage());
 00426         \}
@@ -471,11 +472,11 @@
 00446 \textcolor{keyword}{}\{
 00447     SoapySDR::RangeList bws;
 00448 
-00449     \textcolor{keywordflow}{if} (direction == SOAPY\_SDR\_RX)
+00449     \textcolor{keywordflow}{if} (direction == SOAPY_SDR_RX)
 00450     \{
 00451         bws.push\_back(SoapySDR::Range(1.4e6, 130e6));
 00452     \}
-00453     \textcolor{keywordflow}{if} (direction == SOAPY\_SDR\_TX)
+00453     \textcolor{keywordflow}{if} (direction == SOAPY_SDR_TX)
 00454     \{
 00455         bws.push\_back(SoapySDR::Range(5e6, 40e6));
 00456         bws.push\_back(SoapySDR::Range(50e6, 130e6));
@@ -560,390 +561,436 @@
 00535     std::vector<std::string> sensors;
 00536     sensors.push\_back(\textcolor{stringliteral}{"clock\_locked"});
 00537     sensors.push\_back(\textcolor{stringliteral}{"lms7\_temp"});
-00538     \textcolor{keywordflow}{return} sensors;
-00539 \}
-00540 
-00541 SoapySDR::ArgInfo SoapyLMS7::getSensorInfo(\textcolor{keyword}{const} std::string &name)\textcolor{keyword}{ const}
-00542 \textcolor{keyword}{}\{
-00543     SoapySDR::ArgInfo info;
-00544     \textcolor{keywordflow}{if} (name == \textcolor{stringliteral}{"clock\_locked"})
-00545     \{
-00546         info.key = \textcolor{stringliteral}{"clock\_locked"};
-00547         info.name = \textcolor{stringliteral}{"Clock Locked"};
-00548         info.type = SoapySDR::ArgInfo::BOOL;
-00549         info.value = \textcolor{stringliteral}{"false"};
-00550         info.description = \textcolor{stringliteral}{"CGEN clock is locked, good VCO selection."};
-00551     \}
-00552     \textcolor{keywordflow}{else} \textcolor{keywordflow}{if} (name == \textcolor{stringliteral}{"lms7\_temp"})
-00553     \{
-00554         info.key = \textcolor{stringliteral}{"lms7\_temp"};
-00555         info.name = \textcolor{stringliteral}{"LMS7 Temperature"};
-00556         info.type = SoapySDR::ArgInfo::FLOAT;
-00557         info.value = \textcolor{stringliteral}{"0.0"};
-00558         info.units = \textcolor{stringliteral}{"C"};
-00559         info.description = \textcolor{stringliteral}{"The temperature of the LMS7002M in degrees C."};
-00560     \}
-00561     \textcolor{keywordflow}{return} info;
-00562 \}
-00563 
-00564 std::string SoapyLMS7::readSensor(\textcolor{keyword}{const} std::string &name)\textcolor{keyword}{ const}
-00565 \textcolor{keyword}{}\{
-00566     std::unique\_lock<std::recursive\_mutex> lock(_accessMutex);
-00567 
-00568     \textcolor{keywordflow}{if} (name == \textcolor{stringliteral}{"clock\_locked"})
-00569     \{
-00570         \textcolor{keywordflow}{return} lms7Device->GetLMS()->GetCGENLocked()?\textcolor{stringliteral}{"true"}:\textcolor{stringliteral}{"false"};
+00538     sensors.push\_back(\textcolor{stringliteral}{"chirp\_period"});
+00539     sensors.push\_back(\textcolor{stringliteral}{"chirp\_time"});
+00540     \textcolor{keywordflow}{return} sensors;
+00541 \}
+00542 
+00543 SoapySDR::ArgInfo SoapyLMS7::getSensorInfo(\textcolor{keyword}{const} std::string &name)\textcolor{keyword}{ const}
+00544 \textcolor{keyword}{}\{
+00545     SoapySDR::ArgInfo info;
+00546     \textcolor{keywordflow}{if} (name == \textcolor{stringliteral}{"clock\_locked"})
+00547     \{
+00548         info.key = \textcolor{stringliteral}{"clock\_locked"};
+00549         info.name = \textcolor{stringliteral}{"Clock Locked"};
+00550         info.type = SoapySDR::ArgInfo::BOOL;
+00551         info.value = \textcolor{stringliteral}{"false"};
+00552         info.description = \textcolor{stringliteral}{"CGEN clock is locked, good VCO selection."};
+00553     \}
+00554     \textcolor{keywordflow}{else} \textcolor{keywordflow}{if} (name == \textcolor{stringliteral}{"lms7\_temp"})
+00555     \{
+00556         info.key = \textcolor{stringliteral}{"lms7\_temp"};
+00557         info.name = \textcolor{stringliteral}{"LMS7 Temperature"};
+00558         info.type = SoapySDR::ArgInfo::FLOAT;
+00559         info.value = \textcolor{stringliteral}{"0.0"};
+00560         info.units = \textcolor{stringliteral}{"C"};
+00561         info.description = \textcolor{stringliteral}{"The temperature of the LMS7002M in degrees C."};
+00562     \}
+00563     \textcolor{keywordflow}{else} \textcolor{keywordflow}{if} (name == \textcolor{stringliteral}{"chirp\_period"})
+00564     \{
+00565         info.key = \textcolor{stringliteral}{"chirp\_period"};
+00566         info.name = \textcolor{stringliteral}{"Chirp Period"};
+00567         info.type = SoapySDR::ArgInfo::INT;
+00568         info.value = \textcolor{stringliteral}{"0"};
+00569         info.units = \textcolor{stringliteral}{"ns"};
+00570         info.description = \textcolor{stringliteral}{"The length in nanoseconds of an external chirp signal. Period of external
+       function generators sync signal."};
 00571     \}
-00572     \textcolor{keywordflow}{if} (name == \textcolor{stringliteral}{"lms7\_temp"})
+00572     \textcolor{keywordflow}{else} \textcolor{keywordflow}{if} (name == \textcolor{stringliteral}{"chirp\_time"})
 00573     \{
-00574         \textcolor{keywordflow}{return} std::to\_string(lms7Device->GetChipTemperature());
-00575     \}
-00576 
-00577     \textcolor{keywordflow}{throw} std::runtime\_error(\textcolor{stringliteral}{"SoapyLMS7::readSensor("}+name+\textcolor{stringliteral}{") - unknown sensor name"});
-00578 \}
-00579 
-00580 std::vector<std::string> SoapyLMS7::listSensors(\textcolor{keyword}{const} \textcolor{keywordtype}{int} \textcolor{comment}{/*direction*/}, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} \textcolor{comment}{/*channel*/})\textcolor{keyword}{ const}
-00581 \textcolor{keyword}{}\{
-00582     std::vector<std::string> sensors;
-00583     sensors.push\_back(\textcolor{stringliteral}{"lo\_locked"});
-00584     \textcolor{keywordflow}{return} sensors;
-00585 \}
-00586 
-00587 SoapySDR::ArgInfo SoapyLMS7::getSensorInfo(\textcolor{keyword}{const} \textcolor{keywordtype}{int} direction, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} channel, \textcolor{keyword}{const} std::string &
-      name)\textcolor{keyword}{ const}
-00588 \textcolor{keyword}{}\{
-00589     SoapySDR::ArgInfo info;
-00590     \textcolor{keywordflow}{if} (name == \textcolor{stringliteral}{"lo\_locked"})
-00591     \{
-00592         info.key = \textcolor{stringliteral}{"lo\_locked"};
-00593         info.name = \textcolor{stringliteral}{"LO Locked"};
-00594         info.type = SoapySDR::ArgInfo::BOOL;
-00595         info.value = \textcolor{stringliteral}{"false"};
-00596         info.description = \textcolor{stringliteral}{"LO synthesizer is locked, good VCO selection."};
-00597     \}
-00598     \textcolor{keywordflow}{return} info;
-00599 \}
-00600 
-00601 std::string SoapyLMS7::readSensor(\textcolor{keyword}{const} \textcolor{keywordtype}{int} direction, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} channel, \textcolor{keyword}{const} std::string &
-      name)\textcolor{keyword}{ const}
-00602 \textcolor{keyword}{}\{
-00603     std::unique\_lock<std::recursive\_mutex> lock(_accessMutex);
-00604     \textcolor{keyword}{const} \textcolor{keyword}{auto} lmsDir = (direction == SOAPY\_SDR\_TX)?LMS7002M::Tx:LMS7002M::Rx;
-00605 
-00606     \textcolor{keywordflow}{if} (name == \textcolor{stringliteral}{"lo\_locked"})
-00607     \{
-00608         \textcolor{keywordflow}{return} lms7Device->GetLMS(channel/2)->GetSXLocked(lmsDir)?\textcolor{stringliteral}{"true"}:\textcolor{stringliteral}{"false"};
-00609     \}
-00610 
-00611     \textcolor{keywordflow}{throw} std::runtime\_error(\textcolor{stringliteral}{"SoapyLMS7::readSensor("}+name+\textcolor{stringliteral}{") - unknown sensor name"});
-00612 \}
-00613 
-00614 \textcolor{comment}{/*******************************************************************}
-00615 \textcolor{comment}{ * Register API}
-00616 \textcolor{comment}{ ******************************************************************/}
-00617 
-00618 std::vector<std::string> SoapyLMS7::listRegisterInterfaces(\textcolor{keywordtype}{void})\textcolor{keyword}{ const}
-00619 \textcolor{keyword}{}\{
-00620     std::vector<std::string> ifaces;
-00621     ifaces.push\_back(\textcolor{stringliteral}{"BBIC"});
-00622     \textcolor{keywordflow}{for} (\textcolor{keywordtype}{size\_t} i = 0; i < lms7Device->GetNumChannels()/2; i++)
-00623     \{
-00624         ifaces.push\_back(\textcolor{stringliteral}{"RFIC"} + std::to\_string(i));
-00625     \}
-00626     \textcolor{keywordflow}{return} ifaces;
-00627 \}
-00628 
-00629 \textcolor{keywordtype}{void} SoapyLMS7::writeRegister(\textcolor{keyword}{const} std::string &name, \textcolor{keyword}{const} \textcolor{keywordtype}{unsigned} addr, \textcolor{keyword}{const} \textcolor{keywordtype}{unsigned} value)
-00630 \{
-00631     \textcolor{keywordflow}{if} (name == \textcolor{stringliteral}{"BBIC"}) \textcolor{keywordflow}{return} this->writeRegister(addr, value);
-00632     \textcolor{keywordflow}{if} (\textcolor{stringliteral}{"RFIC"} != name.substr(0,4))  
-00633         \textcolor{keywordflow}{throw} std::runtime\_error(\textcolor{stringliteral}{"SoapyLMS7::readRegister("}+name+\textcolor{stringliteral}{") unknown interface"});
-00634 
-00635     \textcolor{keywordtype}{int} st = lms7Device->WriteLMSReg(addr, value, name[4]-\textcolor{charliteral}{'0'});
-00636     \textcolor{keywordflow}{if} (st == 0) \textcolor{keywordflow}{return};
-00637     \textcolor{keywordflow}{throw} std::runtime\_error(\textcolor{stringliteral}{"SoapyLMS7::WriteRegister("}+name+\textcolor{stringliteral}{", "}+std::to\_string(addr)+\textcolor{stringliteral}{") FAIL"});
-00638 
-00639 \}
-00640 
-00641 \textcolor{keywordtype}{unsigned} SoapyLMS7::readRegister(\textcolor{keyword}{const} std::string &name, \textcolor{keyword}{const} \textcolor{keywordtype}{unsigned} addr)\textcolor{keyword}{ const}
-00642 \textcolor{keyword}{}\{
-00643     \textcolor{keywordflow}{if} (name == \textcolor{stringliteral}{"BBIC"}) \textcolor{keywordflow}{return} this->readRegister(addr);
-00644     \textcolor{keywordflow}{if} (\textcolor{stringliteral}{"RFIC"} != name.substr(0,4))  
-00645         \textcolor{keywordflow}{throw} std::runtime\_error(\textcolor{stringliteral}{"SoapyLMS7::readRegister("}+name+\textcolor{stringliteral}{") unknown interface"});
-00646     
-00647     \textcolor{keywordflow}{return} lms7Device->ReadLMSReg(addr, name[4]-\textcolor{charliteral}{'0'});
-00648 \}
+00574         info.key = \textcolor{stringliteral}{"chirp\_time"};
+00575         info.name = \textcolor{stringliteral}{"Chirp Timestamp"};
+00576         info.type = SoapySDR::ArgInfo::INT;
+00577         info.value = \textcolor{stringliteral}{"0"};
+00578         info.units = \textcolor{stringliteral}{"ns"};
+00579         info.description = \textcolor{stringliteral}{"The timestamp of last chirp start"};
+00580     \}
+00581     \textcolor{keywordflow}{return} info;
+00582 \}
+00583 
+00584 std::string SoapyLMS7::readSensor(\textcolor{keyword}{const} std::string &name)\textcolor{keyword}{ const}
+00585 \textcolor{keyword}{}\{
+00586     std::unique\_lock<std::recursive\_mutex> lock(_accessMutex);
+00587 
+00588     \textcolor{keywordflow}{if} (name == \textcolor{stringliteral}{"clock\_locked"})
+00589     \{
+00590         \textcolor{keywordflow}{return} lms7Device->GetLMS()->GetCGENLocked()?\textcolor{stringliteral}{"true"}:\textcolor{stringliteral}{"false"};
+00591     \}
+00592     \textcolor{keywordflow}{if} (name == \textcolor{stringliteral}{"lms7\_temp"})
+00593     \{
+00594         \textcolor{keywordflow}{return} std::to\_string(lms7Device->GetChipTemperature());
+00595     \}
+00596     \textcolor{keywordflow}{if} (name == \textcolor{stringliteral}{"chirp\_period"})
+00597     \{
+00598       \textcolor{keywordflow}{if} (sampleRate == 0)
+00599       \{
+00600         \textcolor{keywordflow}{throw} std::runtime\_error(\textcolor{stringliteral}{"SoapyLMS7::readSensor (chirp\_period) sample rate unset"});
+00601       \}
+00602       \textcolor{keywordflow}{else}
+00603       \{
+00604         \textcolor{keyword}{auto} ticks = lms7Device->GetChirpTimePeriod();
+00605         \textcolor{keywordflow}{return} std::to\_string(SoapySDR::ticksToTimeNs(ticks, sampleRate));
+00606       \}
+00607     \}
+00608     \textcolor{keywordflow}{if} (name == \textcolor{stringliteral}{"chirp\_time"})
+00609     \{
+00610       \textcolor{keywordflow}{if} (sampleRate == 0)
+00611       \{
+00612         \textcolor{keywordflow}{throw} std::runtime\_error(\textcolor{stringliteral}{"SoapyLMS7::readSensor (chirp\_time) sample rate unset"});
+00613       \}
+00614       \textcolor{keywordflow}{else}
+00615       \{
+00616         \textcolor{keyword}{auto} ticks = lms7Device->GetChirpTimeStamp();
+00617         \textcolor{keywordflow}{return} std::to\_string(SoapySDR::ticksToTimeNs(ticks, sampleRate));
+00618       \}
+00619     \}
+00620 
+00621     \textcolor{keywordflow}{throw} std::runtime\_error(\textcolor{stringliteral}{"SoapyLMS7::readSensor("}+name+\textcolor{stringliteral}{") - unknown sensor name"});
+00622 \}
+00623 
+00624 std::vector<std::string> SoapyLMS7::listSensors(\textcolor{keyword}{const} \textcolor{keywordtype}{int} \textcolor{comment}{/*direction*/}, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} \textcolor{comment}{/*channel*/})\textcolor{keyword}{ const}
+00625 \textcolor{keyword}{}\{
+00626     std::vector<std::string> sensors;
+00627     sensors.push\_back(\textcolor{stringliteral}{"lo\_locked"});
+00628     \textcolor{keywordflow}{return} sensors;
+00629 \}
+00630 
+00631 SoapySDR::ArgInfo SoapyLMS7::getSensorInfo(\textcolor{keyword}{const} \textcolor{keywordtype}{int} direction, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} channel, \textcolor{keyword}{const} 
+      std::string &name)\textcolor{keyword}{ const}
+00632 \textcolor{keyword}{}\{
+00633     SoapySDR::ArgInfo info;
+00634     \textcolor{keywordflow}{if} (name == \textcolor{stringliteral}{"lo\_locked"})
+00635     \{
+00636         info.key = \textcolor{stringliteral}{"lo\_locked"};
+00637         info.name = \textcolor{stringliteral}{"LO Locked"};
+00638         info.type = SoapySDR::ArgInfo::BOOL;
+00639         info.value = \textcolor{stringliteral}{"false"};
+00640         info.description = \textcolor{stringliteral}{"LO synthesizer is locked, good VCO selection."};
+00641     \}
+00642     \textcolor{keywordflow}{return} info;
+00643 \}
+00644 
+00645 std::string SoapyLMS7::readSensor(\textcolor{keyword}{const} \textcolor{keywordtype}{int} direction, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} channel, \textcolor{keyword}{const} 
+      std::string &name)\textcolor{keyword}{ const}
+00646 \textcolor{keyword}{}\{
+00647     std::unique\_lock<std::recursive\_mutex> lock(_accessMutex);
+00648     \textcolor{keyword}{const} \textcolor{keyword}{auto} lmsDir = (direction == SOAPY_SDR_TX)?LMS7002M::Tx:LMS7002M::Rx;
 00649 
-00650 \textcolor{keywordtype}{void} SoapyLMS7::writeRegister(\textcolor{keyword}{const} \textcolor{keywordtype}{unsigned} addr, \textcolor{keyword}{const} \textcolor{keywordtype}{unsigned} value)
-00651 \{
-00652     \textcolor{keyword}{auto} st = lms7Device->GetConnection()->WriteRegister(addr, value);
-00653     \textcolor{keywordflow}{if} (st != 0) \textcolor{keywordflow}{throw} std::runtime\_error(
-00654         \textcolor{stringliteral}{"SoapyLMS7::WriteRegister("}+std::to\_string(addr)+\textcolor{stringliteral}{") FAIL"});
-00655 \}
-00656 
-00657 \textcolor{keywordtype}{unsigned} SoapyLMS7::readRegister(\textcolor{keyword}{const} \textcolor{keywordtype}{unsigned} addr)\textcolor{keyword}{ const}
-00658 \textcolor{keyword}{}\{
-00659     \textcolor{keywordtype}{unsigned} readbackData = 0;
-00660     \textcolor{keyword}{auto} st = lms7Device->GetConnection()->ReadRegister(addr, readbackData);
-00661     \textcolor{keywordflow}{if} (st != 0) \textcolor{keywordflow}{throw} std::runtime\_error(
-00662         \textcolor{stringliteral}{"SoapyLMS7::ReadRegister("}+std::to\_string(addr)+\textcolor{stringliteral}{") FAIL"});
-00663     \textcolor{keywordflow}{return} readbackData;
-00664 \}
-00665 
-00666 \textcolor{comment}{/*******************************************************************}
-00667 \textcolor{comment}{ * Settings API}
-00668 \textcolor{comment}{ ******************************************************************/}
-00669 SoapySDR::ArgInfoList SoapyLMS7::getSettingInfo(\textcolor{keywordtype}{void})\textcolor{keyword}{ const}
-00670 \textcolor{keyword}{}\{
-00671     SoapySDR::ArgInfoList infos;
+00650     \textcolor{keywordflow}{if} (name == \textcolor{stringliteral}{"lo\_locked"})
+00651     \{
+00652         \textcolor{keywordflow}{return} lms7Device->GetLMS(channel/2)->GetSXLocked(lmsDir)?\textcolor{stringliteral}{"true"}:\textcolor{stringliteral}{"false"};
+00653     \}
+00654 
+00655     \textcolor{keywordflow}{throw} std::runtime\_error(\textcolor{stringliteral}{"SoapyLMS7::readSensor("}+name+\textcolor{stringliteral}{") - unknown sensor name"});
+00656 \}
+00657 
+00658 \textcolor{comment}{/*******************************************************************}
+00659 \textcolor{comment}{ * Register API}
+00660 \textcolor{comment}{ ******************************************************************/}
+00661 
+00662 std::vector<std::string> SoapyLMS7::listRegisterInterfaces(\textcolor{keywordtype}{void})\textcolor{keyword}{ const}
+00663 \textcolor{keyword}{}\{
+00664     std::vector<std::string> ifaces;
+00665     ifaces.push\_back(\textcolor{stringliteral}{"BBIC"});
+00666     \textcolor{keywordflow}{for} (\textcolor{keywordtype}{size\_t} i = 0; i < lms7Device->GetNumChannels()/2; i++)
+00667     \{
+00668         ifaces.push\_back(\textcolor{stringliteral}{"RFIC"} + std::to\_string(i));
+00669     \}
+00670     \textcolor{keywordflow}{return} ifaces;
+00671 \}
 00672 
-00673     \textcolor{keywordflow}{return} infos;
-00674 \}
-00675 
-00676 \textcolor{keywordtype}{void} SoapyLMS7::writeSetting(\textcolor{keyword}{const} std::string &key, \textcolor{keyword}{const} std::string &value)
-00677 \{
-00678     \textcolor{keywordflow}{if} (key == \textcolor{stringliteral}{"RXTSP\_CONST"})
-00679     \{
-00680         \textcolor{keywordflow}{for} (\textcolor{keywordtype}{size\_t} channel = 0; channel < lms7Device->GetNumChannels(); channel++)
-00681         \{
-00682             this->writeSetting(SOAPY\_SDR\_RX, channel, \textcolor{stringliteral}{"TSP\_CONST"}, value);
-00683         \}
-00684     \}
-00685 
-00686     \textcolor{keywordflow}{else} \textcolor{keywordflow}{if} (key == \textcolor{stringliteral}{"TXTSP\_CONST"})
-00687     \{
-00688         \textcolor{keywordflow}{for} (\textcolor{keywordtype}{size\_t} channel = 0; channel < lms7Device->GetNumChannels(); channel++)
-00689         \{
-00690             this->writeSetting(SOAPY\_SDR\_TX, channel, \textcolor{stringliteral}{"TSP\_CONST"}, value);
-00691         \}
-00692     \}
+00673 \textcolor{keywordtype}{void} SoapyLMS7::writeRegister(\textcolor{keyword}{const} std::string &name, \textcolor{keyword}{const} \textcolor{keywordtype}{unsigned} addr, \textcolor{keyword}{const} \textcolor{keywordtype}{unsigned} value)
+00674 \{
+00675     \textcolor{keywordflow}{if} (name == \textcolor{stringliteral}{"BBIC"}) \textcolor{keywordflow}{return} this->writeRegister(addr, value);
+00676     \textcolor{keywordflow}{if} (\textcolor{stringliteral}{"RFIC"} != name.substr(0,4))
+00677         \textcolor{keywordflow}{throw} std::runtime\_error(\textcolor{stringliteral}{"SoapyLMS7::readRegister("}+name+\textcolor{stringliteral}{") unknown interface"});
+00678 
+00679     \textcolor{keywordtype}{int} st = lms7Device->WriteLMSReg(addr, value, name[4]-\textcolor{charliteral}{'0'});
+00680     \textcolor{keywordflow}{if} (st == 0) \textcolor{keywordflow}{return};
+00681     \textcolor{keywordflow}{throw} std::runtime\_error(\textcolor{stringliteral}{"SoapyLMS7::WriteRegister("}+name+\textcolor{stringliteral}{", "}+std::to\_string(addr)+\textcolor{stringliteral}{") FAIL"});
+00682 
+00683 \}
+00684 
+00685 \textcolor{keywordtype}{unsigned} SoapyLMS7::readRegister(\textcolor{keyword}{const} std::string &name, \textcolor{keyword}{const} \textcolor{keywordtype}{unsigned} addr)\textcolor{keyword}{ const}
+00686 \textcolor{keyword}{}\{
+00687     \textcolor{keywordflow}{if} (name == \textcolor{stringliteral}{"BBIC"}) \textcolor{keywordflow}{return} this->readRegister(addr);
+00688     \textcolor{keywordflow}{if} (\textcolor{stringliteral}{"RFIC"} != name.substr(0,4))
+00689         \textcolor{keywordflow}{throw} std::runtime\_error(\textcolor{stringliteral}{"SoapyLMS7::readRegister("}+name+\textcolor{stringliteral}{") unknown interface"});
+00690 
+00691     \textcolor{keywordflow}{return} lms7Device->ReadLMSReg(addr, name[4]-\textcolor{charliteral}{'0'});
+00692 \}
 00693 
-00694     \textcolor{keywordflow}{else} \textcolor{keywordflow}{if} (key == \textcolor{stringliteral}{"CALIBRATE\_TX"})
-00695     \{
-00696         \textcolor{keywordflow}{for} (\textcolor{keywordtype}{size\_t} channel = 0; channel < lms7Device->GetNumChannels(); channel++)
-00697         \{
-00698             this->writeSetting(SOAPY\_SDR\_TX, channel, \textcolor{stringliteral}{"CALIBRATE\_TX"}, value);
-00699         \}
-00700     \}
-00701 
-00702     \textcolor{keywordflow}{else} \textcolor{keywordflow}{if} (key == \textcolor{stringliteral}{"CALIBRATE\_RX"})
-00703     \{
-00704         \textcolor{keywordflow}{for} (\textcolor{keywordtype}{size\_t} channel = 0; channel < lms7Device->GetNumChannels(); channel++)
-00705         \{
-00706             this->writeSetting(SOAPY\_SDR\_RX, channel, \textcolor{stringliteral}{"CALIBRATE\_RX"}, value);
-00707         \}
-00708     \}
+00694 \textcolor{keywordtype}{void} SoapyLMS7::writeRegister(\textcolor{keyword}{const} \textcolor{keywordtype}{unsigned} addr, \textcolor{keyword}{const} \textcolor{keywordtype}{unsigned} value)
+00695 \{
+00696     \textcolor{keyword}{auto} st = lms7Device->GetConnection()->WriteRegister(addr, value);
+00697     \textcolor{keywordflow}{if} (st != 0) \textcolor{keywordflow}{throw} std::runtime\_error(
+00698         \textcolor{stringliteral}{"SoapyLMS7::WriteRegister("}+std::to\_string(addr)+\textcolor{stringliteral}{") FAIL"});
+00699 \}
+00700 
+00701 \textcolor{keywordtype}{unsigned} SoapyLMS7::readRegister(\textcolor{keyword}{const} \textcolor{keywordtype}{unsigned} addr)\textcolor{keyword}{ const}
+00702 \textcolor{keyword}{}\{
+00703     \textcolor{keywordtype}{unsigned} readbackData = 0;
+00704     \textcolor{keyword}{auto} st = lms7Device->GetConnection()->ReadRegister(addr, readbackData);
+00705     \textcolor{keywordflow}{if} (st != 0) \textcolor{keywordflow}{throw} std::runtime\_error(
+00706         \textcolor{stringliteral}{"SoapyLMS7::ReadRegister("}+std::to\_string(addr)+\textcolor{stringliteral}{") FAIL"});
+00707     \textcolor{keywordflow}{return} readbackData;
+00708 \}
 00709 
-00710     \textcolor{keywordflow}{else} \textcolor{keywordflow}{if} (key == \textcolor{stringliteral}{"ENABLE\_RX\_GFIR\_LPF"})
-00711     \{
-00712         \textcolor{keywordflow}{for} (\textcolor{keywordtype}{size\_t} channel = 0; channel < lms7Device->GetNumChannels(); channel++)
-00713         \{
-00714             this->writeSetting(SOAPY\_SDR\_RX, channel, \textcolor{stringliteral}{"ENABLE\_GFIR\_LPF"}, value);
-00715         \}
-00716     \}
-00717 
-00718     \textcolor{keywordflow}{else} \textcolor{keywordflow}{if} (key == \textcolor{stringliteral}{"ENABLE\_TX\_GFIR\_LPF"})
-00719     \{
-00720         \textcolor{keywordflow}{for} (\textcolor{keywordtype}{size\_t} channel = 0; channel < lms7Device->GetNumChannels(); channel++)
-00721         \{
-00722             this->writeSetting(SOAPY\_SDR\_TX, channel, \textcolor{stringliteral}{"ENABLE\_GFIR\_LPF"}, value);
-00723         \}
-00724     \}
-00725 
-00726     \textcolor{keywordflow}{else} \textcolor{keywordflow}{if} (key == \textcolor{stringliteral}{"DISABLE\_RX\_GFIR\_LPF"})
-00727     \{
-00728         \textcolor{keywordflow}{for} (\textcolor{keywordtype}{size\_t} channel = 0; channel < lms7Device->GetNumChannels(); channel++)
-00729         \{
-00730             this->writeSetting(SOAPY\_SDR\_RX, channel, \textcolor{stringliteral}{"DISABLE\_GFIR\_LPF"}, value);
-00731         \}
-00732     \}
-00733 
-00734     \textcolor{keywordflow}{else} \textcolor{keywordflow}{if} (key == \textcolor{stringliteral}{"DISABLE\_TX\_GFIR\_LPF"})
-00735     \{
-00736         \textcolor{keywordflow}{for} (\textcolor{keywordtype}{size\_t} channel = 0; channel < lms7Device->GetNumChannels(); channel++)
-00737         \{
-00738             this->writeSetting(SOAPY\_SDR\_TX, channel, \textcolor{stringliteral}{"DISABLE\_GFIR\_LPF"}, value);
-00739         \}
-00740     \}
-00741 
-00742     \textcolor{keywordflow}{else} \textcolor{keywordflow}{if} (key == \textcolor{stringliteral}{"RXTSG\_NCO"})
-00743     \{
-00744         \textcolor{keywordflow}{for} (\textcolor{keywordtype}{size\_t} channel = 0; channel < lms7Device->GetNumChannels(); channel++)
-00745         \{
-00746             this->writeSetting(SOAPY\_SDR\_RX, channel, \textcolor{stringliteral}{"TSG\_NCO"}, value);
-00747         \}
-00748     \}
-00749 
-00750     \textcolor{keywordflow}{else} \textcolor{keywordflow}{if} (key == \textcolor{stringliteral}{"TXTSG\_NCO"})
-00751     \{
-00752         \textcolor{keywordflow}{for} (\textcolor{keywordtype}{size\_t} channel = 0; channel < lms7Device->GetNumChannels(); channel++)
-00753         \{
-00754             this->writeSetting(SOAPY\_SDR\_TX, channel, \textcolor{stringliteral}{"TSG\_NCO"}, value);
-00755         \}
-00756     \}
-00757 
-00758     \textcolor{keywordflow}{else} \textcolor{keywordflow}{if} (key == \textcolor{stringliteral}{"SAVE\_CONFIG"})
-00759     \{
-00760         lms7Device->SaveConfig(value.c\_str());
-00761     \}
-00762 
-00763     \textcolor{keywordflow}{else} \textcolor{keywordflow}{if} (key == \textcolor{stringliteral}{"LOAD\_CONFIG"})
-00764     \{
-00765         lms7Device->LoadConfig(value.c\_str());
-00766     \}
-00767 
-00768     \textcolor{keywordflow}{else}
-00769     \{
-00770         \textcolor{keywordflow}{for} (\textcolor{keywordtype}{size\_t} channel = 0; channel < lms7Device->GetNumChannels(); channel++)
-00771         \{
-00772             this->writeSetting(SOAPY\_SDR\_RX, channel, key, value);
-00773         \}
-00774     \}
-00775 \}
-00776 
-00777 SoapySDR::ArgInfoList SoapyLMS7::getSettingInfo(\textcolor{keyword}{const} \textcolor{keywordtype}{int} direction, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} channel)\textcolor{keyword}{ const}
-00778 \textcolor{keyword}{}\{
-00779     SoapySDR::ArgInfoList infos;
-00780 
-00781     \{
-00782         SoapySDR::ArgInfo info;
-00783         info.key = \textcolor{stringliteral}{"TSP\_CONST"};
-00784         info.name = \textcolor{stringliteral}{"TSP DC Level"};
-00785         info.type = SoapySDR::ArgInfo::INT;
-00786         info.description = \textcolor{stringliteral}{"Digital DC level in LMS7002M TSP chain."};
-00787         info.range = SoapySDR::Range(0, (1 << 15)-1);
-00788         infos.push\_back(info);
-00789     \}
-00790 
-00791     \textcolor{keywordflow}{return} infos;
-00792 \}
+00710 \textcolor{comment}{/*******************************************************************}
+00711 \textcolor{comment}{ * Settings API}
+00712 \textcolor{comment}{ ******************************************************************/}
+00713 SoapySDR::ArgInfoList SoapyLMS7::getSettingInfo(\textcolor{keywordtype}{void})\textcolor{keyword}{ const}
+00714 \textcolor{keyword}{}\{
+00715     SoapySDR::ArgInfoList infos;
+00716 
+00717     \textcolor{keywordflow}{return} infos;
+00718 \}
+00719 
+00720 \textcolor{keywordtype}{void} SoapyLMS7::writeSetting(\textcolor{keyword}{const} std::string &key, \textcolor{keyword}{const} std::string &value)
+00721 \{
+00722     \textcolor{keywordflow}{if} (key == \textcolor{stringliteral}{"RXTSP\_CONST"})
+00723     \{
+00724         \textcolor{keywordflow}{for} (\textcolor{keywordtype}{size\_t} channel = 0; channel < lms7Device->GetNumChannels(); channel++)
+00725         \{
+00726             this->writeSetting(SOAPY_SDR_RX, channel, \textcolor{stringliteral}{"TSP\_CONST"}, value);
+00727         \}
+00728     \}
+00729 
+00730     \textcolor{keywordflow}{else} \textcolor{keywordflow}{if} (key == \textcolor{stringliteral}{"TXTSP\_CONST"})
+00731     \{
+00732         \textcolor{keywordflow}{for} (\textcolor{keywordtype}{size\_t} channel = 0; channel < lms7Device->GetNumChannels(); channel++)
+00733         \{
+00734             this->writeSetting(SOAPY_SDR_TX, channel, \textcolor{stringliteral}{"TSP\_CONST"}, value);
+00735         \}
+00736     \}
+00737 
+00738     \textcolor{keywordflow}{else} \textcolor{keywordflow}{if} (key == \textcolor{stringliteral}{"CALIBRATE\_TX"})
+00739     \{
+00740         \textcolor{keywordflow}{for} (\textcolor{keywordtype}{size\_t} channel = 0; channel < lms7Device->GetNumChannels(); channel++)
+00741         \{
+00742             this->writeSetting(SOAPY_SDR_TX, channel, \textcolor{stringliteral}{"CALIBRATE\_TX"}, value);
+00743         \}
+00744     \}
+00745 
+00746     \textcolor{keywordflow}{else} \textcolor{keywordflow}{if} (key == \textcolor{stringliteral}{"CALIBRATE\_RX"})
+00747     \{
+00748         \textcolor{keywordflow}{for} (\textcolor{keywordtype}{size\_t} channel = 0; channel < lms7Device->GetNumChannels(); channel++)
+00749         \{
+00750             this->writeSetting(SOAPY_SDR_RX, channel, \textcolor{stringliteral}{"CALIBRATE\_RX"}, value);
+00751         \}
+00752     \}
+00753 
+00754     \textcolor{keywordflow}{else} \textcolor{keywordflow}{if} (key == \textcolor{stringliteral}{"ENABLE\_RX\_GFIR\_LPF"})
+00755     \{
+00756         \textcolor{keywordflow}{for} (\textcolor{keywordtype}{size\_t} channel = 0; channel < lms7Device->GetNumChannels(); channel++)
+00757         \{
+00758             this->writeSetting(SOAPY_SDR_RX, channel, \textcolor{stringliteral}{"ENABLE\_GFIR\_LPF"}, value);
+00759         \}
+00760     \}
+00761 
+00762     \textcolor{keywordflow}{else} \textcolor{keywordflow}{if} (key == \textcolor{stringliteral}{"ENABLE\_TX\_GFIR\_LPF"})
+00763     \{
+00764         \textcolor{keywordflow}{for} (\textcolor{keywordtype}{size\_t} channel = 0; channel < lms7Device->GetNumChannels(); channel++)
+00765         \{
+00766             this->writeSetting(SOAPY_SDR_TX, channel, \textcolor{stringliteral}{"ENABLE\_GFIR\_LPF"}, value);
+00767         \}
+00768     \}
+00769 
+00770     \textcolor{keywordflow}{else} \textcolor{keywordflow}{if} (key == \textcolor{stringliteral}{"DISABLE\_RX\_GFIR\_LPF"})
+00771     \{
+00772         \textcolor{keywordflow}{for} (\textcolor{keywordtype}{size\_t} channel = 0; channel < lms7Device->GetNumChannels(); channel++)
+00773         \{
+00774             this->writeSetting(SOAPY_SDR_RX, channel, \textcolor{stringliteral}{"DISABLE\_GFIR\_LPF"}, value);
+00775         \}
+00776     \}
+00777 
+00778     \textcolor{keywordflow}{else} \textcolor{keywordflow}{if} (key == \textcolor{stringliteral}{"DISABLE\_TX\_GFIR\_LPF"})
+00779     \{
+00780         \textcolor{keywordflow}{for} (\textcolor{keywordtype}{size\_t} channel = 0; channel < lms7Device->GetNumChannels(); channel++)
+00781         \{
+00782             this->writeSetting(SOAPY_SDR_TX, channel, \textcolor{stringliteral}{"DISABLE\_GFIR\_LPF"}, value);
+00783         \}
+00784     \}
+00785 
+00786     \textcolor{keywordflow}{else} \textcolor{keywordflow}{if} (key == \textcolor{stringliteral}{"RXTSG\_NCO"})
+00787     \{
+00788         \textcolor{keywordflow}{for} (\textcolor{keywordtype}{size\_t} channel = 0; channel < lms7Device->GetNumChannels(); channel++)
+00789         \{
+00790             this->writeSetting(SOAPY_SDR_RX, channel, \textcolor{stringliteral}{"TSG\_NCO"}, value);
+00791         \}
+00792     \}
 00793 
-00794 \textcolor{keywordtype}{void} SoapyLMS7::writeSetting(\textcolor{keyword}{const} \textcolor{keywordtype}{int} direction, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} channel, \textcolor{keyword}{const} std::string &key, \textcolor{keyword}{const} 
-      std::string &value)
-00795 \{
-00796     std::unique\_lock<std::recursive\_mutex> lock(_accessMutex);
-00797     \textcolor{keyword}{const} \textcolor{keywordtype}{bool} isTx = (direction == SOAPY\_SDR\_TX);
-00798 
-00799     \textcolor{keywordflow}{if} (key == \textcolor{stringliteral}{"TSP\_CONST"})
-00800     \{
-00801         \textcolor{keyword}{const} \textcolor{keyword}{auto} ampl = std::stoi(value);
-00802         lms7Device->SetTestSignal(isTx, channel, LMS_TESTSIG_DC, ampl, 0);
-00803     \}
-00804 
-00805     \textcolor{keywordflow}{else} \textcolor{keywordflow}{if} (key == \textcolor{stringliteral}{"CALIBRATE\_TX"} or (isTx and key == \textcolor{stringliteral}{"CALIBRATE"}))
-00806     \{
-00807         \textcolor{keywordtype}{double} bw = std::stof(value);
-00808         SoapySDR::logf(SOAPY\_SDR\_INFO, \textcolor{stringliteral}{"Calibrate Tx %f"}, bw);
-00809         \textcolor{keywordflow}{if} (lms7Device->Calibrate(\textcolor{keyword}{true}, channel, bw, 0)!=0)
-00810             \textcolor{keywordflow}{throw} std::runtime\_error(lime::GetLastErrorMessage());
-00811         _channelsToCal.erase(std::make\_pair(direction, channel));
-00812     \}
-00813 
-00814     \textcolor{keywordflow}{else} \textcolor{keywordflow}{if} (key == \textcolor{stringliteral}{"CALIBRATE\_RX"} or (not isTx and key == \textcolor{stringliteral}{"CALIBRATE"}))
-00815     \{
-00816         \textcolor{keywordtype}{double} bw = std::stof(value);
-00817         SoapySDR::logf(SOAPY\_SDR\_INFO, \textcolor{stringliteral}{"CalibrateRx %f"}, bw);
-00818         \textcolor{keywordflow}{if} (lms7Device->Calibrate(\textcolor{keyword}{false}, channel, bw, 0)!=0)
-00819             \textcolor{keywordflow}{throw} std::runtime\_error(lime::GetLastErrorMessage());
-00820         _channelsToCal.erase(std::make\_pair(direction, channel));
-00821     \}
-00822 
-00823     \textcolor{keywordflow}{else} \textcolor{keywordflow}{if} (key == \textcolor{stringliteral}{"ENABLE\_GFIR\_LPF"})
-00824     \{
-00825         \textcolor{keywordtype}{double} bw = std::stof(value);
-00826         SoapySDR::logf(SOAPY\_SDR\_INFO, \textcolor{stringliteral}{"Configurate GFIR LPF %f"}, bw);
-00827         lms7Device->ConfigureGFIR(isTx, channel, \textcolor{keyword}{true}, bw);
-00828     \}
-00829 
-00830     \textcolor{keywordflow}{else} \textcolor{keywordflow}{if}  (key == \textcolor{stringliteral}{"DISABLE\_GFIR\_LPF"})
-00831     \{
-00832         SoapySDR::logf(SOAPY\_SDR\_INFO, \textcolor{stringliteral}{"Disable GFIR LPF"});
-00833         lms7Device->ConfigureGFIR(isTx, channel, \textcolor{keyword}{false}, 0.0);
-00834     \}
-00835 
-00836     \textcolor{keywordflow}{else} \textcolor{keywordflow}{if} (key == \textcolor{stringliteral}{"TSG\_NCO"})
-00837     \{
-00838         \textcolor{keyword}{auto} select = std::stoi(value);
-00839         \textcolor{keywordflow}{if} (select == -1)
-00840         \{
-00841             \textcolor{comment}{//Requested to disable the TSG}
-00842             lms7Device->SetTestSignal(isTx, channel, LMS_TESTSIG_NONE);
-00843         \}
-00844         \textcolor{keywordflow}{else} \textcolor{keywordflow}{if}(select == 4)
-00845         \{
-00846             lms7Device->SetTestSignal(isTx, channel, LMS_TESTSIG_NCODIV4F);
-00847         \}
-00848         \textcolor{keywordflow}{else} \textcolor{keywordflow}{if} (select == 8)
-00849         \{
-00850             lms7Device->SetTestSignal(isTx, channel, LMS_TESTSIG_NCODIV8F);
-00851         \}
-00852         \textcolor{keywordflow}{else}
-00853         \{
-00854             \textcolor{keywordflow}{throw} std::runtime\_error(\textcolor{stringliteral}{"Invalid TSG\_NCO option: "} + value);
-00855         \}
+00794     \textcolor{keywordflow}{else} \textcolor{keywordflow}{if} (key == \textcolor{stringliteral}{"TXTSG\_NCO"})
+00795     \{
+00796         \textcolor{keywordflow}{for} (\textcolor{keywordtype}{size\_t} channel = 0; channel < lms7Device->GetNumChannels(); channel++)
+00797         \{
+00798             this->writeSetting(SOAPY_SDR_TX, channel, \textcolor{stringliteral}{"TSG\_NCO"}, value);
+00799         \}
+00800     \}
+00801 
+00802     \textcolor{keywordflow}{else} \textcolor{keywordflow}{if} (key == \textcolor{stringliteral}{"SAVE\_CONFIG"})
+00803     \{
+00804         lms7Device->SaveConfig(value.c\_str());
+00805     \}
+00806 
+00807     \textcolor{keywordflow}{else} \textcolor{keywordflow}{if} (key == \textcolor{stringliteral}{"LOAD\_CONFIG"})
+00808     \{
+00809         lms7Device->LoadConfig(value.c\_str());
+00810     \}
+00811 
+00812     \textcolor{keywordflow}{else}
+00813     \{
+00814         \textcolor{keywordflow}{for} (\textcolor{keywordtype}{size\_t} channel = 0; channel < lms7Device->GetNumChannels(); channel++)
+00815         \{
+00816             this->writeSetting(SOAPY_SDR_RX, channel, key, value);
+00817         \}
+00818     \}
+00819 \}
+00820 
+00821 SoapySDR::ArgInfoList SoapyLMS7::getSettingInfo(\textcolor{keyword}{const} \textcolor{keywordtype}{int} direction, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} channel)\textcolor{keyword}{ const}
+00822 \textcolor{keyword}{}\{
+00823     SoapySDR::ArgInfoList infos;
+00824 
+00825     \{
+00826         SoapySDR::ArgInfo info;
+00827         info.key = \textcolor{stringliteral}{"TSP\_CONST"};
+00828         info.name = \textcolor{stringliteral}{"TSP DC Level"};
+00829         info.type = SoapySDR::ArgInfo::INT;
+00830         info.description = \textcolor{stringliteral}{"Digital DC level in LMS7002M TSP chain."};
+00831         info.range = SoapySDR::Range(0, (1 << 15)-1);
+00832         infos.push\_back(info);
+00833     \}
+00834 
+00835     \textcolor{keywordflow}{return} infos;
+00836 \}
+00837 
+00838 \textcolor{keywordtype}{void} SoapyLMS7::writeSetting(\textcolor{keyword}{const} \textcolor{keywordtype}{int} direction, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} channel, \textcolor{keyword}{const} 
+      std::string &key, \textcolor{keyword}{const} std::string &value)
+00839 \{
+00840     std::unique\_lock<std::recursive\_mutex> lock(_accessMutex);
+00841     \textcolor{keyword}{const} \textcolor{keywordtype}{bool} isTx = (direction == SOAPY_SDR_TX);
+00842 
+00843     \textcolor{keywordflow}{if} (key == \textcolor{stringliteral}{"TSP\_CONST"})
+00844     \{
+00845         \textcolor{keyword}{const} \textcolor{keyword}{auto} ampl = std::stoi(value);
+00846         lms7Device->SetTestSignal(isTx, channel, LMS_TESTSIG_DC, ampl, 0);
+00847     \}
+00848 
+00849     \textcolor{keywordflow}{else} \textcolor{keywordflow}{if} (key == \textcolor{stringliteral}{"CALIBRATE\_TX"} or (isTx and key == \textcolor{stringliteral}{"CALIBRATE"}))
+00850     \{
+00851         \textcolor{keywordtype}{double} bw = std::stof(value);
+00852         SoapySDR::logf(SOAPY_SDR_INFO, \textcolor{stringliteral}{"Calibrate Tx %f"}, bw);
+00853         \textcolor{keywordflow}{if} (lms7Device->Calibrate(\textcolor{keyword}{true}, channel, bw, 0)!=0)
+00854             \textcolor{keywordflow}{throw} std::runtime\_error(lime::GetLastErrorMessage());
+00855         _channelsToCal.erase(std::make\_pair(direction, channel));
 00856     \}
-00857     \textcolor{keywordflow}{else}
-00858     \{
-00859         uint16\_t val = std::stoi(value);
-00860         \textcolor{keywordflow}{if} (lms7Device->WriteParam(key,val,channel)!=-1)
-00861             \textcolor{keywordflow}{return};
-00862         \textcolor{keywordflow}{throw} std::runtime\_error(\textcolor{stringliteral}{"unknown setting key: "}+key);
-00863     \}
-00864 \}
-00865 
-00866 std::string SoapyLMS7::readSetting(\textcolor{keyword}{const} std::string &key)\textcolor{keyword}{ const}
-00867 \textcolor{keyword}{}\{
-00868     \textcolor{keywordflow}{return} readSetting(SOAPY\_SDR\_TX, 0, key);
-00869 \}
-00870     
-00871 std::string SoapyLMS7::readSetting(\textcolor{keyword}{const} \textcolor{keywordtype}{int} direction, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} channel, \textcolor{keyword}{const} std::string &key)\textcolor{keyword}{ const}
-00872 \textcolor{keyword}{}\{
-00873     \textcolor{keywordtype}{int} val = lms7Device->ReadParam(key,channel);
-00874     \textcolor{keywordflow}{if} ( val !=-1)
-00875         \textcolor{keywordflow}{return} std::to\_string(val);
-00876     
-00877     \textcolor{keywordflow}{throw} std::runtime\_error(\textcolor{stringliteral}{"unknown setting key: "}+key);
-00878 \}
-00879 \textcolor{comment}{/******************************************************************}
-00880 \textcolor{comment}{ * GPIO API}
-00881 \textcolor{comment}{ ******************************************************************/}
-00882 
-00883 std::vector<std::string> SoapyLMS7::listGPIOBanks(\textcolor{keywordtype}{void})\textcolor{keyword}{ const}
-00884 \textcolor{keyword}{}\{
-00885     std::vector<std::string> banks;
-00886     banks.push\_back(\textcolor{stringliteral}{"MAIN"}); \textcolor{comment}{//just one associated with the connection}
-00887     \textcolor{keywordflow}{return} banks;
-00888 \}
-00889 
-00890 \textcolor{keywordtype}{void} SoapyLMS7::writeGPIO(\textcolor{keyword}{const} std::string &, \textcolor{keyword}{const} \textcolor{keywordtype}{unsigned} value)
-00891 \{
-00892     \textcolor{keywordtype}{int} r = lms7Device->GetConnection()->GPIOWrite((uint8\_t*)&value, \textcolor{keyword}{sizeof}(value));
-00893     \textcolor{keywordflow}{if} (r != 0) \textcolor{keywordflow}{throw} std::runtime\_error(\textcolor{stringliteral}{"SoapyLMS7::writeGPIO() "} + std::string(
-      lime::GetLastErrorMessage()));
-00894 \}
-00895 
-00896 \textcolor{keywordtype}{unsigned} SoapyLMS7::readGPIO(\textcolor{keyword}{const} std::string &)\textcolor{keyword}{ const}
-00897 \textcolor{keyword}{}\{
-00898     \textcolor{keywordtype}{unsigned} buffer(0);
-00899     \textcolor{keywordtype}{int} r = lms7Device->GetConnection()->GPIORead((uint8\_t*)&buffer, \textcolor{keyword}{sizeof}(buffer));
-00900     \textcolor{keywordflow}{if} (r != 0) \textcolor{keywordflow}{throw} std::runtime\_error(\textcolor{stringliteral}{"SoapyLMS7::readGPIO() "} + std::string(
-      lime::GetLastErrorMessage()));
-00901     \textcolor{keywordflow}{return} buffer;
-00902 \}
-00903 
-00904 \textcolor{keywordtype}{void} SoapyLMS7::writeGPIODir(\textcolor{keyword}{const} std::string &, \textcolor{keyword}{const} \textcolor{keywordtype}{unsigned} dir)
-00905 \{
-00906     \textcolor{keywordtype}{int} r = lms7Device->GetConnection()->GPIODirWrite((uint8\_t*)&dir, \textcolor{keyword}{sizeof}(dir));
-00907     \textcolor{keywordflow}{if} (r != 0) \textcolor{keywordflow}{throw} std::runtime\_error(\textcolor{stringliteral}{"SoapyLMS7::writeGPIODir() "} + std::string(
-      lime::GetLastErrorMessage()));
+00857 
+00858     \textcolor{keywordflow}{else} \textcolor{keywordflow}{if} (key == \textcolor{stringliteral}{"CALIBRATE\_RX"} or (not isTx and key == \textcolor{stringliteral}{"CALIBRATE"}))
+00859     \{
+00860         \textcolor{keywordtype}{double} bw = std::stof(value);
+00861         SoapySDR::logf(SOAPY_SDR_INFO, \textcolor{stringliteral}{"CalibrateRx %f"}, bw);
+00862         \textcolor{keywordflow}{if} (lms7Device->Calibrate(\textcolor{keyword}{false}, channel, bw, 0)!=0)
+00863             \textcolor{keywordflow}{throw} std::runtime\_error(lime::GetLastErrorMessage());
+00864         _channelsToCal.erase(std::make\_pair(direction, channel));
+00865     \}
+00866 
+00867     \textcolor{keywordflow}{else} \textcolor{keywordflow}{if} (key == \textcolor{stringliteral}{"ENABLE\_GFIR\_LPF"})
+00868     \{
+00869         \textcolor{keywordtype}{double} bw = std::stof(value);
+00870         SoapySDR::logf(SOAPY_SDR_INFO, \textcolor{stringliteral}{"Configurate GFIR LPF %f"}, bw);
+00871         lms7Device->ConfigureGFIR(isTx, channel, \textcolor{keyword}{true}, bw);
+00872     \}
+00873 
+00874     \textcolor{keywordflow}{else} \textcolor{keywordflow}{if}  (key == \textcolor{stringliteral}{"DISABLE\_GFIR\_LPF"})
+00875     \{
+00876         SoapySDR::logf(SOAPY_SDR_INFO, \textcolor{stringliteral}{"Disable GFIR LPF"});
+00877         lms7Device->ConfigureGFIR(isTx, channel, \textcolor{keyword}{false}, 0.0);
+00878     \}
+00879 
+00880     \textcolor{keywordflow}{else} \textcolor{keywordflow}{if} (key == \textcolor{stringliteral}{"TSG\_NCO"})
+00881     \{
+00882         \textcolor{keyword}{auto} select = std::stoi(value);
+00883         \textcolor{keywordflow}{if} (select == -1)
+00884         \{
+00885             \textcolor{comment}{//Requested to disable the TSG}
+00886             lms7Device->SetTestSignal(isTx, channel, LMS_TESTSIG_NONE);
+00887         \}
+00888         \textcolor{keywordflow}{else} \textcolor{keywordflow}{if}(select == 4)
+00889         \{
+00890             lms7Device->SetTestSignal(isTx, channel, LMS_TESTSIG_NCODIV4F);
+00891         \}
+00892         \textcolor{keywordflow}{else} \textcolor{keywordflow}{if} (select == 8)
+00893         \{
+00894             lms7Device->SetTestSignal(isTx, channel, LMS_TESTSIG_NCODIV8F);
+00895         \}
+00896         \textcolor{keywordflow}{else}
+00897         \{
+00898             \textcolor{keywordflow}{throw} std::runtime\_error(\textcolor{stringliteral}{"Invalid TSG\_NCO option: "} + value);
+00899         \}
+00900     \}
+00901     \textcolor{keywordflow}{else}
+00902     \{
+00903         uint16\_t val = std::stoi(value);
+00904         \textcolor{keywordflow}{if} (lms7Device->WriteParam(key,val,channel)!=-1)
+00905             \textcolor{keywordflow}{return};
+00906         \textcolor{keywordflow}{throw} std::runtime\_error(\textcolor{stringliteral}{"unknown setting key: "}+key);
+00907     \}
 00908 \}
 00909 
-00910 \textcolor{keywordtype}{unsigned} SoapyLMS7::readGPIODir(\textcolor{keyword}{const} std::string &)\textcolor{keyword}{ const}
+00910 std::string SoapyLMS7::readSetting(\textcolor{keyword}{const} std::string &key)\textcolor{keyword}{ const}
 00911 \textcolor{keyword}{}\{
-00912     \textcolor{keywordtype}{unsigned} buffer(0);
-00913     \textcolor{keywordtype}{int} r = lms7Device->GetConnection()->GPIODirRead((uint8\_t*)&buffer, \textcolor{keyword}{sizeof}(buffer));
-00914     \textcolor{keywordflow}{if} (r != 0) \textcolor{keywordflow}{throw} std::runtime\_error(\textcolor{stringliteral}{"SoapyLMS7::readGPIODir() "} + std::string(
+00912     \textcolor{keywordflow}{return} readSetting(SOAPY_SDR_TX, 0, key);
+00913 \}
+00914 
+00915 std::string SoapyLMS7::readSetting(\textcolor{keyword}{const} \textcolor{keywordtype}{int} direction, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} channel, \textcolor{keyword}{const} 
+      std::string &key)\textcolor{keyword}{ const}
+00916 \textcolor{keyword}{}\{
+00917     \textcolor{keywordtype}{int} val = lms7Device->ReadParam(key,channel);
+00918     \textcolor{keywordflow}{if} ( val !=-1)
+00919         \textcolor{keywordflow}{return} std::to\_string(val);
+00920 
+00921     \textcolor{keywordflow}{throw} std::runtime\_error(\textcolor{stringliteral}{"unknown setting key: "}+key);
+00922 \}
+00923 \textcolor{comment}{/******************************************************************}
+00924 \textcolor{comment}{ * GPIO API}
+00925 \textcolor{comment}{ ******************************************************************/}
+00926 
+00927 std::vector<std::string> SoapyLMS7::listGPIOBanks(\textcolor{keywordtype}{void})\textcolor{keyword}{ const}
+00928 \textcolor{keyword}{}\{
+00929     std::vector<std::string> banks;
+00930     banks.push\_back(\textcolor{stringliteral}{"MAIN"}); \textcolor{comment}{//just one associated with the connection}
+00931     \textcolor{keywordflow}{return} banks;
+00932 \}
+00933 
+00934 \textcolor{keywordtype}{void} SoapyLMS7::writeGPIO(\textcolor{keyword}{const} std::string &, \textcolor{keyword}{const} \textcolor{keywordtype}{unsigned} value)
+00935 \{
+00936     \textcolor{keywordtype}{int} r = lms7Device->GetConnection()->GPIOWrite((uint8\_t*)&value, \textcolor{keyword}{sizeof}(value));
+00937     \textcolor{keywordflow}{if} (r != 0) \textcolor{keywordflow}{throw} std::runtime\_error(\textcolor{stringliteral}{"SoapyLMS7::writeGPIO() "} + std::string(
       lime::GetLastErrorMessage()));
-00915     \textcolor{keywordflow}{return} buffer;
-00916 \}
+00938 \}
+00939 
+00940 \textcolor{keywordtype}{unsigned} SoapyLMS7::readGPIO(\textcolor{keyword}{const} std::string &)\textcolor{keyword}{ const}
+00941 \textcolor{keyword}{}\{
+00942     \textcolor{keywordtype}{unsigned} buffer(0);
+00943     \textcolor{keywordtype}{int} r = lms7Device->GetConnection()->GPIORead((uint8\_t*)&buffer, \textcolor{keyword}{sizeof}(buffer));
+00944     \textcolor{keywordflow}{if} (r != 0) \textcolor{keywordflow}{throw} std::runtime\_error(\textcolor{stringliteral}{"SoapyLMS7::readGPIO() "} + std::string(
+      lime::GetLastErrorMessage()));
+00945     \textcolor{keywordflow}{return} buffer;
+00946 \}
+00947 
+00948 \textcolor{keywordtype}{void} SoapyLMS7::writeGPIODir(\textcolor{keyword}{const} std::string &, \textcolor{keyword}{const} \textcolor{keywordtype}{unsigned} dir)
+00949 \{
+00950     \textcolor{keywordtype}{int} r = lms7Device->GetConnection()->GPIODirWrite((uint8\_t*)&dir, \textcolor{keyword}{sizeof}(dir));
+00951     \textcolor{keywordflow}{if} (r != 0) \textcolor{keywordflow}{throw} std::runtime\_error(\textcolor{stringliteral}{"SoapyLMS7::writeGPIODir() "} + 
+      std::string(lime::GetLastErrorMessage()));
+00952 \}
+00953 
+00954 \textcolor{keywordtype}{unsigned} SoapyLMS7::readGPIODir(\textcolor{keyword}{const} std::string &)\textcolor{keyword}{ const}
+00955 \textcolor{keyword}{}\{
+00956     \textcolor{keywordtype}{unsigned} buffer(0);
+00957     \textcolor{keywordtype}{int} r = lms7Device->GetConnection()->GPIODirRead((uint8\_t*)&buffer, \textcolor{keyword}{sizeof}(buffer));
+00958     \textcolor{keywordflow}{if} (r != 0) \textcolor{keywordflow}{throw} std::runtime\_error(\textcolor{stringliteral}{"SoapyLMS7::readGPIODir() "} + 
+      std::string(lime::GetLastErrorMessage()));
+00959     \textcolor{keywordflow}{return} buffer;
+00960 \}
 \end{DoxyCode}

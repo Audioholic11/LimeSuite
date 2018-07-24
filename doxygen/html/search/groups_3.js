@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['initialization_2fdeinitialization',['Initialization/deinitialization',['../d1/d90/group__FN__INIT.html',1,'']]]
+  ['high_2dlevel_20control_20functions',['High-level control functions',['../d8/d80/group__FN__HIGH__LVL.html',1,'']]]
 ];

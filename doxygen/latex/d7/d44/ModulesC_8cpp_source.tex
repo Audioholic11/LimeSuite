@@ -1,0 +1,63 @@
+\subsection{Modules\+C.\+cpp}
+\label{ModulesC_8cpp_source}\index{/home/erik/prefix/default/src/soapysdr/lib/\+Modules\+C.\+cpp@{/home/erik/prefix/default/src/soapysdr/lib/\+Modules\+C.\+cpp}}
+
+\begin{DoxyCode}
+00001 \textcolor{comment}{// Copyright (c) 2014-2018 Josh Blum}
+00002 \textcolor{comment}{// SPDX-License-Identifier: BSL-1.0}
+00003 
+00004 \textcolor{preprocessor}{#include "TypeHelpers.hpp"}
+00005 \textcolor{preprocessor}{#include <SoapySDR/Modules.h>}
+00006 \textcolor{preprocessor}{#include <SoapySDR/Modules.hpp>}
+00007 \textcolor{preprocessor}{#include <cstdlib>}
+00008 \textcolor{preprocessor}{#include <cstring>}
+00009 
+00010 \textcolor{keyword}{extern} \textcolor{stringliteral}{"C"} \{
+00011 
+00012 \textcolor{keyword}{const} \textcolor{keywordtype}{char} *SoapySDR_getRootPath(\textcolor{keywordtype}{void})
+00013 \{
+00014     \textcolor{keyword}{static} \textcolor{keyword}{const} std::string root = SoapySDR::getRootPath();
+00015     \textcolor{keywordflow}{return} root.c\_str();
+00016 \}
+00017 
+00018 \textcolor{keywordtype}{char} **SoapySDR_listSearchPaths(\textcolor{keywordtype}{size\_t} *length)
+00019 \{
+00020     \textcolor{keywordflow}{return} toStrArray(SoapySDR::listSearchPaths(), length);
+00021 \}
+00022 
+00023 \textcolor{keywordtype}{char} **SoapySDR_listModules(\textcolor{keywordtype}{size\_t} *length)
+00024 \{
+00025     \textcolor{keywordflow}{return} toStrArray(SoapySDR::listModules(), length);
+00026 \}
+00027 
+00028 \textcolor{keywordtype}{char} **SoapySDR_listModulesPath(\textcolor{keyword}{const} \textcolor{keywordtype}{char} *path, \textcolor{keywordtype}{size\_t} *length)
+00029 \{
+00030     \textcolor{keywordflow}{return} toStrArray(SoapySDR::listModules(path), length);
+00031 \}
+00032 
+00033 \textcolor{keywordtype}{char} *SoapySDR_loadModule(\textcolor{keyword}{const} \textcolor{keywordtype}{char} *path)
+00034 \{
+00035     \textcolor{keywordflow}{return} strdup(SoapySDR::loadModule(path).c\_str());
+00036 \}
+00037 
+00038 SoapySDRKwargs SoapySDR_getLoaderResult(\textcolor{keyword}{const} \textcolor{keywordtype}{char} *path)
+00039 \{
+00040     \textcolor{keywordflow}{return} toKwargs(SoapySDR::getLoaderResult(path));
+00041 \}
+00042 
+00043 \textcolor{keywordtype}{char} *SoapySDR_getModuleVersion(\textcolor{keyword}{const} \textcolor{keywordtype}{char} *path)
+00044 \{
+00045     \textcolor{keywordflow}{return} strdup(SoapySDR::getModuleVersion(path).c\_str());
+00046 \}
+00047 
+00048 \textcolor{keywordtype}{char} *SoapySDR_unloadModule(\textcolor{keyword}{const} \textcolor{keywordtype}{char} *path)
+00049 \{
+00050     \textcolor{keywordflow}{return} strdup(SoapySDR::unloadModule(path).c\_str());
+00051 \}
+00052 
+00053 \textcolor{keywordtype}{void} SoapySDR_loadModules(\textcolor{keywordtype}{void})
+00054 \{
+00055     SoapySDR::loadModules();
+00056 \}
+00057 
+00058 \}
+\end{DoxyCode}

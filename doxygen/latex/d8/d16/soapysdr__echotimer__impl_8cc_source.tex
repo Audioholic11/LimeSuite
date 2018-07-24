@@ -1,0 +1,580 @@
+\subsection{soapysdr\+\_\+echotimer\+\_\+impl.\+cc}
+\label{soapysdr__echotimer__impl_8cc_source}\index{/home/erik/prefix/default/src/gr-\/radar-\/dev/lib/soapysdr\+\_\+echotimer\+\_\+impl.\+cc@{/home/erik/prefix/default/src/gr-\/radar-\/dev/lib/soapysdr\+\_\+echotimer\+\_\+impl.\+cc}}
+
+\begin{DoxyCode}
+00001 \textcolor{comment}{/* -*- c++ -*- */}
+00002 \textcolor{comment}{/*}
+00003 \textcolor{comment}{* Copyright 2018 <+YOU OR YOUR COMPANY+>.}
+00004 \textcolor{comment}{*}
+00005 \textcolor{comment}{* This is free software; you can redistribute it and/or modify}
+00006 \textcolor{comment}{* it under the terms of the GNU General Public License as published by}
+00007 \textcolor{comment}{* the Free Software Foundation; either version 3, or (at your option)}
+00008 \textcolor{comment}{* any later version.}
+00009 \textcolor{comment}{*}
+00010 \textcolor{comment}{* This software is distributed in the hope that it will be useful,}
+00011 \textcolor{comment}{* but WITHOUT ANY WARRANTY; without even the implied warranty of}
+00012 \textcolor{comment}{* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the}
+00013 \textcolor{comment}{* GNU General Public License for more details.}
+00014 \textcolor{comment}{*}
+00015 \textcolor{comment}{* You should have received a copy of the GNU General Public License}
+00016 \textcolor{comment}{* along with this software; see the file COPYING.  If not, write to}
+00017 \textcolor{comment}{* the Free Software Foundation, Inc., 51 Franklin Street,}
+00018 \textcolor{comment}{* Boston, MA 02110-1301, USA.}
+00019 \textcolor{comment}{*/}
+00020 
+00021 \textcolor{preprocessor}{#ifdef HAVE\_CONFIG\_H}
+00022 \textcolor{preprocessor}{#include "config.h"}
+00023 \textcolor{preprocessor}{#endif}
+00024 
+00025 \textcolor{preprocessor}{#include <gnuradio/io\_signature.h>}
+00026 \textcolor{preprocessor}{#include "soapysdr_echotimer_impl.h"}
+00027 
+00028 \textcolor{preprocessor}{#include <iostream>}
+00029 
+00030 \textcolor{keyword}{namespace }gr \{
+00031   \textcolor{keyword}{namespace }radar \{
+00032     soapysdr_echotimer::sptr
+00033     soapysdr_echotimer::make(\textcolor{keywordtype}{int} samp_rate, \textcolor{keywordtype}{float} center_freq, \textcolor{keywordtype}{int} num\_delay\_samps,
+00034                               std::string args,
+00035                               std::string antenna\_tx, \textcolor{keywordtype}{float} gain\_tx, \textcolor{keywordtype}{float} bw\_tx,
+00036                               \textcolor{keywordtype}{float} timeout\_tx, \textcolor{keywordtype}{float} wait\_tx, \textcolor{keywordtype}{float} lo\_offset\_tx,
+00037                               std::string antenna\_rx, \textcolor{keywordtype}{float} gain\_rx, \textcolor{keywordtype}{float} bw\_rx,
+00038                               \textcolor{keywordtype}{float} timeout\_rx, \textcolor{keywordtype}{float} wait\_rx, \textcolor{keywordtype}{float} lo\_offset\_rx,
+00039                               \textcolor{keyword}{const} std::string& len\_key)
+00040       \{\textcolor{keywordflow}{return} gnuradio::get\_initial\_sptr
+00041         ( \textcolor{keyword}{new} soapysdr_echotimer_impl (samp\_rate, center\_freq, num\_delay\_samps,
+00042                                           args,
+00043                                           antenna\_tx, gain\_tx, bw\_tx,
+00044                                           timeout\_tx, wait\_tx, lo\_offset\_tx,
+00045                                           antenna\_rx, gain\_rx, bw\_rx,
+00046                                           timeout\_rx, wait\_rx, lo\_offset\_rx,
+00047                                           len\_key));
+00048       \}
+00049 
+00050       \textcolor{comment}{/*}
+00051 \textcolor{comment}{      * The private constructor}
+00052 \textcolor{comment}{      */}
+00053       soapysdr_echotimer_impl::soapysdr_echotimer_impl(\textcolor{keywordtype}{int} samp_rate, \textcolor{keywordtype}{float} 
+      center_freq, \textcolor{keywordtype}{int} num_delay_samps,
+00054                                                         std::string args,
+00055                                                         std::string antenna\_tx, \textcolor{keywordtype}{float} gain\_tx, \textcolor{keywordtype}{float} bw\_tx,
+00056                                                         \textcolor{keywordtype}{float} timeout\_tx, \textcolor{keywordtype}{float} 
+      wait_tx, \textcolor{keywordtype}{float} lo\_offset\_tx,
+00057                                                         std::string antenna\_rx, \textcolor{keywordtype}{float} gain\_rx, \textcolor{keywordtype}{float} bw\_rx,
+00058                                                         \textcolor{keywordtype}{float} timeout\_rx, \textcolor{keywordtype}{float} 
+      wait_rx, \textcolor{keywordtype}{float} lo\_offset\_rx,
+00059                                                         \textcolor{keyword}{const} std::string& len\_key)
+00060       : gr::tagged\_stream\_block(\textcolor{stringliteral}{"soapysdr\_echotimer"},
+00061       gr::io\_signature::make(1, 1, sizeof(gr\_complex)),
+00062       gr::io\_signature::make(1, 1, sizeof(gr\_complex)), len\_key),
+00063       \textcolor{comment}{//Parameters}
+00064         \textcolor{comment}{//EchoParameters}
+00065         d\_num\_delay\_samps(num\_delay\_samps),
+00066         \textcolor{comment}{//Common}
+00067         d\_args(args),
+00068         d\_samp\_rate(samp\_rate),
+00069         d\_center\_freq(center\_freq),
+00070         \textcolor{comment}{//Rx}
+00071         d\_timeout\_rx(timeout\_rx),
+00072         d\_wait\_rx(wait\_rx),
+00073         d\_lo\_offset\_rx(lo\_offset\_rx),
+00074         d\_antenna\_rx(antenna\_rx),
+00075         d\_gain\_rx(gain\_rx),
+00076         d\_bw\_rx(bw\_rx),
+00077         \textcolor{comment}{//Tx}
+00078         d\_timeout\_tx(timeout\_tx),
+00079         d\_wait\_tx(wait\_tx),
+00080         d\_lo\_offset\_tx(lo\_offset\_tx),
+00081         d\_antenna\_tx(antenna\_tx),
+00082         d\_gain\_tx(gain\_tx),
+00083         d\_bw\_tx(bw\_tx)
+00084       \{
+00085 
+00086       \textcolor{comment}{//#define BOARD\_GPIO\_OVRD (6 << 5)}
+00087       \textcolor{comment}{//SoapySDRDevice\_writeRegister(sdr, *registers, BOARD\_GPIO\_DIR, 0x00FF);}
+00088       d_out_buffer.resize(0);
+00089       d_timeNs_tx = 0;
+00090       d_timeNs_rx = 0;
+00091       d_timeoutUs = 10000000;
+00092       d_time_now_rx = 0;
+00093       d_time_now_tx = 0;
+00094       d_timeNs_rx_return = 1e9;
+00095 
+00096       \textcolor{comment}{//******************* Setup Soapy RX *******************//}
+00097       d_chan_rx = 0;
+00098 
+00099       d_kw = SoapySDR::KwargsFromString(d_args);
+00100       \textcolor{comment}{// Setup USRP RX: args (addr,...)}
+00101       d_soapysdr = SoapySDR::Device::make(d_kw);
+00102       SoapySDR::Kwargs  HWINFO = d_soapysdr->getHardwareInfo();
+00103       SoapySDR::ArgInfoList StreamArg = d_soapysdr->getStreamArgsInfo(
+      SOAPY_SDR_RX,d_chan_rx);
+00104       std::vector<std::string> StreamFormats = d_soapysdr->getStreamFormats(
+      SOAPY_SDR_RX,d_chan_rx);
+00105 
+00106 
+00107 
+00108       std::cout << \textcolor{stringliteral}{" Using Soapy Device (RX): "} << SoapySDR::KwargsToString(HWINFO) << std::endl;
+00109       std::cout << \textcolor{stringliteral}{" Using Driver (RX): "} << d_soapysdr->getDriverKey() << std::endl;
+00110       std::cout << \textcolor{stringliteral}{" Using HW (RX): "} << d_soapysdr->getHardwareKey() << std::endl;
+00111       std::cout << \textcolor{stringliteral}{" has HW Time? (RX): "} << d_soapysdr->hasHardwareTime() << std::endl;
+00112       std::cout << \textcolor{stringliteral}{" clock rate (RX): "} << d_soapysdr->getMasterClockRate() << std::endl;
+00113       std::cout << \textcolor{stringliteral}{" num channels (RX): "} << d_soapysdr->getNumChannels(
+      SOAPY_SDR_RX) << std::endl;
+00114       \textcolor{comment}{//std::cout << "stream format (RX): " << StreamFormats[0]<< StreamFormats[1] << std::endl;}
+00115       \textcolor{comment}{//std::cout << "stream native (RX): " << d\_soapysdr->getNativeStreamFormat(SOAPY\_SDR\_RX,d\_chan\_rx,1)
+       << std::endl <<}
+00116       \textcolor{comment}{//std::cout << "stream args (RX): " << SoapySDR::KwargsToString(StreamArg.key[1]) << std::endl;}
+00117 
+00118       \textcolor{comment}{//Setup Register Devices}
+00119       d_listRegInterfaces = d_soapysdr->listRegisterInterfaces();
+00120       \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} i = 0; i < d_listRegInterfaces.size(); i ++)
+00121         std::cout << \textcolor{stringliteral}{"Register Interfaces: "} << i << \textcolor{stringliteral}{" "} << d_listRegInterfaces[
+      i] << std::endl;
+00122 
+00123       \textcolor{comment}{//Turn on Fan}
+00124       d_register = 0x00CC;
+00125       d_value = 1;
+00126       d_soapysdr->writeRegister(d_listRegInterfaces[0],d_register,d_value);
+00127       d_register = 0x00CD;
+00128       d_soapysdr->writeRegister(d_listRegInterfaces[0],d_register,d_value);
+00129 
+00130 
+00131       \textcolor{comment}{//Chirp setting}
+00132       d_register = 0x001D;
+00133       d_value = 5;
+00134       d_soapysdr->writeRegister(d_listRegInterfaces[0],d_register,d_value);
+00135 
+00136       \textcolor{comment}{//GPIO Setup}
+00137       \textcolor{comment}{//Setup GPIO OVERLOAD}
+00138       d_register = 6<<5;
+00139 
+00140       \textcolor{comment}{//d\_value = 0xFFE0;// GPIO(0-4) overload bits = 0}
+00141       d_value = 0xFF80;\textcolor{comment}{// GPIO(0-6) overload bits = 0}
+00142 
+00143 
+00144       d_soapysdr->writeRegister(d_listRegInterfaces[0], d_register,d_value);
+00145       d_value = d_soapysdr->readRegister(d_listRegInterfaces[0],d_register);
+00146       std::cout << std::hex << \textcolor{stringliteral}{"Register GPIO Overload: 0x"}  << d_register << \textcolor{stringliteral}{" 0x"}  <<  
+      d_value << std::endl;
+00147       std::cout << std::dec;
+00148 
+00149       \textcolor{comment}{//GPIO Output Setup}
+00150       d_GPIOBanks = d_soapysdr->listGPIOBanks();
+00151       \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} i = 0; i < d_GPIOBanks.size(); i ++)
+00152         std::cout << \textcolor{stringliteral}{"GPIO Banks: "} << i << \textcolor{stringliteral}{" "} << d_GPIOBanks[i] << std::endl;
+00153 
+00154       d_value = 0x00; d_soapysdr->writeGPIO(d_GPIOBanks[0],d_value);
+00155 
+00156       \textcolor{comment}{//All Pins Outputs}
+00157       \textcolor{comment}{//d\_value = 0xFB;//all out but bit 6}
+00158       d_value = 0x00;\textcolor{comment}{//all in (overwrite)}
+00159       d_soapysdr->writeGPIODir(d_GPIOBanks[0],d_value);
+00160 
+00161 
+00162       \textcolor{comment}{//Sensors}
+00163       sensors = d_soapysdr->listSensors();
+00164 
+00165       \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} i=0; i<sensors.size();i++)
+00166       \{
+00167         std::cout << \textcolor{stringliteral}{"Sensors Banks: "} << i << \textcolor{stringliteral}{" "} << sensors[i] << std::endl;
+00168       \}
+00169 
+00170       \textcolor{comment}{// Setup Soapy RX: sample rate}
+00171       std::cout << \textcolor{stringliteral}{"Setting RX Rate: "} << d_samp_rate << std::endl;
+00172       \textcolor{comment}{//setSampleRate(const int direction, const size\_t channel, const double rate);}
+00173       d_soapysdr->setSampleRate(SOAPY_SDR_RX, d_chan_rx, d_samp_rate);
+00174       \textcolor{comment}{//getSampleRate(const int direction, const size\_t channel);}
+00175       std::cout << \textcolor{stringliteral}{"Actual RX Rate: "} << d_soapysdr->getSampleRate(SOAPY_SDR_RX, 
+      d_chan_rx) << std::endl;
+00176       std::cout << \textcolor{stringliteral}{"Actual Master Clock Rate: "} << d_soapysdr->
+      getMasterClockRate() << std::endl;
+00177 
+00178       \textcolor{comment}{// Setup USRP RX: gain}
+00179       set_rx_gain(d_chan_rx, d_gain_rx);
+00180 
+00181       \textcolor{comment}{// Setup Soapysdr RX: set frequency (tune?)}
+00182       \textcolor{comment}{//setFrequency(const int direction, const size\_t channel, const std::string &name, const double
+       frequency, const Kwargs &args = Kwargs());}
+00183       d_soapysdr->setFrequency(SOAPY_SDR_RX, d_chan_rx, d_center_freq);
+00184       std::cout << \textcolor{stringliteral}{"Set RX Frequency: "}  << d_soapysdr->getFrequency(
+      SOAPY_SDR_RX, d_chan_rx) << std::endl;
+00185 
+00186       \textcolor{comment}{// Setup Soapysdr RX: antenna}
+00187       \textcolor{comment}{//setAntenna(const int direction, const size\_t channel, const std::string &name);}
+00188       d_soapysdr->setAntenna(SOAPY_SDR_RX, d_chan_rx, d_antenna_rx);
+00189       std::cout << \textcolor{stringliteral}{"Set RX Antenna: "}  << d_soapysdr->getAntenna(SOAPY_SDR_RX, 
+      d_chan_rx) << std::endl;
+00190 
+00191       \textcolor{comment}{//void setBandwidth(const int direction, const size\_t channel, const double bw);}
+00192       d_soapysdr->setBandwidth(SOAPY_SDR_RX, d_chan_rx, d_bw_rx);
+00193       std::cout << \textcolor{stringliteral}{"Set RX BW: "}  << d_soapysdr->getBandwidth(SOAPY_SDR_RX, 
+      d_chan_rx) << std::endl;
+00194 
+00195       \textcolor{comment}{//d\_soapysdr->setHardwareTime(0.0);}
+00196       \textcolor{comment}{// Setup receive streamer}
+00197 
+00198       d_rx_stream = d_soapysdr->setupStream(SOAPY_SDR_RX, \textcolor{stringliteral}{"CF32"});\textcolor{comment}{//might need channels}
+00199       d_soapysdr->setHardwareTime(0);
+00200 
+00201 
+00202 
+00203       \textcolor{comment}{//std::cout << "Set RX Antenna: " << getStreamMTU(d\_rx\_stream) << std::endl;}
+00204       \textcolor{comment}{//std::cout << "List TX GPIO Banks: " << d\_soapysdr->listGPIOBanks() << std::endl;}
+00205 
+00206       \textcolor{comment}{//******************* Setup Soapy TX *******************//}
+00207       d_chan_tx = 0;
+00208 
+00209       \textcolor{comment}{//d\_kw = SoapySDR::Device::enumerate();}
+00210       d_kw = SoapySDR::KwargsFromString(d_args);
+00211       \textcolor{comment}{// Setup Soapysdr TX: args (addr,...)}
+00212       \textcolor{comment}{//d\_soapysdr = SoapySDR::Device::make(params\_to\_dict(d\_args\_tx));}
+00213       \textcolor{comment}{//d\_soapysdr = SoapySDR::Device::make(d\_kw);}
+00214       d_soapysdr = d_soapysdr;
+00215       std::cout << \textcolor{stringliteral}{"Using Soapy Device (TX): "}  << d_soapysdr->getHardwareKey() << std::endl;
+00216 
+00217       \textcolor{comment}{// Setup Soapysdr TX: sample rate}
+00218       std::cout << \textcolor{stringliteral}{"Setting TX Rate: "} << d_samp_rate << std::endl;
+00219       \textcolor{comment}{//setSampleRate(const int direction, const size\_t channel, const double rate);}
+00220       d_soapysdr->setSampleRate(SOAPY_SDR_TX, d_chan_tx, d_samp_rate);
+00221       \textcolor{comment}{//getSampleRate(const int direction, const size\_t channel);}
+00222       std::cout << \textcolor{stringliteral}{"Actual TX Rate: "} << d_soapysdr->getSampleRate(SOAPY_SDR_TX, 
+      d_chan_tx) << std::endl;
+00223 
+00224       \textcolor{comment}{// Setup Soapysdr TX: gain}
+00225       set_tx_gain(d_chan_tx, d_gain_tx);
+00226 
+00227       \textcolor{comment}{// Setup Soapysdr TX: set frequency (tune?)}
+00228       \textcolor{comment}{//setFrequency(const int direction, const size\_t channel, const std::string &name, const double
+       frequency, const Kwargs &args = Kwargs());}
+00229       d_soapysdr->setFrequency(SOAPY_SDR_TX, d_chan_tx, d_center_freq);
+00230       std::cout << \textcolor{stringliteral}{"Set TX Frequency: "}  << d_soapysdr->getFrequency(
+      SOAPY_SDR_TX, d_chan_tx) << std::endl;
+00231 
+00232       \textcolor{comment}{// Setup Soapysdr TX: antenna}
+00233       \textcolor{comment}{//setAntenna(const int direction, const size\_t channel, const std::string &name);}
+00234       d_soapysdr->setAntenna(SOAPY_SDR_TX, d_chan_tx, d_antenna_tx);
+00235       std::cout << \textcolor{stringliteral}{"Set TX Antenna: "}  << d_soapysdr->getAntenna(SOAPY_SDR_TX, 
+      d_chan_tx) << std::endl;
+00236 
+00237 
+00238       d_soapysdr->setBandwidth(SOAPY_SDR_TX, d_chan_tx, d_bw_tx);
+00239       std::cout << \textcolor{stringliteral}{"Set TX BW: "}  << d_soapysdr->getBandwidth(SOAPY_SDR_TX, 
+      d_chan_tx) << std::endl;
+00240 
+00241       \textcolor{comment}{// Setup Soapysdr TX: timestamp}
+00242       \textcolor{comment}{//setHardwareTime(const long long timeNs, const std::string &what = "");}
+00243       \textcolor{comment}{//d\_soapysdr->setHardwareTime(0.0); // Do set time on startup if not gpsdo is activated.}
+00244 
+00245       \textcolor{comment}{// Setup transmit streamer}
+00246       \textcolor{comment}{//Stream *setupStream( const int direction, const std::string &format, const std::vector<size\_t>
+       &channels = std::vector<size\_t>(), const Kwargs &args = Kwargs());}
+00247       d_tx_stream = d_soapysdr->setupStream(SOAPY_SDR_TX, \textcolor{stringliteral}{"CF32"});\textcolor{comment}{//might need channels}
+00248       \textcolor{comment}{//d\_soapysdr->activateStream(d\_tx\_stream);}
+00249       \textcolor{comment}{//uhd::stream\_args\_t stream\_args\_tx("fc32", d\_wire\_tx); // complex floats}
+00250       \textcolor{comment}{//d\_tx\_stream = d\_soapysdr->get\_tx\_stream(stream\_args\_tx);}
+00251       \textcolor{comment}{//std::cout << "List TX GPIO Banks: " << d\_soapysdr->listGPIOBanks() << std::endl;}
+00252 
+00253 
+00254       \textcolor{comment}{//***** Misc *****//}
+00255 
+00256       \textcolor{comment}{// Setup rx\_time pmt}
+00257       d_time_key = pmt::string\_to\_symbol(\textcolor{stringliteral}{"rx\_time"});
+00258       d_srcid = pmt::string\_to\_symbol(\textcolor{stringliteral}{"soapysdr\_echotimer"});
+00259 
+00260       \textcolor{comment}{// Setup thread priority}
+00261       \textcolor{comment}{//uhd::set\_thread\_priority\_safe(); // necessary? doesnt work...}
+00262       std::cout << \textcolor{stringliteral}{"Actual Master Clock Rate: [MHz]"} << d_soapysdr->
+      getMasterClockRate()/1e6 << std::endl;
+00263       \textcolor{comment}{// Sleep to get sync done}
+00264       boost::this_thread::sleep(boost::posix\_time::milliseconds(1000)); \textcolor{comment}{// FIXME: necessary?}
+00265 
+00266       \textcolor{comment}{//Aux variables start default}
+00267       d_extra_work_time = 0;
+00268       d_workNum = 0;
+00269       d_SendPacket = 1;
+00270       firstPacket_Rx = 0;
+00271       firstPacket = 1;
+00272       d_flagsRx_return = 0;
+00273 
+00274       d_flagsTx = SOAPY_SDR_HAS_TIME;
+00275       d_flagsTx = 0;
+00276       d_soapysdr->activateStream(d_tx_stream,d_flagsTx);
+00277       \textcolor{comment}{//d\_flagsRx = SOAPY\_SDR\_HAS\_TIME | SOAPY\_SDR\_END\_BURST;}
+00278       \textcolor{comment}{//d\_flagsRx = SOAPY\_SDR\_HAS\_TIME;}
+00279       \textcolor{comment}{//d\_soapysdr->activateStream(d\_rx\_stream,d\_flagsRx,0);}
+00280 
+00281     \}
+00282 
+00283     \textcolor{comment}{/*}
+00284 \textcolor{comment}{    * Our virtual destructor.}
+00285 \textcolor{comment}{    */}
+00286     soapysdr_echotimer_impl::~soapysdr_echotimer_impl()
+00287     \{
+00288       d_soapysdr->writeRegister(d_listRegInterfaces[1], 6<<5, 0xFFFF);
+00289       d_soapysdr->deactivateStream(d_rx_stream);
+00290       d_soapysdr->deactivateStream(d_tx_stream);
+00291       d_soapysdr->closeStream(d_rx_stream);
+00292       d_soapysdr->closeStream(d_tx_stream);
+00293     \}
+00294 
+00295     \textcolor{comment}{// Input based block needs to know output stream length}
+00296     \textcolor{comment}{// This case is based on input port 0 (only input port)}
+00297     \textcolor{keywordtype}{int}
+00298     soapysdr_echotimer_impl::calculate_output_stream_length(\textcolor{keyword}{const} gr\_vector\_int &ninput\_items)
+00299     \{
+00300       \textcolor{keywordtype}{int} noutput\_items = ninput\_items[0];
+00301       \textcolor{keywordflow}{return} noutput\_items ;
+00302     \}
+00303 
+00304 
+00305     \textcolor{comment}{// ***************  Implemented Variable set and gets *********************}
+00306     \textcolor{comment}{//int soapysdr\_echotimer\_impl::num\_delay\_samps() \{ return d\_num\_delay\_samps; \}}
+00307     \textcolor{comment}{//void soapysdr\_echotimer\_impl::set\_num\_delay\_samps(int num\_delay\_samps) \{ d\_num\_delay\_samps =
+       num\_delay\_samps; \}}
+00308 
+00309 
+00310     \textcolor{comment}{/*}
+00311 \textcolor{comment}{    void}
+00312 \textcolor{comment}{    soapysdr\_echotimer\_impl::set\_rx\_freq( size\_t chan, float gain)}
+00313 \textcolor{comment}{    \{}
+00314 \textcolor{comment}{      //setGain(const int direction, const size\_t channel, const double value);}
+00315 \textcolor{comment}{      d\_soapysdr->setGain(SOAPY\_SDR\_RX, chan, gain);}
+00316 \textcolor{comment}{      std::cout << "RX Gain: "  << d\_soapysdr->getGain(SOAPY\_SDR\_RX, chan) << std::endl;}
+00317 \textcolor{comment}{    \}}
+00318 \textcolor{comment}{}
+00319 \textcolor{comment}{    void}
+00320 \textcolor{comment}{    soapysdr\_echotimer\_impl::set\_tx\_freq( size\_t chan, float gain)}
+00321 \textcolor{comment}{    \{}
+00322 \textcolor{comment}{      //setGain(const int direction, const size\_t channel, const double value);}
+00323 \textcolor{comment}{      d\_soapysdr->setGain(SOAPY\_SDR\_TX, chan, gain);}
+00324 \textcolor{comment}{      std::cout << "TX Gain: "  << d\_soapysdr->getGain(SOAPY\_SDR\_TX, chan) << std::endl;}
+00325 \textcolor{comment}{    \}*/}
+00326 
+00327     \textcolor{keywordtype}{void}
+00328     soapysdr_echotimer_impl::set_rx_gain( \textcolor{keywordtype}{size\_t} chan, \textcolor{keywordtype}{float} gain)
+00329     \{
+00330       \textcolor{comment}{//setGain(const int direction, const size\_t channel, const double value);}
+00331       d_soapysdr->setGain(SOAPY_SDR_RX, chan, gain);
+00332       std::cout << \textcolor{stringliteral}{"RX Gain: "}  << d_soapysdr->getGain(SOAPY_SDR_RX, chan) << std::endl;
+00333     \}
+00334 
+00335     \textcolor{keywordtype}{void}
+00336     soapysdr_echotimer_impl::set_tx_gain( \textcolor{keywordtype}{size\_t} chan, \textcolor{keywordtype}{float} gain)
+00337     \{
+00338       \textcolor{comment}{//setGain(const int direction, const size\_t channel, const double value);}
+00339       d_soapysdr->setGain(SOAPY_SDR_TX, chan, gain);
+00340       std::cout << \textcolor{stringliteral}{"TX Gain: "}  << d_soapysdr->getGain(SOAPY_SDR_TX, chan) << std::endl;
+00341     \}
+00342 
+00343     \textcolor{keywordtype}{void}
+00344     soapysdr_echotimer_impl::send()
+00345     \{
+00346       \textcolor{comment}{// Send input buffer}
+00347       \textcolor{keywordtype}{size\_t} total\_num\_samps = d_noutput_items_send;
+00348       \textcolor{comment}{//Data to Soapy \_device}
+00349       \textcolor{comment}{//virtual int writeStream(}
+00350       \textcolor{comment}{//        Stream *stream,}
+00351       \textcolor{comment}{//        const void * const *buffs,}
+00352       \textcolor{comment}{//        const size\_t numElems,}
+00353       \textcolor{comment}{//        int &flags,}
+00354       \textcolor{comment}{//        const long long timeNs = 0,}
+00355       \textcolor{comment}{//        const long timeoutUs = 100000);}
+00356 
+00357 
+00358       \textcolor{comment}{//SoapyLMS7->streaming->fifo.h}
+00359       \textcolor{comment}{//SYNC\_TIMESTAMP = 1,}
+00360       \textcolor{comment}{//END\_BURST = 2,}
+00361       \textcolor{comment}{//OVERWRITE\_OLD = 4,}
+00362 
+00363       \textcolor{comment}{//soapyflags}
+00364       \textcolor{comment}{//SOAPY\_SDR\_HAS\_TIME = 1;}
+00365       \textcolor{comment}{//SOAPY\_SDR\_END\_BURST = 2;}
+00366 
+00367       d_timeNs_tx = d_time_now_tx + ((\textcolor{keywordtype}{long} long) (d_wait_tx*1000000000));
+00368 
+00369       d_timeoutUs = d_timeout_tx*1000000;
+00370 
+00371       \textcolor{comment}{//d\_flagsTx = 0;}
+00372       \textcolor{comment}{//d\_soapysdr->activateStream(d\_tx\_stream,d\_flagsTx);}
+00373 
+00374       \textcolor{comment}{//d\_flagsTx =  SOAPY\_SDR\_HAS\_TIME  | SOAPY\_SDR\_ONE\_PACKET;}
+00375       d_flagsTx =  SOAPY_SDR_HAS_TIME | SOAPY_SDR_END_BURST;
+00376       d_num_tx_samps = d_soapysdr->writeStream(d_tx_stream, &d_in_buffer[0], total\_num\_samps, 
+      d_flagsTx, d_timeNs_tx, d\_timeoutUs);
+00377       \textcolor{keywordflow}{if} (d_num_tx_samps != total\_num\_samps)
+00378       \{
+00379         std::cout << \textcolor{stringliteral}{"Tx Samples: "} << d_num_tx_samps << std::endl;
+00380       \}
+00381       \textcolor{comment}{//d\_flagsTx = SOAPY\_SDR\_END\_BURST;}
+00382       \textcolor{comment}{//d\_num\_tx\_samps = d\_soapysdr->writeStream(d\_tx\_stream, &d\_in\_buffer[0], 0, d\_flagsTx, 0,
+       d\_timeoutUs);}
+00383 
+00384     \}
+00385 
+00386     \textcolor{keywordtype}{void}
+00387     soapysdr_echotimer_impl::receive()
+00388     \{
+00389       \textcolor{comment}{// Setup RX streaming}
+00390       \textcolor{keywordtype}{size\_t} total\_num\_samps = d_noutput_items_recv;
+00391 
+00392       d_timeNs_rx = d_time_now_rx + ((\textcolor{keywordtype}{long} long)(d_wait_rx*1000000000));
+00393 
+00394       d_timeoutUs = d_timeout_rx*10000000;
+00395 
+00396       \textcolor{comment}{//d\_flagsRx =  SOAPY\_SDR\_HAS\_TIME | SOAPY\_SDR\_ONE\_PACKET;}
+00397       \textcolor{comment}{//d\_flagsRx =  SOAPY\_SDR\_HAS\_TIME | SOAPY\_SDR\_END\_BURST;}
+00398       d_flagsRx =  0;
+00399 
+00400       d_soapysdr->activateStream(d_rx_stream, SOAPY_SDR_HAS_TIME | 
+      SOAPY_SDR_END_BURST , d_timeNs_rx, total\_num\_samps);
+00401       d_num_rx_samps = d_soapysdr->readStream(d_rx_stream, &d_out_buffer[0], total\_num\_samps, 
+      d_flagsRx, d_timeNs_rx_return, d\_timeoutUs);
+00402       \textcolor{comment}{//d\_timeNs\_rx\_return = d\_timeNs\_rx;}
+00403       \textcolor{keywordflow}{if} (d_num_rx_samps != total\_num\_samps)
+00404       \{
+00405       std::cout << \textcolor{stringliteral}{"Dropped Rx Samples: "} << d_num_rx_samps << std::endl;
+00406       \}
+00407     \}
+00408 
+00409   \textcolor{comment}{// Where the work is done}
+00410     \textcolor{keywordtype}{int}
+00411     soapysdr_echotimer_impl::work (\textcolor{keywordtype}{int} noutput\_items,
+00412     gr\_vector\_int &ninput\_items,
+00413     gr\_vector\_const\_void\_star &input\_items,
+00414     gr\_vector\_void\_star &output\_items)
+00415     \{
+00416 
+00417       gr\_complex *in = (gr\_complex *) input\_items[0];
+00418       gr\_complex *out = (gr\_complex *) output\_items[0];
+00419 
+00420       \textcolor{comment}{//std::cout << "Start Work routine"<< std::endl;}
+00421 
+00422       \textcolor{comment}{// Set output items on packet length}
+00423       noutput\_items = ninput\_items[0];
+00424       d_time_packet = (noutput\_items*1e9/d_samp_rate);
+00425       d_SendPacket = 1;
+00426 
+00427       \textcolor{comment}{// tags}
+00428       std::vector<tag\_t> tags;
+00429       \textcolor{keyword}{const} uint64\_t nread = nitems\_read(0); \textcolor{comment}{//number of items read on port 0}
+00430       get\_tags\_in\_range(tags, 0, nread, nread+noutput\_items);
+00431 
+00432       std::sort(tags.begin(), tags.end(), tag\_t::offset\_compare);
+00433 
+00434       std::vector<tag\_t>::iterator vitr = tags.begin();
+00435 
+00436       \textcolor{comment}{//std::cout << "packet offset: " << nread << std::endl;}
+00437 
+00438       \textcolor{keywordflow}{while}(vitr != tags.end())
+00439       \{
+00440 
+00441         \textcolor{comment}{//std::cout << "tags offset: " << (*vitr).offset << " key: " << (*vitr).key << " value: " <<
+       (*vitr).value << std::endl;}
+00442         \textcolor{keywordflow}{if}((pmt::eqv((*vitr).key, DeadtimeKey)))
+00443             d_SendPacket = 0;
+00444         vitr++;
+00445       \}
+00446 
+00447       \textcolor{comment}{// Resize output buffer}
+00448       \textcolor{keywordflow}{if}(d_out_buffer.size()!=noutput\_items) d_out_buffer.resize(noutput\_items);
+00449       \textcolor{keywordflow}{if}(d_in_buffer.size()!=noutput\_items) d_in_buffer.resize(noutput\_items);
+00450 
+00451 
+00452 
+00453       \textcolor{keywordflow}{if} (firstPacket)
+00454       \{
+00455         Chirp_Sync = d_soapysdr->readGPIO(d_GPIOBanks[0]) && (1<<6);
+00456         std::cout << \textcolor{stringliteral}{" readGPIO: "} << Chirp_Sync << std::endl;
+00457         firstPacket = 0;
+00458       \}
+00459 
+00460 
+00461       \textcolor{comment}{//Get New Packet Time}
+00462       d_time_now_rx = d_soapysdr->getHardwareTime();
+00463       d_time_now_tx = d_time_now_rx;
+00464 
+00465       std::cout << \textcolor{stringliteral}{" read chirpPeriod: "}<< d_soapysdr->readSensor(\textcolor{stringliteral}{"chirp\_period"}) << std::endl;
+00466       std::cout << \textcolor{stringliteral}{" read chirpTime: "}<< d_soapysdr->readSensor(\textcolor{stringliteral}{"chirp\_time"}) << std::endl;
+00467 
+00468       \textcolor{keywordflow}{if} (d_SendPacket)\textcolor{comment}{// Tx and Rx Packet}
+00469       \{
+00470 
+00471 
+00472 
+00473         \textcolor{comment}{// ************** Send thread *********************}
+00474         d_in_buffer = input\_items;
+00475         d_noutput_items_send = noutput\_items;
+00476         d_thread_send = gr::thread::thread(boost::bind(&
+      soapysdr_echotimer_impl::send, \textcolor{keyword}{this}));
+00477 
+00478         \textcolor{comment}{// ************** Receive thread *********************}
+00479         \textcolor{comment}{//gr\_vector\_void\_star d\_out\_buffer (initialize with output\_items)}
+00480         d_out_buffer = output\_items;
+00481         d_noutput_items_recv = noutput\_items;
+00482         d_thread_recv = gr::thread::thread(boost::bind(&
+      soapysdr_echotimer_impl::receive, \textcolor{keyword}{this}));
+00483 
+00484         \textcolor{comment}{//d\_value = d\_value ^ 0x80; d\_soapysdr->writeGPIO(d\_GPIOBanks[0],d\_value);}
+00485         \textcolor{comment}{// Wait for threads to complete}
+00486         d_thread_send.join();
+00487         d_thread_recv.join();
+00488 
+00489         d_out_recv = (gr\_complex *) d_out_buffer[0];
+00490 
+00491         memcpy(out,&d_out_recv[0]+d_num_delay_samps,(noutput\_items-
+      d_num_delay_samps)*\textcolor{keyword}{sizeof}(gr\_complex)); \textcolor{comment}{// push buffer to output}
+00492         memset(out+(noutput\_items-d_num_delay_samps),0,d_num_delay_samps*\textcolor{keyword}{sizeof}(gr\_complex)); \textcolor{comment}{// set zeros}
+00493 
+00494         \textcolor{comment}{//memset(out,0,noutput\_items*sizeof(gr\_complex));}
+00495         firstPacket_Rx = 0;
+00496       \}
+00497       \textcolor{keywordflow}{else}\textcolor{comment}{//Rx only Packet}
+00498       \{
+00499         \textcolor{keywordflow}{if}(firstPacket_Rx == Rx_Skip_Packets)\textcolor{comment}{//skip return packets: set by Rx\_Skip\_Packets}
+00500         \{
+00501           \textcolor{comment}{// ************** Receive thread *********************}
+00502           \textcolor{comment}{//gr\_vector\_void\_star d\_out\_buffer (initialize with output\_items)}
+00503           d_out_buffer = output\_items;
+00504           d_noutput_items_recv = noutput\_items;
+00505           d_thread_recv = gr::thread::thread(boost::bind(&
+      soapysdr_echotimer_impl::receive, \textcolor{keyword}{this}));
+00506 
+00507 
+00508           d_thread_recv.join();
+00509           d_out_recv = (gr\_complex *) d_out_buffer[0];
+00510 
+00511 
+00512           memcpy(out,&d_out_recv[0]+d_num_delay_samps,(noutput\_items-
+      d_num_delay_samps)*\textcolor{keyword}{sizeof}(gr\_complex)); \textcolor{comment}{// push buffer to output}
+00513           memset(out+(noutput\_items-d_num_delay_samps),0,d_num_delay_samps*\textcolor{keyword}{sizeof}(gr\_complex)); \textcolor{comment}{// set
+       zeros}
+00514 
+00515           firstPacket_Rx = 0;
+00516         \}
+00517         \textcolor{keywordflow}{else}
+00518         \{
+00519 
+00520 
+00521           memset(out,0,noutput\_items*\textcolor{keyword}{sizeof}(gr\_complex));
+00522           firstPacket_Rx++;
+00523         \}
+00524 
+00525       \}
+00526 
+00527       \textcolor{comment}{// Setup rx\_time tag}
+00528       d_time_val = pmt::make\_tuple
+00529       (pmt::from\_uint64(d_time_now_rx/1E9));
+00530       \textcolor{comment}{// Save timestamp}
+00531       add\_item\_tag(0, nitems\_written(0), d_time_key, d_time_val, d_srcid);
+00532 
+00533 
+00534 
+00535       \textcolor{comment}{//d\_value = 0; d\_soapysdr->writeGPIO(d\_GPIOBanks[0],d\_value);}
+00536 
+00537       \textcolor{comment}{// Tell runtime system how many output items we produced.}
+00538       \textcolor{keywordflow}{return} noutput\_items;
+00539     \}
+00540   \} \textcolor{comment}{/* namespace radar */}
+00541 \} \textcolor{comment}{/* namespace gr */}
+\end{DoxyCode}

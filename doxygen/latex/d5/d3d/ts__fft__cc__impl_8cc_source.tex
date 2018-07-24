@@ -1,0 +1,105 @@
+\subsection{ts\+\_\+fft\+\_\+cc\+\_\+impl.\+cc}
+\label{ts__fft__cc__impl_8cc_source}\index{/home/erik/prefix/default/src/gr-\/radar-\/dev/lib/ts\+\_\+fft\+\_\+cc\+\_\+impl.\+cc@{/home/erik/prefix/default/src/gr-\/radar-\/dev/lib/ts\+\_\+fft\+\_\+cc\+\_\+impl.\+cc}}
+
+\begin{DoxyCode}
+00001 \textcolor{comment}{/* -*- c++ -*- */}
+00002 \textcolor{comment}{/* }
+00003 \textcolor{comment}{ * Copyright 2014 Communications Engineering Lab, KIT.}
+00004 \textcolor{comment}{ * }
+00005 \textcolor{comment}{ * This is free software; you can redistribute it and/or modify}
+00006 \textcolor{comment}{ * it under the terms of the GNU General Public License as published by}
+00007 \textcolor{comment}{ * the Free Software Foundation; either version 3, or (at your option)}
+00008 \textcolor{comment}{ * any later version.}
+00009 \textcolor{comment}{ * }
+00010 \textcolor{comment}{ * This software is distributed in the hope that it will be useful,}
+00011 \textcolor{comment}{ * but WITHOUT ANY WARRANTY; without even the implied warranty of}
+00012 \textcolor{comment}{ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the}
+00013 \textcolor{comment}{ * GNU General Public License for more details.}
+00014 \textcolor{comment}{ * }
+00015 \textcolor{comment}{ * You should have received a copy of the GNU General Public License}
+00016 \textcolor{comment}{ * along with this software; see the file COPYING.  If not, write to}
+00017 \textcolor{comment}{ * the Free Software Foundation, Inc., 51 Franklin Street,}
+00018 \textcolor{comment}{ * Boston, MA 02110-1301, USA.}
+00019 \textcolor{comment}{ */}
+00020  
+00021 \textcolor{preprocessor}{#ifdef HAVE\_CONFIG\_H}
+00022 \textcolor{preprocessor}{#include "config.h"}
+00023 \textcolor{preprocessor}{#endif}
+00024 
+00025 \textcolor{preprocessor}{#include <gnuradio/io\_signature.h>}
+00026 \textcolor{preprocessor}{#include "ts_fft_cc_impl.h"}
+00027 \textcolor{preprocessor}{#include <volk/volk.h>}
+00028 
+00029 \textcolor{keyword}{namespace }gr \{
+00030   \textcolor{keyword}{namespace }radar \{
+00031 
+00032     ts_fft_cc::sptr
+00033     ts_fft_cc::make(\textcolor{keywordtype}{int} packet\_len, \textcolor{keyword}{const} std::string& len\_key)
+00034     \{
+00035       \textcolor{keywordflow}{return} gnuradio::get\_initial\_sptr
+00036         (\textcolor{keyword}{new} ts_fft_cc_impl(packet\_len, len\_key));
+00037     \}
+00038 
+00039     \textcolor{comment}{/*}
+00040 \textcolor{comment}{     * The private constructor}
+00041 \textcolor{comment}{     */}
+00042     ts_fft_cc_impl::ts_fft_cc_impl(\textcolor{keywordtype}{int} packet\_len, \textcolor{keyword}{const} std::string& len\_key)
+00043       : gr::tagged\_stream\_block(\textcolor{stringliteral}{"ts\_fft\_cc"},
+00044               gr::io\_signature::make(1, 1, sizeof(gr\_complex)),
+00045               gr::io\_signature::make(1, 1, sizeof(gr\_complex)), len\_key)
+00046     \{
+00047         d_packet_len = packet\_len;
+00048         d_buffer = (fftwf\_complex*) fftwf\_malloc(\textcolor{keyword}{sizeof}(fftw\_complex) * 
+      d_packet_len);
+00049         
+00050         \textcolor{comment}{// Check datatype}
+00051         \textcolor{keywordflow}{if}(\textcolor{keyword}{sizeof}(gr\_complex)!=\textcolor{keyword}{sizeof}(fftw\_complex)) std::runtime\_error(\textcolor{stringliteral}{"
+      sizeof(gr\_complex)!=sizeof(fftw\_complex)"});
+00052         
+00053         \textcolor{comment}{// Setup plan}
+00054         \textcolor{comment}{//d\_fft\_plan = fftwf\_plan\_dft\_1d(d\_packet\_len, reinterpret\_cast<fftwf\_complex *>(&d\_buffer[0]),
+       reinterpret\_cast<fftwf\_complex *>(&d\_buffer[0]), FFTW\_FORWARD, FFTW\_ESTIMATE);}
+00055         d_fft_plan = fftwf\_plan\_dft\_1d(d_packet_len, d_buffer, d_buffer, FFTW\_FORWARD, FFTW\_ESTIMATE);
+00056     \}
+00057 
+00058     \textcolor{comment}{/*}
+00059 \textcolor{comment}{     * Our virtual destructor.}
+00060 \textcolor{comment}{     */}
+00061     ts_fft_cc_impl::~ts_fft_cc_impl()
+00062     \{
+00063         fftwf\_destroy\_plan(d_fft_plan);
+00064         fftwf\_free(d_buffer);
+00065     \}
+00066 
+00067     \textcolor{keywordtype}{int}
+00068     ts_fft_cc_impl::calculate_output_stream_length(\textcolor{keyword}{const} gr\_vector\_int &ninput\_items)
+00069     \{
+00070       \textcolor{keywordtype}{int} noutput\_items = ninput\_items[0];
+00071       \textcolor{keywordflow}{return} noutput\_items ;
+00072     \}
+00073 
+00074     \textcolor{keywordtype}{int}
+00075     ts_fft_cc_impl::work (\textcolor{keywordtype}{int} noutput\_items,
+00076                        gr\_vector\_int &ninput\_items,
+00077                        gr\_vector\_const\_void\_star &input\_items,
+00078                        gr\_vector\_void\_star &output\_items)
+00079     \{
+00080         gr\_complex *in = (gr\_complex *) input\_items[0];
+00081         gr\_complex *out = (gr\_complex *) output\_items[0];
+00082         
+00083         \textcolor{comment}{// Set output to one packet (defined with tagged stream)}
+00084         noutput\_items = ninput\_items[0];
+00085             
+00086         \textcolor{comment}{// Execute fft plan}
+00087         memcpy(d_buffer,in,d_packet_len*\textcolor{keyword}{sizeof}(gr\_complex));
+00088         fftwf\_execute(d_fft_plan);
+00089         memcpy(out,d_buffer,d_packet_len*\textcolor{keyword}{sizeof}(gr\_complex));
+00090 
+00091         \textcolor{comment}{// Tell runtime system how many output items we produced.}
+00092         \textcolor{keywordflow}{return} noutput\_items;
+00093     \}
+00094 
+00095   \} \textcolor{comment}{/* namespace radar */}
+00096 \} \textcolor{comment}{/* namespace gr */}
+00097 
+\end{DoxyCode}

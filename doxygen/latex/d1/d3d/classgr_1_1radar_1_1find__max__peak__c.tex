@@ -1,0 +1,162 @@
+\subsection{gr\+:\+:radar\+:\+:find\+\_\+max\+\_\+peak\+\_\+c Class Reference}
+\label{classgr_1_1radar_1_1find__max__peak__c}\index{gr\+::radar\+::find\+\_\+max\+\_\+peak\+\_\+c@{gr\+::radar\+::find\+\_\+max\+\_\+peak\+\_\+c}}
+
+
+This block estimates a single peak of a given F\+FT spectrum as tagged stream. Output is a message with the information of frequency, phase and power of the peak as a f32vector with a single item. All data is tagged with the identifiers (symbols) \textquotesingle{}frequency\textquotesingle{}, \textquotesingle{}phase\textquotesingle{} and \textquotesingle{}power\textquotesingle{}. The peak is estimated on the whole spectrum or on the range max\+\_\+freq if cut\+\_\+max\+\_\+freq is true. Furthermore a threshold of the spectrum amplitude can be given with threshold. The DC peak can be cut out with the protected samples samp\+\_\+protect. This value do not evaluate samp\+\_\+protect samples around the DC peak. If no suitable peak is found the block returns empty vectors with the identifiers.  
+
+
+
+
+{\ttfamily \#include $<$find\+\_\+max\+\_\+peak\+\_\+c.\+h$>$}
+
+
+
+Inheritance diagram for gr\+:\+:radar\+:\+:find\+\_\+max\+\_\+peak\+\_\+c\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=550pt]{d0/d23/classgr_1_1radar_1_1find__max__peak__c__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for gr\+:\+:radar\+:\+:find\+\_\+max\+\_\+peak\+\_\+c\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=190pt]{d0/d9b/classgr_1_1radar_1_1find__max__peak__c__coll__graph}
+\end{center}
+\end{figure}
+\subsubsection*{Public Types}
+\begin{DoxyCompactItemize}
+\item 
+typedef boost\+::shared\+\_\+ptr$<$ {\bf find\+\_\+max\+\_\+peak\+\_\+c} $>$ {\bf sptr}
+\end{DoxyCompactItemize}
+\subsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+virtual {\bf void} {\bf set\+\_\+threshold} (float threshold)=0
+\item 
+virtual {\bf void} {\bf set\+\_\+samp\+\_\+protect} ({\bf int} samp)=0
+\item 
+virtual {\bf void} {\bf set\+\_\+max\+\_\+freq} ({\bf std\+::vector}$<$ float $>$ {\bf freq})=0
+\end{DoxyCompactItemize}
+\subsubsection*{Static Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+static {\bf sptr} {\bf make} ({\bf int} samp\+\_\+rate, float threshold, {\bf int} samp\+\_\+protect, {\bf std\+::vector}$<$ float $>$ max\+\_\+freq, bool cut\+\_\+max\+\_\+freq, const {\bf std\+::string} \&len\+\_\+key=\char`\"{}packet\+\_\+len\char`\"{})
+\begin{DoxyCompactList}\small\item\em Return a shared\+\_\+ptr to a new instance of \doxyref{radar\+::find\+\_\+max\+\_\+peak\+\_\+c}{p.}{d1/d3d/classgr_1_1radar_1_1find__max__peak__c}. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsubsection{Detailed Description}
+This block estimates a single peak of a given F\+FT spectrum as tagged stream. Output is a message with the information of frequency, phase and power of the peak as a f32vector with a single item. All data is tagged with the identifiers (symbols) \textquotesingle{}frequency\textquotesingle{}, \textquotesingle{}phase\textquotesingle{} and \textquotesingle{}power\textquotesingle{}. The peak is estimated on the whole spectrum or on the range max\+\_\+freq if cut\+\_\+max\+\_\+freq is true. Furthermore a threshold of the spectrum amplitude can be given with threshold. The DC peak can be cut out with the protected samples samp\+\_\+protect. This value do not evaluate samp\+\_\+protect samples around the DC peak. If no suitable peak is found the block returns empty vectors with the identifiers. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em samp\+\_\+rate} & Sample rate \\
+\hline
+{\em threshold} & Threshold for detection of the spectrum amplitude \\
+\hline
+{\em samp\+\_\+protect} & Protected samples for cutting DC peak \\
+\hline
+{\em max\+\_\+freq} & Frequency range for cutting spectrum \\
+\hline
+{\em cut\+\_\+max\+\_\+freq} & Toggle cutting the spectrum for peak estimation \\
+\hline
+{\em len\+\_\+key} & Packet length key for tagged stream \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line {\bf 44} of file {\bf find\+\_\+max\+\_\+peak\+\_\+c.\+h}.
+
+
+
+\subsubsection{Member Typedef Documentation}
+\index{gr\+::radar\+::find\+\_\+max\+\_\+peak\+\_\+c@{gr\+::radar\+::find\+\_\+max\+\_\+peak\+\_\+c}!sptr@{sptr}}
+\index{sptr@{sptr}!gr\+::radar\+::find\+\_\+max\+\_\+peak\+\_\+c@{gr\+::radar\+::find\+\_\+max\+\_\+peak\+\_\+c}}
+\paragraph[{sptr}]{\setlength{\rightskip}{0pt plus 5cm}typedef boost\+::shared\+\_\+ptr$<${\bf find\+\_\+max\+\_\+peak\+\_\+c}$>$ {\bf gr\+::radar\+::find\+\_\+max\+\_\+peak\+\_\+c\+::sptr}}\label{classgr_1_1radar_1_1find__max__peak__c_ac301e10b9eec76e0064c045350712115}
+
+
+Definition at line {\bf 47} of file {\bf find\+\_\+max\+\_\+peak\+\_\+c.\+h}.
+
+
+
+\subsubsection{Member Function Documentation}
+\index{gr\+::radar\+::find\+\_\+max\+\_\+peak\+\_\+c@{gr\+::radar\+::find\+\_\+max\+\_\+peak\+\_\+c}!make@{make}}
+\index{make@{make}!gr\+::radar\+::find\+\_\+max\+\_\+peak\+\_\+c@{gr\+::radar\+::find\+\_\+max\+\_\+peak\+\_\+c}}
+\paragraph[{make(int samp\+\_\+rate, float threshold, int samp\+\_\+protect, std\+::vector$<$ float $>$ max\+\_\+freq, bool cut\+\_\+max\+\_\+freq, const std\+::string \&len\+\_\+key=""packet\+\_\+len"")}]{\setlength{\rightskip}{0pt plus 5cm}{\bf find\+\_\+max\+\_\+peak\+\_\+c\+::sptr} gr\+::radar\+::find\+\_\+max\+\_\+peak\+\_\+c\+::make (
+\begin{DoxyParamCaption}
+\item[{{\bf int}}]{samp\+\_\+rate, }
+\item[{float}]{threshold, }
+\item[{{\bf int}}]{samp\+\_\+protect, }
+\item[{{\bf std\+::vector}$<$ float $>$}]{max\+\_\+freq, }
+\item[{bool}]{cut\+\_\+max\+\_\+freq, }
+\item[{const {\bf std\+::string} \&}]{len\+\_\+key = {\ttfamily \char`\"{}packet\+\_\+len\char`\"{}}}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [static]}}\label{classgr_1_1radar_1_1find__max__peak__c_aef687482074fb69ec464f0cbff3b4d9a}
+
+
+Return a shared\+\_\+ptr to a new instance of \doxyref{radar\+::find\+\_\+max\+\_\+peak\+\_\+c}{p.}{d1/d3d/classgr_1_1radar_1_1find__max__peak__c}. 
+
+To avoid accidental use of raw pointers, \doxyref{radar\+::find\+\_\+max\+\_\+peak\+\_\+c}{p.}{d1/d3d/classgr_1_1radar_1_1find__max__peak__c}\textquotesingle{}s constructor is in a private implementation class. \doxyref{radar\+::find\+\_\+max\+\_\+peak\+\_\+c\+::make}{p.}{d1/d3d/classgr_1_1radar_1_1find__max__peak__c_aef687482074fb69ec464f0cbff3b4d9a} is the public interface for creating new instances. 
+
+Definition at line {\bf 32} of file {\bf find\+\_\+max\+\_\+peak\+\_\+c\+\_\+impl.\+cc}.
+
+
+
+Referenced by {\bf \+\_\+wrap\+\_\+find\+\_\+max\+\_\+peak\+\_\+c\+\_\+make()}.
+
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=328pt]{d1/d3d/classgr_1_1radar_1_1find__max__peak__c_aef687482074fb69ec464f0cbff3b4d9a_icgraph}
+\end{center}
+\end{figure}
+
+
+\index{gr\+::radar\+::find\+\_\+max\+\_\+peak\+\_\+c@{gr\+::radar\+::find\+\_\+max\+\_\+peak\+\_\+c}!set\+\_\+max\+\_\+freq@{set\+\_\+max\+\_\+freq}}
+\index{set\+\_\+max\+\_\+freq@{set\+\_\+max\+\_\+freq}!gr\+::radar\+::find\+\_\+max\+\_\+peak\+\_\+c@{gr\+::radar\+::find\+\_\+max\+\_\+peak\+\_\+c}}
+\paragraph[{set\+\_\+max\+\_\+freq(std\+::vector$<$ float $>$ freq)=0}]{\setlength{\rightskip}{0pt plus 5cm}virtual {\bf void} gr\+::radar\+::find\+\_\+max\+\_\+peak\+\_\+c\+::set\+\_\+max\+\_\+freq (
+\begin{DoxyParamCaption}
+\item[{{\bf std\+::vector}$<$ float $>$}]{freq}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [pure virtual]}}\label{classgr_1_1radar_1_1find__max__peak__c_a85faea414a4ed5966fb7240bc82f2826}
+
+
+Implemented in {\bf gr\+::radar\+::find\+\_\+max\+\_\+peak\+\_\+c\+\_\+impl} \doxyref{}{p.}{d9/d22/classgr_1_1radar_1_1find__max__peak__c__impl_a831fdc228c728c13ba4225e90306bf14}.
+
+\index{gr\+::radar\+::find\+\_\+max\+\_\+peak\+\_\+c@{gr\+::radar\+::find\+\_\+max\+\_\+peak\+\_\+c}!set\+\_\+samp\+\_\+protect@{set\+\_\+samp\+\_\+protect}}
+\index{set\+\_\+samp\+\_\+protect@{set\+\_\+samp\+\_\+protect}!gr\+::radar\+::find\+\_\+max\+\_\+peak\+\_\+c@{gr\+::radar\+::find\+\_\+max\+\_\+peak\+\_\+c}}
+\paragraph[{set\+\_\+samp\+\_\+protect(int samp)=0}]{\setlength{\rightskip}{0pt plus 5cm}virtual {\bf void} gr\+::radar\+::find\+\_\+max\+\_\+peak\+\_\+c\+::set\+\_\+samp\+\_\+protect (
+\begin{DoxyParamCaption}
+\item[{{\bf int}}]{samp}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [pure virtual]}}\label{classgr_1_1radar_1_1find__max__peak__c_abaf4240cdb5dcd4af0a88821221861e7}
+
+
+Implemented in {\bf gr\+::radar\+::find\+\_\+max\+\_\+peak\+\_\+c\+\_\+impl} \doxyref{}{p.}{d9/d22/classgr_1_1radar_1_1find__max__peak__c__impl_ad43be71ddea1d2a5ccf0039b232fd0a1}.
+
+\index{gr\+::radar\+::find\+\_\+max\+\_\+peak\+\_\+c@{gr\+::radar\+::find\+\_\+max\+\_\+peak\+\_\+c}!set\+\_\+threshold@{set\+\_\+threshold}}
+\index{set\+\_\+threshold@{set\+\_\+threshold}!gr\+::radar\+::find\+\_\+max\+\_\+peak\+\_\+c@{gr\+::radar\+::find\+\_\+max\+\_\+peak\+\_\+c}}
+\paragraph[{set\+\_\+threshold(float threshold)=0}]{\setlength{\rightskip}{0pt plus 5cm}virtual {\bf void} gr\+::radar\+::find\+\_\+max\+\_\+peak\+\_\+c\+::set\+\_\+threshold (
+\begin{DoxyParamCaption}
+\item[{float}]{threshold}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [pure virtual]}}\label{classgr_1_1radar_1_1find__max__peak__c_adc7673c9ed04bf49b1ef7e9cb60db989}
+
+
+Implemented in {\bf gr\+::radar\+::find\+\_\+max\+\_\+peak\+\_\+c\+\_\+impl} \doxyref{}{p.}{d9/d22/classgr_1_1radar_1_1find__max__peak__c__impl_a86f8f41f1c632cd79a43eb2d597908d3}.
+
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+/home/erik/prefix/default/src/gr-\/radar-\/dev/include/radar/{\bf find\+\_\+max\+\_\+peak\+\_\+c.\+h}\item 
+/home/erik/prefix/default/src/gr-\/radar-\/dev/lib/{\bf find\+\_\+max\+\_\+peak\+\_\+c\+\_\+impl.\+cc}\end{DoxyCompactItemize}

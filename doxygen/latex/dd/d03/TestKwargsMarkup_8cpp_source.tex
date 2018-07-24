@@ -1,0 +1,82 @@
+\subsection{Test\+Kwargs\+Markup.\+cpp}
+\label{TestKwargsMarkup_8cpp_source}\index{/home/erik/prefix/default/src/soapysdr/tests/\+Test\+Kwargs\+Markup.\+cpp@{/home/erik/prefix/default/src/soapysdr/tests/\+Test\+Kwargs\+Markup.\+cpp}}
+
+\begin{DoxyCode}
+00001 \textcolor{comment}{// Copyright (c) 2016-2016 Josh Blum}
+00002 \textcolor{comment}{// SPDX-License-Identifier: BSL-1.0}
+00003 
+00004 \textcolor{preprocessor}{#include <SoapySDR/Types.hpp>}
+00005 \textcolor{preprocessor}{#include <cstdlib>}
+00006 \textcolor{preprocessor}{#include <cstdio>}
+00007 
+00008 \textcolor{keywordtype}{bool} checkArgsInLhs__(\textcolor{keyword}{const} SoapySDR::Kwargs &lhs, \textcolor{keyword}{const} SoapySDR::Kwargs &rhs)
+00009 \{
+00010     \textcolor{keyword}{const} \textcolor{keyword}{auto} strLhs = SoapySDR::KwargsToString(lhs);
+00011     \textcolor{keyword}{const} \textcolor{keyword}{auto} strRhs = SoapySDR::KwargsToString(rhs);
+00012     \textcolor{keywordflow}{for} (\textcolor{keyword}{const} \textcolor{keyword}{auto} &pair : lhs)
+00013     \{
+00014         \textcolor{keywordflow}{if} (rhs.count(pair.first) == 0)
+00015         \{
+00016             printf(\textcolor{stringliteral}{"FAIL: \{%s\}[%s] not found in \{%s\}\(\backslash\)n"},
+00017                 strLhs.c\_str(), pair.first.c\_str(), strRhs.c\_str());
+00018             \textcolor{keywordflow}{return} \textcolor{keyword}{false};
+00019         \}
+00020         \textcolor{keywordflow}{if} (pair.second != rhs.at(pair.first))
+00021         \{
+00022             printf(\textcolor{stringliteral}{"FAIL: \{%s\}[%s] != \{%s\}[%s]\(\backslash\)n"},
+00023                 strLhs.c\_str(), pair.first.c\_str(), strRhs.c\_str(), pair.first.c\_str());
+00024             \textcolor{keywordflow}{return} \textcolor{keyword}{false};
+00025         \}
+00026     \}
+00027     \textcolor{keywordflow}{return} \textcolor{keyword}{true};
+00028 \}
+00029 
+00030 \textcolor{keywordtype}{int} main(\textcolor{keywordtype}{void})
+00031 \{
+00032 \textcolor{preprocessor}{    #define checkArgsEq(lhs, rhs) \(\backslash\)}
+00033 \textcolor{preprocessor}{    \{ \(\backslash\)}
+00034 \textcolor{preprocessor}{        printf("Test line %d\(\backslash\)n", \_\_LINE\_\_); \(\backslash\)}
+00035 \textcolor{preprocessor}{        if (not checkArgsInLhs\_\_(lhs, rhs)) return EXIT\_FAILURE; \(\backslash\)}
+00036 \textcolor{preprocessor}{        if (not checkArgsInLhs\_\_(rhs, lhs)) return EXIT\_FAILURE; \(\backslash\)}
+00037 \textcolor{preprocessor}{    \}}
+00038 
+00039     \textcolor{comment}{//string to args - empty string}
+00040     checkArgsEq(SoapySDR::KwargsFromString(\textcolor{stringliteral}{""}), SoapySDR::Kwargs());
+00041     checkArgsEq(SoapySDR::KwargsFromString(\textcolor{stringliteral}{" "}), SoapySDR::Kwargs());
+00042 
+00043     \textcolor{comment}{//single keyword}
+00044     SoapySDR::Kwargs args0;
+00045     args0[\textcolor{stringliteral}{"Foo"}] = \textcolor{stringliteral}{"Bar"};
+00046     checkArgsEq(SoapySDR::KwargsFromString(\textcolor{stringliteral}{"Foo=Bar"}), args0);
+00047     checkArgsEq(SoapySDR::KwargsFromString(\textcolor{stringliteral}{" Foo = Bar "}), args0);
+00048     checkArgsEq(SoapySDR::KwargsFromString(\textcolor{stringliteral}{" Foo = Bar, "}), args0);
+00049 
+00050     \textcolor{comment}{//two keywords}
+00051     SoapySDR::Kwargs args1;
+00052     args1[\textcolor{stringliteral}{"Foo"}] = \textcolor{stringliteral}{"Bar"};
+00053     args1[\textcolor{stringliteral}{"Baz"}] = \textcolor{stringliteral}{"123"};
+00054     checkArgsEq(SoapySDR::KwargsFromString(\textcolor{stringliteral}{"Foo=Bar, Baz=123"}), args1);
+00055     checkArgsEq(SoapySDR::KwargsFromString(\textcolor{stringliteral}{"Baz=123,Foo = Bar "}), args1);
+00056     checkArgsEq(SoapySDR::KwargsFromString(\textcolor{stringliteral}{"Baz=123,Foo = Bar , "}), args1);
+00057 
+00058     \textcolor{comment}{//empty value}
+00059     SoapySDR::Kwargs args2;
+00060     args2[\textcolor{stringliteral}{"Foo"}] = \textcolor{stringliteral}{"Bar"};
+00061     args2[\textcolor{stringliteral}{"Baz"}] = \textcolor{stringliteral}{""};
+00062     checkArgsEq(SoapySDR::KwargsFromString(\textcolor{stringliteral}{"Foo=Bar, Baz="}), args2);
+00063     checkArgsEq(SoapySDR::KwargsFromString(\textcolor{stringliteral}{"Baz=,Foo = Bar "}), args2);
+00064     checkArgsEq(SoapySDR::KwargsFromString(\textcolor{stringliteral}{"Baz= ,Foo = Bar , "}), args2);
+00065     checkArgsEq(SoapySDR::KwargsFromString(\textcolor{stringliteral}{"Baz ,Foo = Bar"}), args2);
+00066     checkArgsEq(SoapySDR::KwargsFromString(\textcolor{stringliteral}{"Baz,Foo = Bar"}), args2);
+00067 
+00068     \textcolor{comment}{//loopback arg to markup to arg}
+00069     checkArgsEq(SoapySDR::KwargsFromString(SoapySDR::KwargsToString(
+      SoapySDR::Kwargs())), SoapySDR::Kwargs());
+00070     checkArgsEq(SoapySDR::KwargsFromString(SoapySDR::KwargsToString(args0)), args0);
+00071     checkArgsEq(SoapySDR::KwargsFromString(SoapySDR::KwargsToString(args1)), args1);
+00072     checkArgsEq(SoapySDR::KwargsFromString(SoapySDR::KwargsToString(args2)), args2);
+00073 
+00074     printf(\textcolor{stringliteral}{"DONE!\(\backslash\)n"});
+00075     \textcolor{keywordflow}{return} EXIT\_SUCCESS;
+00076 \}
+\end{DoxyCode}

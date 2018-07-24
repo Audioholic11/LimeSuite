@@ -1,0 +1,457 @@
+\subsection{gr\+:\+:radar\+:\+:os\+\_\+cfar\+\_\+c\+\_\+impl Class Reference}
+\label{classgr_1_1radar_1_1os__cfar__c__impl}\index{gr\+::radar\+::os\+\_\+cfar\+\_\+c\+\_\+impl@{gr\+::radar\+::os\+\_\+cfar\+\_\+c\+\_\+impl}}
+
+
+{\ttfamily \#include $<$os\+\_\+cfar\+\_\+c\+\_\+impl.\+h$>$}
+
+
+
+Inheritance diagram for gr\+:\+:radar\+:\+:os\+\_\+cfar\+\_\+c\+\_\+impl\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=550pt]{d9/d06/classgr_1_1radar_1_1os__cfar__c__impl__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for gr\+:\+:radar\+:\+:os\+\_\+cfar\+\_\+c\+\_\+impl\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{db/d4f/classgr_1_1radar_1_1os__cfar__c__impl__coll__graph}
+\end{center}
+\end{figure}
+\subsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+{\bf os\+\_\+cfar\+\_\+c\+\_\+impl} ({\bf int} samp\+\_\+rate, {\bf int} samp\+\_\+compare, {\bf int} samp\+\_\+protect, float rel\+\_\+threshold, float mult\+\_\+threshold, bool merge\+\_\+consecutive, const {\bf std\+::string} \&len\+\_\+key)
+\item 
+{\bf $\sim$os\+\_\+cfar\+\_\+c\+\_\+impl} ()
+\item 
+{\bf void} {\bf set\+\_\+rel\+\_\+threshold} (float inp)
+\item 
+{\bf void} {\bf set\+\_\+mult\+\_\+threshold} (float inp)
+\item 
+{\bf void} {\bf set\+\_\+samp\+\_\+compare} ({\bf int} inp)
+\item 
+{\bf void} {\bf set\+\_\+samp\+\_\+protect} ({\bf int} inp)
+\item 
+{\bf int} {\bf work} ({\bf int} noutput\+\_\+items, gr\+\_\+vector\+\_\+int \&ninput\+\_\+items, gr\+\_\+vector\+\_\+const\+\_\+void\+\_\+star \&input\+\_\+items, gr\+\_\+vector\+\_\+void\+\_\+star \&output\+\_\+items)
+\end{DoxyCompactItemize}
+\subsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+{\bf int} {\bf d\+\_\+samp\+\_\+compare}
+\item 
+{\bf int} {\bf d\+\_\+samp\+\_\+protect}
+\item 
+{\bf int} {\bf d\+\_\+samp\+\_\+rate}
+\item 
+float {\bf d\+\_\+rel\+\_\+threshold}
+\item 
+float {\bf d\+\_\+mult\+\_\+threshold}
+\item 
+bool {\bf d\+\_\+merge\+\_\+consecutive}
+\item 
+bool {\bf d\+\_\+consecutive}
+\item 
+{\bf std\+::vector}$<$ float $>$ {\bf d\+\_\+pks}
+\item 
+{\bf std\+::vector}$<$ float $>$ {\bf d\+\_\+freq}
+\item 
+{\bf std\+::vector}$<$ float $>$ {\bf d\+\_\+angle}
+\item 
+{\bf std\+::vector}$<$ float $>$ {\bf d\+\_\+hold\+\_\+samp}
+\item 
+pmt\+::pmt\+\_\+t {\bf d\+\_\+port\+\_\+id}
+\item 
+pmt\+::pmt\+\_\+t {\bf d\+\_\+ptimestamp}
+\item 
+pmt\+::pmt\+\_\+t {\bf d\+\_\+pfreq}
+\item 
+pmt\+::pmt\+\_\+t {\bf d\+\_\+ppks}
+\item 
+pmt\+::pmt\+\_\+t {\bf d\+\_\+pangle}
+\item 
+pmt\+::pmt\+\_\+t {\bf d\+\_\+value}
+\item 
+{\bf std\+::vector}$<$ tag\+\_\+t $>$ {\bf d\+\_\+tags}
+\end{DoxyCompactItemize}
+\subsubsection*{Protected Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+{\bf int} {\bf calculate\+\_\+output\+\_\+stream\+\_\+length} (const gr\+\_\+vector\+\_\+int \&ninput\+\_\+items)
+\end{DoxyCompactItemize}
+\subsubsection*{Additional Inherited Members}
+
+
+\subsubsection{Detailed Description}
+
+
+Definition at line {\bf 29} of file {\bf os\+\_\+cfar\+\_\+c\+\_\+impl.\+h}.
+
+
+
+\subsubsection{Constructor \& Destructor Documentation}
+\index{gr\+::radar\+::os\+\_\+cfar\+\_\+c\+\_\+impl@{gr\+::radar\+::os\+\_\+cfar\+\_\+c\+\_\+impl}!os\+\_\+cfar\+\_\+c\+\_\+impl@{os\+\_\+cfar\+\_\+c\+\_\+impl}}
+\index{os\+\_\+cfar\+\_\+c\+\_\+impl@{os\+\_\+cfar\+\_\+c\+\_\+impl}!gr\+::radar\+::os\+\_\+cfar\+\_\+c\+\_\+impl@{gr\+::radar\+::os\+\_\+cfar\+\_\+c\+\_\+impl}}
+\paragraph[{os\+\_\+cfar\+\_\+c\+\_\+impl(int samp\+\_\+rate, int samp\+\_\+compare, int samp\+\_\+protect, float rel\+\_\+threshold, float mult\+\_\+threshold, bool merge\+\_\+consecutive, const std\+::string \&len\+\_\+key)}]{\setlength{\rightskip}{0pt plus 5cm}gr\+::radar\+::os\+\_\+cfar\+\_\+c\+\_\+impl\+::os\+\_\+cfar\+\_\+c\+\_\+impl (
+\begin{DoxyParamCaption}
+\item[{{\bf int}}]{samp\+\_\+rate, }
+\item[{{\bf int}}]{samp\+\_\+compare, }
+\item[{{\bf int}}]{samp\+\_\+protect, }
+\item[{float}]{rel\+\_\+threshold, }
+\item[{float}]{mult\+\_\+threshold, }
+\item[{bool}]{merge\+\_\+consecutive, }
+\item[{const {\bf std\+::string} \&}]{len\+\_\+key}
+\end{DoxyParamCaption}
+)}\label{classgr_1_1radar_1_1os__cfar__c__impl_ad292ba3ab1a8dbff8f9c359511afa55a}
+
+
+Definition at line {\bf 41} of file {\bf os\+\_\+cfar\+\_\+c\+\_\+impl.\+cc}.
+
+
+
+References {\bf d\+\_\+consecutive}, {\bf d\+\_\+merge\+\_\+consecutive}, {\bf d\+\_\+mult\+\_\+threshold}, {\bf d\+\_\+port\+\_\+id}, {\bf d\+\_\+rel\+\_\+threshold}, {\bf d\+\_\+samp\+\_\+compare}, {\bf d\+\_\+samp\+\_\+protect}, {\bf d\+\_\+samp\+\_\+rate}, and {\bf calc\+\_\+fmcw\+\_\+peaks\+::samp\+\_\+rate}.
+
+\index{gr\+::radar\+::os\+\_\+cfar\+\_\+c\+\_\+impl@{gr\+::radar\+::os\+\_\+cfar\+\_\+c\+\_\+impl}!````~os\+\_\+cfar\+\_\+c\+\_\+impl@{$\sim$os\+\_\+cfar\+\_\+c\+\_\+impl}}
+\index{````~os\+\_\+cfar\+\_\+c\+\_\+impl@{$\sim$os\+\_\+cfar\+\_\+c\+\_\+impl}!gr\+::radar\+::os\+\_\+cfar\+\_\+c\+\_\+impl@{gr\+::radar\+::os\+\_\+cfar\+\_\+c\+\_\+impl}}
+\paragraph[{$\sim$os\+\_\+cfar\+\_\+c\+\_\+impl()}]{\setlength{\rightskip}{0pt plus 5cm}gr\+::radar\+::os\+\_\+cfar\+\_\+c\+\_\+impl\+::$\sim$os\+\_\+cfar\+\_\+c\+\_\+impl (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}\label{classgr_1_1radar_1_1os__cfar__c__impl_aad95ba6ae292d9d47eb2688fe8b539ca}
+
+
+Definition at line {\bf 67} of file {\bf os\+\_\+cfar\+\_\+c\+\_\+impl.\+cc}.
+
+
+
+\subsubsection{Member Function Documentation}
+\index{gr\+::radar\+::os\+\_\+cfar\+\_\+c\+\_\+impl@{gr\+::radar\+::os\+\_\+cfar\+\_\+c\+\_\+impl}!calculate\+\_\+output\+\_\+stream\+\_\+length@{calculate\+\_\+output\+\_\+stream\+\_\+length}}
+\index{calculate\+\_\+output\+\_\+stream\+\_\+length@{calculate\+\_\+output\+\_\+stream\+\_\+length}!gr\+::radar\+::os\+\_\+cfar\+\_\+c\+\_\+impl@{gr\+::radar\+::os\+\_\+cfar\+\_\+c\+\_\+impl}}
+\paragraph[{calculate\+\_\+output\+\_\+stream\+\_\+length(const gr\+\_\+vector\+\_\+int \&ninput\+\_\+items)}]{\setlength{\rightskip}{0pt plus 5cm}{\bf int} gr\+::radar\+::os\+\_\+cfar\+\_\+c\+\_\+impl\+::calculate\+\_\+output\+\_\+stream\+\_\+length (
+\begin{DoxyParamCaption}
+\item[{const gr\+\_\+vector\+\_\+int \&}]{ninput\+\_\+items}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [protected]}}\label{classgr_1_1radar_1_1os__cfar__c__impl_a2524a12cab072ae7e58a31df635d003e}
+
+
+Definition at line {\bf 72} of file {\bf os\+\_\+cfar\+\_\+c\+\_\+impl.\+cc}.
+
+\index{gr\+::radar\+::os\+\_\+cfar\+\_\+c\+\_\+impl@{gr\+::radar\+::os\+\_\+cfar\+\_\+c\+\_\+impl}!set\+\_\+mult\+\_\+threshold@{set\+\_\+mult\+\_\+threshold}}
+\index{set\+\_\+mult\+\_\+threshold@{set\+\_\+mult\+\_\+threshold}!gr\+::radar\+::os\+\_\+cfar\+\_\+c\+\_\+impl@{gr\+::radar\+::os\+\_\+cfar\+\_\+c\+\_\+impl}}
+\paragraph[{set\+\_\+mult\+\_\+threshold(float inp)}]{\setlength{\rightskip}{0pt plus 5cm}{\bf void} gr\+::radar\+::os\+\_\+cfar\+\_\+c\+\_\+impl\+::set\+\_\+mult\+\_\+threshold (
+\begin{DoxyParamCaption}
+\item[{float}]{inp}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [virtual]}}\label{classgr_1_1radar_1_1os__cfar__c__impl_a76de588ab4e26491c86d52774ffc9ce6}
+
+
+Implements {\bf gr\+::radar\+::os\+\_\+cfar\+\_\+c} \doxyref{}{p.}{d0/dc2/classgr_1_1radar_1_1os__cfar__c_ab54a405c844312f8fb9eeb62b3c4409e}.
+
+
+
+Definition at line {\bf 60} of file {\bf os\+\_\+cfar\+\_\+c\+\_\+impl.\+cc}.
+
+
+
+References {\bf d\+\_\+mult\+\_\+threshold}.
+
+\index{gr\+::radar\+::os\+\_\+cfar\+\_\+c\+\_\+impl@{gr\+::radar\+::os\+\_\+cfar\+\_\+c\+\_\+impl}!set\+\_\+rel\+\_\+threshold@{set\+\_\+rel\+\_\+threshold}}
+\index{set\+\_\+rel\+\_\+threshold@{set\+\_\+rel\+\_\+threshold}!gr\+::radar\+::os\+\_\+cfar\+\_\+c\+\_\+impl@{gr\+::radar\+::os\+\_\+cfar\+\_\+c\+\_\+impl}}
+\paragraph[{set\+\_\+rel\+\_\+threshold(float inp)}]{\setlength{\rightskip}{0pt plus 5cm}{\bf void} gr\+::radar\+::os\+\_\+cfar\+\_\+c\+\_\+impl\+::set\+\_\+rel\+\_\+threshold (
+\begin{DoxyParamCaption}
+\item[{float}]{inp}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [virtual]}}\label{classgr_1_1radar_1_1os__cfar__c__impl_a39e6f6e7364a9c2693e086b24c107b4b}
+
+
+Implements {\bf gr\+::radar\+::os\+\_\+cfar\+\_\+c} \doxyref{}{p.}{d0/dc2/classgr_1_1radar_1_1os__cfar__c_a228c699ffb518d6c1e3c15a37e4ad225}.
+
+
+
+Definition at line {\bf 59} of file {\bf os\+\_\+cfar\+\_\+c\+\_\+impl.\+cc}.
+
+
+
+References {\bf d\+\_\+rel\+\_\+threshold}.
+
+\index{gr\+::radar\+::os\+\_\+cfar\+\_\+c\+\_\+impl@{gr\+::radar\+::os\+\_\+cfar\+\_\+c\+\_\+impl}!set\+\_\+samp\+\_\+compare@{set\+\_\+samp\+\_\+compare}}
+\index{set\+\_\+samp\+\_\+compare@{set\+\_\+samp\+\_\+compare}!gr\+::radar\+::os\+\_\+cfar\+\_\+c\+\_\+impl@{gr\+::radar\+::os\+\_\+cfar\+\_\+c\+\_\+impl}}
+\paragraph[{set\+\_\+samp\+\_\+compare(int inp)}]{\setlength{\rightskip}{0pt plus 5cm}{\bf void} gr\+::radar\+::os\+\_\+cfar\+\_\+c\+\_\+impl\+::set\+\_\+samp\+\_\+compare (
+\begin{DoxyParamCaption}
+\item[{{\bf int}}]{inp}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [virtual]}}\label{classgr_1_1radar_1_1os__cfar__c__impl_a8f686347a258633cb6dd82014d8e656b}
+
+
+Implements {\bf gr\+::radar\+::os\+\_\+cfar\+\_\+c} \doxyref{}{p.}{d0/dc2/classgr_1_1radar_1_1os__cfar__c_ae9762c0ae9e9e58b89ff86b58e539da1}.
+
+
+
+Definition at line {\bf 61} of file {\bf os\+\_\+cfar\+\_\+c\+\_\+impl.\+cc}.
+
+
+
+References {\bf d\+\_\+samp\+\_\+compare}.
+
+\index{gr\+::radar\+::os\+\_\+cfar\+\_\+c\+\_\+impl@{gr\+::radar\+::os\+\_\+cfar\+\_\+c\+\_\+impl}!set\+\_\+samp\+\_\+protect@{set\+\_\+samp\+\_\+protect}}
+\index{set\+\_\+samp\+\_\+protect@{set\+\_\+samp\+\_\+protect}!gr\+::radar\+::os\+\_\+cfar\+\_\+c\+\_\+impl@{gr\+::radar\+::os\+\_\+cfar\+\_\+c\+\_\+impl}}
+\paragraph[{set\+\_\+samp\+\_\+protect(int inp)}]{\setlength{\rightskip}{0pt plus 5cm}{\bf void} gr\+::radar\+::os\+\_\+cfar\+\_\+c\+\_\+impl\+::set\+\_\+samp\+\_\+protect (
+\begin{DoxyParamCaption}
+\item[{{\bf int}}]{inp}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [virtual]}}\label{classgr_1_1radar_1_1os__cfar__c__impl_a31b484b37e381e02a76544b89186a340}
+
+
+Implements {\bf gr\+::radar\+::os\+\_\+cfar\+\_\+c} \doxyref{}{p.}{d0/dc2/classgr_1_1radar_1_1os__cfar__c_af426bc0ddc593c41138f8622ce1e76a0}.
+
+
+
+Definition at line {\bf 62} of file {\bf os\+\_\+cfar\+\_\+c\+\_\+impl.\+cc}.
+
+
+
+References {\bf d\+\_\+samp\+\_\+protect}.
+
+\index{gr\+::radar\+::os\+\_\+cfar\+\_\+c\+\_\+impl@{gr\+::radar\+::os\+\_\+cfar\+\_\+c\+\_\+impl}!work@{work}}
+\index{work@{work}!gr\+::radar\+::os\+\_\+cfar\+\_\+c\+\_\+impl@{gr\+::radar\+::os\+\_\+cfar\+\_\+c\+\_\+impl}}
+\paragraph[{work(int noutput\+\_\+items, gr\+\_\+vector\+\_\+int \&ninput\+\_\+items, gr\+\_\+vector\+\_\+const\+\_\+void\+\_\+star \&input\+\_\+items, gr\+\_\+vector\+\_\+void\+\_\+star \&output\+\_\+items)}]{\setlength{\rightskip}{0pt plus 5cm}{\bf int} gr\+::radar\+::os\+\_\+cfar\+\_\+c\+\_\+impl\+::work (
+\begin{DoxyParamCaption}
+\item[{{\bf int}}]{noutput\+\_\+items, }
+\item[{gr\+\_\+vector\+\_\+int \&}]{ninput\+\_\+items, }
+\item[{gr\+\_\+vector\+\_\+const\+\_\+void\+\_\+star \&}]{input\+\_\+items, }
+\item[{gr\+\_\+vector\+\_\+void\+\_\+star \&}]{output\+\_\+items}
+\end{DoxyParamCaption}
+)}\label{classgr_1_1radar_1_1os__cfar__c__impl_a744b2cbbaba0f9211e47d1b2bab100d7}
+
+
+Definition at line {\bf 79} of file {\bf os\+\_\+cfar\+\_\+c\+\_\+impl.\+cc}.
+
+
+
+References {\bf d\+\_\+angle}, {\bf d\+\_\+consecutive}, {\bf d\+\_\+freq}, {\bf d\+\_\+hold\+\_\+samp}, {\bf d\+\_\+merge\+\_\+consecutive}, {\bf d\+\_\+mult\+\_\+threshold}, {\bf d\+\_\+pangle}, {\bf d\+\_\+pfreq}, {\bf d\+\_\+pks}, {\bf d\+\_\+port\+\_\+id}, {\bf d\+\_\+ppks}, {\bf d\+\_\+ptimestamp}, {\bf d\+\_\+rel\+\_\+threshold}, {\bf d\+\_\+samp\+\_\+compare}, {\bf d\+\_\+samp\+\_\+protect}, {\bf d\+\_\+samp\+\_\+rate}, {\bf d\+\_\+tags}, {\bf d\+\_\+value}, {\bf int()}, and {\bf k}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=236pt]{d4/d37/classgr_1_1radar_1_1os__cfar__c__impl_a744b2cbbaba0f9211e47d1b2bab100d7_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+\subsubsection{Member Data Documentation}
+\index{gr\+::radar\+::os\+\_\+cfar\+\_\+c\+\_\+impl@{gr\+::radar\+::os\+\_\+cfar\+\_\+c\+\_\+impl}!d\+\_\+angle@{d\+\_\+angle}}
+\index{d\+\_\+angle@{d\+\_\+angle}!gr\+::radar\+::os\+\_\+cfar\+\_\+c\+\_\+impl@{gr\+::radar\+::os\+\_\+cfar\+\_\+c\+\_\+impl}}
+\paragraph[{d\+\_\+angle}]{\setlength{\rightskip}{0pt plus 5cm}{\bf std\+::vector}$<$float$>$ gr\+::radar\+::os\+\_\+cfar\+\_\+c\+\_\+impl\+::d\+\_\+angle}\label{classgr_1_1radar_1_1os__cfar__c__impl_a806baf11e02dbb8c15c54fd92f24a800}
+
+
+Definition at line {\bf 49} of file {\bf os\+\_\+cfar\+\_\+c\+\_\+impl.\+h}.
+
+
+
+Referenced by {\bf work()}.
+
+\index{gr\+::radar\+::os\+\_\+cfar\+\_\+c\+\_\+impl@{gr\+::radar\+::os\+\_\+cfar\+\_\+c\+\_\+impl}!d\+\_\+consecutive@{d\+\_\+consecutive}}
+\index{d\+\_\+consecutive@{d\+\_\+consecutive}!gr\+::radar\+::os\+\_\+cfar\+\_\+c\+\_\+impl@{gr\+::radar\+::os\+\_\+cfar\+\_\+c\+\_\+impl}}
+\paragraph[{d\+\_\+consecutive}]{\setlength{\rightskip}{0pt plus 5cm}bool gr\+::radar\+::os\+\_\+cfar\+\_\+c\+\_\+impl\+::d\+\_\+consecutive}\label{classgr_1_1radar_1_1os__cfar__c__impl_a7bdd978328cb629d90215b820bb1f2f3}
+
+
+Definition at line {\bf 47} of file {\bf os\+\_\+cfar\+\_\+c\+\_\+impl.\+h}.
+
+
+
+Referenced by {\bf os\+\_\+cfar\+\_\+c\+\_\+impl()}, and {\bf work()}.
+
+\index{gr\+::radar\+::os\+\_\+cfar\+\_\+c\+\_\+impl@{gr\+::radar\+::os\+\_\+cfar\+\_\+c\+\_\+impl}!d\+\_\+freq@{d\+\_\+freq}}
+\index{d\+\_\+freq@{d\+\_\+freq}!gr\+::radar\+::os\+\_\+cfar\+\_\+c\+\_\+impl@{gr\+::radar\+::os\+\_\+cfar\+\_\+c\+\_\+impl}}
+\paragraph[{d\+\_\+freq}]{\setlength{\rightskip}{0pt plus 5cm}{\bf std\+::vector}$<$float$>$ gr\+::radar\+::os\+\_\+cfar\+\_\+c\+\_\+impl\+::d\+\_\+freq}\label{classgr_1_1radar_1_1os__cfar__c__impl_a143eeb642d703fd8316de0c2abf8a0da}
+
+
+Definition at line {\bf 49} of file {\bf os\+\_\+cfar\+\_\+c\+\_\+impl.\+h}.
+
+
+
+Referenced by {\bf work()}.
+
+\index{gr\+::radar\+::os\+\_\+cfar\+\_\+c\+\_\+impl@{gr\+::radar\+::os\+\_\+cfar\+\_\+c\+\_\+impl}!d\+\_\+hold\+\_\+samp@{d\+\_\+hold\+\_\+samp}}
+\index{d\+\_\+hold\+\_\+samp@{d\+\_\+hold\+\_\+samp}!gr\+::radar\+::os\+\_\+cfar\+\_\+c\+\_\+impl@{gr\+::radar\+::os\+\_\+cfar\+\_\+c\+\_\+impl}}
+\paragraph[{d\+\_\+hold\+\_\+samp}]{\setlength{\rightskip}{0pt plus 5cm}{\bf std\+::vector}$<$float$>$ gr\+::radar\+::os\+\_\+cfar\+\_\+c\+\_\+impl\+::d\+\_\+hold\+\_\+samp}\label{classgr_1_1radar_1_1os__cfar__c__impl_aede80bbf65ddbceff2413763d9af3c27}
+
+
+Definition at line {\bf 49} of file {\bf os\+\_\+cfar\+\_\+c\+\_\+impl.\+h}.
+
+
+
+Referenced by {\bf work()}.
+
+\index{gr\+::radar\+::os\+\_\+cfar\+\_\+c\+\_\+impl@{gr\+::radar\+::os\+\_\+cfar\+\_\+c\+\_\+impl}!d\+\_\+merge\+\_\+consecutive@{d\+\_\+merge\+\_\+consecutive}}
+\index{d\+\_\+merge\+\_\+consecutive@{d\+\_\+merge\+\_\+consecutive}!gr\+::radar\+::os\+\_\+cfar\+\_\+c\+\_\+impl@{gr\+::radar\+::os\+\_\+cfar\+\_\+c\+\_\+impl}}
+\paragraph[{d\+\_\+merge\+\_\+consecutive}]{\setlength{\rightskip}{0pt plus 5cm}bool gr\+::radar\+::os\+\_\+cfar\+\_\+c\+\_\+impl\+::d\+\_\+merge\+\_\+consecutive}\label{classgr_1_1radar_1_1os__cfar__c__impl_a0657a5f23a2d9dd555f9ad459395c7a9}
+
+
+Definition at line {\bf 47} of file {\bf os\+\_\+cfar\+\_\+c\+\_\+impl.\+h}.
+
+
+
+Referenced by {\bf os\+\_\+cfar\+\_\+c\+\_\+impl()}, and {\bf work()}.
+
+\index{gr\+::radar\+::os\+\_\+cfar\+\_\+c\+\_\+impl@{gr\+::radar\+::os\+\_\+cfar\+\_\+c\+\_\+impl}!d\+\_\+mult\+\_\+threshold@{d\+\_\+mult\+\_\+threshold}}
+\index{d\+\_\+mult\+\_\+threshold@{d\+\_\+mult\+\_\+threshold}!gr\+::radar\+::os\+\_\+cfar\+\_\+c\+\_\+impl@{gr\+::radar\+::os\+\_\+cfar\+\_\+c\+\_\+impl}}
+\paragraph[{d\+\_\+mult\+\_\+threshold}]{\setlength{\rightskip}{0pt plus 5cm}float gr\+::radar\+::os\+\_\+cfar\+\_\+c\+\_\+impl\+::d\+\_\+mult\+\_\+threshold}\label{classgr_1_1radar_1_1os__cfar__c__impl_a4240e0e5527a682064d2cbba4a85dbf7}
+
+
+Definition at line {\bf 46} of file {\bf os\+\_\+cfar\+\_\+c\+\_\+impl.\+h}.
+
+
+
+Referenced by {\bf os\+\_\+cfar\+\_\+c\+\_\+impl()}, {\bf set\+\_\+mult\+\_\+threshold()}, and {\bf work()}.
+
+\index{gr\+::radar\+::os\+\_\+cfar\+\_\+c\+\_\+impl@{gr\+::radar\+::os\+\_\+cfar\+\_\+c\+\_\+impl}!d\+\_\+pangle@{d\+\_\+pangle}}
+\index{d\+\_\+pangle@{d\+\_\+pangle}!gr\+::radar\+::os\+\_\+cfar\+\_\+c\+\_\+impl@{gr\+::radar\+::os\+\_\+cfar\+\_\+c\+\_\+impl}}
+\paragraph[{d\+\_\+pangle}]{\setlength{\rightskip}{0pt plus 5cm}pmt\+::pmt\+\_\+t gr\+::radar\+::os\+\_\+cfar\+\_\+c\+\_\+impl\+::d\+\_\+pangle}\label{classgr_1_1radar_1_1os__cfar__c__impl_ac2469babb5c8980289285ba9bbe9aceb}
+
+
+Definition at line {\bf 52} of file {\bf os\+\_\+cfar\+\_\+c\+\_\+impl.\+h}.
+
+
+
+Referenced by {\bf work()}.
+
+\index{gr\+::radar\+::os\+\_\+cfar\+\_\+c\+\_\+impl@{gr\+::radar\+::os\+\_\+cfar\+\_\+c\+\_\+impl}!d\+\_\+pfreq@{d\+\_\+pfreq}}
+\index{d\+\_\+pfreq@{d\+\_\+pfreq}!gr\+::radar\+::os\+\_\+cfar\+\_\+c\+\_\+impl@{gr\+::radar\+::os\+\_\+cfar\+\_\+c\+\_\+impl}}
+\paragraph[{d\+\_\+pfreq}]{\setlength{\rightskip}{0pt plus 5cm}pmt\+::pmt\+\_\+t gr\+::radar\+::os\+\_\+cfar\+\_\+c\+\_\+impl\+::d\+\_\+pfreq}\label{classgr_1_1radar_1_1os__cfar__c__impl_a195bdb737b9bbc42e9cb149a44ec8dce}
+
+
+Definition at line {\bf 52} of file {\bf os\+\_\+cfar\+\_\+c\+\_\+impl.\+h}.
+
+
+
+Referenced by {\bf work()}.
+
+\index{gr\+::radar\+::os\+\_\+cfar\+\_\+c\+\_\+impl@{gr\+::radar\+::os\+\_\+cfar\+\_\+c\+\_\+impl}!d\+\_\+pks@{d\+\_\+pks}}
+\index{d\+\_\+pks@{d\+\_\+pks}!gr\+::radar\+::os\+\_\+cfar\+\_\+c\+\_\+impl@{gr\+::radar\+::os\+\_\+cfar\+\_\+c\+\_\+impl}}
+\paragraph[{d\+\_\+pks}]{\setlength{\rightskip}{0pt plus 5cm}{\bf std\+::vector}$<$float$>$ gr\+::radar\+::os\+\_\+cfar\+\_\+c\+\_\+impl\+::d\+\_\+pks}\label{classgr_1_1radar_1_1os__cfar__c__impl_a06f2da914c50b79666056652a6f452ab}
+
+
+Definition at line {\bf 49} of file {\bf os\+\_\+cfar\+\_\+c\+\_\+impl.\+h}.
+
+
+
+Referenced by {\bf work()}.
+
+\index{gr\+::radar\+::os\+\_\+cfar\+\_\+c\+\_\+impl@{gr\+::radar\+::os\+\_\+cfar\+\_\+c\+\_\+impl}!d\+\_\+port\+\_\+id@{d\+\_\+port\+\_\+id}}
+\index{d\+\_\+port\+\_\+id@{d\+\_\+port\+\_\+id}!gr\+::radar\+::os\+\_\+cfar\+\_\+c\+\_\+impl@{gr\+::radar\+::os\+\_\+cfar\+\_\+c\+\_\+impl}}
+\paragraph[{d\+\_\+port\+\_\+id}]{\setlength{\rightskip}{0pt plus 5cm}pmt\+::pmt\+\_\+t gr\+::radar\+::os\+\_\+cfar\+\_\+c\+\_\+impl\+::d\+\_\+port\+\_\+id}\label{classgr_1_1radar_1_1os__cfar__c__impl_a75abcfe1a60df846c5cb555a2f218b34}
+
+
+Definition at line {\bf 51} of file {\bf os\+\_\+cfar\+\_\+c\+\_\+impl.\+h}.
+
+
+
+Referenced by {\bf os\+\_\+cfar\+\_\+c\+\_\+impl()}, and {\bf work()}.
+
+\index{gr\+::radar\+::os\+\_\+cfar\+\_\+c\+\_\+impl@{gr\+::radar\+::os\+\_\+cfar\+\_\+c\+\_\+impl}!d\+\_\+ppks@{d\+\_\+ppks}}
+\index{d\+\_\+ppks@{d\+\_\+ppks}!gr\+::radar\+::os\+\_\+cfar\+\_\+c\+\_\+impl@{gr\+::radar\+::os\+\_\+cfar\+\_\+c\+\_\+impl}}
+\paragraph[{d\+\_\+ppks}]{\setlength{\rightskip}{0pt plus 5cm}pmt\+::pmt\+\_\+t gr\+::radar\+::os\+\_\+cfar\+\_\+c\+\_\+impl\+::d\+\_\+ppks}\label{classgr_1_1radar_1_1os__cfar__c__impl_a4916f0d612c6a4249340377658b88ef5}
+
+
+Definition at line {\bf 52} of file {\bf os\+\_\+cfar\+\_\+c\+\_\+impl.\+h}.
+
+
+
+Referenced by {\bf work()}.
+
+\index{gr\+::radar\+::os\+\_\+cfar\+\_\+c\+\_\+impl@{gr\+::radar\+::os\+\_\+cfar\+\_\+c\+\_\+impl}!d\+\_\+ptimestamp@{d\+\_\+ptimestamp}}
+\index{d\+\_\+ptimestamp@{d\+\_\+ptimestamp}!gr\+::radar\+::os\+\_\+cfar\+\_\+c\+\_\+impl@{gr\+::radar\+::os\+\_\+cfar\+\_\+c\+\_\+impl}}
+\paragraph[{d\+\_\+ptimestamp}]{\setlength{\rightskip}{0pt plus 5cm}pmt\+::pmt\+\_\+t gr\+::radar\+::os\+\_\+cfar\+\_\+c\+\_\+impl\+::d\+\_\+ptimestamp}\label{classgr_1_1radar_1_1os__cfar__c__impl_a9bec803fab8f062fadebc7010b5269ce}
+
+
+Definition at line {\bf 52} of file {\bf os\+\_\+cfar\+\_\+c\+\_\+impl.\+h}.
+
+
+
+Referenced by {\bf work()}.
+
+\index{gr\+::radar\+::os\+\_\+cfar\+\_\+c\+\_\+impl@{gr\+::radar\+::os\+\_\+cfar\+\_\+c\+\_\+impl}!d\+\_\+rel\+\_\+threshold@{d\+\_\+rel\+\_\+threshold}}
+\index{d\+\_\+rel\+\_\+threshold@{d\+\_\+rel\+\_\+threshold}!gr\+::radar\+::os\+\_\+cfar\+\_\+c\+\_\+impl@{gr\+::radar\+::os\+\_\+cfar\+\_\+c\+\_\+impl}}
+\paragraph[{d\+\_\+rel\+\_\+threshold}]{\setlength{\rightskip}{0pt plus 5cm}float gr\+::radar\+::os\+\_\+cfar\+\_\+c\+\_\+impl\+::d\+\_\+rel\+\_\+threshold}\label{classgr_1_1radar_1_1os__cfar__c__impl_ac58835bfa039060d949400a8d68c5f7d}
+
+
+Definition at line {\bf 46} of file {\bf os\+\_\+cfar\+\_\+c\+\_\+impl.\+h}.
+
+
+
+Referenced by {\bf os\+\_\+cfar\+\_\+c\+\_\+impl()}, {\bf set\+\_\+rel\+\_\+threshold()}, and {\bf work()}.
+
+\index{gr\+::radar\+::os\+\_\+cfar\+\_\+c\+\_\+impl@{gr\+::radar\+::os\+\_\+cfar\+\_\+c\+\_\+impl}!d\+\_\+samp\+\_\+compare@{d\+\_\+samp\+\_\+compare}}
+\index{d\+\_\+samp\+\_\+compare@{d\+\_\+samp\+\_\+compare}!gr\+::radar\+::os\+\_\+cfar\+\_\+c\+\_\+impl@{gr\+::radar\+::os\+\_\+cfar\+\_\+c\+\_\+impl}}
+\paragraph[{d\+\_\+samp\+\_\+compare}]{\setlength{\rightskip}{0pt plus 5cm}{\bf int} gr\+::radar\+::os\+\_\+cfar\+\_\+c\+\_\+impl\+::d\+\_\+samp\+\_\+compare}\label{classgr_1_1radar_1_1os__cfar__c__impl_ae85917832dc7e4b988bfee546738e2ac}
+
+
+Definition at line {\bf 45} of file {\bf os\+\_\+cfar\+\_\+c\+\_\+impl.\+h}.
+
+
+
+Referenced by {\bf os\+\_\+cfar\+\_\+c\+\_\+impl()}, {\bf set\+\_\+samp\+\_\+compare()}, and {\bf work()}.
+
+\index{gr\+::radar\+::os\+\_\+cfar\+\_\+c\+\_\+impl@{gr\+::radar\+::os\+\_\+cfar\+\_\+c\+\_\+impl}!d\+\_\+samp\+\_\+protect@{d\+\_\+samp\+\_\+protect}}
+\index{d\+\_\+samp\+\_\+protect@{d\+\_\+samp\+\_\+protect}!gr\+::radar\+::os\+\_\+cfar\+\_\+c\+\_\+impl@{gr\+::radar\+::os\+\_\+cfar\+\_\+c\+\_\+impl}}
+\paragraph[{d\+\_\+samp\+\_\+protect}]{\setlength{\rightskip}{0pt plus 5cm}{\bf int} gr\+::radar\+::os\+\_\+cfar\+\_\+c\+\_\+impl\+::d\+\_\+samp\+\_\+protect}\label{classgr_1_1radar_1_1os__cfar__c__impl_aaacfde4fa2eeb3ddf0df8fcbee9caba6}
+
+
+Definition at line {\bf 45} of file {\bf os\+\_\+cfar\+\_\+c\+\_\+impl.\+h}.
+
+
+
+Referenced by {\bf os\+\_\+cfar\+\_\+c\+\_\+impl()}, {\bf set\+\_\+samp\+\_\+protect()}, and {\bf work()}.
+
+\index{gr\+::radar\+::os\+\_\+cfar\+\_\+c\+\_\+impl@{gr\+::radar\+::os\+\_\+cfar\+\_\+c\+\_\+impl}!d\+\_\+samp\+\_\+rate@{d\+\_\+samp\+\_\+rate}}
+\index{d\+\_\+samp\+\_\+rate@{d\+\_\+samp\+\_\+rate}!gr\+::radar\+::os\+\_\+cfar\+\_\+c\+\_\+impl@{gr\+::radar\+::os\+\_\+cfar\+\_\+c\+\_\+impl}}
+\paragraph[{d\+\_\+samp\+\_\+rate}]{\setlength{\rightskip}{0pt plus 5cm}{\bf int} gr\+::radar\+::os\+\_\+cfar\+\_\+c\+\_\+impl\+::d\+\_\+samp\+\_\+rate}\label{classgr_1_1radar_1_1os__cfar__c__impl_a8c325f9d8518e2317acb8314ccf0c969}
+
+
+Definition at line {\bf 45} of file {\bf os\+\_\+cfar\+\_\+c\+\_\+impl.\+h}.
+
+
+
+Referenced by {\bf os\+\_\+cfar\+\_\+c\+\_\+impl()}, and {\bf work()}.
+
+\index{gr\+::radar\+::os\+\_\+cfar\+\_\+c\+\_\+impl@{gr\+::radar\+::os\+\_\+cfar\+\_\+c\+\_\+impl}!d\+\_\+tags@{d\+\_\+tags}}
+\index{d\+\_\+tags@{d\+\_\+tags}!gr\+::radar\+::os\+\_\+cfar\+\_\+c\+\_\+impl@{gr\+::radar\+::os\+\_\+cfar\+\_\+c\+\_\+impl}}
+\paragraph[{d\+\_\+tags}]{\setlength{\rightskip}{0pt plus 5cm}{\bf std\+::vector}$<$ tag\+\_\+t $>$ gr\+::radar\+::os\+\_\+cfar\+\_\+c\+\_\+impl\+::d\+\_\+tags}\label{classgr_1_1radar_1_1os__cfar__c__impl_a17771d59721662ad60ee9efc3df57e53}
+
+
+Definition at line {\bf 53} of file {\bf os\+\_\+cfar\+\_\+c\+\_\+impl.\+h}.
+
+
+
+Referenced by {\bf work()}.
+
+\index{gr\+::radar\+::os\+\_\+cfar\+\_\+c\+\_\+impl@{gr\+::radar\+::os\+\_\+cfar\+\_\+c\+\_\+impl}!d\+\_\+value@{d\+\_\+value}}
+\index{d\+\_\+value@{d\+\_\+value}!gr\+::radar\+::os\+\_\+cfar\+\_\+c\+\_\+impl@{gr\+::radar\+::os\+\_\+cfar\+\_\+c\+\_\+impl}}
+\paragraph[{d\+\_\+value}]{\setlength{\rightskip}{0pt plus 5cm}pmt\+::pmt\+\_\+t gr\+::radar\+::os\+\_\+cfar\+\_\+c\+\_\+impl\+::d\+\_\+value}\label{classgr_1_1radar_1_1os__cfar__c__impl_a3c2eaf1a8e3efbbb89deed70a906d51a}
+
+
+Definition at line {\bf 52} of file {\bf os\+\_\+cfar\+\_\+c\+\_\+impl.\+h}.
+
+
+
+Referenced by {\bf work()}.
+
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+/home/erik/prefix/default/src/gr-\/radar-\/dev/lib/{\bf os\+\_\+cfar\+\_\+c\+\_\+impl.\+h}\item 
+/home/erik/prefix/default/src/gr-\/radar-\/dev/lib/{\bf os\+\_\+cfar\+\_\+c\+\_\+impl.\+cc}\end{DoxyCompactItemize}

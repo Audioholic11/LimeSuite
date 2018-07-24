@@ -1787,6 +1787,16 @@ void LMS7_Device::SetHardwareTimestamp(const uint64_t now)
     mStreamers[0]->SetHardwareTimestamp(now);
 }
 
+uint64_t LMS7_Device::GetChirpTimePeriod(void) const
+{
+    return mStreamers[0]->GetChirpTimePeriod();
+}
+
+uint64_t LMS7_Device::GetChirpTimeStamp(void) const
+{
+    return mStreamers[0]->GetChirpTimeStamp();
+}
+
 int LMS7_Device::MCU_AGCStart(uint32_t wantedRSSI)
 {
     lime::MCU_BD *mcu = lms_list.at(lms_chip_id)->GetMCUControls();

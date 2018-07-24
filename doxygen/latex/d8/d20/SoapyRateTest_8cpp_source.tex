@@ -1,0 +1,181 @@
+\subsection{Soapy\+Rate\+Test.\+cpp}
+\label{SoapyRateTest_8cpp_source}\index{/home/erik/prefix/default/src/soapysdr/apps/\+Soapy\+Rate\+Test.\+cpp@{/home/erik/prefix/default/src/soapysdr/apps/\+Soapy\+Rate\+Test.\+cpp}}
+
+\begin{DoxyCode}
+00001 \textcolor{comment}{// Copyright (c) 2016-2017 Josh Blum}
+00002 \textcolor{comment}{// SPDX-License-Identifier: BSL-1.0}
+00003 
+00004 \textcolor{preprocessor}{#include <SoapySDR/Device.hpp>}
+00005 \textcolor{preprocessor}{#include <SoapySDR/Formats.hpp>}
+00006 \textcolor{preprocessor}{#include <SoapySDR/Errors.hpp>}
+00007 \textcolor{preprocessor}{#include <string>}
+00008 \textcolor{preprocessor}{#include <cstdlib>}
+00009 \textcolor{preprocessor}{#include <iostream>}
+00010 \textcolor{preprocessor}{#include <stdexcept>}
+00011 \textcolor{preprocessor}{#include <csignal>}
+00012 \textcolor{preprocessor}{#include <chrono>}
+00013 \textcolor{preprocessor}{#include <cstdio>}
+00014 
+00015 \textcolor{keyword}{static} sig\_atomic\_t loopDone = \textcolor{keyword}{false};
+00016 \textcolor{keywordtype}{void} sigIntHandler(\textcolor{keyword}{const} \textcolor{keywordtype}{int})
+00017 \{
+00018     loopDone = \textcolor{keyword}{true};
+00019 \}
+00020 
+00021 \textcolor{keywordtype}{void} runRateTestStreamLoop(
+00022     SoapySDR::Device *device,
+00023     SoapySDR::Stream *stream,
+00024     \textcolor{keyword}{const} \textcolor{keywordtype}{int} direction,
+00025     \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} numChans,
+00026     \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} elemSize)
+00027 \{
+00028     \textcolor{comment}{//allocate buffers for the stream read/write}
+00029     \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} numElems = device->getStreamMTU(stream);
+00030     std::vector<std::vector<char>> buffMem(numChans, std::vector<char>(elemSize*numElems));
+00031     std::vector<void *> buffs(numChans);
+00032     \textcolor{keywordflow}{for} (\textcolor{keywordtype}{size\_t} i = 0; i < numChans; i++) buffs[i] = buffMem[i].data();
+00033 
+00034     \textcolor{comment}{//state collected in this loop}
+00035     \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{int} overflows(0);
+00036     \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{int} underflows(0);
+00037     \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{long} \textcolor{keywordtype}{long} totalSamples(0);
+00038     \textcolor{keyword}{const} \textcolor{keyword}{auto} startTime = std::chrono::high\_resolution\_clock::now();
+00039     \textcolor{keyword}{auto} timeLastPrint = std::chrono::high\_resolution\_clock::now();
+00040     \textcolor{keyword}{auto} timeLastSpin = std::chrono::high\_resolution\_clock::now();
+00041     \textcolor{keyword}{auto} timeLastStatus = std::chrono::high\_resolution\_clock::now();
+00042     \textcolor{keywordtype}{int} spinIndex(0);
+00043 
+00044     std::cout << \textcolor{stringliteral}{"Starting stream loop, press Ctrl+C to exit..."} << std::endl;
+00045     device->activateStream(stream);
+00046     signal(SIGINT, sigIntHandler);
+00047     \textcolor{keywordflow}{while} (not loopDone)
+00048     \{
+00049         \textcolor{keywordtype}{int} ret(0);
+00050         \textcolor{keywordtype}{int} flags(0);
+00051         \textcolor{keywordtype}{long} \textcolor{keywordtype}{long} timeNs(0);
+00052         \textcolor{keywordflow}{switch}(direction)
+00053         \{
+00054         \textcolor{keywordflow}{case} SOAPY_SDR_RX:
+00055             ret = device->readStream(stream, buffs.data(), numElems, flags, timeNs);
+00056             \textcolor{keywordflow}{break};
+00057         \textcolor{keywordflow}{case} SOAPY_SDR_TX:
+00058             ret = device->writeStream(stream, buffs.data(), numElems, flags, timeNs);
+00059             \textcolor{keywordflow}{break};
+00060         \}
+00061 
+00062         \textcolor{keywordflow}{if} (ret == SOAPY_SDR_TIMEOUT) \textcolor{keywordflow}{continue};
+00063         \textcolor{keywordflow}{if} (ret == SOAPY_SDR_OVERFLOW)
+00064         \{
+00065             overflows++;
+00066             \textcolor{keywordflow}{continue};
+00067         \}
+00068         \textcolor{keywordflow}{if} (ret == SOAPY_SDR_UNDERFLOW)
+00069         \{
+00070             underflows++;
+00071             \textcolor{keywordflow}{continue};
+00072         \}
+00073         \textcolor{keywordflow}{if} (ret < 0)
+00074         \{
+00075             std::cerr << \textcolor{stringliteral}{"Unexpected stream error "} << SoapySDR::errToStr(ret) << std::endl;
+00076             \textcolor{keywordflow}{break};
+00077         \}
+00078         totalSamples += ret;
+00079 
+00080         \textcolor{keyword}{const} \textcolor{keyword}{auto} now = std::chrono::high\_resolution\_clock::now();
+00081         \textcolor{keywordflow}{if} (timeLastSpin + std::chrono::milliseconds(300) < now)
+00082         \{
+00083             timeLastSpin = now;
+00084             \textcolor{keyword}{static} \textcolor{keyword}{const} \textcolor{keywordtype}{char} spin[] = \{\textcolor{stringliteral}{"|/-\(\backslash\)\(\backslash\)"}\};
+00085             printf(\textcolor{stringliteral}{"\(\backslash\)b%c"}, spin[(spinIndex++)%4]);
+00086             fflush(stdout);
+00087         \}
+00088         \textcolor{comment}{//occasionally read out the stream status (non blocking)}
+00089         \textcolor{keywordflow}{if} (timeLastStatus + std::chrono::seconds(1) < now)
+00090         \{
+00091             timeLastStatus = now;
+00092             \textcolor{keywordflow}{while} (\textcolor{keyword}{true})
+00093             \{
+00094                 \textcolor{keywordtype}{size\_t} chanMask; \textcolor{keywordtype}{int} flags; \textcolor{keywordtype}{long} \textcolor{keywordtype}{long} timeNs;
+00095                 ret = device->readStreamStatus(stream, chanMask, flags, timeNs, 0);
+00096                 \textcolor{keywordflow}{if} (ret == SOAPY_SDR_OVERFLOW) overflows++;
+00097                 \textcolor{keywordflow}{else} \textcolor{keywordflow}{if} (ret == SOAPY_SDR_UNDERFLOW) underflows++;
+00098                 \textcolor{keywordflow}{else} \textcolor{keywordflow}{if} (ret == SOAPY_SDR_TIME_ERROR) \{\}
+00099                 \textcolor{keywordflow}{else} \textcolor{keywordflow}{break};
+00100             \}
+00101         \}
+00102         \textcolor{keywordflow}{if} (timeLastPrint + std::chrono::seconds(5) < now)
+00103         \{
+00104             timeLastPrint = now;
+00105             \textcolor{keyword}{const} \textcolor{keyword}{auto} timePassed = std::chrono::duration\_cast<std::chrono::microseconds>(now - startTime);
+00106             \textcolor{keyword}{const} \textcolor{keyword}{auto} sampleRate = double(totalSamples)/timePassed.count();
+00107             printf(\textcolor{stringliteral}{"\(\backslash\)b%g Msps\(\backslash\)t%g MBps"}, sampleRate, sampleRate*numChans*elemSize);
+00108             \textcolor{keywordflow}{if} (overflows != 0) printf(\textcolor{stringliteral}{"\(\backslash\)tOverflows %u"}, overflows);
+00109             \textcolor{keywordflow}{if} (underflows != 0) printf(\textcolor{stringliteral}{"\(\backslash\)tUnderflows %u"}, underflows);
+00110             printf(\textcolor{stringliteral}{"\(\backslash\)n "});
+00111         \}
+00112 
+00113     \}
+00114     device->deactivateStream(stream);
+00115 \}
+00116 
+00117 \textcolor{keywordtype}{int} SoapySDRRateTest(
+00118     \textcolor{keyword}{const} std::string &argStr,
+00119     \textcolor{keyword}{const} \textcolor{keywordtype}{double} sampleRate,
+00120     \textcolor{keyword}{const} std::string &channelStr,
+00121     \textcolor{keyword}{const} std::string &directionStr)
+00122 \{
+00123     SoapySDR::Device *device(\textcolor{keyword}{nullptr});
+00124 
+00125     \textcolor{keywordflow}{try}
+00126     \{
+00127         device = SoapySDR::Device::make(argStr);
+00128 
+00129         \textcolor{comment}{//parse the direction to the integer enum}
+00130         \textcolor{keywordtype}{int} direction(-1);
+00131         \textcolor{keywordflow}{if} (directionStr == \textcolor{stringliteral}{"RX"} or directionStr == \textcolor{stringliteral}{"rx"}) direction = 
+      SOAPY_SDR_RX;
+00132         \textcolor{keywordflow}{if} (directionStr == \textcolor{stringliteral}{"TX"} or directionStr == \textcolor{stringliteral}{"tx"}) direction = 
+      SOAPY_SDR_TX;
+00133         \textcolor{keywordflow}{if} (direction == -1) \textcolor{keywordflow}{throw} std::invalid\_argument(\textcolor{stringliteral}{"direction not in RX/TX: "} + directionStr);
+00134 
+00135         \textcolor{comment}{//build channels list, using KwargsFromString is a easy parsing hack}
+00136         std::vector<size\_t> channels;
+00137         \textcolor{keywordflow}{for} (\textcolor{keyword}{const} \textcolor{keyword}{auto} &pair : SoapySDR::KwargsFromString(channelStr))
+00138         \{
+00139             channels.push\_back(std::stoi(pair.first));
+00140         \}
+00141         \textcolor{keywordflow}{if} (channels.empty()) channels.push\_back(0);
+00142 
+00143         \textcolor{comment}{//initialize the sample rate for all channels}
+00144         \textcolor{keywordflow}{for} (\textcolor{keyword}{const} \textcolor{keyword}{auto} &chan : channels)
+00145         \{
+00146             device->setSampleRate(direction, chan, sampleRate);
+00147         \}
+00148 
+00149         \textcolor{comment}{//create the stream, use the native format}
+00150         \textcolor{keywordtype}{double} fullScale(0.0);
+00151         \textcolor{keyword}{const} \textcolor{keyword}{auto} format = device->getNativeStreamFormat(direction, channels.front(), fullScale);
+00152         \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} elemSize = SoapySDR::formatToSize(format);
+00153         \textcolor{keyword}{auto} stream = device->setupStream(direction, format, channels);
+00154 
+00155         \textcolor{comment}{//run the rate test one setup is complete}
+00156         std::cout << \textcolor{stringliteral}{"Stream format: "} << format << std::endl;
+00157         std::cout << \textcolor{stringliteral}{"Num channels: "} << channels.size() << std::endl;
+00158         std::cout << \textcolor{stringliteral}{"Element size: "} << elemSize << \textcolor{stringliteral}{" bytes"} << std::endl;
+00159         std::cout << \textcolor{stringliteral}{"Begin "} << directionStr << \textcolor{stringliteral}{" rate test at "} << (sampleRate/1e6) << \textcolor{stringliteral}{" Msps"} << 
+      std::endl;
+00160         runRateTestStreamLoop(device, stream, direction, channels.size(), elemSize);
+00161 
+00162         \textcolor{comment}{//cleanup stream and device}
+00163         device->closeStream(stream);
+00164         SoapySDR::Device::unmake(device);
+00165     \}
+00166     \textcolor{keywordflow}{catch} (\textcolor{keyword}{const} std::exception &ex)
+00167     \{
+00168         std::cerr << \textcolor{stringliteral}{"Error in rate test: "} << ex.what() << std::endl;
+00169         SoapySDR::Device::unmake(device);
+00170         \textcolor{keywordflow}{return} EXIT\_FAILURE;
+00171     \}
+00172     \textcolor{keywordflow}{return} EXIT\_FAILURE;
+00173 \}
+\end{DoxyCode}

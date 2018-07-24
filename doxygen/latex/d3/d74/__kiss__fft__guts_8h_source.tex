@@ -1,0 +1,180 @@
+\subsection{\+\_\+kiss\+\_\+fft\+\_\+guts.\+h}
+\label{__kiss__fft__guts_8h_source}\index{/home/erik/prefix/default/src/limesuite-\/dev/external/kiss\+F\+F\+T/\+\_\+kiss\+\_\+fft\+\_\+guts.\+h@{/home/erik/prefix/default/src/limesuite-\/dev/external/kiss\+F\+F\+T/\+\_\+kiss\+\_\+fft\+\_\+guts.\+h}}
+
+\begin{DoxyCode}
+00001 \textcolor{comment}{/*}
+00002 \textcolor{comment}{Copyright (c) 2003-2010, Mark Borgerding}
+00003 \textcolor{comment}{}
+00004 \textcolor{comment}{All rights reserved.}
+00005 \textcolor{comment}{}
+00006 \textcolor{comment}{Redistribution and use in source and binary forms, with or without modification, are permitted provided
+       that the following conditions are met:}
+00007 \textcolor{comment}{}
+00008 \textcolor{comment}{    * Redistributions of source code must retain the above copyright notice, this list of conditions and
+       the following disclaimer.}
+00009 \textcolor{comment}{    * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
+       the following disclaimer in the documentation and/or other materials provided with the distribution.}
+00010 \textcolor{comment}{    * Neither the author nor the names of any contributors may be used to endorse or promote products
+       derived from this software without specific prior written permission.}
+00011 \textcolor{comment}{}
+00012 \textcolor{comment}{THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
+       WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
+       PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
+       INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT
+       OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED
+       AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+       OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.}
+00013 \textcolor{comment}{*/}
+00014 
+00015 \textcolor{comment}{/* kiss\_fft.h}
+00016 \textcolor{comment}{   defines kiss\_fft\_scalar as either short or a float type}
+00017 \textcolor{comment}{   and defines}
+00018 \textcolor{comment}{   typedef struct \{ kiss\_fft\_scalar r; kiss\_fft\_scalar i; \}kiss\_fft\_cpx; */}
+00019 \textcolor{preprocessor}{#include "kiss_fft.h"}
+00020 \textcolor{preprocessor}{#include <limits.h>}
+00021 
+00022 \textcolor{preprocessor}{#define MAXFACTORS 32}
+00023 \textcolor{comment}{/* e.g. an fft of length 128 has 4 factors }
+00024 \textcolor{comment}{ as far as kissfft is concerned}
+00025 \textcolor{comment}{ 4*4*4*2}
+00026 \textcolor{comment}{ */}
+00027 
+00028 \textcolor{keyword}{struct }kiss_fft_state\{
+00029     \textcolor{keywordtype}{int} nfft;
+00030     \textcolor{keywordtype}{int} inverse;
+00031     \textcolor{keywordtype}{int} factors[2*MAXFACTORS];
+00032     kiss_fft_cpx twiddles[1];
+00033 \};
+00034 
+00035 \textcolor{comment}{/*}
+00036 \textcolor{comment}{  Explanation of macros dealing with complex math:}
+00037 \textcolor{comment}{}
+00038 \textcolor{comment}{   C\_MUL(m,a,b)         : m = a*b}
+00039 \textcolor{comment}{   C\_FIXDIV( c , div )  : if a fixed point impl., c /= div. noop otherwise}
+00040 \textcolor{comment}{   C\_SUB( res, a,b)     : res = a - b}
+00041 \textcolor{comment}{   C\_SUBFROM( res , a)  : res -= a}
+00042 \textcolor{comment}{   C\_ADDTO( res , a)    : res += a}
+00043 \textcolor{comment}{ * */}
+00044 \textcolor{preprocessor}{#ifdef FIXED\_POINT}
+00045 \textcolor{preprocessor}{#if (FIXED\_POINT==32)}
+00046 \textcolor{preprocessor}{# define FRACBITS 31}
+00047 \textcolor{preprocessor}{# define SAMPPROD int64\_t}
+00048 \textcolor{preprocessor}{#define SAMP\_MAX 2147483647}
+00049 \textcolor{preprocessor}{#else}
+00050 \textcolor{preprocessor}{# define FRACBITS 15}
+00051 \textcolor{preprocessor}{# define SAMPPROD int32\_t }
+00052 \textcolor{preprocessor}{#define SAMP\_MAX 32767}
+00053 \textcolor{preprocessor}{#endif}
+00054 
+00055 \textcolor{preprocessor}{#define SAMP\_MIN -SAMP\_MAX}
+00056 
+00057 \textcolor{preprocessor}{#if defined(CHECK\_OVERFLOW)}
+00058 \textcolor{preprocessor}{#  define CHECK\_OVERFLOW\_OP(a,op,b)  \(\backslash\)}
+00059 \textcolor{preprocessor}{    if ( (SAMPPROD)(a) op (SAMPPROD)(b) > SAMP\_MAX || (SAMPPROD)(a) op (SAMPPROD)(b) < SAMP\_MIN ) \{ \(\backslash\)}
+00060 \textcolor{preprocessor}{        fprintf(stderr,"WARNING:overflow @ " \_\_FILE\_\_ "(%d): (%d " #op" %d) = %ld\(\backslash\)
+      n",\_\_LINE\_\_,(a),(b),(SAMPPROD)(a) op (SAMPPROD)(b) );  \}}
+00061 \textcolor{preprocessor}{#endif}
+00062 
+00063 
+00064 \textcolor{preprocessor}{#   define smul(a,b) ( (SAMPPROD)(a)*(b) )}
+00065 \textcolor{preprocessor}{#   define sround( x )  (kiss\_fft\_scalar)( ( (x) + (1<<(FRACBITS-1)) ) >> FRACBITS )}
+00066 
+00067 \textcolor{preprocessor}{#   define S\_MUL(a,b) sround( smul(a,b) )}
+00068 
+00069 \textcolor{preprocessor}{#   define C\_MUL(m,a,b) \(\backslash\)}
+00070 \textcolor{preprocessor}{      do\{ (m).r = sround( smul((a).r,(b).r) - smul((a).i,(b).i) ); \(\backslash\)}
+00071 \textcolor{preprocessor}{          (m).i = sround( smul((a).r,(b).i) + smul((a).i,(b).r) ); \}while(0)}
+00072 
+00073 \textcolor{preprocessor}{#   define DIVSCALAR(x,k) \(\backslash\)}
+00074 \textcolor{preprocessor}{    (x) = sround( smul(  x, SAMP\_MAX/k ) )}
+00075 
+00076 \textcolor{preprocessor}{#   define C\_FIXDIV(c,div) \(\backslash\)}
+00077 \textcolor{preprocessor}{    do \{    DIVSCALAR( (c).r , div);  \(\backslash\)}
+00078 \textcolor{preprocessor}{        DIVSCALAR( (c).i  , div); \}while (0)}
+00079 
+00080 \textcolor{preprocessor}{#   define C\_MULBYSCALAR( c, s ) \(\backslash\)}
+00081 \textcolor{preprocessor}{    do\{ (c).r =  sround( smul( (c).r , s ) ) ;\(\backslash\)}
+00082 \textcolor{preprocessor}{        (c).i =  sround( smul( (c).i , s ) ) ; \}while(0)}
+00083 
+00084 \textcolor{preprocessor}{#else  }\textcolor{comment}{/* not FIXED\_POINT*/}\textcolor{preprocessor}{}
+00085 
+00086 \textcolor{preprocessor}{#   define S\_MUL(a,b) ( (a)*(b) )}
+00087 \textcolor{preprocessor}{#define C\_MUL(m,a,b) \(\backslash\)}
+00088 \textcolor{preprocessor}{    do\{ (m).r = (a).r*(b).r - (a).i*(b).i;\(\backslash\)}
+00089 \textcolor{preprocessor}{        (m).i = (a).r*(b).i + (a).i*(b).r; \}while(0)}
+00090 \textcolor{preprocessor}{#   define C\_FIXDIV(c,div) }\textcolor{comment}{/* NOOP */}\textcolor{preprocessor}{}
+00091 \textcolor{preprocessor}{#   define C\_MULBYSCALAR( c, s ) \(\backslash\)}
+00092 \textcolor{preprocessor}{    do\{ (c).r *= (s);\(\backslash\)}
+00093 \textcolor{preprocessor}{        (c).i *= (s); \}while(0)}
+00094 \textcolor{preprocessor}{#endif}
+00095 
+00096 \textcolor{preprocessor}{#ifndef CHECK\_OVERFLOW\_OP}
+00097 \textcolor{preprocessor}{#  define CHECK\_OVERFLOW\_OP(a,op,b) }\textcolor{comment}{/* noop */}\textcolor{preprocessor}{}
+00098 \textcolor{preprocessor}{#endif}
+00099 
+00100 \textcolor{preprocessor}{#define  C\_ADD( res, a,b)\(\backslash\)}
+00101 \textcolor{preprocessor}{    do \{ \(\backslash\)}
+00102 \textcolor{preprocessor}{        CHECK\_OVERFLOW\_OP((a).r,+,(b).r)\(\backslash\)}
+00103 \textcolor{preprocessor}{        CHECK\_OVERFLOW\_OP((a).i,+,(b).i)\(\backslash\)}
+00104 \textcolor{preprocessor}{        (res).r=(a).r+(b).r;  (res).i=(a).i+(b).i; \(\backslash\)}
+00105 \textcolor{preprocessor}{    \}while(0)}
+00106 \textcolor{preprocessor}{#define  C\_SUB( res, a,b)\(\backslash\)}
+00107 \textcolor{preprocessor}{    do \{ \(\backslash\)}
+00108 \textcolor{preprocessor}{        CHECK\_OVERFLOW\_OP((a).r,-,(b).r)\(\backslash\)}
+00109 \textcolor{preprocessor}{        CHECK\_OVERFLOW\_OP((a).i,-,(b).i)\(\backslash\)}
+00110 \textcolor{preprocessor}{        (res).r=(a).r-(b).r;  (res).i=(a).i-(b).i; \(\backslash\)}
+00111 \textcolor{preprocessor}{    \}while(0)}
+00112 \textcolor{preprocessor}{#define C\_ADDTO( res , a)\(\backslash\)}
+00113 \textcolor{preprocessor}{    do \{ \(\backslash\)}
+00114 \textcolor{preprocessor}{        CHECK\_OVERFLOW\_OP((res).r,+,(a).r)\(\backslash\)}
+00115 \textcolor{preprocessor}{        CHECK\_OVERFLOW\_OP((res).i,+,(a).i)\(\backslash\)}
+00116 \textcolor{preprocessor}{        (res).r += (a).r;  (res).i += (a).i;\(\backslash\)}
+00117 \textcolor{preprocessor}{    \}while(0)}
+00118 
+00119 \textcolor{preprocessor}{#define C\_SUBFROM( res , a)\(\backslash\)}
+00120 \textcolor{preprocessor}{    do \{\(\backslash\)}
+00121 \textcolor{preprocessor}{        CHECK\_OVERFLOW\_OP((res).r,-,(a).r)\(\backslash\)}
+00122 \textcolor{preprocessor}{        CHECK\_OVERFLOW\_OP((res).i,-,(a).i)\(\backslash\)}
+00123 \textcolor{preprocessor}{        (res).r -= (a).r;  (res).i -= (a).i; \(\backslash\)}
+00124 \textcolor{preprocessor}{    \}while(0)}
+00125 
+00126 
+00127 \textcolor{preprocessor}{#ifdef FIXED\_POINT}
+00128 \textcolor{preprocessor}{#  define KISS\_FFT\_COS(phase)  floor(.5+SAMP\_MAX * cos (phase))}
+00129 \textcolor{preprocessor}{#  define KISS\_FFT\_SIN(phase)  floor(.5+SAMP\_MAX * sin (phase))}
+00130 \textcolor{preprocessor}{#  define HALF\_OF(x) ((x)>>1)}
+00131 \textcolor{preprocessor}{#elif defined(USE\_SIMD)}
+00132 \textcolor{preprocessor}{#  define KISS\_FFT\_COS(phase) \_mm\_set1\_ps( cos(phase) )}
+00133 \textcolor{preprocessor}{#  define KISS\_FFT\_SIN(phase) \_mm\_set1\_ps( sin(phase) )}
+00134 \textcolor{preprocessor}{#  define HALF\_OF(x) ((x)*\_mm\_set1\_ps(.5))}
+00135 \textcolor{preprocessor}{#else}
+00136 \textcolor{preprocessor}{#  define KISS\_FFT\_COS(phase) (kiss\_fft\_scalar) cos(phase)}
+00137 \textcolor{preprocessor}{#  define KISS\_FFT\_SIN(phase) (kiss\_fft\_scalar) sin(phase)}
+00138 \textcolor{preprocessor}{#  define HALF\_OF(x) ((x)*.5)}
+00139 \textcolor{preprocessor}{#endif}
+00140 
+00141 \textcolor{preprocessor}{#define  kf\_cexp(x,phase) \(\backslash\)}
+00142 \textcolor{preprocessor}{    do\{ \(\backslash\)}
+00143 \textcolor{preprocessor}{        (x)->r = KISS\_FFT\_COS(phase);\(\backslash\)}
+00144 \textcolor{preprocessor}{        (x)->i = KISS\_FFT\_SIN(phase);\(\backslash\)}
+00145 \textcolor{preprocessor}{    \}while(0)}
+00146 
+00147 
+00148 \textcolor{comment}{/* a debugging function */}
+00149 \textcolor{preprocessor}{#define pcpx(c)\(\backslash\)}
+00150 \textcolor{preprocessor}{    fprintf(stderr,"%g + %gi\(\backslash\)n",(double)((c)->r),(double)((c)->i) )}
+00151 
+00152 
+00153 \textcolor{preprocessor}{#ifdef KISS\_FFT\_USE\_ALLOCA}
+00154 \textcolor{comment}{// define this to allow use of alloca instead of malloc for temporary buffers}
+00155 \textcolor{comment}{// Temporary buffers are used in two case: }
+00156 \textcolor{comment}{// 1. FFT sizes that have "bad" factors. i.e. not 2,3 and 5}
+00157 \textcolor{comment}{// 2. "in-place" FFTs.  Notice the quotes, since kissfft does not really do an in-place transform.}
+00158 \textcolor{preprocessor}{#include <alloca.h>}
+00159 \textcolor{preprocessor}{#define  KISS\_FFT\_TMP\_ALLOC(nbytes) alloca(nbytes)}
+00160 \textcolor{preprocessor}{#define  KISS\_FFT\_TMP\_FREE(ptr) }
+00161 \textcolor{preprocessor}{#else}
+00162 \textcolor{preprocessor}{#define  KISS\_FFT\_TMP\_ALLOC(nbytes) KISS\_FFT\_MALLOC(nbytes)}
+00163 \textcolor{preprocessor}{#define  KISS\_FFT\_TMP\_FREE(ptr) KISS\_FFT\_FREE(ptr)}
+00164 \textcolor{preprocessor}{#endif}
+\end{DoxyCode}

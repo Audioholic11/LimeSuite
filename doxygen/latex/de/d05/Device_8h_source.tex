@@ -1,0 +1,474 @@
+\subsection{Device.\+h}
+\label{Device_8h_source}\index{/home/erik/prefix/default/src/soapysdr/include/\+Soapy\+S\+D\+R/\+Device.\+h@{/home/erik/prefix/default/src/soapysdr/include/\+Soapy\+S\+D\+R/\+Device.\+h}}
+
+\begin{DoxyCode}
+00001 
+00016 \textcolor{preprocessor}{#pragma once}
+00017 \textcolor{preprocessor}{#include <SoapySDR/Config.h>}
+00018 \textcolor{preprocessor}{#include <SoapySDR/Types.h>}
+00019 \textcolor{preprocessor}{#include <SoapySDR/Constants.h>}
+00020 \textcolor{preprocessor}{#include <SoapySDR/Errors.h>}
+00021 \textcolor{preprocessor}{#include <SoapySDR/Device.h>}
+00022 
+00023 \textcolor{preprocessor}{#ifdef \_\_cplusplus}
+00024 \textcolor{keyword}{extern} \textcolor{stringliteral}{"C"} \{
+00025 \textcolor{preprocessor}{#endif}
+00026 
+00028 \textcolor{keyword}{typedef} \textcolor{keyword}{struct }SoapySDRDevice SoapySDRDevice;
+00029 
+00031 \textcolor{keyword}{typedef} \textcolor{keyword}{struct }SoapySDRStream SoapySDRStream;
+00032 
+00041 SOAPY_SDR_API \textcolor{keywordtype}{int} SoapySDRDevice_lastStatus(\textcolor{keywordtype}{void});
+00042 
+00050 SOAPY_SDR_API \textcolor{keyword}{const} \textcolor{keywordtype}{char} *SoapySDRDevice_lastError(\textcolor{keywordtype}{void});
+00051 
+00058 SOAPY_SDR_API SoapySDRKwargs *SoapySDRDevice_enumerate(\textcolor{keyword}{const} SoapySDRKwargs *
+      args, \textcolor{keywordtype}{size\_t} *length);
+00059 
+00067 SOAPY_SDR_API SoapySDRKwargs *SoapySDRDevice_enumerateStrArgs(\textcolor{keyword}{const} \textcolor{keywordtype}{char} *args, \textcolor{keywordtype}{size\_t} *
+      length);
+00068 
+00078 SOAPY_SDR_API SoapySDRDevice *SoapySDRDevice_make(\textcolor{keyword}{const} SoapySDRKwargs *args);
+00079 
+00089 SOAPY_SDR_API SoapySDRDevice *SoapySDRDevice_makeStrArgs(\textcolor{keyword}{const} \textcolor{keywordtype}{char} *args);
+00090 
+00097 SOAPY_SDR_API \textcolor{keywordtype}{int} SoapySDRDevice_unmake(SoapySDRDevice *device);
+00098 
+00099 \textcolor{comment}{/*******************************************************************}
+00100 \textcolor{comment}{ * Identification API}
+00101 \textcolor{comment}{ ******************************************************************/}
+00102 
+00109 SOAPY_SDR_API \textcolor{keywordtype}{char} *SoapySDRDevice_getDriverKey(\textcolor{keyword}{const} SoapySDRDevice *device);
+00110 
+00117 SOAPY_SDR_API \textcolor{keywordtype}{char} *SoapySDRDevice_getHardwareKey(\textcolor{keyword}{const} SoapySDRDevice *device);
+00118 
+00127 SOAPY_SDR_API SoapySDRKwargs SoapySDRDevice_getHardwareInfo(\textcolor{keyword}{const} SoapySDRDevice *
+      device);
+00128 
+00129 \textcolor{comment}{/*******************************************************************}
+00130 \textcolor{comment}{ * Channels API}
+00131 \textcolor{comment}{ ******************************************************************/}
+00132 
+00141 SOAPY_SDR_API \textcolor{keywordtype}{int} SoapySDRDevice_setFrontendMapping(SoapySDRDevice *device, \textcolor{keyword}{const} \textcolor{keywordtype}{int} direction, \textcolor{keyword}{const} \textcolor{keywordtype}{char}
+       *mapping);
+00142 
+00149 SOAPY_SDR_API \textcolor{keywordtype}{char} *SoapySDRDevice_getFrontendMapping(\textcolor{keyword}{const} SoapySDRDevice *
+      device, \textcolor{keyword}{const} \textcolor{keywordtype}{int} direction);
+00150 
+00157 SOAPY_SDR_API \textcolor{keywordtype}{size\_t} SoapySDRDevice_getNumChannels(\textcolor{keyword}{const} SoapySDRDevice *device, \textcolor{keyword}{const} \textcolor{keywordtype}{int} direction);
+00158 
+00166 SOAPY_SDR_API SoapySDRKwargs SoapySDRDevice_getChannelInfo(\textcolor{keyword}{const} SoapySDRDevice *
+      device, \textcolor{keyword}{const} \textcolor{keywordtype}{int} direction, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} channel);
+00167 
+00175 SOAPY_SDR_API \textcolor{keywordtype}{bool} SoapySDRDevice_getFullDuplex(\textcolor{keyword}{const} SoapySDRDevice *device, \textcolor{keyword}{const} \textcolor{keywordtype}{int} direction, \textcolor{keyword}{const} \textcolor{keywordtype}{
+      size\_t} channel);
+00176 
+00177 \textcolor{comment}{/*******************************************************************}
+00178 \textcolor{comment}{ * Stream API}
+00179 \textcolor{comment}{ ******************************************************************/}
+00180 
+00190 SOAPY_SDR_API \textcolor{keywordtype}{char} **SoapySDRDevice_getStreamFormats(\textcolor{keyword}{const} SoapySDRDevice *
+      device, \textcolor{keyword}{const} \textcolor{keywordtype}{int} direction, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} channel, \textcolor{keywordtype}{size\_t} *length);
+00191 
+00202 SOAPY_SDR_API \textcolor{keywordtype}{char} *SoapySDRDevice_getNativeStreamFormat(\textcolor{keyword}{const} SoapySDRDevice *
+      device, \textcolor{keyword}{const} \textcolor{keywordtype}{int} direction, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} channel, \textcolor{keywordtype}{double} *fullScale);
+00203 
+00212 SOAPY_SDR_API SoapySDRArgInfo *SoapySDRDevice_getStreamArgsInfo(\textcolor{keyword}{const} 
+      SoapySDRDevice *device, \textcolor{keyword}{const} \textcolor{keywordtype}{int} direction, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} channel, \textcolor{keywordtype}{size\_t} *
+      length);
+00213 
+00267 SOAPY_SDR_API \textcolor{keywordtype}{int} SoapySDRDevice_setupStream(SoapySDRDevice *device,
+00268     SoapySDRStream **stream,
+00269     \textcolor{keyword}{const} \textcolor{keywordtype}{int} direction,
+00270     \textcolor{keyword}{const} \textcolor{keywordtype}{char} *format,
+00271     \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} *channels,
+00272     \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} numChans,
+00273     \textcolor{keyword}{const} SoapySDRKwargs *args);
+00274 
+00281 SOAPY_SDR_API \textcolor{keywordtype}{int} SoapySDRDevice_closeStream(SoapySDRDevice *device, 
+      SoapySDRStream *stream);
+00282 
+00293 SOAPY_SDR_API \textcolor{keywordtype}{size\_t} SoapySDRDevice_getStreamMTU(\textcolor{keyword}{const} SoapySDRDevice *device, 
+      SoapySDRStream *stream);
+00294 
+00313 SOAPY_SDR_API \textcolor{keywordtype}{int} SoapySDRDevice_activateStream(SoapySDRDevice *device,
+00314     SoapySDRStream *stream,
+00315     \textcolor{keyword}{const} \textcolor{keywordtype}{int} flags,
+00316     \textcolor{keyword}{const} \textcolor{keywordtype}{long} \textcolor{keywordtype}{long} timeNs,
+00317     \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} numElems);
+00318 
+00334 SOAPY_SDR_API \textcolor{keywordtype}{int} SoapySDRDevice_deactivateStream(SoapySDRDevice *device,
+00335     SoapySDRStream *stream,
+00336     \textcolor{keyword}{const} \textcolor{keywordtype}{int} flags,
+00337     \textcolor{keyword}{const} \textcolor{keywordtype}{long} \textcolor{keywordtype}{long} timeNs);
+00338 
+00359 SOAPY_SDR_API \textcolor{keywordtype}{int} SoapySDRDevice_readStream(SoapySDRDevice *device,
+00360     SoapySDRStream *stream,
+00361     \textcolor{keywordtype}{void} * \textcolor{keyword}{const} *buffs,
+00362     \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} numElems,
+00363     \textcolor{keywordtype}{int} *flags,
+00364     \textcolor{keywordtype}{long} \textcolor{keywordtype}{long} *timeNs,
+00365     \textcolor{keyword}{const} \textcolor{keywordtype}{long} timeoutUs);
+00366 
+00387 SOAPY_SDR_API \textcolor{keywordtype}{int} SoapySDRDevice_writeStream(SoapySDRDevice *device,
+00388     SoapySDRStream *stream,
+00389     \textcolor{keyword}{const} \textcolor{keywordtype}{void} * \textcolor{keyword}{const} *buffs,
+00390     \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} numElems,
+00391     \textcolor{keywordtype}{int} *flags,
+00392     \textcolor{keyword}{const} \textcolor{keywordtype}{long} \textcolor{keywordtype}{long} timeNs,
+00393     \textcolor{keyword}{const} \textcolor{keywordtype}{long} timeoutUs);
+00394 
+00416 SOAPY_SDR_API \textcolor{keywordtype}{int} SoapySDRDevice_readStreamStatus(SoapySDRDevice *device,
+00417     SoapySDRStream *stream,
+00418     \textcolor{keywordtype}{size\_t} *chanMask,
+00419     \textcolor{keywordtype}{int} *flags,
+00420     \textcolor{keywordtype}{long} \textcolor{keywordtype}{long} *timeNs,
+00421     \textcolor{keyword}{const} \textcolor{keywordtype}{long} timeoutUs);
+00422 
+00423 \textcolor{comment}{/*******************************************************************}
+00424 \textcolor{comment}{ * Direct buffer access API}
+00425 \textcolor{comment}{ ******************************************************************/}
+00426 
+00437 SOAPY_SDR_API \textcolor{keywordtype}{size\_t} SoapySDRDevice_getNumDirectAccessBuffers(SoapySDRDevice *
+      device, SoapySDRStream *stream);
+00438 
+00453 SOAPY_SDR_API \textcolor{keywordtype}{int} SoapySDRDevice_getDirectAccessBufferAddrs(SoapySDRDevice *
+      device, SoapySDRStream *stream, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} handle, \textcolor{keywordtype}{void} **buffs);
+00454 
+00476 SOAPY_SDR_API \textcolor{keywordtype}{int} SoapySDRDevice_acquireReadBuffer(SoapySDRDevice *device,
+00477     SoapySDRStream *stream,
+00478     \textcolor{keywordtype}{size\_t} *handle,
+00479     \textcolor{keyword}{const} \textcolor{keywordtype}{void} **buffs,
+00480     \textcolor{keywordtype}{int} *flags,
+00481     \textcolor{keywordtype}{long} \textcolor{keywordtype}{long} *timeNs,
+00482     \textcolor{keyword}{const} \textcolor{keywordtype}{long} timeoutUs);
+00483 
+00492 SOAPY_SDR_API \textcolor{keywordtype}{void} SoapySDRDevice_releaseReadBuffer(SoapySDRDevice *device,
+00493     SoapySDRStream *stream,
+00494     \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} handle);
+00495 
+00515 SOAPY_SDR_API \textcolor{keywordtype}{int} SoapySDRDevice_acquireWriteBuffer(SoapySDRDevice *device,
+00516     SoapySDRStream *stream,
+00517     \textcolor{keywordtype}{size\_t} *handle,
+00518     \textcolor{keywordtype}{void} **buffs,
+00519     \textcolor{keyword}{const} \textcolor{keywordtype}{long} timeoutUs);
+00520 
+00537 SOAPY_SDR_API \textcolor{keywordtype}{void} SoapySDRDevice_releaseWriteBuffer(SoapySDRDevice *device,
+00538     SoapySDRStream *stream,
+00539     \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} handle,
+00540     \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} numElems,
+00541     \textcolor{keywordtype}{int} *flags,
+00542     \textcolor{keyword}{const} \textcolor{keywordtype}{long} \textcolor{keywordtype}{long} timeNs);
+00543 
+00544 \textcolor{comment}{/*******************************************************************}
+00545 \textcolor{comment}{ * Antenna API}
+00546 \textcolor{comment}{ ******************************************************************/}
+00547 
+00556 SOAPY_SDR_API \textcolor{keywordtype}{char} **SoapySDRDevice_listAntennas(\textcolor{keyword}{const} SoapySDRDevice *device, \textcolor{keyword}{const} \textcolor{keywordtype}{int} direction, \textcolor{keyword}{const} \textcolor{keywordtype}{
+      size\_t} channel, \textcolor{keywordtype}{size\_t} *length);
+00557 
+00566 SOAPY_SDR_API \textcolor{keywordtype}{int} SoapySDRDevice_setAntenna(SoapySDRDevice *device, \textcolor{keyword}{const} \textcolor{keywordtype}{int} direction, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} 
+      channel, \textcolor{keyword}{const} \textcolor{keywordtype}{char} *name);
+00567 
+00575 SOAPY_SDR_API \textcolor{keywordtype}{char} *SoapySDRDevice_getAntenna(\textcolor{keyword}{const} SoapySDRDevice *device, \textcolor{keyword}{const} \textcolor{keywordtype}{int} direction, \textcolor{keyword}{const} \textcolor{keywordtype}{
+      size\_t} channel);
+00576 
+00577 \textcolor{comment}{/*******************************************************************}
+00578 \textcolor{comment}{ * Frontend corrections API}
+00579 \textcolor{comment}{ ******************************************************************/}
+00580 
+00588 SOAPY_SDR_API \textcolor{keywordtype}{bool} SoapySDRDevice_hasDCOffsetMode(\textcolor{keyword}{const} SoapySDRDevice *device, \textcolor{keyword}{const} \textcolor{keywordtype}{int} direction, \textcolor{keyword}{const} \textcolor{keywordtype}{
+      size\_t} channel);
+00589 
+00598 SOAPY_SDR_API \textcolor{keywordtype}{int} SoapySDRDevice_setDCOffsetMode(SoapySDRDevice *device, \textcolor{keyword}{const} \textcolor{keywordtype}{int} direction, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} 
+      channel, \textcolor{keyword}{const} \textcolor{keywordtype}{bool} automatic);
+00599 
+00607 SOAPY_SDR_API \textcolor{keywordtype}{bool} SoapySDRDevice_getDCOffsetMode(\textcolor{keyword}{const} SoapySDRDevice *device, \textcolor{keyword}{const} \textcolor{keywordtype}{int} direction, \textcolor{keyword}{const} \textcolor{keywordtype}{
+      size\_t} channel);
+00608 
+00616 SOAPY_SDR_API \textcolor{keywordtype}{bool} SoapySDRDevice_hasDCOffset(\textcolor{keyword}{const} SoapySDRDevice *device, \textcolor{keyword}{const} \textcolor{keywordtype}{int} direction, \textcolor{keyword}{const} \textcolor{keywordtype}{
+      size\_t} channel);
+00617 
+00627 SOAPY_SDR_API \textcolor{keywordtype}{int} SoapySDRDevice_setDCOffset(SoapySDRDevice *device, \textcolor{keyword}{const} \textcolor{keywordtype}{int} direction, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} 
+      channel, \textcolor{keyword}{const} \textcolor{keywordtype}{double} offsetI, \textcolor{keyword}{const} \textcolor{keywordtype}{double} offsetQ);
+00628 
+00638 SOAPY_SDR_API \textcolor{keywordtype}{int} SoapySDRDevice_getDCOffset(\textcolor{keyword}{const} SoapySDRDevice *device, \textcolor{keyword}{const} \textcolor{keywordtype}{int} direction, \textcolor{keyword}{const} \textcolor{keywordtype}{
+      size\_t} channel, \textcolor{keywordtype}{double} *offsetI, \textcolor{keywordtype}{double} *offsetQ);
+00639 
+00647 SOAPY_SDR_API \textcolor{keywordtype}{bool} SoapySDRDevice_hasIQBalance(\textcolor{keyword}{const} SoapySDRDevice *device, \textcolor{keyword}{const} \textcolor{keywordtype}{int} direction, \textcolor{keyword}{const} \textcolor{keywordtype}{
+      size\_t} channel);
+00648 
+00658 SOAPY_SDR_API \textcolor{keywordtype}{int} SoapySDRDevice_setIQBalance(SoapySDRDevice *device, \textcolor{keyword}{const} \textcolor{keywordtype}{int} direction, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} 
+      channel, \textcolor{keyword}{const} \textcolor{keywordtype}{double} balanceI, \textcolor{keyword}{const} \textcolor{keywordtype}{double} balanceQ);
+00659 
+00669 SOAPY_SDR_API \textcolor{keywordtype}{int} SoapySDRDevice_getIQBalance(\textcolor{keyword}{const} SoapySDRDevice *device, \textcolor{keyword}{const} \textcolor{keywordtype}{int} direction, \textcolor{keyword}{const} \textcolor{keywordtype}{
+      size\_t} channel, \textcolor{keywordtype}{double} *balanceI, \textcolor{keywordtype}{double} *balanceQ);
+00670 
+00678 SOAPY_SDR_API \textcolor{keywordtype}{bool} SoapySDRDevice_hasFrequencyCorrection(\textcolor{keyword}{const} SoapySDRDevice *
+      device, \textcolor{keyword}{const} \textcolor{keywordtype}{int} direction, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} channel);
+00679 
+00688 SOAPY_SDR_API \textcolor{keywordtype}{int} SoapySDRDevice_setFrequencyCorrection(SoapySDRDevice *device, \textcolor{keyword}{const} \textcolor{keywordtype}{int} direction, \textcolor{keyword}{const} \textcolor{keywordtype}{
+      size\_t} channel, \textcolor{keyword}{const} \textcolor{keywordtype}{double} value);
+00689 
+00697 SOAPY_SDR_API \textcolor{keywordtype}{double} SoapySDRDevice_getFrequencyCorrection(\textcolor{keyword}{const} SoapySDRDevice *
+      device, \textcolor{keyword}{const} \textcolor{keywordtype}{int} direction, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} channel);
+00698 
+00699 \textcolor{comment}{/*******************************************************************}
+00700 \textcolor{comment}{ * Gain API}
+00701 \textcolor{comment}{ ******************************************************************/}
+00702 
+00712 SOAPY_SDR_API \textcolor{keywordtype}{char} **SoapySDRDevice_listGains(\textcolor{keyword}{const} SoapySDRDevice *device, \textcolor{keyword}{const} \textcolor{keywordtype}{int} direction, \textcolor{keyword}{const} \textcolor{keywordtype}{
+      size\_t} channel, \textcolor{keywordtype}{size\_t} *length);
+00713 
+00721 SOAPY_SDR_API \textcolor{keywordtype}{bool} SoapySDRDevice_hasGainMode(\textcolor{keyword}{const} SoapySDRDevice *device, \textcolor{keyword}{const} \textcolor{keywordtype}{int} direction, \textcolor{keyword}{const} \textcolor{keywordtype}{
+      size\_t} channel);
+00722 
+00731 SOAPY_SDR_API \textcolor{keywordtype}{int} SoapySDRDevice_setGainMode(SoapySDRDevice *device, \textcolor{keyword}{const} \textcolor{keywordtype}{int} direction, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} 
+      channel, \textcolor{keyword}{const} \textcolor{keywordtype}{bool} automatic);
+00732 
+00740 SOAPY_SDR_API \textcolor{keywordtype}{bool} SoapySDRDevice_getGainMode(\textcolor{keyword}{const} SoapySDRDevice *device, \textcolor{keyword}{const} \textcolor{keywordtype}{int} direction, \textcolor{keyword}{const} \textcolor{keywordtype}{
+      size\_t} channel);
+00741 
+00751 SOAPY_SDR_API \textcolor{keywordtype}{int} SoapySDRDevice_setGain(SoapySDRDevice *device, \textcolor{keyword}{const} \textcolor{keywordtype}{int} direction, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} channel,
+       \textcolor{keyword}{const} \textcolor{keywordtype}{double} value);
+00752 
+00762 SOAPY_SDR_API \textcolor{keywordtype}{int} SoapySDRDevice_setGainElement(SoapySDRDevice *device, \textcolor{keyword}{const} \textcolor{keywordtype}{int} direction, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} 
+      channel, \textcolor{keyword}{const} \textcolor{keywordtype}{char} *name, \textcolor{keyword}{const} \textcolor{keywordtype}{double} value);
+00763 
+00771 SOAPY_SDR_API \textcolor{keywordtype}{double} SoapySDRDevice_getGain(\textcolor{keyword}{const} SoapySDRDevice *device, \textcolor{keyword}{const} \textcolor{keywordtype}{int} direction, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t}
+       channel);
+00772 
+00781 SOAPY_SDR_API \textcolor{keywordtype}{double} SoapySDRDevice_getGainElement(\textcolor{keyword}{const} SoapySDRDevice *device, \textcolor{keyword}{const} \textcolor{keywordtype}{int} direction, \textcolor{keyword}{const}
+       \textcolor{keywordtype}{size\_t} channel, \textcolor{keyword}{const} \textcolor{keywordtype}{char} *name);
+00782 
+00790 SOAPY_SDR_API SoapySDRRange SoapySDRDevice_getGainRange(\textcolor{keyword}{const} SoapySDRDevice *
+      device, \textcolor{keyword}{const} \textcolor{keywordtype}{int} direction, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} channel);
+00791 
+00800 SOAPY_SDR_API SoapySDRRange SoapySDRDevice_getGainElementRange(\textcolor{keyword}{const} 
+      SoapySDRDevice *device, \textcolor{keyword}{const} \textcolor{keywordtype}{int} direction, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} channel, \textcolor{keyword}{const} \textcolor{keywordtype}{char} *
+      name);
+00801 
+00802 \textcolor{comment}{/*******************************************************************}
+00803 \textcolor{comment}{ * Frequency API}
+00804 \textcolor{comment}{ ******************************************************************/}
+00805 
+00835 SOAPY_SDR_API \textcolor{keywordtype}{int} SoapySDRDevice_setFrequency(SoapySDRDevice *device, \textcolor{keyword}{const} \textcolor{keywordtype}{int} direction, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} 
+      channel, \textcolor{keyword}{const} \textcolor{keywordtype}{double} frequency, \textcolor{keyword}{const} SoapySDRKwargs *args);
+00836 
+00855 SOAPY_SDR_API \textcolor{keywordtype}{int} SoapySDRDevice_setFrequencyComponent(SoapySDRDevice *device, \textcolor{keyword}{const} \textcolor{keywordtype}{int} direction, \textcolor{keyword}{const} \textcolor{keywordtype}{
+      size\_t} channel, \textcolor{keyword}{const} \textcolor{keywordtype}{char} *name, \textcolor{keyword}{const} \textcolor{keywordtype}{double} frequency, \textcolor{keyword}{const} SoapySDRKwargs *
+      args);
+00856 
+00866 SOAPY_SDR_API \textcolor{keywordtype}{double} SoapySDRDevice_getFrequency(\textcolor{keyword}{const} SoapySDRDevice *device, \textcolor{keyword}{const} \textcolor{keywordtype}{int} direction, \textcolor{keyword}{const} \textcolor{keywordtype}{
+      size\_t} channel);
+00867 
+00876 SOAPY_SDR_API \textcolor{keywordtype}{double} SoapySDRDevice_getFrequencyComponent(\textcolor{keyword}{const} SoapySDRDevice *
+      device, \textcolor{keyword}{const} \textcolor{keywordtype}{int} direction, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} channel, \textcolor{keyword}{const} \textcolor{keywordtype}{char} *name);
+00877 
+00887 SOAPY_SDR_API \textcolor{keywordtype}{char} **SoapySDRDevice_listFrequencies(\textcolor{keyword}{const} SoapySDRDevice *device, \textcolor{keyword}{const} \textcolor{keywordtype}{int} direction, \textcolor{keyword}{
+      const} \textcolor{keywordtype}{size\_t} channel, \textcolor{keywordtype}{size\_t} *length);
+00888 
+00897 SOAPY_SDR_API SoapySDRRange *SoapySDRDevice_getFrequencyRange(\textcolor{keyword}{const} 
+      SoapySDRDevice *device, \textcolor{keyword}{const} \textcolor{keywordtype}{int} direction, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} channel, \textcolor{keywordtype}{size\_t} *
+      length);
+00898 
+00908 SOAPY_SDR_API SoapySDRRange *SoapySDRDevice_getFrequencyRangeComponent(\textcolor{keyword}{const} 
+      SoapySDRDevice *device, \textcolor{keyword}{const} \textcolor{keywordtype}{int} direction, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} channel, \textcolor{keyword}{const} \textcolor{keywordtype}{char} *
+      name, \textcolor{keywordtype}{size\_t} *length);
+00909 
+00918 SOAPY_SDR_API SoapySDRArgInfo *SoapySDRDevice_getFrequencyArgsInfo(\textcolor{keyword}{const} 
+      SoapySDRDevice *device, \textcolor{keyword}{const} \textcolor{keywordtype}{int} direction, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} channel, \textcolor{keywordtype}{size\_t} *
+      length);
+00919 
+00920 \textcolor{comment}{/*******************************************************************}
+00921 \textcolor{comment}{ * Sample Rate API}
+00922 \textcolor{comment}{ ******************************************************************/}
+00923 
+00932 SOAPY_SDR_API \textcolor{keywordtype}{int} SoapySDRDevice_setSampleRate(SoapySDRDevice *device, \textcolor{keyword}{const} \textcolor{keywordtype}{int} direction, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} 
+      channel, \textcolor{keyword}{const} \textcolor{keywordtype}{double} rate);
+00933 
+00941 SOAPY_SDR_API \textcolor{keywordtype}{double} SoapySDRDevice_getSampleRate(\textcolor{keyword}{const} SoapySDRDevice *device, \textcolor{keyword}{const} \textcolor{keywordtype}{int} direction, \textcolor{keyword}{const} \textcolor{keywordtype}{
+      size\_t} channel);
+00942 
+00952 SOAPY_SDR_API \textcolor{keywordtype}{double} *SoapySDRDevice_listSampleRates(\textcolor{keyword}{const} SoapySDRDevice *
+      device, \textcolor{keyword}{const} \textcolor{keywordtype}{int} direction, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} channel, \textcolor{keywordtype}{size\_t} *length);
+00953 
+00962 SOAPY_SDR_API SoapySDRRange *SoapySDRDevice_getSampleRateRange(\textcolor{keyword}{const} 
+      SoapySDRDevice *device, \textcolor{keyword}{const} \textcolor{keywordtype}{int} direction, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} channel, \textcolor{keywordtype}{size\_t} *
+      length);
+00963 
+00964 \textcolor{comment}{/*******************************************************************}
+00965 \textcolor{comment}{ * Bandwidth API}
+00966 \textcolor{comment}{ ******************************************************************/}
+00967 
+00976 SOAPY_SDR_API \textcolor{keywordtype}{int} SoapySDRDevice_setBandwidth(SoapySDRDevice *device, \textcolor{keyword}{const} \textcolor{keywordtype}{int} direction, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} 
+      channel, \textcolor{keyword}{const} \textcolor{keywordtype}{double} bw);
+00977 
+00985 SOAPY_SDR_API \textcolor{keywordtype}{double} SoapySDRDevice_getBandwidth(\textcolor{keyword}{const} SoapySDRDevice *device, \textcolor{keyword}{const} \textcolor{keywordtype}{int} direction, \textcolor{keyword}{const} \textcolor{keywordtype}{
+      size\_t} channel);
+00986 
+00996 SOAPY_SDR_API \textcolor{keywordtype}{double} *SoapySDRDevice_listBandwidths(\textcolor{keyword}{const} SoapySDRDevice *device, \textcolor{keyword}{const} \textcolor{keywordtype}{int} direction, \textcolor{keyword}{
+      const} \textcolor{keywordtype}{size\_t} channel, \textcolor{keywordtype}{size\_t} *length);
+00997 
+01006 SOAPY_SDR_API SoapySDRRange *SoapySDRDevice_getBandwidthRange(\textcolor{keyword}{const} 
+      SoapySDRDevice *device, \textcolor{keyword}{const} \textcolor{keywordtype}{int} direction, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} channel, \textcolor{keywordtype}{size\_t} *
+      length);
+01007 
+01008 \textcolor{comment}{/*******************************************************************}
+01009 \textcolor{comment}{ * Clocking API}
+01010 \textcolor{comment}{ ******************************************************************/}
+01011 
+01018 SOAPY_SDR_API \textcolor{keywordtype}{int} SoapySDRDevice_setMasterClockRate(SoapySDRDevice *device, \textcolor{keyword}{const} \textcolor{keywordtype}{double} 
+      rate);
+01019 
+01025 SOAPY_SDR_API \textcolor{keywordtype}{double} SoapySDRDevice_getMasterClockRate(\textcolor{keyword}{const} SoapySDRDevice *
+      device);
+01026 
+01033 SOAPY_SDR_API SoapySDRRange *SoapySDRDevice_getMasterClockRates(\textcolor{keyword}{const} 
+      SoapySDRDevice *device, \textcolor{keywordtype}{size\_t} *length);
+01034 
+01041 SOAPY_SDR_API \textcolor{keywordtype}{char} **SoapySDRDevice_listClockSources(\textcolor{keyword}{const} SoapySDRDevice *
+      device, \textcolor{keywordtype}{size\_t} *length);
+01042 
+01049 SOAPY_SDR_API \textcolor{keywordtype}{int} SoapySDRDevice_setClockSource(SoapySDRDevice *device, \textcolor{keyword}{const} \textcolor{keywordtype}{char} *source);
+01050 
+01056 SOAPY_SDR_API \textcolor{keywordtype}{char} *SoapySDRDevice_getClockSource(\textcolor{keyword}{const} SoapySDRDevice *device);
+01057 
+01058 \textcolor{comment}{/*******************************************************************}
+01059 \textcolor{comment}{ * Time API}
+01060 \textcolor{comment}{ ******************************************************************/}
+01061 
+01068 SOAPY_SDR_API \textcolor{keywordtype}{char} **SoapySDRDevice_listTimeSources(\textcolor{keyword}{const} SoapySDRDevice *device, \textcolor{keywordtype}{size\_t} *
+      length);
+01069 
+01076 SOAPY_SDR_API \textcolor{keywordtype}{int} SoapySDRDevice_setTimeSource(SoapySDRDevice *device, \textcolor{keyword}{const} \textcolor{keywordtype}{char} *source);
+01077 
+01083 SOAPY_SDR_API \textcolor{keywordtype}{char} *SoapySDRDevice_getTimeSource(\textcolor{keyword}{const} SoapySDRDevice *device);
+01084 
+01091 SOAPY_SDR_API \textcolor{keywordtype}{bool} SoapySDRDevice_hasHardwareTime(\textcolor{keyword}{const} SoapySDRDevice *device, \textcolor{keyword}{const} \textcolor{keywordtype}{char} *what);
+01092 
+01100 SOAPY_SDR_API \textcolor{keywordtype}{long} \textcolor{keywordtype}{long} SoapySDRDevice_getHardwareTime(\textcolor{keyword}{const} SoapySDRDevice *
+      device, \textcolor{keyword}{const} \textcolor{keywordtype}{char} *what);
+01101 
+01110 SOAPY_SDR_API \textcolor{keywordtype}{int} SoapySDRDevice_setHardwareTime(SoapySDRDevice *device, \textcolor{keyword}{const} \textcolor{keywordtype}{long} \textcolor{keywordtype}{long} timeNs, \textcolor{keyword}{const} \textcolor{keywordtype}{char}
+       *what);
+01111 
+01122 SOAPY_SDR_API \textcolor{keywordtype}{int} SoapySDRDevice_setCommandTime(SoapySDRDevice *device, \textcolor{keyword}{const} \textcolor{keywordtype}{long} \textcolor{keywordtype}{long} timeNs, \textcolor{keyword}{const} \textcolor{keywordtype}{char} 
+      *what);
+01123 
+01124 \textcolor{comment}{/*******************************************************************}
+01125 \textcolor{comment}{ * Sensor API}
+01126 \textcolor{comment}{ ******************************************************************/}
+01127 
+01135 SOAPY_SDR_API \textcolor{keywordtype}{char} **SoapySDRDevice_listSensors(\textcolor{keyword}{const} SoapySDRDevice *device, \textcolor{keywordtype}{size\_t} *
+      length);
+01136 
+01144 SOAPY_SDR_API SoapySDRArgInfo SoapySDRDevice_getSensorInfo(\textcolor{keyword}{const} SoapySDRDevice *
+      device, \textcolor{keyword}{const} \textcolor{keywordtype}{char} *key);
+01145 
+01154 SOAPY_SDR_API \textcolor{keywordtype}{char} *SoapySDRDevice_readSensor(\textcolor{keyword}{const} SoapySDRDevice *device, \textcolor{keyword}{const} \textcolor{keywordtype}{char} *key);
+01155 
+01165 SOAPY_SDR_API \textcolor{keywordtype}{char} **SoapySDRDevice_listChannelSensors(\textcolor{keyword}{const} SoapySDRDevice *
+      device, \textcolor{keyword}{const} \textcolor{keywordtype}{int} direction, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} channel, \textcolor{keywordtype}{size\_t} *length);
+01166 
+01176 SOAPY_SDR_API SoapySDRArgInfo SoapySDRDevice_getChannelSensorInfo(\textcolor{keyword}{const} 
+      SoapySDRDevice *device, \textcolor{keyword}{const} \textcolor{keywordtype}{int} direction, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} channel, \textcolor{keyword}{const} \textcolor{keywordtype}{char} *key);
+01177 
+01188 SOAPY_SDR_API \textcolor{keywordtype}{char} *SoapySDRDevice_readChannelSensor(\textcolor{keyword}{const} SoapySDRDevice *
+      device, \textcolor{keyword}{const} \textcolor{keywordtype}{int} direction, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} channel, \textcolor{keyword}{const} \textcolor{keywordtype}{char} *key);
+01189 
+01190 \textcolor{comment}{/*******************************************************************}
+01191 \textcolor{comment}{ * Register API}
+01192 \textcolor{comment}{ ******************************************************************/}
+01193 
+01200 SOAPY_SDR_API \textcolor{keywordtype}{char} **SoapySDRDevice_listRegisterInterfaces(\textcolor{keyword}{const} SoapySDRDevice *
+      device, \textcolor{keywordtype}{size\_t} *length);
+01201 
+01212 SOAPY_SDR_API \textcolor{keywordtype}{int} SoapySDRDevice_writeRegister(SoapySDRDevice *device, \textcolor{keyword}{const} \textcolor{keywordtype}{char} *
+      name, \textcolor{keyword}{const} \textcolor{keywordtype}{unsigned} addr, \textcolor{keyword}{const} \textcolor{keywordtype}{unsigned} value);
+01213 
+01221 SOAPY_SDR_API \textcolor{keywordtype}{unsigned} SoapySDRDevice_readRegister(\textcolor{keyword}{const} SoapySDRDevice *device, \textcolor{keyword}{const} \textcolor{keywordtype}{char} *
+      name, \textcolor{keyword}{const} \textcolor{keywordtype}{unsigned} addr);
+01222 
+01234 SOAPY_SDR_API \textcolor{keywordtype}{int} SoapySDRDevice_writeRegisters(SoapySDRDevice *device, \textcolor{keyword}{const} \textcolor{keywordtype}{char} *
+      name, \textcolor{keyword}{const} \textcolor{keywordtype}{unsigned} addr, \textcolor{keyword}{const} \textcolor{keywordtype}{unsigned} *value, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} length);
+01235 
+01246 SOAPY_SDR_API \textcolor{keywordtype}{unsigned} *SoapySDRDevice_readRegisters(\textcolor{keyword}{const} SoapySDRDevice *
+      device, \textcolor{keyword}{const} \textcolor{keywordtype}{char} *name, \textcolor{keyword}{const} \textcolor{keywordtype}{unsigned} addr, \textcolor{keywordtype}{size\_t} *length);
+01247 
+01248 \textcolor{comment}{/*******************************************************************}
+01249 \textcolor{comment}{ * Settings API}
+01250 \textcolor{comment}{ ******************************************************************/}
+01251 
+01258 SOAPY_SDR_API SoapySDRArgInfo *SoapySDRDevice_getSettingInfo(\textcolor{keyword}{const} 
+      SoapySDRDevice *device, \textcolor{keywordtype}{size\_t} *length);
+01259 
+01268 SOAPY_SDR_API \textcolor{keywordtype}{int} SoapySDRDevice_writeSetting(SoapySDRDevice *device, \textcolor{keyword}{const} \textcolor{keywordtype}{char} *key, \textcolor{keyword}{const} \textcolor{keywordtype}{char} *value);
+01269 
+01276 SOAPY_SDR_API \textcolor{keywordtype}{char} *SoapySDRDevice_readSetting(\textcolor{keyword}{const} SoapySDRDevice *device, \textcolor{keyword}{const} \textcolor{keywordtype}{char} *key);
+01277 
+01286 SOAPY_SDR_API SoapySDRArgInfo *SoapySDRDevice_getChannelSettingInfo(\textcolor{keyword}{const} 
+      SoapySDRDevice *device, \textcolor{keyword}{const} \textcolor{keywordtype}{int} direction, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} channel, \textcolor{keywordtype}{size\_t} *
+      length);
+01287 
+01298 SOAPY_SDR_API \textcolor{keywordtype}{int} SoapySDRDevice_writeChannelSetting(SoapySDRDevice *device, \textcolor{keyword}{const} \textcolor{keywordtype}{int} direction, \textcolor{keyword}{const} \textcolor{keywordtype}{
+      size\_t} channel, \textcolor{keyword}{const} \textcolor{keywordtype}{char} *key, \textcolor{keyword}{const} \textcolor{keywordtype}{char} *value);
+01299 
+01308 SOAPY_SDR_API \textcolor{keywordtype}{char} *SoapySDRDevice_readChannelSetting(\textcolor{keyword}{const} SoapySDRDevice *
+      device, \textcolor{keyword}{const} \textcolor{keywordtype}{int} direction, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} channel, \textcolor{keyword}{const} \textcolor{keywordtype}{char} *key);
+01309 
+01310 \textcolor{comment}{/*******************************************************************}
+01311 \textcolor{comment}{ * GPIO API}
+01312 \textcolor{comment}{ ******************************************************************/}
+01313 
+01319 SOAPY_SDR_API \textcolor{keywordtype}{char} **SoapySDRDevice_listGPIOBanks(\textcolor{keyword}{const} SoapySDRDevice *device, \textcolor{keywordtype}{size\_t} *
+      length);
+01320 
+01328 SOAPY_SDR_API \textcolor{keywordtype}{int} SoapySDRDevice_writeGPIO(SoapySDRDevice *device, \textcolor{keyword}{const} \textcolor{keywordtype}{char} *bank, \textcolor{keyword}{const} \textcolor{keywordtype}{unsigned} value);
+01329 
+01338 SOAPY_SDR_API \textcolor{keywordtype}{int} SoapySDRDevice_writeGPIOMasked(SoapySDRDevice *device, \textcolor{keyword}{const} \textcolor{keywordtype}{char} *bank, \textcolor{keyword}{const} \textcolor{keywordtype}{unsigned} 
+      value, \textcolor{keyword}{const} \textcolor{keywordtype}{unsigned} mask);
+01339 
+01346 SOAPY_SDR_API \textcolor{keywordtype}{unsigned} SoapySDRDevice_readGPIO(\textcolor{keyword}{const} SoapySDRDevice *device, \textcolor{keyword}{const} \textcolor{keywordtype}{char} *bank);
+01347 
+01356 SOAPY_SDR_API \textcolor{keywordtype}{int} SoapySDRDevice_writeGPIODir(SoapySDRDevice *device, \textcolor{keyword}{const} \textcolor{keywordtype}{char} *bank, \textcolor{keyword}{const} \textcolor{keywordtype}{unsigned} dir)
+      ;
+01357 
+01367 SOAPY_SDR_API \textcolor{keywordtype}{int} SoapySDRDevice_writeGPIODirMasked(SoapySDRDevice *device, \textcolor{keyword}{const} \textcolor{keywordtype}{char} *bank, \textcolor{keyword}{const} \textcolor{keywordtype}{
+      unsigned} dir, \textcolor{keyword}{const} \textcolor{keywordtype}{unsigned} mask);
+01368 
+01376 SOAPY_SDR_API \textcolor{keywordtype}{unsigned} SoapySDRDevice_readGPIODir(\textcolor{keyword}{const} SoapySDRDevice *device, \textcolor{keyword}{const} \textcolor{keywordtype}{char} *bank);
+01377 
+01378 \textcolor{comment}{/*******************************************************************}
+01379 \textcolor{comment}{ * I2C API}
+01380 \textcolor{comment}{ ******************************************************************/}
+01381 
+01392 SOAPY_SDR_API \textcolor{keywordtype}{int} SoapySDRDevice_writeI2C(SoapySDRDevice *device, \textcolor{keyword}{const} \textcolor{keywordtype}{int} addr, \textcolor{keyword}{const} \textcolor{keywordtype}{char} *
+      data, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} numBytes);
+01393 
+01405 SOAPY_SDR_API \textcolor{keywordtype}{char} *SoapySDRDevice_readI2C(SoapySDRDevice *device, \textcolor{keyword}{const} \textcolor{keywordtype}{int} addr, \textcolor{keywordtype}{size\_t} *numBytes);
+01406 
+01407 \textcolor{comment}{/*******************************************************************}
+01408 \textcolor{comment}{ * SPI API}
+01409 \textcolor{comment}{ ******************************************************************/}
+01410 
+01426 SOAPY_SDR_API \textcolor{keywordtype}{unsigned} SoapySDRDevice_transactSPI(SoapySDRDevice *device, \textcolor{keyword}{const} \textcolor{keywordtype}{int} addr, \textcolor{keyword}{const} \textcolor{keywordtype}{unsigned} 
+      data, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} numBits);
+01427 
+01428 \textcolor{comment}{/*******************************************************************}
+01429 \textcolor{comment}{ * UART API}
+01430 \textcolor{comment}{ ******************************************************************/}
+01431 
+01438 SOAPY_SDR_API \textcolor{keywordtype}{char} **SoapySDRDevice_listUARTs(\textcolor{keyword}{const} SoapySDRDevice *device, \textcolor{keywordtype}{size\_t} *
+      length);
+01439 
+01449 SOAPY_SDR_API \textcolor{keywordtype}{int} SoapySDRDevice_writeUART(SoapySDRDevice *device, \textcolor{keyword}{const} \textcolor{keywordtype}{char} *which, \textcolor{keyword}{const} \textcolor{keywordtype}{char} *
+      data);
+01450 
+01460 SOAPY_SDR_API \textcolor{keywordtype}{char} *SoapySDRDevice_readUART(\textcolor{keyword}{const} SoapySDRDevice *device, \textcolor{keyword}{const} \textcolor{keywordtype}{char} *which, \textcolor{keyword}{const} \textcolor{keywordtype}{long} 
+      timeoutUs);
+01461 
+01462 \textcolor{preprocessor}{#ifdef \_\_cplusplus}
+01463 \}
+01464 \textcolor{preprocessor}{#endif}
+\end{DoxyCode}

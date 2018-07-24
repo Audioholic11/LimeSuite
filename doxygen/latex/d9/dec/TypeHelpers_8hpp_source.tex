@@ -1,0 +1,137 @@
+\subsection{Type\+Helpers.\+hpp}
+\label{TypeHelpers_8hpp_source}\index{/home/erik/prefix/default/src/soapysdr/lib/\+Type\+Helpers.\+hpp@{/home/erik/prefix/default/src/soapysdr/lib/\+Type\+Helpers.\+hpp}}
+
+\begin{DoxyCode}
+00001 \textcolor{comment}{// Copyright (c) 2014-2017 Josh Blum}
+00002 \textcolor{comment}{// SPDX-License-Identifier: BSL-1.0}
+00003 
+00004 \textcolor{preprocessor}{#pragma once}
+00005 \textcolor{preprocessor}{#include <SoapySDR/Config.hpp>}
+00006 \textcolor{preprocessor}{#include <SoapySDR/Types.hpp>}
+00007 \textcolor{preprocessor}{#include <SoapySDR/Types.h>}
+00008 \textcolor{preprocessor}{#include <vector>}
+00009 \textcolor{preprocessor}{#include <string>}
+00010 \textcolor{preprocessor}{#include <cstdlib>}
+00011 \textcolor{preprocessor}{#include <cstring>}
+00012 
+00013 \textcolor{comment}{/*******************************************************************}
+00014 \textcolor{comment}{ * Helpful converters}
+00015 \textcolor{comment}{ ******************************************************************/}
+00016 \textcolor{keyword}{static} \textcolor{keyword}{inline} \textcolor{keywordtype}{char} **toStrArray(\textcolor{keyword}{const} std::vector<std::string> &strs, \textcolor{keywordtype}{size\_t} *
+      length)
+00017 \{
+00018     \textcolor{keywordtype}{char} **out = (\textcolor{keywordtype}{char} **)calloc(strs.size(), \textcolor{keyword}{sizeof}(\textcolor{keywordtype}{char} *));
+00019     \textcolor{keywordflow}{for} (\textcolor{keywordtype}{size\_t} i = 0; i < strs.size(); i++)
+00020     \{
+00021         out[i] = strdup(strs[i].c\_str());
+00022     \}
+00023     *length = strs.size();
+00024     \textcolor{keywordflow}{return} out;
+00025 \}
+00026 
+00027 \textcolor{keyword}{static} \textcolor{keyword}{inline} SoapySDRRange toRange(\textcolor{keyword}{const} SoapySDR::Range &range)
+00028 \{
+00029     SoapySDRRange out;
+00030     out.minimum = range.minimum();
+00031     out.maximum = range.maximum();
+00032     out.step = range.step();
+00033     \textcolor{keywordflow}{return} out;
+00034 \}
+00035 
+00036 \textcolor{keyword}{static} \textcolor{keyword}{inline} SoapySDRRange *toRangeList(\textcolor{keyword}{const} SoapySDR::RangeList &ranges, \textcolor{keywordtype}{size\_t} *
+      length)
+00037 \{
+00038     SoapySDRRange *out = (SoapySDRRange *)calloc(ranges.size(), \textcolor{keyword}{sizeof}(
+      SoapySDRRange));
+00039     \textcolor{keywordflow}{for} (\textcolor{keywordtype}{size\_t} i = 0; i < ranges.size(); i++) out[i] = toRange(ranges[i]);
+00040     *length = ranges.size();
+00041     \textcolor{keywordflow}{return} out;
+00042 \}
+00043 
+00044 \textcolor{keyword}{static} \textcolor{keyword}{inline} \textcolor{keywordtype}{double} *toNumericList(\textcolor{keyword}{const} std::vector<double> &values, \textcolor{keywordtype}{size\_t} *
+      length)
+00045 \{
+00046     \textcolor{keywordtype}{double} *out = (\textcolor{keywordtype}{double} *)calloc(values.size(), \textcolor{keyword}{sizeof}(double));
+00047     \textcolor{keywordflow}{for} (\textcolor{keywordtype}{size\_t} i = 0; i < values.size(); i++) out[i] = values[i];
+00048     *length = values.size();
+00049     \textcolor{keywordflow}{return} out;
+00050 \}
+00051 
+00052 \textcolor{keyword}{static} \textcolor{keyword}{inline} SoapySDR::Kwargs toKwargs(\textcolor{keyword}{const} SoapySDRKwargs *args)
+00053 \{
+00054     SoapySDR::Kwargs out;
+00055     \textcolor{keywordflow}{if} (args == NULL) \textcolor{keywordflow}{return} out;
+00056     \textcolor{keywordflow}{for} (\textcolor{keywordtype}{size\_t} i = 0; i < args->size; i++)
+00057     \{
+00058         out[args->keys[i]] = args->vals[i];
+00059     \}
+00060     \textcolor{keywordflow}{return} out;
+00061 \}
+00062 
+00063 \textcolor{keyword}{static} \textcolor{keyword}{inline} SoapySDRKwargs toKwargs(\textcolor{keyword}{const} SoapySDR::Kwargs &args)
+00064 \{
+00065     SoapySDRKwargs out;
+00066     std::memset(&out, 0, \textcolor{keyword}{sizeof}(out));
+00067     \textcolor{keywordflow}{for} (\textcolor{keyword}{const} \textcolor{keyword}{auto} &it : args)
+00068     \{
+00069         SoapySDRKwargs_set(&out, it.first.c\_str(), it.second.c\_str());
+00070     \}
+00071     \textcolor{keywordflow}{return} out;
+00072 \}
+00073 
+00074 \textcolor{keyword}{static} \textcolor{keyword}{inline} SoapySDRKwargs *toKwargsList(\textcolor{keyword}{const} SoapySDR::KwargsList &args, \textcolor{keywordtype}{size\_t} *
+      length)
+00075 \{
+00076     SoapySDRKwargs *outArgs = (SoapySDRKwargs *)calloc(args.size(), \textcolor{keyword}{sizeof}(
+      SoapySDRKwargs));
+00077     \textcolor{keywordflow}{for} (\textcolor{keywordtype}{size\_t} i = 0; i < args.size(); i++) outArgs[i] = toKwargs(args[i]);
+00078     *length = args.size();
+00079     \textcolor{keywordflow}{return} outArgs;
+00080 \}
+00081 
+00082 \textcolor{keyword}{static} \textcolor{keyword}{inline} SoapySDRArgInfo toArgInfo(\textcolor{keyword}{const} SoapySDR::ArgInfo &info)
+00083 \{
+00084     SoapySDRArgInfo out;
+00085     out.key = strdup(info.key.c\_str());
+00086     out.name = strdup(info.name.c\_str());
+00087     out.description = strdup(info.description.c\_str());
+00088     out.units = strdup(info.units.c\_str());
+00089     out.type = SoapySDRArgInfoType(info.type);
+00090     out.range = toRange(info.range);
+00091     out.options = toStrArray(info.options, &out.numOptions);
+00092     out.optionNames = toStrArray(info.optionNames, &out.numOptions);
+00093 
+00094     \textcolor{keywordflow}{return} out;
+00095 \}
+00096 
+00097 \textcolor{keyword}{static} \textcolor{keyword}{inline} SoapySDRArgInfo *toArgInfoList(\textcolor{keyword}{const} SoapySDR::ArgInfoList &infos, \textcolor{keywordtype}{size\_t} *
+      length)
+00098 \{
+00099     SoapySDRArgInfo *out = (SoapySDRArgInfo *)calloc(infos.size(), \textcolor{keyword}{sizeof}(
+      SoapySDRArgInfo));
+00100     \textcolor{keywordflow}{for} (\textcolor{keywordtype}{size\_t} i = 0; i < infos.size(); i++)
+00101     \{
+00102         out[i] = toArgInfo(infos[i]);
+00103     \}
+00104     *length = infos.size();
+00105     \textcolor{keywordflow}{return} out;
+00106 \}
+00107 
+00108 \textcolor{keyword}{static} \textcolor{keyword}{inline} std::vector<unsigned> toNumericVector(\textcolor{keyword}{const} \textcolor{keywordtype}{unsigned} *values, \textcolor{keywordtype}{size\_t} 
+      length)
+00109 \{
+00110     std::vector<unsigned> out (length, 0);
+00111     \textcolor{keywordflow}{for} (\textcolor{keywordtype}{size\_t} i = 0; i < length; i++) out[i] = values[i];
+00112     \textcolor{keywordflow}{return} out;
+00113 \}
+00114 
+00115 \textcolor{keyword}{static} \textcolor{keyword}{inline} \textcolor{keywordtype}{unsigned} *toNumericList(\textcolor{keyword}{const} std::vector<unsigned> &values, \textcolor{keywordtype}{size\_t} *
+      length)
+00116 \{
+00117     \textcolor{keywordtype}{unsigned} *out = (\textcolor{keywordtype}{unsigned} *)calloc(values.size(), \textcolor{keyword}{sizeof}(unsigned));
+00118     \textcolor{keywordflow}{for} (\textcolor{keywordtype}{size\_t} i = 0; i < values.size(); i++) out[i] = values[i];
+00119     *length = values.size();
+00120     \textcolor{keywordflow}{return} out;
+00121 \}
+00122 
+\end{DoxyCode}

@@ -1,0 +1,244 @@
+\subsection{estimator\+\_\+fmcw\+\_\+impl.\+cc}
+\label{estimator__fmcw__impl_8cc_source}\index{/home/erik/prefix/default/src/gr-\/radar-\/dev/lib/estimator\+\_\+fmcw\+\_\+impl.\+cc@{/home/erik/prefix/default/src/gr-\/radar-\/dev/lib/estimator\+\_\+fmcw\+\_\+impl.\+cc}}
+
+\begin{DoxyCode}
+00001 \textcolor{comment}{/* -*- c++ -*- */}
+00002 \textcolor{comment}{/* }
+00003 \textcolor{comment}{ * Copyright 2014 Communications Engineering Lab, KIT.}
+00004 \textcolor{comment}{ * }
+00005 \textcolor{comment}{ * This is free software; you can redistribute it and/or modify}
+00006 \textcolor{comment}{ * it under the terms of the GNU General Public License as published by}
+00007 \textcolor{comment}{ * the Free Software Foundation; either version 3, or (at your option)}
+00008 \textcolor{comment}{ * any later version.}
+00009 \textcolor{comment}{ * }
+00010 \textcolor{comment}{ * This software is distributed in the hope that it will be useful,}
+00011 \textcolor{comment}{ * but WITHOUT ANY WARRANTY; without even the implied warranty of}
+00012 \textcolor{comment}{ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the}
+00013 \textcolor{comment}{ * GNU General Public License for more details.}
+00014 \textcolor{comment}{ * }
+00015 \textcolor{comment}{ * You should have received a copy of the GNU General Public License}
+00016 \textcolor{comment}{ * along with this software; see the file COPYING.  If not, write to}
+00017 \textcolor{comment}{ * the Free Software Foundation, Inc., 51 Franklin Street,}
+00018 \textcolor{comment}{ * Boston, MA 02110-1301, USA.}
+00019 \textcolor{comment}{ */}
+00020  
+00021 \textcolor{preprocessor}{#ifdef HAVE\_CONFIG\_H}
+00022 \textcolor{preprocessor}{#include "config.h"}
+00023 \textcolor{preprocessor}{#endif}
+00024 
+00025 \textcolor{preprocessor}{#include <gnuradio/io\_signature.h>}
+00026 \textcolor{preprocessor}{#include "estimator_fmcw_impl.h"}
+00027 \textcolor{preprocessor}{#include <iostream>}
+00028 
+00029 \textcolor{keyword}{namespace }gr \{
+00030   \textcolor{keyword}{namespace }radar \{
+00031 
+00032     estimator_fmcw::sptr
+00033     estimator_fmcw::make(\textcolor{keywordtype}{int} samp_rate, \textcolor{keywordtype}{float} center_freq, \textcolor{keywordtype}{float} sweep_freq, \textcolor{keywordtype}{int} 
+      samp_up, \textcolor{keywordtype}{int} samp_down, \textcolor{keywordtype}{bool} push\_power)
+00034     \{
+00035       \textcolor{keywordflow}{return} gnuradio::get\_initial\_sptr
+00036         (\textcolor{keyword}{new} estimator_fmcw_impl(samp\_rate, center\_freq, sweep\_freq, samp\_up, samp\_down, push\_power));
+00037     \}
+00038 
+00039     \textcolor{comment}{/*}
+00040 \textcolor{comment}{     * The private constructor}
+00041 \textcolor{comment}{     */}
+00042     estimator_fmcw_impl::estimator_fmcw_impl(\textcolor{keywordtype}{int} samp_rate, \textcolor{keywordtype}{float} center_freq, \textcolor{keywordtype}{float} 
+      sweep_freq, \textcolor{keywordtype}{int} samp_up, \textcolor{keywordtype}{int} samp_down, \textcolor{keywordtype}{bool} push\_power)
+00043       : gr::block(\textcolor{stringliteral}{"estimator\_fmcw"},
+00044               gr::io\_signature::make(0,0,0),
+00045               gr::io\_signature::make(0,0,0))
+00046     \{
+00047         d_samp_rate = samp_rate;
+00048         d_center_freq = center_freq;
+00049         d_sweep_freq = sweep_freq;
+00050         d_samp_up = samp_up;
+00051         d_samp_down = samp_down;
+00052         d_push_power = push\_power;
+00053         
+00054         d_msg_cw_in = \textcolor{keyword}{false};
+00055         d_msg_up_in = \textcolor{keyword}{false};
+00056         d_msg_down_in = \textcolor{keyword}{false};
+00057         
+00058         \textcolor{comment}{// Setup estimation constants}
+00059         d_const_doppler = 2*d_center_freq/c_light;
+00060         d_const_up = 2*d_sweep_freq/c_light*(float)d_samp_rate/(\textcolor{keywordtype}{float})d_samp_up;
+00061         d_const_down = 2*d_sweep_freq/c_light*(float)d_samp_rate/(\textcolor{keywordtype}{float})
+      d_samp_down;
+00062         
+00063         \textcolor{comment}{// Register input message ports}
+00064         d_port_id_in_cw = pmt::mp(\textcolor{stringliteral}{"Msg in CW"});
+00065         message\_port\_register\_in(d_port_id_in_cw);
+00066         set\_msg\_handler(d_port_id_in_cw, boost::bind(&
+      estimator_fmcw_impl::handle_msg_cw, \textcolor{keyword}{this}, \_1));
+00067         
+00068         d_port_id_in_up = pmt::mp(\textcolor{stringliteral}{"Msg in UP"});
+00069         message\_port\_register\_in(d_port_id_in_up);
+00070         set\_msg\_handler(d_port_id_in_up, boost::bind(&
+      estimator_fmcw_impl::handle_msg_up, \textcolor{keyword}{this}, \_1));
+00071         
+00072         d_port_id_in_down = pmt::mp(\textcolor{stringliteral}{"Msg in DOWN"});
+00073         message\_port\_register\_in(d_port_id_in_down);
+00074         set\_msg\_handler(d_port_id_in_down, boost::bind(&
+      estimator_fmcw_impl::handle_msg_down, \textcolor{keyword}{this}, \_1));
+00075         
+00076         \textcolor{comment}{// Register output message port}
+00077         d_port_id_out = pmt::mp(\textcolor{stringliteral}{"Msg out"});
+00078         message\_port\_register\_out(d_port_id_out);
+00079     \}
+00080     
+00081     \textcolor{keywordtype}{void}
+00082     estimator_fmcw_impl::handle_msg_cw(pmt::pmt\_t msg)
+00083     \{
+00084         \textcolor{comment}{// Handle CW msg and call estimate if all msgs are available}
+00085         d_msg_cw = msg;
+00086         d_msg_cw_in = \textcolor{keyword}{true};
+00087         \textcolor{keywordflow}{if}(d_msg_cw_in&&d_msg_up_in&&d_msg_down_in)\{
+00088             d_msg_cw_in = \textcolor{keyword}{false};
+00089             d_msg_up_in = \textcolor{keyword}{false};
+00090             d_msg_down_in = \textcolor{keyword}{false};
+00091             estimate();
+00092         \}
+00093     \}
+00094     
+00095     \textcolor{keywordtype}{void}
+00096     estimator_fmcw_impl::handle_msg_up(pmt::pmt\_t msg)
+00097     \{
+00098         \textcolor{comment}{// Handle UP msg and call estimate if all msgs are available}
+00099         d_msg_up = msg;
+00100         d_msg_up_in = \textcolor{keyword}{true};
+00101         \textcolor{keywordflow}{if}(d_msg_cw_in&&d_msg_up_in&&d_msg_down_in)\{
+00102             d_msg_cw_in = \textcolor{keyword}{false};
+00103             d_msg_up_in = \textcolor{keyword}{false};
+00104             d_msg_down_in = \textcolor{keyword}{false};
+00105             estimate();
+00106         \}
+00107     \}
+00108     
+00109     \textcolor{keywordtype}{void}
+00110     estimator_fmcw_impl::handle_msg_down(pmt::pmt\_t msg)
+00111     \{
+00112         \textcolor{comment}{// Handle DOWN msg and call estimate if all msgs are available}
+00113         d_msg_down = msg;
+00114         d_msg_down_in = \textcolor{keyword}{true};
+00115         \textcolor{keywordflow}{if}(d_msg_cw_in&&d_msg_up_in&&d_msg_down_in)\{
+00116             d_msg_cw_in = \textcolor{keyword}{false};
+00117             d_msg_up_in = \textcolor{keyword}{false};
+00118             d_msg_down_in = \textcolor{keyword}{false};
+00119             estimate();
+00120         \}
+00121     \}
+00122     
+00123     \textcolor{keywordtype}{void}
+00124     estimator_fmcw_impl::estimate()
+00125     \{
+00126         \textcolor{comment}{// Get timestamp and frequencies (cw, up-chirp, down-chirp)}
+00127         std::vector<float> freq_cw, freq_up, freq_down;
+00128         pmt::pmt\_t timestamp;
+00129         pmt::pmt\_t msg\_part;
+00130         pmt::pmt\_t power;
+00131         
+00132         \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} k=0; k<pmt::length(d_msg_cw); k++)\{ \textcolor{comment}{// search freq CW}
+00133             msg\_part = pmt::nth(k,d_msg_cw);
+00134             \textcolor{keywordflow}{if}(pmt::symbol\_to\_string(pmt::nth(0,msg\_part))==\textcolor{stringliteral}{"frequency"})\{
+00135                 freq\_cw = pmt::f32vector\_elements(pmt::nth(1,msg\_part));
+00136             \}
+00137             \textcolor{keywordflow}{else} \textcolor{keywordflow}{if}(pmt::symbol\_to\_string(pmt::nth(0,msg\_part))==\textcolor{stringliteral}{"rx\_time"})\{
+00138                 timestamp = pmt::nth(1,msg\_part);
+00139             \}
+00140             \textcolor{keywordflow}{else} \textcolor{keywordflow}{if}(pmt::symbol\_to\_string(pmt::nth(0,msg\_part))==\textcolor{stringliteral}{"power"})\{
+00141                 power = msg\_part;
+00142             \}
+00143         \}
+00144         
+00145         \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} k=0; k<pmt::length(d_msg_up); k++)\{ \textcolor{comment}{// search freq UP}
+00146             msg\_part = pmt::nth(k,d_msg_up);
+00147             \textcolor{keywordflow}{if}(pmt::symbol\_to\_string(pmt::nth(0,msg\_part))==\textcolor{stringliteral}{"frequency"})\{
+00148                 freq\_up = pmt::f32vector\_elements(pmt::nth(1,msg\_part));
+00149             \}
+00150         \}
+00151         
+00152         \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} k=0; k<pmt::length(d_msg_down); k++)\{ \textcolor{comment}{// search freq DOWN}
+00153             msg\_part = pmt::nth(k,d_msg_down);
+00154             \textcolor{keywordflow}{if}(pmt::symbol\_to\_string(pmt::nth(0,msg\_part))==\textcolor{stringliteral}{"frequency"})\{
+00155                 freq\_down = pmt::f32vector\_elements(pmt::nth(1,msg\_part));
+00156             \}
+00157         \}
+00158         
+00159         \textcolor{comment}{// Get velocities out of CW frequencies}
+00160         std::vector<float> velocity\_cw;
+00161         \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} k=0; k<freq\_cw.size(); k++)\{
+00162             velocity\_cw.push\_back(-c_light/2/d_center_freq*freq\_cw[k]); \textcolor{comment}{// with minus! for same sign as
+       all\_velocities}
+00163         \}
+00164         
+00165         \textcolor{comment}{// Get all possible range/velocity pairs}
+00166         std::vector<float> all\_ranges, all\_velocities;
+00167         \textcolor{keywordtype}{float} v1, v2, r;
+00168         \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} m=0; m<freq\_up.size(); m++)\{
+00169             \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} n=0; n<freq\_down.size(); n++)\{
+00170                 r = (freq\_up[m]-freq\_down[n])/(d_const_up+d_const_down); \textcolor{comment}{// range from up- and down-chirp}
+00171                 all\_ranges.push\_back(r);
+00172                 v1 = (d_const_up*r-freq\_up[m])/d_const_doppler; \textcolor{comment}{// velocity from up-chirp}
+00173                 v2 = (-d_const_down*r-freq\_down[n])/d_const_doppler; \textcolor{comment}{// velocity from down-chirp}
+00174                 all\_velocities.push\_back((v1+v2)/2.0); \textcolor{comment}{// median of up- and down-chirp}
+00175             \}
+00176         \}
+00177         
+00178         \textcolor{comment}{// Minimize velocity from CW with all possible velocities from up-/down-chirp}
+00179         std::vector<float> velocity, range;
+00180         \textcolor{keywordtype}{int} min\_vel\_index;
+00181         \textcolor{keywordtype}{float} min\_vel;
+00182         \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} k=0; k<velocity\_cw.size(); k++)\{
+00183             min\_vel = 1e20;
+00184             min\_vel\_index = -1;
+00185             
+00186             \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} l=0; l<all\_velocities.size(); l++)\{
+00187                 \textcolor{keywordflow}{if}(min\_vel>std::abs(velocity\_cw[k]-all\_velocities[l]))\{
+00188                     min\_vel = std::abs(velocity\_cw[k]-all\_velocities[l]);
+00189                     min\_vel\_index = l;
+00190                 \}
+00191             \}
+00192             
+00193             velocity.push\_back(velocity\_cw[k]); \textcolor{comment}{// push back cw velocity because of (probably) better
+       resolution}
+00194             range.push\_back(all\_ranges[min\_vel\_index]);
+00195         \}
+00196         
+00197         \textcolor{comment}{// Pack output msg and push to output}
+00198         pmt::pmt\_t time\_pack;
+00199         time\_pack = pmt::list2(pmt::string\_to\_symbol(\textcolor{stringliteral}{"rx\_time"}), timestamp); \textcolor{comment}{// make list for timestamp
+       information}
+00200         
+00201         pmt::pmt\_t vel\_value, vel\_pack;
+00202         vel\_value = pmt::init\_f32vector(velocity.size(), velocity); \textcolor{comment}{// vector to pmt}
+00203         vel\_pack = pmt::list2(pmt::string\_to\_symbol(\textcolor{stringliteral}{"velocity"}), vel\_value); \textcolor{comment}{// make list for velocity
+       information}
+00204         
+00205         pmt::pmt\_t range\_value, range\_pack;
+00206         range\_value = pmt::init\_f32vector(range.size(), range); \textcolor{comment}{// vector to pmt}
+00207         range\_pack = pmt::list2(pmt::string\_to\_symbol(\textcolor{stringliteral}{"range"}), range\_value); \textcolor{comment}{// make list for range
+       information}
+00208         
+00209         pmt::pmt\_t value;
+00210         \textcolor{keywordflow}{if}(d_push_power)\{ \textcolor{comment}{// if power of peaks shall be pushed through}
+00211             value = pmt::list4(time\_pack, vel\_pack, range\_pack, power); \textcolor{comment}{// all information to one pmt list}
+00212         \}
+00213         \textcolor{keywordflow}{else}\{
+00214             value = pmt::list3(time\_pack, vel\_pack, range\_pack); \textcolor{comment}{// all information to one pmt list}
+00215         \}
+00216         message\_port\_pub(d_port_id_out,value);
+00217     \}
+00218 
+00219     \textcolor{comment}{/*}
+00220 \textcolor{comment}{     * Our virtual destructor.}
+00221 \textcolor{comment}{     */}
+00222     estimator_fmcw_impl::~estimator_fmcw_impl()
+00223     \{
+00224     \}
+00225 
+00226   \} \textcolor{comment}{/* namespace radar */}
+00227 \} \textcolor{comment}{/* namespace gr */}
+00228 
+\end{DoxyCode}

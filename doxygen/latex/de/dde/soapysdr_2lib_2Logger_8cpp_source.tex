@@ -1,0 +1,29 @@
+\subsection{Logger.\+cpp}
+\label{soapysdr_2lib_2Logger_8cpp_source}\index{/home/erik/prefix/default/src/soapysdr/lib/\+Logger.\+cpp@{/home/erik/prefix/default/src/soapysdr/lib/\+Logger.\+cpp}}
+
+\begin{DoxyCode}
+00001 \textcolor{comment}{// Copyright (c) 2014-2015 Josh Blum}
+00002 \textcolor{comment}{// SPDX-License-Identifier: BSL-1.0}
+00003 
+00004 \textcolor{preprocessor}{#include <SoapySDR/Logger.hpp>}
+00005 
+00006 \textcolor{keywordtype}{void} SoapySDR::log(\textcolor{keyword}{const} LogLevel logLevel, \textcolor{keyword}{const} std::string &message)
+00007 \{
+00008     \textcolor{keywordflow}{return} SoapySDR_log(logLevel, message.c\_str());
+00009 \}
+00010 
+00011 \textcolor{keywordtype}{void} SoapySDR::vlogf(\textcolor{keyword}{const} SoapySDRLogLevel logLevel, \textcolor{keyword}{const} \textcolor{keywordtype}{char} *format, va\_list argList)
+00012 \{
+00013     \textcolor{keywordflow}{return} SoapySDR_vlogf(logLevel, format, argList);
+00014 \}
+00015 
+00016 \textcolor{keywordtype}{void} SoapySDR::registerLogHandler(\textcolor{keyword}{const} LogHandler &handler)
+00017 \{
+00018     \textcolor{keywordflow}{return} SoapySDR_registerLogHandler(handler);
+00019 \}
+00020 
+00021 \textcolor{keywordtype}{void} SoapySDR::setLogLevel(\textcolor{keyword}{const} LogLevel logLevel)
+00022 \{
+00023     SoapySDR_setLogLevel(logLevel);
+00024 \}
+\end{DoxyCode}

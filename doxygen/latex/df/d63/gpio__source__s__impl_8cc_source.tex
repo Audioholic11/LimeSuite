@@ -1,0 +1,206 @@
+\subsection{gpio\+\_\+source\+\_\+s\+\_\+impl.\+cc}
+\label{gpio__source__s__impl_8cc_source}\index{/home/erik/prefix/default/src/gr-\/radar-\/dev/lib/gpio\+\_\+source\+\_\+s\+\_\+impl.\+cc@{/home/erik/prefix/default/src/gr-\/radar-\/dev/lib/gpio\+\_\+source\+\_\+s\+\_\+impl.\+cc}}
+
+\begin{DoxyCode}
+00001 \textcolor{comment}{/* -*- c++ -*- */}
+00002 \textcolor{comment}{/*}
+00003 \textcolor{comment}{ * Copyright 2018 <+YOU OR YOUR COMPANY+>.}
+00004 \textcolor{comment}{ *}
+00005 \textcolor{comment}{ * This is free software; you can redistribute it and/or modify}
+00006 \textcolor{comment}{ * it under the terms of the GNU General Public License as published by}
+00007 \textcolor{comment}{ * the Free Software Foundation; either version 3, or (at your option)}
+00008 \textcolor{comment}{ * any later version.}
+00009 \textcolor{comment}{ *}
+00010 \textcolor{comment}{ * This software is distributed in the hope that it will be useful,}
+00011 \textcolor{comment}{ * but WITHOUT ANY WARRANTY; without even the implied warranty of}
+00012 \textcolor{comment}{ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the}
+00013 \textcolor{comment}{ * GNU General Public License for more details.}
+00014 \textcolor{comment}{ *}
+00015 \textcolor{comment}{ * You should have received a copy of the GNU General Public License}
+00016 \textcolor{comment}{ * along with this software; see the file COPYING.  If not, write to}
+00017 \textcolor{comment}{ * the Free Software Foundation, Inc., 51 Franklin Street,}
+00018 \textcolor{comment}{ * Boston, MA 02110-1301, USA.}
+00019 \textcolor{comment}{ */}
+00020 
+00021 \textcolor{preprocessor}{#ifdef HAVE\_CONFIG\_H}
+00022 \textcolor{preprocessor}{#include "config.h"}
+00023 \textcolor{preprocessor}{#endif}
+00024 
+00025 \textcolor{preprocessor}{#include <gnuradio/io\_signature.h>}
+00026 \textcolor{preprocessor}{#include "gpio_source_s_impl.h"}
+00027 
+00028 \textcolor{keyword}{namespace }gr \{
+00029   \textcolor{keyword}{namespace }radar \{
+00030 
+00031     gpio_source_s::sptr
+00032     gpio_source_s::make(std::string device\_args, \textcolor{keywordtype}{int} pins, \textcolor{keywordtype}{int} sample\_rate)
+00033     \{
+00034       \textcolor{keywordflow}{return} gnuradio::get\_initial\_sptr
+00035         (\textcolor{keyword}{new} gpio_source_s_impl(device\_args,pins,sample\_rate));
+00036     \}
+00037 
+00038     \textcolor{comment}{/*}
+00039 \textcolor{comment}{     * The private constructor}
+00040 \textcolor{comment}{     */}
+00041     gpio_source_s_impl::gpio_source_s_impl(std::string device\_args, \textcolor{keywordtype}{int} pins, \textcolor{keywordtype}{int} sample\_rate)
+00042       : gr::sync\_block(\textcolor{stringliteral}{"gpio\_source\_s"},
+00043               gr::io\_signature::make(0, 0, 0),
+00044               gr::io\_signature::make(1, pins, sizeof(int16\_t))),
+00045               \textcolor{comment}{//Parameters}
+00046               d\_device\_args(device\_args),
+00047               d\_pins(pins),
+00048               d\_samp\_rate(sample\_rate)
+00049     \{
+00050     \textcolor{comment}{//Setup Soapy Device}
+00051     d_kw = SoapySDR::KwargsFromString(d_device_args);
+00052     d_soapysdr = SoapySDR::Device::make(d_kw);
+00053 
+00054 
+00055     \textcolor{comment}{//Setup Register Devices}
+00056     d_listRegInterfaces = d_soapysdr->listRegisterInterfaces();
+00057     \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} i = 0; i < d_listRegInterfaces.size(); i ++)
+00058       std::cout << \textcolor{stringliteral}{"Register Interfaces: "} << i << \textcolor{stringliteral}{" "} << d_listRegInterfaces[i] << std::endl;
+00059 
+00060     \textcolor{comment}{//Turn on Fan}
+00061     d_register = 0x00CC;
+00062     d_value = 1;
+00063     d_soapysdr->writeRegister(d_listRegInterfaces[0],d_register,d_value);
+00064     d_register = 0x00CD;
+00065     d_soapysdr->writeRegister(d_listRegInterfaces[0],d_register,d_value);
+00066 
+00067 
+00068     \textcolor{comment}{//GPIO Setup}
+00069     \textcolor{comment}{//Setup GPIO OVERLOAD}
+00070     d_register = 6<<5;
+00071 
+00072     \textcolor{comment}{//d\_value = 0xFFE0;// GPIO(0-4) overload bits = 0}
+00073     d_value = 0xFFFF;\textcolor{comment}{// GPIO(0-5) overload bits = 0}
+00074 
+00075     d_soapysdr->writeRegister(d_listRegInterfaces[0], d_register,d_value);
+00076     d_value = d_soapysdr->readRegister(d_listRegInterfaces[0],d_register);
+00077     std::cout << std::hex << \textcolor{stringliteral}{"Register GPIO Overload: 0x"}  << d_register << \textcolor{stringliteral}{" 0x"}  <<  
+      d_value << std::endl;
+00078     std::cout << std::dec;
+00079 
+00080 
+00081     \textcolor{comment}{//GPIO Output Setup}
+00082     d_GPIOBanks = d_soapysdr->listGPIOBanks();
+00083     \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} i = 0; i < d_GPIOBanks.size(); i ++)
+00084       std::cout << \textcolor{stringliteral}{"GPIO Banks: "} << i << \textcolor{stringliteral}{" "} << d_GPIOBanks[i] << std::endl;
+00085 
+00086     d_value = 0x00; d_soapysdr->writeGPIO(d_GPIOBanks[0],d_value);
+00087 
+00088     \textcolor{comment}{//All Pins Outputs}
+00089     d_value = 0x80;\textcolor{comment}{//bit 6 input}
+00090     d_soapysdr->writeGPIODir(d_GPIOBanks[0],d_value);
+00091 
+00092     t1 = std::chrono::steady\_clock::now();
+00093     t2 = t1;
+00094 
+00095     d_deltaTime_Average = 0;
+00096     d_deltaTime_Average_Running = 0;
+00097     d_num_works = 1;
+00098     firstPacket = 1;
+00099 
+00100     \textcolor{comment}{//std::cout << "is steady: "<< std::chrono::high\_resolution\_clock.is\_steady() << std::endl;}
+00101     \}
+00102 
+00103     \textcolor{comment}{/*}
+00104 \textcolor{comment}{     * Our virtual destructor.}
+00105 \textcolor{comment}{     */}
+00106     gpio_source_s_impl::~gpio_source_s_impl()
+00107     \{
+00108       \textcolor{comment}{//Turn off GPIO Overload}
+00109       d_soapysdr->writeRegister(d_listRegInterfaces[1], 6<<5, 0xFFFF);
+00110     \}
+00111 
+00112     \textcolor{keywordtype}{void} gpio_source_s_impl::readGPIO()
+00113     \{
+00114       \textcolor{comment}{//Check Affinity and Priority}
+00115       \textcolor{comment}{//std::cout << "Thread Affinity: " << processor\_affinity() << std::endl;}
+00116       \textcolor{comment}{//std::cout << "Thread priority active: " << active\_thread\_priority() << std::endl;}
+00117       \textcolor{comment}{//std::cout << "Thread priority: " << thread\_priority() << std::endl;}
+00118 
+00119 
+00120       set\_thread\_priority(1);\textcolor{comment}{//Sets the current thread priority.}
+00121 
+00122       \textcolor{keywordflow}{if}(firstPacket)
+00123       \{
+00124         firstPacket = 0;
+00125         t1 = std::chrono::steady\_clock::now();
+00126       \}
+00127 
+00128       t2 = std::chrono::steady\_clock::now();
+00129       \textcolor{keyword}{auto} timePeriod = std::chrono::duration\_cast<std::chrono::nanoseconds>(t2 - 
+      t1).count();
+00130     \textcolor{comment}{//  std::cout << "New Work timePeriod: " << timePeriod << std::endl;}
+00131 
+00132       d_deltaTime_Total = 0;
+00133 
+00134       \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} i = 0; i < d_noutput_items; i++)
+00135       \{
+00136 
+00137         t2 = std::chrono::steady\_clock::now();
+00138         \textcolor{keyword}{auto} timePeriod = std::chrono::duration\_cast<std::chrono::nanoseconds>(
+      t2 - t1).count();
+00139         \textcolor{comment}{//std::cout << "timePeriod: " << timePeriod;}
+00140 
+00141         \textcolor{keywordflow}{while}(timePeriod < (1e9 / (\textcolor{keywordtype}{float}) d_samp_rate))
+00142         \{
+00143           t2 = std::chrono::steady\_clock::now();
+00144           timePeriod = std::chrono::duration\_cast<std::chrono::nanoseconds>(t2 - 
+      t1).count();
+00145 
+00146         \}
+00147         \textcolor{comment}{//timePeriod = std::chrono::duration\_cast<std::chrono::nanoseconds>(t2 - t1).count();}
+00148 
+00149         t1 = std::chrono::steady\_clock::now();
+00150 
+00151         d_readValue = d_soapysdr->readGPIO(d_GPIOBanks[0]);
+00152 
+00153         d_deltaTime_Total += timePeriod - (1e9/ (float) d\_samp\_rate);
+00154 
+00155       \textcolor{comment}{//  std::cout << "while loop timeperiod: " << timePeriod  << std::endl;}
+00156 
+00157         \textcolor{comment}{//Chirp\_Sync[i] = (short) d\_readValue;}
+00158         Chirp_Sync[i] = 1 && (d_readValue >> 7);
+00159         \textcolor{comment}{//std::cout << "GPIO: " << d\_readValue << std::endl;}
+00160         \textcolor{comment}{//boost::this\_thread::sleep(boost::posix\_time::microseconds(1e6/ (float) d\_samp\_rate));}
+00161       \}
+00162       d_deltaTime_Average = (float) d_deltaTime_Total / (\textcolor{keywordtype}{float}) d_noutput_items;
+00163       \textcolor{comment}{//std::cout << "   delta timePeriod Average: " << d\_deltaTime\_Average << std::endl;}
+00164     \}
+00165 
+00166     \textcolor{keywordtype}{int}
+00167     gpio_source_s_impl::work(\textcolor{keywordtype}{int} noutput\_items,
+00168         gr\_vector\_const\_void\_star &input\_items,
+00169         gr\_vector\_void\_star &output\_items)
+00170     \{
+00171       Chirp_Sync.assign(noutput\_items,0);
+00172       int16\_t *out = (int16\_t *) output\_items[0];
+00173 
+00174 
+00175 
+00176       \textcolor{comment}{//std::cout << "   Work items: " << noutput\_items << std::endl;}
+00177       d_noutput_items = noutput\_items;
+00178 
+00179       d_thread_readGPIO = gr::thread::thread(boost::bind(&
+      gpio_source_s_impl::readGPIO, \textcolor{keyword}{this}));
+00180 
+00181       d_thread_readGPIO.join();
+00182 
+00183       d_num_works++;
+00184       d_deltaTime_Average_Running = (d_deltaTime_Average*1/d_num_works)  + (
+      d_deltaTime_Average_Running*(d_num_works-1)/d_num_works);
+00185       \textcolor{comment}{//std::cout << "   delta timePeriod Average Running: " << d\_deltaTime\_Average\_Running << std::endl;}
+00186 
+00187       memcpy(out,&Chirp_Sync[0],noutput\_items*\textcolor{keyword}{sizeof}(int16\_t));
+00188       \textcolor{comment}{//memset(out,0,noutput\_items*sizeof(short));}
+00189 
+00190       \textcolor{comment}{// Tell runtime system how many output items we produced.}
+00191       \textcolor{keywordflow}{return} noutput\_items;
+00192     \}
+00193 
+00194   \} \textcolor{comment}{/* namespace radar */}
+00195 \} \textcolor{comment}{/* namespace gr */}
+\end{DoxyCode}

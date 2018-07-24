@@ -92,6 +92,8 @@ public:
     int DestroyStream(lime::StreamChannel* streamID);
     uint64_t GetHardwareTimestamp(void) const;
     void SetHardwareTimestamp(const uint64_t now);
+    uint64_t GetChirpTimePeriod(void) const;
+    uint64_t GetChirpTimeStamp(void) const;
 
     int MCU_AGCStart(uint32_t wantedRSSI);
     int MCU_AGCStop();

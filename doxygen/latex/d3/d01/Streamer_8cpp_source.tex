@@ -74,14 +74,14 @@
 00069             samplesShort[i] = samplesFloat[i]*32767.0f;
 00070         \textcolor{keyword}{const} complex16_t* ptr = (\textcolor{keyword}{const} complex16_t*)samplesShort ;
 00071         pushed = fifo->push_samples(ptr, count, 1, meta->timestamp, timeout\_ms, meta->
-      flags);
+      flags, meta->lastchirp_timestamp,meta->chirptime);
 00072         \textcolor{keyword}{delete}[] samplesShort;
 00073     \}
 00074     \textcolor{keywordflow}{else}
 00075     \{
 00076         \textcolor{keyword}{const} complex16_t* ptr = (\textcolor{keyword}{const} complex16_t*)samples;
 00077         pushed = fifo->push_samples(ptr, count, 1, meta->timestamp, timeout\_ms, meta->
-      flags);
+      flags, meta->lastchirp_timestamp,meta->chirptime);
 00078     \}
 00079     \textcolor{keywordflow}{return} pushed;
 00080 \}
@@ -97,7 +97,7 @@
 00089         int16\_t* samplesShort = (int16\_t*)samples;
 00090         \textcolor{keywordtype}{float}* samplesFloat = (\textcolor{keywordtype}{float}*)samples;
 00091         popped = fifo->pop_samples(ptr, count, 1, &meta->timestamp, timeout\_ms, &meta->
-      flags);
+      flags, &meta->lastchirp_timestamp, &meta->chirptime);
 00092         \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} i=2*popped-1; i>=0; --i)
 00093             samplesFloat[i] = (\textcolor{keywordtype}{float})samplesShort[i]/32767.0f;
 00094     \}
@@ -171,784 +171,829 @@
 00161     dataPort = f->GetConnection();
 00162     mTimestampOffset = 0;
 00163     rxLastTimestamp = 0;
-00164     terminateRx = \textcolor{keyword}{false};
-00165     terminateTx = \textcolor{keyword}{false};
-00166     rxDataRate_Bps = 0;
-00167     txDataRate_Bps = 0;
-00168     txBatchSize = 1;
-00169     rxBatchSize = 1;
-00170     streamSize = 1;
-00171 \}
-00172 
-00173 Streamer::~Streamer()
-00174 \{
-00175     terminateTx.store(\textcolor{keyword}{true});
-00176     \textcolor{keywordflow}{if} (txThread.joinable())
-00177         txThread.join();
-00178     terminateRx.store(\textcolor{keyword}{true});
-00179     \textcolor{keywordflow}{if} (rxThread.joinable())
-00180         rxThread.join();
-00181 \}
-00182 
-00183 
-00184 StreamChannel* Streamer::SetupStream(\textcolor{keyword}{const} StreamConfig& config)
-00185 \{
-00186     \textcolor{keyword}{const} \textcolor{keywordtype}{int} ch = config.channelID&1;
+00164     chirpLastTimeStamp = 0;
+00165     chirpLastTimePeriod = 0;
+00166     terminateRx = \textcolor{keyword}{false};
+00167     terminateTx = \textcolor{keyword}{false};
+00168     rxDataRate_Bps = 0;
+00169     txDataRate_Bps = 0;
+00170     txBatchSize = 1;
+00171     rxBatchSize = 1;
+00172     streamSize = 1;
+00173     \textcolor{comment}{//rxChirpLength = 0;}
+00174     \textcolor{comment}{//rxLastchirp = 0;}
+00175 \}
+00176 
+00177 Streamer::~Streamer()
+00178 \{
+00179     terminateTx.store(\textcolor{keyword}{true});
+00180     \textcolor{keywordflow}{if} (txThread.joinable())
+00181         txThread.join();
+00182     terminateRx.store(\textcolor{keyword}{true});
+00183     \textcolor{keywordflow}{if} (rxThread.joinable())
+00184         rxThread.join();
+00185 \}
+00186 
 00187 
-00188     \textcolor{keywordflow}{if} ((config.isTx && mTxStreams[ch].used) || (!config.isTx && mRxStreams[ch].used))
-00189     \{
-00190         lime::error(\textcolor{stringliteral}{"Setup Stream: Channel already in use"});
-00191         \textcolor{keywordflow}{return} \textcolor{keyword}{nullptr};
-00192     \}
-00193 
-00194     \textcolor{keywordflow}{if} ((!mTxStreams[ch].used) && (!mRxStreams[ch].used) && (txThread.joinable() || 
+00188 StreamChannel* Streamer::SetupStream(\textcolor{keyword}{const} StreamConfig& config)
+00189 \{
+00190     \textcolor{keyword}{const} \textcolor{keywordtype}{int} ch = config.channelID&1;
+00191 
+00192     \textcolor{keywordflow}{if} ((config.isTx && mTxStreams[ch].used) || (!config.isTx && mRxStreams[ch].used))
+00193     \{
+00194         lime::error(\textcolor{stringliteral}{"Setup Stream: Channel already in use"});
+00195         \textcolor{keywordflow}{return} \textcolor{keyword}{nullptr};
+00196     \}
+00197 
+00198     \textcolor{keywordflow}{if} ((!mTxStreams[ch].used) && (!mRxStreams[ch].used) && (txThread.joinable() || 
       rxThread.joinable()))
-00195     \{
-00196         lime::warning(\textcolor{stringliteral}{"Stopping data stream to set up a new stream"});
-00197         UpdateThreads(\textcolor{keyword}{true});
-00198     \}
-00199 
-00200 
-00201     \textcolor{keywordflow}{if}(config.isTx)
-00202         mTxStreams[ch].Setup(config);
-00203     \textcolor{keywordflow}{else}
-00204         mRxStreams[ch].Setup(config);
-00205 
-00206     \textcolor{keywordtype}{double} rate = lms->GetSampleRate(config.isTx,LMS7002M::ChA)/1e6;
-00207     streamSize = (mTxStreams[0].used||mRxStreams[0].used) + (mTxStreams[1].used||
+00199     \{
+00200         lime::warning(\textcolor{stringliteral}{"Stopping data stream to set up a new stream"});
+00201         UpdateThreads(\textcolor{keyword}{true});
+00202     \}
+00203 
+00204 
+00205     \textcolor{keywordflow}{if}(config.isTx)
+00206         mTxStreams[ch].Setup(config);
+00207     \textcolor{keywordflow}{else}
+00208         mRxStreams[ch].Setup(config);
+00209 
+00210     \textcolor{keywordtype}{double} rate = lms->GetSampleRate(config.isTx,LMS7002M::ChA)/1e6;
+00211     streamSize = (mTxStreams[0].used||mRxStreams[0].used) + (mTxStreams[1].used||
       mRxStreams[1].used);
-00208 
-00209     rate = (rate + 5) * config.performanceLatency * streamSize;
-00210     for (\textcolor{keywordtype}{int} batch = 1; batch < rate; batch <<= 1)
-00211         \textcolor{keywordflow}{if} (config.isTx)
-00212             txBatchSize = batch;
-00213         \textcolor{keywordflow}{else}
-00214             rxBatchSize = batch;
-00215 
-00216     \textcolor{keywordflow}{return} config.isTx ? &mTxStreams[ch] : &mRxStreams[ch]; \textcolor{comment}{//success}
-00217 \}
-00218 
-00219 \textcolor{keywordtype}{int} Streamer::GetStreamSize(\textcolor{keywordtype}{bool} tx)
-00220 \{
-00221     \textcolor{keywordtype}{int} batchSize = (tx ? txBatchSize : rxBatchSize)/streamSize;
-00222     \textcolor{keywordflow}{for}(\textcolor{keyword}{auto} &i : mRxStreams)
-00223         \textcolor{keywordflow}{if}(i.used && i.config.format != StreamConfig::FMT_INT12)
-00224             \textcolor{keywordflow}{return} samples16InPkt*batchSize;
-00225 
-00226     \textcolor{keywordflow}{for}(\textcolor{keyword}{auto} &i : mTxStreams)
+00212 
+00213     rate = (rate + 5) * config.performanceLatency * streamSize;
+00214     for (\textcolor{keywordtype}{int} batch = 1; batch < rate; batch <<= 1)
+00215         \textcolor{keywordflow}{if} (config.isTx)
+00216             txBatchSize = batch;
+00217         \textcolor{keywordflow}{else}
+00218             rxBatchSize = batch;
+00219 
+00220     \textcolor{keywordflow}{return} config.isTx ? &mTxStreams[ch] : &mRxStreams[ch]; \textcolor{comment}{//success}
+00221 \}
+00222 
+00223 \textcolor{keywordtype}{int} Streamer::GetStreamSize(\textcolor{keywordtype}{bool} tx)
+00224 \{
+00225     \textcolor{keywordtype}{int} batchSize = (tx ? txBatchSize : rxBatchSize)/streamSize;
+00226     \textcolor{keywordflow}{for}(\textcolor{keyword}{auto} &i : mRxStreams)
 00227         \textcolor{keywordflow}{if}(i.used && i.config.format != StreamConfig::FMT_INT12)
 00228             \textcolor{keywordflow}{return} samples16InPkt*batchSize;
 00229 
-00230     \textcolor{keywordflow}{return} samples12InPkt*batchSize;
-00231 \}
-00232 
-00233 uint64\_t Streamer::GetHardwareTimestamp(\textcolor{keywordtype}{void})
-00234 \{
-00235     \textcolor{keywordflow}{if}(!(rxThread.joinable() || txThread.joinable()))
-00236     \{
-00237         \textcolor{comment}{//stop streaming just in case the board has not been configured}
-00238         dataPort->WriteRegister(0xFFFF, 1 << chipId);
-00239         fpga->StopStreaming();
-00240         fpga->ResetTimestamp();
-00241         mTimestampOffset = 0;
-00242         \textcolor{keywordflow}{return} 0;
-00243     \}
-00244     \textcolor{keywordflow}{else}
-00245     \{
-00246         \textcolor{keywordflow}{return} rxLastTimestamp.load()+mTimestampOffset;
+00230     \textcolor{keywordflow}{for}(\textcolor{keyword}{auto} &i : mTxStreams)
+00231         \textcolor{keywordflow}{if}(i.used && i.config.format != StreamConfig::FMT_INT12)
+00232             \textcolor{keywordflow}{return} samples16InPkt*batchSize;
+00233 
+00234     \textcolor{keywordflow}{return} samples12InPkt*batchSize;
+00235 \}
+00236 
+00237 uint64\_t Streamer::GetHardwareTimestamp(\textcolor{keywordtype}{void})
+00238 \{
+00239     \textcolor{keywordflow}{if}(!(rxThread.joinable() || txThread.joinable()))
+00240     \{
+00241         \textcolor{comment}{//stop streaming just in case the board has not been configured}
+00242         dataPort->WriteRegister(0xFFFF, 1 << chipId);
+00243         fpga->StopStreaming();
+00244         fpga->ResetTimestamp();
+00245         mTimestampOffset = 0;
+00246         \textcolor{keywordflow}{return} 0;
 00247     \}
-00248 \}
-00249 
-00250 \textcolor{keywordtype}{void} Streamer::SetHardwareTimestamp(\textcolor{keyword}{const} uint64\_t now)
-00251 \{
-00252     mTimestampOffset = now - rxLastTimestamp.load();
-00253 \}
-00254 
-00255 \textcolor{keywordtype}{void} Streamer::RstRxIQGen()
-00256 \{
-00257     uint32\_t data[16];
-00258     uint32\_t reg20;
-00259     uint32\_t reg11C;
-00260     uint32\_t reg10C;
-00261     data[0] = (uint32\_t(0x0020) << 16);
-00262     dataPort->ReadLMS7002MSPI(data, &reg20, 1, chipId);
-00263     data[0] = (uint32\_t(0x010C) << 16);
-00264     dataPort->ReadLMS7002MSPI(data, &reg10C, 1, chipId);
-00265     data[0] = (1 << 31) | (uint32\_t(0x0020) << 16) | 0xFFFD;
-00266     dataPort->WriteLMS7002MSPI(data, 1, chipId);
-00267     data[0] = (uint32\_t(0x011C) << 16);
-00268     dataPort->ReadLMS7002MSPI(data, &reg11C, 1, chipId);
-00269     data[0] = (1 << 31) | (uint32\_t(0x0020) << 16) | 0xFFFD;             \textcolor{comment}{//SXR}
-00270     data[1] = (1 << 31) | (uint32\_t(0x011C) << 16) | (reg11C | 0x10);    \textcolor{comment}{//PD\_FDIV}
-00271     data[2] = (1 << 31) | (uint32\_t(0x0020) << 16) | 0xFFFF;             \textcolor{comment}{// mac 3 - both channels}
-00272     data[3] = (1 << 31) | (uint32\_t(0x0124) << 16) | 0x001F;             \textcolor{comment}{//direct control of powerdowns}
-00273     data[4] = (1 << 31) | (uint32\_t(0x010C) << 16) | (reg10C | 0x8);     \textcolor{comment}{// PD\_QGEN\_RFE}
-00274     data[5] = (1 << 31) | (uint32\_t(0x010C) << 16) | reg10C;             \textcolor{comment}{//restore value}
-00275     data[6] = (1 << 31) | (uint32\_t(0x0020) << 16) | 0xFFFD;             \textcolor{comment}{//SXR}
-00276     data[7] = (1 << 31) | (uint32\_t(0x011C) << 16) | reg11C;             \textcolor{comment}{//restore value}
-00277     data[8] = (1 << 31) | (uint32\_t(0x0020) << 16) | reg20;              \textcolor{comment}{//restore value}
-00278     dataPort->WriteLMS7002MSPI(data, 9, chipId);
-00279 \}
-00280 
-00281 \textcolor{keywordtype}{void} Streamer::AlignRxTSP()
-00282 \{
-00283     uint32\_t reg20;
-00284     uint32\_t regsA[2];
-00285     uint32\_t regsB[2];
-00286     \textcolor{comment}{//backup values}
-00287     \{
-00288         \textcolor{keyword}{const} std::vector<uint32\_t> bakAddr = \{ (uint32\_t(0x0400) << 16), (uint32\_t(0x040C) << 16) \};
-00289         uint32\_t data = (uint32\_t(0x0020) << 16);
-00290         dataPort->ReadLMS7002MSPI(&data, &reg20, 1, chipId);
-00291         data = (uint32\_t(0x0020) << 16) | 0xFFFD;
-00292         dataPort->WriteLMS7002MSPI(&data, 1, chipId);
-00293         dataPort->ReadLMS7002MSPI(bakAddr.data(), regsA, bakAddr.size(), chipId);
-00294         data = (uint32\_t(0x0020) << 16) | 0xFFFE;
-00295         dataPort->WriteLMS7002MSPI(&data, 1, chipId);
-00296         dataPort->ReadLMS7002MSPI(bakAddr.data(), regsB, bakAddr.size(), chipId);
-00297     \}
-00298 
-00299     \textcolor{comment}{//alignment search}
-00300     \{
-00301         uint32\_t dataWr[4];
-00302         dataWr[0] = (1 << 31) | (uint32\_t(0x0020) << 16) | 0xFFFF;
-00303         dataWr[1] = (1 << 31) | (uint32\_t(0x0400) << 16) | 0x8085;
-00304         dataWr[2] = (1 << 31) | (uint32\_t(0x040C) << 16) | 0x01FF;
-00305         dataPort->WriteLMS7002MSPI(dataWr, 3, chipId);
-00306         uint32\_t* buf = \textcolor{keyword}{new} uint32\_t[\textcolor{keyword}{sizeof}(FPGA_DataPacket) / \textcolor{keyword}{sizeof}(uint32\_t)];
-00307 
-00308         fpga->StopStreaming();
-00309         dataPort->WriteRegister(0xFFFF, 1 << chipId);
-00310         dataPort->WriteRegister(0x0008, 0x0100);
-00311         dataPort->WriteRegister(0x0007, 3);
-00312 
-00313         dataWr[0] = (1 << 31) | (uint32\_t(0x0020) << 16) | 0x55FE;
-00314         dataWr[1] = (1 << 31) | (uint32\_t(0x0020) << 16) | 0xFFFD;
-00315 
-00316         \textcolor{keywordflow}{for} (\textcolor{keywordtype}{int} i = 0; i < 100; i++)
-00317         \{
-00318             dataPort->WriteLMS7002MSPI(&dataWr[0], 2, chipId);
-00319             dataPort->ResetStreamBuffers();
-00320             fpga->StartStreaming();
-00321             \textcolor{keywordflow}{if} (dataPort->ReceiveData((\textcolor{keywordtype}{char}*)buf, \textcolor{keyword}{sizeof}(FPGA_DataPacket), 
+00248     \textcolor{keywordflow}{else}
+00249     \{
+00250         \textcolor{keywordflow}{return} rxLastTimestamp.load()+mTimestampOffset;
+00251     \}
+00252 \}
+00253 
+00254 \textcolor{keywordtype}{void} Streamer::SetHardwareTimestamp(\textcolor{keyword}{const} uint64\_t now)
+00255 \{
+00256     mTimestampOffset = now - rxLastTimestamp.load();
+00257 \}
+00258 
+00259 uint64\_t Streamer::GetChirpTimePeriod(\textcolor{keywordtype}{void})
+00260 \{
+00261     \textcolor{keywordflow}{if}(!(rxThread.joinable() || txThread.joinable()))
+00262     \{
+00263         \textcolor{comment}{//stop streaming just in case the board has not been configured}
+00264         dataPort->WriteRegister(0xFFFF, 1 << chipId);
+00265         fpga->StopStreaming();
+00266         fpga->ResetTimestamp();
+00267         mTimestampOffset = 0;
+00268         \textcolor{keywordflow}{return} 0;
+00269     \}
+00270     \textcolor{keywordflow}{else}
+00271     \{
+00272         \textcolor{keywordflow}{return} chirpLastTimePeriod.load();
+00273     \}
+00274 \}
+00275 
+00276 uint64\_t Streamer::GetChirpTimeStamp(\textcolor{keywordtype}{void})
+00277 \{
+00278     \textcolor{keywordflow}{if}(!(rxThread.joinable() || txThread.joinable()))
+00279     \{
+00280         \textcolor{comment}{//stop streaming just in case the board has not been configured}
+00281         dataPort->WriteRegister(0xFFFF, 1 << chipId);
+00282         fpga->StopStreaming();
+00283         fpga->ResetTimestamp();
+00284         mTimestampOffset = 0;
+00285         \textcolor{keywordflow}{return} 0;
+00286     \}
+00287     \textcolor{keywordflow}{else}
+00288     \{
+00289         \textcolor{keywordflow}{return} chirpLastTimeStamp.load()+mTimestampOffset;
+00290     \}
+00291 \}
+00292 
+00293 \textcolor{keywordtype}{void} Streamer::RstRxIQGen()
+00294 \{
+00295     uint32\_t data[16];
+00296     uint32\_t reg20;
+00297     uint32\_t reg11C;
+00298     uint32\_t reg10C;
+00299     data[0] = (uint32\_t(0x0020) << 16);
+00300     dataPort->ReadLMS7002MSPI(data, &reg20, 1, chipId);
+00301     data[0] = (uint32\_t(0x010C) << 16);
+00302     dataPort->ReadLMS7002MSPI(data, &reg10C, 1, chipId);
+00303     data[0] = (1 << 31) | (uint32\_t(0x0020) << 16) | 0xFFFD;
+00304     dataPort->WriteLMS7002MSPI(data, 1, chipId);
+00305     data[0] = (uint32\_t(0x011C) << 16);
+00306     dataPort->ReadLMS7002MSPI(data, &reg11C, 1, chipId);
+00307     data[0] = (1 << 31) | (uint32\_t(0x0020) << 16) | 0xFFFD;             \textcolor{comment}{//SXR}
+00308     data[1] = (1 << 31) | (uint32\_t(0x011C) << 16) | (reg11C | 0x10);    \textcolor{comment}{//PD\_FDIV}
+00309     data[2] = (1 << 31) | (uint32\_t(0x0020) << 16) | 0xFFFF;             \textcolor{comment}{// mac 3 - both channels}
+00310     data[3] = (1 << 31) | (uint32\_t(0x0124) << 16) | 0x001F;             \textcolor{comment}{//direct control of powerdowns}
+00311     data[4] = (1 << 31) | (uint32\_t(0x010C) << 16) | (reg10C | 0x8);     \textcolor{comment}{// PD\_QGEN\_RFE}
+00312     data[5] = (1 << 31) | (uint32\_t(0x010C) << 16) | reg10C;             \textcolor{comment}{//restore value}
+00313     data[6] = (1 << 31) | (uint32\_t(0x0020) << 16) | 0xFFFD;             \textcolor{comment}{//SXR}
+00314     data[7] = (1 << 31) | (uint32\_t(0x011C) << 16) | reg11C;             \textcolor{comment}{//restore value}
+00315     data[8] = (1 << 31) | (uint32\_t(0x0020) << 16) | reg20;              \textcolor{comment}{//restore value}
+00316     dataPort->WriteLMS7002MSPI(data, 9, chipId);
+00317 \}
+00318 
+00319 \textcolor{keywordtype}{void} Streamer::AlignRxTSP()
+00320 \{
+00321     uint32\_t reg20;
+00322     uint32\_t regsA[2];
+00323     uint32\_t regsB[2];
+00324     \textcolor{comment}{//backup values}
+00325     \{
+00326         \textcolor{keyword}{const} std::vector<uint32\_t> bakAddr = \{ (uint32\_t(0x0400) << 16), (uint32\_t(0x040C) << 16) \};
+00327         uint32\_t data = (uint32\_t(0x0020) << 16);
+00328         dataPort->ReadLMS7002MSPI(&data, &reg20, 1, chipId);
+00329         data = (uint32\_t(0x0020) << 16) | 0xFFFD;
+00330         dataPort->WriteLMS7002MSPI(&data, 1, chipId);
+00331         dataPort->ReadLMS7002MSPI(bakAddr.data(), regsA, bakAddr.size(), chipId);
+00332         data = (uint32\_t(0x0020) << 16) | 0xFFFE;
+00333         dataPort->WriteLMS7002MSPI(&data, 1, chipId);
+00334         dataPort->ReadLMS7002MSPI(bakAddr.data(), regsB, bakAddr.size(), chipId);
+00335     \}
+00336 
+00337     \textcolor{comment}{//alignment search}
+00338     \{
+00339         uint32\_t dataWr[4];
+00340         dataWr[0] = (1 << 31) | (uint32\_t(0x0020) << 16) | 0xFFFF;
+00341         dataWr[1] = (1 << 31) | (uint32\_t(0x0400) << 16) | 0x8085;
+00342         dataWr[2] = (1 << 31) | (uint32\_t(0x040C) << 16) | 0x01FF;
+00343         dataPort->WriteLMS7002MSPI(dataWr, 3, chipId);
+00344         uint32\_t* buf = \textcolor{keyword}{new} uint32\_t[\textcolor{keyword}{sizeof}(FPGA_DataPacket) / \textcolor{keyword}{sizeof}(uint32\_t)];
+00345 
+00346         fpga->StopStreaming();
+00347         dataPort->WriteRegister(0xFFFF, 1 << chipId);
+00348         dataPort->WriteRegister(0x0008, 0x0100);
+00349         dataPort->WriteRegister(0x0007, 3);
+00350 
+00351         dataWr[0] = (1 << 31) | (uint32\_t(0x0020) << 16) | 0x55FE;
+00352         dataWr[1] = (1 << 31) | (uint32\_t(0x0020) << 16) | 0xFFFD;
+00353 
+00354         \textcolor{keywordflow}{for} (\textcolor{keywordtype}{int} i = 0; i < 100; i++)
+00355         \{
+00356             dataPort->WriteLMS7002MSPI(&dataWr[0], 2, chipId);
+00357             dataPort->ResetStreamBuffers();
+00358             fpga->StartStreaming();
+00359             \textcolor{keywordflow}{if} (dataPort->ReceiveData((\textcolor{keywordtype}{char}*)buf, \textcolor{keyword}{sizeof}(FPGA_DataPacket), 
       chipId, 50) != \textcolor{keyword}{sizeof}(FPGA_DataPacket))
-00322             \{
-00323                 lime::warning(\textcolor{stringliteral}{"Channel alignment failed"});
-00324                 \textcolor{keywordflow}{break};
-00325             \}
-00326             fpga->StopStreaming();
-00327             dataPort->AbortReading(chipId);
-00328             \textcolor{keywordflow}{if} (buf[4] == buf[5])
-00329                 \textcolor{keywordflow}{break};
-00330         \}
-00331         \textcolor{keyword}{delete}[] buf;
-00332     \}
-00333 
-00334     \textcolor{comment}{//restore values}
-00335     \{
-00336         uint32\_t dataWr[7];
-00337         dataWr[0] = (uint32\_t(0x0020) << 16) | 0xFFFD;
-00338         dataWr[1] = (uint32\_t(0x0400) << 16) | regsA[0];
-00339         dataWr[2] = (uint32\_t(0x040C) << 16) | regsA[1];
-00340         dataWr[3] = (uint32\_t(0x0020) << 16) | 0xFFFE;
-00341         dataWr[4] = (uint32\_t(0x0400) << 16) | regsB[0];
-00342         dataWr[5] = (uint32\_t(0x040C) << 16) | regsB[1];
-00343         dataWr[6] = (uint32\_t(0x0020) << 16) | reg20;
-00344         dataPort->WriteLMS7002MSPI(dataWr, 7, chipId);
-00345     \}
-00346 \}
-00347 
-00348 \textcolor{keywordtype}{double} Streamer::GetPhaseOffset(\textcolor{keywordtype}{int} bin)
-00349 \{
-00350     int16\_t* buf = \textcolor{keyword}{new} int16\_t[\textcolor{keyword}{sizeof}(FPGA_DataPacket)/\textcolor{keyword}{sizeof}(int16\_t)];
-00351 
-00352     dataPort->ResetStreamBuffers();
-00353     fpga->StartStreaming();
-00354     \textcolor{keywordflow}{if} (dataPort->ReceiveData((\textcolor{keywordtype}{char}*)buf, \textcolor{keyword}{sizeof}(FPGA_DataPacket), chipId, 50)!=\textcolor{keyword}{sizeof}(
+00360             \{
+00361                 lime::warning(\textcolor{stringliteral}{"Channel alignment failed"});
+00362                 \textcolor{keywordflow}{break};
+00363             \}
+00364             fpga->StopStreaming();
+00365             dataPort->AbortReading(chipId);
+00366             \textcolor{keywordflow}{if} (buf[4] == buf[5])
+00367                 \textcolor{keywordflow}{break};
+00368         \}
+00369         \textcolor{keyword}{delete}[] buf;
+00370     \}
+00371 
+00372     \textcolor{comment}{//restore values}
+00373     \{
+00374         uint32\_t dataWr[7];
+00375         dataWr[0] = (uint32\_t(0x0020) << 16) | 0xFFFD;
+00376         dataWr[1] = (uint32\_t(0x0400) << 16) | regsA[0];
+00377         dataWr[2] = (uint32\_t(0x040C) << 16) | regsA[1];
+00378         dataWr[3] = (uint32\_t(0x0020) << 16) | 0xFFFE;
+00379         dataWr[4] = (uint32\_t(0x0400) << 16) | regsB[0];
+00380         dataWr[5] = (uint32\_t(0x040C) << 16) | regsB[1];
+00381         dataWr[6] = (uint32\_t(0x0020) << 16) | reg20;
+00382         dataPort->WriteLMS7002MSPI(dataWr, 7, chipId);
+00383     \}
+00384 \}
+00385 
+00386 \textcolor{keywordtype}{double} Streamer::GetPhaseOffset(\textcolor{keywordtype}{int} bin)
+00387 \{
+00388     int16\_t* buf = \textcolor{keyword}{new} int16\_t[\textcolor{keyword}{sizeof}(FPGA_DataPacket)/\textcolor{keyword}{sizeof}(int16\_t)];
+00389 
+00390     dataPort->ResetStreamBuffers();
+00391     fpga->StartStreaming();
+00392     \textcolor{keywordflow}{if} (dataPort->ReceiveData((\textcolor{keywordtype}{char}*)buf, \textcolor{keyword}{sizeof}(FPGA_DataPacket), chipId, 50)!=\textcolor{keyword}{sizeof}(
       FPGA_DataPacket))
-00355     \{
-00356         lime::warning(\textcolor{stringliteral}{"Channel alignment failed"});
-00357         \textcolor{keyword}{delete} [] buf;
-00358         \textcolor{keywordflow}{return} -1000;
-00359     \}
-00360     fpga->StopStreaming();
-00361     dataPort->AbortReading(chipId);
-00362     \textcolor{comment}{//calculate DFT bin of interest and check channel phase difference}
-00363     \textcolor{keyword}{const} std::complex<double> iunit(0, 1);
-00364     \textcolor{keyword}{const} \textcolor{keywordtype}{double} pi = std::acos(-1);
-00365     \textcolor{keyword}{const} \textcolor{keywordtype}{int} N = 512;
-00366     std::complex<double> xA(0,0);
-00367     std::complex<double> xB(0, 0);
-00368     \textcolor{keywordflow}{for} (\textcolor{keywordtype}{int} n = 0; n < N; n++)
-00369     \{
-00370         \textcolor{keyword}{const} std::complex<double> xAn(buf[8+4*n], buf[9+4*n]);
-00371         \textcolor{keyword}{const} std::complex<double> xBn(buf[10+4*n],buf[11+4*n]);
-00372         \textcolor{keyword}{const} std::complex<double> mult = std::exp(-2.0*iunit*pi* \textcolor{keywordtype}{double}(bin)* \textcolor{keywordtype}{double}(n)/\textcolor{keywordtype}{double}(N));
-00373         xA += xAn * mult;
-00374         xB += xBn * mult;
-00375     \}
-00376     \textcolor{keywordtype}{double} phaseA = std::arg(xA) * 180.0 / pi;
-00377     \textcolor{keywordtype}{double} phaseB = std::arg(xB) * 180.0 / pi;
-00378     \textcolor{keywordtype}{double} phasediff = phaseB - phaseA;
-00379     \textcolor{keywordflow}{if} (phasediff < -180.0) phasediff +=360.0;
-00380     \textcolor{keywordflow}{if} (phasediff > 180.0) phasediff -=360.0;
-00381     \textcolor{keyword}{delete} [] buf;
-00382     \textcolor{keywordflow}{return} phasediff;
-00383 \}
-00384 
-00385 \textcolor{keywordtype}{void} Streamer::AlignRxRF(\textcolor{keywordtype}{bool} restoreValues)
-00386 \{
-00387     uint32\_t addr = 0, val =0;
-00388     dataPort->ReadRegisters(&addr,&val,1);
-00389     \textcolor{keywordflow}{if} (val==0x10) \textcolor{comment}{//does not work on LimeSDR-QPCIE}
-00390         \textcolor{keywordflow}{return};
-00391     uint32\_t reg20 = lms->SPI_read(0x20);
-00392     \textcolor{keyword}{auto} regBackup = lms->BackupRegisterMap();
-00393     lms->SPI_write(0x20, 0xFFFF);
-00394     lms->SetDefaults(LMS7002M::RFE);
-00395     lms->SetDefaults(LMS7002M::RBB);
-00396     lms->SetDefaults(LMS7002M::TBB);
-00397     lms->SetDefaults(LMS7002M::TRF);
-00398     lms->SPI_write(0x10C, 0x88C5);
-00399     lms->SPI_write(0x10D, 0x0117);
-00400     lms->SPI_write(0x113, 0x024A);
-00401     lms->SPI_write(0x118, 0x418C);
-00402     lms->SPI_write(0x100, 0x4039);
-00403     lms->SPI_write(0x101, 0x7801);
-00404     lms->SPI_write(0x103, 0x0612);
-00405     lms->SPI_write(0x108, 0x318C);
-00406     lms->SPI_write(0x082, 0x8001);
-00407     lms->SPI_write(0x200, 0x008D);
-00408     lms->SPI_write(0x208, 0x01FB);
-00409     lms->SPI_write(0x400, 0x8081);
-00410     lms->SPI_write(0x40C, 0x01FF);
-00411     lms->SPI_write(0x404, 0x0006);
-00412     lms->LoadDC_REG_IQ(\textcolor{keyword}{true}, 0x3FFF, 0x3FFF);
-00413     \textcolor{keywordtype}{double} srate = lms->GetSampleRate(\textcolor{keyword}{false}, LMS7002M::ChA);
-00414     lms->SetFrequencySX(\textcolor{keyword}{false},450e6);
-00415     \textcolor{keywordtype}{int} dec = lms->Get_SPI_Reg_bits(LMS7_HBD_OVR_RXTSP);
-00416     \textcolor{keywordflow}{if} (dec > 4) dec = 0;
-00417 
-00418     \textcolor{keywordtype}{double} offsets[] = \{1.15/60.0, 1.1/40.0, 0.55/20.0, 0.2/10.0, 0.18/5.0\};
-00419     \textcolor{keywordtype}{double} tolerance[] = \{0.9, 0.45, 0.25, 0.14, 0.06\};
-00420     \textcolor{keywordtype}{double} offset = offsets[dec]*srate/1e6;
-00421     std::vector<uint32\_t>  dataWr;
-00422     dataWr.resize(16);
-00423 
-00424     dataPort->WriteRegister(0xFFFF, 1 << chipId);
-00425     fpga->StopStreaming();
-00426     dataPort->WriteRegister(0x0008, 0x0100);
-00427     dataPort->WriteRegister(0x0007, 3);
-00428     \textcolor{keywordtype}{bool} found = \textcolor{keyword}{false};
-00429     \textcolor{keywordflow}{for} (\textcolor{keywordtype}{int} i = 0; i < 200; i++)\{
-00430         lms->Modify_SPI_Reg_bits(LMS7_PD_FDIV_O_CGEN, 1);
-00431         lms->Modify_SPI_Reg_bits(LMS7_PD_FDIV_O_CGEN, 0);
-00432         AlignRxTSP();
-00433 
-00434         lms->SetFrequencySX(\textcolor{keyword}{true}, 450e6+srate/16.0);
-00435         \textcolor{keywordtype}{double} offset1 = GetPhaseOffset(32);
-00436         \textcolor{keywordflow}{if} (offset1 < -360)
-00437             \textcolor{keywordflow}{break};
-00438         lms->SetFrequencySX(\textcolor{keyword}{true}, 450e6+srate/8.0);
-00439         \textcolor{keywordtype}{double} offset2 = GetPhaseOffset(64);
-00440         \textcolor{keywordflow}{if} (offset2 < -360)
-00441             \textcolor{keywordflow}{break};
-00442         \textcolor{keywordtype}{double} diff = offset1-offset2;
-00443         \textcolor{keywordflow}{if} (abs(diff-offset) < tolerance[dec])
-00444         \{
-00445             found = \textcolor{keyword}{true};
-00446             \textcolor{keywordflow}{break};
-00447         \}
-00448     \}
-00449     \textcolor{keywordflow}{if} (restoreValues)
-00450         lms->RestoreRegisterMap(regBackup);
-00451     \textcolor{keywordflow}{if} (found)
-00452         AlignQuadrature(restoreValues);
-00453     \textcolor{keywordflow}{else}
-00454         lime::warning(\textcolor{stringliteral}{"Channel alignment failed"});
-00455     lms->SPI_write(0x20, reg20);
-00456 \}
-00457 
-00458 \textcolor{keywordtype}{void} Streamer::AlignQuadrature(\textcolor{keywordtype}{bool} restoreValues)
-00459 \{
-00460     \textcolor{keyword}{auto} regBackup = lms->BackupRegisterMap();
+00393     \{
+00394         lime::warning(\textcolor{stringliteral}{"Channel alignment failed"});
+00395         \textcolor{keyword}{delete} [] buf;
+00396         \textcolor{keywordflow}{return} -1000;
+00397     \}
+00398     fpga->StopStreaming();
+00399     dataPort->AbortReading(chipId);
+00400     \textcolor{comment}{//calculate DFT bin of interest and check channel phase difference}
+00401     \textcolor{keyword}{const} std::complex<double> iunit(0, 1);
+00402     \textcolor{keyword}{const} \textcolor{keywordtype}{double} pi = std::acos(-1);
+00403     \textcolor{keyword}{const} \textcolor{keywordtype}{int} N = 512;
+00404     std::complex<double> xA(0,0);
+00405     std::complex<double> xB(0, 0);
+00406     \textcolor{keywordflow}{for} (\textcolor{keywordtype}{int} n = 0; n < N; n++)
+00407     \{
+00408         \textcolor{keyword}{const} std::complex<double> xAn(buf[8+4*n], buf[9+4*n]);
+00409         \textcolor{keyword}{const} std::complex<double> xBn(buf[10+4*n],buf[11+4*n]);
+00410         \textcolor{keyword}{const} std::complex<double> mult = std::exp(-2.0*iunit*pi* \textcolor{keywordtype}{double}(bin)* \textcolor{keywordtype}{double}(n)/\textcolor{keywordtype}{double}(N));
+00411         xA += xAn * mult;
+00412         xB += xBn * mult;
+00413     \}
+00414     \textcolor{keywordtype}{double} phaseA = std::arg(xA) * 180.0 / pi;
+00415     \textcolor{keywordtype}{double} phaseB = std::arg(xB) * 180.0 / pi;
+00416     \textcolor{keywordtype}{double} phasediff = phaseB - phaseA;
+00417     \textcolor{keywordflow}{if} (phasediff < -180.0) phasediff +=360.0;
+00418     \textcolor{keywordflow}{if} (phasediff > 180.0) phasediff -=360.0;
+00419     \textcolor{keyword}{delete} [] buf;
+00420     \textcolor{keywordflow}{return} phasediff;
+00421 \}
+00422 
+00423 \textcolor{keywordtype}{void} Streamer::AlignRxRF(\textcolor{keywordtype}{bool} restoreValues)
+00424 \{
+00425     uint32\_t addr = 0, val =0;
+00426     dataPort->ReadRegisters(&addr,&val,1);
+00427     \textcolor{keywordflow}{if} (val==0x10) \textcolor{comment}{//does not work on LimeSDR-QPCIE}
+00428         \textcolor{keywordflow}{return};
+00429     uint32\_t reg20 = lms->SPI_read(0x20);
+00430     \textcolor{keyword}{auto} regBackup = lms->BackupRegisterMap();
+00431     lms->SPI_write(0x20, 0xFFFF);
+00432     lms->SetDefaults(LMS7002M::RFE);
+00433     lms->SetDefaults(LMS7002M::RBB);
+00434     lms->SetDefaults(LMS7002M::TBB);
+00435     lms->SetDefaults(LMS7002M::TRF);
+00436     lms->SPI_write(0x10C, 0x88C5);
+00437     lms->SPI_write(0x10D, 0x0117);
+00438     lms->SPI_write(0x113, 0x024A);
+00439     lms->SPI_write(0x118, 0x418C);
+00440     lms->SPI_write(0x100, 0x4039);
+00441     lms->SPI_write(0x101, 0x7801);
+00442     lms->SPI_write(0x103, 0x0612);
+00443     lms->SPI_write(0x108, 0x318C);
+00444     lms->SPI_write(0x082, 0x8001);
+00445     lms->SPI_write(0x200, 0x008D);
+00446     lms->SPI_write(0x208, 0x01FB);
+00447     lms->SPI_write(0x400, 0x8081);
+00448     lms->SPI_write(0x40C, 0x01FF);
+00449     lms->SPI_write(0x404, 0x0006);
+00450     lms->LoadDC_REG_IQ(\textcolor{keyword}{true}, 0x3FFF, 0x3FFF);
+00451     \textcolor{keywordtype}{double} srate = lms->GetSampleRate(\textcolor{keyword}{false}, LMS7002M::ChA);
+00452     lms->SetFrequencySX(\textcolor{keyword}{false},450e6);
+00453     \textcolor{keywordtype}{int} dec = lms->Get_SPI_Reg_bits(LMS7_HBD_OVR_RXTSP);
+00454     \textcolor{keywordflow}{if} (dec > 4) dec = 0;
+00455 
+00456     \textcolor{keywordtype}{double} offsets[] = \{1.15/60.0, 1.1/40.0, 0.55/20.0, 0.2/10.0, 0.18/5.0\};
+00457     \textcolor{keywordtype}{double} tolerance[] = \{0.9, 0.45, 0.25, 0.14, 0.06\};
+00458     \textcolor{keywordtype}{double} offset = offsets[dec]*srate/1e6;
+00459     std::vector<uint32\_t>  dataWr;
+00460     dataWr.resize(16);
 00461 
-00462     lms->SPI_write(0x20, 0xFFFF);
-00463     lms->SetDefaults(LMS7002M::RBB);
-00464     lms->SetDefaults(LMS7002M::TBB);
-00465     lms->SetDefaults(LMS7002M::TRF);
-00466     lms->SPI_write(0x113, 0x0046);
-00467     lms->SPI_write(0x118, 0x418C);
-00468     lms->SPI_write(0x100, 0x4039);
-00469     lms->SPI_write(0x101, 0x7801);
-00470     lms->SPI_write(0x108, 0x318C);
-00471     lms->SPI_write(0x082, 0x8001);
-00472     lms->SPI_write(0x200, 0x008D);
-00473     lms->SPI_write(0x208, 0x01FB);
-00474     lms->SPI_write(0x400, 0x8081);
-00475     lms->SPI_write(0x40C, 0x01FF);
-00476     lms->SPI_write(0x404, 0x0006);
-00477     lms->LoadDC_REG_IQ(\textcolor{keyword}{true}, 0x3FFF, 0x3FFF);
-00478     lms->SPI_write(0x20, 0xFFFE);
-00479     lms->SPI_write(0x105, 0x0006);
-00480     lms->SPI_write(0x100, 0x4038);
-00481     lms->SPI_write(0x113, 0x007F);
-00482     lms->SPI_write(0x119, 0x529B);
-00483     \textcolor{keyword}{auto} val = lms->Get_SPI_Reg_bits(LMS7_SEL_PATH_RFE, \textcolor{keyword}{true});
-00484     lms->SPI_write(0x10D, val==3 ? 0x18F : val==2 ? 0x117 : 0x08F);
-00485     lms->SPI_write(0x10C, val==2 ? 0x88C5 : 0x88A5);
-00486     lms->SPI_write(0x20, 0xFFFD);
-00487     lms->SPI_write(0x103, val==2 ? 0x612 : 0xA12);
-00488     val = lms->Get_SPI_Reg_bits(LMS7_SEL_PATH_RFE, \textcolor{keyword}{true});
-00489     lms->SPI_write(0x10D, val==3 ? 0x18F : val==2 ? 0x117 : 0x08F);
-00490     lms->SPI_write(0x10C, val==2 ? 0x88C5 : 0x88A5);
-00491     lms->SPI_write(0x119, 0x5293);
-00492     \textcolor{keywordtype}{double} srate = lms->GetSampleRate(\textcolor{keyword}{false}, LMS7002M::ChA);
-00493     \textcolor{keywordtype}{double} freq = lms->GetFrequencySX(\textcolor{keyword}{false});
-00494 
-00495     dataPort->WriteRegister(0xFFFF, 1 << chipId);
-00496     fpga->StopStreaming();
-00497     dataPort->WriteRegister(0x0008, 0x0100);
-00498     dataPort->WriteRegister(0x0007, 3);
-00499     lms->SetFrequencySX(\textcolor{keyword}{true}, freq+srate/16.0);
-00500     \textcolor{keywordtype}{bool} found = \textcolor{keyword}{false};
-00501     \textcolor{keywordflow}{for} (\textcolor{keywordtype}{int} i = 0; i < 100; i++)\{
-00502 
-00503         \textcolor{keywordtype}{double} offset = GetPhaseOffset(32);
-00504         \textcolor{keywordflow}{if} (offset < -360)
-00505             \textcolor{keywordflow}{break};
-00506         \textcolor{keywordflow}{if} (fabs(offset) <= 90.0)
-00507         \{
-00508             found = \textcolor{keyword}{true};
-00509             \textcolor{keywordflow}{break};
-00510         \}
-00511         RstRxIQGen();
-00512     \}
-00513 
-00514     \textcolor{keywordflow}{if} (restoreValues)
-00515         lms->RestoreRegisterMap(regBackup);
-00516     \textcolor{keywordflow}{if} (!found)
-00517         lime::warning(\textcolor{stringliteral}{"Channel alignment failed"});
-00518 \}
-00519 
-00520 \textcolor{keywordtype}{int} Streamer::UpdateThreads(\textcolor{keywordtype}{bool} stopAll)
-00521 \{
-00522     \textcolor{keywordtype}{bool} needTx = \textcolor{keyword}{false};
-00523     \textcolor{keywordtype}{bool} needRx = \textcolor{keyword}{false};
-00524 
-00525     \textcolor{comment}{//check which threads are needed}
-00526     \textcolor{keywordflow}{if} (!stopAll)
-00527     \{
-00528         \textcolor{keywordflow}{for}(\textcolor{keyword}{auto} &i : mRxStreams)
-00529             \textcolor{keywordflow}{if}(i.used && i.IsActive())
-00530             \{
-00531                 needRx = \textcolor{keyword}{true};
-00532                 \textcolor{keywordflow}{break};
-00533             \}
-00534         \textcolor{keywordflow}{for}(\textcolor{keyword}{auto} &i : mTxStreams)
-00535             \textcolor{keywordflow}{if}(i.used && i.IsActive())
-00536             \{
-00537                 needTx = \textcolor{keyword}{true};
-00538                 \textcolor{keywordflow}{break};
-00539             \}
-00540     \}
-00541 
-00542     \textcolor{comment}{//stop threads if not needed}
-00543     \textcolor{keywordflow}{if}((!needTx) && txThread.joinable())
-00544     \{
-00545         terminateTx.store(\textcolor{keyword}{true});
-00546         txThread.join();
-00547     \}
-00548     \textcolor{keywordflow}{if}((!needRx) && rxThread.joinable())
-00549     \{
-00550         terminateRx.store(\textcolor{keyword}{true});
-00551         rxThread.join();
-00552     \}
-00553 
-00554     \textcolor{comment}{//configure FPGA on first start, or disable FPGA when not streaming}
-00555     \textcolor{keywordflow}{if}((needTx || needRx) && (!txThread.joinable()) && (!rxThread.joinable()))
-00556     \{
-00557         dataPort->WriteRegister(0xFFFF, 1 << chipId);
-00558         \textcolor{keywordflow}{if} (mRxStreams[0].used && mRxStreams[1].used)
-00559             AlignRxRF(\textcolor{keyword}{true});
-00560         \textcolor{comment}{//enable FPGA streaming}
-00561         fpga->StopStreaming();
-00562         fpga->ResetTimestamp();
-00563         rxLastTimestamp.store(0);
-00564         \textcolor{comment}{//Clear device stream buffers}
-00565         dataPort->ResetStreamBuffers();
-00566 
-00567         \textcolor{comment}{//enable MIMO mode, 12 bit compressed values}
-00568         dataLinkFormat = StreamConfig::FMT_INT12;
-00569         \textcolor{comment}{//by default use 12 bit compressed, adjust link format for stream}
-00570 
-00571         \textcolor{keywordflow}{for}(\textcolor{keyword}{auto} &i : mRxStreams)
-00572             \textcolor{keywordflow}{if}(i.used && i.config.format != StreamConfig::FMT_INT12)
-00573             \{
-00574                 dataLinkFormat = StreamConfig::FMT_INT16;
-00575                 \textcolor{keywordflow}{break};
-00576             \}
-00577 
-00578         \textcolor{keywordflow}{for}(\textcolor{keyword}{auto} &i : mTxStreams)
-00579             \textcolor{keywordflow}{if}(i.used && i.config.format != StreamConfig::FMT_INT12)
-00580             \{
-00581                 dataLinkFormat = StreamConfig::FMT_INT16;
-00582                 \textcolor{keywordflow}{break};
-00583             \}
-00584 
-00585         \textcolor{keywordflow}{for}(\textcolor{keyword}{auto} &i : mRxStreams)
-00586             \textcolor{keywordflow}{if} (i.used)
-00587                 i.config.linkFormat = dataLinkFormat;
-00588         \textcolor{keywordflow}{for}(\textcolor{keyword}{auto} &i : mTxStreams)
-00589             \textcolor{keywordflow}{if} (i.used)
-00590                 i.config.linkFormat = dataLinkFormat;
+00462     dataPort->WriteRegister(0xFFFF, 1 << chipId);
+00463     fpga->StopStreaming();
+00464     dataPort->WriteRegister(0x0008, 0x0100);
+00465     dataPort->WriteRegister(0x0007, 3);
+00466     \textcolor{keywordtype}{bool} found = \textcolor{keyword}{false};
+00467     \textcolor{keywordflow}{for} (\textcolor{keywordtype}{int} i = 0; i < 200; i++)\{
+00468         lms->Modify_SPI_Reg_bits(LMS7_PD_FDIV_O_CGEN, 1);
+00469         lms->Modify_SPI_Reg_bits(LMS7_PD_FDIV_O_CGEN, 0);
+00470         AlignRxTSP();
+00471 
+00472         lms->SetFrequencySX(\textcolor{keyword}{true}, 450e6+srate/16.0);
+00473         \textcolor{keywordtype}{double} offset1 = GetPhaseOffset(32);
+00474         \textcolor{keywordflow}{if} (offset1 < -360)
+00475             \textcolor{keywordflow}{break};
+00476         lms->SetFrequencySX(\textcolor{keyword}{true}, 450e6+srate/8.0);
+00477         \textcolor{keywordtype}{double} offset2 = GetPhaseOffset(64);
+00478         \textcolor{keywordflow}{if} (offset2 < -360)
+00479             \textcolor{keywordflow}{break};
+00480         \textcolor{keywordtype}{double} diff = offset1-offset2;
+00481         \textcolor{keywordflow}{if} (abs(diff-offset) < tolerance[dec])
+00482         \{
+00483             found = \textcolor{keyword}{true};
+00484             \textcolor{keywordflow}{break};
+00485         \}
+00486     \}
+00487     \textcolor{keywordflow}{if} (restoreValues)
+00488         lms->RestoreRegisterMap(regBackup);
+00489     \textcolor{keywordflow}{if} (found)
+00490         AlignQuadrature(restoreValues);
+00491     \textcolor{keywordflow}{else}
+00492         lime::warning(\textcolor{stringliteral}{"Channel alignment failed"});
+00493     lms->SPI_write(0x20, reg20);
+00494 \}
+00495 
+00496 \textcolor{keywordtype}{void} Streamer::AlignQuadrature(\textcolor{keywordtype}{bool} restoreValues)
+00497 \{
+00498     \textcolor{keyword}{auto} regBackup = lms->BackupRegisterMap();
+00499 
+00500     lms->SPI_write(0x20, 0xFFFF);
+00501     lms->SetDefaults(LMS7002M::RBB);
+00502     lms->SetDefaults(LMS7002M::TBB);
+00503     lms->SetDefaults(LMS7002M::TRF);
+00504     lms->SPI_write(0x113, 0x0046);
+00505     lms->SPI_write(0x118, 0x418C);
+00506     lms->SPI_write(0x100, 0x4039);
+00507     lms->SPI_write(0x101, 0x7801);
+00508     lms->SPI_write(0x108, 0x318C);
+00509     lms->SPI_write(0x082, 0x8001);
+00510     lms->SPI_write(0x200, 0x008D);
+00511     lms->SPI_write(0x208, 0x01FB);
+00512     lms->SPI_write(0x400, 0x8081);
+00513     lms->SPI_write(0x40C, 0x01FF);
+00514     lms->SPI_write(0x404, 0x0006);
+00515     lms->LoadDC_REG_IQ(\textcolor{keyword}{true}, 0x3FFF, 0x3FFF);
+00516     lms->SPI_write(0x20, 0xFFFE);
+00517     lms->SPI_write(0x105, 0x0006);
+00518     lms->SPI_write(0x100, 0x4038);
+00519     lms->SPI_write(0x113, 0x007F);
+00520     lms->SPI_write(0x119, 0x529B);
+00521     \textcolor{keyword}{auto} val = lms->Get_SPI_Reg_bits(LMS7_SEL_PATH_RFE, \textcolor{keyword}{true});
+00522     lms->SPI_write(0x10D, val==3 ? 0x18F : val==2 ? 0x117 : 0x08F);
+00523     lms->SPI_write(0x10C, val==2 ? 0x88C5 : 0x88A5);
+00524     lms->SPI_write(0x20, 0xFFFD);
+00525     lms->SPI_write(0x103, val==2 ? 0x612 : 0xA12);
+00526     val = lms->Get_SPI_Reg_bits(LMS7_SEL_PATH_RFE, \textcolor{keyword}{true});
+00527     lms->SPI_write(0x10D, val==3 ? 0x18F : val==2 ? 0x117 : 0x08F);
+00528     lms->SPI_write(0x10C, val==2 ? 0x88C5 : 0x88A5);
+00529     lms->SPI_write(0x119, 0x5293);
+00530     \textcolor{keywordtype}{double} srate = lms->GetSampleRate(\textcolor{keyword}{false}, LMS7002M::ChA);
+00531     \textcolor{keywordtype}{double} freq = lms->GetFrequencySX(\textcolor{keyword}{false});
+00532 
+00533     dataPort->WriteRegister(0xFFFF, 1 << chipId);
+00534     fpga->StopStreaming();
+00535     dataPort->WriteRegister(0x0008, 0x0100);
+00536     dataPort->WriteRegister(0x0007, 3);
+00537     lms->SetFrequencySX(\textcolor{keyword}{true}, freq+srate/16.0);
+00538     \textcolor{keywordtype}{bool} found = \textcolor{keyword}{false};
+00539     \textcolor{keywordflow}{for} (\textcolor{keywordtype}{int} i = 0; i < 100; i++)\{
+00540 
+00541         \textcolor{keywordtype}{double} offset = GetPhaseOffset(32);
+00542         \textcolor{keywordflow}{if} (offset < -360)
+00543             \textcolor{keywordflow}{break};
+00544         \textcolor{keywordflow}{if} (fabs(offset) <= 90.0)
+00545         \{
+00546             found = \textcolor{keyword}{true};
+00547             \textcolor{keywordflow}{break};
+00548         \}
+00549         RstRxIQGen();
+00550     \}
+00551 
+00552     \textcolor{keywordflow}{if} (restoreValues)
+00553         lms->RestoreRegisterMap(regBackup);
+00554     \textcolor{keywordflow}{if} (!found)
+00555         lime::warning(\textcolor{stringliteral}{"Channel alignment failed"});
+00556 \}
+00557 
+00558 \textcolor{keywordtype}{int} Streamer::UpdateThreads(\textcolor{keywordtype}{bool} stopAll)
+00559 \{
+00560     \textcolor{keywordtype}{bool} needTx = \textcolor{keyword}{false};
+00561     \textcolor{keywordtype}{bool} needRx = \textcolor{keyword}{false};
+00562 
+00563     \textcolor{comment}{//check which threads are needed}
+00564     \textcolor{keywordflow}{if} (!stopAll)
+00565     \{
+00566         \textcolor{keywordflow}{for}(\textcolor{keyword}{auto} &i : mRxStreams)
+00567             \textcolor{keywordflow}{if}(i.used && i.IsActive())
+00568             \{
+00569                 needRx = \textcolor{keyword}{true};
+00570                 \textcolor{keywordflow}{break};
+00571             \}
+00572         \textcolor{keywordflow}{for}(\textcolor{keyword}{auto} &i : mTxStreams)
+00573             \textcolor{keywordflow}{if}(i.used && i.IsActive())
+00574             \{
+00575                 needTx = \textcolor{keyword}{true};
+00576                 \textcolor{keywordflow}{break};
+00577             \}
+00578     \}
+00579 
+00580     \textcolor{comment}{//stop threads if not needed}
+00581     \textcolor{keywordflow}{if}((!needTx) && txThread.joinable())
+00582     \{
+00583         terminateTx.store(\textcolor{keyword}{true});
+00584         txThread.join();
+00585     \}
+00586     \textcolor{keywordflow}{if}((!needRx) && rxThread.joinable())
+00587     \{
+00588         terminateRx.store(\textcolor{keyword}{true});
+00589         rxThread.join();
+00590     \}
 00591 
-00592         \textcolor{keyword}{const} uint16\_t smpl\_width = dataLinkFormat == StreamConfig::FMT_INT12 ? 2 : 0;
-00593         uint16\_t mode = 0x0100;
-00594 
-00595         \textcolor{keywordflow}{if} (lms->Get_SPI_Reg_bits(LMS7param(LML1\_SISODDR)))
-00596             mode = 0x0040;
-00597         \textcolor{keywordflow}{else} \textcolor{keywordflow}{if} (lms->Get_SPI_Reg_bits(LMS7param(LML1\_TRXIQPULSE)))
-00598             mode = 0x0180;
-00599 
-00600         dataPort->WriteRegister(0x0008, mode | smpl\_width);
-00601 
-00602         \textcolor{keyword}{const} uint16\_t channelEnables = (mRxStreams[0].used||mTxStreams[0].used) + 2 * (mRxStreams[1].used
-      ||mTxStreams[1].used);
-00603         dataPort->WriteRegister(0x0007, channelEnables);
+00592     \textcolor{comment}{//configure FPGA on first start, or disable FPGA when not streaming}
+00593     \textcolor{keywordflow}{if}((needTx || needRx) && (!txThread.joinable()) && (!rxThread.joinable()))
+00594     \{
+00595         dataPort->WriteRegister(0xFFFF, 1 << chipId);
+00596         \textcolor{keywordflow}{if} (mRxStreams[0].used && mRxStreams[1].used)
+00597             AlignRxRF(\textcolor{keyword}{true});
+00598         \textcolor{comment}{//enable FPGA streaming}
+00599         fpga->StopStreaming();
+00600         fpga->ResetTimestamp();
+00601         rxLastTimestamp.store(0);
+00602         \textcolor{comment}{//Clear device stream buffers}
+00603         dataPort->ResetStreamBuffers();
 00604 
-00605         uint32\_t reg9;
-00606         dataPort->ReadRegister(0x0009, reg9);
-00607         \textcolor{keyword}{const} uint32\_t addr[] = \{0x0009, 0x0009\};
-00608         \textcolor{keyword}{const} uint32\_t data[] = \{reg9 | (5 << 1), reg9 & ~(5 << 1)\};
-00609         fpga->StartStreaming();
-00610         dataPort->WriteRegisters(addr, data, 2);
-00611     \}
-00612     \textcolor{keywordflow}{else} \textcolor{keywordflow}{if}(not needTx and not needRx)
-00613     \{
-00614         \textcolor{comment}{//disable FPGA streaming}
-00615         dataPort->WriteRegister(0xFFFF, 1 << chipId);
-00616         fpga->StopStreaming();
-00617     \}
-00618 
-00619     \textcolor{comment}{//FPGA should be configured and activated, start needed threads}
-00620     \textcolor{keywordflow}{if}(needRx && (!rxThread.joinable()))
-00621     \{
-00622         terminateRx.store(\textcolor{keyword}{false});
-00623         \textcolor{keyword}{auto} RxLoopFunction = std::bind(&Streamer::ReceivePacketsLoop, \textcolor{keyword}{this});
-00624         rxThread = std::thread(RxLoopFunction);
-00625     \}
-00626     \textcolor{keywordflow}{if}(needTx && (!txThread.joinable()))
-00627     \{
-00628         dataPort->WriteRegister(0xFFFF, 1 << chipId);
-00629         dataPort->WriteRegister(0xD, 0); \textcolor{comment}{//stop WFM}
-00630         terminateTx.store(\textcolor{keyword}{false});
-00631         \textcolor{keyword}{auto} TxLoopFunction = std::bind(&Streamer::TransmitPacketsLoop, \textcolor{keyword}{this});
-00632         txThread = std::thread(TxLoopFunction);
-00633     \}
-00634     \textcolor{keywordflow}{return} 0;
-00635 \}
-00636 
-00637 \textcolor{keywordtype}{void} Streamer::TransmitPacketsLoop()
-00638 \{
-00639     \textcolor{comment}{//at this point FPGA has to be already configured to output samples}
-00640     \textcolor{keyword}{const} uint8\_t maxChannelCount = 2;
-00641     \textcolor{keyword}{const} uint8\_t chCount = streamSize;
-00642     \textcolor{keyword}{const} \textcolor{keywordtype}{bool} packed = dataLinkFormat == StreamConfig::FMT_INT12;
-00643     \textcolor{keyword}{const} \textcolor{keywordtype}{int} epIndex = chipId;
-00644     \textcolor{keyword}{const} uint8\_t buffersCount = dataPort->GetBuffersCount();
-00645     \textcolor{keyword}{const} uint8\_t packetsToBatch = dataPort->CheckStreamSize(rxBatchSize);
-00646     \textcolor{keyword}{const} uint32\_t bufferSize = packetsToBatch*\textcolor{keyword}{sizeof}(FPGA_DataPacket);
-00647     \textcolor{keyword}{const} uint32\_t popTimeout\_ms = 500;
-00648 
-00649     \textcolor{keyword}{const} \textcolor{keywordtype}{int} maxSamplesBatch = (packed ? samples12InPkt:samples16InPkt)/chCount;
-00650     std::vector<int> handles(buffersCount, 0);
-00651     std::vector<bool> bufferUsed(buffersCount, 0);
-00652     std::vector<uint32\_t> bytesToSend(buffersCount, 0);
-00653     std::vector<complex16\_t> samples[maxChannelCount];
-00654     std::vector<char> buffers;
-00655     \textcolor{keywordflow}{try}
-00656     \{
-00657         \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} i=0; i<chCount; ++i)
-00658             samples[i].resize(maxSamplesBatch);
-00659         buffers.resize(buffersCount*bufferSize, 0);
-00660     \}
-00661     \textcolor{keywordflow}{catch} (\textcolor{keyword}{const} std::bad\_alloc& ex) \textcolor{comment}{//not enough memory for buffers}
-00662     \{
-00663         \textcolor{keywordflow}{return} lime::error(\textcolor{stringliteral}{"Error allocating Tx buffers, not enough memory"});
-00664     \}
-00665 
-00666     \textcolor{keywordtype}{long} totalBytesSent = 0;
-00667     \textcolor{keyword}{auto} t1 = std::chrono::high\_resolution\_clock::now();
-00668     \textcolor{keyword}{auto} t2 = t1;
-00669     \textcolor{keywordtype}{bool} end\_burst = \textcolor{keyword}{false};
-00670     uint8\_t bi = 0; \textcolor{comment}{//buffer index}
-00671     \textcolor{keywordflow}{while} (terminateTx.load() != \textcolor{keyword}{true})
-00672     \{
-00673         \textcolor{keywordflow}{if} (bufferUsed[bi])
-00674         \{
-00675             \textcolor{keywordflow}{if} (dataPort->WaitForSending(handles[bi], 1000) == \textcolor{keyword}{true})
-00676             \{
-00677                 \textcolor{keywordtype}{unsigned} bytesSent = dataPort->FinishDataSending(&buffers[bi*bufferSize], bytesToSend[bi], 
+00605         \textcolor{comment}{//enable MIMO mode, 12 bit compressed values}
+00606         dataLinkFormat = StreamConfig::FMT_INT12;
+00607         \textcolor{comment}{//by default use 12 bit compressed, adjust link format for stream}
+00608 
+00609         \textcolor{keywordflow}{for}(\textcolor{keyword}{auto} &i : mRxStreams)
+00610             \textcolor{keywordflow}{if}(i.used && i.config.format != StreamConfig::FMT_INT12)
+00611             \{
+00612                 dataLinkFormat = StreamConfig::FMT_INT16;
+00613                 \textcolor{keywordflow}{break};
+00614             \}
+00615 
+00616         \textcolor{keywordflow}{for}(\textcolor{keyword}{auto} &i : mTxStreams)
+00617             \textcolor{keywordflow}{if}(i.used && i.config.format != StreamConfig::FMT_INT12)
+00618             \{
+00619                 dataLinkFormat = StreamConfig::FMT_INT16;
+00620                 \textcolor{keywordflow}{break};
+00621             \}
+00622 
+00623         \textcolor{keywordflow}{for}(\textcolor{keyword}{auto} &i : mRxStreams)
+00624             \textcolor{keywordflow}{if} (i.used)
+00625                 i.config.linkFormat = dataLinkFormat;
+00626         \textcolor{keywordflow}{for}(\textcolor{keyword}{auto} &i : mTxStreams)
+00627             \textcolor{keywordflow}{if} (i.used)
+00628                 i.config.linkFormat = dataLinkFormat;
+00629 
+00630         \textcolor{keyword}{const} uint16\_t smpl\_width = dataLinkFormat == StreamConfig::FMT_INT12 ? 2 : 0;
+00631         uint16\_t mode = 0x0100;
+00632 
+00633         \textcolor{keywordflow}{if} (lms->Get_SPI_Reg_bits(LMS7param(LML1\_SISODDR)))
+00634             mode = 0x0040;
+00635         \textcolor{keywordflow}{else} \textcolor{keywordflow}{if} (lms->Get_SPI_Reg_bits(LMS7param(LML1\_TRXIQPULSE)))
+00636             mode = 0x0180;
+00637 
+00638         dataPort->WriteRegister(0x0008, mode | smpl\_width);
+00639 
+00640         \textcolor{keyword}{const} uint16\_t channelEnables = (mRxStreams[0].used||mTxStreams[0].used) + 2 * (mRxStreams[1].used
+      ||mTxStreams[1].used);
+00641         dataPort->WriteRegister(0x0007, channelEnables);
+00642 
+00643         uint32\_t reg9;
+00644         dataPort->ReadRegister(0x0009, reg9);
+00645         \textcolor{keyword}{const} uint32\_t addr[] = \{0x0009, 0x0009\};
+00646         \textcolor{keyword}{const} uint32\_t data[] = \{reg9 | (5 << 1), reg9 & ~(5 << 1)\};
+00647         fpga->StartStreaming();
+00648         dataPort->WriteRegisters(addr, data, 2);
+00649     \}
+00650     \textcolor{keywordflow}{else} \textcolor{keywordflow}{if}(not needTx and not needRx)
+00651     \{
+00652         \textcolor{comment}{//disable FPGA streaming}
+00653         dataPort->WriteRegister(0xFFFF, 1 << chipId);
+00654         fpga->StopStreaming();
+00655     \}
+00656 
+00657     \textcolor{comment}{//FPGA should be configured and activated, start needed threads}
+00658     \textcolor{keywordflow}{if}(needRx && (!rxThread.joinable()))
+00659     \{
+00660         terminateRx.store(\textcolor{keyword}{false});
+00661         \textcolor{keyword}{auto} RxLoopFunction = std::bind(&Streamer::ReceivePacketsLoop, \textcolor{keyword}{this});
+00662         rxThread = std::thread(RxLoopFunction);
+00663     \}
+00664     \textcolor{keywordflow}{if}(needTx && (!txThread.joinable()))
+00665     \{
+00666         dataPort->WriteRegister(0xFFFF, 1 << chipId);
+00667         dataPort->WriteRegister(0xD, 0); \textcolor{comment}{//stop WFM}
+00668         terminateTx.store(\textcolor{keyword}{false});
+00669         \textcolor{keyword}{auto} TxLoopFunction = std::bind(&Streamer::TransmitPacketsLoop, \textcolor{keyword}{this});
+00670         txThread = std::thread(TxLoopFunction);
+00671     \}
+00672     \textcolor{keywordflow}{return} 0;
+00673 \}
+00674 
+00675 \textcolor{keywordtype}{void} Streamer::TransmitPacketsLoop()
+00676 \{
+00677     \textcolor{comment}{//at this point FPGA has to be already configured to output samples}
+00678     \textcolor{keyword}{const} uint8\_t maxChannelCount = 2;
+00679     \textcolor{keyword}{const} uint8\_t chCount = streamSize;
+00680     \textcolor{keyword}{const} \textcolor{keywordtype}{bool} packed = dataLinkFormat == StreamConfig::FMT_INT12;
+00681     \textcolor{keyword}{const} \textcolor{keywordtype}{int} epIndex = chipId;
+00682     \textcolor{keyword}{const} uint8\_t buffersCount = dataPort->GetBuffersCount();
+00683     \textcolor{keyword}{const} uint8\_t packetsToBatch = dataPort->CheckStreamSize(rxBatchSize);
+00684     \textcolor{keyword}{const} uint32\_t bufferSize = packetsToBatch*\textcolor{keyword}{sizeof}(FPGA_DataPacket);
+00685     \textcolor{keyword}{const} uint32\_t popTimeout\_ms = 500;
+00686 
+00687     \textcolor{keyword}{const} \textcolor{keywordtype}{int} maxSamplesBatch = (packed ? samples12InPkt:samples16InPkt)/chCount;
+00688     std::vector<int> handles(buffersCount, 0);
+00689     std::vector<bool> bufferUsed(buffersCount, 0);
+00690     std::vector<uint32\_t> bytesToSend(buffersCount, 0);
+00691     std::vector<complex16\_t> samples[maxChannelCount];
+00692     std::vector<char> buffers;
+00693     \textcolor{keywordflow}{try}
+00694     \{
+00695         \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} i=0; i<chCount; ++i)
+00696             samples[i].resize(maxSamplesBatch);
+00697         buffers.resize(buffersCount*bufferSize, 0);
+00698     \}
+00699     \textcolor{keywordflow}{catch} (\textcolor{keyword}{const} std::bad\_alloc& ex) \textcolor{comment}{//not enough memory for buffers}
+00700     \{
+00701         \textcolor{keywordflow}{return} lime::error(\textcolor{stringliteral}{"Error allocating Tx buffers, not enough memory"});
+00702     \}
+00703 
+00704     \textcolor{keywordtype}{long} totalBytesSent = 0;
+00705     \textcolor{keyword}{auto} t1 = std::chrono::high\_resolution\_clock::now();
+00706     \textcolor{keyword}{auto} t2 = t1;
+00707     \textcolor{keywordtype}{bool} end\_burst = \textcolor{keyword}{false};
+00708     uint8\_t bi = 0; \textcolor{comment}{//buffer index}
+00709     \textcolor{keywordflow}{while} (terminateTx.load() != \textcolor{keyword}{true})
+00710     \{
+00711         \textcolor{keywordflow}{if} (bufferUsed[bi])
+00712         \{
+00713             \textcolor{keywordflow}{if} (dataPort->WaitForSending(handles[bi], 1000) == \textcolor{keyword}{true})
+00714             \{
+00715                 \textcolor{keywordtype}{unsigned} bytesSent = dataPort->FinishDataSending(&buffers[bi*bufferSize], bytesToSend[bi], 
       handles[bi]);
-00678 
-00679                 \textcolor{keywordflow}{if} (bytesSent != bytesToSend[bi])
-00680                 \{
-00681                     \textcolor{keywordflow}{for} (\textcolor{keyword}{auto} &value : mTxStreams)
-00682                         \textcolor{keywordflow}{if} (value.used && value.mActive)
-00683                             value.overflow++;
-00684                 \}
-00685                 \textcolor{keywordflow}{else}
-00686                     totalBytesSent += bytesSent;
-00687                 bufferUsed[bi] = \textcolor{keyword}{false};
-00688             \}
-00689             \textcolor{keywordflow}{else}
-00690             \{
-00691                 txDataRate_Bps.store(totalBytesSent);
-00692                 totalBytesSent = 0;
-00693                 \textcolor{keywordflow}{continue};
-00694             \}
-00695         \}
-00696 
-00697         FPGA_DataPacket* pkt = \textcolor{keyword}{reinterpret\_cast<}FPGA_DataPacket*\textcolor{keyword}{>}(&buffers[bi*bufferSize]);
-00698         \textcolor{keywordtype}{int} i=0;
-00699         \textcolor{keywordflow}{do}
-00700         \{
-00701             \textcolor{keywordtype}{bool} has\_samples = \textcolor{keyword}{false};
-00702             StreamChannel::Metadata meta = \{0, 0\};
-00703             \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} ch=0; ch<maxChannelCount; ++ch)
-00704             \{
-00705                 \textcolor{keywordflow}{if} (!mTxStreams[ch].used)
-00706                     \textcolor{keywordflow}{continue};
-00707                 \textcolor{keyword}{const} \textcolor{keywordtype}{int} ind = chCount == maxChannelCount ? ch : 0;
-00708                 \textcolor{keywordflow}{if} (mTxStreams[ch].mActive==\textcolor{keyword}{false})
-00709                 \{
-00710                     memset(&samples[ind][0],0,maxSamplesBatch*\textcolor{keyword}{sizeof}(complex16_t));
-00711                     \textcolor{keywordflow}{continue};
-00712                 \}
-00713                 \textcolor{keywordtype}{int} samplesPopped = mTxStreams[ch].Read(samples[ind].data(), maxSamplesBatch, &meta, 
+00716 
+00717                 \textcolor{keywordflow}{if} (bytesSent != bytesToSend[bi])
+00718                 \{
+00719                     \textcolor{keywordflow}{for} (\textcolor{keyword}{auto} &value : mTxStreams)
+00720                         \textcolor{keywordflow}{if} (value.used && value.mActive)
+00721                             value.overflow++;
+00722                 \}
+00723                 \textcolor{keywordflow}{else}
+00724                     totalBytesSent += bytesSent;
+00725                 bufferUsed[bi] = \textcolor{keyword}{false};
+00726             \}
+00727             \textcolor{keywordflow}{else}
+00728             \{
+00729                 txDataRate_Bps.store(totalBytesSent);
+00730                 totalBytesSent = 0;
+00731                 \textcolor{keywordflow}{continue};
+00732             \}
+00733         \}
+00734 
+00735         FPGA_DataPacket* pkt = \textcolor{keyword}{reinterpret\_cast<}FPGA_DataPacket*\textcolor{keyword}{>}(&buffers[bi*bufferSize]);
+00736         \textcolor{keywordtype}{int} i=0;
+00737         \textcolor{keywordflow}{do}
+00738         \{
+00739             \textcolor{keywordtype}{bool} has\_samples = \textcolor{keyword}{false};
+00740             StreamChannel::Metadata meta = \{0, 0\};
+00741             \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} ch=0; ch<maxChannelCount; ++ch)
+00742             \{
+00743                 \textcolor{keywordflow}{if} (!mTxStreams[ch].used)
+00744                     \textcolor{keywordflow}{continue};
+00745                 \textcolor{keyword}{const} \textcolor{keywordtype}{int} ind = chCount == maxChannelCount ? ch : 0;
+00746                 \textcolor{keywordflow}{if} (mTxStreams[ch].mActive==\textcolor{keyword}{false})
+00747                 \{
+00748                     memset(&samples[ind][0],0,maxSamplesBatch*\textcolor{keyword}{sizeof}(complex16_t));
+00749                     \textcolor{keywordflow}{continue};
+00750                 \}
+00751                 \textcolor{keywordtype}{int} samplesPopped = mTxStreams[ch].Read(samples[ind].data(), maxSamplesBatch, &meta, 
       popTimeout\_ms);
-00714                 \textcolor{keywordflow}{if} (samplesPopped != maxSamplesBatch)
-00715                 \{
-00716                     \textcolor{keywordflow}{if} ((!end\_burst) && !(meta.flags & RingFIFO::END_BURST))
-00717                     \{
-00718                         mTxStreams[ch].underflow++;
-00719                         lime::warning(\textcolor{stringliteral}{"popping from TX, samples popped %i/%i"}, samplesPopped, 
+00752                 \textcolor{keywordflow}{if} (samplesPopped != maxSamplesBatch)
+00753                 \{
+00754                     \textcolor{keywordflow}{if} ((!end\_burst) && !(meta.flags & RingFIFO::END_BURST))
+00755                     \{
+00756                         mTxStreams[ch].underflow++;
+00757                         lime::warning(\textcolor{stringliteral}{"popping from TX, samples popped %i/%i"}, samplesPopped, 
       maxSamplesBatch);
-00720                         \textcolor{keywordflow}{continue};
-00721                     \}
-00722                     memset(&samples[ind][samplesPopped],0,(maxSamplesBatch-samplesPopped)*\textcolor{keyword}{sizeof}(
+00758                         \textcolor{keywordflow}{continue};
+00759                     \}
+00760                     memset(&samples[ind][samplesPopped],0,(maxSamplesBatch-samplesPopped)*\textcolor{keyword}{sizeof}(
       complex16_t));
-00723                 \}
-00724                 has\_samples = \textcolor{keyword}{true};
-00725             \}
-00726 
-00727             \textcolor{keywordflow}{if} (!has\_samples)
-00728                 \textcolor{keywordflow}{break};
-00729 
-00730             end\_burst = (meta.flags & RingFIFO::END_BURST);
-00731             pkt[i].counter = meta.timestamp;
-00732             pkt[i].reserved[0] = 0;
-00733             \textcolor{comment}{//by default ignore timestamps}
-00734             \textcolor{keyword}{const} \textcolor{keywordtype}{int} ignoreTimestamp = !(meta.flags & RingFIFO::SYNC_TIMESTAMP);
-00735             pkt[i].reserved[0] |= ((int)ignoreTimestamp << 4); \textcolor{comment}{//ignore timestamp}
-00736 
-00737             std::vector<complex16\_t*> src(chCount);
-00738             \textcolor{keywordflow}{for}(uint8\_t c=0; c<chCount; ++c)
-00739                 src[c] = (samples[c].data());
-00740             uint8\_t* \textcolor{keyword}{const} dataStart = (uint8\_t*)pkt[i].data;
-00741             FPGA::Samples2FPGAPacketPayload(src.data(), maxSamplesBatch, chCount==2, packed, dataStart);
-00742 
-00743         \}\textcolor{keywordflow}{while}(++i<packetsToBatch && end\_burst == \textcolor{keyword}{false});
-00744 
-00745         \textcolor{keywordflow}{if}(terminateTx.load() == \textcolor{keyword}{true}) \textcolor{comment}{//early termination}
-00746             \textcolor{keywordflow}{break};
-00747 
-00748         \textcolor{keywordflow}{if} (i)
-00749         \{
-00750             bytesToSend[bi] = i*\textcolor{keyword}{sizeof}(FPGA_DataPacket);
-00751             handles[bi] = dataPort->BeginDataSending(&buffers[bi*bufferSize], bytesToSend[bi], epIndex);
-00752             txLastTimestamp.store(pkt[i-1].counter+maxSamplesBatch-1); \textcolor{comment}{//timestamp of the last sample that
+00761                 \}
+00762                 has\_samples = \textcolor{keyword}{true};
+00763             \}
+00764 
+00765             \textcolor{keywordflow}{if} (!has\_samples)
+00766                 \textcolor{keywordflow}{break};
+00767 
+00768             end\_burst = (meta.flags & RingFIFO::END_BURST);
+00769             pkt[i].counter = meta.timestamp;
+00770             pkt[i].reserved[0] = 0;
+00771             \textcolor{comment}{//by default ignore timestamps}
+00772             \textcolor{keyword}{const} \textcolor{keywordtype}{int} ignoreTimestamp = !(meta.flags & RingFIFO::SYNC_TIMESTAMP);
+00773             pkt[i].reserved[0] |= ((int)ignoreTimestamp << 4); \textcolor{comment}{//ignore timestamp}
+00774 
+00775             std::vector<complex16\_t*> src(chCount);
+00776             \textcolor{keywordflow}{for}(uint8\_t c=0; c<chCount; ++c)
+00777                 src[c] = (samples[c].data());
+00778             uint8\_t* \textcolor{keyword}{const} dataStart = (uint8\_t*)pkt[i].data;
+00779             FPGA::Samples2FPGAPacketPayload(src.data(), maxSamplesBatch, chCount==2, packed, dataStart);
+00780 
+00781         \}\textcolor{keywordflow}{while}(++i<packetsToBatch && end\_burst == \textcolor{keyword}{false});
+00782 
+00783         \textcolor{keywordflow}{if}(terminateTx.load() == \textcolor{keyword}{true}) \textcolor{comment}{//early termination}
+00784             \textcolor{keywordflow}{break};
+00785 
+00786         \textcolor{keywordflow}{if} (i)
+00787         \{
+00788             bytesToSend[bi] = i*\textcolor{keyword}{sizeof}(FPGA_DataPacket);
+00789             handles[bi] = dataPort->BeginDataSending(&buffers[bi*bufferSize], bytesToSend[bi], epIndex);
+00790             txLastTimestamp.store(pkt[i-1].counter+maxSamplesBatch-1); \textcolor{comment}{//timestamp of the last sample that
        was sent to HW}
-00753             bufferUsed[bi] = \textcolor{keyword}{true};
-00754             bi = (bi + 1) & (buffersCount-1);
-00755         \}
-00756 
-00757         t2 = std::chrono::high\_resolution\_clock::now();
-00758         \textcolor{keyword}{auto} timePeriod = std::chrono::duration\_cast<std::chrono::milliseconds>(
+00791             bufferUsed[bi] = \textcolor{keyword}{true};
+00792             bi = (bi + 1) & (buffersCount-1);
+00793         \}
+00794 
+00795         t2 = std::chrono::high\_resolution\_clock::now();
+00796         \textcolor{keyword}{auto} timePeriod = std::chrono::duration\_cast<std::chrono::milliseconds>(
       t2 - t1).count();
-00759         \textcolor{keywordflow}{if} (timePeriod >= 1000)
-00760         \{
-00761             \textcolor{comment}{//total number of bytes sent per second}
-00762             \textcolor{keywordtype}{float} dataRate = 1000.0*totalBytesSent / timePeriod;
-00763             txDataRate_Bps.store(dataRate);
-00764             totalBytesSent = 0;
-00765             t1 = t2;
-00766 \textcolor{preprocessor}{#ifndef NDEBUG}
-00767             printf(\textcolor{stringliteral}{"Tx: %.3f MB/s\(\backslash\)n"}, dataRate / 1000000.0);
-00768 \textcolor{preprocessor}{#endif}
-00769         \}
-00770     \}
-00771 
-00772     \textcolor{comment}{// Wait for all the queued requests to be cancelled}
-00773     dataPort->AbortSending(epIndex);
-00774     txDataRate_Bps.store(0);
-00775 \}
-00776 
-00780 \textcolor{keywordtype}{void} Streamer::ReceivePacketsLoop()
-00781 \{
-00782     \textcolor{comment}{//at this point FPGA has to be already configured to output samples}
-00783     \textcolor{keyword}{const} uint8\_t maxChannelCount = 2;
-00784     \textcolor{keyword}{const} uint8\_t chCount = streamSize;
-00785     \textcolor{keyword}{const} \textcolor{keywordtype}{bool} packed = dataLinkFormat == StreamConfig::FMT_INT12;
-00786     \textcolor{keyword}{const} uint32\_t samplesInPacket = (packed  ? samples12InPkt : samples16InPkt)/chCount;
-00787 
-00788     \textcolor{keyword}{const} \textcolor{keywordtype}{int} epIndex = chipId;
-00789     \textcolor{keyword}{const} uint8\_t buffersCount = dataPort->GetBuffersCount();
-00790     \textcolor{keyword}{const} uint8\_t packetsToBatch = dataPort->CheckStreamSize(rxBatchSize);
-00791     \textcolor{keyword}{const} uint32\_t bufferSize = packetsToBatch*\textcolor{keyword}{sizeof}(FPGA_DataPacket);
-00792     std::vector<int> handles(buffersCount, 0);
-00793     std::vector<char>buffers(buffersCount*bufferSize, 0);
-00794     std::vector<StreamChannel::Frame> chFrames;
-00795     \textcolor{keywordflow}{try}
-00796     \{
-00797         chFrames.resize(chCount);
-00798     \}
-00799     \textcolor{keywordflow}{catch} (\textcolor{keyword}{const} std::bad\_alloc &ex)
-00800     \{
-00801         lime::error(\textcolor{stringliteral}{"Error allocating Rx buffers, not enough memory"});
-00802         \textcolor{keywordflow}{return};
-00803     \}
-00804 
-00805     \textcolor{keywordflow}{for} (\textcolor{keywordtype}{int} i = 0; i<buffersCount; ++i)
-00806         handles[i] = dataPort->BeginDataReading(&buffers[i*bufferSize], bufferSize, epIndex);
-00807 
-00808     \textcolor{keywordtype}{int} bi = 0;
-00809     \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{long} totalBytesReceived = 0; \textcolor{comment}{//for data rate calculation}
-00810 
-00811     \textcolor{keyword}{auto} t1 = std::chrono::high\_resolution\_clock::now();
-00812     \textcolor{keyword}{auto} t2 = t1;
-00813 
-00814     std::mutex txFlagsLock;
-00815     std::condition\_variable resetTxFlags;
-00816     \textcolor{comment}{//worker thread for reseting late Tx packet flags}
-00817     std::thread txReset([](IConnection* port,
-00818                         std::atomic<bool> *terminate,
-00819                         std::mutex *spiLock,
-00820                         std::condition\_variable *doWork)
-00821     \{
-00822         uint32\_t reg9;
-00823         port->ReadRegister(0x0009, reg9);
-00824         \textcolor{keyword}{const} uint32\_t addr[] = \{0x0009, 0x0009\};
-00825         \textcolor{keyword}{const} uint32\_t data[] = \{reg9 | (5 << 1), reg9 & ~(5 << 1)\};
-00826         \textcolor{keywordflow}{while} (not terminate->load())
-00827         \{
-00828             std::unique\_lock<std::mutex> lck(*spiLock);
-00829             doWork->wait(lck);
-00830             port->WriteRegisters(addr, data, 2);
-00831         \}
-00832     \}, dataPort, &terminateRx, &txFlagsLock, &resetTxFlags);
-00833 
-00834     \textcolor{keywordtype}{int} resetFlagsDelay = 0;
-00835     uint64\_t prevTs = 0;
-00836     \textcolor{keywordflow}{while} (terminateRx.load() == \textcolor{keyword}{false})
-00837     \{
-00838         int32\_t bytesReceived = 0;
-00839         \textcolor{keywordflow}{if}(handles[bi] >= 0)
-00840         \{
-00841             \textcolor{keywordflow}{if} (dataPort->WaitForReading(handles[bi], 1000) == \textcolor{keyword}{true})
-00842             \{
-00843                 bytesReceived = dataPort->FinishDataReading(&buffers[bi*bufferSize], bufferSize, handles[bi
+00797         \textcolor{keywordflow}{if} (timePeriod >= 1000)
+00798         \{
+00799             \textcolor{comment}{//total number of bytes sent per second}
+00800             \textcolor{keywordtype}{float} dataRate = 1000.0*totalBytesSent / timePeriod;
+00801             txDataRate_Bps.store(dataRate);
+00802             totalBytesSent = 0;
+00803             t1 = t2;
+00804 \textcolor{preprocessor}{#ifndef NDEBUG}
+00805             printf(\textcolor{stringliteral}{"Tx: %.3f MB/s\(\backslash\)n"}, dataRate / 1000000.0);
+00806 \textcolor{preprocessor}{#endif}
+00807         \}
+00808     \}
+00809 
+00810     \textcolor{comment}{// Wait for all the queued requests to be cancelled}
+00811     dataPort->AbortSending(epIndex);
+00812     txDataRate_Bps.store(0);
+00813 \}
+00814 
+00818 \textcolor{keywordtype}{void} Streamer::ReceivePacketsLoop()
+00819 \{
+00820     \textcolor{comment}{//at this point FPGA has to be already configured to output samples}
+00821     \textcolor{keyword}{const} uint8\_t maxChannelCount = 2;
+00822     \textcolor{keyword}{const} uint8\_t chCount = streamSize;
+00823     \textcolor{keyword}{const} \textcolor{keywordtype}{bool} packed = dataLinkFormat == StreamConfig::FMT_INT12;
+00824     \textcolor{keyword}{const} uint32\_t samplesInPacket = (packed  ? samples12InPkt : samples16InPkt)/chCount;
+00825 
+00826     \textcolor{keyword}{const} \textcolor{keywordtype}{int} epIndex = chipId;
+00827     \textcolor{keyword}{const} uint8\_t buffersCount = dataPort->GetBuffersCount();
+00828     \textcolor{keyword}{const} uint8\_t packetsToBatch = dataPort->CheckStreamSize(rxBatchSize);
+00829     \textcolor{keyword}{const} uint32\_t bufferSize = packetsToBatch*\textcolor{keyword}{sizeof}(FPGA_DataPacket);
+00830     std::vector<int> handles(buffersCount, 0);
+00831     std::vector<char>buffers(buffersCount*bufferSize, 0);
+00832     std::vector<StreamChannel::Frame> chFrames;
+00833     \textcolor{keywordflow}{try}
+00834     \{
+00835         chFrames.resize(chCount);
+00836     \}
+00837     \textcolor{keywordflow}{catch} (\textcolor{keyword}{const} std::bad\_alloc &ex)
+00838     \{
+00839         lime::error(\textcolor{stringliteral}{"Error allocating Rx buffers, not enough memory"});
+00840         \textcolor{keywordflow}{return};
+00841     \}
+00842 
+00843     \textcolor{keywordflow}{for} (\textcolor{keywordtype}{int} i = 0; i<buffersCount; ++i)
+00844         handles[i] = dataPort->BeginDataReading(&buffers[i*bufferSize], bufferSize, epIndex);
+00845 
+00846     \textcolor{keywordtype}{int} bi = 0;
+00847     \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{long} totalBytesReceived = 0; \textcolor{comment}{//for data rate calculation}
+00848 
+00849     \textcolor{keyword}{auto} t1 = std::chrono::high\_resolution\_clock::now();
+00850     \textcolor{keyword}{auto} t2 = t1;
+00851 
+00852     std::mutex txFlagsLock;
+00853     std::condition\_variable resetTxFlags;
+00854     \textcolor{comment}{//worker thread for reseting late Tx packet flags}
+00855     std::thread txReset([](IConnection* port,
+00856                         std::atomic<bool> *terminate,
+00857                         std::mutex *spiLock,
+00858                         std::condition\_variable *doWork)
+00859     \{
+00860         uint32\_t reg9;
+00861         port->ReadRegister(0x0009, reg9);
+00862         \textcolor{keyword}{const} uint32\_t addr[] = \{0x0009, 0x0009\};
+00863         \textcolor{keyword}{const} uint32\_t data[] = \{reg9 | (5 << 1), reg9 & ~(5 << 1)\};
+00864         \textcolor{keywordflow}{while} (not terminate->load())
+00865         \{
+00866             std::unique\_lock<std::mutex> lck(*spiLock);
+00867             doWork->wait(lck);
+00868             port->WriteRegisters(addr, data, 2);
+00869         \}
+00870     \}, dataPort, &terminateRx, &txFlagsLock, &resetTxFlags);
+00871 
+00872     \textcolor{keywordtype}{int} resetFlagsDelay = 0;
+00873     uint64\_t prevTs = 0;
+00874     \textcolor{keywordflow}{while} (terminateRx.load() == \textcolor{keyword}{false})
+00875     \{
+00876         int32\_t bytesReceived = 0;
+00877         \textcolor{keywordflow}{if}(handles[bi] >= 0)
+00878         \{
+00879             \textcolor{keywordflow}{if} (dataPort->WaitForReading(handles[bi], 1000) == \textcolor{keyword}{true})
+00880             \{
+00881                 bytesReceived = dataPort->FinishDataReading(&buffers[bi*bufferSize], bufferSize, handles[bi
       ]);
-00844                 totalBytesReceived += bytesReceived;
-00845                 \textcolor{keywordflow}{if} (bytesReceived != int32\_t(bufferSize)) \textcolor{comment}{//data should come in full sized packets}
-00846                     \textcolor{keywordflow}{for}(\textcolor{keyword}{auto} &value: mRxStreams)
-00847                         \textcolor{keywordflow}{if} (value.used && value.mActive)
-00848                             value.underflow++;
-00849             \}
-00850             \textcolor{keywordflow}{else}
-00851             \{
-00852                 rxDataRate_Bps.store(totalBytesReceived);
-00853                 totalBytesReceived = 0;
-00854                 \textcolor{keywordflow}{continue};
-00855             \}
-00856         \}
-00857         \textcolor{keywordtype}{bool} txLate=\textcolor{keyword}{false};
-00858         \textcolor{keywordflow}{for} (uint8\_t pktIndex = 0; pktIndex < bytesReceived / \textcolor{keyword}{sizeof}(
+00882                 totalBytesReceived += bytesReceived;
+00883                 \textcolor{keywordflow}{if} (bytesReceived != int32\_t(bufferSize)) \textcolor{comment}{//data should come in full sized packets}
+00884                     \textcolor{keywordflow}{for}(\textcolor{keyword}{auto} &value: mRxStreams)
+00885                         \textcolor{keywordflow}{if} (value.used && value.mActive)
+00886                             value.underflow++;
+00887             \}
+00888             \textcolor{keywordflow}{else}
+00889             \{
+00890                 rxDataRate_Bps.store(totalBytesReceived);
+00891                 totalBytesReceived = 0;
+00892                 \textcolor{keywordflow}{continue};
+00893             \}
+00894         \}
+00895         \textcolor{keywordtype}{bool} txLate=\textcolor{keyword}{false};
+00896         \textcolor{keywordflow}{for} (uint8\_t pktIndex = 0; pktIndex < bytesReceived / \textcolor{keyword}{sizeof}(
       FPGA_DataPacket); ++pktIndex)
-00859         \{
-00860             \textcolor{keyword}{const} FPGA_DataPacket* pkt = (FPGA_DataPacket*)&buffers[bi*bufferSize];
-00861             \textcolor{keyword}{const} uint8\_t byte0 = pkt[pktIndex].reserved[0];
-00862             \textcolor{keywordflow}{if} ((byte0 & (1 << 3)) != 0 && !txLate) \textcolor{comment}{//report only once per batch}
-00863             \{
-00864                 txLate = \textcolor{keyword}{true};
-00865                 \textcolor{keywordflow}{if}(resetFlagsDelay > 0)
-00866                     --resetFlagsDelay;
-00867                 \textcolor{keywordflow}{else}
-00868                 \{
-00869                     lime::warning(\textcolor{stringliteral}{"L"});
-00870                     resetTxFlags.notify\_one();
-00871                     resetFlagsDelay = buffersCount;
-00872                     \textcolor{keywordflow}{for}(\textcolor{keyword}{auto} &value: mTxStreams)
-00873                         \textcolor{keywordflow}{if} (value.used && value.mActive)
-00874                             value.pktLost++;
-00875                 \}
-00876             \}
-00877             uint8\_t* pktStart = (uint8\_t*)pkt[pktIndex].data;
-00878             \textcolor{keywordflow}{if}(pkt[pktIndex].counter - prevTs != samplesInPacket && pkt[pktIndex].counter != prevTs)
-00879             \{
-00880                 \textcolor{keywordtype}{int} packetLoss = ((pkt[pktIndex].counter - prevTs)/samplesInPacket)-1;
-00881                 \textcolor{keywordflow}{for}(\textcolor{keyword}{auto} &value: mRxStreams)
-00882                     \textcolor{keywordflow}{if} (value.used && value.mActive)
-00883                         value.pktLost += packetLoss;
-00884             \}
-00885             prevTs = pkt[pktIndex].counter;
-00886             rxLastTimestamp.store(prevTs);
-00887             \textcolor{comment}{//parse samples}
-00888             std::vector<complex16\_t*> dest(chCount);
-00889             \textcolor{keywordflow}{for}(uint8\_t c=0; c<chCount; ++c)
-00890                 dest[c] = (chFrames[c].samples);
-00891             \textcolor{keywordtype}{int} samplesCount = FPGA::FPGAPacketPayload2Samples(pktStart, 4080, chCount==2, packed, dest.
-      data());
-00892 
-00893             \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} ch=0; ch<maxChannelCount; ++ch)
-00894             \{
-00895                 \textcolor{keywordflow}{if} (mRxStreams[ch].used==\textcolor{keyword}{false} || mRxStreams[ch].mActive==\textcolor{keyword}{false})
-00896                     \textcolor{keywordflow}{continue};
-00897                 \textcolor{keyword}{const} \textcolor{keywordtype}{int} ind = chCount == maxChannelCount ? ch : 0;
-00898                 StreamChannel::Metadata meta;
-00899                 meta.timestamp = pkt[pktIndex].counter;
-00900                 meta.flags = RingFIFO::OVERWRITE_OLD | RingFIFO::SYNC_TIMESTAMP;
-00901                 \textcolor{keywordtype}{int} samplesPushed = mRxStreams[ch].Write((\textcolor{keyword}{const} \textcolor{keywordtype}{void}*)chFrames[ind].samples, samplesCount, 
-      &meta, 100);
-00902                 \textcolor{keywordflow}{if}(samplesPushed != samplesCount)
-00903                     mRxStreams[ch].overflow++;
-00904             \}
-00905         \}
-00906         \textcolor{comment}{// Re-submit this request to keep the queue full}
-00907         handles[bi] = dataPort->BeginDataReading(&buffers[bi*bufferSize], bufferSize, epIndex);
-00908         bi = (bi + 1) & (buffersCount-1);
-00909 
-00910         t2 = std::chrono::high\_resolution\_clock::now();
-00911         \textcolor{keyword}{auto} timePeriod = std::chrono::duration\_cast<std::chrono::milliseconds>(
-      t2 - t1).count();
-00912         \textcolor{keywordflow}{if} (timePeriod >= 1000)
-00913         \{
-00914             t1 = t2;
-00915             \textcolor{comment}{//total number of bytes sent per second}
-00916             \textcolor{keywordtype}{double} dataRate = 1000.0*totalBytesReceived / timePeriod;
-00917 \textcolor{preprocessor}{#ifndef NDEBUG}
-00918             printf(\textcolor{stringliteral}{"Rx: %.3f MB/s\(\backslash\)n"}, dataRate / 1000000.0);
-00919 \textcolor{preprocessor}{#endif}
-00920             totalBytesReceived = 0;
-00921             rxDataRate_Bps.store((uint32\_t)dataRate);
-00922         \}
-00923     \}
-00924     dataPort->AbortReading(epIndex);
-00925     resetTxFlags.notify\_one();
-00926     txReset.join();
-00927     rxDataRate_Bps.store(0);
-00928 \}
+00897         \{
+00898             \textcolor{keyword}{const} FPGA_DataPacket* pkt = (FPGA_DataPacket*)&buffers[bi*bufferSize];
+00899             \textcolor{keyword}{const} uint8\_t byte0 = pkt[pktIndex].reserved[0];
+00900 
+00901             \textcolor{keywordflow}{if} ((byte0 & (1 << 3)) != 0 && !txLate) \textcolor{comment}{//report only once per batch}
+00902             \{
+00903                 txLate = \textcolor{keyword}{true};
+00904                 \textcolor{keywordflow}{if}(resetFlagsDelay > 0)
+00905                     --resetFlagsDelay;
+00906                 \textcolor{keywordflow}{else}
+00907                 \{
+00908                     lime::warning(\textcolor{stringliteral}{"L"});
+00909                     resetTxFlags.notify\_one();
+00910                     resetFlagsDelay = buffersCount;
+00911                     \textcolor{keywordflow}{for}(\textcolor{keyword}{auto} &value: mTxStreams)
+00912                         \textcolor{keywordflow}{if} (value.used && value.mActive)
+00913                             value.pktLost++;
+00914                 \}
+00915             \}
+00916             uint8\_t* pktStart = (uint8\_t*)pkt[pktIndex].data;
+00917             \textcolor{keywordflow}{if}(pkt[pktIndex].counter - prevTs != samplesInPacket && pkt[pktIndex].counter != prevTs)
+00918             \{
+00919                 \textcolor{keywordtype}{int} packetLoss = ((pkt[pktIndex].counter - prevTs)/samplesInPacket)-1;
+00920                 \textcolor{keywordflow}{for}(\textcolor{keyword}{auto} &value: mRxStreams)
+00921                     \textcolor{keywordflow}{if} (value.used && value.mActive)
+00922                         value.pktLost += packetLoss;
+00923             \}
+00924             prevTs = pkt[pktIndex].counter;
+00925             rxLastTimestamp.store(prevTs);
+00926 
+00927             chirpLastTimeStamp.store(pkt[pktIndex].ftr0);
+00928             chirpLastTimePeriod.store(pkt[pktIndex].ftr1);
 00929 
-00930 \}
+00930             \textcolor{comment}{//parse samples}
+00931             std::vector<complex16\_t*> dest(chCount);
+00932             \textcolor{keywordflow}{for}(uint8\_t c=0; c<chCount; ++c)
+00933                 dest[c] = (chFrames[c].samples);
+00934             \textcolor{keywordtype}{int} samplesCount = FPGA::FPGAPacketPayload2Samples(pktStart, 
+      dataLength, chCount==2, packed, dest.data());
+00935 
+00936             \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} ch=0; ch<maxChannelCount; ++ch)
+00937             \{
+00938                 \textcolor{keywordflow}{if} (mRxStreams[ch].used==\textcolor{keyword}{false} || mRxStreams[ch].mActive==\textcolor{keyword}{false})
+00939                     \textcolor{keywordflow}{continue};
+00940                 \textcolor{keyword}{const} \textcolor{keywordtype}{int} ind = chCount == maxChannelCount ? ch : 0;
+00941                 StreamChannel::Metadata meta;
+00942                 meta.timestamp = pkt[pktIndex].counter;
+00943                 meta.lastchirp_timestamp = pkt[pktIndex].ftr0;
+00944                 meta.chirptime = pkt[pktIndex].ftr1;
+00945                 meta.flags = RingFIFO::OVERWRITE_OLD | RingFIFO::SYNC_TIMESTAMP;
+00946                 \textcolor{keywordtype}{int} samplesPushed = mRxStreams[ch].Write((\textcolor{keyword}{const} \textcolor{keywordtype}{void}*)chFrames[ind].samples, samplesCount, 
+      &meta, 100);
+00947                 \textcolor{keywordflow}{if}(samplesPushed != samplesCount)
+00948                     mRxStreams[ch].overflow++;
+00949             \}
+00950         \}
+00951         \textcolor{comment}{// Re-submit this request to keep the queue full}
+00952         handles[bi] = dataPort->BeginDataReading(&buffers[bi*bufferSize], bufferSize, epIndex);
+00953         bi = (bi + 1) & (buffersCount-1);
+00954 
+00955         t2 = std::chrono::high\_resolution\_clock::now();
+00956         \textcolor{keyword}{auto} timePeriod = std::chrono::duration\_cast<std::chrono::milliseconds>(
+      t2 - t1).count();
+00957         \textcolor{keywordflow}{if} (timePeriod >= 1000)
+00958         \{
+00959             t1 = t2;
+00960             \textcolor{comment}{//total number of bytes sent per second}
+00961             \textcolor{keywordtype}{double} dataRate = 1000.0*totalBytesReceived / timePeriod;
+00962 \textcolor{preprocessor}{#ifndef NDEBUG}
+00963             printf(\textcolor{stringliteral}{"Rx: %.3f MB/s\(\backslash\)n"}, dataRate / 1000000.0);
+00964 \textcolor{preprocessor}{#endif}
+00965             totalBytesReceived = 0;
+00966             rxDataRate_Bps.store((uint32\_t)dataRate);
+00967         \}
+00968     \}
+00969     dataPort->AbortReading(epIndex);
+00970     resetTxFlags.notify\_one();
+00971     txReset.join();
+00972     rxDataRate_Bps.store(0);
+00973 \}
+00974 
+00975 \}
 \end{DoxyCode}

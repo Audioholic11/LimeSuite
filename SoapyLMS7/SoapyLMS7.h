@@ -137,7 +137,7 @@ public:
     std::vector<std::string> listGains(const int direction, const size_t channel) const;
 
     void setGain(const int direction, const size_t channel, const double value) override;
-    
+
     double getGain(const int direction, const size_t channel) const;
 
     void setGain(const int direction, const size_t channel, const std::string &name, const double value);
@@ -159,7 +159,7 @@ public:
     void setFrequency(const int direction, const size_t channel, const std::string &name, const double frequency, const SoapySDR::Kwargs &args = SoapySDR::Kwargs());
 
     double getFrequency(const int direction, const size_t channel, const std::string &name) const;
-    
+
     double getFrequency(const int direction, const size_t channel) const override;
 
     std::vector<std::string> listFrequencies(const int direction, const size_t channel) const;
@@ -256,9 +256,9 @@ public:
     SoapySDR::ArgInfoList getSettingInfo(const int direction, const size_t channel) const;
 
     void writeSetting(const int direction, const size_t channel, const std::string &key, const std::string &value);
-    
+
     std::string readSetting(const std::string &key) const;
-    
+
     std::string readSetting(const int direction, const size_t channel, const std::string &key) const;
 
     /*******************************************************************

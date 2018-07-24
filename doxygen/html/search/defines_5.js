@@ -1,5 +1,6 @@
 var searchData=
 [
+  ['emsg',['EMSG',['../d5/ded/limesuite-dev_2external_2msvc_2getopt_8h.html#ac393ec775622430dfe25cd2ac9dec9f4',1,'EMSG():&#160;getopt.h'],['../df/da5/soapysdr_2apps_2msvc_2getopt_8h.html#ac393ec775622430dfe25cd2ac9dec9f4',1,'EMSG():&#160;getopt.h']]],
   ['en_5fadcclkh_5fclkgn',['EN_ADCCLKH_CLKGN',['../d4/d84/LMS7002M__parameters__compact_8h.html#ab1ac4c2045d6cafb280d5bae7c8fb741',1,'LMS7002M_parameters_compact.h']]],
   ['en_5famphf_5fpdet_5ftrf',['EN_AMPHF_PDET_TRF',['../d4/d84/LMS7002M__parameters__compact_8h.html#ab0d2b3659780dad0144852b5067b5391',1,'LMS7002M_parameters_compact.h']]],
   ['en_5fcoarse_5fcklgen',['EN_COARSE_CKLGEN',['../d4/d84/LMS7002M__parameters__compact_8h.html#a8ad3021c4e247238580c7316e85eafed',1,'LMS7002M_parameters_compact.h']]],

@@ -1,5 +1,7 @@
 var searchData=
 [
+  ['badarg',['BADARG',['../d5/ded/limesuite-dev_2external_2msvc_2getopt_8h.html#aa66fa298ed3187720cb609e15cd7d22c',1,'BADARG():&#160;getopt.h'],['../df/da5/soapysdr_2apps_2msvc_2getopt_8h.html#aa66fa298ed3187720cb609e15cd7d22c',1,'BADARG():&#160;getopt.h']]],
+  ['badch',['BADCH',['../d5/ded/limesuite-dev_2external_2msvc_2getopt_8h.html#a1c8c2c090f7416155b04f9d6eb50faa0',1,'BADCH():&#160;getopt.h'],['../df/da5/soapysdr_2apps_2msvc_2getopt_8h.html#a1c8c2c090f7416155b04f9d6eb50faa0',1,'BADCH():&#160;getopt.h']]],
   ['batch_5frx_5fsetup',['BATCH_RX_SETUP',['../d2/da6/lms7002m__filters_8c.html#a3effd48ce344144155ae040e316ee0cf',1,'lms7002m_filters.c']]],
   ['batch_5ftx_5fsetup',['BATCH_TX_SETUP',['../d2/da6/lms7002m__filters_8c.html#a9d0cfc738b7b42e6b902cbf22037b102',1,'lms7002m_filters.c']]],
   ['bdata',['bdata',['../d7/d69/typedefs_8h.html#a4c97264453f16cbc633de35be518e550',1,'typedefs.h']]],

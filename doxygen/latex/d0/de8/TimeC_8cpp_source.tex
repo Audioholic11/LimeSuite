@@ -1,0 +1,43 @@
+\subsection{Time\+C.\+cpp}
+\label{TimeC_8cpp_source}\index{/home/erik/prefix/default/src/soapysdr/lib/\+Time\+C.\+cpp@{/home/erik/prefix/default/src/soapysdr/lib/\+Time\+C.\+cpp}}
+
+\begin{DoxyCode}
+00001 \textcolor{comment}{// Copyright (c) 2015-2015 Josh Blum}
+00002 \textcolor{comment}{// SPDX-License-Identifier: BSL-1.0}
+00003 
+00004 \textcolor{preprocessor}{#include <SoapySDR/Time.h>}
+00005 \textcolor{preprocessor}{#include <cmath>}
+00006 
+00007 \textcolor{keyword}{extern} \textcolor{stringliteral}{"C"} \{
+00008 
+00009 \textcolor{preprocessor}{#if defined(\_MSC\_VER) && (\_MSC\_VER < 1800)}
+00010 
+00011 \textcolor{keyword}{static} \textcolor{keyword}{inline} \textcolor{keywordtype}{long} \textcolor{keywordtype}{long} \textcolor{keywordtype}{int} llround(\textcolor{keyword}{const} \textcolor{keywordtype}{double} x)
+00012 \{
+00013     \textcolor{keywordflow}{return} (\textcolor{keywordtype}{long} \textcolor{keywordtype}{long} \textcolor{keywordtype}{int})((x < (0.0)) ? (x - (0.5)) : (x + (0.5)));
+00014 \}
+00015 
+00016 \textcolor{preprocessor}{#endif}
+00017 
+00018 \textcolor{keywordtype}{long} \textcolor{keywordtype}{long} SoapySDR_ticksToTimeNs(\textcolor{keyword}{const} \textcolor{keywordtype}{long} \textcolor{keywordtype}{long} ticks, \textcolor{keyword}{const} \textcolor{keywordtype}{double} rate)
+00019 \{
+00020     \textcolor{keyword}{const} \textcolor{keywordtype}{long} \textcolor{keywordtype}{long} ratell = (\textcolor{keywordtype}{long} long)(rate);
+00021     \textcolor{keyword}{const} \textcolor{keywordtype}{long} \textcolor{keywordtype}{long} full = (\textcolor{keywordtype}{long} long)(ticks/ratell);
+00022     \textcolor{keyword}{const} \textcolor{keywordtype}{long} \textcolor{keywordtype}{long} err = ticks - (full*ratell);
+00023     \textcolor{keyword}{const} \textcolor{keywordtype}{double} part = full*(rate - ratell);
+00024     \textcolor{keyword}{const} \textcolor{keywordtype}{double} frac = ((err - part)*1000000000)/rate;
+00025     \textcolor{keywordflow}{return} (full*1000000000) + llround(frac);
+00026 \}
+00027 
+00028 \textcolor{keywordtype}{long} \textcolor{keywordtype}{long} SoapySDR_timeNsToTicks(\textcolor{keyword}{const} \textcolor{keywordtype}{long} \textcolor{keywordtype}{long} timeNs, \textcolor{keyword}{const} \textcolor{keywordtype}{double} rate)
+00029 \{
+00030     \textcolor{keyword}{const} \textcolor{keywordtype}{long} \textcolor{keywordtype}{long} ratell = (\textcolor{keywordtype}{long} long)(rate);
+00031     \textcolor{keyword}{const} \textcolor{keywordtype}{long} \textcolor{keywordtype}{long} full = (\textcolor{keywordtype}{long} long)(timeNs/1000000000);
+00032     \textcolor{keyword}{const} \textcolor{keywordtype}{long} \textcolor{keywordtype}{long} err = timeNs - (full*1000000000);
+00033     \textcolor{keyword}{const} \textcolor{keywordtype}{double} part = full*(rate - ratell);
+00034     \textcolor{keyword}{const} \textcolor{keywordtype}{double} frac = part + ((err*rate)/1000000000);
+00035     \textcolor{keywordflow}{return} (full*ratell) + llround(frac);
+00036 \}
+00037 
+00038 \}
+\end{DoxyCode}

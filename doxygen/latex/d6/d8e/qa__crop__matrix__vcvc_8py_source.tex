@@ -1,0 +1,96 @@
+\subsection{qa\+\_\+crop\+\_\+matrix\+\_\+vcvc.\+py}
+\label{qa__crop__matrix__vcvc_8py_source}\index{/home/erik/prefix/default/src/gr-\/radar-\/dev/python/qa\+\_\+crop\+\_\+matrix\+\_\+vcvc.\+py@{/home/erik/prefix/default/src/gr-\/radar-\/dev/python/qa\+\_\+crop\+\_\+matrix\+\_\+vcvc.\+py}}
+
+\begin{DoxyCode}
+00001 \textcolor{comment}{#!/usr/bin/env python}
+00002 \textcolor{comment}{# -*- coding: utf-8 -*-}
+00003 \textcolor{comment}{# }
+00004 \textcolor{comment}{# Copyright 2014 Communications Engineering Lab, KIT.}
+00005 \textcolor{comment}{# }
+00006 \textcolor{comment}{# This is free software; you can redistribute it and/or modify}
+00007 \textcolor{comment}{# it under the terms of the GNU General Public License as published by}
+00008 \textcolor{comment}{# the Free Software Foundation; either version 3, or (at your option)}
+00009 \textcolor{comment}{# any later version.}
+00010 \textcolor{comment}{# }
+00011 \textcolor{comment}{# This software is distributed in the hope that it will be useful,}
+00012 \textcolor{comment}{# but WITHOUT ANY WARRANTY; without even the implied warranty of}
+00013 \textcolor{comment}{# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the}
+00014 \textcolor{comment}{# GNU General Public License for more details.}
+00015 \textcolor{comment}{# }
+00016 \textcolor{comment}{# You should have received a copy of the GNU General Public License}
+00017 \textcolor{comment}{# along with this software; see the file COPYING.  If not, write to}
+00018 \textcolor{comment}{# the Free Software Foundation, Inc., 51 Franklin Street,}
+00019 \textcolor{comment}{# Boston, MA 02110-1301, USA.}
+00020 \textcolor{comment}{# }
+00021 
+00022 \textcolor{keyword}{from} gnuradio \textcolor{keyword}{import} gr, gr\_unittest
+00023 \textcolor{keyword}{from} gnuradio \textcolor{keyword}{import} blocks
+00024 \textcolor{keyword}{import} radar\_swig \textcolor{keyword}{as} radar
+00025 
+00026 \textcolor{keyword}{class }qa_crop_matrix_vcvc (gr\_unittest.TestCase):
+00027 
+00028     \textcolor{keyword}{def }setUp (self):
+00029         self.tb = gr.top\_block ()
+00030 
+00031     \textcolor{keyword}{def }tearDown (self):
+00032         self.tb = \textcolor{keywordtype}{None}
+00033 
+00034     \textcolor{keyword}{def }test_001_t (self):
+00035         \textcolor{comment}{# set up fg}
+00036         in\_data = range(16)
+00037         vlen\_in = 4
+00038         
+00039         crop\_x = (0,3)
+00040         crop\_y = (0,3)
+00041         
+00042         src = blocks.vector\_source\_c(in\_data)
+00043         s2v = blocks.stream\_to\_vector(8,vlen\_in)
+00044         s2ts = blocks.stream\_to\_tagged\_stream(8,vlen\_in,len(in\_data)/vlen\_in,\textcolor{stringliteral}{'packet\_len'})
+00045         crop = radar.crop\_matrix\_vcvc(vlen\_in,crop\_x,crop\_y)
+00046         v2s = blocks.vector\_to\_stream(8,crop\_x[1]-crop\_x[0])
+00047         snk = blocks.vector\_sink\_c()
+00048         debug = blocks.tag\_debug(8,\textcolor{stringliteral}{'debug'})
+00049         
+00050         self.tb.connect(src,s2v,s2ts,crop,v2s,snk)
+00051         self.tb.connect(v2s,debug)
+00052         self.tb.run ()
+00053         \textcolor{comment}{# check data}
+00054         ref\_data = (0,1,2,4,5,6,8,9,10)
+00055         out\_data = snk.data()
+00056         \textcolor{keywordflow}{print} \textcolor{stringliteral}{"INDATA:"}, in\_data
+00057         \textcolor{keywordflow}{print} \textcolor{stringliteral}{"REF: "}, ref\_data
+00058         \textcolor{keywordflow}{print} \textcolor{stringliteral}{"OUTPUT:"}, out\_data
+00059         \textcolor{keywordflow}{for} k \textcolor{keywordflow}{in} range(len(out\_data)):
+00060             self.assertEqual(out\_data[k].real,ref\_data[k])
+00061             
+00062     \textcolor{keyword}{def }test_002_t (self):
+00063         \textcolor{comment}{# set up fg}
+00064         in\_data = range(20)
+00065         vlen\_in = 5
+00066         
+00067         crop\_x = (2,4)
+00068         crop\_y = (1,4)
+00069         
+00070         src = blocks.vector\_source\_c(in\_data)
+00071         s2v = blocks.stream\_to\_vector(8,vlen\_in)
+00072         s2ts = blocks.stream\_to\_tagged\_stream(8,vlen\_in,len(in\_data)/vlen\_in,\textcolor{stringliteral}{'packet\_len'})
+00073         crop = radar.crop\_matrix\_vcvc(vlen\_in,crop\_x,crop\_y)
+00074         v2s = blocks.vector\_to\_stream(8,crop\_x[1]-crop\_x[0])
+00075         snk = blocks.vector\_sink\_c()
+00076         debug = blocks.tag\_debug(8,\textcolor{stringliteral}{'debug'})
+00077         
+00078         self.tb.connect(src,s2v,s2ts,crop,v2s,snk)
+00079         self.tb.connect(v2s,debug)
+00080         self.tb.run ()
+00081         \textcolor{comment}{# check data}
+00082         ref\_data = (7,8,12,13,17,18)
+00083         out\_data = snk.data()
+00084         \textcolor{keywordflow}{print} \textcolor{stringliteral}{"INDATA:"}, in\_data
+00085         \textcolor{keywordflow}{print} \textcolor{stringliteral}{"REF: "}, ref\_data
+00086         \textcolor{keywordflow}{print} \textcolor{stringliteral}{"OUTPUT:"}, out\_data
+00087         \textcolor{keywordflow}{for} k \textcolor{keywordflow}{in} range(len(out\_data)):
+00088             self.assertEqual(out\_data[k].real,ref\_data[k])
+00089 
+00090 \textcolor{keywordflow}{if} \_\_name\_\_ == \textcolor{stringliteral}{'\_\_main\_\_'}:
+00091     gr\_unittest.run(qa\_crop\_matrix\_vcvc)\textcolor{comment}{#, "qa\_crop\_matrix\_vcvc.xml")}
+\end{DoxyCode}

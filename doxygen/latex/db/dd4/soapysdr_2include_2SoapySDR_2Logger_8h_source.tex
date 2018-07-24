@@ -1,0 +1,53 @@
+\subsection{Logger.\+h}
+\label{soapysdr_2include_2SoapySDR_2Logger_8h_source}\index{/home/erik/prefix/default/src/soapysdr/include/\+Soapy\+S\+D\+R/\+Logger.\+h@{/home/erik/prefix/default/src/soapysdr/include/\+Soapy\+S\+D\+R/\+Logger.\+h}}
+
+\begin{DoxyCode}
+00001 
+00013 \textcolor{preprocessor}{#pragma once}
+00014 \textcolor{preprocessor}{#include <SoapySDR/Config.h>}
+00015 \textcolor{preprocessor}{#include <stdarg.h>}
+00016 
+00029 \textcolor{keyword}{typedef} \textcolor{keyword}{enum}
+00030 \{
+00031     SOAPY_SDR_FATAL    = 1, 
+00032     SOAPY_SDR_CRITICAL = 2, 
+00033     SOAPY_SDR_ERROR    = 3, 
+00034     SOAPY_SDR_WARNING  = 4, 
+00035     SOAPY_SDR_NOTICE   = 5, 
+00036     SOAPY_SDR_INFO     = 6, 
+00037     SOAPY_SDR_DEBUG    = 7, 
+00038     SOAPY_SDR_TRACE    = 8, 
+00039     SOAPY_SDR_SSI      = 9, 
+00040 \} SoapySDRLogLevel;
+00041 
+00043 \textcolor{preprocessor}{#define SOAPY\_SDR\_SSI SOAPY\_SDR\_SSI}
+00044 
+00045 \textcolor{preprocessor}{#ifdef \_\_cplusplus}
+00046 \textcolor{keyword}{extern} \textcolor{stringliteral}{"C"} \{
+00047 \textcolor{preprocessor}{#endif}
+00048 
+00054 SOAPY_SDR_API \textcolor{keywordtype}{void} SoapySDR_log(\textcolor{keyword}{const} SoapySDRLogLevel logLevel, \textcolor{keyword}{const} \textcolor{keywordtype}{char} *
+      message);
+00055 
+00062 SOAPY_SDR_API \textcolor{keywordtype}{void} SoapySDR_vlogf(\textcolor{keyword}{const} SoapySDRLogLevel logLevel, \textcolor{keyword}{const} \textcolor{keywordtype}{char} *
+      format, va\_list argList);
+00063 
+00069 \textcolor{keyword}{static} \textcolor{keyword}{inline} \textcolor{keywordtype}{void} SoapySDR_logf(\textcolor{keyword}{const} SoapySDRLogLevel logLevel, \textcolor{keyword}{const} \textcolor{keywordtype}{char} *format, ...)
+00070 \{
+00071     va\_list argList;
+00072     va\_start(argList, format);
+00073     SoapySDR_vlogf(logLevel, format, argList);
+00074     va\_end(argList);
+00075 \}
+00076 
+00080 \textcolor{keyword}{typedef} void (*SoapySDRLogHandler)(\textcolor{keyword}{const} SoapySDRLogLevel logLevel, \textcolor{keyword}{const} \textcolor{keywordtype}{char} *
+      message);
+00081 
+00086 SOAPY_SDR_API \textcolor{keywordtype}{void} SoapySDR_registerLogHandler(\textcolor{keyword}{const} SoapySDRLogHandler handler);
+00087 
+00092 SOAPY_SDR_API \textcolor{keywordtype}{void} SoapySDR_setLogLevel(\textcolor{keyword}{const} SoapySDRLogLevel logLevel);
+00093 
+00094 \textcolor{preprocessor}{#ifdef \_\_cplusplus}
+00095 \}
+00096 \textcolor{preprocessor}{#endif}
+\end{DoxyCode}

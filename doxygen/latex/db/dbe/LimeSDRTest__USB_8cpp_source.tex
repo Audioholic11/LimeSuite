@@ -1,0 +1,192 @@
+\subsection{Lime\+S\+D\+R\+Test\+\_\+\+U\+S\+B.\+cpp}
+\label{LimeSDRTest__USB_8cpp_source}\index{/home/erik/prefix/default/src/limesuite-\/dev/\+Quick\+Test/\+Lime\+S\+D\+R\+Test\+\_\+\+U\+S\+B.\+cpp@{/home/erik/prefix/default/src/limesuite-\/dev/\+Quick\+Test/\+Lime\+S\+D\+R\+Test\+\_\+\+U\+S\+B.\+cpp}}
+
+\begin{DoxyCode}
+00001 \textcolor{preprocessor}{#include <chrono>}
+00002 \textcolor{preprocessor}{#include "Logger.h"}
+00003 \textcolor{preprocessor}{#include "LMS64CProtocol.h"}
+00004 \textcolor{preprocessor}{#include "LimeSDRTest.h"}
+00005 \textcolor{preprocessor}{#include <thread>}
+00006 \textcolor{preprocessor}{#include "kiss_fft.h"}
+00007 \textcolor{preprocessor}{#include "FPGA_Mini.h"}
+00008 \textcolor{preprocessor}{#include <ctime>}
+00009 \textcolor{preprocessor}{#include "Si5351C.h"}
+00010 \textcolor{preprocessor}{#include "ADF4002.h"}
+00011 
+00012 \textcolor{keyword}{using namespace }lime;
+00013 
+00014 \textcolor{keywordtype}{int} LimeSDRTest_USB::ClockNetworkTest()
+00015 \{
+00016     \textcolor{keywordtype}{int} ret = 0;
+00017     UpdateStatus(LMS_TEST_INFO, \textcolor{stringliteral}{"->FX3 GPIF clock test"});
+00018     \textcolor{keywordflow}{if} (GPIFClkTest() == -1)
+00019     \{
+00020         UpdateStatus(LMS_TEST_INFO, \textcolor{stringliteral}{"->FX3 GPIF clock test FAILED"});
+00021         ret = -1;
+00022     \}
+00023 
+00024     UpdateStatus(LMS_TEST_INFO, \textcolor{stringliteral}{"->Si5351C test"});
+00025     \textcolor{keywordflow}{if} (Si5351CTest() == -1)
+00026     \{
+00027         UpdateStatus(LMS_TEST_INFO, \textcolor{stringliteral}{"  FAILED"});
+00028         ret = -1;
+00029     \}
+00030     
+00031     UpdateStatus(LMS_TEST_INFO, \textcolor{stringliteral}{"->ADF4002 Test"});
+00032     \textcolor{keywordflow}{if} (ADF4002Test() == -1)
+00033     \{
+00034         UpdateStatus(LMS_TEST_INFO, \textcolor{stringliteral}{"  FAILED"});
+00035         ret = -1;
+00036     \}
+00037 
+00038     UpdateStatus(LMS_TEST_INFO, \textcolor{stringliteral}{"->VCTCXO test"});
+00039     \textcolor{keywordflow}{if} (VCTCXOTest() == -1)
+00040     \{
+00041         UpdateStatus(LMS_TEST_INFO, \textcolor{stringliteral}{"  FAILED"});
+00042         ret = -1;
+00043     \}
+00044 
+00045     \textcolor{keywordflow}{return} ret;
+00046 \}
+00047 
+00048 \textcolor{keywordtype}{int} LimeSDRTest_USB::Si5351CTest()
+00049 \{
+00050     \textcolor{keyword}{auto} port = device->GetConnection();
+00051     std::shared\_ptr<Si5351C> si5351module(\textcolor{keyword}{new} Si5351C());
+00052     si5351module->Initialize(port);
+00053     si5351module->SetPLL(0, 25000000, 0);
+00054     si5351module->SetPLL(1, 25000000, 0);
+00055     \textcolor{keywordflow}{for} (\textcolor{keywordtype}{int} i = 0; i < 8; ++i)
+00056         si5351module->SetClock(i, 27000000, \textcolor{keyword}{true}, \textcolor{keyword}{false});
+00057     Si5351C::Status status = si5351module->ConfigureClocks();
+00058     \textcolor{keywordflow}{if} (status != Si5351C::SUCCESS || si5351module->UploadConfiguration() != 
+      Si5351C::SUCCESS)
+00059     \{
+00060         UpdateStatus(LMS_TEST_INFO, \textcolor{stringliteral}{"Failed to configure Si5351C"});
+00061         \textcolor{keywordflow}{return} -1;
+00062     \}
+00063     std::this\_thread::sleep\_for(std::chrono::milliseconds(5)); \textcolor{comment}{//some settle time}
+00064 
+00065     \textcolor{keywordflow}{if} ((InitFPGATest(0x02, 1.0) & 0x2) != 0x2)
+00066         \textcolor{keywordflow}{return} -1;
+00067 
+00068     uint32\_t addr[] = \{ 0x6A, 0x6B, 0x6C, 0x6D, 0x6F, 0x70, 0x71 \};
+00069     uint32\_t vals[7];
+00070     \textcolor{keywordflow}{if} (port->ReadRegisters(addr, vals, 7) != 0)
+00071         \textcolor{keywordflow}{return} -1;
+00072 
+00073     std::string str = \textcolor{stringliteral}{""};
+00074     \textcolor{keywordtype}{int} result = 0;
+00075     \textcolor{keywordflow}{for} (\textcolor{keywordtype}{int} i = 0; i < 7; i++)
+00076     \{
+00077         str += \textcolor{stringliteral}{"  CLK"} + std::to\_string(i) + \textcolor{stringliteral}{": "} + std::to\_string(vals[0]) + \textcolor{stringliteral}{" / 17554"};;
+00078         \textcolor{keywordtype}{int} check = (int)vals[i] - vals[0];
+00079         \textcolor{keywordflow}{if} (check > 1 || check < -1)
+00080         \{
+00081             result = -1;
+00082             str += \textcolor{stringliteral}{" - FAILED\(\backslash\)n"};
+00083             \textcolor{keywordflow}{continue};
+00084         \}
+00085         check = (int)vals[i] - 17554;
+00086         \textcolor{keywordflow}{if} (check > 5 || check < -5)
+00087         \{
+00088             str += \textcolor{stringliteral}{" - FAILED\(\backslash\)n"};
+00089             result = -1;
+00090             \textcolor{keywordflow}{continue};
+00091         \}
+00092         str += \textcolor{stringliteral}{" - PASSED\(\backslash\)n"};
+00093     \}
+00094     UpdateStatus(LMS_TEST_INFO, str.substr(0,str.length()-1).c\_str());
+00095     \textcolor{keywordflow}{return} result;
+00096 \}
+00097 
+00098 
+00099 \textcolor{keywordtype}{int} LimeSDRTest_USB::ADF4002Test()
+00100 \{
+00101     uint32\_t data\_l[] = \{ 0x1F8093, 0x1F80F2, 0x0001F4, 0x018001 \};
+00102     uint32\_t data\_h[] = \{ 0x1F8093, 0x1F80B2, 0x0001F4, 0x018001 \};
+00103     \textcolor{keyword}{auto} port = device->GetConnection();
+00104     \textcolor{comment}{// ADF4002 needs to be writen 4 values of 24 bits}
+00105     \textcolor{keywordflow}{if} (port->TransactSPI(0x30, data\_l, \textcolor{keyword}{nullptr}, 4) != 0)
+00106         \textcolor{keywordflow}{return} -1;
+00107 
+00108     \textcolor{keywordflow}{if} (InitFPGATest(0x08, -1) == -1)
+00109         \textcolor{keywordflow}{return} -1;
+00110 
+00111     \textcolor{keywordflow}{for} (\textcolor{keywordtype}{int} i = 0; i < 5; i++)
+00112     \{
+00113         \textcolor{keywordflow}{if} (port->TransactSPI(0x30, data\_h, \textcolor{keyword}{nullptr}, 4) != 0)
+00114             \textcolor{keywordflow}{return} -1;
+00115         \textcolor{keywordflow}{if} (port->TransactSPI(0x30, data\_l, \textcolor{keyword}{nullptr}, 4) != 0)
+00116             \textcolor{keywordflow}{return} -1;
+00117     \}
+00118 
+00119     \textcolor{keywordtype}{unsigned} adf\_cnt;
+00120     \textcolor{keywordflow}{if} (port->ReadRegister(0x74, adf\_cnt) != 0)
+00121         \textcolor{keywordflow}{return} -1;
+00122 
+00123     std::string str = \textcolor{stringliteral}{"  Result: "} + std::to\_string(adf\_cnt);
+00124     \textcolor{keywordflow}{if} (adf\_cnt != 10)
+00125     \{
+00126             str += \textcolor{stringliteral}{" - FAILED"};
+00127             UpdateStatus(LMS_TEST_INFO, str.c\_str());
+00128             \textcolor{keywordflow}{return} -1;
+00129     \}
+00130     str += \textcolor{stringliteral}{" - PASSED"};
+00131     UpdateStatus(LMS_TEST_INFO, str.c\_str());
+00132     \textcolor{keywordflow}{return} 0;
+00133 \}
+00134 
+00135 
+00136 \textcolor{keywordtype}{int} LimeSDRTest_USB::RFTest()
+00137 \{
+00138     \textcolor{keyword}{auto} testPath = [\textcolor{keyword}{this}](\textcolor{keywordtype}{float} rxfreq, \textcolor{keywordtype}{int} gain, \textcolor{keywordtype}{int} rxPath)->\textcolor{keywordtype}{bool}\{
+00139         \textcolor{keyword}{const} \textcolor{keywordtype}{float} tx\_offset = 5e6;
+00140         \textcolor{keywordtype}{bool} passed = \textcolor{keyword}{true};
+00141         \textcolor{keywordflow}{if} (device->GetConnection()->WriteRegister(0x17, rxPath==1? 0x11:0x44) != 0)
+00142             \textcolor{keywordflow}{return} \textcolor{keyword}{false};
+00143         \textcolor{keywordflow}{if} (device->GetLMS()->SetFrequencySX(lime::LMS7002M::Tx, rxfreq+tx\_offset)!=0)
+00144             \textcolor{keywordflow}{return} \textcolor{keyword}{false};
+00145         \textcolor{keywordflow}{if} (device->GetLMS()->SetFrequencySX(lime::LMS7002M::Rx, rxfreq)!=0)
+00146             \textcolor{keywordflow}{return} \textcolor{keyword}{false};
+00147 
+00148         \textcolor{keywordflow}{for} (\textcolor{keywordtype}{int} ch = 0; ch < 2; ch++) \{
+00149             RFTestData testinfo = \{rxfreq, rxfreq+tx\_offset, -15, tx\_offset, ch\};
+00150             device->SetPath(\textcolor{keyword}{false}, ch, rxPath);
+00151             device->SetPath(\textcolor{keyword}{true}, ch, rxPath==4? 1 : 2);
+00152             \textcolor{keywordflow}{if} (rxPath == 1)
+00153                 device->SetGain(\textcolor{keyword}{false},ch, gain);
+00154             \textcolor{keywordflow}{else}
+00155                 device->WriteParam(LMS7_G_RXLOOPB_RFE, gain, ch);
+00156             \textcolor{keywordtype}{bool} testPassed = RunTest(testinfo.peakval,testinfo.peakfreq, ch);
+00157             std::string str = RFTestInfo(testinfo, testPassed);
+00158             UpdateStatus(LMS_TEST_INFO, str.c\_str());
+00159             \textcolor{keywordflow}{if} (testPassed == \textcolor{keyword}{false})
+00160                 passed = \textcolor{keyword}{false};
+00161         \}
+00162         \textcolor{keywordflow}{return} passed;
+00163     \};
+00164 
+00165     UpdateStatus(LMS_TEST_INFO, \textcolor{stringliteral}{"->Configure LMS"});
+00166     device->Init();
+00167     \textcolor{keywordflow}{if} (device->SetRate(61.44e6, 0)!=0)
+00168     \{
+00169         UpdateStatus(LMS_TEST_FAIL, \textcolor{stringliteral}{"Failed to set sample rate"});
+00170         \textcolor{keywordflow}{return} -1;
+00171     \}
+00172 
+00173     device->SetTestSignal(\textcolor{keyword}{true}, 0, LMS_TESTSIG_DC, 0x7000, 0x7000);
+00174     device->EnableChannel(\textcolor{keyword}{true}, 1, \textcolor{keyword}{true});
+00175     device->EnableChannel(\textcolor{keyword}{false}, 1, \textcolor{keyword}{true});
+00176     device->SetTestSignal(\textcolor{keyword}{true}, 1, LMS_TESTSIG_DC, 0x7000, 0x7000);
+00177 
+00178     UpdateStatus(LMS_TEST_INFO, \textcolor{stringliteral}{"->Run Tests (TX\_2-> LNA\_L):"});
+00179     \textcolor{keywordtype}{bool} passed = testPath(800e6, 1, 5);
+00180     UpdateStatus(LMS_TEST_INFO, \textcolor{stringliteral}{"->Run Tests (TX\_1 -> LNA\_W):"});
+00181     passed &= testPath(1800e6, 3, 4);
+00182     UpdateStatus(LMS_TEST_INFO, \textcolor{stringliteral}{"->Run Tests (TX\_2-> LNA\_H):"});
+00183     passed &= testPath(2500e6, 21, 1);
+00184 
+00185     \textcolor{keywordflow}{return} passed ? 0 : -1;
+00186 \}
+\end{DoxyCode}

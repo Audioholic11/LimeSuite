@@ -1,0 +1,55 @@
+\subsection{Null\+Device.\+cpp}
+\label{NullDevice_8cpp_source}\index{/home/erik/prefix/default/src/soapysdr/lib/\+Null\+Device.\+cpp@{/home/erik/prefix/default/src/soapysdr/lib/\+Null\+Device.\+cpp}}
+
+\begin{DoxyCode}
+00001 \textcolor{comment}{// Copyright (c) 2014-2015 Josh Blum}
+00002 \textcolor{comment}{// SPDX-License-Identifier: BSL-1.0}
+00003 
+00004 \textcolor{preprocessor}{#include <SoapySDR/Device.hpp>}
+00005 \textcolor{preprocessor}{#include <SoapySDR/Registry.hpp>}
+00006 
+00007 \textcolor{keyword}{class }NullDevice : \textcolor{keyword}{public} SoapySDR::Device
+00008 \{
+00009 \textcolor{keyword}{public}:
+00010     NullDevice(\textcolor{keywordtype}{void})
+00011     \{
+00012         \textcolor{keywordflow}{return};
+00013     \}
+00014 
+00015     std::string getDriverKey(\textcolor{keywordtype}{void})\textcolor{keyword}{ const}
+00016 \textcolor{keyword}{    }\{
+00017         \textcolor{keywordflow}{return} \textcolor{stringliteral}{"null"};
+00018     \}
+00019 
+00020     std::string getHardwareKey(\textcolor{keywordtype}{void})\textcolor{keyword}{ const}
+00021 \textcolor{keyword}{    }\{
+00022         \textcolor{keywordflow}{return} \textcolor{stringliteral}{"null"};
+00023     \}
+00024 \};
+00025 
+00026 SoapySDR::KwargsList findNullDevice(\textcolor{keyword}{const} SoapySDR::Kwargs &args)
+00027 \{
+00028     SoapySDR::KwargsList results;
+00029 
+00030     \textcolor{comment}{//require that the user specify type=null}
+00031     \textcolor{keywordflow}{if} (args.count(\textcolor{stringliteral}{"type"}) == 0) \textcolor{keywordflow}{return} results;
+00032     \textcolor{keywordflow}{if} (args.at(\textcolor{stringliteral}{"type"}) != \textcolor{stringliteral}{"null"}) \textcolor{keywordflow}{return} results;
+00033 
+00034     SoapySDR::Kwargs nullArgs;
+00035     nullArgs[\textcolor{stringliteral}{"type"}] = \textcolor{stringliteral}{"null"};
+00036     results.push\_back(nullArgs);
+00037 
+00038     \textcolor{keywordflow}{return} results;
+00039 \}
+00040 
+00041 SoapySDR::Device *makeNullDevice(\textcolor{keyword}{const} SoapySDR::Kwargs &)
+00042 \{
+00043     \textcolor{keywordflow}{return} \textcolor{keyword}{new} NullDevice();
+00044 \}
+00045 
+00054 \textcolor{keywordtype}{void} lateLoadNullDevice(\textcolor{keywordtype}{void})
+00055 \{
+00056     \textcolor{keyword}{static} SoapySDR::Registry registerNullDevice(\textcolor{stringliteral}{"null"}, &findNullDevice, &
+      makeNullDevice, SOAPY_SDR_ABI_VERSION);
+00057 \}
+\end{DoxyCode}

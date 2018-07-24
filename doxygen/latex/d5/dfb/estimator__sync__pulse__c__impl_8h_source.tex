@@ -1,0 +1,63 @@
+\subsection{estimator\+\_\+sync\+\_\+pulse\+\_\+c\+\_\+impl.\+h}
+\label{estimator__sync__pulse__c__impl_8h_source}\index{/home/erik/prefix/default/src/gr-\/radar-\/dev/lib/estimator\+\_\+sync\+\_\+pulse\+\_\+c\+\_\+impl.\+h@{/home/erik/prefix/default/src/gr-\/radar-\/dev/lib/estimator\+\_\+sync\+\_\+pulse\+\_\+c\+\_\+impl.\+h}}
+
+\begin{DoxyCode}
+00001 \textcolor{comment}{/* -*- c++ -*- */}
+00002 \textcolor{comment}{/* }
+00003 \textcolor{comment}{ * Copyright 2014 Communications Engineering Lab, KIT.}
+00004 \textcolor{comment}{ * }
+00005 \textcolor{comment}{ * This is free software; you can redistribute it and/or modify}
+00006 \textcolor{comment}{ * it under the terms of the GNU General Public License as published by}
+00007 \textcolor{comment}{ * the Free Software Foundation; either version 3, or (at your option)}
+00008 \textcolor{comment}{ * any later version.}
+00009 \textcolor{comment}{ * }
+00010 \textcolor{comment}{ * This software is distributed in the hope that it will be useful,}
+00011 \textcolor{comment}{ * but WITHOUT ANY WARRANTY; without even the implied warranty of}
+00012 \textcolor{comment}{ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the}
+00013 \textcolor{comment}{ * GNU General Public License for more details.}
+00014 \textcolor{comment}{ * }
+00015 \textcolor{comment}{ * You should have received a copy of the GNU General Public License}
+00016 \textcolor{comment}{ * along with this software; see the file COPYING.  If not, write to}
+00017 \textcolor{comment}{ * the Free Software Foundation, Inc., 51 Franklin Street,}
+00018 \textcolor{comment}{ * Boston, MA 02110-1301, USA.}
+00019 \textcolor{comment}{ */}
+00020 
+00021 \textcolor{preprocessor}{#ifndef INCLUDED\_RADAR\_ESTIMATOR\_SYNC\_PULSE\_C\_IMPL\_H}
+00022 \textcolor{preprocessor}{#define INCLUDED\_RADAR\_ESTIMATOR\_SYNC\_PULSE\_C\_IMPL\_H}
+00023 
+00024 \textcolor{preprocessor}{#include <radar/estimator_sync_pulse_c.h>}
+00025 
+00026 \textcolor{keyword}{namespace }gr \{
+00027   \textcolor{keyword}{namespace }radar \{
+00028 
+00029     \textcolor{keyword}{class }estimator_sync_pulse_c_impl : \textcolor{keyword}{public} estimator_sync_pulse_c
+00030     \{
+00031      \textcolor{keyword}{private}:
+00032       \textcolor{comment}{// Nothing to declare in this block.}
+00033 
+00034      \textcolor{keyword}{protected}:
+00035       \textcolor{keywordtype}{int} calculate_output_stream_length(\textcolor{keyword}{const} gr\_vector\_int &ninput\_items);
+00036 
+00037      \textcolor{keyword}{public}:
+00038       estimator_sync_pulse_c_impl(\textcolor{keywordtype}{int} num\_xcorr, \textcolor{keyword}{const} std::string len\_key);
+00039       ~estimator_sync_pulse_c_impl();
+00040       \textcolor{keywordtype}{void} set_num_xcorr(\textcolor{keywordtype}{int} num);
+00041       
+00042       \textcolor{keywordtype}{int} d_num_xcorr;
+00043       pmt::pmt\_t d_port_id;
+00044       \textcolor{keywordtype}{int} d_noutput_items_vec;
+00045       std::vector<float> d_in_tx_real, d_in_rx_real;
+00046 
+00047       \textcolor{comment}{// Where all the action really happens}
+00048       \textcolor{keywordtype}{int} work(\textcolor{keywordtype}{int} noutput\_items,
+00049                gr\_vector\_int &ninput\_items,
+00050                gr\_vector\_const\_void\_star &input\_items,
+00051                gr\_vector\_void\_star &output\_items);
+00052     \};
+00053 
+00054   \} \textcolor{comment}{// namespace radar}
+00055 \} \textcolor{comment}{// namespace gr}
+00056 
+00057 \textcolor{preprocessor}{#endif }\textcolor{comment}{/* INCLUDED\_RADAR\_ESTIMATOR\_SYNC\_PULSE\_C\_IMPL\_H */}\textcolor{preprocessor}{}
+00058 
+\end{DoxyCode}

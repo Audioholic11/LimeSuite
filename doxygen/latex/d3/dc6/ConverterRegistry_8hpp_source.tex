@@ -1,0 +1,56 @@
+\subsection{Converter\+Registry.\+hpp}
+\label{ConverterRegistry_8hpp_source}\index{/home/erik/prefix/default/src/soapysdr/include/\+Soapy\+S\+D\+R/\+Converter\+Registry.\+hpp@{/home/erik/prefix/default/src/soapysdr/include/\+Soapy\+S\+D\+R/\+Converter\+Registry.\+hpp}}
+
+\begin{DoxyCode}
+00001 
+00012 \textcolor{preprocessor}{#pragma once}
+00013 \textcolor{preprocessor}{#include <SoapySDR/Config.hpp>}
+00014 \textcolor{preprocessor}{#include <SoapySDR/Logger.hpp>}
+00015 \textcolor{preprocessor}{#include <SoapySDR/Formats.hpp>}
+00016 \textcolor{preprocessor}{#include <utility>}
+00017 \textcolor{preprocessor}{#include <vector>}
+00018 \textcolor{preprocessor}{#include <map>}
+00019 \textcolor{preprocessor}{#include <string>}
+00020 
+00021 \textcolor{keyword}{namespace }SoapySDR
+00022 \{
+00023   \textcolor{keyword}{class }SOAPY_SDR_API ConverterRegistry
+00024   \{
+00025   \textcolor{keyword}{public}:
+00031     \textcolor{keyword}{typedef} void (*ConverterFunction)(\textcolor{keyword}{const} \textcolor{keywordtype}{void} *, \textcolor{keywordtype}{void} *, \textcolor{keyword}{const} size\_t, \textcolor{keyword}{const} double);
+00032 
+00036     \textcolor{keyword}{enum} FunctionPriority\{
+00037       GENERIC = 0,          \textcolor{comment}{// usual C for-loops, shifts, multiplies, etc}
+00038       VECTORIZED = 3,       \textcolor{comment}{// vectorized operations such as SIMD}
+00039       CUSTOM = 5            \textcolor{comment}{// custom user re-implementation, max priority}
+00040     \};
+00041 
+00045     \textcolor{keyword}{typedef} std::map<FunctionPriority, ConverterFunction> 
+      TargetFormatConverterPriority;
+00046 
+00050     \textcolor{keyword}{typedef} std::map<std::string, TargetFormatConverterPriority> 
+      TargetFormatConverters;
+00051     
+00055     \textcolor{keyword}{typedef} std::map<std::string, TargetFormatConverters> FormatConverters;
+00056 
+00065     ConverterRegistry(\textcolor{keyword}{const} std::string &sourceFormat, \textcolor{keyword}{const} std::string &targetFormat, \textcolor{keyword}{const} 
+      FunctionPriority &priority, ConverterFunction converter);
+00066     
+00074     \textcolor{keyword}{static} std::vector<std::string> listTargetFormats(\textcolor{keyword}{const} std::string &sourceFormat);
+00075     
+00083     \textcolor{keyword}{static} std::vector<std::string> listSourceFormats(\textcolor{keyword}{const} std::string &targetFormat);
+00084     
+00091     \textcolor{keyword}{static} std::vector<FunctionPriority> listPriorities(\textcolor{keyword}{const} std::string &sourceFormat, \textcolor{keyword}{const} 
+      std::string &targetFormat);
+00092     
+00100     \textcolor{keyword}{static} ConverterFunction getFunction(\textcolor{keyword}{const} std::string &sourceFormat, \textcolor{keyword}{const} 
+      std::string &targetFormat);
+00101     \textcolor{keyword}{static} ConverterFunction getFunction(\textcolor{keyword}{const} std::string &sourceFormat, \textcolor{keyword}{const} 
+      std::string &targetFormat, \textcolor{keyword}{const} FunctionPriority &priority);
+00102 
+00106     \textcolor{keyword}{static} std::vector<std::string> listAvailableSourceFormats(\textcolor{keywordtype}{void});
+00107 
+00108   \};
+00109   
+00110 \}
+\end{DoxyCode}

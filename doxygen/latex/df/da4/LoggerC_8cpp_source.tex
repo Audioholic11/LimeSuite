@@ -1,0 +1,125 @@
+\subsection{Logger\+C.\+cpp}
+\label{LoggerC_8cpp_source}\index{/home/erik/prefix/default/src/soapysdr/lib/\+Logger\+C.\+cpp@{/home/erik/prefix/default/src/soapysdr/lib/\+Logger\+C.\+cpp}}
+
+\begin{DoxyCode}
+00001 \textcolor{comment}{// Copyright (c) 2014-2017 Josh Blum}
+00002 \textcolor{comment}{// SPDX-License-Identifier: BSL-1.0}
+00003 
+00004 \textcolor{preprocessor}{#include <SoapySDR/Logger.h>}
+00005 \textcolor{preprocessor}{#include <cstdio>}
+00006 \textcolor{preprocessor}{#include <cstdlib>}
+00007 \textcolor{preprocessor}{#include <string>}
+00008 \textcolor{preprocessor}{#include <iostream>}
+00009 
+00010 \textcolor{comment}{/***********************************************************************}
+00011 \textcolor{comment}{ * default log level supports environment variable}
+00012 \textcolor{comment}{ **********************************************************************/}
+00013 std::string getEnvImpl(\textcolor{keyword}{const} \textcolor{keywordtype}{char} *name);
+00014 
+00015 \textcolor{keyword}{static} SoapySDRLogLevel getDefaultLogLevel(\textcolor{keywordtype}{void})
+00016 \{
+00017     \textcolor{keyword}{const} std::string logLevelEnvStr = getEnvImpl(\textcolor{stringliteral}{"SOAPY\_SDR\_LOG\_LEVEL"});
+00018     \textcolor{keywordflow}{if} (logLevelEnvStr.empty()) \textcolor{keywordflow}{return} SOAPY_SDR_INFO;
+00019 
+00020     \textcolor{comment}{//check string names}
+00021 \textcolor{preprocessor}{    #define checkLogLevelEnvStr(level) \(\backslash\)}
+00022 \textcolor{preprocessor}{        if (logLevelEnvStr == #level) return SOAPY\_SDR\_ ## level}
+00023     checkLogLevelEnvStr(FATAL);
+00024     checkLogLevelEnvStr(CRITICAL);
+00025     checkLogLevelEnvStr(ERROR);
+00026     checkLogLevelEnvStr(WARNING);
+00027     checkLogLevelEnvStr(NOTICE);
+00028     checkLogLevelEnvStr(INFO);
+00029     checkLogLevelEnvStr(DEBUG);
+00030     checkLogLevelEnvStr(TRACE);
+00031 
+00032     \textcolor{comment}{//check int values}
+00033     \textcolor{keyword}{const} \textcolor{keywordtype}{int} logLevelInt = std::atoi(logLevelEnvStr.c\_str());
+00034     \textcolor{keywordflow}{if} (logLevelInt < SOAPY_SDR_FATAL) \textcolor{keywordflow}{return} SOAPY_SDR_FATAL;
+00035     \textcolor{keywordflow}{if} (logLevelInt > SOAPY_SDR_TRACE) \textcolor{keywordflow}{return} SOAPY_SDR_TRACE;
+00036     \textcolor{keywordflow}{return} SoapySDRLogLevel(logLevelInt);
+00037 \}
+00038 
+00039 \textcolor{comment}{/***********************************************************************}
+00040 \textcolor{comment}{ * Compatibility for vasprintf under MSVC}
+00041 \textcolor{comment}{ **********************************************************************/}
+00042 \textcolor{preprocessor}{#ifdef \_MSC\_VER}
+00043 \textcolor{keywordtype}{int} vasprintf(\textcolor{keywordtype}{char} **strp, \textcolor{keyword}{const} \textcolor{keywordtype}{char} *fmt, va\_list ap)
+00044 \{
+00045     \textcolor{keywordtype}{int} r = \_vscprintf(fmt, ap);
+00046     \textcolor{keywordflow}{if} (r < 0) \textcolor{keywordflow}{return} r;
+00047     *strp = (\textcolor{keywordtype}{char} *)malloc(r+1);
+00048     \textcolor{keywordflow}{return} vsprintf\_s(*strp, r+1, fmt, ap);
+00049 \}
+00050 \textcolor{preprocessor}{#endif}
+00051 
+00052 \textcolor{comment}{/***********************************************************************}
+00053 \textcolor{comment}{ * ANSI terminal colors for default logger}
+00054 \textcolor{comment}{ **********************************************************************/}
+00055 \textcolor{preprocessor}{#define ANSI\_COLOR\_RED     "\(\backslash\)x1b[31m"}
+00056 \textcolor{preprocessor}{#define ANSI\_COLOR\_GREEN   "\(\backslash\)x1b[32m"}
+00057 \textcolor{preprocessor}{#define ANSI\_COLOR\_YELLOW  "\(\backslash\)x1b[33m"}
+00058 \textcolor{preprocessor}{#define ANSI\_COLOR\_BLUE    "\(\backslash\)x1b[34m"}
+00059 \textcolor{preprocessor}{#define ANSI\_COLOR\_MAGENTA "\(\backslash\)x1b[35m"}
+00060 \textcolor{preprocessor}{#define ANSI\_COLOR\_CYAN    "\(\backslash\)x1b[36m"}
+00061 \textcolor{preprocessor}{#define ANSI\_COLOR\_RESET   "\(\backslash\)x1b[0m"}
+00062 \textcolor{preprocessor}{#define ANSI\_COLOR\_BOLD    "\(\backslash\)x1b[1m"}
+00063 
+00064 \textcolor{comment}{/***********************************************************************}
+00065 \textcolor{comment}{ * Default log message handler implementation}
+00066 \textcolor{comment}{ **********************************************************************/}
+00067 \textcolor{keywordtype}{void} defaultLogHandler(\textcolor{keyword}{const} SoapySDRLogLevel logLevel, \textcolor{keyword}{const} \textcolor{keywordtype}{char} *message)
+00068 \{
+00069     \textcolor{keywordflow}{switch} (logLevel)
+00070     \{
+00071     \textcolor{keywordflow}{case} SOAPY_SDR_FATAL:    fprintf(stderr, ANSI_COLOR_BOLD ANSI_COLOR_RED \textcolor{stringliteral}{"[FATAL] %s"} 
+      ANSI_COLOR_RESET \textcolor{stringliteral}{"\(\backslash\)n"}, message); \textcolor{keywordflow}{break};
+00072     \textcolor{keywordflow}{case} SOAPY_SDR_CRITICAL: fprintf(stderr, ANSI_COLOR_BOLD ANSI_COLOR_RED \textcolor{stringliteral}{"[CRITICAL] %s"} 
+      ANSI\_COLOR\_RESET \textcolor{stringliteral}{"\(\backslash\)n"}, message); \textcolor{keywordflow}{break};
+00073     \textcolor{keywordflow}{case} SOAPY_SDR_ERROR:    fprintf(stderr, ANSI_COLOR_BOLD ANSI_COLOR_RED \textcolor{stringliteral}{"[ERROR] %s"} ANSI\_COLOR\_RESET \textcolor{stringliteral}{"
+      \(\backslash\)n"}, message); \textcolor{keywordflow}{break};
+00074     \textcolor{keywordflow}{case} SOAPY_SDR_WARNING:  fprintf(stderr, ANSI_COLOR_BOLD ANSI_COLOR_YELLOW \textcolor{stringliteral}{"[WARNING] %s"} 
+      ANSI\_COLOR\_RESET \textcolor{stringliteral}{"\(\backslash\)n"}, message); \textcolor{keywordflow}{break};
+00075     \textcolor{keywordflow}{case} SOAPY_SDR_NOTICE:   fprintf(stderr, ANSI_COLOR_GREEN \textcolor{stringliteral}{"[NOTICE] %s"} ANSI\_COLOR\_RESET \textcolor{stringliteral}{"\(\backslash\)n"}, message)
+      ; \textcolor{keywordflow}{break};
+00076     \textcolor{keywordflow}{case} SOAPY_SDR_INFO:     fprintf(stderr, \textcolor{stringliteral}{"[INFO] %s\(\backslash\)n"}, message); \textcolor{keywordflow}{break};
+00077     \textcolor{keywordflow}{case} SOAPY_SDR_DEBUG:    fprintf(stderr, \textcolor{stringliteral}{"[DEBUG] %s\(\backslash\)n"}, message); \textcolor{keywordflow}{break};
+00078     \textcolor{keywordflow}{case} SOAPY_SDR_TRACE:    fprintf(stderr, \textcolor{stringliteral}{"[TRACE] %s\(\backslash\)n"}, message); \textcolor{keywordflow}{break};
+00079     \textcolor{keywordflow}{case} SOAPY_SDR_SSI:      fputs(message, stderr); fflush(stderr); \textcolor{keywordflow}{break};
+00080     \}
+00081 \}
+00082 
+00083 \textcolor{keyword}{static} SoapySDRLogHandler registeredLogHandler = &defaultLogHandler;
+00084 \textcolor{keyword}{static} SoapySDRLogLevel registeredLogLevel = getDefaultLogLevel();
+00085 
+00086 \textcolor{keyword}{extern} \textcolor{stringliteral}{"C"} \{
+00087 
+00088 \textcolor{keywordtype}{void} SoapySDR_log(\textcolor{keyword}{const} SoapySDRLogLevel logLevel, \textcolor{keyword}{const} \textcolor{keywordtype}{char} *message)
+00089 \{
+00090     \textcolor{keywordflow}{if} (logLevel > registeredLogLevel and logLevel != SOAPY_SDR_SSI) \textcolor{keywordflow}{return};
+00091     \textcolor{keywordflow}{return} registeredLogHandler(logLevel, message);
+00092 \}
+00093 
+00094 \textcolor{keywordtype}{void} SoapySDR_vlogf(\textcolor{keyword}{const} SoapySDRLogLevel logLevel, \textcolor{keyword}{const} \textcolor{keywordtype}{char} *format, va\_list argList)
+00095 \{
+00096     \textcolor{keywordflow}{if} (logLevel > registeredLogLevel) \textcolor{keywordflow}{return};
+00097     \textcolor{keywordtype}{char} *message = NULL;
+00098     \textcolor{keywordflow}{if} (vasprintf(&message, format, argList) != -1)
+00099     \{
+00100         SoapySDR_log(logLevel, message);
+00101         free(message);
+00102     \}
+00103 \}
+00104 
+00105 \textcolor{keywordtype}{void} SoapySDR_registerLogHandler(\textcolor{keyword}{const} SoapySDRLogHandler handler)
+00106 \{
+00107     registeredLogHandler = handler;
+00108 \}
+00109 
+00110 \textcolor{keywordtype}{void} SoapySDR_setLogLevel(\textcolor{keyword}{const} SoapySDRLogLevel logLevel)
+00111 \{
+00112     registeredLogLevel = logLevel;
+00113 \}
+00114 
+00115 \}
+\end{DoxyCode}

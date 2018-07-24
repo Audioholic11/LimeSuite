@@ -1,0 +1,28 @@
+\subsection{Formats\+C.\+cpp}
+\label{FormatsC_8cpp_source}\index{/home/erik/prefix/default/src/soapysdr/lib/\+Formats\+C.\+cpp@{/home/erik/prefix/default/src/soapysdr/lib/\+Formats\+C.\+cpp}}
+
+\begin{DoxyCode}
+00001 \textcolor{comment}{// Copyright (c) 2015-2015 Josh Blum}
+00002 \textcolor{comment}{// SPDX-License-Identifier: BSL-1.0}
+00003 
+00004 \textcolor{preprocessor}{#include <SoapySDR/Formats.h>}
+00005 \textcolor{preprocessor}{#include <cctype>}
+00006 
+00007 \textcolor{keyword}{extern} \textcolor{stringliteral}{"C"} \{
+00008 
+00009 \textcolor{keywordtype}{size\_t} SoapySDR_formatToSize(\textcolor{keyword}{const} \textcolor{keywordtype}{char} *format)
+00010 \{
+00011     \textcolor{keywordtype}{size\_t} size = 0;
+00012     \textcolor{keywordtype}{size\_t} isComplex = \textcolor{keyword}{false};
+00013     \textcolor{keywordtype}{char} ch = 0;
+00014     \textcolor{keywordflow}{while} ((ch = *format++) != \textcolor{charliteral}{'\(\backslash\)0'})
+00015     \{
+00016         \textcolor{keywordflow}{if} (ch == \textcolor{charliteral}{'C'}) isComplex = \textcolor{keyword}{true};
+00017         \textcolor{keywordflow}{if} (std::isdigit(ch)) size = (size*10) + \textcolor{keywordtype}{size\_t}(ch-\textcolor{charliteral}{'0'});
+00018     \}
+00019     \textcolor{keywordflow}{if} (isComplex) size *= 2;
+00020     \textcolor{keywordflow}{return} size / 8; \textcolor{comment}{//bits to bytes}
+00021 \}
+00022 
+00023 \} \textcolor{comment}{//extern "C"}
+\end{DoxyCode}

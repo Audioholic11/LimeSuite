@@ -1,0 +1,792 @@
+\subsection{Default\+Converters.\+cpp}
+\label{DefaultConverters_8cpp_source}\index{/home/erik/prefix/default/src/soapysdr/lib/\+Default\+Converters.\+cpp@{/home/erik/prefix/default/src/soapysdr/lib/\+Default\+Converters.\+cpp}}
+
+\begin{DoxyCode}
+00001 \textcolor{comment}{// Copyright (c) 2017-2017 Coburn Wightman}
+00002 \textcolor{comment}{//}
+00003 \textcolor{comment}{// derived from SoapyRemote/client/ClientStreamData.cpp}
+00004 \textcolor{comment}{// Copyright (c) 2015-2017 Josh Blum}
+00005 \textcolor{comment}{// SPDX-License-Identifier: BSL-1.0}
+00006 
+00007 \textcolor{preprocessor}{#include <SoapySDR/ConverterPrimatives.hpp>}
+00008 \textcolor{preprocessor}{#include <SoapySDR/ConverterRegistry.hpp>}
+00009 \textcolor{preprocessor}{#include <SoapySDR/Formats.hpp>}
+00010 \textcolor{preprocessor}{#include <cstring>} \textcolor{comment}{//memcpy}
+00011 
+00012 \textcolor{comment}{// ********************************}
+00013 \textcolor{comment}{// Real Soapy Formats}
+00014 
+00015 \textcolor{comment}{// Copy Converters}
+00016 
+00017 \textcolor{comment}{// F32 <> F32}
+00018 \textcolor{keyword}{static} \textcolor{keywordtype}{void} genericF32toF32(\textcolor{keyword}{const} \textcolor{keywordtype}{void} *srcBuff, \textcolor{keywordtype}{void} *dstBuff, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} numElems, \textcolor{keyword}{const} \textcolor{keywordtype}{double} scaler)
+00019 \{
+00020   \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} elemDepth = 1;
+00021 
+00022   \textcolor{keywordflow}{if} (scaler == 1.0)
+00023     \{
+00024       \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} sampleSize = \textcolor{keyword}{sizeof}(float);
+00025       std::memcpy(dstBuff, srcBuff, numElems*elemDepth*sampleSize);
+00026     \}
+00027   \textcolor{keywordflow}{else}
+00028     \{
+00029       \textcolor{keyword}{auto} *src = (\textcolor{keywordtype}{float}*)srcBuff;
+00030       \textcolor{keyword}{auto} *dst = (\textcolor{keywordtype}{float}*)dstBuff;
+00031       \textcolor{keywordflow}{for} (\textcolor{keywordtype}{size\_t} i = 0; i < numElems*elemDepth; i++)
+00032     \{
+00033       dst[i] = float(src[i]) * scaler;
+00034     \}
+00035     \}
+00036 \}
+00037 
+00038 \textcolor{keyword}{static} SoapySDR::ConverterRegistry registerGenericF32toF32(SOAPY_SDR_F32, 
+      SOAPY_SDR_F32, SoapySDR::ConverterRegistry::GENERIC, &genericF32toF32);
+00039 
+00040 \textcolor{comment}{// S32 <> S32}
+00041 \textcolor{keyword}{static} \textcolor{keywordtype}{void} genericS32toS32(\textcolor{keyword}{const} \textcolor{keywordtype}{void} *srcBuff, \textcolor{keywordtype}{void} *dstBuff, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} numElems, \textcolor{keyword}{const} \textcolor{keywordtype}{double} scaler)
+00042 \{
+00043   \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} elemDepth = 1;
+00044 
+00045   \textcolor{keywordflow}{if} (scaler == 1.0)
+00046     \{
+00047       \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} sampleSize = \textcolor{keyword}{sizeof}(int32\_t);
+00048       std::memcpy(dstBuff, srcBuff, numElems*elemDepth*sampleSize);
+00049     \}
+00050   \textcolor{keywordflow}{else}
+00051     \{
+00052       \textcolor{keyword}{auto} *src = (int32\_t*)srcBuff;
+00053       \textcolor{keyword}{auto} *dst = (int32\_t*)dstBuff;
+00054       \textcolor{keywordflow}{for} (\textcolor{keywordtype}{size\_t} i = 0; i < numElems*elemDepth; i++)
+00055     \{
+00056       dst[i] = int32\_t(src[i]) * scaler;
+00057     \}
+00058     \}
+00059 \}
+00060 
+00061 \textcolor{keyword}{static} SoapySDR::ConverterRegistry registerGenericS32toS32(SOAPY_SDR_S32, 
+      SOAPY_SDR_S32, SoapySDR::ConverterRegistry::GENERIC, &genericS32toS32);
+00062 
+00063 \textcolor{comment}{// S16 <> S16}
+00064 \textcolor{keyword}{static} \textcolor{keywordtype}{void} genericS16toS16(\textcolor{keyword}{const} \textcolor{keywordtype}{void} *srcBuff, \textcolor{keywordtype}{void} *dstBuff, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} numElems, \textcolor{keyword}{const} \textcolor{keywordtype}{double} scaler)
+00065 \{
+00066   \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} elemDepth = 1;
+00067 
+00068   \textcolor{keywordflow}{if} (scaler == 1.0)
+00069     \{
+00070       \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} sampleSize = \textcolor{keyword}{sizeof}(int16\_t);
+00071       std::memcpy(dstBuff, srcBuff, numElems*elemDepth*sampleSize);
+00072     \}
+00073   \textcolor{keywordflow}{else}
+00074     \{
+00075       \textcolor{keyword}{auto} *src = (int16\_t*)srcBuff;
+00076       \textcolor{keyword}{auto} *dst = (int16\_t*)dstBuff;
+00077       \textcolor{keywordflow}{for} (\textcolor{keywordtype}{size\_t} i = 0; i < numElems*elemDepth; i++)
+00078     \{
+00079       dst[i] = int16\_t(src[i]) * scaler;
+00080     \}
+00081     \}
+00082 \}
+00083 
+00084 \textcolor{keyword}{static} SoapySDR::ConverterRegistry registerGenericS16toS16(SOAPY_SDR_S16, 
+      SOAPY_SDR_S16, SoapySDR::ConverterRegistry::GENERIC, &genericS16toS16);
+00085 
+00086 \textcolor{comment}{// S8 <> S8}
+00087 \textcolor{keyword}{static} \textcolor{keywordtype}{void} genericS8toS8(\textcolor{keyword}{const} \textcolor{keywordtype}{void} *srcBuff, \textcolor{keywordtype}{void} *dstBuff, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} numElems, \textcolor{keyword}{const} \textcolor{keywordtype}{double} scaler)
+00088 \{
+00089   \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} elemDepth = 1;
+00090 
+00091   \textcolor{keywordflow}{if} (scaler == 1.0)
+00092     \{
+00093       \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} sampleSize = \textcolor{keyword}{sizeof}(int8\_t);
+00094       std::memcpy(dstBuff, srcBuff, numElems*elemDepth*sampleSize);
+00095     \}
+00096   \textcolor{keywordflow}{else}
+00097     \{
+00098       \textcolor{keyword}{auto} *src = (int8\_t*)srcBuff;
+00099       \textcolor{keyword}{auto} *dst = (int8\_t*)dstBuff;
+00100       \textcolor{keywordflow}{for} (\textcolor{keywordtype}{size\_t} i = 0; i < numElems*elemDepth; i++)
+00101     \{
+00102       dst[i] = int8\_t(src[i]) * scaler;
+00103     \}
+00104     \}
+00105 \}
+00106 
+00107 \textcolor{keyword}{static} SoapySDR::ConverterRegistry registerGenericS8toS8(SOAPY_SDR_S8, 
+      SOAPY_SDR_S8, SoapySDR::ConverterRegistry::GENERIC, &genericS8toS8);
+00108 
+00109 
+00110 \textcolor{comment}{// Type Converters}
+00111 
+00112 \textcolor{comment}{// F32 <> S16}
+00113 \textcolor{keyword}{static} \textcolor{keywordtype}{void} genericF32toS16(\textcolor{keyword}{const} \textcolor{keywordtype}{void} *srcBuff, \textcolor{keywordtype}{void} *dstBuff, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} numElems, \textcolor{keyword}{const} \textcolor{keywordtype}{double} scaler)
+00114 \{
+00115   \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} elemDepth = 1;
+00116 
+00117   \textcolor{keyword}{auto} *src = (\textcolor{keywordtype}{float}*)srcBuff;
+00118   \textcolor{keyword}{auto} *dst = (int16\_t*)dstBuff;
+00119   \textcolor{keywordflow}{for} (\textcolor{keywordtype}{size\_t} i = 0; i < numElems*elemDepth; i++)
+00120     \{
+00121       dst[i] = SoapySDR::F32toS16(src[i] * scaler);
+00122     \}
+00123 \}
+00124 
+00125 \textcolor{keyword}{static} \textcolor{keywordtype}{void} genericS16toF32(\textcolor{keyword}{const} \textcolor{keywordtype}{void} *srcBuff, \textcolor{keywordtype}{void} *dstBuff, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} numElems, \textcolor{keyword}{const} \textcolor{keywordtype}{double} scaler)
+00126 \{
+00127   \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} elemDepth = 1;
+00128 
+00129   \textcolor{keyword}{auto} *src = (int16\_t*)srcBuff;
+00130   \textcolor{keyword}{auto} *dst = (\textcolor{keywordtype}{float}*)dstBuff;
+00131   \textcolor{keywordflow}{for} (\textcolor{keywordtype}{size\_t} i = 0; i < numElems*elemDepth; i++)
+00132     \{
+00133       dst[i] = SoapySDR::S16toF32(src[i]) * scaler;
+00134     \}
+00135 \}
+00136 
+00137 \textcolor{keyword}{static} SoapySDR::ConverterRegistry registerGenericF32toS16(SOAPY_SDR_F32, 
+      SOAPY_SDR_S16, SoapySDR::ConverterRegistry::GENERIC, &genericF32toS16);
+00138 \textcolor{keyword}{static} SoapySDR::ConverterRegistry registerGenericS16toF32(SOAPY_SDR_S16, 
+      SOAPY_SDR_F32, SoapySDR::ConverterRegistry::GENERIC, &genericS16toF32);
+00139 
+00140 
+00141 \textcolor{comment}{// F32 <> U16}
+00142 \textcolor{keyword}{static} \textcolor{keywordtype}{void} genericF32toU16(\textcolor{keyword}{const} \textcolor{keywordtype}{void} *srcBuff, \textcolor{keywordtype}{void} *dstBuff, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} numElems, \textcolor{keyword}{const} \textcolor{keywordtype}{double} scaler)
+00143 \{
+00144   \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} elemDepth = 1;
+00145 
+00146   \textcolor{keyword}{auto} *src = (\textcolor{keywordtype}{float}*)srcBuff;
+00147   \textcolor{keyword}{auto} *dst = (uint16\_t*)dstBuff;
+00148   \textcolor{keywordflow}{for} (\textcolor{keywordtype}{size\_t} i = 0; i < numElems*elemDepth; i++)
+00149     \{
+00150       dst[i] = SoapySDR::F32toU16(src[i] * scaler);
+00151     \}
+00152 \}
+00153 
+00154 \textcolor{keyword}{static} \textcolor{keywordtype}{void} genericU16toF32(\textcolor{keyword}{const} \textcolor{keywordtype}{void} *srcBuff, \textcolor{keywordtype}{void} *dstBuff, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} numElems, \textcolor{keyword}{const} \textcolor{keywordtype}{double} scaler)
+00155 \{
+00156   \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} elemDepth = 1;
+00157 
+00158   \textcolor{keyword}{auto} *src = (uint16\_t*)srcBuff;
+00159   \textcolor{keyword}{auto} *dst = (\textcolor{keywordtype}{float}*)dstBuff;
+00160   \textcolor{keywordflow}{for} (\textcolor{keywordtype}{size\_t} i = 0; i < numElems*elemDepth; i++)
+00161     \{
+00162       dst[i] = SoapySDR::U16toF32(src[i]) * scaler;
+00163     \}
+00164 \}
+00165 
+00166 \textcolor{keyword}{static} SoapySDR::ConverterRegistry registerGenericF32toU16(SOAPY_SDR_F32, 
+      SOAPY_SDR_U16, SoapySDR::ConverterRegistry::GENERIC, &genericF32toU16);
+00167 \textcolor{keyword}{static} SoapySDR::ConverterRegistry registerGenericU16toF32(SOAPY_SDR_U16, 
+      SOAPY_SDR_F32, SoapySDR::ConverterRegistry::GENERIC, &genericU16toF32);
+00168 
+00169 
+00170 \textcolor{comment}{// F32 <> S8}
+00171 \textcolor{keyword}{static} \textcolor{keywordtype}{void} genericF32toS8(\textcolor{keyword}{const} \textcolor{keywordtype}{void} *srcBuff, \textcolor{keywordtype}{void} *dstBuff, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} numElems, \textcolor{keyword}{const} \textcolor{keywordtype}{double} scaler)
+00172 \{
+00173   \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} elemDepth = 1;
+00174 
+00175   \textcolor{keyword}{auto} *src = (\textcolor{keywordtype}{float}*)srcBuff;
+00176   \textcolor{keyword}{auto} *dst = (int8\_t*)dstBuff;
+00177   \textcolor{keywordflow}{for} (\textcolor{keywordtype}{size\_t} i = 0; i < numElems*elemDepth; i++)
+00178     \{
+00179       dst[i] = SoapySDR::F32toS8(src[i] * scaler);
+00180     \}
+00181 \}
+00182 
+00183 \textcolor{keyword}{static} \textcolor{keywordtype}{void} genericS8toF32(\textcolor{keyword}{const} \textcolor{keywordtype}{void} *srcBuff, \textcolor{keywordtype}{void} *dstBuff, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} numElems, \textcolor{keyword}{const} \textcolor{keywordtype}{double} scaler)
+00184 \{
+00185   \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} elemDepth = 1;
+00186 
+00187   \textcolor{keyword}{auto} *src = (int8\_t*)srcBuff;
+00188   \textcolor{keyword}{auto} *dst = (\textcolor{keywordtype}{float}*)dstBuff;
+00189   \textcolor{keywordflow}{for} (\textcolor{keywordtype}{size\_t} i = 0; i < numElems*elemDepth; i++)
+00190     \{
+00191       dst[i] = SoapySDR::S8toF32(src[i]) * scaler;
+00192     \}
+00193 \}
+00194 
+00195 \textcolor{keyword}{static} SoapySDR::ConverterRegistry registerGenericF32toS8(SOAPY_SDR_F32, 
+      SOAPY_SDR_S8, SoapySDR::ConverterRegistry::GENERIC, &genericF32toS8);
+00196 \textcolor{keyword}{static} SoapySDR::ConverterRegistry registerGenericS8toF32(SOAPY_SDR_S8, 
+      SOAPY_SDR_F32, SoapySDR::ConverterRegistry::GENERIC, &genericS8toF32);
+00197 
+00198 
+00199 \textcolor{comment}{// F32 <> U8}
+00200 \textcolor{keyword}{static} \textcolor{keywordtype}{void} genericF32toU8(\textcolor{keyword}{const} \textcolor{keywordtype}{void} *srcBuff, \textcolor{keywordtype}{void} *dstBuff, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} numElems, \textcolor{keyword}{const} \textcolor{keywordtype}{double} scaler)
+00201 \{
+00202   \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} elemDepth = 1;
+00203 
+00204   \textcolor{keyword}{auto} *src = (\textcolor{keywordtype}{float}*)srcBuff;
+00205   \textcolor{keyword}{auto} *dst = (uint8\_t*)dstBuff;
+00206   \textcolor{keywordflow}{for} (\textcolor{keywordtype}{size\_t} i = 0; i < numElems*elemDepth; i++)
+00207     \{
+00208       dst[i] = SoapySDR::F32toU8(src[i] * scaler);
+00209     \}
+00210 \}
+00211 
+00212 \textcolor{keyword}{static} \textcolor{keywordtype}{void} genericU8toF32(\textcolor{keyword}{const} \textcolor{keywordtype}{void} *srcBuff, \textcolor{keywordtype}{void} *dstBuff, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} numElems, \textcolor{keyword}{const} \textcolor{keywordtype}{double} scaler)
+00213 \{
+00214   \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} elemDepth = 1;
+00215 
+00216   \textcolor{keyword}{auto} *src = (uint8\_t*)srcBuff;
+00217   \textcolor{keyword}{auto} *dst = (\textcolor{keywordtype}{float}*)dstBuff;
+00218   \textcolor{keywordflow}{for} (\textcolor{keywordtype}{size\_t} i = 0; i < numElems*elemDepth; i++)
+00219     \{
+00220       dst[i] = SoapySDR::U8toF32(src[i]) * scaler;
+00221     \}
+00222 \}
+00223 
+00224 \textcolor{keyword}{static} SoapySDR::ConverterRegistry registerGenericF32toU8(SOAPY_SDR_F32, 
+      SOAPY_SDR_U8, SoapySDR::ConverterRegistry::GENERIC, &genericF32toU8);
+00225 \textcolor{keyword}{static} SoapySDR::ConverterRegistry registerGenericU8toF32(SOAPY_SDR_U8, 
+      SOAPY_SDR_F32, SoapySDR::ConverterRegistry::GENERIC, &genericU8toF32);
+00226 
+00227 \textcolor{comment}{// S16 <> U16}
+00228 \textcolor{keyword}{static} \textcolor{keywordtype}{void} genericS16toU16(\textcolor{keyword}{const} \textcolor{keywordtype}{void} *srcBuff, \textcolor{keywordtype}{void} *dstBuff, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} numElems, \textcolor{keyword}{const} \textcolor{keywordtype}{double} scaler)
+00229 \{
+00230   \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} elemDepth = 1;
+00231 
+00232   \textcolor{keyword}{auto} *src = (int16\_t*)srcBuff;
+00233   \textcolor{keyword}{auto} *dst = (uint16\_t*)dstBuff;
+00234   \textcolor{keywordflow}{for} (\textcolor{keywordtype}{size\_t} i = 0; i < numElems*elemDepth; i++)
+00235     \{
+00236       dst[i] = SoapySDR::S16toU16(src[i] * scaler);
+00237     \}
+00238 \}
+00239 
+00240 \textcolor{keyword}{static} \textcolor{keywordtype}{void} genericU16toS16(\textcolor{keyword}{const} \textcolor{keywordtype}{void} *srcBuff, \textcolor{keywordtype}{void} *dstBuff, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} numElems, \textcolor{keyword}{const} \textcolor{keywordtype}{double} scaler)
+00241 \{
+00242   \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} elemDepth = 1;
+00243 
+00244   \textcolor{keyword}{auto} *src = (uint16\_t*)srcBuff;
+00245   \textcolor{keyword}{auto} *dst = (int16\_t*)dstBuff;
+00246   \textcolor{keywordflow}{for} (\textcolor{keywordtype}{size\_t} i = 0; i < numElems*elemDepth; i++)
+00247     \{
+00248       dst[i] = SoapySDR::U16toS16(src[i]) * scaler;
+00249     \}
+00250 \}
+00251 
+00252 \textcolor{keyword}{static} SoapySDR::ConverterRegistry registerGenericS16toU16(SOAPY_SDR_S16, 
+      SOAPY_SDR_U16, SoapySDR::ConverterRegistry::GENERIC, &genericS16toU16);
+00253 \textcolor{keyword}{static} SoapySDR::ConverterRegistry registerGenericU16toS16(SOAPY_SDR_U16, 
+      SOAPY_SDR_S16, SoapySDR::ConverterRegistry::GENERIC, &genericU16toS16);
+00254 
+00255 
+00256 \textcolor{comment}{// S16 <> S8}
+00257 \textcolor{keyword}{static} \textcolor{keywordtype}{void} genericS16toS8(\textcolor{keyword}{const} \textcolor{keywordtype}{void} *srcBuff, \textcolor{keywordtype}{void} *dstBuff, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} numElems, \textcolor{keyword}{const} \textcolor{keywordtype}{double} scaler)
+00258 \{
+00259   \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} elemDepth = 1;
+00260 
+00261   \textcolor{keyword}{auto} *src = (int16\_t*)srcBuff;
+00262   \textcolor{keyword}{auto} *dst = (int8\_t*)dstBuff;
+00263   \textcolor{keywordflow}{for} (\textcolor{keywordtype}{size\_t} i = 0; i < numElems*elemDepth; i++)
+00264     \{
+00265       dst[i] = SoapySDR::S16toS8(src[i] * scaler);
+00266     \}
+00267 \}
+00268 
+00269 \textcolor{keyword}{static} \textcolor{keywordtype}{void} genericS8toS16(\textcolor{keyword}{const} \textcolor{keywordtype}{void} *srcBuff, \textcolor{keywordtype}{void} *dstBuff, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} numElems, \textcolor{keyword}{const} \textcolor{keywordtype}{double} scaler)
+00270 \{
+00271   \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} elemDepth = 1;
+00272 
+00273   \textcolor{keyword}{auto} *src = (int8\_t*)srcBuff;
+00274   \textcolor{keyword}{auto} *dst = (int16\_t*)dstBuff;
+00275   \textcolor{keywordflow}{for} (\textcolor{keywordtype}{size\_t} i = 0; i < numElems*elemDepth; i++)
+00276     \{
+00277       dst[i] = SoapySDR::S8toS16(src[i]) * scaler;
+00278     \}
+00279 \}
+00280 
+00281 \textcolor{keyword}{static} SoapySDR::ConverterRegistry registerGenericS16toS8(SOAPY_SDR_S16, 
+      SOAPY_SDR_S8, SoapySDR::ConverterRegistry::GENERIC, &genericS16toS8);
+00282 \textcolor{keyword}{static} SoapySDR::ConverterRegistry registerGenericS8toS16(SOAPY_SDR_S8, 
+      SOAPY_SDR_S16, SoapySDR::ConverterRegistry::GENERIC, &genericS8toS16);
+00283 
+00284 \textcolor{comment}{// S16 <> U8}
+00285 \textcolor{keyword}{static} \textcolor{keywordtype}{void} genericS16toU8(\textcolor{keyword}{const} \textcolor{keywordtype}{void} *srcBuff, \textcolor{keywordtype}{void} *dstBuff, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} numElems, \textcolor{keyword}{const} \textcolor{keywordtype}{double} scaler)
+00286 \{
+00287   \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} elemDepth = 1;
+00288 
+00289   \textcolor{keyword}{auto} *src = (int16\_t*)srcBuff;
+00290   \textcolor{keyword}{auto} *dst = (uint8\_t*)dstBuff;
+00291   \textcolor{keywordflow}{for} (\textcolor{keywordtype}{size\_t} i = 0; i < numElems*elemDepth; i++)
+00292     \{
+00293       dst[i] = SoapySDR::S16toU8(src[i] * scaler);
+00294     \}
+00295 \}
+00296 
+00297 \textcolor{keyword}{static} \textcolor{keywordtype}{void} genericU8toS16(\textcolor{keyword}{const} \textcolor{keywordtype}{void} *srcBuff, \textcolor{keywordtype}{void} *dstBuff, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} numElems, \textcolor{keyword}{const} \textcolor{keywordtype}{double} scaler)
+00298 \{
+00299   \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} elemDepth = 1;
+00300 
+00301   \textcolor{keyword}{auto} *src = (uint8\_t*)srcBuff;
+00302   \textcolor{keyword}{auto} *dst = (int16\_t*)dstBuff;
+00303   \textcolor{keywordflow}{for} (\textcolor{keywordtype}{size\_t} i = 0; i < numElems*elemDepth; i++)
+00304     \{
+00305       dst[i] = SoapySDR::U8toS16(src[i]) * scaler;
+00306     \}
+00307 \}
+00308 
+00309 \textcolor{keyword}{static} SoapySDR::ConverterRegistry registerGenericS16toU8(SOAPY_SDR_S16, 
+      SOAPY_SDR_U8, SoapySDR::ConverterRegistry::GENERIC, &genericS16toU8);
+00310 \textcolor{keyword}{static} SoapySDR::ConverterRegistry registerGenericU8toS16(SOAPY_SDR_U8, 
+      SOAPY_SDR_S16, SoapySDR::ConverterRegistry::GENERIC, &genericU8toS16);
+00311 
+00312 \textcolor{comment}{// U16 <> S8}
+00313 \textcolor{keyword}{static} \textcolor{keywordtype}{void} genericU16toS8(\textcolor{keyword}{const} \textcolor{keywordtype}{void} *srcBuff, \textcolor{keywordtype}{void} *dstBuff, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} numElems, \textcolor{keyword}{const} \textcolor{keywordtype}{double} scaler)
+00314 \{
+00315   \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} elemDepth = 1;
+00316 
+00317   \textcolor{keyword}{auto} *src = (uint16\_t*)srcBuff;
+00318   \textcolor{keyword}{auto} *dst = (int8\_t*)dstBuff;
+00319   \textcolor{keywordflow}{for} (\textcolor{keywordtype}{size\_t} i = 0; i < numElems*elemDepth; i++)
+00320     \{
+00321       dst[i] = SoapySDR::U16toS8(src[i] * scaler);
+00322     \}
+00323 \}
+00324 
+00325 \textcolor{keyword}{static} \textcolor{keywordtype}{void} genericS8toU16(\textcolor{keyword}{const} \textcolor{keywordtype}{void} *srcBuff, \textcolor{keywordtype}{void} *dstBuff, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} numElems, \textcolor{keyword}{const} \textcolor{keywordtype}{double} scaler)
+00326 \{
+00327   \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} elemDepth = 1;
+00328 
+00329   \textcolor{keyword}{auto} *src = (int8\_t*)srcBuff;
+00330   \textcolor{keyword}{auto} *dst = (uint16\_t*)dstBuff;
+00331   \textcolor{keywordflow}{for} (\textcolor{keywordtype}{size\_t} i = 0; i < numElems*elemDepth; i++)
+00332     \{
+00333       dst[i] = SoapySDR::S8toU16(src[i]) * scaler;
+00334     \}
+00335 \}
+00336 
+00337 \textcolor{keyword}{static} SoapySDR::ConverterRegistry registerGenericU16toS8(SOAPY_SDR_U16, 
+      SOAPY_SDR_S8, SoapySDR::ConverterRegistry::GENERIC, &genericU16toS8);
+00338 \textcolor{keyword}{static} SoapySDR::ConverterRegistry registerGenericS8toU16(SOAPY_SDR_S8, 
+      SOAPY_SDR_U16, SoapySDR::ConverterRegistry::GENERIC, &genericS8toU16);
+00339 
+00340 \textcolor{comment}{// S8 <> U8}
+00341 \textcolor{keyword}{static} \textcolor{keywordtype}{void} genericS8toU8(\textcolor{keyword}{const} \textcolor{keywordtype}{void} *srcBuff, \textcolor{keywordtype}{void} *dstBuff, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} numElems, \textcolor{keyword}{const} \textcolor{keywordtype}{double} scaler)
+00342 \{
+00343   \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} elemDepth = 1;
+00344 
+00345   \textcolor{keyword}{auto} *src = (int8\_t*)srcBuff;
+00346   \textcolor{keyword}{auto} *dst = (uint8\_t*)dstBuff;
+00347   \textcolor{keywordflow}{for} (\textcolor{keywordtype}{size\_t} i = 0; i < numElems*elemDepth; i++)
+00348     \{
+00349       dst[i] = SoapySDR::S8toU8(src[i] * scaler);
+00350     \}
+00351 \}
+00352 
+00353 \textcolor{keyword}{static} \textcolor{keywordtype}{void} genericU8toS8(\textcolor{keyword}{const} \textcolor{keywordtype}{void} *srcBuff, \textcolor{keywordtype}{void} *dstBuff, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} numElems, \textcolor{keyword}{const} \textcolor{keywordtype}{double} scaler)
+00354 \{
+00355   \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} elemDepth = 1;
+00356 
+00357   \textcolor{keyword}{auto} *src = (uint8\_t*)srcBuff;
+00358   \textcolor{keyword}{auto} *dst = (int8\_t*)dstBuff;
+00359   \textcolor{keywordflow}{for} (\textcolor{keywordtype}{size\_t} i = 0; i < numElems*elemDepth; i++)
+00360     \{
+00361       dst[i] = SoapySDR::U8toS8(src[i]) * scaler;
+00362     \}
+00363 \}
+00364 
+00365 \textcolor{keyword}{static} SoapySDR::ConverterRegistry registerGenericS8toU8(SOAPY_SDR_S8, 
+      SOAPY_SDR_U8, SoapySDR::ConverterRegistry::GENERIC, &genericS8toU8);
+00366 \textcolor{keyword}{static} SoapySDR::ConverterRegistry registerGenericU8toS8(SOAPY_SDR_U8, 
+      SOAPY_SDR_S8, SoapySDR::ConverterRegistry::GENERIC, &genericU8toS8);
+00367 
+00368 
+00369 \textcolor{comment}{// ********************************}
+00370 \textcolor{comment}{// Complex Data Types}
+00371 
+00372 \textcolor{comment}{// Copy Converters}
+00373 
+00374 \textcolor{comment}{// CF32 <> CF32}
+00375 \textcolor{keyword}{static} \textcolor{keywordtype}{void} genericCF32toCF32(\textcolor{keyword}{const} \textcolor{keywordtype}{void} *srcBuff, \textcolor{keywordtype}{void} *dstBuff, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} numElems, \textcolor{keyword}{const} \textcolor{keywordtype}{double} 
+      scaler)
+00376 \{
+00377   \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} elemDepth = 2;
+00378 
+00379   \textcolor{keywordflow}{if} (scaler == 1.0)
+00380     \{
+00381       \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} sampleSize = \textcolor{keyword}{sizeof}(float);
+00382       std::memcpy(dstBuff, srcBuff, numElems*elemDepth*sampleSize);
+00383     \}
+00384   \textcolor{keywordflow}{else}
+00385     \{
+00386       \textcolor{keyword}{auto} *src = (\textcolor{keywordtype}{float}*)srcBuff;
+00387       \textcolor{keyword}{auto} *dst = (\textcolor{keywordtype}{float}*)dstBuff;
+00388       \textcolor{keywordflow}{for} (\textcolor{keywordtype}{size\_t} i = 0; i < numElems*elemDepth; i++)
+00389     \{
+00390       dst[i] = float(src[i]) * scaler;
+00391     \}
+00392     \}
+00393 \}
+00394 
+00395 \textcolor{keyword}{static} SoapySDR::ConverterRegistry registerGenericCF32toCF32(SOAPY_SDR_CF32, 
+      SOAPY_SDR_CF32, SoapySDR::ConverterRegistry::GENERIC, &genericCF32toCF32);
+00396 
+00397 \textcolor{comment}{// CS32 <> CS32}
+00398 \textcolor{keyword}{static} \textcolor{keywordtype}{void} genericCS32toCS32(\textcolor{keyword}{const} \textcolor{keywordtype}{void} *srcBuff, \textcolor{keywordtype}{void} *dstBuff, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} numElems, \textcolor{keyword}{const} \textcolor{keywordtype}{double} 
+      scaler)
+00399 \{
+00400   \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} elemDepth = 2;
+00401 
+00402   \textcolor{keywordflow}{if} (scaler == 1.0)
+00403     \{
+00404       \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} sampleSize = \textcolor{keyword}{sizeof}(int32\_t);
+00405       std::memcpy(dstBuff, srcBuff, numElems*elemDepth*sampleSize);
+00406     \}
+00407   \textcolor{keywordflow}{else}
+00408     \{
+00409       \textcolor{keyword}{auto} *src = (int32\_t*)srcBuff;
+00410       \textcolor{keyword}{auto} *dst = (int32\_t*)dstBuff;
+00411       \textcolor{keywordflow}{for} (\textcolor{keywordtype}{size\_t} i = 0; i < numElems*elemDepth; i++)
+00412     \{
+00413       dst[i] = int32\_t(src[i]) * scaler;
+00414     \}
+00415     \}
+00416 \}
+00417 
+00418 \textcolor{keyword}{static} SoapySDR::ConverterRegistry registerGenericCS32toCS32(SOAPY_SDR_CS32, 
+      SOAPY_SDR_CS32, SoapySDR::ConverterRegistry::GENERIC, &genericCS32toCS32);
+00419 
+00420 \textcolor{comment}{// CS16 <> CS16}
+00421 \textcolor{keyword}{static} \textcolor{keywordtype}{void} genericCS16toCS16(\textcolor{keyword}{const} \textcolor{keywordtype}{void} *srcBuff, \textcolor{keywordtype}{void} *dstBuff, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} numElems, \textcolor{keyword}{const} \textcolor{keywordtype}{double} 
+      scaler)
+00422 \{
+00423   \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} elemDepth = 2;
+00424 
+00425   \textcolor{keywordflow}{if} (scaler == 1.0)
+00426     \{
+00427       \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} sampleSize = \textcolor{keyword}{sizeof}(int16\_t);
+00428       std::memcpy(dstBuff, srcBuff, numElems*elemDepth*sampleSize);
+00429     \}
+00430   \textcolor{keywordflow}{else}
+00431     \{
+00432       \textcolor{keyword}{auto} *src = (int16\_t*)srcBuff;
+00433       \textcolor{keyword}{auto} *dst = (int16\_t*)dstBuff;
+00434       \textcolor{keywordflow}{for} (\textcolor{keywordtype}{size\_t} i = 0; i < numElems*elemDepth; i++)
+00435     \{
+00436       dst[i] = int16\_t(src[i]) * scaler;
+00437     \}
+00438     \}
+00439 \}
+00440 
+00441 \textcolor{keyword}{static} SoapySDR::ConverterRegistry registerGenericCS16toCS16(SOAPY_SDR_CS16, 
+      SOAPY_SDR_CS16, SoapySDR::ConverterRegistry::GENERIC, &genericCS16toCS16);
+00442 
+00443 \textcolor{comment}{// CS8 <> CS8}
+00444 \textcolor{keyword}{static} \textcolor{keywordtype}{void} genericCS8toCS8(\textcolor{keyword}{const} \textcolor{keywordtype}{void} *srcBuff, \textcolor{keywordtype}{void} *dstBuff, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} numElems, \textcolor{keyword}{const} \textcolor{keywordtype}{double} scaler)
+00445 \{
+00446   \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} elemDepth = 2;
+00447 
+00448   \textcolor{keywordflow}{if} (scaler == 1.0)
+00449     \{
+00450       \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} sampleSize = \textcolor{keyword}{sizeof}(int8\_t);
+00451       std::memcpy(dstBuff, srcBuff, numElems*elemDepth*sampleSize);
+00452     \}
+00453   \textcolor{keywordflow}{else}
+00454     \{
+00455       \textcolor{keyword}{auto} *src = (int8\_t*)srcBuff;
+00456       \textcolor{keyword}{auto} *dst = (int8\_t*)dstBuff;
+00457       \textcolor{keywordflow}{for} (\textcolor{keywordtype}{size\_t} i = 0; i < numElems*elemDepth; i++)
+00458     \{
+00459       dst[i] = int8\_t(src[i]) * scaler;
+00460     \}
+00461     \}
+00462 \}
+00463 
+00464 \textcolor{keyword}{static} SoapySDR::ConverterRegistry registerGenericCS8toCS8(SOAPY_SDR_CS8, 
+      SOAPY_SDR_CS8, SoapySDR::ConverterRegistry::GENERIC, &genericCS8toCS8);
+00465 
+00466 
+00467 \textcolor{comment}{// Type Converters}
+00468 
+00469 \textcolor{comment}{// CF32 <> CS16}
+00470 \textcolor{keyword}{static} \textcolor{keywordtype}{void} genericCF32toCS16(\textcolor{keyword}{const} \textcolor{keywordtype}{void} *srcBuff, \textcolor{keywordtype}{void} *dstBuff, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} numElems, \textcolor{keyword}{const} \textcolor{keywordtype}{double} 
+      scaler)
+00471 \{
+00472   \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} elemDepth = 2;
+00473 
+00474   \textcolor{keyword}{auto} *src = (\textcolor{keywordtype}{float}*)srcBuff;
+00475   \textcolor{keyword}{auto} *dst = (int16\_t*)dstBuff;
+00476   \textcolor{keywordflow}{for} (\textcolor{keywordtype}{size\_t} i = 0; i < numElems*elemDepth; i++)
+00477     \{
+00478       dst[i] = SoapySDR::F32toS16(src[i] * scaler);
+00479     \}
+00480 \}
+00481 
+00482 \textcolor{keyword}{static} \textcolor{keywordtype}{void} genericCS16toCF32(\textcolor{keyword}{const} \textcolor{keywordtype}{void} *srcBuff, \textcolor{keywordtype}{void} *dstBuff, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} numElems, \textcolor{keyword}{const} \textcolor{keywordtype}{double} 
+      scaler)
+00483 \{
+00484   \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} elemDepth = 2;
+00485 
+00486   \textcolor{keyword}{auto} *src = (int16\_t*)srcBuff;
+00487   \textcolor{keyword}{auto} *dst = (\textcolor{keywordtype}{float}*)dstBuff;
+00488   \textcolor{keywordflow}{for} (\textcolor{keywordtype}{size\_t} i = 0; i < numElems*elemDepth; i++)
+00489     \{
+00490       dst[i] = SoapySDR::S16toF32(src[i]) * scaler;
+00491     \}
+00492 \}
+00493 
+00494 \textcolor{keyword}{static} SoapySDR::ConverterRegistry registerGenericCF32toCS16(SOAPY_SDR_CF32, 
+      SOAPY_SDR_CS16, SoapySDR::ConverterRegistry::GENERIC, &genericCF32toCS16);
+00495 \textcolor{keyword}{static} SoapySDR::ConverterRegistry registerGenericCS16toCF32(SOAPY_SDR_CS16, 
+      SOAPY_SDR_CF32, SoapySDR::ConverterRegistry::GENERIC, &genericCS16toCF32);
+00496 
+00497 
+00498 \textcolor{comment}{// CF32 <> CU16}
+00499 \textcolor{keyword}{static} \textcolor{keywordtype}{void} genericCF32toCU16(\textcolor{keyword}{const} \textcolor{keywordtype}{void} *srcBuff, \textcolor{keywordtype}{void} *dstBuff, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} numElems, \textcolor{keyword}{const} \textcolor{keywordtype}{double} 
+      scaler)
+00500 \{
+00501   \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} elemDepth = 2;
+00502 
+00503   \textcolor{keyword}{auto} *src = (\textcolor{keywordtype}{float}*)srcBuff;
+00504   \textcolor{keyword}{auto} *dst = (uint16\_t*)dstBuff;
+00505   \textcolor{keywordflow}{for} (\textcolor{keywordtype}{size\_t} i = 0; i < numElems*elemDepth; i++)
+00506     \{
+00507       dst[i] = SoapySDR::F32toU16(src[i] * scaler);
+00508     \}
+00509 \}
+00510 
+00511 \textcolor{keyword}{static} \textcolor{keywordtype}{void} genericCU16toCF32(\textcolor{keyword}{const} \textcolor{keywordtype}{void} *srcBuff, \textcolor{keywordtype}{void} *dstBuff, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} numElems, \textcolor{keyword}{const} \textcolor{keywordtype}{double} 
+      scaler)
+00512 \{
+00513   \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} elemDepth = 2;
+00514 
+00515   \textcolor{keyword}{auto} *src = (uint16\_t*)srcBuff;
+00516   \textcolor{keyword}{auto} *dst = (\textcolor{keywordtype}{float}*)dstBuff;
+00517   \textcolor{keywordflow}{for} (\textcolor{keywordtype}{size\_t} i = 0; i < numElems*elemDepth; i++)
+00518     \{
+00519       dst[i] = SoapySDR::U16toF32(src[i]) * scaler;
+00520     \}
+00521 \}
+00522 
+00523 \textcolor{keyword}{static} SoapySDR::ConverterRegistry registerGenericCF32toCU16(SOAPY_SDR_CF32, 
+      SOAPY_SDR_CU16, SoapySDR::ConverterRegistry::GENERIC, &genericCF32toCU16);
+00524 \textcolor{keyword}{static} SoapySDR::ConverterRegistry registerGenericCU16toCF32(SOAPY_SDR_CU16, 
+      SOAPY_SDR_CF32, SoapySDR::ConverterRegistry::GENERIC, &genericCU16toCF32);
+00525 
+00526 
+00527 \textcolor{comment}{// CF32 <> CS8}
+00528 \textcolor{keyword}{static} \textcolor{keywordtype}{void} genericCF32toCS8(\textcolor{keyword}{const} \textcolor{keywordtype}{void} *srcBuff, \textcolor{keywordtype}{void} *dstBuff, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} numElems, \textcolor{keyword}{const} \textcolor{keywordtype}{double} scaler
+      )
+00529 \{
+00530   \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} elemDepth = 2;
+00531 
+00532   \textcolor{keyword}{auto} *src = (\textcolor{keywordtype}{float}*)srcBuff;
+00533   \textcolor{keyword}{auto} *dst = (int8\_t*)dstBuff;
+00534   \textcolor{keywordflow}{for} (\textcolor{keywordtype}{size\_t} i = 0; i < numElems*elemDepth; i++)
+00535     \{
+00536       dst[i] = SoapySDR::F32toS8(src[i] * scaler);
+00537     \}
+00538 \}
+00539 
+00540 \textcolor{keyword}{static} \textcolor{keywordtype}{void} genericCS8toCF32(\textcolor{keyword}{const} \textcolor{keywordtype}{void} *srcBuff, \textcolor{keywordtype}{void} *dstBuff, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} numElems, \textcolor{keyword}{const} \textcolor{keywordtype}{double} scaler
+      )
+00541 \{
+00542   \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} elemDepth = 2;
+00543 
+00544   \textcolor{keyword}{auto} *src = (int8\_t*)srcBuff;
+00545   \textcolor{keyword}{auto} *dst = (\textcolor{keywordtype}{float}*)dstBuff;
+00546   \textcolor{keywordflow}{for} (\textcolor{keywordtype}{size\_t} i = 0; i < numElems*elemDepth; i++)
+00547     \{
+00548       dst[i] = SoapySDR::S8toF32(src[i]) * scaler;
+00549     \}
+00550 \}
+00551 
+00552 \textcolor{keyword}{static} SoapySDR::ConverterRegistry registerGenericCF32toCS8(SOAPY_SDR_CF32, 
+      SOAPY_SDR_CS8, SoapySDR::ConverterRegistry::GENERIC, &genericCF32toCS8);
+00553 \textcolor{keyword}{static} SoapySDR::ConverterRegistry registerGenericCS8toCF32(SOAPY_SDR_CS8, 
+      SOAPY_SDR_CF32, SoapySDR::ConverterRegistry::GENERIC, &genericCS8toCF32);
+00554 
+00555 
+00556 \textcolor{comment}{// CF32 <> CU8}
+00557 \textcolor{keyword}{static} \textcolor{keywordtype}{void} genericCF32toCU8(\textcolor{keyword}{const} \textcolor{keywordtype}{void} *srcBuff, \textcolor{keywordtype}{void} *dstBuff, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} numElems, \textcolor{keyword}{const} \textcolor{keywordtype}{double} scaler
+      )
+00558 \{
+00559   \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} elemDepth = 2;
+00560 
+00561   \textcolor{keyword}{auto} *src = (\textcolor{keywordtype}{float}*)srcBuff;
+00562   \textcolor{keyword}{auto} *dst = (uint8\_t*)dstBuff;
+00563   \textcolor{keywordflow}{for} (\textcolor{keywordtype}{size\_t} i = 0; i < numElems*elemDepth; i++)
+00564     \{
+00565       dst[i] = SoapySDR::F32toU8(src[i] * scaler);
+00566     \}
+00567 \}
+00568 
+00569 \textcolor{keyword}{static} \textcolor{keywordtype}{void} genericCU8toCF32(\textcolor{keyword}{const} \textcolor{keywordtype}{void} *srcBuff, \textcolor{keywordtype}{void} *dstBuff, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} numElems, \textcolor{keyword}{const} \textcolor{keywordtype}{double} scaler
+      )
+00570 \{
+00571   \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} elemDepth = 2;
+00572 
+00573   \textcolor{keyword}{auto} *src = (uint8\_t*)srcBuff;
+00574   \textcolor{keyword}{auto} *dst = (\textcolor{keywordtype}{float}*)dstBuff;
+00575   \textcolor{keywordflow}{for} (\textcolor{keywordtype}{size\_t} i = 0; i < numElems*elemDepth; i++)
+00576     \{
+00577       dst[i] = SoapySDR::U8toF32(src[i]) * scaler;
+00578     \}
+00579 \}
+00580 
+00581 \textcolor{keyword}{static} SoapySDR::ConverterRegistry registerGenericCF32toCU8(SOAPY_SDR_CF32, 
+      SOAPY_SDR_CU8, SoapySDR::ConverterRegistry::GENERIC, &genericCF32toCU8);
+00582 \textcolor{keyword}{static} SoapySDR::ConverterRegistry registerGenericCU8toCF32(SOAPY_SDR_CU8, 
+      SOAPY_SDR_CF32, SoapySDR::ConverterRegistry::GENERIC, &genericCU8toCF32);
+00583 
+00584 \textcolor{comment}{// CS16 <> CU16}
+00585 \textcolor{keyword}{static} \textcolor{keywordtype}{void} genericCS16toCU16(\textcolor{keyword}{const} \textcolor{keywordtype}{void} *srcBuff, \textcolor{keywordtype}{void} *dstBuff, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} numElems, \textcolor{keyword}{const} \textcolor{keywordtype}{double} 
+      scaler)
+00586 \{
+00587   \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} elemDepth = 2;
+00588 
+00589   \textcolor{keyword}{auto} *src = (int16\_t*)srcBuff;
+00590   \textcolor{keyword}{auto} *dst = (uint16\_t*)dstBuff;
+00591   \textcolor{keywordflow}{for} (\textcolor{keywordtype}{size\_t} i = 0; i < numElems*elemDepth; i++)
+00592     \{
+00593       dst[i] = SoapySDR::S16toU16(src[i] * scaler);
+00594     \}
+00595 \}
+00596 
+00597 \textcolor{keyword}{static} \textcolor{keywordtype}{void} genericCU16toCS16(\textcolor{keyword}{const} \textcolor{keywordtype}{void} *srcBuff, \textcolor{keywordtype}{void} *dstBuff, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} numElems, \textcolor{keyword}{const} \textcolor{keywordtype}{double} 
+      scaler)
+00598 \{
+00599   \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} elemDepth = 2;
+00600 
+00601   \textcolor{keyword}{auto} *src = (uint16\_t*)srcBuff;
+00602   \textcolor{keyword}{auto} *dst = (int16\_t*)dstBuff;
+00603   \textcolor{keywordflow}{for} (\textcolor{keywordtype}{size\_t} i = 0; i < numElems*elemDepth; i++)
+00604     \{
+00605       dst[i] = SoapySDR::U16toS16(src[i]) * scaler;
+00606     \}
+00607 \}
+00608 
+00609 \textcolor{keyword}{static} SoapySDR::ConverterRegistry registerGenericCS16toCU16(SOAPY_SDR_CS16, 
+      SOAPY_SDR_CU16, SoapySDR::ConverterRegistry::GENERIC, &genericCS16toCU16);
+00610 \textcolor{keyword}{static} SoapySDR::ConverterRegistry registerGenericCU16toCS16(SOAPY_SDR_CU16, 
+      SOAPY_SDR_CS16, SoapySDR::ConverterRegistry::GENERIC, &genericCU16toCS16);
+00611 
+00612 
+00613 \textcolor{comment}{// CS16 <> CS8}
+00614 \textcolor{keyword}{static} \textcolor{keywordtype}{void} genericCS16toCS8(\textcolor{keyword}{const} \textcolor{keywordtype}{void} *srcBuff, \textcolor{keywordtype}{void} *dstBuff, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} numElems, \textcolor{keyword}{const} \textcolor{keywordtype}{double} scaler
+      )
+00615 \{
+00616   \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} elemDepth = 2;
+00617 
+00618   \textcolor{keyword}{auto} *src = (int16\_t*)srcBuff;
+00619   \textcolor{keyword}{auto} *dst = (int8\_t*)dstBuff;
+00620   \textcolor{keywordflow}{for} (\textcolor{keywordtype}{size\_t} i = 0; i < numElems*elemDepth; i++)
+00621     \{
+00622       dst[i] = SoapySDR::S16toS8(src[i] * scaler);
+00623     \}
+00624 \}
+00625 
+00626 \textcolor{keyword}{static} \textcolor{keywordtype}{void} genericCS8toCS16(\textcolor{keyword}{const} \textcolor{keywordtype}{void} *srcBuff, \textcolor{keywordtype}{void} *dstBuff, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} numElems, \textcolor{keyword}{const} \textcolor{keywordtype}{double} scaler
+      )
+00627 \{
+00628   \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} elemDepth = 2;
+00629 
+00630   \textcolor{keyword}{auto} *src = (int8\_t*)srcBuff;
+00631   \textcolor{keyword}{auto} *dst = (int16\_t*)dstBuff;
+00632   \textcolor{keywordflow}{for} (\textcolor{keywordtype}{size\_t} i = 0; i < numElems*elemDepth; i++)
+00633     \{
+00634       dst[i] = SoapySDR::S8toS16(src[i]) * scaler;
+00635     \}
+00636 \}
+00637 
+00638 \textcolor{keyword}{static} SoapySDR::ConverterRegistry registerGenericCS16toCS8(SOAPY_SDR_CS16, 
+      SOAPY_SDR_CS8, SoapySDR::ConverterRegistry::GENERIC, &genericCS16toCS8);
+00639 \textcolor{keyword}{static} SoapySDR::ConverterRegistry registerGenericCS8toCS16(SOAPY_SDR_CS8, 
+      SOAPY_SDR_CS16, SoapySDR::ConverterRegistry::GENERIC, &genericCS8toCS16);
+00640 
+00641 \textcolor{comment}{// CS16 <> CU8}
+00642 \textcolor{keyword}{static} \textcolor{keywordtype}{void} genericCS16toCU8(\textcolor{keyword}{const} \textcolor{keywordtype}{void} *srcBuff, \textcolor{keywordtype}{void} *dstBuff, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} numElems, \textcolor{keyword}{const} \textcolor{keywordtype}{double} scaler
+      )
+00643 \{
+00644   \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} elemDepth = 2;
+00645 
+00646   \textcolor{keyword}{auto} *src = (int16\_t*)srcBuff;
+00647   \textcolor{keyword}{auto} *dst = (uint8\_t*)dstBuff;
+00648   \textcolor{keywordflow}{for} (\textcolor{keywordtype}{size\_t} i = 0; i < numElems*elemDepth; i++)
+00649     \{
+00650       dst[i] = SoapySDR::S16toU8(src[i] * scaler);
+00651     \}
+00652 \}
+00653 
+00654 \textcolor{keyword}{static} \textcolor{keywordtype}{void} genericCU8toCS16(\textcolor{keyword}{const} \textcolor{keywordtype}{void} *srcBuff, \textcolor{keywordtype}{void} *dstBuff, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} numElems, \textcolor{keyword}{const} \textcolor{keywordtype}{double} scaler
+      )
+00655 \{
+00656   \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} elemDepth = 2;
+00657 
+00658   \textcolor{keyword}{auto} *src = (uint8\_t*)srcBuff;
+00659   \textcolor{keyword}{auto} *dst = (int16\_t*)dstBuff;
+00660   \textcolor{keywordflow}{for} (\textcolor{keywordtype}{size\_t} i = 0; i < numElems*elemDepth; i++)
+00661     \{
+00662       dst[i] = SoapySDR::U8toS16(src[i]) * scaler;
+00663     \}
+00664 \}
+00665 
+00666 \textcolor{keyword}{static} SoapySDR::ConverterRegistry registerGenericCS16toCU8(SOAPY_SDR_CS16, 
+      SOAPY_SDR_CU8, SoapySDR::ConverterRegistry::GENERIC, &genericCS16toCU8);
+00667 \textcolor{keyword}{static} SoapySDR::ConverterRegistry registerGenericCU8toCS16(SOAPY_SDR_CU8, 
+      SOAPY_SDR_CS16, SoapySDR::ConverterRegistry::GENERIC, &genericCU8toCS16);
+00668 
+00669 \textcolor{comment}{// CU16 <> CS8}
+00670 \textcolor{keyword}{static} \textcolor{keywordtype}{void} genericCU16toCS8(\textcolor{keyword}{const} \textcolor{keywordtype}{void} *srcBuff, \textcolor{keywordtype}{void} *dstBuff, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} numElems, \textcolor{keyword}{const} \textcolor{keywordtype}{double} scaler
+      )
+00671 \{
+00672   \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} elemDepth = 2;
+00673 
+00674   \textcolor{keyword}{auto} *src = (uint16\_t*)srcBuff;
+00675   \textcolor{keyword}{auto} *dst = (int8\_t*)dstBuff;
+00676   \textcolor{keywordflow}{for} (\textcolor{keywordtype}{size\_t} i = 0; i < numElems*elemDepth; i++)
+00677     \{
+00678       dst[i] = SoapySDR::U16toS8(src[i] * scaler);
+00679     \}
+00680 \}
+00681 
+00682 \textcolor{keyword}{static} \textcolor{keywordtype}{void} genericCS8toCU16(\textcolor{keyword}{const} \textcolor{keywordtype}{void} *srcBuff, \textcolor{keywordtype}{void} *dstBuff, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} numElems, \textcolor{keyword}{const} \textcolor{keywordtype}{double} scaler
+      )
+00683 \{
+00684   \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} elemDepth = 2;
+00685 
+00686   \textcolor{keyword}{auto} *src = (int8\_t*)srcBuff;
+00687   \textcolor{keyword}{auto} *dst = (uint16\_t*)dstBuff;
+00688   \textcolor{keywordflow}{for} (\textcolor{keywordtype}{size\_t} i = 0; i < numElems*elemDepth; i++)
+00689     \{
+00690       dst[i] = SoapySDR::S8toU16(src[i]) * scaler;
+00691     \}
+00692 \}
+00693 
+00694 \textcolor{keyword}{static} SoapySDR::ConverterRegistry registerGenericCU16toCS8(SOAPY_SDR_CU16, 
+      SOAPY_SDR_CS8, SoapySDR::ConverterRegistry::GENERIC, &genericCU16toCS8);
+00695 \textcolor{keyword}{static} SoapySDR::ConverterRegistry registerGenericCS8toCU16(SOAPY_SDR_CS8, 
+      SOAPY_SDR_CU16, SoapySDR::ConverterRegistry::GENERIC, &genericCS8toCU16);
+00696 
+00697 \textcolor{comment}{// CS8 <> CU8}
+00698 \textcolor{keyword}{static} \textcolor{keywordtype}{void} genericCS8toCU8(\textcolor{keyword}{const} \textcolor{keywordtype}{void} *srcBuff, \textcolor{keywordtype}{void} *dstBuff, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} numElems, \textcolor{keyword}{const} \textcolor{keywordtype}{double} scaler)
+00699 \{
+00700   \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} elemDepth = 2;
+00701 
+00702   \textcolor{keyword}{auto} *src = (int8\_t*)srcBuff;
+00703   \textcolor{keyword}{auto} *dst = (uint8\_t*)dstBuff;
+00704   \textcolor{keywordflow}{for} (\textcolor{keywordtype}{size\_t} i = 0; i < numElems*elemDepth; i++)
+00705     \{
+00706       dst[i] = SoapySDR::S8toU8(src[i] * scaler);
+00707     \}
+00708 \}
+00709 
+00710 \textcolor{keyword}{static} \textcolor{keywordtype}{void} genericCU8toCS8(\textcolor{keyword}{const} \textcolor{keywordtype}{void} *srcBuff, \textcolor{keywordtype}{void} *dstBuff, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} numElems, \textcolor{keyword}{const} \textcolor{keywordtype}{double} scaler)
+00711 \{
+00712   \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} elemDepth = 2;
+00713 
+00714   \textcolor{keyword}{auto} *src = (uint8\_t*)srcBuff;
+00715   \textcolor{keyword}{auto} *dst = (int8\_t*)dstBuff;
+00716   \textcolor{keywordflow}{for} (\textcolor{keywordtype}{size\_t} i = 0; i < numElems*elemDepth; i++)
+00717     \{
+00718       dst[i] = SoapySDR::U8toS8(src[i]) * scaler;
+00719     \}
+00720 \}
+00721 
+00722 \textcolor{keyword}{static} SoapySDR::ConverterRegistry registerGenericCS8toCU8(SOAPY_SDR_CS8, 
+      SOAPY_SDR_CU8, SoapySDR::ConverterRegistry::GENERIC, &genericCS8toCU8);
+00723 \textcolor{keyword}{static} SoapySDR::ConverterRegistry registerGenericCU8toCS8(SOAPY_SDR_CU8, 
+      SOAPY_SDR_CS8, SoapySDR::ConverterRegistry::GENERIC, &genericCU8toCS8);
+00724 
+\end{DoxyCode}

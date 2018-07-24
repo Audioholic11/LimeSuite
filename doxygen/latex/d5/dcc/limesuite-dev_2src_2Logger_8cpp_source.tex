@@ -1,0 +1,96 @@
+\subsection{Logger.\+cpp}
+\label{limesuite-dev_2src_2Logger_8cpp_source}\index{/home/erik/prefix/default/src/limesuite-\/dev/src/\+Logger.\+cpp@{/home/erik/prefix/default/src/limesuite-\/dev/src/\+Logger.\+cpp}}
+
+\begin{DoxyCode}
+00001 
+00007 \textcolor{preprocessor}{#include "Logger.h"}
+00008 \textcolor{preprocessor}{#include <cstdio>}
+00009 \textcolor{preprocessor}{#include <cstring>} \textcolor{comment}{//strerror}
+00010 
+00011 
+00012 \textcolor{preprocessor}{#ifdef \_MSC\_VER}
+00013 \textcolor{preprocessor}{    #define thread\_local \_\_declspec( thread )}
+00014 \textcolor{preprocessor}{    #include <Windows.h>}
+00015 \textcolor{preprocessor}{#endif}
+00016 
+00017 \textcolor{preprocessor}{#ifdef \_\_APPLE\_\_}
+00018 \textcolor{preprocessor}{    #define thread\_local \_\_thread}
+00019 \textcolor{preprocessor}{#endif}
+00020 
+00021 \textcolor{preprocessor}{#define MAX\_MSG\_LEN 1024}
+00022 thread\_local \textcolor{keywordtype}{int} _reportedErrorCode;
+00023 thread\_local \textcolor{keywordtype}{char} _reportedErrorMessage[MAX_MSG_LEN];
+00024 
+00025 \textcolor{keyword}{static} \textcolor{keyword}{const} \textcolor{keywordtype}{char} *errToStr(\textcolor{keyword}{const} \textcolor{keywordtype}{int} errnum)
+00026 \{
+00027     thread\_local \textcolor{keyword}{static} \textcolor{keywordtype}{char} buff[MAX_MSG_LEN];
+00028 \textcolor{preprocessor}{    #ifdef \_MSC\_VER}
+00029     FormatMessage(FORMAT\_MESSAGE\_FROM\_SYSTEM | FORMAT\_MESSAGE\_IGNORE\_INSERTS, NULL, errnum, MAKELANGID(
+      LANG\_NEUTRAL, SUBLANG\_DEFAULT), (LPTSTR)&buff, \textcolor{keyword}{sizeof}(buff), NULL);
+00030     \textcolor{keywordflow}{return} buff;
+00031 \textcolor{preprocessor}{    #else}
+00032     \textcolor{comment}{//http://linux.die.net/man/3/strerror\_r}
+00033 \textcolor{preprocessor}{    #if ((\_POSIX\_C\_SOURCE >= 200112L || \_XOPEN\_SOURCE >= 600) && ! \_GNU\_SOURCE) || \_\_APPLE\_\_}
+00034     strerror\_r(errnum, buff, \textcolor{keyword}{sizeof}(buff));
+00035 \textcolor{preprocessor}{    #else}
+00036     \textcolor{comment}{//this version may decide to use its own internal string}
+00037     \textcolor{keywordflow}{return} strerror\_r(errnum, buff, \textcolor{keyword}{sizeof}(buff));
+00038 \textcolor{preprocessor}{    #endif}
+00039     \textcolor{keywordflow}{return} buff;
+00040 \textcolor{preprocessor}{    #endif}
+00041 \}
+00042 
+00043 \textcolor{keyword}{const} \textcolor{keywordtype}{char} *lime::GetLastErrorMessage(\textcolor{keywordtype}{void})
+00044 \{
+00045     \textcolor{keywordflow}{return} _reportedErrorMessage;
+00046 \}
+00047 
+00048 \textcolor{keywordtype}{int} lime::ReportError(\textcolor{keyword}{const} \textcolor{keywordtype}{int} errnum)
+00049 \{
+00050     \textcolor{keywordflow}{return} lime::ReportError(errnum, errToStr(errnum));
+00051 \}
+00052 
+00053 \textcolor{keywordtype}{int} lime::ReportError(\textcolor{keyword}{const} \textcolor{keywordtype}{int} errnum, \textcolor{keyword}{const} \textcolor{keywordtype}{char} *format, va\_list argList)
+00054 \{
+00055     _reportedErrorCode = errnum;
+00056     vsnprintf(_reportedErrorMessage, MAX_MSG_LEN, format, argList);
+00057     lime::log(LOG_LEVEL_ERROR, _reportedErrorMessage);
+00058     \textcolor{keywordflow}{return} errnum;
+00059 \}
+00060 
+00061 \textcolor{keyword}{static} \textcolor{keywordtype}{void} defaultLogHandler(\textcolor{keyword}{const} lime::LogLevel level, \textcolor{keyword}{const} \textcolor{keywordtype}{char} *message)
+00062 \{
+00063 \textcolor{preprocessor}{#ifdef NDEBUG}
+00064     \textcolor{keywordflow}{if} (level == lime::LOG_LEVEL_DEBUG)
+00065         \textcolor{keywordflow}{return};
+00066 \textcolor{preprocessor}{#endif}
+00067     fprintf(stderr, \textcolor{stringliteral}{"%s\(\backslash\)n"}, message);
+00068 \}
+00069 
+00070 \textcolor{keyword}{static} lime::LogHandler logHandler(&defaultLogHandler);
+00071 
+00072 \textcolor{keywordtype}{void} lime::log(\textcolor{keyword}{const} LogLevel level, \textcolor{keyword}{const} \textcolor{keywordtype}{char} *format, va\_list argList)
+00073 \{
+00074     \textcolor{keywordtype}{char} buff[4096];
+00075     \textcolor{keywordtype}{int} ret = vsnprintf(buff, \textcolor{keyword}{sizeof}(buff), format, argList);
+00076     \textcolor{keywordflow}{if} (ret > 0) logHandler(level, buff);
+00077 \}
+00078 
+00079 \textcolor{keywordtype}{void} lime::registerLogHandler(\textcolor{keyword}{const} LogHandler handler)
+00080 \{
+00081     logHandler = handler;
+00082 \}
+00083 
+00084 \textcolor{keyword}{const} \textcolor{keywordtype}{char} *lime::logLevelToName(\textcolor{keyword}{const} LogLevel level)
+00085 \{
+00086     \textcolor{keywordflow}{switch}(level)
+00087     \{
+00088     \textcolor{keywordflow}{case} lime::LOG_LEVEL_CRITICAL: \textcolor{keywordflow}{return} \textcolor{stringliteral}{"CRITICAL"};
+00089     \textcolor{keywordflow}{case} lime::LOG_LEVEL_ERROR: \textcolor{keywordflow}{return} \textcolor{stringliteral}{"ERROR"};
+00090     \textcolor{keywordflow}{case} lime::LOG_LEVEL_WARNING: \textcolor{keywordflow}{return} \textcolor{stringliteral}{"WARNING"};
+00091     \textcolor{keywordflow}{case} lime::LOG_LEVEL_INFO: \textcolor{keywordflow}{return} \textcolor{stringliteral}{"INFO"};
+00092     \textcolor{keywordflow}{case} lime::LOG_LEVEL_DEBUG: \textcolor{keywordflow}{return} \textcolor{stringliteral}{"DEBUG"};
+00093     \}
+00094     \textcolor{keywordflow}{return} \textcolor{stringliteral}{""};
+00095 \}
+\end{DoxyCode}

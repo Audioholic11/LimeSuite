@@ -1,6 +1,5 @@
 var searchData=
 [
-  ['lime',['lime',['../d5/d6c/namespacelime.html',1,'']]],
-  ['lms7002_5fwxgui',['LMS7002_WXGUI',['../de/df1/namespaceLMS7002__WXGUI.html',1,'']]],
-  ['program_5fmode',['program_mode',['../db/d25/namespacelime_1_1program__mode.html',1,'lime']]]
+  ['calc_5ffmcw_5fpeaks',['calc_fmcw_peaks',['../d2/d94/namespacecalc__fmcw__peaks.html',1,'']]],
+  ['calc_5ffsk_5fpeaks',['calc_fsk_peaks',['../d2/de7/namespacecalc__fsk__peaks.html',1,'']]]
 ];

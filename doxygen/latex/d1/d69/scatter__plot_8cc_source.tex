@@ -1,0 +1,116 @@
+\subsection{scatter\+\_\+plot.\+cc}
+\label{scatter__plot_8cc_source}\index{/home/erik/prefix/default/src/gr-\/radar-\/dev/lib/scatter\+\_\+plot.\+cc@{/home/erik/prefix/default/src/gr-\/radar-\/dev/lib/scatter\+\_\+plot.\+cc}}
+
+\begin{DoxyCode}
+00001 \textcolor{comment}{/* -*- c++ -*- */}
+00002 \textcolor{comment}{/* }
+00003 \textcolor{comment}{ * Copyright 2014 Communications Engineering Lab, KIT.}
+00004 \textcolor{comment}{ * }
+00005 \textcolor{comment}{ * This is free software; you can redistribute it and/or modify}
+00006 \textcolor{comment}{ * it under the terms of the GNU General Public License as published by}
+00007 \textcolor{comment}{ * the Free Software Foundation; either version 3, or (at your option)}
+00008 \textcolor{comment}{ * any later version.}
+00009 \textcolor{comment}{ * }
+00010 \textcolor{comment}{ * This software is distributed in the hope that it will be useful,}
+00011 \textcolor{comment}{ * but WITHOUT ANY WARRANTY; without even the implied warranty of}
+00012 \textcolor{comment}{ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the}
+00013 \textcolor{comment}{ * GNU General Public License for more details.}
+00014 \textcolor{comment}{ * }
+00015 \textcolor{comment}{ * You should have received a copy of the GNU General Public License}
+00016 \textcolor{comment}{ * along with this software; see the file COPYING.  If not, write to}
+00017 \textcolor{comment}{ * the Free Software Foundation, Inc., 51 Franklin Street,}
+00018 \textcolor{comment}{ * Boston, MA 02110-1301, USA.}
+00019 \textcolor{comment}{ */}
+00020 
+00021 \textcolor{preprocessor}{#include <iostream>}
+00022 \textcolor{preprocessor}{#include "scatter_plot.h"}
+00023 
+00024 \textcolor{keyword}{namespace }gr \{
+00025     \textcolor{keyword}{namespace }radar \{
+00026 
+00027         scatter_plot::scatter_plot(\textcolor{keywordtype}{int} interval, std::vector<float> axis\_x, std::vector<float> axis\_y, 
+      std::vector<float>* x, std::vector<float>* y, std::string label\_x, std::string label\_y, \textcolor{keywordtype}{bool}* xy\_read, 
+      std::string label,
+00028         QWidget* parent) : QWidget(parent)
+00029         \{
+00030             d_interval = interval;
+00031             d_xy_read = xy\_read;
+00032             d_axis_x = axis\_x;
+00033             d_axis_y = axis\_y;
+00034             d_x = x;
+00035             d_y = y;
+00036             d_label_x = label\_x;
+00037             d_label_y = label\_y;
+00038             d_marker.resize(0);
+00039             
+00040             \textcolor{comment}{// Setup GUI}
+00041             resize(QSize(600,600));
+00042             d_plot = \textcolor{keyword}{new} QwtPlot(\textcolor{keyword}{this});
+00043             d_symbol = \textcolor{keyword}{new} QwtSymbol(QwtSymbol::Diamond,Qt::red,Qt::NoPen,QSize(20,20));
+00044             d_grid = \textcolor{keyword}{new} QwtPlotGrid;
+00045             
+00046             std::string label\_title = \textcolor{stringliteral}{"Scatter Plot: "};
+00047             label\_title.append(label\_x);
+00048             label\_title.append(\textcolor{stringliteral}{"/"});
+00049             label\_title.append(label\_y);
+00050             \textcolor{keywordflow}{if}(label!=\textcolor{stringliteral}{""})\{
+00051                 label\_title.append(\textcolor{stringliteral}{" ("});
+00052                 label\_title.append(label);
+00053                 label\_title.append(\textcolor{stringliteral}{")"});
+00054             \}
+00055             d_plot->setTitle(QwtText(label\_title.c\_str())); 
+00056             d_plot->setAxisScale(QwtPlot::xBottom,d_axis_x[0],d_axis_x[1]);
+00057             d_plot->setAxisTitle(QwtPlot::xBottom, d_label_x.c\_str());
+00058             d_plot->setAxisScale(QwtPlot::yLeft,d_axis_y[0],d_axis_y[1]);
+00059             d_plot->setAxisTitle(QwtPlot::yLeft, d_label_y.c\_str());
+00060             
+00061             \textcolor{comment}{// Add grid}
+00062             d_grid->setPen(QPen(QColor(119,136,153),0.5, Qt::DashLine));
+00063             d_grid->attach(d_plot);
+00064             
+00065             \textcolor{comment}{// Plot grid and axis}
+00066             d_plot->replot();
+00067             
+00068             \textcolor{comment}{// Setup timer and connect refreshing plot}
+00069             d_timer = \textcolor{keyword}{new} QTimer(\textcolor{keyword}{this});
+00070             connect(d_timer, SIGNAL(timeout()), \textcolor{keyword}{this}, SLOT(refresh()));
+00071             d_timer->start(d_interval);
+00072         \}
+00073 
+00074         scatter_plot::~scatter_plot()\{
+00075         \}
+00076         
+00077         \textcolor{keywordtype}{void}
+00078         scatter_plot::resizeEvent( QResizeEvent * event )\{
+00079             d_plot->setGeometry(0,0,this->width(),this->height());
+00080         \}
+00081         
+00082         \textcolor{keywordtype}{void}
+00083         scatter_plot::refresh()\{
+00084             \textcolor{comment}{// Clear plot from old markers}
+00085             \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} k=0; k<d_marker.size(); k++) d_marker[k]->detach();
+00086             
+00087             \textcolor{keywordflow}{if}(not(*d_xy_read))\{
+00088                 \textcolor{comment}{// Set new marker}
+00089                 \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} k=0; k<d_x->size(); k++)\{ \textcolor{comment}{// len(range)==len(velocity), same size x and y!}
+00090                     \textcolor{keywordflow}{if}(k<d_marker.size())\{
+00091                         d_marker[k]->setValue(QPointF((*d_x)[k],(*d_y)[k]));
+00092                         d_marker[k]->attach(d_plot);
+00093                     \}
+00094                     \textcolor{keywordflow}{else}\{
+00095                         d_marker.push\_back(\textcolor{keyword}{new} QwtPlotMarker);
+00096                         d_marker[k]->setSymbol(d_symbol);
+00097                         d_marker[k]->setValue(QPointF((*d_x)[k],(*d_y)[k]));
+00098                         d_marker[k]->attach(d_plot);
+00099                     \}
+00100                 \}
+00101                 *d_xy_read = \textcolor{keyword}{true}; \textcolor{comment}{// set points as read}
+00102             \}
+00103             
+00104             \textcolor{comment}{// Replot}
+00105             d_plot->replot();
+00106         \}
+00107 
+00108     \}
+00109 \}
+\end{DoxyCode}

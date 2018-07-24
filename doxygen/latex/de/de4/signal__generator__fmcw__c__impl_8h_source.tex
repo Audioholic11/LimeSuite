@@ -1,0 +1,113 @@
+\subsection{signal\+\_\+generator\+\_\+fmcw\+\_\+c\+\_\+impl.\+h}
+\label{signal__generator__fmcw__c__impl_8h_source}\index{/home/erik/prefix/default/src/gr-\/radar-\/dev/lib/signal\+\_\+generator\+\_\+fmcw\+\_\+c\+\_\+impl.\+h@{/home/erik/prefix/default/src/gr-\/radar-\/dev/lib/signal\+\_\+generator\+\_\+fmcw\+\_\+c\+\_\+impl.\+h}}
+
+\begin{DoxyCode}
+00001 \textcolor{comment}{/* -*- c++ -*- */}
+00002 \textcolor{comment}{/*}
+00003 \textcolor{comment}{ * Copyright 2014 Communications Engineering Lab, KIT.}
+00004 \textcolor{comment}{ *}
+00005 \textcolor{comment}{ * This is free software; you can redistribute it and/or modify}
+00006 \textcolor{comment}{ * it under the terms of the GNU General Public License as published by}
+00007 \textcolor{comment}{ * the Free Software Foundation; either version 3, or (at your option)}
+00008 \textcolor{comment}{ * any later version.}
+00009 \textcolor{comment}{ *}
+00010 \textcolor{comment}{ * This software is distributed in the hope that it will be useful,}
+00011 \textcolor{comment}{ * but WITHOUT ANY WARRANTY; without even the implied warranty of}
+00012 \textcolor{comment}{ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the}
+00013 \textcolor{comment}{ * GNU General Public License for more details.}
+00014 \textcolor{comment}{ *}
+00015 \textcolor{comment}{ * You should have received a copy of the GNU General Public License}
+00016 \textcolor{comment}{ * along with this software; see the file COPYING.  If not, write to}
+00017 \textcolor{comment}{ * the Free Software Foundation, Inc., 51 Franklin Street,}
+00018 \textcolor{comment}{ * Boston, MA 02110-1301, USA.}
+00019 \textcolor{comment}{ */}
+00020 
+00021 \textcolor{preprocessor}{#ifndef INCLUDED\_RADAR\_SIGNAL\_GENERATOR\_FMCW\_C\_IMPL\_H}
+00022 \textcolor{preprocessor}{#define INCLUDED\_RADAR\_SIGNAL\_GENERATOR\_FMCW\_C\_IMPL\_H}
+00023 
+00024 \textcolor{preprocessor}{#include <radar/signal_generator_fmcw_c.h>}
+00025 
+00026 \textcolor{keyword}{namespace }gr \{
+00027   \textcolor{keyword}{namespace }radar \{
+00028 
+00029     \textcolor{keyword}{class }signal_generator_fmcw_c_impl : \textcolor{keyword}{public} signal_generator_fmcw_c
+00030     \{
+00031      \textcolor{keyword}{public}:
+00032       signal_generator_fmcw_c_impl(
+00033         \textcolor{keyword}{const} \textcolor{keywordtype}{int} samp_rate,
+00034         \textcolor{keyword}{const} \textcolor{keywordtype}{int} packet\_len,
+00035         \textcolor{keywordtype}{int} samp_up,
+00036         \textcolor{keywordtype}{int} samp\_up\_hold,
+00037         \textcolor{keywordtype}{int} samp_down,
+00038         \textcolor{keywordtype}{int} samp\_down\_hold,
+00039         \textcolor{keywordtype}{int} samp_cw,
+00040         \textcolor{keywordtype}{int} samp\_dead,
+00041         \textcolor{keyword}{const} \textcolor{keywordtype}{float} freq_cw,
+00042         \textcolor{keyword}{const} \textcolor{keywordtype}{float} freq\_sweep,
+00043         \textcolor{keyword}{const} \textcolor{keywordtype}{float} amplitude,
+00044         \textcolor{keyword}{const} std::string& len\_key,
+00045         \textcolor{keyword}{const} std::string& chirp\_len\_key,
+00046         \textcolor{keyword}{const} std::string& total\_len\_key
+00047       );
+00048       ~signal_generator_fmcw_c_impl();
+00049 
+00050       \textcolor{comment}{//Aux methods: Set Members (perform calcuations if necessary)}
+00051       \textcolor{keywordtype}{void} set_d_chirp_len(\textcolor{keywordtype}{int} chirp\_length);
+00052       \textcolor{keywordtype}{void} set_d_total_len(\textcolor{keywordtype}{int} total\_length);
+00053       \textcolor{keywordtype}{void} set_waveform();
+00054 
+00055       \textcolor{keywordtype}{void} set_d_samp_dead(\textcolor{keywordtype}{int} dead\_samples);
+00056       \textcolor{keywordtype}{void} set_d_samp_dead_round(\textcolor{keywordtype}{int} dead\_samples);
+00057       \textcolor{keywordtype}{void} set_chirp(\textcolor{keywordtype}{int} up\_samples, \textcolor{keywordtype}{int} up\_hold\_samples,
+00058                      \textcolor{keywordtype}{int} down\_samples, \textcolor{keywordtype}{int} down\_hold\_samples,
+00059                      \textcolor{keywordtype}{int} cw\_samples);
+00060 
+00061       \textcolor{comment}{//work function}
+00062       \textcolor{keywordtype}{int} work(\textcolor{keywordtype}{int} noutput\_items,
+00063           gr\_vector\_const\_void\_star &input\_items,
+00064           gr\_vector\_void\_star &output\_items
+00065       );
+00066 
+00067      \textcolor{keyword}{private}:
+00068       \textcolor{keyword}{const} \textcolor{keywordtype}{int} d_samp_rate; 
+00069       \textcolor{keyword}{const} \textcolor{keywordtype}{int} d_packet_len; 
+00070       \textcolor{keywordtype}{int} d_samp_up; 
+00071       \textcolor{keywordtype}{int} d_samp_up_hold; 
+00072       \textcolor{keywordtype}{int} d_samp_down; 
+00073       \textcolor{keywordtype}{int} d_samp_down_hold; 
+00074       \textcolor{keywordtype}{int} d_samp_cw; 
+00075       \textcolor{keywordtype}{int} d_samp_dead; 
+00076       \textcolor{keywordtype}{int} d_chirp_len; 
+00077       \textcolor{keyword}{const} \textcolor{keywordtype}{float} d_freq_cw; 
+00078       \textcolor{keyword}{const} \textcolor{keywordtype}{float} d_freq_sweep; 
+00079       \textcolor{keyword}{const} \textcolor{keywordtype}{float} d_amplitude; 
+00080       \textcolor{keywordtype}{int} d_total_len;
+00081 
+00082       \textcolor{comment}{//tags}
+00083       \textcolor{keyword}{const} pmt::pmt\_t d_srcid; 
+00084 
+00085       \textcolor{keyword}{const} pmt::pmt\_t d_key_len; 
+00086       \textcolor{keyword}{const} pmt::pmt\_t d_value_len; 
+00087 
+00088       \textcolor{keyword}{const} pmt::pmt\_t d_key_chirp_len; 
+00089       pmt::pmt\_t d_value_chirp_len; 
+00090 
+00091       \textcolor{keyword}{const} pmt::pmt\_t d_key_total_len; 
+00092       pmt::pmt\_t d_value_total_len; 
+00093 
+00094       \textcolor{keyword}{const} pmt::pmt\_t d_key_deadtime; 
+00095       pmt::pmt\_t d_value_deadtime; 
+00096       \textcolor{keywordtype}{bool} d_counter_deadtime;
+00097 
+00098       std::complex<float> d_phase; 
+00099       std::complex<float> d_amp;
+00100       std::vector<float> d_waveform; 
+00101       std::vector<float> d_waveform_amp; 
+00102       \textcolor{keywordtype}{int} d_wv_counter; 
+00103     \};
+00104 
+00105   \} \textcolor{comment}{// namespace radar}
+00106 \} \textcolor{comment}{// namespace gr}
+00107 
+00108 \textcolor{preprocessor}{#endif }\textcolor{comment}{/* INCLUDED\_RADAR\_SIGNAL\_GENERATOR\_FMCW\_C\_IMPL\_H */}\textcolor{preprocessor}{}
+\end{DoxyCode}

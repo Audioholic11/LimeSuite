@@ -1,0 +1,87 @@
+\subsection{Types.\+hpp}
+\label{Types_8hpp_source}\index{/home/erik/prefix/default/src/soapysdr/include/\+Soapy\+S\+D\+R/\+Types.\+hpp@{/home/erik/prefix/default/src/soapysdr/include/\+Soapy\+S\+D\+R/\+Types.\+hpp}}
+
+\begin{DoxyCode}
+00001 
+00011 \textcolor{preprocessor}{#pragma once}
+00012 \textcolor{preprocessor}{#include <SoapySDR/Config.hpp>}
+00013 \textcolor{preprocessor}{#include <SoapySDR/Types.h>}
+00014 \textcolor{preprocessor}{#include <vector>}
+00015 \textcolor{preprocessor}{#include <string>}
+00016 \textcolor{preprocessor}{#include <map>}
+00017 
+00018 \textcolor{keyword}{namespace }SoapySDR
+00019 \{
+00020 
+00022 \textcolor{keyword}{typedef} std::map<std::string, std::string> Kwargs;
+00023 
+00028 SOAPY_SDR_API Kwargs KwargsFromString(\textcolor{keyword}{const} std::string &markup);
+00029 
+00034 SOAPY_SDR_API std::string KwargsToString(\textcolor{keyword}{const} Kwargs &args);
+00035 
+00037 \textcolor{keyword}{typedef} std::vector<Kwargs> KwargsList;
+00038 
+00042 \textcolor{keyword}{class }SOAPY_SDR_API Range
+00043 \{
+00044 \textcolor{keyword}{public}:
+00045 
+00047     Range(\textcolor{keywordtype}{void});
+00048 
+00050     Range(\textcolor{keyword}{const} \textcolor{keywordtype}{double} minimum, \textcolor{keyword}{const} \textcolor{keywordtype}{double} maximum, \textcolor{keyword}{const} \textcolor{keywordtype}{double} step=0.0);
+00051 
+00053     \textcolor{keywordtype}{double} minimum(\textcolor{keywordtype}{void}) \textcolor{keyword}{const};
+00054 
+00056     \textcolor{keywordtype}{double} maximum(\textcolor{keywordtype}{void}) \textcolor{keyword}{const};
+00057 
+00059     \textcolor{keywordtype}{double} step(\textcolor{keywordtype}{void}) \textcolor{keyword}{const};
+00060 
+00061 \textcolor{keyword}{private}:
+00062     \textcolor{keywordtype}{double} \_min, \_max, _step;
+00063 \};
+00064 
+00070 \textcolor{keyword}{typedef} std::vector<Range> RangeList;
+00071 
+00075 \textcolor{keyword}{class }SOAPY_SDR_API ArgInfo
+00076 \{
+00077 \textcolor{keyword}{public}:
+00078 
+00080     ArgInfo(\textcolor{keywordtype}{void});
+00081 
+00083     std::string key;
+00084 
+00090     std::string value;
+00091 
+00093     std::string name;
+00094 
+00096     std::string description;
+00097 
+00099     std::string units;
+00100 
+00102     \textcolor{keyword}{enum} Type \{BOOL, INT, FLOAT, STRING\} type;
+00103 
+00109     Range range;
+00110 
+00115     std::vector<std::string> options;
+00116 
+00121     std::vector<std::string> optionNames;
+00122 \};
+00123 
+00127 \textcolor{keyword}{typedef} std::vector<ArgInfo> ArgInfoList;
+00128 
+00129 \}
+00130 
+00131 \textcolor{keyword}{inline} \textcolor{keywordtype}{double} SoapySDR::Range::minimum(\textcolor{keywordtype}{void})\textcolor{keyword}{ const}
+00132 \textcolor{keyword}{}\{
+00133     \textcolor{keywordflow}{return} \_min;
+00134 \}
+00135 
+00136 \textcolor{keyword}{inline} \textcolor{keywordtype}{double} SoapySDR::Range::maximum(\textcolor{keywordtype}{void})\textcolor{keyword}{ const}
+00137 \textcolor{keyword}{}\{
+00138     \textcolor{keywordflow}{return} \_max;
+00139 \}
+00140 
+00141 \textcolor{keyword}{inline} \textcolor{keywordtype}{double} SoapySDR::Range::step(\textcolor{keywordtype}{void})\textcolor{keyword}{ const}
+00142 \textcolor{keyword}{}\{
+00143     \textcolor{keywordflow}{return} \_step;
+00144 \}
+\end{DoxyCode}

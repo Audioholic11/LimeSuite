@@ -1,0 +1,244 @@
+\subsection{estimator\+\_\+rcs\+\_\+impl.\+cc}
+\label{estimator__rcs__impl_8cc_source}\index{/home/erik/prefix/default/src/gr-\/radar-\/dev/lib/estimator\+\_\+rcs\+\_\+impl.\+cc@{/home/erik/prefix/default/src/gr-\/radar-\/dev/lib/estimator\+\_\+rcs\+\_\+impl.\+cc}}
+
+\begin{DoxyCode}
+00001 \textcolor{comment}{/* -*- c++ -*- */}
+00002 \textcolor{comment}{/* }
+00003 \textcolor{comment}{ * Copyright 2014 Communications Engineering Lab, KIT.}
+00004 \textcolor{comment}{ * }
+00005 \textcolor{comment}{ * This is free software; you can redistribute it and/or modify}
+00006 \textcolor{comment}{ * it under the terms of the GNU General Public License as published by}
+00007 \textcolor{comment}{ * the Free Software Foundation; either version 3, or (at your option)}
+00008 \textcolor{comment}{ * any later version.}
+00009 \textcolor{comment}{ * }
+00010 \textcolor{comment}{ * This software is distributed in the hope that it will be useful,}
+00011 \textcolor{comment}{ * but WITHOUT ANY WARRANTY; without even the implied warranty of}
+00012 \textcolor{comment}{ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the}
+00013 \textcolor{comment}{ * GNU General Public License for more details.}
+00014 \textcolor{comment}{ * }
+00015 \textcolor{comment}{ * You should have received a copy of the GNU General Public License}
+00016 \textcolor{comment}{ * along with this software; see the file COPYING.  If not, write to}
+00017 \textcolor{comment}{ * the Free Software Foundation, Inc., 51 Franklin Street,}
+00018 \textcolor{comment}{ * Boston, MA 02110-1301, USA.}
+00019 \textcolor{comment}{ */}
+00020 
+00021 \textcolor{preprocessor}{#ifdef HAVE\_CONFIG\_H}
+00022 \textcolor{preprocessor}{#include "config.h"}
+00023 \textcolor{preprocessor}{#endif}
+00024 
+00025 \textcolor{preprocessor}{#include <gnuradio/io\_signature.h>}
+00026 \textcolor{preprocessor}{#include <boost/circular\_buffer.hpp>}
+00027 \textcolor{preprocessor}{#include "estimator_rcs_impl.h"}
+00028 \textcolor{preprocessor}{#include <numeric>}
+00029 
+00030 \textcolor{keyword}{namespace }gr \{
+00031   \textcolor{keyword}{namespace }radar \{
+00032 
+00033     estimator_rcs::sptr
+00034     estimator_rcs::make(\textcolor{keywordtype}{int} num\_mean, \textcolor{keywordtype}{float} center_freq, \textcolor{keywordtype}{float} antenna\_gain\_tx, \textcolor{keywordtype}{float} antenna\_gain\_rx, \textcolor{keywordtype}{
+      float} usrp\_gain\_rx, \textcolor{keywordtype}{float} power\_tx, \textcolor{keywordtype}{float} corr\_factor, \textcolor{keywordtype}{float} exponent)
+00035     \{
+00036       \textcolor{keywordflow}{return} gnuradio::get\_initial\_sptr
+00037         (\textcolor{keyword}{new} estimator_rcs_impl(num\_mean, center\_freq, antenna\_gain\_tx, antenna\_gain\_rx, usrp\_gain\_rx, 
+      power\_tx, corr\_factor, exponent));
+00038     \}
+00039 
+00040     \textcolor{comment}{/*}
+00041 \textcolor{comment}{     * The private constructor}
+00042 \textcolor{comment}{     */}
+00043     estimator_rcs_impl::estimator_rcs_impl(\textcolor{keywordtype}{int} num\_mean, \textcolor{keywordtype}{float} center_freq, \textcolor{keywordtype}{float} antenna\_gain\_tx, \textcolor{keywordtype}{float} 
+      antenna\_gain\_rx, \textcolor{keywordtype}{float} usrp\_gain\_rx, \textcolor{keywordtype}{float} power\_tx, \textcolor{keywordtype}{float} corr\_factor, \textcolor{keywordtype}{float} exponent)
+00044       : gr::block(\textcolor{stringliteral}{"estimator\_rcs"},
+00045               gr::io\_signature::make(0,0,0),
+00046               gr::io\_signature::make(0,0,0))
+00047     \{
+00048         d_num_mean = num\_mean;
+00049         d_center_freq = center_freq;
+00050         d_antenna_gain_tx = antenna\_gain\_tx;
+00051         d_antenna_gain_rx = antenna\_gain\_rx;
+00052         d_usrp_gain_rx = usrp\_gain\_rx;
+00053         d_power_tx = power\_tx; \textcolor{comment}{// needs to be calibrated for every usage}
+00054         d_corr_factor = corr\_factor;
+00055         d_exponent = exponent;
+00056 
+00057         d_rcs_vals.resize(d_num_mean);
+00058 
+00059         \textcolor{comment}{// Register input message port}
+00060         d_port_id_in = pmt::mp(\textcolor{stringliteral}{"Msg in"});
+00061         message\_port\_register\_in(d_port_id_in);
+00062         set\_msg\_handler(d_port_id_in, boost::bind(&
+      estimator_rcs_impl::handle_msg, \textcolor{keyword}{this}, \_1));
+00063         
+00064         \textcolor{comment}{// Register output message port}
+00065         d_port_id_out = pmt::mp(\textcolor{stringliteral}{"Msg out"});
+00066         message\_port\_register\_out(d_port_id_out);
+00067 
+00068         d_loop_counter = 0;
+00069 
+00070         \textcolor{comment}{// constant factors in radar equation}
+00071         d_antenna_gain_abs_rx = pow(10, d_antenna_gain_rx/10);
+00072         d_antenna_gain_abs_tx = pow(10, d_antenna_gain_tx/10);
+00073         d_lambda = c_light/d_center_freq;
+00074         d_fak = pow(4.0*M\_PI, 3) / (d_antenna_gain_abs_rx * 
+      d_antenna_gain_abs_tx * pow(d_lambda, 2));
+00075 
+00076     \}
+00077 
+00078     \textcolor{comment}{/*}
+00079 \textcolor{comment}{     * Our virtual destructor.}
+00080 \textcolor{comment}{     */}
+00081     estimator_rcs_impl::~estimator_rcs_impl()
+00082     \{
+00083     \}
+00084 
+00085     \textcolor{keywordtype}{void}
+00086     estimator_rcs_impl::set_num_mean(\textcolor{keywordtype}{int} val)\{
+00087       d_num_mean = val;
+00088       d_rcs_vals.clear();
+00089       d_rcs_vals.resize(d_num_mean);
+00090       d_loop_counter = 0;
+00091     \}
+00092 
+00093     \textcolor{keywordtype}{void}
+00094     estimator_rcs_impl::set_center_freq(\textcolor{keywordtype}{float} val)\{
+00095       d_center_freq = val;
+00096       d_lambda = c_light/d_center_freq;
+00097       d_fak = pow(4.0*M\_PI, 3) / (d_antenna_gain_abs_rx * d_antenna_gain_abs_tx * pow(
+      d_lambda, 2));
+00098     \}
+00099 
+00100     \textcolor{keywordtype}{void}
+00101     estimator_rcs_impl::set_antenna_gain_tx(\textcolor{keywordtype}{float} val)\{
+00102       d_antenna_gain_tx = val;
+00103       d_antenna_gain_abs_tx = pow(10, d_antenna_gain_tx/10);
+00104       d_fak = pow(4.0*M\_PI, 3) / (d_antenna_gain_abs_rx * d_antenna_gain_abs_tx * pow(
+      d_lambda, 2));
+00105     \}
+00106 
+00107     \textcolor{keywordtype}{void}
+00108     estimator_rcs_impl::set_antenna_gain_rx(\textcolor{keywordtype}{float} val)\{
+00109       d_antenna_gain_rx = val;
+00110       d_antenna_gain_abs_rx = pow(10, d_antenna_gain_rx/10);
+00111       d_fak = pow(4.0*M\_PI, 3) / (d_antenna_gain_abs_rx * d_antenna_gain_abs_tx * pow(
+      d_lambda, 2));
+00112     \}
+00113 
+00114     \textcolor{keywordtype}{void}
+00115     estimator_rcs_impl::set_usrp_gain_rx(\textcolor{keywordtype}{float} val)\{
+00116       d_usrp_gain_rx = val;
+00117     \}
+00118 
+00119     \textcolor{keywordtype}{void}
+00120     estimator_rcs_impl::set_power_tx(\textcolor{keywordtype}{float} val)\{
+00121       d_power_tx = val;
+00122     \}
+00123 
+00124     \textcolor{keywordtype}{void}
+00125     estimator_rcs_impl::set_corr_factor(\textcolor{keywordtype}{float} val)\{
+00126       d_corr_factor = val;
+00127     \}
+00128 
+00129     \textcolor{keywordtype}{float}
+00130     estimator_rcs_impl::calculate_vector_mean(boost::circular\_buffer<float>* rcs\_vals) \{
+00131       \textcolor{keywordtype}{float} sum\_of\_elems = 0;
+00132       \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} k=0; k<rcs\_vals->size(); k++)\{
+00133         sum\_of\_elems += (*rcs\_vals)[k];
+00134       \}
+00135       \textcolor{keywordflow}{return} sum\_of\_elems/rcs\_vals->size();
+00136     \}
+00137 
+00138     \textcolor{keywordtype}{float}
+00139     estimator_rcs_impl::calculate_rcs() \{
+00140       \textcolor{comment}{// catch errors}
+00141             \textcolor{keywordflow}{if}(d_range.size() == 0) \textcolor{keywordflow}{throw} std::runtime\_error(\textcolor{stringliteral}{"range vector has size zero"});
+00142             \textcolor{keywordflow}{if}(d_power.size() == 0) \textcolor{keywordflow}{throw} std::runtime\_error(\textcolor{stringliteral}{"power vector has size zero"});
+00143 
+00144       \textcolor{comment}{// regard usrp gain and signal path}
+00145             \textcolor{keywordtype}{float} power\_rx = pow(d_power[0], d_exponent) / d_power_tx / pow(10, 
+      d_usrp_gain_rx/10);
+00146             
+00147             \textcolor{keywordtype}{float} fak = d_fak * pow(d_range[0], 4);
+00148 
+00149       \textcolor{comment}{// debug output}
+00150       \textcolor{comment}{// std::cout << "PowerTx: " << d\_power\_tx << std::endl;}
+00151       \textcolor{comment}{// std::cout << "PowerRx: " << power\_rx << std::endl;}
+00152       \textcolor{comment}{// std::cout << "Lambda: " << d\_lambda << std::endl;}
+00153       \textcolor{comment}{// std::cout << "GainRx: " << d\_antenna\_gain\_rx << std::endl;}
+00154       \textcolor{comment}{// std::cout << "GainTx: " << d\_antenna\_gain\_tx << std::endl;}
+00155       \textcolor{comment}{// std::cout << "fak: " << fak << std::endl;}
+00156 
+00157             \textcolor{keywordflow}{return} power\_rx/d_power_tx * fak * d_corr_factor;
+00158     \}
+00159 
+00160     \textcolor{keywordtype}{void}
+00161     estimator_rcs_impl::handle_msg(pmt::pmt\_t msg)
+00162     \{
+00163         \textcolor{comment}{// Read msg from peak detector}
+00164         d_msg_hold.clear();
+00165         pmt::pmt\_t msg\_part;
+00166         \textcolor{keywordtype}{bool} found\_range = \textcolor{keyword}{false};
+00167         \textcolor{keywordtype}{bool} found\_power = \textcolor{keyword}{false};
+00168         \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} k=0; k<pmt::length(msg); k++)\{
+00169           msg\_part = pmt::nth(k,msg);
+00170           \textcolor{keywordflow}{if}(pmt::symbol\_to\_string(pmt::nth(0,msg\_part))==\textcolor{stringliteral}{"range"})\{
+00171             d_prange = pmt::nth(1,msg\_part);
+00172             d_msg_hold.push\_back(msg\_part);
+00173             found\_range = \textcolor{keyword}{true};
+00174           \}
+00175           \textcolor{keywordflow}{else} \textcolor{keywordflow}{if}(pmt::symbol\_to\_string(pmt::nth(0,msg\_part))==\textcolor{stringliteral}{"power"})\{
+00176             d_ppower = pmt::nth(1,msg\_part);
+00177             found\_power = \textcolor{keyword}{true};
+00178           \}
+00179           \textcolor{keywordflow}{else}\{
+00180             d_msg_hold.push\_back(msg\_part);
+00181           \}
+00182         \}
+00183 
+00184         \textcolor{keywordflow}{if}(not(found\_range&&found\_power)) \textcolor{keywordflow}{throw} std::runtime\_error(\textcolor{stringliteral}{"range or power identifier (symbol) not
+       found"});
+00185 
+00186         d_range = pmt::f32vector\_elements(d_prange);
+00187         d_power = pmt::f32vector\_elements(d_ppower);
+00188         d_rcs.clear();
+00189 
+00190         \textcolor{keywordflow}{if}(d_range.size()!=d_power.size()) \textcolor{keywordflow}{throw} std::runtime\_error(\textcolor{stringliteral}{"range and power vectors do not have
+       same size"});
+00191 
+00192         \textcolor{comment}{// Calculate RCS}
+00193         \textcolor{keywordtype}{float} rcs\_mean = 0.0;
+00194         \textcolor{keywordflow}{if}(d_range.size() == 0 && d_power.size() == 0)\{
+00195           \textcolor{comment}{//std::cout << "ERROR: No target detected for RCS calculation" << std::endl;}
+00196         \}
+00197         \textcolor{keywordflow}{else} \{
+00198           d_rcs_vals.push\_back(calculate_rcs());
+00199         \}
+00200         \textcolor{comment}{//std::cout << "RCS\_TEMP: " << calculate\_rcs() << std::endl;}
+00201 
+00202         \textcolor{keywordflow}{if}(d_loop_counter+1 >= d_num_mean) \{
+00203             rcs\_mean = calculate_vector_mean(&d_rcs_vals);
+00204         \}
+00205         \textcolor{keywordflow}{else} \{
+00206             d_loop_counter++;
+00207         \}
+00208 
+00209         \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} k=0; k<d_range.size(); k++)\{
+00210             d_rcs.push\_back(rcs\_mean);
+00211         \}
+00212         
+00213         \textcolor{comment}{// Push pmt to output msg port}
+00214         d_rcs_key = pmt::string\_to\_symbol(\textcolor{stringliteral}{"rcs"}); \textcolor{comment}{// identifier velocity}
+00215         d_rcs_value = pmt::init\_f32vector(d_rcs.size(), d_rcs); \textcolor{comment}{// vector to pmt}
+00216         d_rcs_pack = pmt::list2(d_rcs_key, d_rcs_value); \textcolor{comment}{// make list for velocity information}
+00217         
+00218         d_value = pmt::list1(d\_rcs\_pack);
+00219         \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} k=0; k<d_msg_hold.size(); k++)\{
+00220             d_value = pmt::list\_add(d_value, d_msg_hold[k]);
+00221         \}
+00222         
+00223         message\_port\_pub(d_port_id_out,d_value); \textcolor{comment}{// publish message}
+00224     \}
+00225 
+00226   \} \textcolor{comment}{/* namespace radar */}
+00227 \} \textcolor{comment}{/* namespace gr */}
+00228 
+\end{DoxyCode}

@@ -1,0 +1,45 @@
+\subsection{S\+I\+Z\+E\+O\+F\+\_\+\+U\+I\+N\+T.\+c}
+\label{SIZEOF__UINT_8c_source}\index{/home/erik/prefix/default/src/gr-\/radar-\/dev/build/\+C\+Make\+Files/\+Check\+Type\+Size/\+S\+I\+Z\+E\+O\+F\+\_\+\+U\+I\+N\+T.\+c@{/home/erik/prefix/default/src/gr-\/radar-\/dev/build/\+C\+Make\+Files/\+Check\+Type\+Size/\+S\+I\+Z\+E\+O\+F\+\_\+\+U\+I\+N\+T.\+c}}
+
+\begin{DoxyCode}
+00001 \textcolor{preprocessor}{#include <sys/types.h>}
+00002 \textcolor{preprocessor}{#include <stdint.h>}
+00003 \textcolor{preprocessor}{#include <stddef.h>}
+00004 
+00005 
+00006 \textcolor{preprocessor}{#undef KEY}
+00007 \textcolor{preprocessor}{#if defined(\_\_i386)}
+00008 \textcolor{preprocessor}{# define KEY '\_','\_','i','3','8','6'}
+00009 \textcolor{preprocessor}{#elif defined(\_\_x86\_64)}
+00010 \textcolor{preprocessor}{# define KEY '\_','\_','x','8','6','\_','6','4'}
+00011 \textcolor{preprocessor}{#elif defined(\_\_ppc\_\_)}
+00012 \textcolor{preprocessor}{# define KEY '\_','\_','p','p','c','\_','\_'}
+00013 \textcolor{preprocessor}{#elif defined(\_\_ppc64\_\_)}
+00014 \textcolor{preprocessor}{# define KEY '\_','\_','p','p','c','6','4','\_','\_'}
+00015 \textcolor{preprocessor}{#endif}
+00016 
+00017 \textcolor{preprocessor}{#define SIZE (sizeof(unsigned int))}
+00018 \textcolor{keywordtype}{char} info_size[] =  \{\textcolor{charliteral}{'I'}, \textcolor{charliteral}{'N'}, \textcolor{charliteral}{'F'}, \textcolor{charliteral}{'O'}, \textcolor{charliteral}{':'}, \textcolor{charliteral}{'s'},\textcolor{charliteral}{'i'},\textcolor{charliteral}{'z'},\textcolor{charliteral}{'e'},\textcolor{charliteral}{'['},
+00019   (\textcolor{charliteral}{'0'} + ((SIZE / 10000)%10)),
+00020   (\textcolor{charliteral}{'0'} + ((SIZE / 1000)%10)),
+00021   (\textcolor{charliteral}{'0'} + ((SIZE / 100)%10)),
+00022   (\textcolor{charliteral}{'0'} + ((SIZE / 10)%10)),
+00023   (\textcolor{charliteral}{'0'} +  (SIZE    % 10)),
+00024   \textcolor{charliteral}{']'},
+00025 \textcolor{preprocessor}{#ifdef KEY}
+00026   \textcolor{charliteral}{' '},\textcolor{charliteral}{'k'},\textcolor{charliteral}{'e'},\textcolor{charliteral}{'y'},\textcolor{charliteral}{'['}, KEY, \textcolor{charliteral}{']'},
+00027 \textcolor{preprocessor}{#endif}
+00028   \textcolor{charliteral}{'\(\backslash\)0'}\};
+00029 
+00030 \textcolor{preprocessor}{#ifdef \_\_CLASSIC\_C\_\_}
+00031 \textcolor{keywordtype}{int} main(argc, argv) \textcolor{keywordtype}{int} argc; \textcolor{keywordtype}{char} *argv[];
+00032 \textcolor{preprocessor}{#else}
+00033 \textcolor{keywordtype}{int} main(\textcolor{keywordtype}{int} argc, \textcolor{keywordtype}{char} *argv[])
+00034 \textcolor{preprocessor}{#endif}
+00035 \{
+00036   \textcolor{keywordtype}{int} require = 0;
+00037   require += info_size[argc];
+00038   (void)argv;
+00039   \textcolor{keywordflow}{return} require;
+00040 \}
+\end{DoxyCode}

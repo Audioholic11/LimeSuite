@@ -1,0 +1,82 @@
+\subsection{index.\+py}
+\label{index_8py_source}\index{/home/erik/prefix/default/src/gr-\/radar-\/dev/docs/doxygen/doxyxml/generated/index.\+py@{/home/erik/prefix/default/src/gr-\/radar-\/dev/docs/doxygen/doxyxml/generated/index.\+py}}
+
+\begin{DoxyCode}
+00001 \textcolor{comment}{#!/usr/bin/env python2}
+00002 
+00003 \textcolor{stringliteral}{"""}
+00004 \textcolor{stringliteral}{Generated Mon Feb  9 19:08:05 2009 by generateDS.py.}
+00005 \textcolor{stringliteral}{"""}
+00006 
+00007 \textcolor{keyword}{from} xml.dom \textcolor{keyword}{import} minidom
+00008 
+00009 \textcolor{keyword}{import} os
+00010 \textcolor{keyword}{import} sys
+00011 \textcolor{keyword}{import} compound
+00012 
+00013 \textcolor{keyword}{import} indexsuper \textcolor{keyword}{as} supermod
+00014 
+00015 \textcolor{keyword}{class }DoxygenTypeSub(supermod.DoxygenType):
+00016     \textcolor{keyword}{def }__init__(self, version=None, compound=None):
+00017         supermod.DoxygenType.\_\_init\_\_(self, version, compound)
+00018 
+00019     \textcolor{keyword}{def }find_compounds_and_members(self, details):
+00020         \textcolor{stringliteral}{"""}
+00021 \textcolor{stringliteral}{        Returns a list of all compounds and their members which match details}
+00022 \textcolor{stringliteral}{        """}
+00023 
+00024         results = []
+00025         \textcolor{keywordflow}{for} compound \textcolor{keywordflow}{in} self.compound:
+00026             members = compound.find\_members(details)
+00027             \textcolor{keywordflow}{if} members:
+00028                 results.append([compound, members])
+00029             \textcolor{keywordflow}{else}:
+00030                 \textcolor{keywordflow}{if} details.match(compound):
+00031                     results.append([compound, []])
+00032 
+00033         \textcolor{keywordflow}{return} results
+00034 
+00035 supermod.DoxygenType.subclass = DoxygenTypeSub
+00036 \textcolor{comment}{# end class DoxygenTypeSub}
+00037 
+00038 
+00039 \textcolor{keyword}{class }CompoundTypeSub(supermod.CompoundType):
+00040     \textcolor{keyword}{def }__init__(self, kind=None, refid=None, name='', member=None):
+00041         supermod.CompoundType.\_\_init\_\_(self, kind, refid, name, member)
+00042 
+00043     \textcolor{keyword}{def }find_members(self, details):
+00044         \textcolor{stringliteral}{"""}
+00045 \textcolor{stringliteral}{        Returns a list of all members which match details}
+00046 \textcolor{stringliteral}{        """}
+00047 
+00048         results = []
+00049 
+00050         \textcolor{keywordflow}{for} member \textcolor{keywordflow}{in} self.member:
+00051             \textcolor{keywordflow}{if} details.match(member):
+00052                 results.append(member)
+00053 
+00054         \textcolor{keywordflow}{return} results
+00055 
+00056 supermod.CompoundType.subclass = CompoundTypeSub
+00057 \textcolor{comment}{# end class CompoundTypeSub}
+00058 
+00059 
+00060 \textcolor{keyword}{class }MemberTypeSub(supermod.MemberType):
+00061 
+00062     \textcolor{keyword}{def }__init__(self, kind=None, refid=None, name=''):
+00063         supermod.MemberType.\_\_init\_\_(self, kind, refid, name)
+00064 
+00065 supermod.MemberType.subclass = MemberTypeSub
+00066 \textcolor{comment}{# end class MemberTypeSub}
+00067 
+00068 
+00069 \textcolor{keyword}{def }parse(inFilename):
+00070 
+00071     doc = minidom.parse(inFilename)
+00072     rootNode = doc.documentElement
+00073     rootObj = supermod.DoxygenType.factory()
+00074     rootObj.build(rootNode)
+00075 
+00076     \textcolor{keywordflow}{return} rootObj
+00077 
+\end{DoxyCode}

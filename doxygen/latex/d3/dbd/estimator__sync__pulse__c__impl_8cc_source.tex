@@ -1,0 +1,140 @@
+\subsection{estimator\+\_\+sync\+\_\+pulse\+\_\+c\+\_\+impl.\+cc}
+\label{estimator__sync__pulse__c__impl_8cc_source}\index{/home/erik/prefix/default/src/gr-\/radar-\/dev/lib/estimator\+\_\+sync\+\_\+pulse\+\_\+c\+\_\+impl.\+cc@{/home/erik/prefix/default/src/gr-\/radar-\/dev/lib/estimator\+\_\+sync\+\_\+pulse\+\_\+c\+\_\+impl.\+cc}}
+
+\begin{DoxyCode}
+00001 \textcolor{comment}{/* -*- c++ -*- */}
+00002 \textcolor{comment}{/* }
+00003 \textcolor{comment}{ * Copyright 2014 Communications Engineering Lab, KIT.}
+00004 \textcolor{comment}{ * }
+00005 \textcolor{comment}{ * This is free software; you can redistribute it and/or modify}
+00006 \textcolor{comment}{ * it under the terms of the GNU General Public License as published by}
+00007 \textcolor{comment}{ * the Free Software Foundation; either version 3, or (at your option)}
+00008 \textcolor{comment}{ * any later version.}
+00009 \textcolor{comment}{ * }
+00010 \textcolor{comment}{ * This software is distributed in the hope that it will be useful,}
+00011 \textcolor{comment}{ * but WITHOUT ANY WARRANTY; without even the implied warranty of}
+00012 \textcolor{comment}{ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the}
+00013 \textcolor{comment}{ * GNU General Public License for more details.}
+00014 \textcolor{comment}{ * }
+00015 \textcolor{comment}{ * You should have received a copy of the GNU General Public License}
+00016 \textcolor{comment}{ * along with this software; see the file COPYING.  If not, write to}
+00017 \textcolor{comment}{ * the Free Software Foundation, Inc., 51 Franklin Street,}
+00018 \textcolor{comment}{ * Boston, MA 02110-1301, USA.}
+00019 \textcolor{comment}{ */}
+00020 
+00021 \textcolor{preprocessor}{#ifdef HAVE\_CONFIG\_H}
+00022 \textcolor{preprocessor}{#include "config.h"}
+00023 \textcolor{preprocessor}{#endif}
+00024 
+00025 \textcolor{preprocessor}{#include <gnuradio/io\_signature.h>}
+00026 \textcolor{preprocessor}{#include "estimator_sync_pulse_c_impl.h"}
+00027 \textcolor{preprocessor}{#include <volk/volk.h>}
+00028 
+00029 \textcolor{keyword}{namespace }gr \{
+00030   \textcolor{keyword}{namespace }radar \{
+00031 
+00032     estimator_sync_pulse_c::sptr
+00033     estimator_sync_pulse_c::make(\textcolor{keywordtype}{int} num\_xcorr, \textcolor{keyword}{const} std::string len\_key)
+00034     \{
+00035       \textcolor{keywordflow}{return} gnuradio::get\_initial\_sptr
+00036         (\textcolor{keyword}{new} estimator_sync_pulse_c_impl(num\_xcorr, len\_key));
+00037     \}
+00038 
+00039     \textcolor{comment}{/*}
+00040 \textcolor{comment}{     * The private constructor}
+00041 \textcolor{comment}{     */}
+00042     estimator_sync_pulse_c_impl::estimator_sync_pulse_c_impl(\textcolor{keywordtype}{int} num\_xcorr, \textcolor{keyword}{const} 
+      std::string len\_key)
+00043       : gr::tagged\_stream\_block(\textcolor{stringliteral}{"estimator\_sync\_pulse\_c"},
+00044               gr::io\_signature::make(2, 2, sizeof(gr\_complex)),
+00045               gr::io\_signature::make(0, 0, 0), len\_key)
+00046     \{
+00047         d_num_xcorr = num\_xcorr;
+00048         d_noutput_items_vec = -1;
+00049         
+00050         \textcolor{comment}{// Register message port}
+00051         d_port_id = pmt::mp(\textcolor{stringliteral}{"Msg out"});
+00052         message\_port\_register\_out(d_port_id);
+00053     \}
+00054     
+00055     \textcolor{keywordtype}{void}
+00056     estimator_sync_pulse_c_impl::set_num_xcorr(\textcolor{keywordtype}{int} num)
+00057     \{
+00058       d_num_xcorr = num;
+00059     \}
+00060 
+00061     \textcolor{comment}{/*}
+00062 \textcolor{comment}{     * Our virtual destructor.}
+00063 \textcolor{comment}{     */}
+00064     estimator_sync_pulse_c_impl::~estimator_sync_pulse_c_impl()
+00065     \{
+00066     \}
+00067 
+00068     \textcolor{keywordtype}{int}
+00069     estimator_sync_pulse_c_impl::calculate_output_stream_length(\textcolor{keyword}{const} gr\_vector\_int &ninput\_items)
+00070     \{
+00071       \textcolor{keywordtype}{int} noutput\_items = 0;
+00072       \textcolor{keywordflow}{return} noutput\_items ;
+00073     \}
+00074 
+00075     \textcolor{keywordtype}{int}
+00076     estimator_sync_pulse_c_impl::work (\textcolor{keywordtype}{int} noutput\_items,
+00077                        gr\_vector\_int &ninput\_items,
+00078                        gr\_vector\_const\_void\_star &input\_items,
+00079                        gr\_vector\_void\_star &output\_items)
+00080     \{
+00081         \textcolor{keyword}{const} gr\_complex *in\_tx = (\textcolor{keyword}{const} gr\_complex *) input\_items[0];
+00082         \textcolor{keyword}{const} gr\_complex *in\_rx = (\textcolor{keyword}{const} gr\_complex *) input\_items[1];
+00083         
+00084         \textcolor{comment}{// Resize buffers}
+00085         \textcolor{keywordtype}{int} ninput\_items\_min = std::min(ninput\_items[0],ninput\_items[1]);
+00086         \textcolor{keywordflow}{if}(d_noutput_items_vec!=ninput\_items\_min)\{
+00087             d_in_tx_real.resize(ninput\_items\_min);
+00088             d_in_rx_real.resize(ninput\_items\_min);
+00089         \}
+00090         
+00091         \textcolor{comment}{// Copy complex to float and get abs}
+00092         \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} k=0; k<ninput\_items\_min; k++)\{
+00093             d_in_tx_real[k] = std::abs(in\_tx[k]);
+00094             d_in_rx_real[k] = std::abs(in\_rx[k]);
+00095         \}
+00096         
+00097         \textcolor{comment}{// Do cross correlation and find max}
+00098         \textcolor{keywordtype}{float} xcorr, xcorr\_hold;
+00099         \textcolor{keywordtype}{int} num\_delay;
+00100         num\_delay = -1;
+00101         xcorr\_hold = -1;
+00102         
+00103         \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} k=0; k<d_num_xcorr; k++)\{
+00104             volk\_32f\_x2\_dot\_prod\_32f(&xcorr,&d_in_tx_real[0],&d_in_rx_real[0]+k,ninput\_items\_min-
+      k);
+00105             \textcolor{keywordflow}{if}(xcorr>xcorr\_hold)\{
+00106                 xcorr\_hold = xcorr;
+00107                 num\_delay = k;
+00108             \}
+00109         \}
+00110         
+00111         \textcolor{comment}{// Get rx\_time tag}
+00112         std::vector< tag\_t > tags;
+00113         pmt::pmt\_t ptimestamp, msg\_out, pxcorr;
+00114         get\_tags\_in\_range(tags,1,nitems\_read(1),nitems\_read(1)+1,pmt::string\_to\_symbol(\textcolor{stringliteral}{"rx\_time"}));
+00115         
+00116         \textcolor{comment}{// Setup msg pmt}
+00117         \textcolor{keywordflow}{if}(tags.size()>0) ptimestamp = pmt::list2(pmt::string\_to\_symbol(\textcolor{stringliteral}{"rx\_time"}),tags[0].value);
+00118         \textcolor{keywordflow}{else} ptimestamp = pmt::list2(pmt::string\_to\_symbol(\textcolor{stringliteral}{"rx\_time"}),pmt::make\_tuple(pmt::from\_uint64(0),
+      pmt::from\_double(-1))); \textcolor{comment}{// if no timetag is found, set to 0 and frac\_sec to -1}
+00119         
+00120         pxcorr = pmt::list2(pmt::string\_to\_symbol(\textcolor{stringliteral}{"sync\_pulse"}),pmt::from\_long(std::abs(num\_delay)));
+00121         msg\_out = pmt::list2(ptimestamp,pxcorr);
+00122         
+00123         \textcolor{comment}{// Publish message}
+00124         message\_port\_pub(d_port_id,msg\_out);
+00125 
+00126         \textcolor{comment}{// Tell runtime system how many output items we produced.}
+00127         \textcolor{keywordflow}{return} 0;
+00128     \}
+00129 
+00130   \} \textcolor{comment}{/* namespace radar */}
+00131 \} \textcolor{comment}{/* namespace gr */}
+00132 
+\end{DoxyCode}

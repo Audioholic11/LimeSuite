@@ -1,0 +1,71 @@
+\subsection{signal\+\_\+generator\+\_\+fmcw\+\_\+c.\+h}
+\label{signal__generator__fmcw__c_8h_source}\index{/home/erik/prefix/default/src/gr-\/radar-\/dev/include/radar/signal\+\_\+generator\+\_\+fmcw\+\_\+c.\+h@{/home/erik/prefix/default/src/gr-\/radar-\/dev/include/radar/signal\+\_\+generator\+\_\+fmcw\+\_\+c.\+h}}
+
+\begin{DoxyCode}
+00001 \textcolor{comment}{/* -*- c++ -*- */}
+00002 \textcolor{comment}{/*}
+00003 \textcolor{comment}{ * Copyright 2014 Communications Engineering Lab, KIT.}
+00004 \textcolor{comment}{ *}
+00005 \textcolor{comment}{ * This is free software; you can redistribute it and/or modify}
+00006 \textcolor{comment}{ * it under the terms of the GNU General Public License as published by}
+00007 \textcolor{comment}{ * the Free Software Foundation; either version 3, or (at your option)}
+00008 \textcolor{comment}{ * any later version.}
+00009 \textcolor{comment}{ *}
+00010 \textcolor{comment}{ * This software is distributed in the hope that it will be useful,}
+00011 \textcolor{comment}{ * but WITHOUT ANY WARRANTY; without even the implied warranty of}
+00012 \textcolor{comment}{ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the}
+00013 \textcolor{comment}{ * GNU General Public License for more details.}
+00014 \textcolor{comment}{ *}
+00015 \textcolor{comment}{ * You should have received a copy of the GNU General Public License}
+00016 \textcolor{comment}{ * along with this software; see the file COPYING.  If not, write to}
+00017 \textcolor{comment}{ * the Free Software Foundation, Inc., 51 Franklin Street,}
+00018 \textcolor{comment}{ * Boston, MA 02110-1301, USA.}
+00019 \textcolor{comment}{ */}
+00020 
+00021 \textcolor{preprocessor}{#ifndef INCLUDED\_RADAR\_SIGNAL\_GENERATOR\_FMCW\_C\_H}
+00022 \textcolor{preprocessor}{#define INCLUDED\_RADAR\_SIGNAL\_GENERATOR\_FMCW\_C\_H}
+00023 
+00024 \textcolor{preprocessor}{#include <radar/api.h>}
+00025 \textcolor{preprocessor}{#include <gnuradio/sync\_block.h>}
+00026 
+00027 \textcolor{keyword}{namespace }gr \{
+00028   \textcolor{keyword}{namespace }radar \{
+00029 
+00047     \textcolor{keyword}{class }RADAR_API signal_generator_fmcw_c : \textcolor{keyword}{virtual} \textcolor{keyword}{public} gr::sync\_block
+00048     \{
+00049      \textcolor{keyword}{public}:
+00050       \textcolor{keyword}{typedef} boost::shared\_ptr<signal\_generator\_fmcw\_c> sptr;
+00051 
+00067       \textcolor{keyword}{static} sptr make(
+00068         \textcolor{keyword}{const} \textcolor{keywordtype}{int} samp_rate,
+00069         \textcolor{keyword}{const} \textcolor{keywordtype}{int} packet\_len,
+00070         \textcolor{keywordtype}{int} samp_up,
+00071         \textcolor{keywordtype}{int} samp\_up\_hold,
+00072         \textcolor{keywordtype}{int} samp_down,
+00073         \textcolor{keywordtype}{int} samp\_down\_hold,
+00074         \textcolor{keywordtype}{int} samp_cw,
+00075         \textcolor{keywordtype}{int} samp\_dead,
+00076         \textcolor{keyword}{const} \textcolor{keywordtype}{float} freq_cw,
+00077         \textcolor{keyword}{const} \textcolor{keywordtype}{float} freq\_sweep,
+00078         \textcolor{keyword}{const} \textcolor{keywordtype}{float} amplitude,
+00079         \textcolor{keyword}{const} std::string& len\_key=\textcolor{stringliteral}{"packet\_len"},
+00080         \textcolor{keyword}{const} std::string& chirp\_len\_key=\textcolor{stringliteral}{"chirp\_len"},
+00081         \textcolor{keyword}{const} std::string& total\_len\_key=\textcolor{stringliteral}{"total\_len"}
+00082       );
+00083 
+00084       \textcolor{comment}{//Member Set}
+00085       \textcolor{keyword}{virtual} \textcolor{keywordtype}{void} set\_d\_chirp\_len(\textcolor{keywordtype}{int} chirp\_length) = 0;
+00086       \textcolor{keyword}{virtual} \textcolor{keywordtype}{void} set\_d\_total\_len(\textcolor{keywordtype}{int} total\_length) = 0;
+00087       \textcolor{keyword}{virtual} \textcolor{keywordtype}{void} set\_waveform() = 0;
+00088       \textcolor{keyword}{virtual} \textcolor{keywordtype}{void} set\_d\_samp\_dead(\textcolor{keywordtype}{int} dead\_samples) = 0;
+00089       \textcolor{keyword}{virtual} \textcolor{keywordtype}{void} set\_d\_samp\_dead\_round(\textcolor{keywordtype}{int} dead\_samples) = 0;
+00090       \textcolor{keyword}{virtual} \textcolor{keywordtype}{void} set\_chirp(\textcolor{keywordtype}{int} up\_samples, \textcolor{keywordtype}{int} up\_hold\_samples,
+00091                      \textcolor{keywordtype}{int} down\_samples, \textcolor{keywordtype}{int} down\_hold\_samples,
+00092                      \textcolor{keywordtype}{int} cw\_samples) = 0;
+00093     \};
+00094 
+00095   \} \textcolor{comment}{// namespace radar}
+00096 \} \textcolor{comment}{// namespace gr}
+00097 
+00098 \textcolor{preprocessor}{#endif }\textcolor{comment}{/* INCLUDED\_RADAR\_SIGNAL\_GENERATOR\_FMCW\_C\_H */}\textcolor{preprocessor}{}
+\end{DoxyCode}

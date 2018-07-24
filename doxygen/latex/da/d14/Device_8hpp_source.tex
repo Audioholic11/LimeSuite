@@ -1,0 +1,404 @@
+\subsection{Device.\+hpp}
+\label{Device_8hpp_source}\index{/home/erik/prefix/default/src/soapysdr/include/\+Soapy\+S\+D\+R/\+Device.\+hpp@{/home/erik/prefix/default/src/soapysdr/include/\+Soapy\+S\+D\+R/\+Device.\+hpp}}
+
+\begin{DoxyCode}
+00001 
+00012 \textcolor{preprocessor}{#pragma once}
+00013 \textcolor{preprocessor}{#include <SoapySDR/Config.hpp>}
+00014 \textcolor{preprocessor}{#include <SoapySDR/Types.hpp>}
+00015 \textcolor{preprocessor}{#include <SoapySDR/Constants.h>}
+00016 \textcolor{preprocessor}{#include <SoapySDR/Errors.h>}
+00017 \textcolor{preprocessor}{#include <vector>}
+00018 \textcolor{preprocessor}{#include <string>}
+00019 \textcolor{preprocessor}{#include <complex>}
+00020 \textcolor{preprocessor}{#include <cstddef>} \textcolor{comment}{//size\_t}
+00021 
+00022 \textcolor{keyword}{namespace }SoapySDR
+00023 \{
+00024 
+00026 \textcolor{keyword}{class }Stream;
+00027 
+00031 \textcolor{keyword}{class }SOAPY_SDR_API Device
+00032 \{
+00033 \textcolor{keyword}{public}:
+00034 
+00036     \textcolor{keyword}{virtual} ~Device(\textcolor{keywordtype}{void});
+00037 
+00043     \textcolor{keyword}{static} KwargsList enumerate(\textcolor{keyword}{const} Kwargs &args = Kwargs());
+00044 
+00051     \textcolor{keyword}{static} KwargsList enumerate(\textcolor{keyword}{const} std::string &args);
+00052 
+00062     \textcolor{keyword}{static} Device *make(\textcolor{keyword}{const} Kwargs &args = Kwargs());
+00063 
+00073     \textcolor{keyword}{static} Device *make(\textcolor{keyword}{const} std::string &args);
+00074 
+00080     \textcolor{keyword}{static} \textcolor{keywordtype}{void} unmake(Device *device);
+00081 
+00082     \textcolor{comment}{/*******************************************************************}
+00083 \textcolor{comment}{     * Identification API}
+00084 \textcolor{comment}{     ******************************************************************/}
+00085 
+00091     \textcolor{keyword}{virtual} std::string getDriverKey(\textcolor{keywordtype}{void}) \textcolor{keyword}{const};
+00092 
+00098     \textcolor{keyword}{virtual} std::string getHardwareKey(\textcolor{keywordtype}{void}) \textcolor{keyword}{const};
+00099 
+00107     \textcolor{keyword}{virtual} Kwargs getHardwareInfo(\textcolor{keywordtype}{void}) \textcolor{keyword}{const};
+00108 
+00109     \textcolor{comment}{/*******************************************************************}
+00110 \textcolor{comment}{     * Channels API}
+00111 \textcolor{comment}{     ******************************************************************/}
+00112 
+00119     \textcolor{keyword}{virtual} \textcolor{keywordtype}{void} setFrontendMapping(\textcolor{keyword}{const} \textcolor{keywordtype}{int} direction, \textcolor{keyword}{const} std::string &mapping);
+00120 
+00126     \textcolor{keyword}{virtual} std::string getFrontendMapping(\textcolor{keyword}{const} \textcolor{keywordtype}{int} direction) \textcolor{keyword}{const};
+00127 
+00131     \textcolor{keyword}{virtual} \textcolor{keywordtype}{size\_t} getNumChannels(\textcolor{keyword}{const} \textcolor{keywordtype}{int} direction) \textcolor{keyword}{const};
+00132 
+00143     \textcolor{keyword}{virtual} Kwargs getChannelInfo(\textcolor{keyword}{const} \textcolor{keywordtype}{int} direction, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} channel) \textcolor{keyword}{const};
+00144 
+00151     \textcolor{keyword}{virtual} \textcolor{keywordtype}{bool} getFullDuplex(\textcolor{keyword}{const} \textcolor{keywordtype}{int} direction, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} channel) \textcolor{keyword}{const};
+00152 
+00153     \textcolor{comment}{/*******************************************************************}
+00154 \textcolor{comment}{     * Stream API}
+00155 \textcolor{comment}{     ******************************************************************/}
+00156 
+00163     \textcolor{keyword}{virtual} std::vector<std::string> getStreamFormats(\textcolor{keyword}{const} \textcolor{keywordtype}{int} direction, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} channel) \textcolor{keyword}{const};
+00164 
+00174     \textcolor{keyword}{virtual} std::string getNativeStreamFormat(\textcolor{keyword}{const} \textcolor{keywordtype}{int} direction, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} channel, \textcolor{keywordtype}{double} &fullScale)
+       \textcolor{keyword}{const};
+00175 
+00182     \textcolor{keyword}{virtual} ArgInfoList getStreamArgsInfo(\textcolor{keyword}{const} \textcolor{keywordtype}{int} direction, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} channel) \textcolor{keyword}{const};
+00183 
+00233     \textcolor{keyword}{virtual} Stream *setupStream(
+00234         \textcolor{keyword}{const} \textcolor{keywordtype}{int} direction,
+00235         \textcolor{keyword}{const} std::string &format,
+00236         \textcolor{keyword}{const} std::vector<size\_t> &channels = std::vector<size\_t>(),
+00237         \textcolor{keyword}{const} Kwargs &args = Kwargs());
+00238 
+00244     \textcolor{keyword}{virtual} \textcolor{keywordtype}{void} closeStream(Stream *stream);
+00245 
+00255     \textcolor{keyword}{virtual} \textcolor{keywordtype}{size\_t} getStreamMTU(Stream *stream) \textcolor{keyword}{const};
+00256 
+00274     \textcolor{keyword}{virtual} \textcolor{keywordtype}{int} activateStream(
+00275         Stream *stream,
+00276         \textcolor{keyword}{const} \textcolor{keywordtype}{int} flags = 0,
+00277         \textcolor{keyword}{const} \textcolor{keywordtype}{long} \textcolor{keywordtype}{long} timeNs = 0,
+00278         \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} numElems = 0);
+00279 
+00294     \textcolor{keyword}{virtual} \textcolor{keywordtype}{int} deactivateStream(
+00295         Stream *stream,
+00296         \textcolor{keyword}{const} \textcolor{keywordtype}{int} flags = 0,
+00297         \textcolor{keyword}{const} \textcolor{keywordtype}{long} \textcolor{keywordtype}{long} timeNs = 0);
+00298 
+00318     \textcolor{keyword}{virtual} \textcolor{keywordtype}{int} readStream(
+00319         Stream *stream,
+00320         \textcolor{keywordtype}{void} * \textcolor{keyword}{const} *buffs,
+00321         \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} numElems,
+00322         \textcolor{keywordtype}{int} &flags,
+00323         \textcolor{keywordtype}{long} \textcolor{keywordtype}{long} &timeNs,
+00324         \textcolor{keyword}{const} \textcolor{keywordtype}{long} timeoutUs = 100000);
+00325 
+00345     \textcolor{keyword}{virtual} \textcolor{keywordtype}{int} writeStream(
+00346         Stream *stream,
+00347         \textcolor{keyword}{const} \textcolor{keywordtype}{void} * \textcolor{keyword}{const} *buffs,
+00348         \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} numElems,
+00349         \textcolor{keywordtype}{int} &flags,
+00350         \textcolor{keyword}{const} \textcolor{keywordtype}{long} \textcolor{keywordtype}{long} timeNs = 0,
+00351         \textcolor{keyword}{const} \textcolor{keywordtype}{long} timeoutUs = 100000);
+00352 
+00373     \textcolor{keyword}{virtual} \textcolor{keywordtype}{int} readStreamStatus(
+00374         Stream *stream,
+00375         \textcolor{keywordtype}{size\_t} &chanMask,
+00376         \textcolor{keywordtype}{int} &flags,
+00377         \textcolor{keywordtype}{long} \textcolor{keywordtype}{long} &timeNs,
+00378         \textcolor{keyword}{const} \textcolor{keywordtype}{long} timeoutUs = 100000);
+00379 
+00380     \textcolor{comment}{/*******************************************************************}
+00381 \textcolor{comment}{     * Direct buffer access API}
+00382 \textcolor{comment}{     ******************************************************************/}
+00383 
+00393     \textcolor{keyword}{virtual} \textcolor{keywordtype}{size\_t} getNumDirectAccessBuffers(Stream *stream);
+00394 
+00408     \textcolor{keyword}{virtual} \textcolor{keywordtype}{int} getDirectAccessBufferAddrs(Stream *stream, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} handle, \textcolor{keywordtype}{void} **buffs);
+00409 
+00430     \textcolor{keyword}{virtual} \textcolor{keywordtype}{int} acquireReadBuffer(
+00431         Stream *stream,
+00432         \textcolor{keywordtype}{size\_t} &handle,
+00433         \textcolor{keyword}{const} \textcolor{keywordtype}{void} **buffs,
+00434         \textcolor{keywordtype}{int} &flags,
+00435         \textcolor{keywordtype}{long} \textcolor{keywordtype}{long} &timeNs,
+00436         \textcolor{keyword}{const} \textcolor{keywordtype}{long} timeoutUs = 100000);
+00437 
+00445     \textcolor{keyword}{virtual} \textcolor{keywordtype}{void} releaseReadBuffer(
+00446         Stream *stream,
+00447         \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} handle);
+00448 
+00467     \textcolor{keyword}{virtual} \textcolor{keywordtype}{int} acquireWriteBuffer(
+00468         Stream *stream,
+00469         \textcolor{keywordtype}{size\_t} &handle,
+00470         \textcolor{keywordtype}{void} **buffs,
+00471         \textcolor{keyword}{const} \textcolor{keywordtype}{long} timeoutUs = 100000);
+00472 
+00488     \textcolor{keyword}{virtual} \textcolor{keywordtype}{void} releaseWriteBuffer(
+00489         Stream *stream,
+00490         \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} handle,
+00491         \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} numElems,
+00492         \textcolor{keywordtype}{int} &flags,
+00493         \textcolor{keyword}{const} \textcolor{keywordtype}{long} \textcolor{keywordtype}{long} timeNs = 0);
+00494 
+00495     \textcolor{comment}{/*******************************************************************}
+00496 \textcolor{comment}{     * Antenna API}
+00497 \textcolor{comment}{     ******************************************************************/}
+00498 
+00505     \textcolor{keyword}{virtual} std::vector<std::string> listAntennas(\textcolor{keyword}{const} \textcolor{keywordtype}{int} direction, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} channel) \textcolor{keyword}{const};
+00506 
+00513     \textcolor{keyword}{virtual} \textcolor{keywordtype}{void} setAntenna(\textcolor{keyword}{const} \textcolor{keywordtype}{int} direction, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} channel, \textcolor{keyword}{const} 
+      std::string &name);
+00514 
+00521     \textcolor{keyword}{virtual} std::string getAntenna(\textcolor{keyword}{const} \textcolor{keywordtype}{int} direction, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} channel) \textcolor{keyword}{const};
+00522 
+00523     \textcolor{comment}{/*******************************************************************}
+00524 \textcolor{comment}{     * Frontend corrections API}
+00525 \textcolor{comment}{     ******************************************************************/}
+00526 
+00533     \textcolor{keyword}{virtual} \textcolor{keywordtype}{bool} hasDCOffsetMode(\textcolor{keyword}{const} \textcolor{keywordtype}{int} direction, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} channel) \textcolor{keyword}{const};
+00534 
+00541     \textcolor{keyword}{virtual} \textcolor{keywordtype}{void} setDCOffsetMode(\textcolor{keyword}{const} \textcolor{keywordtype}{int} direction, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} channel, \textcolor{keyword}{const} \textcolor{keywordtype}{bool} automatic);
+00542 
+00549     \textcolor{keyword}{virtual} \textcolor{keywordtype}{bool} getDCOffsetMode(\textcolor{keyword}{const} \textcolor{keywordtype}{int} direction, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} channel) \textcolor{keyword}{const};
+00550 
+00557     \textcolor{keyword}{virtual} \textcolor{keywordtype}{bool} hasDCOffset(\textcolor{keyword}{const} \textcolor{keywordtype}{int} direction, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} channel) \textcolor{keyword}{const};
+00558 
+00565     \textcolor{keyword}{virtual} \textcolor{keywordtype}{void} setDCOffset(\textcolor{keyword}{const} \textcolor{keywordtype}{int} direction, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} channel, \textcolor{keyword}{const} std::complex<double> &offset)
+      ;
+00566 
+00573     \textcolor{keyword}{virtual} std::complex<double> getDCOffset(\textcolor{keyword}{const} \textcolor{keywordtype}{int} direction, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} channel) \textcolor{keyword}{const};
+00574 
+00581     \textcolor{keyword}{virtual} \textcolor{keywordtype}{bool} hasIQBalance(\textcolor{keyword}{const} \textcolor{keywordtype}{int} direction, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} channel) \textcolor{keyword}{const};
+00582 
+00589     \textcolor{keyword}{virtual} \textcolor{keywordtype}{void} setIQBalance(\textcolor{keyword}{const} \textcolor{keywordtype}{int} direction, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} channel, \textcolor{keyword}{const} std::complex<double> &
+      balance);
+00590 
+00597     \textcolor{keyword}{virtual} std::complex<double> getIQBalance(\textcolor{keyword}{const} \textcolor{keywordtype}{int} direction, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} channel) \textcolor{keyword}{const};
+00598 
+00605     \textcolor{keyword}{virtual} \textcolor{keywordtype}{bool} hasFrequencyCorrection(\textcolor{keyword}{const} \textcolor{keywordtype}{int} direction, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} channel) \textcolor{keyword}{const};
+00606 
+00613     \textcolor{keyword}{virtual} \textcolor{keywordtype}{void} setFrequencyCorrection(\textcolor{keyword}{const} \textcolor{keywordtype}{int} direction, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} channel, \textcolor{keyword}{const} \textcolor{keywordtype}{double} value);
+00614 
+00621     \textcolor{keyword}{virtual} \textcolor{keywordtype}{double} getFrequencyCorrection(\textcolor{keyword}{const} \textcolor{keywordtype}{int} direction, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} channel) \textcolor{keyword}{const};
+00622 
+00623     \textcolor{comment}{/*******************************************************************}
+00624 \textcolor{comment}{     * Gain API}
+00625 \textcolor{comment}{     ******************************************************************/}
+00626 
+00634     \textcolor{keyword}{virtual} std::vector<std::string> listGains(\textcolor{keyword}{const} \textcolor{keywordtype}{int} direction, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} channel) \textcolor{keyword}{const};
+00635 
+00642     \textcolor{keyword}{virtual} \textcolor{keywordtype}{bool} hasGainMode(\textcolor{keyword}{const} \textcolor{keywordtype}{int} direction, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} channel) \textcolor{keyword}{const};
+00643 
+00650     \textcolor{keyword}{virtual} \textcolor{keywordtype}{void} setGainMode(\textcolor{keyword}{const} \textcolor{keywordtype}{int} direction, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} channel, \textcolor{keyword}{const} \textcolor{keywordtype}{bool} automatic);
+00651 
+00658     \textcolor{keyword}{virtual} \textcolor{keywordtype}{bool} getGainMode(\textcolor{keyword}{const} \textcolor{keywordtype}{int} direction, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} channel) \textcolor{keyword}{const};
+00659 
+00667     \textcolor{keyword}{virtual} \textcolor{keywordtype}{void} setGain(\textcolor{keyword}{const} \textcolor{keywordtype}{int} direction, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} channel, \textcolor{keyword}{const} \textcolor{keywordtype}{double} value);
+00668 
+00676     \textcolor{keyword}{virtual} \textcolor{keywordtype}{void} setGain(\textcolor{keyword}{const} \textcolor{keywordtype}{int} direction, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} channel, \textcolor{keyword}{const} 
+      std::string &name, \textcolor{keyword}{const} \textcolor{keywordtype}{double} value);
+00677 
+00684     \textcolor{keyword}{virtual} \textcolor{keywordtype}{double} getGain(\textcolor{keyword}{const} \textcolor{keywordtype}{int} direction, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} channel) \textcolor{keyword}{const};
+00685 
+00693     \textcolor{keyword}{virtual} \textcolor{keywordtype}{double} getGain(\textcolor{keyword}{const} \textcolor{keywordtype}{int} direction, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} channel, \textcolor{keyword}{const} 
+      std::string &name) \textcolor{keyword}{const};
+00694 
+00701     \textcolor{keyword}{virtual} Range getGainRange(\textcolor{keyword}{const} \textcolor{keywordtype}{int} direction, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} channel) \textcolor{keyword}{const};
+00702 
+00710     \textcolor{keyword}{virtual} Range getGainRange(\textcolor{keyword}{const} \textcolor{keywordtype}{int} direction, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} channel, \textcolor{keyword}{const} 
+      std::string &name) \textcolor{keyword}{const};
+00711 
+00712     \textcolor{comment}{/*******************************************************************}
+00713 \textcolor{comment}{     * Frequency API}
+00714 \textcolor{comment}{     ******************************************************************/}
+00715 
+00743     \textcolor{keyword}{virtual} \textcolor{keywordtype}{void} setFrequency(\textcolor{keyword}{const} \textcolor{keywordtype}{int} direction, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} channel, \textcolor{keyword}{const} \textcolor{keywordtype}{double} 
+      frequency, \textcolor{keyword}{const} Kwargs &args = Kwargs());
+00744 
+00761     \textcolor{keyword}{virtual} \textcolor{keywordtype}{void} setFrequency(\textcolor{keyword}{const} \textcolor{keywordtype}{int} direction, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} channel, \textcolor{keyword}{const} 
+      std::string &name, \textcolor{keyword}{const} \textcolor{keywordtype}{double} frequency, \textcolor{keyword}{const} Kwargs &args = Kwargs());
+00762 
+00771     \textcolor{keyword}{virtual} \textcolor{keywordtype}{double} getFrequency(\textcolor{keyword}{const} \textcolor{keywordtype}{int} direction, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} channel) \textcolor{keyword}{const};
+00772 
+00780     \textcolor{keyword}{virtual} \textcolor{keywordtype}{double} getFrequency(\textcolor{keyword}{const} \textcolor{keywordtype}{int} direction, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} channel, \textcolor{keyword}{const} 
+      std::string &name) \textcolor{keyword}{const};
+00781 
+00789     \textcolor{keyword}{virtual} std::vector<std::string> listFrequencies(\textcolor{keyword}{const} \textcolor{keywordtype}{int} direction, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} channel) \textcolor{keyword}{const};
+00790 
+00797     \textcolor{keyword}{virtual} RangeList getFrequencyRange(\textcolor{keyword}{const} \textcolor{keywordtype}{int} direction, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} channel) \textcolor{keyword}{const};
+00798 
+00806     \textcolor{keyword}{virtual} RangeList getFrequencyRange(\textcolor{keyword}{const} \textcolor{keywordtype}{int} direction, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} channel, \textcolor{keyword}{const} 
+      std::string &name) \textcolor{keyword}{const};
+00807 
+00814     \textcolor{keyword}{virtual} ArgInfoList getFrequencyArgsInfo(\textcolor{keyword}{const} \textcolor{keywordtype}{int} direction, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} channel) \textcolor{keyword}{const};
+00815 
+00816     \textcolor{comment}{/*******************************************************************}
+00817 \textcolor{comment}{     * Sample Rate API}
+00818 \textcolor{comment}{     ******************************************************************/}
+00819 
+00826     \textcolor{keyword}{virtual} \textcolor{keywordtype}{void} setSampleRate(\textcolor{keyword}{const} \textcolor{keywordtype}{int} direction, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} channel, \textcolor{keyword}{const} \textcolor{keywordtype}{double} 
+      rate);
+00827 
+00834     \textcolor{keyword}{virtual} \textcolor{keywordtype}{double} getSampleRate(\textcolor{keyword}{const} \textcolor{keywordtype}{int} direction, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} channel) \textcolor{keyword}{const};
+00835 
+00843     \textcolor{keyword}{virtual} std::vector<double> listSampleRates(\textcolor{keyword}{const} \textcolor{keywordtype}{int} direction, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} channel) \textcolor{keyword}{const};
+00844 
+00851     \textcolor{keyword}{virtual} RangeList getSampleRateRange(\textcolor{keyword}{const} \textcolor{keywordtype}{int} direction, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} channel) \textcolor{keyword}{const};
+00852 
+00853     \textcolor{comment}{/*******************************************************************}
+00854 \textcolor{comment}{     * Bandwidth API}
+00855 \textcolor{comment}{     ******************************************************************/}
+00856 
+00863     \textcolor{keyword}{virtual} \textcolor{keywordtype}{void} setBandwidth(\textcolor{keyword}{const} \textcolor{keywordtype}{int} direction, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} channel, \textcolor{keyword}{const} \textcolor{keywordtype}{double} 
+      bw);
+00864 
+00871     \textcolor{keyword}{virtual} \textcolor{keywordtype}{double} getBandwidth(\textcolor{keyword}{const} \textcolor{keywordtype}{int} direction, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} channel) \textcolor{keyword}{const};
+00872 
+00880     \textcolor{keyword}{virtual} std::vector<double> listBandwidths(\textcolor{keyword}{const} \textcolor{keywordtype}{int} direction, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} channel) \textcolor{keyword}{const};
+00881 
+00888     \textcolor{keyword}{virtual} RangeList getBandwidthRange(\textcolor{keyword}{const} \textcolor{keywordtype}{int} direction, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} channel) \textcolor{keyword}{const};
+00889 
+00890     \textcolor{comment}{/*******************************************************************}
+00891 \textcolor{comment}{     * Clocking API}
+00892 \textcolor{comment}{     ******************************************************************/}
+00893 
+00898     \textcolor{keyword}{virtual} \textcolor{keywordtype}{void} setMasterClockRate(\textcolor{keyword}{const} \textcolor{keywordtype}{double} rate);
+00899 
+00904     \textcolor{keyword}{virtual} \textcolor{keywordtype}{double} getMasterClockRate(\textcolor{keywordtype}{void}) \textcolor{keyword}{const};
+00905 
+00910     \textcolor{keyword}{virtual} RangeList getMasterClockRates(\textcolor{keywordtype}{void}) \textcolor{keyword}{const};
+00911 
+00916     \textcolor{keyword}{virtual} std::vector<std::string> listClockSources(\textcolor{keywordtype}{void}) \textcolor{keyword}{const};
+00917 
+00922     \textcolor{keyword}{virtual} \textcolor{keywordtype}{void} setClockSource(\textcolor{keyword}{const} std::string &source);
+00923 
+00928     \textcolor{keyword}{virtual} std::string getClockSource(\textcolor{keywordtype}{void}) \textcolor{keyword}{const};
+00929 
+00930     \textcolor{comment}{/*******************************************************************}
+00931 \textcolor{comment}{     * Time API}
+00932 \textcolor{comment}{     ******************************************************************/}
+00933 
+00938     \textcolor{keyword}{virtual} std::vector<std::string> listTimeSources(\textcolor{keywordtype}{void}) \textcolor{keyword}{const};
+00939 
+00944     \textcolor{keyword}{virtual} \textcolor{keywordtype}{void} setTimeSource(\textcolor{keyword}{const} std::string &source);
+00945 
+00950     \textcolor{keyword}{virtual} std::string getTimeSource(\textcolor{keywordtype}{void}) \textcolor{keyword}{const};
+00951 
+00957     \textcolor{keyword}{virtual} \textcolor{keywordtype}{bool} hasHardwareTime(\textcolor{keyword}{const} std::string &what = \textcolor{stringliteral}{""}) \textcolor{keyword}{const};
+00958 
+00965     \textcolor{keyword}{virtual} \textcolor{keywordtype}{long} \textcolor{keywordtype}{long} getHardwareTime(\textcolor{keyword}{const} std::string &what = \textcolor{stringliteral}{""}) \textcolor{keyword}{const};
+00966 
+00973     \textcolor{keyword}{virtual} \textcolor{keywordtype}{void} setHardwareTime(\textcolor{keyword}{const} \textcolor{keywordtype}{long} \textcolor{keywordtype}{long} timeNs, \textcolor{keyword}{const} std::string &what = \textcolor{stringliteral}{""});
+00974 
+00983     \textcolor{keyword}{virtual} \textcolor{keywordtype}{void} setCommandTime(\textcolor{keyword}{const} \textcolor{keywordtype}{long} \textcolor{keywordtype}{long} timeNs, \textcolor{keyword}{const} std::string &what = \textcolor{stringliteral}{""});
+00984 
+00985     \textcolor{comment}{/*******************************************************************}
+00986 \textcolor{comment}{     * Sensor API}
+00987 \textcolor{comment}{     ******************************************************************/}
+00988 
+00994     \textcolor{keyword}{virtual} std::vector<std::string> listSensors(\textcolor{keywordtype}{void}) \textcolor{keyword}{const};
+00995 
+01002     \textcolor{keyword}{virtual} ArgInfo getSensorInfo(\textcolor{keyword}{const} std::string &key) \textcolor{keyword}{const};
+01003 
+01011     \textcolor{keyword}{virtual} std::string readSensor(\textcolor{keyword}{const} std::string &key) \textcolor{keyword}{const};
+01012 
+01020     \textcolor{keyword}{virtual} std::vector<std::string> listSensors(\textcolor{keyword}{const} \textcolor{keywordtype}{int} direction, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} channel) \textcolor{keyword}{const};
+01021 
+01030     \textcolor{keyword}{virtual} ArgInfo getSensorInfo(\textcolor{keyword}{const} \textcolor{keywordtype}{int} direction, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} channel, \textcolor{keyword}{const} 
+      std::string &key) \textcolor{keyword}{const};
+01031 
+01041     \textcolor{keyword}{virtual} std::string readSensor(\textcolor{keyword}{const} \textcolor{keywordtype}{int} direction, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} channel, \textcolor{keyword}{const} 
+      std::string &key) \textcolor{keyword}{const};
+01042 
+01043     \textcolor{comment}{/*******************************************************************}
+01044 \textcolor{comment}{     * Register API}
+01045 \textcolor{comment}{     ******************************************************************/}
+01046 
+01051     \textcolor{keyword}{virtual} std::vector<std::string> listRegisterInterfaces(\textcolor{keywordtype}{void}) \textcolor{keyword}{const};
+01052 
+01061     \textcolor{keyword}{virtual} \textcolor{keywordtype}{void} writeRegister(\textcolor{keyword}{const} std::string &name, \textcolor{keyword}{const} \textcolor{keywordtype}{unsigned} addr, \textcolor{keyword}{const} \textcolor{keywordtype}{unsigned} value);
+01062 
+01069     \textcolor{keyword}{virtual} \textcolor{keywordtype}{unsigned} readRegister(\textcolor{keyword}{const} std::string &name, \textcolor{keyword}{const} \textcolor{keywordtype}{unsigned} addr) \textcolor{keyword}{const};
+01070 
+01079     \textcolor{keyword}{virtual} \textcolor{keywordtype}{void} writeRegister(\textcolor{keyword}{const} \textcolor{keywordtype}{unsigned} addr, \textcolor{keyword}{const} \textcolor{keywordtype}{unsigned} value);
+01080 
+01087     \textcolor{keyword}{virtual} \textcolor{keywordtype}{unsigned} readRegister(\textcolor{keyword}{const} \textcolor{keywordtype}{unsigned} addr) \textcolor{keyword}{const};
+01088 
+01097     \textcolor{keyword}{virtual} \textcolor{keywordtype}{void} writeRegisters(\textcolor{keyword}{const} std::string &name, \textcolor{keyword}{const} \textcolor{keywordtype}{unsigned} addr, \textcolor{keyword}{const} std::vector<unsigned> &
+      value);
+01098 
+01106     \textcolor{keyword}{virtual} std::vector<unsigned> readRegisters(\textcolor{keyword}{const} std::string &name, \textcolor{keyword}{const} \textcolor{keywordtype}{unsigned} addr, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} 
+      length) \textcolor{keyword}{const};
+01107 
+01108     \textcolor{comment}{/*******************************************************************}
+01109 \textcolor{comment}{     * Settings API}
+01110 \textcolor{comment}{     ******************************************************************/}
+01111 
+01116     \textcolor{keyword}{virtual} ArgInfoList getSettingInfo(\textcolor{keywordtype}{void}) \textcolor{keyword}{const};
+01117 
+01124     \textcolor{keyword}{virtual} \textcolor{keywordtype}{void} writeSetting(\textcolor{keyword}{const} std::string &key, \textcolor{keyword}{const} std::string &value);
+01125 
+01131     \textcolor{keyword}{virtual} std::string readSetting(\textcolor{keyword}{const} std::string &key) \textcolor{keyword}{const};
+01132 
+01139     \textcolor{keyword}{virtual} ArgInfoList getSettingInfo(\textcolor{keyword}{const} \textcolor{keywordtype}{int} direction, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} channel) \textcolor{keyword}{const};
+01140 
+01149     \textcolor{keyword}{virtual} \textcolor{keywordtype}{void} writeSetting(\textcolor{keyword}{const} \textcolor{keywordtype}{int} direction, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} channel, \textcolor{keyword}{const} 
+      std::string &key, \textcolor{keyword}{const} std::string &value);
+01150 
+01158     \textcolor{keyword}{virtual} std::string readSetting(\textcolor{keyword}{const} \textcolor{keywordtype}{int} direction, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} channel, \textcolor{keyword}{const} 
+      std::string &key) \textcolor{keyword}{const};
+01159 
+01160     \textcolor{comment}{/*******************************************************************}
+01161 \textcolor{comment}{     * GPIO API}
+01162 \textcolor{comment}{     ******************************************************************/}
+01163 
+01167     \textcolor{keyword}{virtual} std::vector<std::string> listGPIOBanks(\textcolor{keywordtype}{void}) \textcolor{keyword}{const};
+01168 
+01174     \textcolor{keyword}{virtual} \textcolor{keywordtype}{void} writeGPIO(\textcolor{keyword}{const} std::string &bank, \textcolor{keyword}{const} \textcolor{keywordtype}{unsigned} value);
+01175 
+01182     \textcolor{keyword}{virtual} \textcolor{keywordtype}{void} writeGPIO(\textcolor{keyword}{const} std::string &bank, \textcolor{keyword}{const} \textcolor{keywordtype}{unsigned} value, \textcolor{keyword}{const} \textcolor{keywordtype}{unsigned} 
+      mask);
+01183 
+01189     \textcolor{keyword}{virtual} \textcolor{keywordtype}{unsigned} readGPIO(\textcolor{keyword}{const} std::string &bank) \textcolor{keyword}{const};
+01190 
+01197     \textcolor{keyword}{virtual} \textcolor{keywordtype}{void} writeGPIODir(\textcolor{keyword}{const} std::string &bank, \textcolor{keyword}{const} \textcolor{keywordtype}{unsigned} dir);
+01198 
+01206     \textcolor{keyword}{virtual} \textcolor{keywordtype}{void} writeGPIODir(\textcolor{keyword}{const} std::string &bank, \textcolor{keyword}{const} \textcolor{keywordtype}{unsigned} dir, \textcolor{keyword}{const} \textcolor{keywordtype}{unsigned} 
+      mask);
+01207 
+01214     \textcolor{keyword}{virtual} \textcolor{keywordtype}{unsigned} readGPIODir(\textcolor{keyword}{const} std::string &bank) \textcolor{keyword}{const};
+01215 
+01216     \textcolor{comment}{/*******************************************************************}
+01217 \textcolor{comment}{     * I2C API}
+01218 \textcolor{comment}{     ******************************************************************/}
+01219 
+01227     \textcolor{keyword}{virtual} \textcolor{keywordtype}{void} writeI2C(\textcolor{keyword}{const} \textcolor{keywordtype}{int} addr, \textcolor{keyword}{const} std::string &data);
+01228 
+01237     \textcolor{keyword}{virtual} std::string readI2C(\textcolor{keyword}{const} \textcolor{keywordtype}{int} addr, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} numBytes);
+01238 
+01239     \textcolor{comment}{/*******************************************************************}
+01240 \textcolor{comment}{     * SPI API}
+01241 \textcolor{comment}{     ******************************************************************/}
+01242 
+01257     \textcolor{keyword}{virtual} \textcolor{keywordtype}{unsigned} transactSPI(\textcolor{keyword}{const} \textcolor{keywordtype}{int} addr, \textcolor{keyword}{const} \textcolor{keywordtype}{unsigned} data, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} numBits);
+01258 
+01259     \textcolor{comment}{/*******************************************************************}
+01260 \textcolor{comment}{     * UART API}
+01261 \textcolor{comment}{     ******************************************************************/}
+01262 
+01267     \textcolor{keyword}{virtual} std::vector<std::string> listUARTs(\textcolor{keywordtype}{void}) \textcolor{keyword}{const};
+01268 
+01276     \textcolor{keyword}{virtual} \textcolor{keywordtype}{void} writeUART(\textcolor{keyword}{const} std::string &which, \textcolor{keyword}{const} std::string &data);
+01277 
+01286     \textcolor{keyword}{virtual} std::string readUART(\textcolor{keyword}{const} std::string &which, \textcolor{keyword}{const} \textcolor{keywordtype}{long} timeoutUs = 100000) \textcolor{keyword}{const};
+01287 
+01288 \};
+01289 
+01290 \};
+\end{DoxyCode}

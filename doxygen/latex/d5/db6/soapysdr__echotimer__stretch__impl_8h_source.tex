@@ -1,0 +1,156 @@
+\subsection{soapysdr\+\_\+echotimer\+\_\+stretch\+\_\+impl.\+h}
+\label{soapysdr__echotimer__stretch__impl_8h_source}\index{/home/erik/prefix/default/src/gr-\/radar-\/dev/lib/soapysdr\+\_\+echotimer\+\_\+stretch\+\_\+impl.\+h@{/home/erik/prefix/default/src/gr-\/radar-\/dev/lib/soapysdr\+\_\+echotimer\+\_\+stretch\+\_\+impl.\+h}}
+
+\begin{DoxyCode}
+00001 \textcolor{comment}{/* -*- c++ -*- */}
+00002 \textcolor{comment}{/*}
+00003 \textcolor{comment}{ * Copyright 2018 <+YOU OR YOUR COMPANY+>.}
+00004 \textcolor{comment}{ *}
+00005 \textcolor{comment}{ * This is free software; you can redistribute it and/or modify}
+00006 \textcolor{comment}{ * it under the terms of the GNU General Public License as published by}
+00007 \textcolor{comment}{ * the Free Software Foundation; either version 3, or (at your option)}
+00008 \textcolor{comment}{ * any later version.}
+00009 \textcolor{comment}{ *}
+00010 \textcolor{comment}{ * This software is distributed in the hope that it will be useful,}
+00011 \textcolor{comment}{ * but WITHOUT ANY WARRANTY; without even the implied warranty of}
+00012 \textcolor{comment}{ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the}
+00013 \textcolor{comment}{ * GNU General Public License for more details.}
+00014 \textcolor{comment}{ *}
+00015 \textcolor{comment}{ * You should have received a copy of the GNU General Public License}
+00016 \textcolor{comment}{ * along with this software; see the file COPYING.  If not, write to}
+00017 \textcolor{comment}{ * the Free Software Foundation, Inc., 51 Franklin Street,}
+00018 \textcolor{comment}{ * Boston, MA 02110-1301, USA.}
+00019 \textcolor{comment}{ */}
+00020 
+00021 \textcolor{preprocessor}{#ifndef INCLUDED\_RADAR\_SOAPYSDR\_ECHOTIMER\_STRETCH\_IMPL\_H}
+00022 \textcolor{preprocessor}{#define INCLUDED\_RADAR\_SOAPYSDR\_ECHOTIMER\_STRETCH\_IMPL\_H}
+00023 
+00024 \textcolor{preprocessor}{#include <radar/soapysdr_echotimer_stretch.h>}
+00025 
+00026 \textcolor{comment}{//soapy}
+00027 \textcolor{preprocessor}{#include <SoapySDR/Device.hpp>}
+00028 \textcolor{preprocessor}{#include <SoapySDR/Time.hpp>}\textcolor{comment}{//?}
+00029 \textcolor{preprocessor}{#include <SoapySDR/Version.hpp>}
+00030 
+00031 
+00032 \textcolor{comment}{//boost}
+00033 \textcolor{preprocessor}{#include <boost/shared\_ptr.hpp>}
+00034 \textcolor{preprocessor}{#include <boost/utility.hpp>}
+00035 \textcolor{preprocessor}{#include <boost/thread/thread.hpp>}
+00036 
+00037 
+00038 \textcolor{keyword}{namespace }gr \{
+00039   \textcolor{keyword}{namespace }radar \{
+00040 
+00041     \textcolor{keyword}{class }soapysdr_echotimer_stretch_impl : \textcolor{keyword}{public} soapysdr_echotimer_stretch
+00042     \{
+00043       \textcolor{keyword}{protected}:
+00044         \textcolor{keywordtype}{int} calculate_output_stream_length(\textcolor{keyword}{const} gr\_vector\_int &ninput\_items);
+00045       \textcolor{keyword}{private}:
+00046        \textcolor{comment}{//variables}
+00047          \textcolor{comment}{//timing}
+00048          \textcolor{keyword}{volatile} \textcolor{keywordtype}{long} \textcolor{keywordtype}{long} d_time_now_tx, d_time_now_rx,d_time_now_rx_HW;
+00049          \textcolor{keywordtype}{long} \textcolor{keywordtype}{long} d_timeNs_tx, d_timeNs_rx;
+00050          \textcolor{keywordtype}{long} \textcolor{keywordtype}{long} d_timeNs_rx_return;
+00051          \textcolor{keyword}{volatile} \textcolor{keywordtype}{long} \textcolor{keywordtype}{long} d_wait_rx_TEST;
+00052          \textcolor{keywordtype}{long} d_timeoutUs;
+00053          pmt::pmt\_t d_time_key, d_time_val, d_srcid;
+00054          \textcolor{comment}{//EchoParameters}
+00055          \textcolor{keywordtype}{int} d_num_delay_samps;
+00056          \textcolor{comment}{//common}
+00057          std::string d_args;
+00058          SoapySDR::Kwargs d_kw;
+00059          \textcolor{keywordtype}{int} d_samp_rate;
+00060          \textcolor{keywordtype}{float} d_center_freq;
+00061          \textcolor{comment}{//Aux}
+00062          std::vector<std::string> d_listRegInterfaces;
+00063          std::vector<std::string> d_GPIOBanks;
+00064          \textcolor{keyword}{volatile} \textcolor{keywordtype}{unsigned} d_register;
+00065          \textcolor{keyword}{volatile} \textcolor{keywordtype}{unsigned} d_value;
+00066          \textcolor{keyword}{volatile} \textcolor{keywordtype}{float} d_time_packet;
+00067          \textcolor{keywordtype}{long} \textcolor{keywordtype}{long} d_extra_work_time;
+00068          \textcolor{keywordtype}{int} d_workNum;
+00069          \textcolor{keywordtype}{bool} d_SendPacket;
+00070          pmt::pmt\_t DeadtimeKey = pmt::string\_to\_symbol(\textcolor{stringliteral}{"Deadtime"});
+00071          \textcolor{keyword}{volatile} \textcolor{keywordtype}{int} firstPacket_Rx;
+00072          \textcolor{keyword}{volatile} \textcolor{keywordtype}{int} firstPacket;
+00073          \textcolor{keywordtype}{int} ERRORS;
+00074          \textcolor{keywordtype}{int} Rx_Skip_Packets = 0;
+00075          \textcolor{keywordtype}{bool} Chirp_Sync;
+00076          std::vector<std::string> sensors;
+00077 
+00078 
+00079 
+00080          \textcolor{comment}{// Tx/Rx}
+00081          SoapySDR::Device *d_soapysdr_tx, *d_soapysdr_rx, *d_soapysdr;
+00082          SoapySDR::Stream *d_tx_stream, *d_rx_stream;
+00083 
+00084          \textcolor{keywordtype}{size\_t} d_chan_tx, d_chan_rx;
+00085          \textcolor{keywordtype}{int} d_flagsTx, d_flagsRx,d_flagsRx_return;
+00086 
+00087          \textcolor{keywordtype}{float} d_timeout_tx, d_timeout_rx;
+00088          \textcolor{keywordtype}{float} d_wait_tx, d_wait_rx;
+00089          \textcolor{keywordtype}{double} d_lo_offset_tx, d_lo_offset_rx;
+00090          std::string d_antenna_tx, d_antenna_rx;
+00091          \textcolor{keywordtype}{float} d_gain_tx, d_gain_rx;
+00092          \textcolor{keywordtype}{float} d_bw_tx, d_bw_rx;
+00093 
+00094          \textcolor{keyword}{volatile} \textcolor{keywordtype}{int} d_num_rx_samps, d_num_tx_samps;
+00095 
+00096          \textcolor{comment}{//receive stream variables}
+00097          gr::thread::thread d_thread_recv;
+00098          gr\_vector\_void\_star d_out_buffer;\textcolor{comment}{//std::vector<gr\_complex>}
+00099          \textcolor{comment}{//std::vector<gr\_complex *> d\_out\_buffer;}
+00100          gr\_complex *  d_out_recv;\textcolor{comment}{//input to "readStream"}
+00101          \textcolor{keywordtype}{int} d_noutput_items_recv;
+00102 
+00103          \textcolor{comment}{//send stream variables}
+00104          gr::thread::thread d_thread_send;
+00105          gr\_vector\_const\_void\_star d_in_buffer;\textcolor{comment}{//input to "writeStream"}
+00106          \textcolor{keywordtype}{int} d_noutput_items_send;
+00107 
+00108 
+00109 
+00110      \textcolor{keyword}{public}:
+00111       soapysdr_echotimer_stretch_impl(\textcolor{keywordtype}{int} samp_rate, \textcolor{keywordtype}{float} center_freq, \textcolor{keywordtype}{int} 
+      num_delay_samps,
+00112                                         std::string args,
+00113                                         std::string antenna\_tx, \textcolor{keywordtype}{float} gain\_tx, \textcolor{keywordtype}{float} bw\_tx,
+00114                                         \textcolor{keywordtype}{float} timeout\_tx, \textcolor{keywordtype}{float} wait_tx, \textcolor{keywordtype}{float} lo\_offset\_tx,
+00115                                         std::string antenna\_rx, \textcolor{keywordtype}{float} gain\_rx, \textcolor{keywordtype}{float} bw\_rx,
+00116                                         \textcolor{keywordtype}{float} timeout\_rx, \textcolor{keywordtype}{float} wait_rx, \textcolor{keywordtype}{float} lo\_offset\_rx,
+00117                                         \textcolor{keyword}{const} std::string& len\_key);
+00118       ~soapysdr_echotimer_stretch_impl();
+00119 
+00120 
+00121       \textcolor{comment}{// methods}
+00122       \textcolor{keywordtype}{void} send();
+00123       \textcolor{keywordtype}{void} receive();
+00124       \textcolor{comment}{//}
+00125       \textcolor{keywordtype}{void} set_rx_gain(\textcolor{keywordtype}{size\_t} chan, \textcolor{keywordtype}{float} gain);
+00126       \textcolor{keywordtype}{void} set_tx_gain(\textcolor{keywordtype}{size\_t} chan, \textcolor{keywordtype}{float} gain);
+00127 
+00128       \textcolor{comment}{//variable set and gets}
+00129       \textcolor{keywordtype}{int} num_delay_samps() \{ \textcolor{keywordflow}{return} d_num_delay_samps; \}
+00130       \textcolor{keywordtype}{void} set_num_delay_samps(\textcolor{keywordtype}{int} num_delay_samps) \{ d\_num\_delay\_samps = 
+      num_delay_samps; \}
+00131 
+00132       \textcolor{keywordtype}{float} wait_rx() \{ \textcolor{keywordflow}{return} d_wait_rx; \}
+00133       \textcolor{keywordtype}{float} wait_tx() \{ \textcolor{keywordflow}{return} d_wait_tx; \}
+00134       \textcolor{keywordtype}{void} set_wait(\textcolor{keywordtype}{float} wait_rx, \textcolor{keywordtype}{float} wait_tx) \{ d\_wait\_rx = wait_rx; d\_wait\_tx = 
+      wait_tx; \}
+00135 
+00136       \textcolor{comment}{//int calculate\_output\_stream\_length(const gr\_vector\_int &ninput\_items);}
+00137 
+00138       \textcolor{comment}{// Where all the action really happens}
+00139       \textcolor{keywordtype}{int} work(\textcolor{keywordtype}{int} noutput\_items,
+00140            gr\_vector\_int &ninput\_items,
+00141            gr\_vector\_const\_void\_star &input\_items,
+00142            gr\_vector\_void\_star &output\_items);
+00143     \};
+00144 
+00145   \} \textcolor{comment}{// namespace radar}
+00146 \} \textcolor{comment}{// namespace gr}
+00147 
+00148 \textcolor{preprocessor}{#endif }\textcolor{comment}{/* INCLUDED\_RADAR\_SOAPYSDR\_ECHOTIMER\_STRETCH\_IMPL\_H */}\textcolor{preprocessor}{}
+\end{DoxyCode}

@@ -1,0 +1,184 @@
+\subsection{estimator\+\_\+ofdm\+\_\+impl.\+cc}
+\label{estimator__ofdm__impl_8cc_source}\index{/home/erik/prefix/default/src/gr-\/radar-\/dev/lib/estimator\+\_\+ofdm\+\_\+impl.\+cc@{/home/erik/prefix/default/src/gr-\/radar-\/dev/lib/estimator\+\_\+ofdm\+\_\+impl.\+cc}}
+
+\begin{DoxyCode}
+00001 \textcolor{comment}{/* -*- c++ -*- */}
+00002 \textcolor{comment}{/* }
+00003 \textcolor{comment}{ * Copyright 2014 Communications Engineering Lab, KIT.}
+00004 \textcolor{comment}{ * }
+00005 \textcolor{comment}{ * This is free software; you can redistribute it and/or modify}
+00006 \textcolor{comment}{ * it under the terms of the GNU General Public License as published by}
+00007 \textcolor{comment}{ * the Free Software Foundation; either version 3, or (at your option)}
+00008 \textcolor{comment}{ * any later version.}
+00009 \textcolor{comment}{ * }
+00010 \textcolor{comment}{ * This software is distributed in the hope that it will be useful,}
+00011 \textcolor{comment}{ * but WITHOUT ANY WARRANTY; without even the implied warranty of}
+00012 \textcolor{comment}{ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the}
+00013 \textcolor{comment}{ * GNU General Public License for more details.}
+00014 \textcolor{comment}{ * }
+00015 \textcolor{comment}{ * You should have received a copy of the GNU General Public License}
+00016 \textcolor{comment}{ * along with this software; see the file COPYING.  If not, write to}
+00017 \textcolor{comment}{ * the Free Software Foundation, Inc., 51 Franklin Street,}
+00018 \textcolor{comment}{ * Boston, MA 02110-1301, USA.}
+00019 \textcolor{comment}{ */}
+00020 
+00021 \textcolor{preprocessor}{#ifdef HAVE\_CONFIG\_H}
+00022 \textcolor{preprocessor}{#include "config.h"}
+00023 \textcolor{preprocessor}{#endif}
+00024 
+00025 \textcolor{preprocessor}{#include <gnuradio/io\_signature.h>}
+00026 \textcolor{preprocessor}{#include "estimator_ofdm_impl.h"}
+00027 
+00028 \textcolor{keyword}{namespace }gr \{
+00029   \textcolor{keyword}{namespace }radar \{
+00030 
+00031     estimator_ofdm::sptr
+00032     estimator_ofdm::make(std::string symbol\_x, \textcolor{keywordtype}{int} len\_x, std::vector<float> axis\_x, 
+      std::string symbol\_y, \textcolor{keywordtype}{int} len\_y, std::vector<float> axis\_y, \textcolor{keywordtype}{bool} merge\_consecutive)
+00033     \{
+00034       \textcolor{keywordflow}{return} gnuradio::get\_initial\_sptr
+00035         (\textcolor{keyword}{new} estimator_ofdm_impl(symbol\_x, len\_x, axis\_x, symbol\_y, len\_y, axis\_y, merge\_consecutive));
+00036     \}
+00037 
+00038     \textcolor{comment}{/*}
+00039 \textcolor{comment}{     * The private constructor}
+00040 \textcolor{comment}{     */}
+00041     estimator_ofdm_impl::estimator_ofdm_impl(std::string symbol\_x, \textcolor{keywordtype}{int} len\_x, std::vector<float> axis\_x, 
+      std::string symbol\_y, \textcolor{keywordtype}{int} len\_y, std::vector<float> axis\_y, \textcolor{keywordtype}{bool} merge\_consecutive)
+00042       : gr::block(\textcolor{stringliteral}{"estimator\_ofdm"},
+00043               gr::io\_signature::make(0,0,0),
+00044               gr::io\_signature::make(0,0,0))
+00045     \{
+00046         d_symbol_x = symbol\_x;
+00047         d_symbol_y = symbol\_y;
+00048         d_len_x = len\_x;
+00049         d_len_y = len\_y;
+00050         d_axis_x = axis\_x;
+00051         d_axis_y = axis\_y;
+00052         d_merge_consecutive = merge\_consecutive;
+00053         
+00054         \textcolor{comment}{// Register input message port}
+00055         d_port_id_in = pmt::mp(\textcolor{stringliteral}{"Msg in"});
+00056         message\_port\_register\_in(d_port_id_in);
+00057         set\_msg\_handler(d_port_id_in, boost::bind(&
+      estimator_ofdm_impl::handle_msg, \textcolor{keyword}{this}, \_1));
+00058         
+00059         \textcolor{comment}{// Register output message port}
+00060         d_port_id_out = pmt::mp(\textcolor{stringliteral}{"Msg out"});
+00061         message\_port\_register\_out(d_port_id_out);
+00062     \}
+00063 
+00064     \textcolor{comment}{/*}
+00065 \textcolor{comment}{     * Our virtual destructor.}
+00066 \textcolor{comment}{     */}
+00067     estimator_ofdm_impl::~estimator_ofdm_impl()
+00068     \{
+00069     \}
+00070     
+00071     \textcolor{keywordtype}{void}
+00072     estimator_ofdm_impl::handle_msg(pmt::pmt\_t msg)
+00073     \{
+00074         \textcolor{comment}{// Read msg from peak detector}
+00075         pmt::pmt\_t msg\_part;
+00076         \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} k=0; k<pmt::length(msg); k++)\{
+00077             msg\_part = pmt::nth(k,msg);
+00078             \textcolor{keywordflow}{if}(pmt::symbol\_to\_string(pmt::nth(0,msg\_part))==\textcolor{stringliteral}{"axis\_x"})\{
+00079                 d_paxis_x = pmt::nth(1,msg\_part);
+00080             \}
+00081             \textcolor{keywordflow}{else} \textcolor{keywordflow}{if}(pmt::symbol\_to\_string(pmt::nth(0,msg\_part))==\textcolor{stringliteral}{"axis\_y"})\{
+00082                 d_paxis_y = pmt::nth(1,msg\_part);
+00083             \}
+00084             \textcolor{keywordflow}{else} \textcolor{keywordflow}{if}(pmt::symbol\_to\_string(pmt::nth(0,msg\_part))==\textcolor{stringliteral}{"power"})\{
+00085                 d_ppower = pmt::nth(1,msg\_part);
+00086             \}
+00087             \textcolor{keywordflow}{else} \textcolor{keywordflow}{if}(pmt::symbol\_to\_string(pmt::nth(0,msg\_part))==\textcolor{stringliteral}{"rx\_time"})\{
+00088                 d_ptimestamp = msg\_part;
+00089             \}
+00090         \}
+00091         
+00092         d_val_x = pmt::f32vector\_elements(d_paxis_x);
+00093         d_val_y = pmt::f32vector\_elements(d_paxis_y);
+00094         
+00095         \textcolor{comment}{// Merge consecutive peaks}
+00096         std::vector<float> val\_x\_hold, val\_y\_hold;
+00097         val\_x\_hold = d_val_x;
+00098         val\_y\_hold = d_val_y;
+00099         \textcolor{keywordflow}{if}(d_merge_consecutive)\{
+00100             d_val_power = pmt::f32vector\_elements(d_ppower);
+00101             \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} k=0; k<d_val_x.size(); k++)\{ \textcolor{comment}{// Go through points and check bins in range one (also
+       diagonal!) if the power is greater then the CUT}
+00102                 \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} l=0; l<d_val_x.size(); l++)\{
+00103                     \textcolor{keywordflow}{if}(std::abs(d_val_x[k]-d_val_x[l])<=1 && std::abs(d_val_y[k]-
+      d_val_y[l])<=1 && d_val_power[k]<d_val_power[l])\{
+00104                         val\_x\_hold[k] = -1;
+00105                         val\_y\_hold[k] = -1;
+00106                     \}
+00107                 \}
+00108             \}
+00109             d_val_x.clear();
+00110             d_val_y.clear();
+00111             \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} k=0; k<val\_x\_hold.size(); k++)\{
+00112                 \textcolor{keywordflow}{if}(val\_x\_hold[k]!=-1 && val\_y\_hold[k]!=-1)\{
+00113                     d_val_x.push\_back(val\_x\_hold[k]);
+00114                     d_val_y.push\_back(val\_y\_hold[k]);
+00115                 \}
+00116             \}
+00117         \}
+00118         
+00119         \textcolor{comment}{// Map bins on given axis}
+00120         \textcolor{comment}{// 4 values given splits in the middle of the axis and interpolates linear in between}
+00121         \textcolor{comment}{// 2 values given represents min and max with linear progression in between}
+00122         d_map_x.clear();
+00123         d_map_y.clear();
+00124         \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} k=0; k<d_val_x.size(); k++)\{ \textcolor{comment}{// x axis}
+00125             \textcolor{keywordflow}{if}(d_axis_x.size()==2)\{
+00126                 d_map_x.push\_back(d_axis_x[0]+d_val_x[k]/d_len_x*(d_axis_x[1]-
+      d_axis_x[0]));
+00127             \}
+00128             \textcolor{keywordflow}{else} \textcolor{keywordflow}{if}(d_axis_x.size()==4)\{
+00129                 \textcolor{keywordflow}{if}(d_val_x[k]<d_len_x/2)\{ \textcolor{comment}{// lower part}
+00130                     d_map_x.push\_back(d_axis_x[0]+d_val_x[k]/(\textcolor{keywordtype}{float})d_len_x*2.0*(
+      d_axis_x[1]-d_axis_x[0]));
+00131                 \}
+00132                 \textcolor{keywordflow}{else}\{ \textcolor{comment}{// upper part}
+00133                     d_map_x.push\_back(d_axis_x[2]+(d_val_x[k]-d_len_x/2.0)/(\textcolor{keywordtype}{float})
+      d_len_x*2.0*(d_axis_x[3]-d_axis_x[2]));
+00134                 \}
+00135             \}
+00136         \}
+00137         
+00138         \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} k=0; k<d_val_y.size(); k++)\{ \textcolor{comment}{// y axis}
+00139             \textcolor{keywordflow}{if}(d_axis_y.size()==2)\{
+00140                 d_map_y.push\_back(d_axis_y[0]+d_val_y[k]/d_len_y*(d_axis_y[1]-
+      d_axis_y[0]));
+00141             \}
+00142             \textcolor{keywordflow}{else} \textcolor{keywordflow}{if}(d_axis_y.size()==4)\{
+00143                 \textcolor{keywordflow}{if}(d_val_y[k]<d_len_y/2)\{ \textcolor{comment}{// lower part}
+00144                     d_map_y.push\_back(d_axis_y[0]+d_val_y[k]/(\textcolor{keywordtype}{float})d_len_y*2.0*(
+      d_axis_y[1]-d_axis_y[0]));
+00145                 \}
+00146                 \textcolor{keywordflow}{else}\{ \textcolor{comment}{// upper part}
+00147                     d_map_y.push\_back(d_axis_y[2]+(d_val_y[k]-d_len_y/2.0)/(\textcolor{keywordtype}{float})
+      d_len_y*2.0*(d_axis_y[3]-d_axis_y[2]));
+00148                 \}
+00149             \}
+00150         \}
+00151         
+00152         \textcolor{comment}{// Push pmt to output msg port}
+00153         d_x_key = pmt::string\_to\_symbol(d_symbol_x); \textcolor{comment}{// identifier x axis}
+00154         d_x_value = pmt::init\_f32vector(d_map_x.size(), d_map_x); \textcolor{comment}{// vector to pmt}
+00155         d_x_pack = pmt::list2(d_x_key, d_x_value); \textcolor{comment}{// make list for x axis information}
+00156         
+00157         d_y_key = pmt::string\_to\_symbol(d_symbol_y); \textcolor{comment}{// identifier y axis}
+00158         d_y_value = pmt::init\_f32vector(d_map_y.size(), d_map_y); \textcolor{comment}{// vector to pmt}
+00159         d_y_pack = pmt::list2(d_y_key, d_y_value); \textcolor{comment}{// make list for y axis information}
+00160         
+00161         d_value = pmt::list3(d_ptimestamp, d\_x\_pack, d\_y\_pack);
+00162         
+00163         message\_port\_pub(d_port_id_out,d_value); \textcolor{comment}{// publish message}
+00164     \}
+00165 
+00166   \} \textcolor{comment}{/* namespace radar */}
+00167 \} \textcolor{comment}{/* namespace gr */}
+00168 
+\end{DoxyCode}

@@ -1,9 +1,9 @@
 var searchData=
 [
-  ['name',['name',['../db/d82/wglew_8h.html#aee931c572fb72bbecd081085e5fd4132',1,'wglew.h']]],
-  ['nattributes',['nAttributes',['../db/d82/wglew_8h.html#acbdabb26241c2bbf86c1a1ee4629c5c8',1,'wglew.h']]],
-  ['nmaxformats',['nMaxFormats',['../db/d82/wglew_8h.html#aca5696c6ab08d74792b53555406d4153',1,'wglew.h']]],
-  ['nnumformats',['nNumFormats',['../db/d82/wglew_8h.html#aaa6694aa8869804a9ea240d2a0b0bac0',1,'wglew.h']]],
-  ['numdevices',['numDevices',['../db/d82/wglew_8h.html#afc3b4efd994aedcffc2dac18a1728cd2',1,'wglew.h']]],
-  ['numerator',['numerator',['../db/d82/wglew_8h.html#a25f46232b6f4a7410d48b173460f06f2',1,'wglew.h']]]
+  ['makefunction',['MakeFunction',['../d6/d17/namespaceSoapySDR.html#ae9bd0b0a1438d0033bfc80dd0eae9e34',1,'SoapySDR']]],
+  ['makefunctions',['MakeFunctions',['../d6/d17/namespaceSoapySDR.html#a88be54739a5edc32363b15681e675fa2',1,'SoapySDR']]],
+  ['mask',['mask',['../db/d82/wglew_8h.html#ac96012c186757f49c8d39675cd43a4e4',1,'wglew.h']]],
+  ['maxbarriers',['maxBarriers',['../db/d82/wglew_8h.html#a97112cce661fcb78de40e65a6d9230a6',1,'wglew.h']]],
+  ['maxgroups',['maxGroups',['../db/d82/wglew_8h.html#a508519b99ae8663aba7fd349cc69997b',1,'wglew.h']]],
+  ['msc',['msc',['../db/d82/wglew_8h.html#ac6ab09fc64bb73d869061c8f9a13c9fd',1,'wglew.h']]]
 ];

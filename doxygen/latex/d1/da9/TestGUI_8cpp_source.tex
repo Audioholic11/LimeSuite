@@ -1,0 +1,377 @@
+\subsection{Test\+G\+U\+I.\+cpp}
+\label{TestGUI_8cpp_source}\index{/home/erik/prefix/default/src/limesuite-\/dev/\+Quick\+Test/\+Test\+G\+U\+I.\+cpp@{/home/erik/prefix/default/src/limesuite-\/dev/\+Quick\+Test/\+Test\+G\+U\+I.\+cpp}}
+
+\begin{DoxyCode}
+00001 \textcolor{preprocessor}{#ifdef QUICKTEST\_GUI}
+00002 \textcolor{preprocessor}{#include <FL/Fl.H>}
+00003 \textcolor{preprocessor}{#include <FL/Fl\_Double\_Window.H>}
+00004 \textcolor{preprocessor}{#include <FL/Fl\_Button.H>}
+00005 \textcolor{preprocessor}{#include <FL/Fl\_Multiline\_Output.H>}
+00006 \textcolor{preprocessor}{#include <FL/Fl\_Box.H>}
+00007 \textcolor{preprocessor}{#include "FL/fl\_draw.H"}
+00008 \textcolor{preprocessor}{#endif}
+00009 \textcolor{preprocessor}{#include <vector>}
+00010 \textcolor{preprocessor}{#include <string>}
+00011 \textcolor{preprocessor}{#include <fstream>}
+00012 
+00013 \textcolor{preprocessor}{#include "LimeSDRTest.h"}
+00014 \textcolor{preprocessor}{#include <iostream>}
+00015 \textcolor{preprocessor}{#include <getopt.h>}
+00016 
+00017 \textcolor{preprocessor}{#ifdef NDEBUG}
+00018 \textcolor{preprocessor}{#ifdef \_MSC\_VER}
+00019 \textcolor{preprocessor}{#pragma comment(linker, "/SUBSYSTEM:windows /ENTRY:mainCRTStartup")}
+00020 \textcolor{preprocessor}{#endif}
+00021 \textcolor{preprocessor}{#endif}
+00022 
+00023 \textcolor{preprocessor}{#ifdef QUICKTEST\_GUI}
+00024 \textcolor{keyword}{static} Fl\_Button** buttons;
+00025 \textcolor{keyword}{static} Fl\_Window* popup = \textcolor{keyword}{nullptr};
+00026 \textcolor{keyword}{static} Fl\_Multiline\_Output* out;
+00027 \textcolor{keyword}{static} Fl\_Output* detect;
+00028 \textcolor{keyword}{static} std::string logfile;
+00029 \textcolor{keyword}{static} \textcolor{keywordtype}{int} started = \textcolor{keyword}{false};
+00030 Fl\_Button* start;
+00031 
+00032 \textcolor{keyword}{const} Fl\_Color CL\_DARK = fl\_rgb\_color(0x18, 0x8A, 0x2E);
+00033 
+00034 \textcolor{keyword}{class }Lms\_Double\_window : \textcolor{keyword}{public} Fl\_Double\_Window
+00035 \{
+00036 \textcolor{keyword}{private}:
+00037     \textcolor{keywordtype}{int} error\_msg;
+00038 \textcolor{keyword}{public}:
+00039     Lms\_Double\_window(\textcolor{keywordtype}{int} W, \textcolor{keywordtype}{int} H, \textcolor{keyword}{const} \textcolor{keywordtype}{char}* L = 0) : Fl\_Double\_Window(W, H, 
+      L)
+00040     \{
+00041         error\_msg = 0;
+00042     \};
+00043     \textcolor{keywordtype}{void} SetErrorMsg(\textcolor{keywordtype}{int} msg) \{
+00044         error\_msg = msg;
+00045     \}
+00046     \textcolor{keywordtype}{void} draw()
+00047     \{
+00048         Fl\_Double\_Window::draw();
+00049         \textcolor{keywordflow}{if} (error\_msg != 0)
+00050         \{
+00051             fl\_rectf(w() / 4, h() / 4, w() / 2, h() / 4,FL\_WHITE);
+00052             fl\_rect(w() / 4, h() / 4, w() / 2, h() / 4, FL\_BLACK);
+00053             fl\_color(FL\_RED);
+00054             fl\_font(FL\_HELVETICA, 20);
+00055             \textcolor{keywordflow}{if} (error\_msg == -1)
+00056             \{
+00057                 fl\_draw(\textcolor{stringliteral}{"No Board Detected"}, 320, h()/4+50);
+00058                 fl\_font(FL\_HELVETICA, 20);
+00059             \}
+00060             \textcolor{keywordflow}{else} \textcolor{keywordflow}{if} (error\_msg == -2)
+00061             \{
+00062                 fl\_font(FL\_HELVETICA, 20);
+00063                 fl\_draw(\textcolor{stringliteral}{"Multiple Boards Detected"}, 295, h() / 4 + 50);
+00064             \}
+00065         \}
+00066     \}
+00067 \};
+00068 
+00069 Lms\_Double\_window* win;
+00070 
+00071 \textcolor{keyword}{class }LmsPopupResult : \textcolor{keyword}{public} Fl\_Window \{
+00072 \textcolor{keyword}{public}:
+00073     LmsPopupResult(\textcolor{keywordtype}{int} X, \textcolor{keywordtype}{int} Y, \textcolor{keywordtype}{int} W, \textcolor{keywordtype}{int} H, \textcolor{keywordtype}{bool} passed, \textcolor{keyword}{const} \textcolor{keywordtype}{char}* L=0) :Fl\_Window(W, H, 
+      L)
+00074     \{
+00075         position(X, Y);
+00076         color(FL\_WHITE);
+00077         Fl\_Button* b = \textcolor{keyword}{new} Fl\_Button(W / 2 - 40, H - 50, 80, 30, \textcolor{stringliteral}{"OK"});
+00078         b->callback(Button\_CB, \textcolor{keyword}{this});
+00079         b->shortcut(FL\_Enter);
+00080         Fl\_Multiline\_Output* out = \textcolor{keyword}{new} Fl\_Multiline\_Output(64, 15, W - 128, 50);
+00081         out->box(FL\_NO\_BOX);
+00082         out->textsize(24);
+00083         out->textcolor(passed ? CL\_DARK : FL\_RED);
+00084         out->value(passed ? \textcolor{stringliteral}{"Board Tests PASSED"} : \textcolor{stringliteral}{"Board Tests FAILED"});
+00085         end();
+00086         set\_modal();
+00087         show();
+00088     \}
+00089     ~LmsPopupResult() \{\};
+00090 \textcolor{keyword}{private}:
+00091     \textcolor{keyword}{static} \textcolor{keywordtype}{void} Button\_CB(Fl\_Widget* obj, \textcolor{keywordtype}{void}* v)
+00092     \{
+00093         ((Fl\_Window*)v)->hide();
+00094     \}
+00095 \};
+00096 
+00097 \textcolor{keyword}{class }LmsPopupError : \textcolor{keyword}{public} Fl\_Window \{
+00098     Fl\_Output* out;
+00099 \textcolor{keyword}{public}:
+00100     LmsPopupError(\textcolor{keywordtype}{int} W, \textcolor{keywordtype}{int} H, \textcolor{keyword}{const} \textcolor{keywordtype}{char}* L = 0) :Fl\_Window(W, H, L)
+00101     \{
+00102         color(FL\_WHITE);
+00103         out = \textcolor{keyword}{new} Fl\_Output(64, 15, W - 128, 40);
+00104         out->box(FL\_NO\_BOX);
+00105         out->textsize(32);
+00106         out->textcolor(FL\_RED);
+00107         end();
+00108         set\_modal();
+00109     \};
+00110     \textcolor{keywordtype}{void} Update(\textcolor{keywordtype}{int} X, \textcolor{keywordtype}{int} Y, \textcolor{keyword}{const} \textcolor{keywordtype}{char}* msg)
+00111     \{
+00112         position(X, Y);
+00113         out->value(msg);
+00114     \}
+00115     ~LmsPopupError() \{\};
+00116 \};
+00117 
+00118 \textcolor{keyword}{static} LmsPopupError* error\_popup = \textcolor{keyword}{nullptr};
+00119 
+00120 \textcolor{keywordtype}{void} ShowMessage(\textcolor{keywordtype}{void}* v)
+00121 \{
+00122     \textcolor{keywordflow}{if} (popup != \textcolor{keyword}{nullptr})
+00123     \{
+00124         popup->hide();
+00125         \textcolor{keyword}{delete} popup;
+00126         popup = \textcolor{keyword}{nullptr};
+00127     \}
+00128     \textcolor{keywordtype}{bool} passed = *((\textcolor{keywordtype}{bool}*)v);
+00129     popup = \textcolor{keyword}{new} LmsPopupResult(win->x() + win->w() / 4, win->y() + win->h() / 4, win->w() / 2, 120, passed,
+       \textcolor{stringliteral}{""});
+00130     \textcolor{keywordflow}{while} (popup && popup->shown())
+00131         Fl::wait();
+00132     \textcolor{keyword}{delete} (\textcolor{keywordtype}{bool}*)v;
+00133     \textcolor{keyword}{delete} popup;
+00134     popup = \textcolor{keyword}{nullptr};
+00135 \}
+00136 
+00137 \textcolor{keywordtype}{void} Timer\_CB(\textcolor{keywordtype}{void} *data)
+00138 \{
+00139     \textcolor{keyword}{static} \textcolor{keywordtype}{int} counter = 30;
+00140     Fl::repeat\_timeout(1.0f / 25.0f, Timer\_CB, \textcolor{keyword}{nullptr});
+00141 
+00142     \textcolor{keywordflow}{if} (counter++ == 30)
+00143     \{
+00144         counter = 0;
+00145         Fl::lock();
+00146         std::string str;
+00147 
+00148         win->SetErrorMsg(0);
+00149         \textcolor{keywordtype}{int} ret;
+00150         str = \textcolor{stringliteral}{""};
+00151         \textcolor{keywordflow}{if} ((ret = LimeSDRTest::CheckDevice(str)) == 0)
+00152         \{
+00153             detect->textcolor(CL\_DARK);
+00154             \textcolor{keywordflow}{if} (!started)
+00155                 start->activate();
+00156             win->SetErrorMsg(0);
+00157         \}
+00158         \textcolor{keywordflow}{else}
+00159         \{
+00160             detect->textcolor(FL\_RED);
+00161             \textcolor{keywordflow}{if} (!started)
+00162                 start->deactivate();
+00163             \textcolor{keywordflow}{if} (popup != \textcolor{keyword}{nullptr})
+00164                 popup->hide();
+00165             win->SetErrorMsg(ret);
+00166         \}
+00167         \textcolor{keywordflow}{if} (str != \textcolor{stringliteral}{""})
+00168             detect->value(str.c\_str());
+00169 
+00170         win->redraw();
+00171         win->damage(FL\_DAMAGE\_ALL, 150, 460, 320, 30);
+00172         Fl::unlock();
+00173     \}
+00174 \}
+00175 
+00176 \textcolor{keyword}{static} \textcolor{keywordtype}{void} Window\_CB(Fl\_Widget*, \textcolor{keywordtype}{void}*)
+00177 \{
+00178     \textcolor{keywordflow}{if} (Fl::event() == FL\_SHORTCUT && Fl::event\_key() == FL\_Escape)
+00179         \textcolor{keywordflow}{return}; \textcolor{comment}{// ignore Escape}
+00180     exit(0);
+00181 \}
+00182 
+00183 \textcolor{keyword}{static} \textcolor{keywordtype}{void} AddLine(\textcolor{keyword}{const} \textcolor{keywordtype}{char} * str)
+00184 \{
+00185     std::string val;
+00186     val = out->value();
+00187     val += str;
+00188     val += \textcolor{stringliteral}{"\(\backslash\)n"};
+00189     out->value(val.c\_str());
+00190     out->position(val.length());
+00191     \textcolor{keywordflow}{if} (logfile != \textcolor{stringliteral}{""})
+00192     \{
+00193         std::ofstream file(logfile, std::ios\_base::out | std::ios\_base::app);
+00194         \textcolor{keywordflow}{if} (file.is\_open())
+00195         \{
+00196             file << str << std::endl;
+00197             file.close();
+00198         \}
+00199     \}
+00200 \}
+00201 
+00202 \textcolor{keyword}{static} \textcolor{keywordtype}{void} DrawButtons(\textcolor{keywordtype}{int} X, \textcolor{keywordtype}{int} Y)
+00203 \{
+00204     buttons = \textcolor{keyword}{new} Fl\_Button*[testNames.size()];
+00205     Fl\_Group* g = \textcolor{keyword}{new} Fl\_Group(X-10,Y-8,240,testNames.size()*55+10,\textcolor{stringliteral}{"Board Tests"});
+00206     \textcolor{comment}{//g->align(FL\_ALIGN\_TOP\_LEFT);}
+00207     g->box(FL\_ENGRAVED\_FRAME);
+00208     \textcolor{keywordflow}{for} (\textcolor{keywordtype}{unsigned} i = 0; i < testNames.size(); i++)
+00209     \{
+00210         \textcolor{keyword}{auto} button = \textcolor{keyword}{new} Fl\_Button(X, Y+i*55, 220, 40,testNames[i].c\_str());
+00211         button->box(FL\_ROUND\_UP\_BOX);
+00212         button->deactivate();
+00213         buttons[i] = button;
+00214     \}
+00215     g->end();
+00216 \}
+00217 
+00218 \textcolor{keyword}{static} \textcolor{keywordtype}{int} CB\_Function(\textcolor{keywordtype}{int} \textcolor{keywordtype}{id}, \textcolor{keywordtype}{int} event, \textcolor{keyword}{const} \textcolor{keywordtype}{char}* msg)
+00219 \{
+00220     Fl::lock();
+00221     \textcolor{keywordflow}{if} (event == LMS_TEST_INFO)
+00222     \{
+00223         \textcolor{keywordflow}{if} (\textcolor{keywordtype}{id} != -1)
+00224         \{
+00225             buttons[id]->activate();
+00226             buttons[id]->color(FL\_YELLOW);
+00227         \}
+00228     \}
+00229     \textcolor{keywordflow}{else} \textcolor{keywordflow}{if} (event == LMS_TEST_FAIL)
+00230     \{
+00231         \textcolor{keywordflow}{if} (\textcolor{keywordtype}{id} != -1)
+00232         \{
+00233             buttons[id]->activate();
+00234             buttons[id]->color(FL\_RED);
+00235         \}
+00236         \textcolor{keywordflow}{else}
+00237         \{
+00238             \textcolor{keywordtype}{bool}* passed = \textcolor{keyword}{new} bool;
+00239             *passed = \textcolor{keyword}{false};
+00240             started = \textcolor{keyword}{false};
+00241             Fl::awake(ShowMessage, passed);
+00242         \}
+00243     \}
+00244     \textcolor{keywordflow}{else} \textcolor{keywordflow}{if} (event == LMS_TEST_SUCCESS)
+00245     \{
+00246         \textcolor{keywordflow}{if} (\textcolor{keywordtype}{id} != -1)
+00247         \{
+00248             buttons[id]->activate();
+00249             buttons[id]->color(FL\_GREEN);
+00250         \}
+00251         \textcolor{keywordflow}{else}
+00252         \{
+00253             \textcolor{keywordtype}{bool}* passed = \textcolor{keyword}{new} bool;
+00254             *passed = \textcolor{keyword}{true};
+00255             started = \textcolor{keyword}{false};
+00256             Fl::awake(ShowMessage, passed);
+00257         \}
+00258     \}
+00259     \textcolor{keywordflow}{else} \textcolor{keywordflow}{if} (event == LMS_TEST_LOGFILE)
+00260     \{
+00261         logfile = \textcolor{stringliteral}{"LimeSDR-Mini\_"};
+00262         logfile += msg;
+00263         logfile +=\textcolor{stringliteral}{".log"};
+00264         std::ofstream file(logfile, std::ios\_base::out | std::ios\_base::app);
+00265         \textcolor{keywordflow}{if} (file.is\_open())
+00266         \{
+00267             file << out->value();
+00268             file.close();
+00269         \}
+00270         std::string str = \textcolor{stringliteral}{"  Serial Number: "};
+00271         str += msg;
+00272         AddLine(str.c\_str());
+00273     \}
+00274 
+00275     \textcolor{keywordflow}{if} (msg && event != LMS_TEST_LOGFILE)
+00276         AddLine(msg);
+00277 
+00278     \textcolor{keywordflow}{if} (\textcolor{keywordtype}{id} == -1)
+00279     start->activate();
+00280 
+00281     win->redraw();
+00282     Fl::unlock();
+00283     \textcolor{keywordflow}{return} 0;
+00284 \}
+00285 
+00286 \textcolor{keyword}{static} \textcolor{keywordtype}{void} Start\_CB(Fl\_Widget*, \textcolor{keywordtype}{void}*)
+00287 \{
+00288     out->value(\textcolor{stringliteral}{""});
+00289     logfile = \textcolor{stringliteral}{""};
+00290     \textcolor{keywordflow}{for} (\textcolor{keywordtype}{unsigned} i = 0; i < testNames.size(); i++)
+00291     \{
+00292         buttons[i]->color(FL\_BACKGROUND\_COLOR);
+00293         buttons[i]->deactivate();
+00294     \}
+00295     started = \textcolor{keyword}{true};
+00296     \textcolor{keywordflow}{if} (LimeSDRTest::RunTests(CB\_Function) == 0)
+00297         start->deactivate();
+00298 \}
+00299 \textcolor{preprocessor}{#endif}
+00300 
+00301 \textcolor{keyword}{static} \textcolor{keywordtype}{int} CB_FunctionCLI(\textcolor{keywordtype}{int} \textcolor{keywordtype}{id}, \textcolor{keywordtype}{int} event, \textcolor{keyword}{const} \textcolor{keywordtype}{char}* msg)
+00302 \{
+00303     \textcolor{keywordflow}{if} (event == LMS_TEST_LOGFILE)
+00304     \{
+00305         std::string str = \textcolor{stringliteral}{"  Serial Number: "};
+00306         str += msg;
+00307         std::cout << str << std::endl;
+00308     \}
+00309     \textcolor{keywordflow}{else}
+00310         std::cout << msg << std::endl;
+00311     \textcolor{keywordflow}{return} 0;
+00312 \}
+00313 
+00314 
+00315 \textcolor{keywordtype}{int} main(\textcolor{keywordtype}{int} argc, \textcolor{keywordtype}{char}** argv)
+00316 \{
+00317 \textcolor{preprocessor}{#ifdef QUICKTEST\_GUI}
+00318 \textcolor{preprocessor}{#ifdef \_\_unix}
+00319     \textcolor{keywordtype}{int} gui = 0;
+00320 \textcolor{preprocessor}{#else}
+00321     \textcolor{keywordtype}{int} gui = 1;
+00322 \textcolor{preprocessor}{#endif}
+00323     \textcolor{keyword}{static} \textcolor{keyword}{struct }option long\_options[] = \{
+00324         \{\textcolor{stringliteral}{"gui"}, no_argument, &gui, 1\},
+00325         \{\textcolor{stringliteral}{"no-gui"}, no_argument, &gui, 0\},
+00326         \{0, 0, 0, 0\}
+00327     \};
+00328 
+00329     \textcolor{keywordtype}{int} option;
+00330     \textcolor{keywordtype}{int} option\_index = 0;
+00331     \textcolor{keywordflow}{while} ((option = getopt_long(argc, argv, \textcolor{stringliteral}{""}, long\_options, &option\_index)) != -1)
+00332     \{
+00333         \textcolor{keywordflow}{if} (option != 0)
+00334         \{
+00335             std::cout << \textcolor{stringliteral}{" --gui\(\backslash\)t\(\backslash\)tenables GUI\(\backslash\)n --no-gui\(\backslash\)tdisables GUI\(\backslash\)n"} << std::endl;
+00336             \textcolor{keywordflow}{return} -1;
+00337         \}
+00338     \}
+00339     \textcolor{keywordflow}{if} (gui)
+00340     \{
+00341         Fl::scheme(\textcolor{stringliteral}{"gleam"});
+00342         win = \textcolor{keyword}{new} Lms\_Double\_window(860, 135+testNames.size()*55, \textcolor{stringliteral}{"LimeSDR TestApp"});
+00343         out = \textcolor{keyword}{new} Fl\_Multiline\_Output(260, 22, win->w()-270, win->h()-50, \textcolor{stringliteral}{"Message Log"});
+00344         out->align(FL\_ALIGN\_TOP\_LEFT);
+00345         out->textsize(11);
+00346         start = \textcolor{keyword}{new} Fl\_Button(20, win->h()-82, 220, 40, \textcolor{stringliteral}{"Start Test"});
+00347         start->callback(Start\_CB);
+00348         start->shortcut(FL\_Enter);
+00349         DrawButtons(20, 30);
+00350         detect = \textcolor{keyword}{new} Fl\_Output(10, win->h()-28, 480, 30);
+00351         detect->box(FL\_NO\_BOX);
+00352         detect->textsize(16);
+00353         win->show();
+00354         win->end();
+00355         error\_popup = \textcolor{keyword}{new} LmsPopupError(win->w()/2, win->h()/4,\textcolor{stringliteral}{""});
+00356         win->callback(Window\_CB);
+00357         Fl::add\_timeout(0.1f, Timer\_CB, \textcolor{keyword}{nullptr});
+00358         Fl::lock();
+00359         Fl::run();
+00360         \textcolor{keyword}{delete} win;
+00361         \textcolor{keywordflow}{return} 0;
+00362     \}
+00363 \textcolor{preprocessor}{#endif}
+00364     \textcolor{keywordflow}{return} LimeSDRTest::RunTests(CB_FunctionCLI, \textcolor{keyword}{false}); \textcolor{comment}{//returns bit field of failed tests}
+00365 
+00366 \}
+00367 
+00368 
+00369 
+\end{DoxyCode}

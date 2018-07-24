@@ -62,7 +62,7 @@ virtual double {\bf Get\+Rate} (bool {\bf tx}, unsigned {\bf chan}, double $\ast
 \item 
 virtual {\bf Range} {\bf Get\+Rate\+Range} (bool dir=false, unsigned {\bf chan}=0) const 
 \item 
-virtual {\bf std\+::vector}$<$ std\+::string $>$ {\bf Get\+Path\+Names} (bool {\bf dir\+\_\+tx}, unsigned {\bf chan}=0) const 
+virtual {\bf std\+::vector}$<$ {\bf std\+::string} $>$ {\bf Get\+Path\+Names} (bool {\bf dir\+\_\+tx}, unsigned {\bf chan}=0) const 
 \item 
 virtual {\bf int} {\bf Set\+Path} (bool {\bf tx}, unsigned {\bf chan}, unsigned path)
 \item 
@@ -90,11 +90,11 @@ double {\bf Get\+L\+P\+F\+BW} (bool {\bf tx}, unsigned {\bf chan}) const
 \item 
 {\bf int} {\bf Set\+G\+F\+IR} (bool {\bf tx}, unsigned {\bf chan}, {\bf lms\+\_\+gfir\+\_\+t} {\bf filt}, bool {\bf enabled})
 \item 
-{\bf int} {\bf Set\+Gain} (bool {\bf dir\+\_\+tx}, unsigned {\bf chan}, double value, const std\+::string \&{\bf name}=\char`\"{}\char`\"{})
+{\bf int} {\bf Set\+Gain} (bool {\bf dir\+\_\+tx}, unsigned {\bf chan}, double value, const {\bf std\+::string} \&{\bf name}=\char`\"{}\char`\"{})
 \item 
-double {\bf Get\+Gain} (bool {\bf dir\+\_\+tx}, unsigned {\bf chan}, const std\+::string \&{\bf name}=\char`\"{}\char`\"{}) const 
+double {\bf Get\+Gain} (bool {\bf dir\+\_\+tx}, unsigned {\bf chan}, const {\bf std\+::string} \&{\bf name}=\char`\"{}\char`\"{}) const 
 \item 
-{\bf Range} {\bf Get\+Gain\+Range} (bool {\bf dir\+\_\+tx}, unsigned {\bf chan}, const std\+::string \&{\bf name}=\char`\"{}\char`\"{}) const 
+{\bf Range} {\bf Get\+Gain\+Range} (bool {\bf dir\+\_\+tx}, unsigned {\bf chan}, const {\bf std\+::string} \&{\bf name}=\char`\"{}\char`\"{}) const 
 \item 
 {\bf int} {\bf Set\+Test\+Signal} (bool {\bf dir\+\_\+tx}, unsigned {\bf chan}, {\bf lms\+\_\+testsig\+\_\+t} {\bf sig}, int16\+\_\+t {\bf dc\+\_\+i}=0, int16\+\_\+t {\bf dc\+\_\+q}=0)
 \item 
@@ -110,9 +110,9 @@ double {\bf Get\+N\+C\+O\+Phase} (bool {\bf tx}, unsigned ch, {\bf int} {\bf ind
 \item 
 {\bf int} {\bf Calibrate} (bool {\bf dir\+\_\+tx}, unsigned {\bf chan}, double {\bf bw}, unsigned {\bf flags})
 \item 
-virtual {\bf std\+::vector}$<$ std\+::string $>$ {\bf Get\+Program\+Modes} () const 
+virtual {\bf std\+::vector}$<$ {\bf std\+::string} $>$ {\bf Get\+Program\+Modes} () const 
 \item 
-virtual {\bf int} {\bf Program} (const std\+::string \&{\bf mode}, const char $\ast${\bf data}, size\+\_\+t {\bf len}, {\bf lime\+::\+I\+Connection\+::\+Programming\+Callback} {\bf callback}) const 
+virtual {\bf int} {\bf Program} (const {\bf std\+::string} \&{\bf mode}, const char $\ast${\bf data}, size\+\_\+t {\bf len}, {\bf lime\+::\+I\+Connection\+::\+Programming\+Callback} {\bf callback}) const 
 \item 
 double {\bf Get\+Clock\+Freq} (unsigned {\bf clk\+\_\+id}, {\bf int} channel=-\/1) const 
 \item 
@@ -138,11 +138,11 @@ double {\bf Get\+Chip\+Temperature} ({\bf int} {\bf ind}=-\/1) const
 \item 
 uint16\+\_\+t {\bf Read\+Param} (const struct {\bf L\+M\+S7\+Parameter} \&param, {\bf int} channel=-\/1, bool force\+Read\+From\+Chip=false) const 
 \item 
-{\bf int} {\bf Read\+Param} (const std\+::string \&param, {\bf int} channel=-\/1, bool force\+Read\+From\+Chip=false) const 
+{\bf int} {\bf Read\+Param} (const {\bf std\+::string} \&param, {\bf int} channel=-\/1, bool force\+Read\+From\+Chip=false) const 
 \item 
 {\bf int} {\bf Write\+Param} (const struct {\bf L\+M\+S7\+Parameter} \&param, uint16\+\_\+t {\bf val}, {\bf int} channel=-\/1)
 \item 
-{\bf int} {\bf Write\+Param} (const std\+::string \&param, uint16\+\_\+t {\bf val}, {\bf int} channel=-\/1)
+{\bf int} {\bf Write\+Param} (const {\bf std\+::string} \&param, uint16\+\_\+t {\bf val}, {\bf int} channel=-\/1)
 \item 
 {\bf int} {\bf Set\+Active\+Chip} (unsigned {\bf ind})
 \item 
@@ -159,6 +159,10 @@ uint16\+\_\+t {\bf Read\+Param} (const struct {\bf L\+M\+S7\+Parameter} \&param,
 uint64\+\_\+t {\bf Get\+Hardware\+Timestamp} ({\bf void}) const 
 \item 
 {\bf void} {\bf Set\+Hardware\+Timestamp} (const uint64\+\_\+t now)
+\item 
+uint64\+\_\+t {\bf Get\+Chirp\+Time\+Period} ({\bf void}) const 
+\item 
+uint64\+\_\+t {\bf Get\+Chirp\+Time\+Stamp} ({\bf void}) const 
 \item 
 {\bf int} {\bf M\+C\+U\+\_\+\+A\+G\+C\+Start} (uint32\+\_\+t wanted\+R\+S\+SI)
 \item 
@@ -326,7 +330,7 @@ Definition at line {\bf 122} of file {\bf lms7\+\_\+device.\+cpp}.
 
 
 
-References {\bf C\+D\+S\+\_\+\+R\+X\+A\+L\+ML}, {\bf C\+D\+S\+\_\+\+R\+X\+B\+L\+ML}, {\bf C\+D\+S\+N\+\_\+\+R\+X\+A\+L\+ML}, {\bf C\+D\+S\+N\+\_\+\+R\+X\+B\+L\+ML}, {\bf coef}, {\bf Generate\+Filter()}, {\bf lime\+::\+L\+M\+S7002\+M\+::\+Get\+\_\+\+S\+P\+I\+\_\+\+Reg\+\_\+bits()}, {\bf lime\+::\+L\+M\+S7002\+M\+::\+Get\+Reference\+Clk\+\_\+\+T\+S\+P()}, {\bf G\+F\+I\+R1\+\_\+\+B\+Y\+P\+\_\+\+R\+X\+T\+SP}, {\bf G\+F\+I\+R1\+\_\+\+B\+Y\+P\+\_\+\+T\+X\+T\+SP}, {\bf G\+F\+I\+R1\+\_\+\+L\+\_\+\+R\+X\+T\+SP}, {\bf G\+F\+I\+R1\+\_\+\+L\+\_\+\+T\+X\+T\+SP}, {\bf G\+F\+I\+R1\+\_\+\+N\+\_\+\+R\+X\+T\+SP}, {\bf G\+F\+I\+R1\+\_\+\+N\+\_\+\+T\+X\+T\+SP}, {\bf G\+F\+I\+R2\+\_\+\+B\+Y\+P\+\_\+\+R\+X\+T\+SP}, {\bf G\+F\+I\+R2\+\_\+\+B\+Y\+P\+\_\+\+T\+X\+T\+SP}, {\bf G\+F\+I\+R2\+\_\+\+L\+\_\+\+R\+X\+T\+SP}, {\bf G\+F\+I\+R2\+\_\+\+L\+\_\+\+T\+X\+T\+SP}, {\bf G\+F\+I\+R2\+\_\+\+N\+\_\+\+R\+X\+T\+SP}, {\bf G\+F\+I\+R2\+\_\+\+N\+\_\+\+T\+X\+T\+SP}, {\bf G\+F\+I\+R3\+\_\+\+B\+Y\+P\+\_\+\+R\+X\+T\+SP}, {\bf G\+F\+I\+R3\+\_\+\+B\+Y\+P\+\_\+\+T\+X\+T\+SP}, {\bf G\+F\+I\+R3\+\_\+\+L\+\_\+\+R\+X\+T\+SP}, {\bf G\+F\+I\+R3\+\_\+\+L\+\_\+\+T\+X\+T\+SP}, {\bf G\+F\+I\+R3\+\_\+\+N\+\_\+\+R\+X\+T\+SP}, {\bf G\+F\+I\+R3\+\_\+\+N\+\_\+\+T\+X\+T\+SP}, {\bf H\+B\+D\+\_\+\+O\+V\+R\+\_\+\+R\+X\+T\+SP}, {\bf H\+B\+I\+\_\+\+O\+V\+R\+\_\+\+T\+X\+T\+SP}, {\bf i}, {\bf lms()}, {\bf L\+M\+S7\+\_\+\+L\+M\+L1\+\_\+\+S\+I\+S\+O\+D\+DR}, {\bf L\+M\+S7param}, {\bf lime\+::\+L\+M\+S7002\+M\+::\+Modify\+\_\+\+S\+P\+I\+\_\+\+Reg\+\_\+bits()}, {\bf lime\+::\+L\+M\+S7002\+M\+::\+Rx}, {\bf Select\+Channel()}, {\bf lime\+::\+L\+M\+S7002\+M\+::\+Set\+G\+F\+I\+R\+Coefficients()}, and {\bf lime\+::\+L\+M\+S7002\+M\+::\+Tx}.
+References {\bf C\+D\+S\+\_\+\+R\+X\+A\+L\+ML}, {\bf C\+D\+S\+\_\+\+R\+X\+B\+L\+ML}, {\bf C\+D\+S\+N\+\_\+\+R\+X\+A\+L\+ML}, {\bf C\+D\+S\+N\+\_\+\+R\+X\+B\+L\+ML}, {\bf coef}, {\bf Generate\+Filter()}, {\bf lime\+::\+L\+M\+S7002\+M\+::\+Get\+\_\+\+S\+P\+I\+\_\+\+Reg\+\_\+bits()}, {\bf lime\+::\+L\+M\+S7002\+M\+::\+Get\+Reference\+Clk\+\_\+\+T\+S\+P()}, {\bf G\+F\+I\+R1\+\_\+\+B\+Y\+P\+\_\+\+R\+X\+T\+SP}, {\bf G\+F\+I\+R1\+\_\+\+B\+Y\+P\+\_\+\+T\+X\+T\+SP}, {\bf G\+F\+I\+R1\+\_\+\+L\+\_\+\+R\+X\+T\+SP}, {\bf G\+F\+I\+R1\+\_\+\+L\+\_\+\+T\+X\+T\+SP}, {\bf G\+F\+I\+R1\+\_\+\+N\+\_\+\+R\+X\+T\+SP}, {\bf G\+F\+I\+R1\+\_\+\+N\+\_\+\+T\+X\+T\+SP}, {\bf G\+F\+I\+R2\+\_\+\+B\+Y\+P\+\_\+\+R\+X\+T\+SP}, {\bf G\+F\+I\+R2\+\_\+\+B\+Y\+P\+\_\+\+T\+X\+T\+SP}, {\bf G\+F\+I\+R2\+\_\+\+L\+\_\+\+R\+X\+T\+SP}, {\bf G\+F\+I\+R2\+\_\+\+L\+\_\+\+T\+X\+T\+SP}, {\bf G\+F\+I\+R2\+\_\+\+N\+\_\+\+R\+X\+T\+SP}, {\bf G\+F\+I\+R2\+\_\+\+N\+\_\+\+T\+X\+T\+SP}, {\bf G\+F\+I\+R3\+\_\+\+B\+Y\+P\+\_\+\+R\+X\+T\+SP}, {\bf G\+F\+I\+R3\+\_\+\+B\+Y\+P\+\_\+\+T\+X\+T\+SP}, {\bf G\+F\+I\+R3\+\_\+\+L\+\_\+\+R\+X\+T\+SP}, {\bf G\+F\+I\+R3\+\_\+\+L\+\_\+\+T\+X\+T\+SP}, {\bf G\+F\+I\+R3\+\_\+\+N\+\_\+\+R\+X\+T\+SP}, {\bf G\+F\+I\+R3\+\_\+\+N\+\_\+\+T\+X\+T\+SP}, {\bf H\+B\+D\+\_\+\+O\+V\+R\+\_\+\+R\+X\+T\+SP}, {\bf H\+B\+I\+\_\+\+O\+V\+R\+\_\+\+T\+X\+T\+SP}, {\bf i}, {\bf L}, {\bf lms()}, {\bf L\+M\+S7\+\_\+\+L\+M\+L1\+\_\+\+S\+I\+S\+O\+D\+DR}, {\bf L\+M\+S7param}, {\bf lime\+::\+L\+M\+S7002\+M\+::\+Modify\+\_\+\+S\+P\+I\+\_\+\+Reg\+\_\+bits()}, {\bf lime\+::\+L\+M\+S7002\+M\+::\+Rx}, {\bf Select\+Channel()}, {\bf lime\+::\+L\+M\+S7002\+M\+::\+Set\+G\+F\+I\+R\+Coefficients()}, and {\bf lime\+::\+L\+M\+S7002\+M\+::\+Tx}.
 
 
 
@@ -403,7 +407,7 @@ References {\bf connection}, {\bf device}, {\bf lime\+::\+Connection\+Registry\+
 
 
 
-Referenced by {\bf L\+M\+S\+\_\+\+Open()}, {\bf main()}, and {\bf dlg\+Connection\+Settings\+::\+On\+Connect()}.
+Referenced by {\bf Lime\+S\+D\+R\+Test\+::\+Connect()}, {\bf L\+M\+S\+\_\+\+Open()}, {\bf main()}, and {\bf dlg\+Connection\+Settings\+::\+On\+Connect()}.
 
 
 
@@ -567,6 +571,68 @@ Here is the caller graph for this function\+:
 \end{figure}
 
 
+\index{lime\+::\+L\+M\+S7\+\_\+\+Device@{lime\+::\+L\+M\+S7\+\_\+\+Device}!Get\+Chirp\+Time\+Period@{Get\+Chirp\+Time\+Period}}
+\index{Get\+Chirp\+Time\+Period@{Get\+Chirp\+Time\+Period}!lime\+::\+L\+M\+S7\+\_\+\+Device@{lime\+::\+L\+M\+S7\+\_\+\+Device}}
+\paragraph[{Get\+Chirp\+Time\+Period(void) const }]{\setlength{\rightskip}{0pt plus 5cm}uint64\+\_\+t lime\+::\+L\+M\+S7\+\_\+\+Device\+::\+Get\+Chirp\+Time\+Period (
+\begin{DoxyParamCaption}
+\item[{{\bf void}}]{}
+\end{DoxyParamCaption}
+) const}\label{classlime_1_1LMS7__Device_ac9c8d4fbe209aa5b3014249042566c97}
+
+
+Definition at line {\bf 1790} of file {\bf lms7\+\_\+device.\+cpp}.
+
+
+
+References {\bf m\+Streamers}.
+
+
+
+Referenced by {\bf Soapy\+L\+M\+S7\+::read\+Sensor()}.
+
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=349pt]{d3/d22/classlime_1_1LMS7__Device_ac9c8d4fbe209aa5b3014249042566c97_icgraph}
+\end{center}
+\end{figure}
+
+
+\index{lime\+::\+L\+M\+S7\+\_\+\+Device@{lime\+::\+L\+M\+S7\+\_\+\+Device}!Get\+Chirp\+Time\+Stamp@{Get\+Chirp\+Time\+Stamp}}
+\index{Get\+Chirp\+Time\+Stamp@{Get\+Chirp\+Time\+Stamp}!lime\+::\+L\+M\+S7\+\_\+\+Device@{lime\+::\+L\+M\+S7\+\_\+\+Device}}
+\paragraph[{Get\+Chirp\+Time\+Stamp(void) const }]{\setlength{\rightskip}{0pt plus 5cm}uint64\+\_\+t lime\+::\+L\+M\+S7\+\_\+\+Device\+::\+Get\+Chirp\+Time\+Stamp (
+\begin{DoxyParamCaption}
+\item[{{\bf void}}]{}
+\end{DoxyParamCaption}
+) const}\label{classlime_1_1LMS7__Device_a511ae131bb8f9907bc4162a01324eb18}
+
+
+Definition at line {\bf 1795} of file {\bf lms7\+\_\+device.\+cpp}.
+
+
+
+References {\bf m\+Streamers}.
+
+
+
+Referenced by {\bf Soapy\+L\+M\+S7\+::read\+Sensor()}.
+
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=349pt]{d3/d22/classlime_1_1LMS7__Device_a511ae131bb8f9907bc4162a01324eb18_icgraph}
+\end{center}
+\end{figure}
+
+
 \index{lime\+::\+L\+M\+S7\+\_\+\+Device@{lime\+::\+L\+M\+S7\+\_\+\+Device}!Get\+Clock\+Freq@{Get\+Clock\+Freq}}
 \index{Get\+Clock\+Freq@{Get\+Clock\+Freq}!lime\+::\+L\+M\+S7\+\_\+\+Device@{lime\+::\+L\+M\+S7\+\_\+\+Device}}
 \paragraph[{Get\+Clock\+Freq(unsigned clk\+\_\+id, int channel=-\/1) const }]{\setlength{\rightskip}{0pt plus 5cm}double lime\+::\+L\+M\+S7\+\_\+\+Device\+::\+Get\+Clock\+Freq (
@@ -659,7 +725,7 @@ References {\bf lime\+::\+Connection\+Registry\+::find\+Connections()}.
 
 
 
-Referenced by {\bf dlg\+Connection\+Settings\+::\+On\+Connect()}.
+Referenced by {\bf Lime\+S\+D\+R\+Test\+::\+Check\+Device()}, {\bf Lime\+S\+D\+R\+Test\+::\+Connect()}, and {\bf dlg\+Connection\+Settings\+::\+On\+Connect()}.
 
 
 
@@ -680,7 +746,7 @@ Here is the caller graph for this function\+:
 \begin{figure}[H]
 \begin{center}
 \leavevmode
-\includegraphics[width=339pt]{d3/d22/classlime_1_1LMS7__Device_a49bc5e1f4dd610633474c5906d2e28a4_icgraph}
+\includegraphics[width=350pt]{d3/d22/classlime_1_1LMS7__Device_a49bc5e1f4dd610633474c5906d2e28a4_icgraph}
 \end{center}
 \end{figure}
 
@@ -797,7 +863,7 @@ Here is the caller graph for this function\+:
 \begin{DoxyParamCaption}
 \item[{bool}]{dir\+\_\+tx, }
 \item[{unsigned}]{chan, }
-\item[{const std\+::string \&}]{name = {\ttfamily \char`\"{}\char`\"{}}}
+\item[{const {\bf std\+::string} \&}]{name = {\ttfamily \char`\"{}\char`\"{}}}
 \end{DoxyParamCaption}
 ) const}\label{classlime_1_1LMS7__Device_a88c6a8b6a14b1e4151c34d2559c4e08c}
 
@@ -842,7 +908,7 @@ Here is the caller graph for this function\+:
 \begin{DoxyParamCaption}
 \item[{bool}]{dir\+\_\+tx, }
 \item[{unsigned}]{chan, }
-\item[{const std\+::string \&}]{name = {\ttfamily \char`\"{}\char`\"{}}}
+\item[{const {\bf std\+::string} \&}]{name = {\ttfamily \char`\"{}\char`\"{}}}
 \end{DoxyParamCaption}
 ) const}\label{classlime_1_1LMS7__Device_ad16dabbfcb8ddb30c6817b720c5fcceb}
 
@@ -1243,7 +1309,7 @@ Here is the caller graph for this function\+:
 
 \index{lime\+::\+L\+M\+S7\+\_\+\+Device@{lime\+::\+L\+M\+S7\+\_\+\+Device}!Get\+Path\+Names@{Get\+Path\+Names}}
 \index{Get\+Path\+Names@{Get\+Path\+Names}!lime\+::\+L\+M\+S7\+\_\+\+Device@{lime\+::\+L\+M\+S7\+\_\+\+Device}}
-\paragraph[{Get\+Path\+Names(bool dir\+\_\+tx, unsigned chan=0) const }]{\setlength{\rightskip}{0pt plus 5cm}{\bf std\+::vector}$<$ std\+::string $>$ lime\+::\+L\+M\+S7\+\_\+\+Device\+::\+Get\+Path\+Names (
+\paragraph[{Get\+Path\+Names(bool dir\+\_\+tx, unsigned chan=0) const }]{\setlength{\rightskip}{0pt plus 5cm}{\bf std\+::vector}$<$ {\bf std\+::string} $>$ lime\+::\+L\+M\+S7\+\_\+\+Device\+::\+Get\+Path\+Names (
 \begin{DoxyParamCaption}
 \item[{bool}]{dir\+\_\+tx, }
 \item[{unsigned}]{chan = {\ttfamily 0}}
@@ -1275,7 +1341,7 @@ Here is the caller graph for this function\+:
 
 \index{lime\+::\+L\+M\+S7\+\_\+\+Device@{lime\+::\+L\+M\+S7\+\_\+\+Device}!Get\+Program\+Modes@{Get\+Program\+Modes}}
 \index{Get\+Program\+Modes@{Get\+Program\+Modes}!lime\+::\+L\+M\+S7\+\_\+\+Device@{lime\+::\+L\+M\+S7\+\_\+\+Device}}
-\paragraph[{Get\+Program\+Modes() const }]{\setlength{\rightskip}{0pt plus 5cm}{\bf std\+::vector}$<$ std\+::string $>$ lime\+::\+L\+M\+S7\+\_\+\+Device\+::\+Get\+Program\+Modes (
+\paragraph[{Get\+Program\+Modes() const }]{\setlength{\rightskip}{0pt plus 5cm}{\bf std\+::vector}$<$ {\bf std\+::string} $>$ lime\+::\+L\+M\+S7\+\_\+\+Device\+::\+Get\+Program\+Modes (
 \begin{DoxyParamCaption}
 {}
 \end{DoxyParamCaption}
@@ -1605,7 +1671,7 @@ Here is the caller graph for this function\+:
 )}\label{classlime_1_1LMS7__Device_a70242eef5ae99ec50bb737c8cff52a48}
 
 
-Definition at line {\bf 1790} of file {\bf lms7\+\_\+device.\+cpp}.
+Definition at line {\bf 1800} of file {\bf lms7\+\_\+device.\+cpp}.
 
 
 
@@ -1648,7 +1714,7 @@ Here is the caller graph for this function\+:
 )}\label{classlime_1_1LMS7__Device_af10c725852e206616ed8f6ee5aebc4fe}
 
 
-Definition at line {\bf 1814} of file {\bf lms7\+\_\+device.\+cpp}.
+Definition at line {\bf 1824} of file {\bf lms7\+\_\+device.\+cpp}.
 
 
 
@@ -1686,7 +1752,7 @@ Here is the caller graph for this function\+:
 \index{Program@{Program}!lime\+::\+L\+M\+S7\+\_\+\+Device@{lime\+::\+L\+M\+S7\+\_\+\+Device}}
 \paragraph[{Program(const std\+::string \&mode, const char $\ast$data, size\+\_\+t len, lime\+::\+I\+Connection\+::\+Programming\+Callback callback) const }]{\setlength{\rightskip}{0pt plus 5cm}{\bf int} lime\+::\+L\+M\+S7\+\_\+\+Device\+::\+Program (
 \begin{DoxyParamCaption}
-\item[{const std\+::string \&}]{mode, }
+\item[{const {\bf std\+::string} \&}]{mode, }
 \item[{const char $\ast$}]{data, }
 \item[{size\+\_\+t}]{len, }
 \item[{{\bf lime\+::\+I\+Connection\+::\+Programming\+Callback}}]{callback}
@@ -1801,7 +1867,7 @@ Here is the caller graph for this function\+:
 \index{Read\+Param@{Read\+Param}!lime\+::\+L\+M\+S7\+\_\+\+Device@{lime\+::\+L\+M\+S7\+\_\+\+Device}}
 \paragraph[{Read\+Param(const std\+::string \&param, int channel=-\/1, bool force\+Read\+From\+Chip=false) const }]{\setlength{\rightskip}{0pt plus 5cm}{\bf int} lime\+::\+L\+M\+S7\+\_\+\+Device\+::\+Read\+Param (
 \begin{DoxyParamCaption}
-\item[{const std\+::string \&}]{param, }
+\item[{const {\bf std\+::string} \&}]{param, }
 \item[{{\bf int}}]{channel = {\ttfamily -\/1}, }
 \item[{bool}]{force\+Read\+From\+Chip = {\ttfamily false}}
 \end{DoxyParamCaption}
@@ -1939,7 +2005,7 @@ Here is the caller graph for this function\+:
 \begin{figure}[H]
 \begin{center}
 \leavevmode
-\includegraphics[height=550pt]{d3/d22/classlime_1_1LMS7__Device_a4ac84063a505d3686527f8ffc28bb9d7_icgraph}
+\includegraphics[width=350pt]{d3/d22/classlime_1_1LMS7__Device_a4ac84063a505d3686527f8ffc28bb9d7_icgraph}
 \end{center}
 \end{figure}
 
@@ -1990,7 +2056,7 @@ References {\bf connection}, {\bf lime\+::\+I\+Connection\+::\+Custom\+Parameter
 
 
 
-Referenced by {\bf L\+M\+S\+\_\+\+Set\+Clock\+Freq()}, {\bf Soapy\+L\+M\+S7\+::set\+Frequency()}, and {\bf Soapy\+L\+M\+S7\+::set\+Master\+Clock\+Rate()}.
+Referenced by {\bf Soapy\+L\+M\+S7\+::get\+Frequency\+Args\+Info()}, {\bf L\+M\+S\+\_\+\+Set\+Clock\+Freq()}, and {\bf Soapy\+L\+M\+S7\+::set\+Master\+Clock\+Rate()}.
 
 
 
@@ -2085,7 +2151,7 @@ References {\bf chan}, {\bf lime\+::\+L\+M\+S7002\+M\+::\+Enable\+S\+X\+T\+D\+D(
 
 
 
-Referenced by {\bf Init()}, {\bf L\+M\+S\+\_\+\+Set\+L\+O\+Frequency()}, and {\bf Soapy\+L\+M\+S7\+::set\+Frequency()}.
+Referenced by {\bf Soapy\+L\+M\+S7\+::get\+Frequency\+Args\+Info()}, {\bf Init()}, and {\bf L\+M\+S\+\_\+\+Set\+L\+O\+Frequency()}.
 
 
 
@@ -2118,7 +2184,7 @@ Here is the caller graph for this function\+:
 \item[{bool}]{dir\+\_\+tx, }
 \item[{unsigned}]{chan, }
 \item[{double}]{value, }
-\item[{const std\+::string \&}]{name = {\ttfamily \char`\"{}\char`\"{}}}
+\item[{const {\bf std\+::string} \&}]{name = {\ttfamily \char`\"{}\char`\"{}}}
 \end{DoxyParamCaption}
 )}\label{classlime_1_1LMS7__Device_a25b87ce1ece61a3bd884b2f01af3bd3e}
 
@@ -2220,7 +2286,7 @@ Definition at line {\bf 795} of file {\bf lms7\+\_\+device.\+cpp}.
 
 
 
-References {\bf lime\+::\+L\+M\+S7002\+M\+::\+Get\+\_\+\+S\+P\+I\+\_\+\+Reg\+\_\+bits()}, {\bf lime\+::\+L\+M\+S7002\+M\+::\+Get\+Reference\+Clk\+\_\+\+T\+S\+P()}, {\bf G\+F\+I\+R1\+\_\+\+L\+\_\+\+R\+X\+T\+SP}, {\bf G\+F\+I\+R1\+\_\+\+L\+\_\+\+T\+X\+T\+SP}, {\bf G\+F\+I\+R1\+\_\+\+N\+\_\+\+R\+X\+T\+SP}, {\bf G\+F\+I\+R1\+\_\+\+N\+\_\+\+T\+X\+T\+SP}, {\bf G\+F\+I\+R2\+\_\+\+L\+\_\+\+R\+X\+T\+SP}, {\bf G\+F\+I\+R2\+\_\+\+L\+\_\+\+T\+X\+T\+SP}, {\bf G\+F\+I\+R2\+\_\+\+N\+\_\+\+R\+X\+T\+SP}, {\bf G\+F\+I\+R2\+\_\+\+N\+\_\+\+T\+X\+T\+SP}, {\bf G\+F\+I\+R3\+\_\+\+L\+\_\+\+R\+X\+T\+SP}, {\bf G\+F\+I\+R3\+\_\+\+L\+\_\+\+T\+X\+T\+SP}, {\bf G\+F\+I\+R3\+\_\+\+N\+\_\+\+R\+X\+T\+SP}, {\bf G\+F\+I\+R3\+\_\+\+N\+\_\+\+T\+X\+T\+SP}, {\bf H\+B\+D\+\_\+\+O\+V\+R\+\_\+\+R\+X\+T\+SP}, {\bf H\+B\+I\+\_\+\+O\+V\+R\+\_\+\+T\+X\+T\+SP}, {\bf i}, {\bf lms()}, {\bf L\+M\+S7param}, {\bf L\+M\+S\+\_\+\+G\+F\+I\+R1}, {\bf L\+M\+S\+\_\+\+G\+F\+I\+R2}, {\bf L\+M\+S\+\_\+\+G\+F\+I\+R3}, {\bf lime\+::\+L\+M\+S7002\+M\+::\+Modify\+\_\+\+S\+P\+I\+\_\+\+Reg\+\_\+bits()}, {\bf lime\+::\+Report\+Error()}, {\bf lime\+::\+L\+M\+S7002\+M\+::\+Rx}, {\bf Select\+Channel()}, {\bf lime\+::\+L\+M\+S7002\+M\+::\+Set\+G\+F\+I\+R\+Coefficients()}, {\bf lime\+::\+L\+M\+S7002\+M\+::\+Tx}, and {\bf lime\+::warning()}.
+References {\bf lime\+::\+L\+M\+S7002\+M\+::\+Get\+\_\+\+S\+P\+I\+\_\+\+Reg\+\_\+bits()}, {\bf lime\+::\+L\+M\+S7002\+M\+::\+Get\+Reference\+Clk\+\_\+\+T\+S\+P()}, {\bf G\+F\+I\+R1\+\_\+\+L\+\_\+\+R\+X\+T\+SP}, {\bf G\+F\+I\+R1\+\_\+\+L\+\_\+\+T\+X\+T\+SP}, {\bf G\+F\+I\+R1\+\_\+\+N\+\_\+\+R\+X\+T\+SP}, {\bf G\+F\+I\+R1\+\_\+\+N\+\_\+\+T\+X\+T\+SP}, {\bf G\+F\+I\+R2\+\_\+\+L\+\_\+\+R\+X\+T\+SP}, {\bf G\+F\+I\+R2\+\_\+\+L\+\_\+\+T\+X\+T\+SP}, {\bf G\+F\+I\+R2\+\_\+\+N\+\_\+\+R\+X\+T\+SP}, {\bf G\+F\+I\+R2\+\_\+\+N\+\_\+\+T\+X\+T\+SP}, {\bf G\+F\+I\+R3\+\_\+\+L\+\_\+\+R\+X\+T\+SP}, {\bf G\+F\+I\+R3\+\_\+\+L\+\_\+\+T\+X\+T\+SP}, {\bf G\+F\+I\+R3\+\_\+\+N\+\_\+\+R\+X\+T\+SP}, {\bf G\+F\+I\+R3\+\_\+\+N\+\_\+\+T\+X\+T\+SP}, {\bf H\+B\+D\+\_\+\+O\+V\+R\+\_\+\+R\+X\+T\+SP}, {\bf H\+B\+I\+\_\+\+O\+V\+R\+\_\+\+T\+X\+T\+SP}, {\bf i}, {\bf L}, {\bf lms()}, {\bf L\+M\+S7param}, {\bf L\+M\+S\+\_\+\+G\+F\+I\+R1}, {\bf L\+M\+S\+\_\+\+G\+F\+I\+R2}, {\bf L\+M\+S\+\_\+\+G\+F\+I\+R3}, {\bf lime\+::\+L\+M\+S7002\+M\+::\+Modify\+\_\+\+S\+P\+I\+\_\+\+Reg\+\_\+bits()}, {\bf lime\+::\+Report\+Error()}, {\bf lime\+::\+L\+M\+S7002\+M\+::\+Rx}, {\bf Select\+Channel()}, {\bf lime\+::\+L\+M\+S7002\+M\+::\+Set\+G\+F\+I\+R\+Coefficients()}, {\bf lime\+::\+L\+M\+S7002\+M\+::\+Tx}, and {\bf lime\+::warning()}.
 
 
 
@@ -2362,7 +2428,7 @@ References {\bf enable}, {\bf lime\+::\+L\+M\+S7002\+M\+::\+Get\+\_\+\+S\+P\+I\+
 
 
 
-Referenced by {\bf L\+M\+S\+\_\+\+Set\+N\+C\+O\+Frequency()}, {\bf L\+M\+S\+\_\+\+Set\+N\+C\+O\+Phase()}, {\bf lime\+::\+L\+M\+S7\+\_\+\+Lime\+S\+D\+R\+\_\+mini\+::\+Set\+Frequency()}, {\bf Set\+Frequency()}, {\bf Soapy\+L\+M\+S7\+::set\+Frequency()}, and {\bf Set\+Rate()}.
+Referenced by {\bf Soapy\+L\+M\+S7\+::get\+Frequency\+Args\+Info()}, {\bf L\+M\+S\+\_\+\+Set\+N\+C\+O\+Frequency()}, {\bf L\+M\+S\+\_\+\+Set\+N\+C\+O\+Phase()}, {\bf lime\+::\+L\+M\+S7\+\_\+\+Lime\+S\+D\+R\+\_\+mini\+::\+Set\+Frequency()}, {\bf Set\+Frequency()}, and {\bf Set\+Rate()}.
 
 
 
@@ -2847,7 +2913,7 @@ Here is the caller graph for this function\+:
 \index{Write\+Param@{Write\+Param}!lime\+::\+L\+M\+S7\+\_\+\+Device@{lime\+::\+L\+M\+S7\+\_\+\+Device}}
 \paragraph[{Write\+Param(const std\+::string \&param, uint16\+\_\+t val, int channel=-\/1)}]{\setlength{\rightskip}{0pt plus 5cm}{\bf int} lime\+::\+L\+M\+S7\+\_\+\+Device\+::\+Write\+Param (
 \begin{DoxyParamCaption}
-\item[{const std\+::string \&}]{param, }
+\item[{const {\bf std\+::string} \&}]{param, }
 \item[{uint16\+\_\+t}]{val, }
 \item[{{\bf int}}]{channel = {\ttfamily -\/1}}
 \end{DoxyParamCaption}
@@ -2880,7 +2946,7 @@ Here is the call graph for this function\+:
 \paragraph[{connection}]{\setlength{\rightskip}{0pt plus 5cm}{\bf lime\+::\+I\+Connection}$\ast$ lime\+::\+L\+M\+S7\+\_\+\+Device\+::connection\hspace{0.3cm}{\ttfamily [protected]}}\label{classlime_1_1LMS7__Device_affa276346d677057fa14dd722a1659df}
 
 
-Definition at line {\bf 113} of file {\bf lms7\+\_\+device.\+h}.
+Definition at line {\bf 115} of file {\bf lms7\+\_\+device.\+h}.
 
 
 
@@ -2891,7 +2957,7 @@ Referenced by {\bf Create\+Device()}, {\bf Get\+Connection()}, {\bf Get\+Info()}
 \paragraph[{dev\+Info}]{\setlength{\rightskip}{0pt plus 5cm}{\bf lms\+\_\+dev\+\_\+info\+\_\+t} lime\+::\+L\+M\+S7\+\_\+\+Device\+::dev\+Info\hspace{0.3cm}{\ttfamily [protected]}}\label{classlime_1_1LMS7__Device_ad49aea40f67f6c459e80858b38911725}
 
 
-Definition at line {\bf 110} of file {\bf lms7\+\_\+device.\+h}.
+Definition at line {\bf 112} of file {\bf lms7\+\_\+device.\+h}.
 
 
 
@@ -2902,7 +2968,7 @@ Referenced by {\bf Get\+Info()}.
 \paragraph[{fpga}]{\setlength{\rightskip}{0pt plus 5cm}{\bf lime\+::\+F\+P\+GA}$\ast$ lime\+::\+L\+M\+S7\+\_\+\+Device\+::fpga\hspace{0.3cm}{\ttfamily [protected]}}\label{classlime_1_1LMS7__Device_a62c78707b87c98f21f65ab10d67d9c54}
 
 
-Definition at line {\bf 119} of file {\bf lms7\+\_\+device.\+h}.
+Definition at line {\bf 121} of file {\bf lms7\+\_\+device.\+h}.
 
 
 
@@ -2913,7 +2979,7 @@ Referenced by {\bf Get\+F\+P\+G\+A()}, {\bf lime\+::\+L\+M\+S7\+\_\+\+Generic\+:
 \paragraph[{lms\+\_\+chip\+\_\+id}]{\setlength{\rightskip}{0pt plus 5cm}unsigned lime\+::\+L\+M\+S7\+\_\+\+Device\+::lms\+\_\+chip\+\_\+id\hspace{0.3cm}{\ttfamily [protected]}}\label{classlime_1_1LMS7__Device_a7f31f92492535e8afc8448572af0ad98}
 
 
-Definition at line {\bf 117} of file {\bf lms7\+\_\+device.\+h}.
+Definition at line {\bf 119} of file {\bf lms7\+\_\+device.\+h}.
 
 
 
@@ -2924,7 +2990,7 @@ Referenced by {\bf Get\+Chip\+Temperature()}, {\bf Get\+Clock\+Freq()}, {\bf Get
 \paragraph[{lms\+\_\+list}]{\setlength{\rightskip}{0pt plus 5cm}{\bf std\+::vector}$<${\bf lime\+::\+L\+M\+S7002M}$\ast$$>$ lime\+::\+L\+M\+S7\+\_\+\+Device\+::lms\+\_\+list\hspace{0.3cm}{\ttfamily [protected]}}\label{classlime_1_1LMS7__Device_aca43b626eca04327c82855eb599879e3}
 
 
-Definition at line {\bf 114} of file {\bf lms7\+\_\+device.\+h}.
+Definition at line {\bf 116} of file {\bf lms7\+\_\+device.\+h}.
 
 
 
@@ -2935,18 +3001,18 @@ Referenced by {\bf Enable\+Calib\+Cache()}, {\bf Get\+Chip\+Temperature()}, {\bf
 \paragraph[{m\+Streamers}]{\setlength{\rightskip}{0pt plus 5cm}{\bf std\+::vector}$<${\bf lime\+::\+Streamer}$\ast$$>$ lime\+::\+L\+M\+S7\+\_\+\+Device\+::m\+Streamers\hspace{0.3cm}{\ttfamily [protected]}}\label{classlime_1_1LMS7__Device_af66ac073b20d98cbc60129b33caa18d0}
 
 
-Definition at line {\bf 118} of file {\bf lms7\+\_\+device.\+h}.
+Definition at line {\bf 120} of file {\bf lms7\+\_\+device.\+h}.
 
 
 
-Referenced by {\bf Get\+Hardware\+Timestamp()}, {\bf lime\+::\+L\+M\+S7\+\_\+\+Generic\+::\+L\+M\+S7\+\_\+\+Generic()}, {\bf lime\+::\+L\+M\+S7\+\_\+\+Lime\+S\+D\+R\+\_\+mini\+::\+L\+M\+S7\+\_\+\+Lime\+S\+D\+R\+\_\+mini()}, {\bf lime\+::\+L\+M\+S7\+\_\+q\+Lime\+S\+D\+R\+::\+L\+M\+S7\+\_\+q\+Lime\+S\+D\+R()}, {\bf Set\+Hardware\+Timestamp()}, {\bf Setup\+Stream()}, and {\bf $\sim$\+L\+M\+S7\+\_\+\+Device()}.
+Referenced by {\bf Get\+Chirp\+Time\+Period()}, {\bf Get\+Chirp\+Time\+Stamp()}, {\bf Get\+Hardware\+Timestamp()}, {\bf lime\+::\+L\+M\+S7\+\_\+\+Generic\+::\+L\+M\+S7\+\_\+\+Generic()}, {\bf lime\+::\+L\+M\+S7\+\_\+\+Lime\+S\+D\+R\+\_\+mini\+::\+L\+M\+S7\+\_\+\+Lime\+S\+D\+R\+\_\+mini()}, {\bf lime\+::\+L\+M\+S7\+\_\+q\+Lime\+S\+D\+R\+::\+L\+M\+S7\+\_\+q\+Lime\+S\+D\+R()}, {\bf Set\+Hardware\+Timestamp()}, {\bf Setup\+Stream()}, and {\bf $\sim$\+L\+M\+S7\+\_\+\+Device()}.
 
 \index{lime\+::\+L\+M\+S7\+\_\+\+Device@{lime\+::\+L\+M\+S7\+\_\+\+Device}!rx\+\_\+channels@{rx\+\_\+channels}}
 \index{rx\+\_\+channels@{rx\+\_\+channels}!lime\+::\+L\+M\+S7\+\_\+\+Device@{lime\+::\+L\+M\+S7\+\_\+\+Device}}
 \paragraph[{rx\+\_\+channels}]{\setlength{\rightskip}{0pt plus 5cm}{\bf std\+::vector}$<${\bf Channel\+Info}$>$ lime\+::\+L\+M\+S7\+\_\+\+Device\+::rx\+\_\+channels\hspace{0.3cm}{\ttfamily [protected]}}\label{classlime_1_1LMS7__Device_a385233df6fad36c82ba5a990ac403fb9}
 
 
-Definition at line {\bf 112} of file {\bf lms7\+\_\+device.\+h}.
+Definition at line {\bf 114} of file {\bf lms7\+\_\+device.\+h}.
 
 
 
@@ -2957,7 +3023,7 @@ Referenced by {\bf Enable\+Channel()}, {\bf Get\+Frequency()}, {\bf Get\+L\+P\+F
 \paragraph[{tx\+\_\+channels}]{\setlength{\rightskip}{0pt plus 5cm}{\bf std\+::vector}$<${\bf Channel\+Info}$>$ lime\+::\+L\+M\+S7\+\_\+\+Device\+::tx\+\_\+channels\hspace{0.3cm}{\ttfamily [protected]}}\label{classlime_1_1LMS7__Device_a1df9ab63073d1d7ecf26388bfb14259f}
 
 
-Definition at line {\bf 111} of file {\bf lms7\+\_\+device.\+h}.
+Definition at line {\bf 113} of file {\bf lms7\+\_\+device.\+h}.
 
 
 

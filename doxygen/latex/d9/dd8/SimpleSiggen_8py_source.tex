@@ -1,0 +1,120 @@
+\subsection{Simple\+Siggen.\+py}
+\label{SimpleSiggen_8py_source}\index{/home/erik/prefix/default/src/soapysdr/python/apps/\+Simple\+Siggen.\+py@{/home/erik/prefix/default/src/soapysdr/python/apps/\+Simple\+Siggen.\+py}}
+
+\begin{DoxyCode}
+00001 \textcolor{comment}{########################################################################}
+00002 \textcolor{comment}{## Simple signal generator for testing transmit}
+00003 \textcolor{comment}{########################################################################}
+00004 
+00005 \textcolor{keyword}{import} SoapySDR
+00006 \textcolor{keyword}{from} SoapySDR \textcolor{keyword}{import} * \textcolor{comment}{#SOAPY\_SDR\_ constants}
+00007 \textcolor{keyword}{import} numpy \textcolor{keyword}{as} np
+00008 \textcolor{keyword}{from} optparse \textcolor{keyword}{import} OptionParser
+00009 \textcolor{keyword}{import} time
+00010 \textcolor{keyword}{import} os
+00011 \textcolor{keyword}{import} math
+00012 
+00013 \textcolor{keyword}{def }siggen_app(
+00014     args,
+00015     rate,
+00016     ampl=0.7,
+00017     freq=\textcolor{keywordtype}{None},
+00018     txBw=\textcolor{keywordtype}{None},
+00019     txChan=0,
+00020     rxChan=0,
+00021     txGain=\textcolor{keywordtype}{None},
+00022     txAnt=\textcolor{keywordtype}{None},
+00023     clockRate=\textcolor{keywordtype}{None},
+00024     waveFreq=\textcolor{keywordtype}{None}
+00025 ):
+00026     \textcolor{keywordflow}{if} waveFreq \textcolor{keywordflow}{is} \textcolor{keywordtype}{None}: waveFreq = rate/10
+00027 
+00028     sdr = SoapySDR.Device(args)
+00029     \textcolor{comment}{#set clock rate first}
+00030     \textcolor{keywordflow}{if} clockRate \textcolor{keywordflow}{is} \textcolor{keywordflow}{not} \textcolor{keywordtype}{None}: sdr.setMasterClockRate(clockRate)
+00031 
+00032     \textcolor{comment}{#set sample rate}
+00033     sdr.setSampleRate(SOAPY\_SDR\_TX, txChan, rate)
+00034     print(\textcolor{stringliteral}{"Actual Tx Rate %f Msps"}%(sdr.getSampleRate(SOAPY\_SDR\_TX, txChan)/1e6))
+00035 
+00036     \textcolor{comment}{#set bandwidth}
+00037     \textcolor{keywordflow}{if} txBw \textcolor{keywordflow}{is} \textcolor{keywordflow}{not} \textcolor{keywordtype}{None}: sdr.setBandwidth(SOAPY\_SDR\_TX, txChan, txBw)
+00038 
+00039     \textcolor{comment}{#set antenna}
+00040     print(\textcolor{stringliteral}{"Set the antenna"})
+00041     \textcolor{keywordflow}{if} txAnt \textcolor{keywordflow}{is} \textcolor{keywordflow}{not} \textcolor{keywordtype}{None}: sdr.setAntenna(SOAPY\_SDR\_TX, txChan, txAnt)
+00042 
+00043     \textcolor{comment}{#set overall gain}
+00044     print(\textcolor{stringliteral}{"Set the gain"})
+00045     \textcolor{keywordflow}{if} txGain \textcolor{keywordflow}{is} \textcolor{keywordflow}{not} \textcolor{keywordtype}{None}: sdr.setGain(SOAPY\_SDR\_TX, txChan, txGain)
+00046 
+00047     \textcolor{comment}{#tune frontends}
+00048     print(\textcolor{stringliteral}{"Tune the frontend"})
+00049     \textcolor{keywordflow}{if} freq \textcolor{keywordflow}{is} \textcolor{keywordflow}{not} \textcolor{keywordtype}{None}: sdr.setFrequency(SOAPY\_SDR\_TX, txChan, freq)
+00050 
+00051     \textcolor{comment}{#tx loop}
+00052     \textcolor{comment}{#create tx stream}
+00053     print(\textcolor{stringliteral}{"Create Tx stream"})
+00054     txStream = sdr.setupStream(SOAPY\_SDR\_TX, \textcolor{stringliteral}{"CF32"}, [txChan])
+00055     print(\textcolor{stringliteral}{"Activate Tx Stream"})
+00056     sdr.activateStream(txStream)
+00057     phaseAcc = 0
+00058     phaseInc = 2*math.pi*waveFreq/rate
+00059     streamMTU = sdr.getStreamMTU(txStream)
+00060     sampsCh0 = np.array([ampl]*streamMTU, np.complex64)
+00061     
+00062     timeLastPrint = time.time()
+00063     totalSamps = 0
+00064     \textcolor{keywordflow}{while} \textcolor{keyword}{True}:
+00065         phaseAccNext = phaseAcc + streamMTU*phaseInc
+00066         sampsCh0 = ampl*np.exp(1j*np.linspace(phaseAcc, phaseAccNext, streamMTU)).astype(np.complex64)
+00067         phaseAcc = phaseAccNext
+00068         \textcolor{keywordflow}{while} phaseAcc > math.pi*2: phaseAcc -= math.pi*2
+00069 
+00070         sr = sdr.writeStream(txStream, [sampsCh0], sampsCh0.size, timeoutUs=1000000)
+00071         \textcolor{keywordflow}{if} sr.ret != sampsCh0.size:
+00072             \textcolor{keywordflow}{raise} Exception(\textcolor{stringliteral}{"Expected writeStream() to consume all samples! %d"}%sr.ret)
+00073         totalSamps += sr.ret
+00074 
+00075         \textcolor{keywordflow}{if} time.time() > timeLastPrint + 5.0:
+00076             print(\textcolor{stringliteral}{"Python siggen rate: %f Msps"}%(totalSamps/(time.time()-timeLastPrint)/1e6))
+00077             totalSamps = 0
+00078             timeLastPrint = time.time()
+00079 
+00080     \textcolor{comment}{#cleanup streams}
+00081     print(\textcolor{stringliteral}{"Cleanup stream"})
+00082     sdr.deactivateStream(txStream)
+00083     sdr.closeStream(txStream)
+00084     print(\textcolor{stringliteral}{"Done!"})
+00085 
+00086 \textcolor{keyword}{def }main():
+00087     parser = OptionParser()
+00088     parser.add\_option(\textcolor{stringliteral}{"--args"}, type=\textcolor{stringliteral}{"string"}, dest=\textcolor{stringliteral}{"args"}, help=\textcolor{stringliteral}{"device factor arguments"}, default=\textcolor{stringliteral}{""})
+00089     parser.add\_option(\textcolor{stringliteral}{"--rate"}, type=\textcolor{stringliteral}{"float"}, dest=\textcolor{stringliteral}{"rate"}, help=\textcolor{stringliteral}{"Tx and Rx sample rate"}, default=1e6)
+00090     parser.add\_option(\textcolor{stringliteral}{"--ampl"}, type=\textcolor{stringliteral}{"float"}, dest=\textcolor{stringliteral}{"ampl"}, help=\textcolor{stringliteral}{"Tx digital amplitude rate"}, default=0.7)
+00091     parser.add\_option(\textcolor{stringliteral}{"--txAnt"}, type=\textcolor{stringliteral}{"string"}, dest=\textcolor{stringliteral}{"txAnt"}, help=\textcolor{stringliteral}{"Optional Tx antenna"}, default=\textcolor{keywordtype}{None})
+00092     parser.add\_option(\textcolor{stringliteral}{"--txGain"}, type=\textcolor{stringliteral}{"float"}, dest=\textcolor{stringliteral}{"txGain"}, help=\textcolor{stringliteral}{"Optional Tx gain (dB)"}, default=\textcolor{keywordtype}{None})
+00093     parser.add\_option(\textcolor{stringliteral}{"--txChan"}, type=\textcolor{stringliteral}{"int"}, dest=\textcolor{stringliteral}{"txChan"}, help=\textcolor{stringliteral}{"Transmitter channel (def=0)"}, default=0)
+00094     parser.add\_option(\textcolor{stringliteral}{"--freq"}, type=\textcolor{stringliteral}{"float"}, dest=\textcolor{stringliteral}{"freq"}, help=\textcolor{stringliteral}{"Optional Tx and Rx freq (Hz)"}, default=\textcolor{keywordtype}{
+      None})
+00095     parser.add\_option(\textcolor{stringliteral}{"--txBw"}, type=\textcolor{stringliteral}{"float"}, dest=\textcolor{stringliteral}{"txBw"}, help=\textcolor{stringliteral}{"Optional Tx filter bw (Hz)"}, default=\textcolor{keywordtype}{None})
+00096     parser.add\_option(\textcolor{stringliteral}{"--waveFreq"}, type=\textcolor{stringliteral}{"float"}, dest=\textcolor{stringliteral}{"waveFreq"}, help=\textcolor{stringliteral}{"Baseband waveform freq (Hz)"}, 
+      default=\textcolor{keywordtype}{None})
+00097     parser.add\_option(\textcolor{stringliteral}{"--clockRate"}, type=\textcolor{stringliteral}{"float"}, dest=\textcolor{stringliteral}{"clockRate"}, help=\textcolor{stringliteral}{"Optional clock rate (Hz)"}, 
+      default=\textcolor{keywordtype}{None})
+00098     (options, args) = parser.parse\_args()
+00099     siggen_app(
+00100         args=options.args,
+00101         rate=options.rate,
+00102         ampl=options.ampl,
+00103         freq=options.freq,
+00104         txBw=options.txBw,
+00105         txAnt=options.txAnt,
+00106         txGain=options.txGain,
+00107         txChan=options.txChan,
+00108         clockRate=options.clockRate,
+00109         waveFreq=options.waveFreq,
+00110     )
+00111 
+00112 \textcolor{keywordflow}{if} \_\_name\_\_ == \textcolor{stringliteral}{'\_\_main\_\_'}: main()
+\end{DoxyCode}

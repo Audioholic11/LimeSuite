@@ -1,0 +1,123 @@
+\subsection{trigger\+\_\+command\+\_\+impl.\+cc}
+\label{trigger__command__impl_8cc_source}\index{/home/erik/prefix/default/src/gr-\/radar-\/dev/lib/trigger\+\_\+command\+\_\+impl.\+cc@{/home/erik/prefix/default/src/gr-\/radar-\/dev/lib/trigger\+\_\+command\+\_\+impl.\+cc}}
+
+\begin{DoxyCode}
+00001 \textcolor{comment}{/* -*- c++ -*- */}
+00002 \textcolor{comment}{/* }
+00003 \textcolor{comment}{ * Copyright 2014 Communications Engineering Lab, KIT.}
+00004 \textcolor{comment}{ * }
+00005 \textcolor{comment}{ * This is free software; you can redistribute it and/or modify}
+00006 \textcolor{comment}{ * it under the terms of the GNU General Public License as published by}
+00007 \textcolor{comment}{ * the Free Software Foundation; either version 3, or (at your option)}
+00008 \textcolor{comment}{ * any later version.}
+00009 \textcolor{comment}{ * }
+00010 \textcolor{comment}{ * This software is distributed in the hope that it will be useful,}
+00011 \textcolor{comment}{ * but WITHOUT ANY WARRANTY; without even the implied warranty of}
+00012 \textcolor{comment}{ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the}
+00013 \textcolor{comment}{ * GNU General Public License for more details.}
+00014 \textcolor{comment}{ * }
+00015 \textcolor{comment}{ * You should have received a copy of the GNU General Public License}
+00016 \textcolor{comment}{ * along with this software; see the file COPYING.  If not, write to}
+00017 \textcolor{comment}{ * the Free Software Foundation, Inc., 51 Franklin Street,}
+00018 \textcolor{comment}{ * Boston, MA 02110-1301, USA.}
+00019 \textcolor{comment}{ */}
+00020 
+00021 \textcolor{preprocessor}{#ifdef HAVE\_CONFIG\_H}
+00022 \textcolor{preprocessor}{#include "config.h"}
+00023 \textcolor{preprocessor}{#endif}
+00024 
+00025 \textcolor{preprocessor}{#include <gnuradio/io\_signature.h>}
+00026 \textcolor{preprocessor}{#include "trigger_command_impl.h"}
+00027 
+00028 \textcolor{keyword}{namespace }gr \{
+00029   \textcolor{keyword}{namespace }radar \{
+00030 
+00031     trigger_command::sptr
+00032     trigger_command::make(std::string command, std::vector<std::string> identifiers, std::vector<float> 
+      vals\_min, std::vector<float> vals\_max, \textcolor{keywordtype}{int} block\_time)
+00033     \{
+00034       \textcolor{keywordflow}{return} gnuradio::get\_initial\_sptr
+00035         (\textcolor{keyword}{new} trigger_command_impl(command, identifiers, vals\_min, vals\_max, block\_time));
+00036     \}
+00037 
+00038     \textcolor{comment}{/*}
+00039 \textcolor{comment}{     * The private constructor}
+00040 \textcolor{comment}{     */}
+00041     trigger_command_impl::trigger_command_impl(std::string command, std::vector<std::string> identifiers, 
+      std::vector<float> vals\_min, std::vector<float> vals\_max, \textcolor{keywordtype}{int} block\_time)
+00042       : gr::block(\textcolor{stringliteral}{"trigger\_command"},
+00043               gr::io\_signature::make(0,0,0),
+00044               gr::io\_signature::make(0,0,0))
+00045     \{
+00046         d_command = command;
+00047         d_identifiers = identifiers;
+00048         d_vals_min = vals\_min;
+00049         d_vals_max = vals\_max;
+00050         d_block_time = block\_time;
+00051         
+00052         d_last_time = boost::posix\_time::microsec\_clock::local\_time();
+00053         
+00054         \textcolor{comment}{// Register input message port}
+00055         d_port_id_in = pmt::mp(\textcolor{stringliteral}{"Msg in"});
+00056         message\_port\_register\_in(d_port_id_in);
+00057         set\_msg\_handler(d_port_id_in, boost::bind(&
+      trigger_command_impl::handle_msg, \textcolor{keyword}{this}, \_1));
+00058     \}
+00059     
+00060     \textcolor{keywordtype}{void}
+00061     trigger_command_impl::handle_msg(pmt::pmt\_t msg)\{
+00062         \textcolor{comment}{// Check if execution has to be blocked}
+00063         d_actual_time = boost::posix\_time::microsec\_clock::local\_time();
+00064         d_time_duration = d_actual_time-d_last_time;
+00065         \textcolor{keywordflow}{if}(d_time_duration.total\_milliseconds()>d_block_time)\{
+00066             d\_last\_time = boost::posix\_time::microsec\_clock::local\_time();
+00067         \}
+00068         \textcolor{keywordflow}{else}\{
+00069             \textcolor{keywordflow}{return};
+00070         \}
+00071         
+00072         \textcolor{comment}{// Go through msg parts and check symbols}
+00073         pmt::pmt\_t msg\_part\_symbol, msg\_part\_value;
+00074         \textcolor{keywordtype}{bool} execute\_command = \textcolor{keyword}{true};
+00075         \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} k=0; k<pmt::length(msg); k++)\{
+00076             msg\_part\_symbol = pmt::nth(0,pmt::nth(k,msg));
+00077             msg\_part\_value = pmt::nth(1,pmt::nth(k,msg));
+00078             \textcolor{comment}{// Go through given symbols}
+00079             \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} p=0; p<d_identifiers.size(); p++)\{
+00080                 \textcolor{keywordflow}{if}(pmt::symbol\_to\_string(msg\_part\_symbol)==d_identifiers[p])\{
+00081                     \textcolor{comment}{// Go through input if values are a f32vector, else set executing command on false}
+00082                     \textcolor{keywordflow}{if}(pmt::is\_f32vector(msg\_part\_value))\{
+00083                         \textcolor{comment}{// Go through values and check boundries}
+00084                         std::vector<float> values = pmt::f32vector\_elements(msg\_part\_value);
+00085                         \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} m=0; m<values.size(); m++)\{
+00086                             \textcolor{keywordflow}{if}( values[m]<d_vals_min[p] || values[m]>d_vals_max[
+      p] )\{
+00087                                 execute\_command = \textcolor{keyword}{false};
+00088                             \}
+00089                         \}
+00090                     \}
+00091                     \textcolor{comment}{// add here more types as else if}
+00092                     \textcolor{keywordflow}{else}\{
+00093                         execute\_command = \textcolor{keyword}{false};
+00094                     \}
+00095                 \}
+00096             \}
+00097         \}
+00098         
+00099         \textcolor{comment}{// Execute command if values are correct}
+00100         \textcolor{keywordflow}{if}(execute\_command)\{
+00101             \textcolor{keywordtype}{int} sys\_return = std::system(d_command.c\_str());
+00102         \}
+00103     \}
+00104 
+00105     \textcolor{comment}{/*}
+00106 \textcolor{comment}{     * Our virtual destructor.}
+00107 \textcolor{comment}{     */}
+00108     trigger_command_impl::~trigger_command_impl()
+00109     \{
+00110     \}
+00111 
+00112   \} \textcolor{comment}{/* namespace radar */}
+00113 \} \textcolor{comment}{/* namespace gr */}
+00114 
+\end{DoxyCode}

@@ -1,0 +1,181 @@
+\subsection{radar\+\_\+swig.\+static\+\_\+target\+\_\+simulator\+\_\+cc Class Reference}
+\label{classradar__swig_1_1static__target__simulator__cc}\index{radar\+\_\+swig.\+static\+\_\+target\+\_\+simulator\+\_\+cc@{radar\+\_\+swig.\+static\+\_\+target\+\_\+simulator\+\_\+cc}}
+
+
+Inheritance diagram for radar\+\_\+swig.\+static\+\_\+target\+\_\+simulator\+\_\+cc\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=201pt]{d2/de9/classradar__swig_1_1static__target__simulator__cc__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for radar\+\_\+swig.\+static\+\_\+target\+\_\+simulator\+\_\+cc\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=201pt]{d8/d84/classradar__swig_1_1static__target__simulator__cc__coll__graph}
+\end{center}
+\end{figure}
+\subsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+def {\bf \+\_\+\+\_\+init\+\_\+\+\_\+} (self, {\bf args}, kwargs)
+\item 
+def {\bf make} ({\bf args}, kwargs)
+\item 
+def {\bf setup\+\_\+targets} (self, {\bf args}, kwargs)
+\end{DoxyCompactItemize}
+\subsubsection*{Static Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+{\bf thisown} = {\bf \+\_\+swig\+\_\+property}(lambda x\+: x.\+this.\+own(), lambda {\bf x}, v\+: x.\+this.\+own(v), doc=\textquotesingle{}The membership flag\textquotesingle{})
+\item 
+{\bf make} = staticmethod(make)
+\end{DoxyCompactItemize}
+\subsubsection*{Static Private Attributes}
+\begin{DoxyCompactItemize}
+\item 
+{\bf \+\_\+\+\_\+repr\+\_\+\+\_\+} = {\bf \+\_\+swig\+\_\+repr}
+\item 
+{\bf \+\_\+\+\_\+swig\+\_\+destroy\+\_\+\+\_\+} = \+\_\+radar\+\_\+swig.\+delete\+\_\+static\+\_\+target\+\_\+simulator\+\_\+cc
+\end{DoxyCompactItemize}
+
+
+\subsubsection{Detailed Description}
+\begin{DoxyVerb}Simulates the backscattering of a given signal on point targets.
+
+Implements the point scatter model. The input signal is the transmitted signal. The output signal is the received, backscattered signal, and contains one output signal per receive antenna.
+
+
+Target modeling
+The targets are modeled by the vectors , , , and . All these vectors need to be of length H, where H describes the number of reflecting targets. The backscattered signal can either have a zero phase, or a random phase (controlled by ). The received signal will be the linear superposition of H signals, each of which are derived from the input signal by the following equation:
+
+
+
+The attenuation depends on the center frequency , the radar cross section , the distance of the target  and the speed of light : 
+
+The delay  depends on the distance of the target: 
+
+The Doppler shift  depends on the relative velocity and the center frequency: 
+
+The signals are added up to produce the total sum signal: 
+
+
+
+MIMO processing simulation
+This block has a limited capability of simulating multi-antenna reception. The  vector determines the distance of every RX antenna from the origin (Note: The TX antenna is always in the origin). The length of the  vector is thus also the number of output signals this block produces. For a simple, mono-static SISO radar, simply set position_rx to [0]. The RX antennas are always laid out in a straight line. When multiple antennas are given, the target azimuth plays a role; an azimuth of zero is perpendicular to the line in which the RX antennas are placed.
+
+
+
+Self-coupling
+Self-coupling describes the amount of the TX signal that is directly coupled into the RX path. When  is set to true, effectively, a target with zero velocity and range is added. The parameter  describes the attenuation of the self-coupling, a value of -10 means that the transmit signal is attenuated by 10 dB on the receive signal.
+\end{DoxyVerb}
+ 
+
+Definition at line {\bf 2495} of file {\bf radar\+\_\+swig.\+py}.
+
+
+
+\subsubsection{Constructor \& Destructor Documentation}
+\index{radar\+\_\+swig\+::static\+\_\+target\+\_\+simulator\+\_\+cc@{radar\+\_\+swig\+::static\+\_\+target\+\_\+simulator\+\_\+cc}!\+\_\+\+\_\+init\+\_\+\+\_\+@{\+\_\+\+\_\+init\+\_\+\+\_\+}}
+\index{\+\_\+\+\_\+init\+\_\+\+\_\+@{\+\_\+\+\_\+init\+\_\+\+\_\+}!radar\+\_\+swig\+::static\+\_\+target\+\_\+simulator\+\_\+cc@{radar\+\_\+swig\+::static\+\_\+target\+\_\+simulator\+\_\+cc}}
+\paragraph[{\+\_\+\+\_\+init\+\_\+\+\_\+(self, args, kwargs)}]{\setlength{\rightskip}{0pt plus 5cm}def radar\+\_\+swig.\+static\+\_\+target\+\_\+simulator\+\_\+cc.\+\_\+\+\_\+init\+\_\+\+\_\+ (
+\begin{DoxyParamCaption}
+\item[{}]{self, }
+\item[{}]{args, }
+\item[{}]{kwargs}
+\end{DoxyParamCaption}
+)}\label{classradar__swig_1_1static__target__simulator__cc_a2ac787cf8531abb86cadd8fd5cf01cba}
+
+
+Definition at line {\bf 2526} of file {\bf radar\+\_\+swig.\+py}.
+
+
+
+\subsubsection{Member Function Documentation}
+\index{radar\+\_\+swig\+::static\+\_\+target\+\_\+simulator\+\_\+cc@{radar\+\_\+swig\+::static\+\_\+target\+\_\+simulator\+\_\+cc}!make@{make}}
+\index{make@{make}!radar\+\_\+swig\+::static\+\_\+target\+\_\+simulator\+\_\+cc@{radar\+\_\+swig\+::static\+\_\+target\+\_\+simulator\+\_\+cc}}
+\paragraph[{make(args, kwargs)}]{\setlength{\rightskip}{0pt plus 5cm}def radar\+\_\+swig.\+static\+\_\+target\+\_\+simulator\+\_\+cc.\+make (
+\begin{DoxyParamCaption}
+\item[{}]{args, }
+\item[{}]{kwargs}
+\end{DoxyParamCaption}
+)}\label{classradar__swig_1_1static__target__simulator__cc_ae157150a0e207dc957d8f5d06aba437f}
+\begin{DoxyVerb}make(pmt_vector_float range, pmt_vector_float velocity, pmt_vector_float rcs, pmt_vector_float azimuth, 
+    pmt_vector_float position_rx, int samp_rate, float center_freq, 
+    float self_coupling_db, bool rndm_phaseshift=True, bool self_coupling=True, 
+    std::string const & len_key="packet_len") -> static_target_simulator_cc_sptr
+
+Params: (range, velocity, rcs, azimuth, position_rx, samp_rate, center_freq, self_coupling_db, rndm_phaseshift, self_coupling, len_key)
+\end{DoxyVerb}
+ 
+
+Definition at line {\bf 2528} of file {\bf radar\+\_\+swig.\+py}.
+
+
+
+References {\bf radar\+\_\+swig.\+static\+\_\+target\+\_\+simulator\+\_\+cc.\+make}.
+
+\index{radar\+\_\+swig\+::static\+\_\+target\+\_\+simulator\+\_\+cc@{radar\+\_\+swig\+::static\+\_\+target\+\_\+simulator\+\_\+cc}!setup\+\_\+targets@{setup\+\_\+targets}}
+\index{setup\+\_\+targets@{setup\+\_\+targets}!radar\+\_\+swig\+::static\+\_\+target\+\_\+simulator\+\_\+cc@{radar\+\_\+swig\+::static\+\_\+target\+\_\+simulator\+\_\+cc}}
+\paragraph[{setup\+\_\+targets(self, args, kwargs)}]{\setlength{\rightskip}{0pt plus 5cm}def radar\+\_\+swig.\+static\+\_\+target\+\_\+simulator\+\_\+cc.\+setup\+\_\+targets (
+\begin{DoxyParamCaption}
+\item[{}]{self, }
+\item[{}]{args, }
+\item[{}]{kwargs}
+\end{DoxyParamCaption}
+)}\label{classradar__swig_1_1static__target__simulator__cc_ad68628cd0bbef45c90abeadec2cf701e}
+\begin{DoxyVerb}setup_targets(static_target_simulator_cc self, pmt_vector_float range, pmt_vector_float velocity, pmt_vector_float rcs, pmt_vector_float azimuth, 
+    pmt_vector_float position_rx, int samp_rate, float center_freq, 
+    float self_coupling_db, bool rndm_phaseshift, bool self_coupling)
+
+Params: (range, velocity, rcs, azimuth, position_rx, samp_rate, center_freq, self_coupling_db, rndm_phaseshift, self_coupling)
+\end{DoxyVerb}
+ 
+
+Definition at line {\bf 2540} of file {\bf radar\+\_\+swig.\+py}.
+
+
+
+\subsubsection{Member Data Documentation}
+\index{radar\+\_\+swig\+::static\+\_\+target\+\_\+simulator\+\_\+cc@{radar\+\_\+swig\+::static\+\_\+target\+\_\+simulator\+\_\+cc}!\+\_\+\+\_\+repr\+\_\+\+\_\+@{\+\_\+\+\_\+repr\+\_\+\+\_\+}}
+\index{\+\_\+\+\_\+repr\+\_\+\+\_\+@{\+\_\+\+\_\+repr\+\_\+\+\_\+}!radar\+\_\+swig\+::static\+\_\+target\+\_\+simulator\+\_\+cc@{radar\+\_\+swig\+::static\+\_\+target\+\_\+simulator\+\_\+cc}}
+\paragraph[{\+\_\+\+\_\+repr\+\_\+\+\_\+}]{\setlength{\rightskip}{0pt plus 5cm}radar\+\_\+swig.\+static\+\_\+target\+\_\+simulator\+\_\+cc.\+\_\+\+\_\+repr\+\_\+\+\_\+ = {\bf \+\_\+swig\+\_\+repr}\hspace{0.3cm}{\ttfamily [static]}, {\ttfamily [private]}}\label{classradar__swig_1_1static__target__simulator__cc_aa8383b9ec34e0fd11b3c47cd43e642fe}
+
+
+Definition at line {\bf 2527} of file {\bf radar\+\_\+swig.\+py}.
+
+\index{radar\+\_\+swig\+::static\+\_\+target\+\_\+simulator\+\_\+cc@{radar\+\_\+swig\+::static\+\_\+target\+\_\+simulator\+\_\+cc}!\+\_\+\+\_\+swig\+\_\+destroy\+\_\+\+\_\+@{\+\_\+\+\_\+swig\+\_\+destroy\+\_\+\+\_\+}}
+\index{\+\_\+\+\_\+swig\+\_\+destroy\+\_\+\+\_\+@{\+\_\+\+\_\+swig\+\_\+destroy\+\_\+\+\_\+}!radar\+\_\+swig\+::static\+\_\+target\+\_\+simulator\+\_\+cc@{radar\+\_\+swig\+::static\+\_\+target\+\_\+simulator\+\_\+cc}}
+\paragraph[{\+\_\+\+\_\+swig\+\_\+destroy\+\_\+\+\_\+}]{\setlength{\rightskip}{0pt plus 5cm}radar\+\_\+swig.\+static\+\_\+target\+\_\+simulator\+\_\+cc.\+\_\+\+\_\+swig\+\_\+destroy\+\_\+\+\_\+ = \+\_\+radar\+\_\+swig.\+delete\+\_\+static\+\_\+target\+\_\+simulator\+\_\+cc\hspace{0.3cm}{\ttfamily [static]}, {\ttfamily [private]}}\label{classradar__swig_1_1static__target__simulator__cc_a55a4b59c27e16414209546a2a3a3229f}
+
+
+Definition at line {\bf 2550} of file {\bf radar\+\_\+swig.\+py}.
+
+\index{radar\+\_\+swig\+::static\+\_\+target\+\_\+simulator\+\_\+cc@{radar\+\_\+swig\+::static\+\_\+target\+\_\+simulator\+\_\+cc}!make@{make}}
+\index{make@{make}!radar\+\_\+swig\+::static\+\_\+target\+\_\+simulator\+\_\+cc@{radar\+\_\+swig\+::static\+\_\+target\+\_\+simulator\+\_\+cc}}
+\paragraph[{make}]{\setlength{\rightskip}{0pt plus 5cm}radar\+\_\+swig.\+static\+\_\+target\+\_\+simulator\+\_\+cc.\+make = staticmethod(make)\hspace{0.3cm}{\ttfamily [static]}}\label{classradar__swig_1_1static__target__simulator__cc_a256bf9f91ba87cbb120e1c9ec0179ed2}
+
+
+Definition at line {\bf 2539} of file {\bf radar\+\_\+swig.\+py}.
+
+
+
+Referenced by {\bf radar\+\_\+swig.\+static\+\_\+target\+\_\+simulator\+\_\+cc.\+make()}.
+
+\index{radar\+\_\+swig\+::static\+\_\+target\+\_\+simulator\+\_\+cc@{radar\+\_\+swig\+::static\+\_\+target\+\_\+simulator\+\_\+cc}!thisown@{thisown}}
+\index{thisown@{thisown}!radar\+\_\+swig\+::static\+\_\+target\+\_\+simulator\+\_\+cc@{radar\+\_\+swig\+::static\+\_\+target\+\_\+simulator\+\_\+cc}}
+\paragraph[{thisown}]{\setlength{\rightskip}{0pt plus 5cm}radar\+\_\+swig.\+static\+\_\+target\+\_\+simulator\+\_\+cc.\+thisown = {\bf \+\_\+swig\+\_\+property}(lambda x\+: x.\+this.\+own(), lambda {\bf x}, v\+: x.\+this.\+own(v), doc=\textquotesingle{}The membership flag\textquotesingle{})\hspace{0.3cm}{\ttfamily [static]}}\label{classradar__swig_1_1static__target__simulator__cc_a4799897952e08806fc6546334e9c084a}
+
+
+Definition at line {\bf 2525} of file {\bf radar\+\_\+swig.\+py}.
+
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+/home/erik/prefix/default/src/gr-\/radar-\/dev/build/swig/{\bf radar\+\_\+swig.\+py}\end{DoxyCompactItemize}

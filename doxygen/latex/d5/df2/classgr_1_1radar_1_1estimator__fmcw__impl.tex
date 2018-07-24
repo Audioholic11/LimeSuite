@@ -1,0 +1,533 @@
+\subsection{gr\+:\+:radar\+:\+:estimator\+\_\+fmcw\+\_\+impl Class Reference}
+\label{classgr_1_1radar_1_1estimator__fmcw__impl}\index{gr\+::radar\+::estimator\+\_\+fmcw\+\_\+impl@{gr\+::radar\+::estimator\+\_\+fmcw\+\_\+impl}}
+
+
+{\ttfamily \#include $<$estimator\+\_\+fmcw\+\_\+impl.\+h$>$}
+
+
+
+Inheritance diagram for gr\+:\+:radar\+:\+:estimator\+\_\+fmcw\+\_\+impl\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=211pt]{d2/dd1/classgr_1_1radar_1_1estimator__fmcw__impl__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for gr\+:\+:radar\+:\+:estimator\+\_\+fmcw\+\_\+impl\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=211pt]{d4/de7/classgr_1_1radar_1_1estimator__fmcw__impl__coll__graph}
+\end{center}
+\end{figure}
+\subsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+{\bf estimator\+\_\+fmcw\+\_\+impl} ({\bf int} samp\+\_\+rate, float center\+\_\+freq, float sweep\+\_\+freq, {\bf int} samp\+\_\+up, {\bf int} samp\+\_\+down, bool push\+\_\+power)
+\item 
+{\bf $\sim$estimator\+\_\+fmcw\+\_\+impl} ()
+\item 
+{\bf void} {\bf handle\+\_\+msg\+\_\+cw} (pmt\+::pmt\+\_\+t msg)
+\item 
+{\bf void} {\bf handle\+\_\+msg\+\_\+up} (pmt\+::pmt\+\_\+t msg)
+\item 
+{\bf void} {\bf handle\+\_\+msg\+\_\+down} (pmt\+::pmt\+\_\+t msg)
+\item 
+{\bf void} {\bf estimate} ()
+\end{DoxyCompactItemize}
+\subsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+{\bf int} {\bf d\+\_\+samp\+\_\+rate}
+\item 
+float {\bf d\+\_\+center\+\_\+freq}
+\item 
+float {\bf d\+\_\+sweep\+\_\+freq}
+\item 
+{\bf int} {\bf d\+\_\+samp\+\_\+up}
+\item 
+{\bf int} {\bf d\+\_\+samp\+\_\+down}
+\item 
+bool {\bf d\+\_\+push\+\_\+power}
+\item 
+float {\bf d\+\_\+const\+\_\+up}
+\item 
+float {\bf d\+\_\+const\+\_\+down}
+\item 
+float {\bf d\+\_\+const\+\_\+doppler}
+\item 
+bool {\bf d\+\_\+msg\+\_\+cw\+\_\+in}
+\item 
+bool {\bf d\+\_\+msg\+\_\+up\+\_\+in}
+\item 
+bool {\bf d\+\_\+msg\+\_\+down\+\_\+in}
+\item 
+pmt\+::pmt\+\_\+t {\bf d\+\_\+port\+\_\+id\+\_\+in\+\_\+cw}
+\item 
+pmt\+::pmt\+\_\+t {\bf d\+\_\+port\+\_\+id\+\_\+in\+\_\+up}
+\item 
+pmt\+::pmt\+\_\+t {\bf d\+\_\+port\+\_\+id\+\_\+in\+\_\+down}
+\item 
+pmt\+::pmt\+\_\+t {\bf d\+\_\+port\+\_\+id\+\_\+out}
+\item 
+pmt\+::pmt\+\_\+t {\bf d\+\_\+msg\+\_\+cw}
+\item 
+pmt\+::pmt\+\_\+t {\bf d\+\_\+msg\+\_\+up}
+\item 
+pmt\+::pmt\+\_\+t {\bf d\+\_\+msg\+\_\+down}
+\end{DoxyCompactItemize}
+\subsubsection*{Static Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+static constexpr float {\bf c\+\_\+light} = 3e8
+\end{DoxyCompactItemize}
+\subsubsection*{Additional Inherited Members}
+
+
+\subsubsection{Detailed Description}
+
+
+Definition at line {\bf 29} of file {\bf estimator\+\_\+fmcw\+\_\+impl.\+h}.
+
+
+
+\subsubsection{Constructor \& Destructor Documentation}
+\index{gr\+::radar\+::estimator\+\_\+fmcw\+\_\+impl@{gr\+::radar\+::estimator\+\_\+fmcw\+\_\+impl}!estimator\+\_\+fmcw\+\_\+impl@{estimator\+\_\+fmcw\+\_\+impl}}
+\index{estimator\+\_\+fmcw\+\_\+impl@{estimator\+\_\+fmcw\+\_\+impl}!gr\+::radar\+::estimator\+\_\+fmcw\+\_\+impl@{gr\+::radar\+::estimator\+\_\+fmcw\+\_\+impl}}
+\paragraph[{estimator\+\_\+fmcw\+\_\+impl(int samp\+\_\+rate, float center\+\_\+freq, float sweep\+\_\+freq, int samp\+\_\+up, int samp\+\_\+down, bool push\+\_\+power)}]{\setlength{\rightskip}{0pt plus 5cm}gr\+::radar\+::estimator\+\_\+fmcw\+\_\+impl\+::estimator\+\_\+fmcw\+\_\+impl (
+\begin{DoxyParamCaption}
+\item[{{\bf int}}]{samp\+\_\+rate, }
+\item[{float}]{center\+\_\+freq, }
+\item[{float}]{sweep\+\_\+freq, }
+\item[{{\bf int}}]{samp\+\_\+up, }
+\item[{{\bf int}}]{samp\+\_\+down, }
+\item[{bool}]{push\+\_\+power}
+\end{DoxyParamCaption}
+)}\label{classgr_1_1radar_1_1estimator__fmcw__impl_ad494cc7d33a3f00ef5ccab280a2819c3}
+
+
+Definition at line {\bf 42} of file {\bf estimator\+\_\+fmcw\+\_\+impl.\+cc}.
+
+
+
+References {\bf c\+\_\+light}, {\bf calc\+\_\+fmcw\+\_\+peaks\+::center\+\_\+freq}, {\bf d\+\_\+center\+\_\+freq}, {\bf d\+\_\+const\+\_\+doppler}, {\bf d\+\_\+const\+\_\+down}, {\bf d\+\_\+const\+\_\+up}, {\bf d\+\_\+msg\+\_\+cw\+\_\+in}, {\bf d\+\_\+msg\+\_\+down\+\_\+in}, {\bf d\+\_\+msg\+\_\+up\+\_\+in}, {\bf d\+\_\+port\+\_\+id\+\_\+in\+\_\+cw}, {\bf d\+\_\+port\+\_\+id\+\_\+in\+\_\+down}, {\bf d\+\_\+port\+\_\+id\+\_\+in\+\_\+up}, {\bf d\+\_\+port\+\_\+id\+\_\+out}, {\bf d\+\_\+push\+\_\+power}, {\bf d\+\_\+samp\+\_\+down}, {\bf d\+\_\+samp\+\_\+rate}, {\bf d\+\_\+samp\+\_\+up}, {\bf d\+\_\+sweep\+\_\+freq}, {\bf handle\+\_\+msg\+\_\+cw()}, {\bf handle\+\_\+msg\+\_\+down()}, {\bf handle\+\_\+msg\+\_\+up()}, {\bf calc\+\_\+fmcw\+\_\+peaks\+::samp\+\_\+down}, {\bf calc\+\_\+fmcw\+\_\+peaks\+::samp\+\_\+rate}, {\bf calc\+\_\+fmcw\+\_\+peaks\+::samp\+\_\+up}, and {\bf calc\+\_\+fmcw\+\_\+peaks\+::sweep\+\_\+freq}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{d5/df2/classgr_1_1radar_1_1estimator__fmcw__impl_ad494cc7d33a3f00ef5ccab280a2819c3_cgraph}
+\end{center}
+\end{figure}
+
+
+\index{gr\+::radar\+::estimator\+\_\+fmcw\+\_\+impl@{gr\+::radar\+::estimator\+\_\+fmcw\+\_\+impl}!````~estimator\+\_\+fmcw\+\_\+impl@{$\sim$estimator\+\_\+fmcw\+\_\+impl}}
+\index{````~estimator\+\_\+fmcw\+\_\+impl@{$\sim$estimator\+\_\+fmcw\+\_\+impl}!gr\+::radar\+::estimator\+\_\+fmcw\+\_\+impl@{gr\+::radar\+::estimator\+\_\+fmcw\+\_\+impl}}
+\paragraph[{$\sim$estimator\+\_\+fmcw\+\_\+impl()}]{\setlength{\rightskip}{0pt plus 5cm}gr\+::radar\+::estimator\+\_\+fmcw\+\_\+impl\+::$\sim$estimator\+\_\+fmcw\+\_\+impl (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}\label{classgr_1_1radar_1_1estimator__fmcw__impl_a298e17a81fb82bb68027cbb1a947557e}
+
+
+Definition at line {\bf 222} of file {\bf estimator\+\_\+fmcw\+\_\+impl.\+cc}.
+
+
+
+\subsubsection{Member Function Documentation}
+\index{gr\+::radar\+::estimator\+\_\+fmcw\+\_\+impl@{gr\+::radar\+::estimator\+\_\+fmcw\+\_\+impl}!estimate@{estimate}}
+\index{estimate@{estimate}!gr\+::radar\+::estimator\+\_\+fmcw\+\_\+impl@{gr\+::radar\+::estimator\+\_\+fmcw\+\_\+impl}}
+\paragraph[{estimate()}]{\setlength{\rightskip}{0pt plus 5cm}{\bf void} gr\+::radar\+::estimator\+\_\+fmcw\+\_\+impl\+::estimate (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}\label{classgr_1_1radar_1_1estimator__fmcw__impl_a022f38530853dbe670a98d49e75f4bc1}
+
+
+Definition at line {\bf 124} of file {\bf estimator\+\_\+fmcw\+\_\+impl.\+cc}.
+
+
+
+References {\bf c\+\_\+light}, {\bf d\+\_\+center\+\_\+freq}, {\bf d\+\_\+const\+\_\+doppler}, {\bf d\+\_\+const\+\_\+down}, {\bf d\+\_\+const\+\_\+up}, {\bf d\+\_\+msg\+\_\+cw}, {\bf d\+\_\+msg\+\_\+down}, {\bf d\+\_\+msg\+\_\+up}, {\bf d\+\_\+port\+\_\+id\+\_\+out}, {\bf d\+\_\+push\+\_\+power}, {\bf calc\+\_\+fmcw\+\_\+peaks\+::freq\+\_\+cw}, {\bf calc\+\_\+fmcw\+\_\+peaks\+::freq\+\_\+down}, {\bf calc\+\_\+fmcw\+\_\+peaks\+::freq\+\_\+up}, {\bf k}, {\bf calc\+\_\+fmcw\+\_\+peaks\+::r}, and {\bf range}.
+
+
+
+Referenced by {\bf handle\+\_\+msg\+\_\+cw()}, {\bf handle\+\_\+msg\+\_\+down()}, and {\bf handle\+\_\+msg\+\_\+up()}.
+
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{d5/df2/classgr_1_1radar_1_1estimator__fmcw__impl_a022f38530853dbe670a98d49e75f4bc1_icgraph}
+\end{center}
+\end{figure}
+
+
+\index{gr\+::radar\+::estimator\+\_\+fmcw\+\_\+impl@{gr\+::radar\+::estimator\+\_\+fmcw\+\_\+impl}!handle\+\_\+msg\+\_\+cw@{handle\+\_\+msg\+\_\+cw}}
+\index{handle\+\_\+msg\+\_\+cw@{handle\+\_\+msg\+\_\+cw}!gr\+::radar\+::estimator\+\_\+fmcw\+\_\+impl@{gr\+::radar\+::estimator\+\_\+fmcw\+\_\+impl}}
+\paragraph[{handle\+\_\+msg\+\_\+cw(pmt\+::pmt\+\_\+t msg)}]{\setlength{\rightskip}{0pt plus 5cm}{\bf void} gr\+::radar\+::estimator\+\_\+fmcw\+\_\+impl\+::handle\+\_\+msg\+\_\+cw (
+\begin{DoxyParamCaption}
+\item[{pmt\+::pmt\+\_\+t}]{msg}
+\end{DoxyParamCaption}
+)}\label{classgr_1_1radar_1_1estimator__fmcw__impl_a69b8976b6ef8b8d197e7eaaf2e798ec2}
+
+
+Definition at line {\bf 82} of file {\bf estimator\+\_\+fmcw\+\_\+impl.\+cc}.
+
+
+
+References {\bf d\+\_\+msg\+\_\+cw}, {\bf d\+\_\+msg\+\_\+cw\+\_\+in}, {\bf d\+\_\+msg\+\_\+down\+\_\+in}, {\bf d\+\_\+msg\+\_\+up\+\_\+in}, and {\bf estimate()}.
+
+
+
+Referenced by {\bf estimator\+\_\+fmcw\+\_\+impl()}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{d5/df2/classgr_1_1radar_1_1estimator__fmcw__impl_a69b8976b6ef8b8d197e7eaaf2e798ec2_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{d5/df2/classgr_1_1radar_1_1estimator__fmcw__impl_a69b8976b6ef8b8d197e7eaaf2e798ec2_icgraph}
+\end{center}
+\end{figure}
+
+
+\index{gr\+::radar\+::estimator\+\_\+fmcw\+\_\+impl@{gr\+::radar\+::estimator\+\_\+fmcw\+\_\+impl}!handle\+\_\+msg\+\_\+down@{handle\+\_\+msg\+\_\+down}}
+\index{handle\+\_\+msg\+\_\+down@{handle\+\_\+msg\+\_\+down}!gr\+::radar\+::estimator\+\_\+fmcw\+\_\+impl@{gr\+::radar\+::estimator\+\_\+fmcw\+\_\+impl}}
+\paragraph[{handle\+\_\+msg\+\_\+down(pmt\+::pmt\+\_\+t msg)}]{\setlength{\rightskip}{0pt plus 5cm}{\bf void} gr\+::radar\+::estimator\+\_\+fmcw\+\_\+impl\+::handle\+\_\+msg\+\_\+down (
+\begin{DoxyParamCaption}
+\item[{pmt\+::pmt\+\_\+t}]{msg}
+\end{DoxyParamCaption}
+)}\label{classgr_1_1radar_1_1estimator__fmcw__impl_ac398fd2713e91dff3ead87e713868a02}
+
+
+Definition at line {\bf 110} of file {\bf estimator\+\_\+fmcw\+\_\+impl.\+cc}.
+
+
+
+References {\bf d\+\_\+msg\+\_\+cw\+\_\+in}, {\bf d\+\_\+msg\+\_\+down}, {\bf d\+\_\+msg\+\_\+down\+\_\+in}, {\bf d\+\_\+msg\+\_\+up\+\_\+in}, and {\bf estimate()}.
+
+
+
+Referenced by {\bf estimator\+\_\+fmcw\+\_\+impl()}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{d5/df2/classgr_1_1radar_1_1estimator__fmcw__impl_ac398fd2713e91dff3ead87e713868a02_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{d5/df2/classgr_1_1radar_1_1estimator__fmcw__impl_ac398fd2713e91dff3ead87e713868a02_icgraph}
+\end{center}
+\end{figure}
+
+
+\index{gr\+::radar\+::estimator\+\_\+fmcw\+\_\+impl@{gr\+::radar\+::estimator\+\_\+fmcw\+\_\+impl}!handle\+\_\+msg\+\_\+up@{handle\+\_\+msg\+\_\+up}}
+\index{handle\+\_\+msg\+\_\+up@{handle\+\_\+msg\+\_\+up}!gr\+::radar\+::estimator\+\_\+fmcw\+\_\+impl@{gr\+::radar\+::estimator\+\_\+fmcw\+\_\+impl}}
+\paragraph[{handle\+\_\+msg\+\_\+up(pmt\+::pmt\+\_\+t msg)}]{\setlength{\rightskip}{0pt plus 5cm}{\bf void} gr\+::radar\+::estimator\+\_\+fmcw\+\_\+impl\+::handle\+\_\+msg\+\_\+up (
+\begin{DoxyParamCaption}
+\item[{pmt\+::pmt\+\_\+t}]{msg}
+\end{DoxyParamCaption}
+)}\label{classgr_1_1radar_1_1estimator__fmcw__impl_ab5a279e002ed4cf17f83aa24d534a306}
+
+
+Definition at line {\bf 96} of file {\bf estimator\+\_\+fmcw\+\_\+impl.\+cc}.
+
+
+
+References {\bf d\+\_\+msg\+\_\+cw\+\_\+in}, {\bf d\+\_\+msg\+\_\+down\+\_\+in}, {\bf d\+\_\+msg\+\_\+up}, {\bf d\+\_\+msg\+\_\+up\+\_\+in}, and {\bf estimate()}.
+
+
+
+Referenced by {\bf estimator\+\_\+fmcw\+\_\+impl()}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{d5/df2/classgr_1_1radar_1_1estimator__fmcw__impl_ab5a279e002ed4cf17f83aa24d534a306_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{d5/df2/classgr_1_1radar_1_1estimator__fmcw__impl_ab5a279e002ed4cf17f83aa24d534a306_icgraph}
+\end{center}
+\end{figure}
+
+
+
+
+\subsubsection{Member Data Documentation}
+\index{gr\+::radar\+::estimator\+\_\+fmcw\+\_\+impl@{gr\+::radar\+::estimator\+\_\+fmcw\+\_\+impl}!c\+\_\+light@{c\+\_\+light}}
+\index{c\+\_\+light@{c\+\_\+light}!gr\+::radar\+::estimator\+\_\+fmcw\+\_\+impl@{gr\+::radar\+::estimator\+\_\+fmcw\+\_\+impl}}
+\paragraph[{c\+\_\+light}]{\setlength{\rightskip}{0pt plus 5cm}constexpr float gr\+::radar\+::estimator\+\_\+fmcw\+\_\+impl\+::c\+\_\+light = 3e8\hspace{0.3cm}{\ttfamily [static]}}\label{classgr_1_1radar_1_1estimator__fmcw__impl_af5e7ae5b0f3cfd677f580974727a01d7}
+
+
+Definition at line {\bf 55} of file {\bf estimator\+\_\+fmcw\+\_\+impl.\+h}.
+
+
+
+Referenced by {\bf estimate()}, and {\bf estimator\+\_\+fmcw\+\_\+impl()}.
+
+\index{gr\+::radar\+::estimator\+\_\+fmcw\+\_\+impl@{gr\+::radar\+::estimator\+\_\+fmcw\+\_\+impl}!d\+\_\+center\+\_\+freq@{d\+\_\+center\+\_\+freq}}
+\index{d\+\_\+center\+\_\+freq@{d\+\_\+center\+\_\+freq}!gr\+::radar\+::estimator\+\_\+fmcw\+\_\+impl@{gr\+::radar\+::estimator\+\_\+fmcw\+\_\+impl}}
+\paragraph[{d\+\_\+center\+\_\+freq}]{\setlength{\rightskip}{0pt plus 5cm}float gr\+::radar\+::estimator\+\_\+fmcw\+\_\+impl\+::d\+\_\+center\+\_\+freq}\label{classgr_1_1radar_1_1estimator__fmcw__impl_af092dc7e0f6283d740be4c6d69fbb538}
+
+
+Definition at line {\bf 44} of file {\bf estimator\+\_\+fmcw\+\_\+impl.\+h}.
+
+
+
+Referenced by {\bf estimate()}, and {\bf estimator\+\_\+fmcw\+\_\+impl()}.
+
+\index{gr\+::radar\+::estimator\+\_\+fmcw\+\_\+impl@{gr\+::radar\+::estimator\+\_\+fmcw\+\_\+impl}!d\+\_\+const\+\_\+doppler@{d\+\_\+const\+\_\+doppler}}
+\index{d\+\_\+const\+\_\+doppler@{d\+\_\+const\+\_\+doppler}!gr\+::radar\+::estimator\+\_\+fmcw\+\_\+impl@{gr\+::radar\+::estimator\+\_\+fmcw\+\_\+impl}}
+\paragraph[{d\+\_\+const\+\_\+doppler}]{\setlength{\rightskip}{0pt plus 5cm}float gr\+::radar\+::estimator\+\_\+fmcw\+\_\+impl\+::d\+\_\+const\+\_\+doppler}\label{classgr_1_1radar_1_1estimator__fmcw__impl_aabf4ddfa3b815ef80554f78fb27b04b7}
+
+
+Definition at line {\bf 48} of file {\bf estimator\+\_\+fmcw\+\_\+impl.\+h}.
+
+
+
+Referenced by {\bf estimate()}, and {\bf estimator\+\_\+fmcw\+\_\+impl()}.
+
+\index{gr\+::radar\+::estimator\+\_\+fmcw\+\_\+impl@{gr\+::radar\+::estimator\+\_\+fmcw\+\_\+impl}!d\+\_\+const\+\_\+down@{d\+\_\+const\+\_\+down}}
+\index{d\+\_\+const\+\_\+down@{d\+\_\+const\+\_\+down}!gr\+::radar\+::estimator\+\_\+fmcw\+\_\+impl@{gr\+::radar\+::estimator\+\_\+fmcw\+\_\+impl}}
+\paragraph[{d\+\_\+const\+\_\+down}]{\setlength{\rightskip}{0pt plus 5cm}float gr\+::radar\+::estimator\+\_\+fmcw\+\_\+impl\+::d\+\_\+const\+\_\+down}\label{classgr_1_1radar_1_1estimator__fmcw__impl_a119186c1c651ff33c1a8d2e7488d3257}
+
+
+Definition at line {\bf 48} of file {\bf estimator\+\_\+fmcw\+\_\+impl.\+h}.
+
+
+
+Referenced by {\bf estimate()}, and {\bf estimator\+\_\+fmcw\+\_\+impl()}.
+
+\index{gr\+::radar\+::estimator\+\_\+fmcw\+\_\+impl@{gr\+::radar\+::estimator\+\_\+fmcw\+\_\+impl}!d\+\_\+const\+\_\+up@{d\+\_\+const\+\_\+up}}
+\index{d\+\_\+const\+\_\+up@{d\+\_\+const\+\_\+up}!gr\+::radar\+::estimator\+\_\+fmcw\+\_\+impl@{gr\+::radar\+::estimator\+\_\+fmcw\+\_\+impl}}
+\paragraph[{d\+\_\+const\+\_\+up}]{\setlength{\rightskip}{0pt plus 5cm}float gr\+::radar\+::estimator\+\_\+fmcw\+\_\+impl\+::d\+\_\+const\+\_\+up}\label{classgr_1_1radar_1_1estimator__fmcw__impl_a9839874e5b204f71b58e57e849ff5b3a}
+
+
+Definition at line {\bf 48} of file {\bf estimator\+\_\+fmcw\+\_\+impl.\+h}.
+
+
+
+Referenced by {\bf estimate()}, and {\bf estimator\+\_\+fmcw\+\_\+impl()}.
+
+\index{gr\+::radar\+::estimator\+\_\+fmcw\+\_\+impl@{gr\+::radar\+::estimator\+\_\+fmcw\+\_\+impl}!d\+\_\+msg\+\_\+cw@{d\+\_\+msg\+\_\+cw}}
+\index{d\+\_\+msg\+\_\+cw@{d\+\_\+msg\+\_\+cw}!gr\+::radar\+::estimator\+\_\+fmcw\+\_\+impl@{gr\+::radar\+::estimator\+\_\+fmcw\+\_\+impl}}
+\paragraph[{d\+\_\+msg\+\_\+cw}]{\setlength{\rightskip}{0pt plus 5cm}pmt\+::pmt\+\_\+t gr\+::radar\+::estimator\+\_\+fmcw\+\_\+impl\+::d\+\_\+msg\+\_\+cw}\label{classgr_1_1radar_1_1estimator__fmcw__impl_a423a3412b57bf9c85b33f4ace4fa5fbb}
+
+
+Definition at line {\bf 53} of file {\bf estimator\+\_\+fmcw\+\_\+impl.\+h}.
+
+
+
+Referenced by {\bf estimate()}, and {\bf handle\+\_\+msg\+\_\+cw()}.
+
+\index{gr\+::radar\+::estimator\+\_\+fmcw\+\_\+impl@{gr\+::radar\+::estimator\+\_\+fmcw\+\_\+impl}!d\+\_\+msg\+\_\+cw\+\_\+in@{d\+\_\+msg\+\_\+cw\+\_\+in}}
+\index{d\+\_\+msg\+\_\+cw\+\_\+in@{d\+\_\+msg\+\_\+cw\+\_\+in}!gr\+::radar\+::estimator\+\_\+fmcw\+\_\+impl@{gr\+::radar\+::estimator\+\_\+fmcw\+\_\+impl}}
+\paragraph[{d\+\_\+msg\+\_\+cw\+\_\+in}]{\setlength{\rightskip}{0pt plus 5cm}bool gr\+::radar\+::estimator\+\_\+fmcw\+\_\+impl\+::d\+\_\+msg\+\_\+cw\+\_\+in}\label{classgr_1_1radar_1_1estimator__fmcw__impl_a3e66ac064e7e6742bd814aceb5686c08}
+
+
+Definition at line {\bf 50} of file {\bf estimator\+\_\+fmcw\+\_\+impl.\+h}.
+
+
+
+Referenced by {\bf estimator\+\_\+fmcw\+\_\+impl()}, {\bf handle\+\_\+msg\+\_\+cw()}, {\bf handle\+\_\+msg\+\_\+down()}, and {\bf handle\+\_\+msg\+\_\+up()}.
+
+\index{gr\+::radar\+::estimator\+\_\+fmcw\+\_\+impl@{gr\+::radar\+::estimator\+\_\+fmcw\+\_\+impl}!d\+\_\+msg\+\_\+down@{d\+\_\+msg\+\_\+down}}
+\index{d\+\_\+msg\+\_\+down@{d\+\_\+msg\+\_\+down}!gr\+::radar\+::estimator\+\_\+fmcw\+\_\+impl@{gr\+::radar\+::estimator\+\_\+fmcw\+\_\+impl}}
+\paragraph[{d\+\_\+msg\+\_\+down}]{\setlength{\rightskip}{0pt plus 5cm}pmt\+::pmt\+\_\+t gr\+::radar\+::estimator\+\_\+fmcw\+\_\+impl\+::d\+\_\+msg\+\_\+down}\label{classgr_1_1radar_1_1estimator__fmcw__impl_a8dcafb31f71fc635142d040ea9faf239}
+
+
+Definition at line {\bf 53} of file {\bf estimator\+\_\+fmcw\+\_\+impl.\+h}.
+
+
+
+Referenced by {\bf estimate()}, and {\bf handle\+\_\+msg\+\_\+down()}.
+
+\index{gr\+::radar\+::estimator\+\_\+fmcw\+\_\+impl@{gr\+::radar\+::estimator\+\_\+fmcw\+\_\+impl}!d\+\_\+msg\+\_\+down\+\_\+in@{d\+\_\+msg\+\_\+down\+\_\+in}}
+\index{d\+\_\+msg\+\_\+down\+\_\+in@{d\+\_\+msg\+\_\+down\+\_\+in}!gr\+::radar\+::estimator\+\_\+fmcw\+\_\+impl@{gr\+::radar\+::estimator\+\_\+fmcw\+\_\+impl}}
+\paragraph[{d\+\_\+msg\+\_\+down\+\_\+in}]{\setlength{\rightskip}{0pt plus 5cm}bool gr\+::radar\+::estimator\+\_\+fmcw\+\_\+impl\+::d\+\_\+msg\+\_\+down\+\_\+in}\label{classgr_1_1radar_1_1estimator__fmcw__impl_a55c66ecaa3ee348f16b577865afb40f0}
+
+
+Definition at line {\bf 50} of file {\bf estimator\+\_\+fmcw\+\_\+impl.\+h}.
+
+
+
+Referenced by {\bf estimator\+\_\+fmcw\+\_\+impl()}, {\bf handle\+\_\+msg\+\_\+cw()}, {\bf handle\+\_\+msg\+\_\+down()}, and {\bf handle\+\_\+msg\+\_\+up()}.
+
+\index{gr\+::radar\+::estimator\+\_\+fmcw\+\_\+impl@{gr\+::radar\+::estimator\+\_\+fmcw\+\_\+impl}!d\+\_\+msg\+\_\+up@{d\+\_\+msg\+\_\+up}}
+\index{d\+\_\+msg\+\_\+up@{d\+\_\+msg\+\_\+up}!gr\+::radar\+::estimator\+\_\+fmcw\+\_\+impl@{gr\+::radar\+::estimator\+\_\+fmcw\+\_\+impl}}
+\paragraph[{d\+\_\+msg\+\_\+up}]{\setlength{\rightskip}{0pt plus 5cm}pmt\+::pmt\+\_\+t gr\+::radar\+::estimator\+\_\+fmcw\+\_\+impl\+::d\+\_\+msg\+\_\+up}\label{classgr_1_1radar_1_1estimator__fmcw__impl_a8a063ad341dd38de217830899bc39332}
+
+
+Definition at line {\bf 53} of file {\bf estimator\+\_\+fmcw\+\_\+impl.\+h}.
+
+
+
+Referenced by {\bf estimate()}, and {\bf handle\+\_\+msg\+\_\+up()}.
+
+\index{gr\+::radar\+::estimator\+\_\+fmcw\+\_\+impl@{gr\+::radar\+::estimator\+\_\+fmcw\+\_\+impl}!d\+\_\+msg\+\_\+up\+\_\+in@{d\+\_\+msg\+\_\+up\+\_\+in}}
+\index{d\+\_\+msg\+\_\+up\+\_\+in@{d\+\_\+msg\+\_\+up\+\_\+in}!gr\+::radar\+::estimator\+\_\+fmcw\+\_\+impl@{gr\+::radar\+::estimator\+\_\+fmcw\+\_\+impl}}
+\paragraph[{d\+\_\+msg\+\_\+up\+\_\+in}]{\setlength{\rightskip}{0pt plus 5cm}bool gr\+::radar\+::estimator\+\_\+fmcw\+\_\+impl\+::d\+\_\+msg\+\_\+up\+\_\+in}\label{classgr_1_1radar_1_1estimator__fmcw__impl_a42da9904d5ff1efc7cec9dd523b41c1d}
+
+
+Definition at line {\bf 50} of file {\bf estimator\+\_\+fmcw\+\_\+impl.\+h}.
+
+
+
+Referenced by {\bf estimator\+\_\+fmcw\+\_\+impl()}, {\bf handle\+\_\+msg\+\_\+cw()}, {\bf handle\+\_\+msg\+\_\+down()}, and {\bf handle\+\_\+msg\+\_\+up()}.
+
+\index{gr\+::radar\+::estimator\+\_\+fmcw\+\_\+impl@{gr\+::radar\+::estimator\+\_\+fmcw\+\_\+impl}!d\+\_\+port\+\_\+id\+\_\+in\+\_\+cw@{d\+\_\+port\+\_\+id\+\_\+in\+\_\+cw}}
+\index{d\+\_\+port\+\_\+id\+\_\+in\+\_\+cw@{d\+\_\+port\+\_\+id\+\_\+in\+\_\+cw}!gr\+::radar\+::estimator\+\_\+fmcw\+\_\+impl@{gr\+::radar\+::estimator\+\_\+fmcw\+\_\+impl}}
+\paragraph[{d\+\_\+port\+\_\+id\+\_\+in\+\_\+cw}]{\setlength{\rightskip}{0pt plus 5cm}pmt\+::pmt\+\_\+t gr\+::radar\+::estimator\+\_\+fmcw\+\_\+impl\+::d\+\_\+port\+\_\+id\+\_\+in\+\_\+cw}\label{classgr_1_1radar_1_1estimator__fmcw__impl_a94eef09295ce5b821c3c4b56ada07d24}
+
+
+Definition at line {\bf 52} of file {\bf estimator\+\_\+fmcw\+\_\+impl.\+h}.
+
+
+
+Referenced by {\bf estimator\+\_\+fmcw\+\_\+impl()}.
+
+\index{gr\+::radar\+::estimator\+\_\+fmcw\+\_\+impl@{gr\+::radar\+::estimator\+\_\+fmcw\+\_\+impl}!d\+\_\+port\+\_\+id\+\_\+in\+\_\+down@{d\+\_\+port\+\_\+id\+\_\+in\+\_\+down}}
+\index{d\+\_\+port\+\_\+id\+\_\+in\+\_\+down@{d\+\_\+port\+\_\+id\+\_\+in\+\_\+down}!gr\+::radar\+::estimator\+\_\+fmcw\+\_\+impl@{gr\+::radar\+::estimator\+\_\+fmcw\+\_\+impl}}
+\paragraph[{d\+\_\+port\+\_\+id\+\_\+in\+\_\+down}]{\setlength{\rightskip}{0pt plus 5cm}pmt\+::pmt\+\_\+t gr\+::radar\+::estimator\+\_\+fmcw\+\_\+impl\+::d\+\_\+port\+\_\+id\+\_\+in\+\_\+down}\label{classgr_1_1radar_1_1estimator__fmcw__impl_ac0a7645a299846ca350db8a114e79544}
+
+
+Definition at line {\bf 52} of file {\bf estimator\+\_\+fmcw\+\_\+impl.\+h}.
+
+
+
+Referenced by {\bf estimator\+\_\+fmcw\+\_\+impl()}.
+
+\index{gr\+::radar\+::estimator\+\_\+fmcw\+\_\+impl@{gr\+::radar\+::estimator\+\_\+fmcw\+\_\+impl}!d\+\_\+port\+\_\+id\+\_\+in\+\_\+up@{d\+\_\+port\+\_\+id\+\_\+in\+\_\+up}}
+\index{d\+\_\+port\+\_\+id\+\_\+in\+\_\+up@{d\+\_\+port\+\_\+id\+\_\+in\+\_\+up}!gr\+::radar\+::estimator\+\_\+fmcw\+\_\+impl@{gr\+::radar\+::estimator\+\_\+fmcw\+\_\+impl}}
+\paragraph[{d\+\_\+port\+\_\+id\+\_\+in\+\_\+up}]{\setlength{\rightskip}{0pt plus 5cm}pmt\+::pmt\+\_\+t gr\+::radar\+::estimator\+\_\+fmcw\+\_\+impl\+::d\+\_\+port\+\_\+id\+\_\+in\+\_\+up}\label{classgr_1_1radar_1_1estimator__fmcw__impl_a1de4e0ca6e2267e1fb92da0cc06f9bab}
+
+
+Definition at line {\bf 52} of file {\bf estimator\+\_\+fmcw\+\_\+impl.\+h}.
+
+
+
+Referenced by {\bf estimator\+\_\+fmcw\+\_\+impl()}.
+
+\index{gr\+::radar\+::estimator\+\_\+fmcw\+\_\+impl@{gr\+::radar\+::estimator\+\_\+fmcw\+\_\+impl}!d\+\_\+port\+\_\+id\+\_\+out@{d\+\_\+port\+\_\+id\+\_\+out}}
+\index{d\+\_\+port\+\_\+id\+\_\+out@{d\+\_\+port\+\_\+id\+\_\+out}!gr\+::radar\+::estimator\+\_\+fmcw\+\_\+impl@{gr\+::radar\+::estimator\+\_\+fmcw\+\_\+impl}}
+\paragraph[{d\+\_\+port\+\_\+id\+\_\+out}]{\setlength{\rightskip}{0pt plus 5cm}pmt\+::pmt\+\_\+t gr\+::radar\+::estimator\+\_\+fmcw\+\_\+impl\+::d\+\_\+port\+\_\+id\+\_\+out}\label{classgr_1_1radar_1_1estimator__fmcw__impl_acb2c78805f434d3528cc7e6867b38d20}
+
+
+Definition at line {\bf 52} of file {\bf estimator\+\_\+fmcw\+\_\+impl.\+h}.
+
+
+
+Referenced by {\bf estimate()}, and {\bf estimator\+\_\+fmcw\+\_\+impl()}.
+
+\index{gr\+::radar\+::estimator\+\_\+fmcw\+\_\+impl@{gr\+::radar\+::estimator\+\_\+fmcw\+\_\+impl}!d\+\_\+push\+\_\+power@{d\+\_\+push\+\_\+power}}
+\index{d\+\_\+push\+\_\+power@{d\+\_\+push\+\_\+power}!gr\+::radar\+::estimator\+\_\+fmcw\+\_\+impl@{gr\+::radar\+::estimator\+\_\+fmcw\+\_\+impl}}
+\paragraph[{d\+\_\+push\+\_\+power}]{\setlength{\rightskip}{0pt plus 5cm}bool gr\+::radar\+::estimator\+\_\+fmcw\+\_\+impl\+::d\+\_\+push\+\_\+power}\label{classgr_1_1radar_1_1estimator__fmcw__impl_add4a453b9e8469b98d6d04dba5eda36c}
+
+
+Definition at line {\bf 46} of file {\bf estimator\+\_\+fmcw\+\_\+impl.\+h}.
+
+
+
+Referenced by {\bf estimate()}, and {\bf estimator\+\_\+fmcw\+\_\+impl()}.
+
+\index{gr\+::radar\+::estimator\+\_\+fmcw\+\_\+impl@{gr\+::radar\+::estimator\+\_\+fmcw\+\_\+impl}!d\+\_\+samp\+\_\+down@{d\+\_\+samp\+\_\+down}}
+\index{d\+\_\+samp\+\_\+down@{d\+\_\+samp\+\_\+down}!gr\+::radar\+::estimator\+\_\+fmcw\+\_\+impl@{gr\+::radar\+::estimator\+\_\+fmcw\+\_\+impl}}
+\paragraph[{d\+\_\+samp\+\_\+down}]{\setlength{\rightskip}{0pt plus 5cm}{\bf int} gr\+::radar\+::estimator\+\_\+fmcw\+\_\+impl\+::d\+\_\+samp\+\_\+down}\label{classgr_1_1radar_1_1estimator__fmcw__impl_a8af82310271b4ad1f4ab87bf5b13cc79}
+
+
+Definition at line {\bf 45} of file {\bf estimator\+\_\+fmcw\+\_\+impl.\+h}.
+
+
+
+Referenced by {\bf estimator\+\_\+fmcw\+\_\+impl()}.
+
+\index{gr\+::radar\+::estimator\+\_\+fmcw\+\_\+impl@{gr\+::radar\+::estimator\+\_\+fmcw\+\_\+impl}!d\+\_\+samp\+\_\+rate@{d\+\_\+samp\+\_\+rate}}
+\index{d\+\_\+samp\+\_\+rate@{d\+\_\+samp\+\_\+rate}!gr\+::radar\+::estimator\+\_\+fmcw\+\_\+impl@{gr\+::radar\+::estimator\+\_\+fmcw\+\_\+impl}}
+\paragraph[{d\+\_\+samp\+\_\+rate}]{\setlength{\rightskip}{0pt plus 5cm}{\bf int} gr\+::radar\+::estimator\+\_\+fmcw\+\_\+impl\+::d\+\_\+samp\+\_\+rate}\label{classgr_1_1radar_1_1estimator__fmcw__impl_a2a9698989905bf4ea283ef9816015515}
+
+
+Definition at line {\bf 43} of file {\bf estimator\+\_\+fmcw\+\_\+impl.\+h}.
+
+
+
+Referenced by {\bf estimator\+\_\+fmcw\+\_\+impl()}.
+
+\index{gr\+::radar\+::estimator\+\_\+fmcw\+\_\+impl@{gr\+::radar\+::estimator\+\_\+fmcw\+\_\+impl}!d\+\_\+samp\+\_\+up@{d\+\_\+samp\+\_\+up}}
+\index{d\+\_\+samp\+\_\+up@{d\+\_\+samp\+\_\+up}!gr\+::radar\+::estimator\+\_\+fmcw\+\_\+impl@{gr\+::radar\+::estimator\+\_\+fmcw\+\_\+impl}}
+\paragraph[{d\+\_\+samp\+\_\+up}]{\setlength{\rightskip}{0pt plus 5cm}{\bf int} gr\+::radar\+::estimator\+\_\+fmcw\+\_\+impl\+::d\+\_\+samp\+\_\+up}\label{classgr_1_1radar_1_1estimator__fmcw__impl_a4627b04c8f72ae560c9fd6616078ead2}
+
+
+Definition at line {\bf 45} of file {\bf estimator\+\_\+fmcw\+\_\+impl.\+h}.
+
+
+
+Referenced by {\bf estimator\+\_\+fmcw\+\_\+impl()}.
+
+\index{gr\+::radar\+::estimator\+\_\+fmcw\+\_\+impl@{gr\+::radar\+::estimator\+\_\+fmcw\+\_\+impl}!d\+\_\+sweep\+\_\+freq@{d\+\_\+sweep\+\_\+freq}}
+\index{d\+\_\+sweep\+\_\+freq@{d\+\_\+sweep\+\_\+freq}!gr\+::radar\+::estimator\+\_\+fmcw\+\_\+impl@{gr\+::radar\+::estimator\+\_\+fmcw\+\_\+impl}}
+\paragraph[{d\+\_\+sweep\+\_\+freq}]{\setlength{\rightskip}{0pt plus 5cm}float gr\+::radar\+::estimator\+\_\+fmcw\+\_\+impl\+::d\+\_\+sweep\+\_\+freq}\label{classgr_1_1radar_1_1estimator__fmcw__impl_aacbedec4243eb7e36dc653e23fc577d8}
+
+
+Definition at line {\bf 44} of file {\bf estimator\+\_\+fmcw\+\_\+impl.\+h}.
+
+
+
+Referenced by {\bf estimator\+\_\+fmcw\+\_\+impl()}.
+
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+/home/erik/prefix/default/src/gr-\/radar-\/dev/lib/{\bf estimator\+\_\+fmcw\+\_\+impl.\+h}\item 
+/home/erik/prefix/default/src/gr-\/radar-\/dev/lib/{\bf estimator\+\_\+fmcw\+\_\+impl.\+cc}\end{DoxyCompactItemize}

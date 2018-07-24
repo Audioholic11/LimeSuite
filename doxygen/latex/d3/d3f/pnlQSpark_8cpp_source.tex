@@ -46,7 +46,7 @@
 00040 
 00041     wxFlexGridSizer* FlexGridSizer1;
 00042 
-00043     Create(parent, \textcolor{keywordtype}{id}, wxDefaultPosition, wxDefaultSize, style, \_T(\textcolor{stringliteral}{"id"}));
+00043     Create(parent, \textcolor{keywordtype}{id}, wxDefaultPosition, wxDefaultSize, style, _T(\textcolor{stringliteral}{"id"}));
 00044 \textcolor{preprocessor}{#ifdef WIN32}
 00045     SetBackgroundColour(wxSystemSettings::GetColour(wxSYS\_COLOUR\_BTNFACE));
 00046 \textcolor{preprocessor}{#endif}
@@ -163,13 +163,13 @@
       pnlQSpark::OnConfigurePLL), NULL, \textcolor{keyword}{this});
 00138 
 00139     wxStaticBoxSizer* streamPllGroup = \textcolor{keyword}{new} wxStaticBoxSizer(wxHORIZONTAL, 
-      mPanelStreamPLL, \_T(\textcolor{stringliteral}{"Digital Interface Clock"}));
+      mPanelStreamPLL, _T(\textcolor{stringliteral}{"Digital Interface Clock"}));
 00140     mPanelStreamPLL->SetSizer(streamPllGroup);
 00141     streamPllGroup->Add(sizerPllControls, 1, wxALIGN\_LEFT | wxALIGN\_TOP, 5);
 00142     streamPllGroup->Fit(mPanelStreamPLL);
 00143     FlexGridSizer1->Add(mPanelStreamPLL, 1, wxEXPAND | wxALIGN\_LEFT | wxALIGN\_TOP, 5);
 00144 
-00145     wxStaticBoxSizer* chBox = \textcolor{keyword}{new} wxStaticBoxSizer(wxVERTICAL, \textcolor{keyword}{this}, \_T(\textcolor{stringliteral}{"ADC/DAC channel controls"}));
+00145     wxStaticBoxSizer* chBox = \textcolor{keyword}{new} wxStaticBoxSizer(wxVERTICAL, \textcolor{keyword}{this}, _T(\textcolor{stringliteral}{"ADC/DAC channel controls"}));
 00146     wxFlexGridSizer* chSizer = \textcolor{keyword}{new} wxFlexGridSizer(6, 0, 0, 0);
 00147     wxFlexGridSizer* chSelect = \textcolor{keyword}{new} wxFlexGridSizer(0, 2, 0, 0);
 00148     rbChannelA = \textcolor{keyword}{new} wxRadioButton(\textcolor{keyword}{this}, wxNewId(), wxT(\textcolor{stringliteral}{"A CHANNEL"}), wxDefaultPosition, wxDefaultSize, 0);
@@ -186,7 +186,8 @@
 00157     chBox->Add(chSizer, 1, wxEXPAND | wxALIGN\_LEFT | wxALIGN\_TOP | wxALL, 5);
 00158     FlexGridSizer1->Add(chBox, 1, wxEXPAND | wxALIGN\_LEFT | wxALIGN\_TOP, 5);
 00159 
-00160     wxStaticBoxSizer* moduleEnables = \textcolor{keyword}{new} wxStaticBoxSizer(wxHORIZONTAL, \textcolor{keyword}{this}, \_T(\textcolor{stringliteral}{""}));
+00160     wxStaticBoxSizer* moduleEnables = \textcolor{keyword}{new} wxStaticBoxSizer(wxHORIZONTAL, \textcolor{keyword}{this}, 
+      _T(\textcolor{stringliteral}{""}));
 00161     chkEN_RXTSP = \textcolor{keyword}{new} wxCheckBox(\textcolor{keyword}{this}, wxNewId(), \_(\textcolor{stringliteral}{"Enable RxTSP"}));
 00162     moduleEnables->Add(chkEN_RXTSP, 1, wxALIGN\_LEFT | wxALIGN\_TOP, 5);
 00163     Connect(chkEN_RXTSP->GetId(), wxEVT\_CHECKBOX, wxCommandEventHandler(
@@ -197,7 +198,7 @@
       pnlQSpark::RegisterParameterChangeHandler), NULL, \textcolor{keyword}{this});
 00167     chSizer->Add(moduleEnables, 1, wxEXPAND | wxALIGN\_LEFT | wxALIGN\_TOP | wxALL, 5);
 00168 
-00169     wxStaticBoxSizer* bypassesGroup = \textcolor{keyword}{new} wxStaticBoxSizer(wxVERTICAL, \textcolor{keyword}{this}, \_T(\textcolor{stringliteral}{"Bypass"}));
+00169     wxStaticBoxSizer* bypassesGroup = \textcolor{keyword}{new} wxStaticBoxSizer(wxVERTICAL, \textcolor{keyword}{this}, _T(\textcolor{stringliteral}{"Bypass"}));
 00170     wxFlexGridSizer* bypasses = \textcolor{keyword}{new} wxFlexGridSizer(0, 2, 0, 0);
 00171     chkRX_GCORR_BYP = \textcolor{keyword}{new} wxCheckBox(\textcolor{keyword}{this}, wxNewId(), \_(\textcolor{stringliteral}{"Rx Gain corrector"}));
 00172     bypasses->Add(chkRX_GCORR_BYP, 1, wxALIGN\_LEFT | wxALIGN\_TOP, 5);
@@ -337,7 +338,8 @@
 00260     correctorsSizer->Add(rx\_correctorsSizer, 1, wxALIGN\_LEFT | wxALIGN\_TOP, 5);
 00261     correctorsSizer->Add(tx\_correctorsSizer, 1, wxALIGN\_LEFT | wxALIGN\_TOP, 5);
 00262 
-00263     wxStaticBoxSizer* correctorsGroup = \textcolor{keyword}{new} wxStaticBoxSizer(wxVERTICAL, \textcolor{keyword}{this}, \_T(\textcolor{stringliteral}{"Correctors"}));
+00263     wxStaticBoxSizer* correctorsGroup = \textcolor{keyword}{new} wxStaticBoxSizer(wxVERTICAL, \textcolor{keyword}{this}, 
+      _T(\textcolor{stringliteral}{"Correctors"}));
 00264     correctorsGroup->Add(correctorsSizer, 1, wxEXPAND | wxALIGN\_LEFT | wxALIGN\_TOP, 5);
 00265     chSizer->Add(correctorsGroup, 1, wxEXPAND | wxALIGN\_LEFT | wxALIGN\_TOP, 5);
 00266 
@@ -350,7 +352,8 @@
 00273     Connect(cmbInsel->GetId(), wxEVT\_CHOICE, wxCommandEventHandler(
       pnlQSpark::RegisterParameterChangeHandler), NULL, \textcolor{keyword}{this});
 00274 
-00275     wxStaticBoxSizer* loopbackGroup = \textcolor{keyword}{new} wxStaticBoxSizer(wxHORIZONTAL, \textcolor{keyword}{this}, \_T(\textcolor{stringliteral}{"Loopback controls"}));
+00275     wxStaticBoxSizer* loopbackGroup = \textcolor{keyword}{new} wxStaticBoxSizer(wxHORIZONTAL, \textcolor{keyword}{this}, 
+      _T(\textcolor{stringliteral}{"Loopback controls"}));
 00276     wxFlexGridSizer* loopbackSizer = \textcolor{keyword}{new} wxFlexGridSizer(0, 2, 0, 0);
 00277     loopbackSizer->Add(\textcolor{keyword}{new} wxStaticText(\textcolor{keyword}{this}, wxID\_ANY, \_(\textcolor{stringliteral}{"Tx chain input source:"})), 1, wxALL | 
       wxALIGN\_RIGHT | wxALIGN\_CENTER\_VERTICAL, 5);

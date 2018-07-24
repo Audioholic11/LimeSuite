@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['high_2dlevel_20control_20functions',['High-level control functions',['../d8/d80/group__FN__HIGH__LVL.html',1,'']]]
+  ['gnu_20radio_20radar_20c_2b_2b_20signal_20processing_20blocks',['GNU Radio RADAR C++ Signal Processing Blocks',['../d2/dba/group__block.html',1,'']]]
 ];

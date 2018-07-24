@@ -1,0 +1,355 @@
+\subsection{/home/erik/prefix/default/src/limesuite-\/dev/external/kiss\+F\+F\+T/\+\_\+kiss\+\_\+fft\+\_\+guts.h File Reference}
+\label{__kiss__fft__guts_8h}\index{/home/erik/prefix/default/src/limesuite-\/dev/external/kiss\+F\+F\+T/\+\_\+kiss\+\_\+fft\+\_\+guts.\+h@{/home/erik/prefix/default/src/limesuite-\/dev/external/kiss\+F\+F\+T/\+\_\+kiss\+\_\+fft\+\_\+guts.\+h}}
+{\ttfamily \#include \char`\"{}kiss\+\_\+fft.\+h\char`\"{}}\\*
+{\ttfamily \#include $<$limits.\+h$>$}\\*
+Include dependency graph for \+\_\+kiss\+\_\+fft\+\_\+guts.\+h\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=325pt]{d7/d43/__kiss__fft__guts_8h__incl}
+\end{center}
+\end{figure}
+This graph shows which files directly or indirectly include this file\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=211pt]{d5/d6b/__kiss__fft__guts_8h__dep__incl}
+\end{center}
+\end{figure}
+\subsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct {\bf kiss\+\_\+fft\+\_\+state}
+\end{DoxyCompactItemize}
+\subsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define {\bf M\+A\+X\+F\+A\+C\+T\+O\+RS}~32
+\item 
+\#define {\bf S\+\_\+\+M\+UL}(a,  {\bf b})~( (a)$\ast$({\bf b}) )
+\item 
+\#define {\bf C\+\_\+\+M\+UL}(m,  a,  {\bf b})
+\item 
+\#define {\bf C\+\_\+\+F\+I\+X\+D\+IV}({\bf c},  div)~/$\ast$ N\+O\+OP $\ast$/
+\item 
+\#define {\bf C\+\_\+\+M\+U\+L\+B\+Y\+S\+C\+A\+L\+AR}({\bf c},  s)
+\item 
+\#define {\bf C\+H\+E\+C\+K\+\_\+\+O\+V\+E\+R\+F\+L\+O\+W\+\_\+\+OP}(a,  op,  {\bf b})~/$\ast$ noop $\ast$/
+\item 
+\#define {\bf C\+\_\+\+A\+DD}(res,  a,  {\bf b})
+\item 
+\#define {\bf C\+\_\+\+S\+UB}(res,  a,  {\bf b})
+\item 
+\#define {\bf C\+\_\+\+A\+D\+D\+TO}(res,  a)
+\item 
+\#define {\bf C\+\_\+\+S\+U\+B\+F\+R\+OM}(res,  a)
+\item 
+\#define {\bf K\+I\+S\+S\+\_\+\+F\+F\+T\+\_\+\+C\+OS}({\bf phase})~({\bf kiss\+\_\+fft\+\_\+scalar}) cos({\bf phase})
+\item 
+\#define {\bf K\+I\+S\+S\+\_\+\+F\+F\+T\+\_\+\+S\+IN}({\bf phase})~({\bf kiss\+\_\+fft\+\_\+scalar}) sin({\bf phase})
+\item 
+\#define {\bf H\+A\+L\+F\+\_\+\+OF}({\bf x})~(({\bf x})$\ast$.\+5)
+\item 
+\#define {\bf kf\+\_\+cexp}({\bf x},  {\bf phase})
+\item 
+\#define {\bf pcpx}({\bf c})~fprintf(stderr,\char`\"{}\%g + \%gi\textbackslash{}n\char`\"{},(double)(({\bf c})-\/$>$r),(double)(({\bf c})-\/$>${\bf i}) )
+\item 
+\#define {\bf K\+I\+S\+S\+\_\+\+F\+F\+T\+\_\+\+T\+M\+P\+\_\+\+A\+L\+L\+OC}(nbytes)~{\bf K\+I\+S\+S\+\_\+\+F\+F\+T\+\_\+\+M\+A\+L\+L\+OC}(nbytes)
+\item 
+\#define {\bf K\+I\+S\+S\+\_\+\+F\+F\+T\+\_\+\+T\+M\+P\+\_\+\+F\+R\+EE}(ptr)~{\bf K\+I\+S\+S\+\_\+\+F\+F\+T\+\_\+\+F\+R\+EE}(ptr)
+\end{DoxyCompactItemize}
+
+
+\subsubsection{Macro Definition Documentation}
+\index{\+\_\+kiss\+\_\+fft\+\_\+guts.\+h@{\+\_\+kiss\+\_\+fft\+\_\+guts.\+h}!C\+\_\+\+A\+DD@{C\+\_\+\+A\+DD}}
+\index{C\+\_\+\+A\+DD@{C\+\_\+\+A\+DD}!\+\_\+kiss\+\_\+fft\+\_\+guts.\+h@{\+\_\+kiss\+\_\+fft\+\_\+guts.\+h}}
+\paragraph[{C\+\_\+\+A\+DD}]{\setlength{\rightskip}{0pt plus 5cm}\#define C\+\_\+\+A\+DD(
+\begin{DoxyParamCaption}
+\item[{}]{res, }
+\item[{}]{a, }
+\item[{}]{{\bf b}}
+\end{DoxyParamCaption}
+)}\label{__kiss__fft__guts_8h_a1f70747639c855259a0965de768e030a}
+{\bfseries Value\+:}
+\begin{DoxyCode}
+\textcolor{keywordflow}{do} \{ \
+	    CHECK_OVERFLOW_OP((a).r,+,(b).r)\
+	    CHECK_OVERFLOW_OP((a).i,+,(b).i)\(\backslash\)
+        (res).r=(a).r+(b).r;  (res).i=(a).i+(b).i; \(\backslash\)
+    \}\textcolor{keywordflow}{while}(0)
+\end{DoxyCode}
+
+
+Definition at line {\bf 100} of file {\bf \+\_\+kiss\+\_\+fft\+\_\+guts.\+h}.
+
+
+
+Referenced by {\bf kf\+\_\+bfly3()}, {\bf kf\+\_\+bfly4()}, and {\bf kf\+\_\+bfly5()}.
+
+\index{\+\_\+kiss\+\_\+fft\+\_\+guts.\+h@{\+\_\+kiss\+\_\+fft\+\_\+guts.\+h}!C\+\_\+\+A\+D\+D\+TO@{C\+\_\+\+A\+D\+D\+TO}}
+\index{C\+\_\+\+A\+D\+D\+TO@{C\+\_\+\+A\+D\+D\+TO}!\+\_\+kiss\+\_\+fft\+\_\+guts.\+h@{\+\_\+kiss\+\_\+fft\+\_\+guts.\+h}}
+\paragraph[{C\+\_\+\+A\+D\+D\+TO}]{\setlength{\rightskip}{0pt plus 5cm}\#define C\+\_\+\+A\+D\+D\+TO(
+\begin{DoxyParamCaption}
+\item[{}]{res, }
+\item[{}]{a}
+\end{DoxyParamCaption}
+)}\label{__kiss__fft__guts_8h_a2042ee8c6fb9306eb20d62e6506446aa}
+{\bfseries Value\+:}
+\begin{DoxyCode}
+\textcolor{keywordflow}{do} \{ \
+	    CHECK_OVERFLOW_OP((res).r,+,(a).r)\
+	    CHECK_OVERFLOW_OP((res).i,+,(a).i)\(\backslash\)
+        (res).r += (a).r;  (res).i += (a).i;\(\backslash\)
+    \}\textcolor{keywordflow}{while}(0)
+\end{DoxyCode}
+
+
+Definition at line {\bf 112} of file {\bf \+\_\+kiss\+\_\+fft\+\_\+guts.\+h}.
+
+
+
+Referenced by {\bf kf\+\_\+bfly2()}, {\bf kf\+\_\+bfly3()}, {\bf kf\+\_\+bfly4()}, and {\bf kf\+\_\+bfly\+\_\+generic()}.
+
+\index{\+\_\+kiss\+\_\+fft\+\_\+guts.\+h@{\+\_\+kiss\+\_\+fft\+\_\+guts.\+h}!C\+\_\+\+F\+I\+X\+D\+IV@{C\+\_\+\+F\+I\+X\+D\+IV}}
+\index{C\+\_\+\+F\+I\+X\+D\+IV@{C\+\_\+\+F\+I\+X\+D\+IV}!\+\_\+kiss\+\_\+fft\+\_\+guts.\+h@{\+\_\+kiss\+\_\+fft\+\_\+guts.\+h}}
+\paragraph[{C\+\_\+\+F\+I\+X\+D\+IV}]{\setlength{\rightskip}{0pt plus 5cm}\#define C\+\_\+\+F\+I\+X\+D\+IV(
+\begin{DoxyParamCaption}
+\item[{}]{{\bf c}, }
+\item[{}]{div}
+\end{DoxyParamCaption}
+)~/$\ast$ N\+O\+OP $\ast$/}\label{__kiss__fft__guts_8h_a05e11bb1e8e815dd7bdd199060b7555a}
+
+
+Definition at line {\bf 90} of file {\bf \+\_\+kiss\+\_\+fft\+\_\+guts.\+h}.
+
+
+
+Referenced by {\bf kf\+\_\+bfly2()}, {\bf kf\+\_\+bfly3()}, {\bf kf\+\_\+bfly4()}, {\bf kf\+\_\+bfly5()}, and {\bf kf\+\_\+bfly\+\_\+generic()}.
+
+\index{\+\_\+kiss\+\_\+fft\+\_\+guts.\+h@{\+\_\+kiss\+\_\+fft\+\_\+guts.\+h}!C\+\_\+\+M\+UL@{C\+\_\+\+M\+UL}}
+\index{C\+\_\+\+M\+UL@{C\+\_\+\+M\+UL}!\+\_\+kiss\+\_\+fft\+\_\+guts.\+h@{\+\_\+kiss\+\_\+fft\+\_\+guts.\+h}}
+\paragraph[{C\+\_\+\+M\+UL}]{\setlength{\rightskip}{0pt plus 5cm}\#define C\+\_\+\+M\+UL(
+\begin{DoxyParamCaption}
+\item[{}]{m, }
+\item[{}]{a, }
+\item[{}]{{\bf b}}
+\end{DoxyParamCaption}
+)}\label{__kiss__fft__guts_8h_ab5092aa032092f1057feca5fbea40758}
+{\bfseries Value\+:}
+\begin{DoxyCode}
+\textcolor{keywordflow}{do}\{ (m).r = (a).r*(b).r - (a).i*(b).i;\(\backslash\)
+        (m).i = (a).r*(b).i + (a).i*(b).r; \}\textcolor{keywordflow}{while}(0)
+\end{DoxyCode}
+
+
+Definition at line {\bf 87} of file {\bf \+\_\+kiss\+\_\+fft\+\_\+guts.\+h}.
+
+
+
+Referenced by {\bf kf\+\_\+bfly2()}, {\bf kf\+\_\+bfly3()}, {\bf kf\+\_\+bfly4()}, {\bf kf\+\_\+bfly5()}, and {\bf kf\+\_\+bfly\+\_\+generic()}.
+
+\index{\+\_\+kiss\+\_\+fft\+\_\+guts.\+h@{\+\_\+kiss\+\_\+fft\+\_\+guts.\+h}!C\+\_\+\+M\+U\+L\+B\+Y\+S\+C\+A\+L\+AR@{C\+\_\+\+M\+U\+L\+B\+Y\+S\+C\+A\+L\+AR}}
+\index{C\+\_\+\+M\+U\+L\+B\+Y\+S\+C\+A\+L\+AR@{C\+\_\+\+M\+U\+L\+B\+Y\+S\+C\+A\+L\+AR}!\+\_\+kiss\+\_\+fft\+\_\+guts.\+h@{\+\_\+kiss\+\_\+fft\+\_\+guts.\+h}}
+\paragraph[{C\+\_\+\+M\+U\+L\+B\+Y\+S\+C\+A\+L\+AR}]{\setlength{\rightskip}{0pt plus 5cm}\#define C\+\_\+\+M\+U\+L\+B\+Y\+S\+C\+A\+L\+AR(
+\begin{DoxyParamCaption}
+\item[{}]{{\bf c}, }
+\item[{}]{s}
+\end{DoxyParamCaption}
+)}\label{__kiss__fft__guts_8h_a958da96ff02cad6be35cafa3019804b5}
+{\bfseries Value\+:}
+\begin{DoxyCode}
+\textcolor{keywordflow}{do}\{ (c).r *= (s);\(\backslash\)
+        (c).i *= (s); \}\textcolor{keywordflow}{while}(0)
+\end{DoxyCode}
+
+
+Definition at line {\bf 91} of file {\bf \+\_\+kiss\+\_\+fft\+\_\+guts.\+h}.
+
+
+
+Referenced by {\bf kf\+\_\+bfly3()}.
+
+\index{\+\_\+kiss\+\_\+fft\+\_\+guts.\+h@{\+\_\+kiss\+\_\+fft\+\_\+guts.\+h}!C\+\_\+\+S\+UB@{C\+\_\+\+S\+UB}}
+\index{C\+\_\+\+S\+UB@{C\+\_\+\+S\+UB}!\+\_\+kiss\+\_\+fft\+\_\+guts.\+h@{\+\_\+kiss\+\_\+fft\+\_\+guts.\+h}}
+\paragraph[{C\+\_\+\+S\+UB}]{\setlength{\rightskip}{0pt plus 5cm}\#define C\+\_\+\+S\+UB(
+\begin{DoxyParamCaption}
+\item[{}]{res, }
+\item[{}]{a, }
+\item[{}]{{\bf b}}
+\end{DoxyParamCaption}
+)}\label{__kiss__fft__guts_8h_a8c00bd9702f25a8514402a3779b3bdda}
+{\bfseries Value\+:}
+\begin{DoxyCode}
+\textcolor{keywordflow}{do} \{ \
+	    CHECK_OVERFLOW_OP((a).r,-,(b).r)\
+	    CHECK_OVERFLOW_OP((a).i,-,(b).i)\(\backslash\)
+        (res).r=(a).r-(b).r;  (res).i=(a).i-(b).i; \(\backslash\)
+    \}\textcolor{keywordflow}{while}(0)
+\end{DoxyCode}
+
+
+Definition at line {\bf 106} of file {\bf \+\_\+kiss\+\_\+fft\+\_\+guts.\+h}.
+
+
+
+Referenced by {\bf kf\+\_\+bfly2()}, {\bf kf\+\_\+bfly3()}, {\bf kf\+\_\+bfly4()}, and {\bf kf\+\_\+bfly5()}.
+
+\index{\+\_\+kiss\+\_\+fft\+\_\+guts.\+h@{\+\_\+kiss\+\_\+fft\+\_\+guts.\+h}!C\+\_\+\+S\+U\+B\+F\+R\+OM@{C\+\_\+\+S\+U\+B\+F\+R\+OM}}
+\index{C\+\_\+\+S\+U\+B\+F\+R\+OM@{C\+\_\+\+S\+U\+B\+F\+R\+OM}!\+\_\+kiss\+\_\+fft\+\_\+guts.\+h@{\+\_\+kiss\+\_\+fft\+\_\+guts.\+h}}
+\paragraph[{C\+\_\+\+S\+U\+B\+F\+R\+OM}]{\setlength{\rightskip}{0pt plus 5cm}\#define C\+\_\+\+S\+U\+B\+F\+R\+OM(
+\begin{DoxyParamCaption}
+\item[{}]{res, }
+\item[{}]{a}
+\end{DoxyParamCaption}
+)}\label{__kiss__fft__guts_8h_aa3f448e1963492dfc145fc391cbedd27}
+{\bfseries Value\+:}
+\begin{DoxyCode}
+\textcolor{keywordflow}{do} \{\
+	    CHECK_OVERFLOW_OP((res).r,-,(a).r)\
+	    CHECK_OVERFLOW_OP((res).i,-,(a).i)\(\backslash\)
+        (res).r -= (a).r;  (res).i -= (a).i; \(\backslash\)
+    \}\textcolor{keywordflow}{while}(0)
+\end{DoxyCode}
+
+
+Definition at line {\bf 119} of file {\bf \+\_\+kiss\+\_\+fft\+\_\+guts.\+h}.
+
+\index{\+\_\+kiss\+\_\+fft\+\_\+guts.\+h@{\+\_\+kiss\+\_\+fft\+\_\+guts.\+h}!C\+H\+E\+C\+K\+\_\+\+O\+V\+E\+R\+F\+L\+O\+W\+\_\+\+OP@{C\+H\+E\+C\+K\+\_\+\+O\+V\+E\+R\+F\+L\+O\+W\+\_\+\+OP}}
+\index{C\+H\+E\+C\+K\+\_\+\+O\+V\+E\+R\+F\+L\+O\+W\+\_\+\+OP@{C\+H\+E\+C\+K\+\_\+\+O\+V\+E\+R\+F\+L\+O\+W\+\_\+\+OP}!\+\_\+kiss\+\_\+fft\+\_\+guts.\+h@{\+\_\+kiss\+\_\+fft\+\_\+guts.\+h}}
+\paragraph[{C\+H\+E\+C\+K\+\_\+\+O\+V\+E\+R\+F\+L\+O\+W\+\_\+\+OP}]{\setlength{\rightskip}{0pt plus 5cm}\#define C\+H\+E\+C\+K\+\_\+\+O\+V\+E\+R\+F\+L\+O\+W\+\_\+\+OP(
+\begin{DoxyParamCaption}
+\item[{}]{a, }
+\item[{}]{op, }
+\item[{}]{{\bf b}}
+\end{DoxyParamCaption}
+)~/$\ast$ noop $\ast$/}\label{__kiss__fft__guts_8h_a664c056b2a7093f88391d7db3558aa24}
+
+
+Definition at line {\bf 97} of file {\bf \+\_\+kiss\+\_\+fft\+\_\+guts.\+h}.
+
+\index{\+\_\+kiss\+\_\+fft\+\_\+guts.\+h@{\+\_\+kiss\+\_\+fft\+\_\+guts.\+h}!H\+A\+L\+F\+\_\+\+OF@{H\+A\+L\+F\+\_\+\+OF}}
+\index{H\+A\+L\+F\+\_\+\+OF@{H\+A\+L\+F\+\_\+\+OF}!\+\_\+kiss\+\_\+fft\+\_\+guts.\+h@{\+\_\+kiss\+\_\+fft\+\_\+guts.\+h}}
+\paragraph[{H\+A\+L\+F\+\_\+\+OF}]{\setlength{\rightskip}{0pt plus 5cm}\#define H\+A\+L\+F\+\_\+\+OF(
+\begin{DoxyParamCaption}
+\item[{}]{{\bf x}}
+\end{DoxyParamCaption}
+)~(({\bf x})$\ast$.\+5)}\label{__kiss__fft__guts_8h_a0b812a30fdb0c530a90a18d1692fab6c}
+
+
+Definition at line {\bf 138} of file {\bf \+\_\+kiss\+\_\+fft\+\_\+guts.\+h}.
+
+
+
+Referenced by {\bf kf\+\_\+bfly3()}.
+
+\index{\+\_\+kiss\+\_\+fft\+\_\+guts.\+h@{\+\_\+kiss\+\_\+fft\+\_\+guts.\+h}!kf\+\_\+cexp@{kf\+\_\+cexp}}
+\index{kf\+\_\+cexp@{kf\+\_\+cexp}!\+\_\+kiss\+\_\+fft\+\_\+guts.\+h@{\+\_\+kiss\+\_\+fft\+\_\+guts.\+h}}
+\paragraph[{kf\+\_\+cexp}]{\setlength{\rightskip}{0pt plus 5cm}\#define kf\+\_\+cexp(
+\begin{DoxyParamCaption}
+\item[{}]{{\bf x}, }
+\item[{}]{{\bf phase}}
+\end{DoxyParamCaption}
+)}\label{__kiss__fft__guts_8h_ac7852abdf2dc5ed4538551be6d1dd20b}
+{\bfseries Value\+:}
+\begin{DoxyCode}
+\textcolor{keywordflow}{do}\{ \(\backslash\)
+        (x)->r = KISS_FFT_COS(phase);\(\backslash\)
+        (x)->i = KISS_FFT_SIN(phase);\(\backslash\)
+    \}\textcolor{keywordflow}{while}(0)
+\end{DoxyCode}
+
+
+Definition at line {\bf 141} of file {\bf \+\_\+kiss\+\_\+fft\+\_\+guts.\+h}.
+
+
+
+Referenced by {\bf kiss\+\_\+fft\+\_\+alloc()}.
+
+\index{\+\_\+kiss\+\_\+fft\+\_\+guts.\+h@{\+\_\+kiss\+\_\+fft\+\_\+guts.\+h}!K\+I\+S\+S\+\_\+\+F\+F\+T\+\_\+\+C\+OS@{K\+I\+S\+S\+\_\+\+F\+F\+T\+\_\+\+C\+OS}}
+\index{K\+I\+S\+S\+\_\+\+F\+F\+T\+\_\+\+C\+OS@{K\+I\+S\+S\+\_\+\+F\+F\+T\+\_\+\+C\+OS}!\+\_\+kiss\+\_\+fft\+\_\+guts.\+h@{\+\_\+kiss\+\_\+fft\+\_\+guts.\+h}}
+\paragraph[{K\+I\+S\+S\+\_\+\+F\+F\+T\+\_\+\+C\+OS}]{\setlength{\rightskip}{0pt plus 5cm}\#define K\+I\+S\+S\+\_\+\+F\+F\+T\+\_\+\+C\+OS(
+\begin{DoxyParamCaption}
+\item[{}]{{\bf phase}}
+\end{DoxyParamCaption}
+)~({\bf kiss\+\_\+fft\+\_\+scalar}) cos({\bf phase})}\label{__kiss__fft__guts_8h_a2e780e8fe86d9c3e7b6a469f61aaf5d1}
+
+
+Definition at line {\bf 136} of file {\bf \+\_\+kiss\+\_\+fft\+\_\+guts.\+h}.
+
+\index{\+\_\+kiss\+\_\+fft\+\_\+guts.\+h@{\+\_\+kiss\+\_\+fft\+\_\+guts.\+h}!K\+I\+S\+S\+\_\+\+F\+F\+T\+\_\+\+S\+IN@{K\+I\+S\+S\+\_\+\+F\+F\+T\+\_\+\+S\+IN}}
+\index{K\+I\+S\+S\+\_\+\+F\+F\+T\+\_\+\+S\+IN@{K\+I\+S\+S\+\_\+\+F\+F\+T\+\_\+\+S\+IN}!\+\_\+kiss\+\_\+fft\+\_\+guts.\+h@{\+\_\+kiss\+\_\+fft\+\_\+guts.\+h}}
+\paragraph[{K\+I\+S\+S\+\_\+\+F\+F\+T\+\_\+\+S\+IN}]{\setlength{\rightskip}{0pt plus 5cm}\#define K\+I\+S\+S\+\_\+\+F\+F\+T\+\_\+\+S\+IN(
+\begin{DoxyParamCaption}
+\item[{}]{{\bf phase}}
+\end{DoxyParamCaption}
+)~({\bf kiss\+\_\+fft\+\_\+scalar}) sin({\bf phase})}\label{__kiss__fft__guts_8h_a2d4fc93cde15512f1946f364d5271dd3}
+
+
+Definition at line {\bf 137} of file {\bf \+\_\+kiss\+\_\+fft\+\_\+guts.\+h}.
+
+\index{\+\_\+kiss\+\_\+fft\+\_\+guts.\+h@{\+\_\+kiss\+\_\+fft\+\_\+guts.\+h}!K\+I\+S\+S\+\_\+\+F\+F\+T\+\_\+\+T\+M\+P\+\_\+\+A\+L\+L\+OC@{K\+I\+S\+S\+\_\+\+F\+F\+T\+\_\+\+T\+M\+P\+\_\+\+A\+L\+L\+OC}}
+\index{K\+I\+S\+S\+\_\+\+F\+F\+T\+\_\+\+T\+M\+P\+\_\+\+A\+L\+L\+OC@{K\+I\+S\+S\+\_\+\+F\+F\+T\+\_\+\+T\+M\+P\+\_\+\+A\+L\+L\+OC}!\+\_\+kiss\+\_\+fft\+\_\+guts.\+h@{\+\_\+kiss\+\_\+fft\+\_\+guts.\+h}}
+\paragraph[{K\+I\+S\+S\+\_\+\+F\+F\+T\+\_\+\+T\+M\+P\+\_\+\+A\+L\+L\+OC}]{\setlength{\rightskip}{0pt plus 5cm}\#define K\+I\+S\+S\+\_\+\+F\+F\+T\+\_\+\+T\+M\+P\+\_\+\+A\+L\+L\+OC(
+\begin{DoxyParamCaption}
+\item[{}]{nbytes}
+\end{DoxyParamCaption}
+)~{\bf K\+I\+S\+S\+\_\+\+F\+F\+T\+\_\+\+M\+A\+L\+L\+OC}(nbytes)}\label{__kiss__fft__guts_8h_abd992e9886fb74f97bf0b6e057fe08a5}
+
+
+Definition at line {\bf 162} of file {\bf \+\_\+kiss\+\_\+fft\+\_\+guts.\+h}.
+
+
+
+Referenced by {\bf kf\+\_\+bfly\+\_\+generic()}, and {\bf kiss\+\_\+fft\+\_\+stride()}.
+
+\index{\+\_\+kiss\+\_\+fft\+\_\+guts.\+h@{\+\_\+kiss\+\_\+fft\+\_\+guts.\+h}!K\+I\+S\+S\+\_\+\+F\+F\+T\+\_\+\+T\+M\+P\+\_\+\+F\+R\+EE@{K\+I\+S\+S\+\_\+\+F\+F\+T\+\_\+\+T\+M\+P\+\_\+\+F\+R\+EE}}
+\index{K\+I\+S\+S\+\_\+\+F\+F\+T\+\_\+\+T\+M\+P\+\_\+\+F\+R\+EE@{K\+I\+S\+S\+\_\+\+F\+F\+T\+\_\+\+T\+M\+P\+\_\+\+F\+R\+EE}!\+\_\+kiss\+\_\+fft\+\_\+guts.\+h@{\+\_\+kiss\+\_\+fft\+\_\+guts.\+h}}
+\paragraph[{K\+I\+S\+S\+\_\+\+F\+F\+T\+\_\+\+T\+M\+P\+\_\+\+F\+R\+EE}]{\setlength{\rightskip}{0pt plus 5cm}\#define K\+I\+S\+S\+\_\+\+F\+F\+T\+\_\+\+T\+M\+P\+\_\+\+F\+R\+EE(
+\begin{DoxyParamCaption}
+\item[{}]{ptr}
+\end{DoxyParamCaption}
+)~{\bf K\+I\+S\+S\+\_\+\+F\+F\+T\+\_\+\+F\+R\+EE}(ptr)}\label{__kiss__fft__guts_8h_ab915c572fe96a51a3528b7419248b655}
+
+
+Definition at line {\bf 163} of file {\bf \+\_\+kiss\+\_\+fft\+\_\+guts.\+h}.
+
+
+
+Referenced by {\bf kf\+\_\+bfly\+\_\+generic()}, and {\bf kiss\+\_\+fft\+\_\+stride()}.
+
+\index{\+\_\+kiss\+\_\+fft\+\_\+guts.\+h@{\+\_\+kiss\+\_\+fft\+\_\+guts.\+h}!M\+A\+X\+F\+A\+C\+T\+O\+RS@{M\+A\+X\+F\+A\+C\+T\+O\+RS}}
+\index{M\+A\+X\+F\+A\+C\+T\+O\+RS@{M\+A\+X\+F\+A\+C\+T\+O\+RS}!\+\_\+kiss\+\_\+fft\+\_\+guts.\+h@{\+\_\+kiss\+\_\+fft\+\_\+guts.\+h}}
+\paragraph[{M\+A\+X\+F\+A\+C\+T\+O\+RS}]{\setlength{\rightskip}{0pt plus 5cm}\#define M\+A\+X\+F\+A\+C\+T\+O\+RS~32}\label{__kiss__fft__guts_8h_af176a125e008eb443996cf0f83cc135c}
+
+
+Definition at line {\bf 22} of file {\bf \+\_\+kiss\+\_\+fft\+\_\+guts.\+h}.
+
+\index{\+\_\+kiss\+\_\+fft\+\_\+guts.\+h@{\+\_\+kiss\+\_\+fft\+\_\+guts.\+h}!pcpx@{pcpx}}
+\index{pcpx@{pcpx}!\+\_\+kiss\+\_\+fft\+\_\+guts.\+h@{\+\_\+kiss\+\_\+fft\+\_\+guts.\+h}}
+\paragraph[{pcpx}]{\setlength{\rightskip}{0pt plus 5cm}\#define pcpx(
+\begin{DoxyParamCaption}
+\item[{}]{{\bf c}}
+\end{DoxyParamCaption}
+)~fprintf(stderr,\char`\"{}\%g + \%gi\textbackslash{}n\char`\"{},(double)(({\bf c})-\/$>$r),(double)(({\bf c})-\/$>${\bf i}) )}\label{__kiss__fft__guts_8h_ac1abb41ecdedd05dda5d1ce83b67a704}
+
+
+Definition at line {\bf 149} of file {\bf \+\_\+kiss\+\_\+fft\+\_\+guts.\+h}.
+
+\index{\+\_\+kiss\+\_\+fft\+\_\+guts.\+h@{\+\_\+kiss\+\_\+fft\+\_\+guts.\+h}!S\+\_\+\+M\+UL@{S\+\_\+\+M\+UL}}
+\index{S\+\_\+\+M\+UL@{S\+\_\+\+M\+UL}!\+\_\+kiss\+\_\+fft\+\_\+guts.\+h@{\+\_\+kiss\+\_\+fft\+\_\+guts.\+h}}
+\paragraph[{S\+\_\+\+M\+UL}]{\setlength{\rightskip}{0pt plus 5cm}\#define S\+\_\+\+M\+UL(
+\begin{DoxyParamCaption}
+\item[{}]{a, }
+\item[{}]{{\bf b}}
+\end{DoxyParamCaption}
+)~( (a)$\ast$({\bf b}) )}\label{__kiss__fft__guts_8h_a944e08f3916c56a9697bbfed458eaa94}
+
+
+Definition at line {\bf 86} of file {\bf \+\_\+kiss\+\_\+fft\+\_\+guts.\+h}.
+
+
+
+Referenced by {\bf kf\+\_\+bfly5()}.
+

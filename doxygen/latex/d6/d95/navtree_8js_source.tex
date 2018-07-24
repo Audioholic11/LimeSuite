@@ -1,0 +1,528 @@
+\subsection{navtree.\+js}
+\label{navtree_8js_source}\index{/home/erik/prefix/default/src/gr-\/radar-\/dev/build/docs/doxygen/html/navtree.\+js@{/home/erik/prefix/default/src/gr-\/radar-\/dev/build/docs/doxygen/html/navtree.\+js}}
+
+\begin{DoxyCode}
+00001 var navTreeSubIndices = \textcolor{keyword}{new} Array();
+00002 
+00003 \textcolor{keyword}{function} getData(varName)
+00004 \{
+00005   var i = varName.lastIndexOf(\textcolor{charliteral}{'/'});
+00006   var n = i>=0 ? varName.substring(i+1) : varName;
+00007   \textcolor{keywordflow}{return} eval(n.replace(/\(\backslash\)-/g,\textcolor{charliteral}{'\_'}));
+00008 \}
+00009 
+00010 \textcolor{keyword}{function} stripPath(uri)
+00011 \{
+00012   \textcolor{keywordflow}{return} uri.substring(uri.lastIndexOf(\textcolor{charliteral}{'/'})+1);
+00013 \}
+00014 
+00015 \textcolor{keyword}{function} stripPath2(uri)
+00016 \{
+00017   var i = uri.lastIndexOf(\textcolor{charliteral}{'/'});
+00018   var s = uri.substring(i+1);
+00019   var m = uri.substring(0,i+1).match(/\(\backslash\)/d\(\backslash\)w\(\backslash\)/d\(\backslash\)w\(\backslash\)w\(\backslash\)/$/);
+00020   \textcolor{keywordflow}{return} m ? uri.substring(i-6) : s;
+00021 \}
+00022 
+00023 \textcolor{keyword}{function} hashValue()
+00024 \{
+00025   \textcolor{keywordflow}{return} $(location).attr(\textcolor{stringliteral}{'hash'}).substring(1).replace(/[^\(\backslash\)w\(\backslash\)-]/g,\textcolor{stringliteral}{''});
+00026 \}
+00027 
+00028 \textcolor{keyword}{function} hashUrl()
+00029 \{
+00030   \textcolor{keywordflow}{return} \textcolor{charliteral}{'#'}+hashValue();
+00031 \}
+00032 
+00033 \textcolor{keyword}{function} pathName()
+00034 \{
+00035   \textcolor{keywordflow}{return} $(location).attr(\textcolor{stringliteral}{'pathname'}).replace(/[^-A-Za-z0-9+&@#/%?=~\_|!:,.;\(\backslash\)(\(\backslash\))]/g, \textcolor{stringliteral}{''});
+00036 \}
+00037 
+00038 \textcolor{keyword}{function} localStorageSupported()
+00039 \{
+00040   \textcolor{keywordflow}{try} \{
+00041     \textcolor{keywordflow}{return} \textcolor{stringliteral}{'localStorage'} in window && window[\textcolor{stringliteral}{'localStorage'}] !== null && window.localStorage.getItem;
+00042   \}
+00043   \textcolor{keywordflow}{catch}(e) \{
+00044     \textcolor{keywordflow}{return} \textcolor{keyword}{false};
+00045   \}
+00046 \}
+00047 
+00048 
+00049 \textcolor{keyword}{function} storeLink(link)
+00050 \{
+00051   \textcolor{keywordflow}{if} (!$(\textcolor{stringliteral}{"#nav-sync"}).hasClass(\textcolor{stringliteral}{'sync'}) && localStorageSupported()) \{
+00052       window.localStorage.setItem(\textcolor{stringliteral}{'navpath'},link);
+00053   \}
+00054 \}
+00055 
+00056 \textcolor{keyword}{function} deleteLink()
+00057 \{
+00058   \textcolor{keywordflow}{if} (localStorageSupported()) \{
+00059     window.localStorage.setItem(\textcolor{stringliteral}{'navpath'},\textcolor{stringliteral}{''});
+00060   \}
+00061 \}
+00062 
+00063 \textcolor{keyword}{function} cachedLink()
+00064 \{
+00065   \textcolor{keywordflow}{if} (localStorageSupported()) \{
+00066     \textcolor{keywordflow}{return} window.localStorage.getItem(\textcolor{stringliteral}{'navpath'});
+00067   \} \textcolor{keywordflow}{else} \{
+00068     \textcolor{keywordflow}{return} \textcolor{stringliteral}{''};
+00069   \}
+00070 \}
+00071 
+00072 \textcolor{keyword}{function} getScript(scriptName,func,show)
+00073 \{
+00074   var head = document.getElementsByTagName(\textcolor{stringliteral}{"head"})[0]; 
+00075   var script = document.createElement(\textcolor{stringliteral}{'script'});
+00076   script.id = scriptName;
+00077   script.type = \textcolor{stringliteral}{'text/javascript'};
+00078   script.onload = func; 
+00079   script.src = scriptName+\textcolor{stringliteral}{'.js'}; 
+00080   \textcolor{keywordflow}{if} ($.browser.msie && $.browser.version<=8) \{ 
+00081     \textcolor{comment}{// script.onload does not work with older versions of IE}
+00082     script.onreadystatechange = \textcolor{keyword}{function}() \{
+00083       \textcolor{keywordflow}{if} (script.readyState==\textcolor{stringliteral}{'complete'} || script.readyState==\textcolor{stringliteral}{'loaded'}) \{ 
+00084         func(); \textcolor{keywordflow}{if} (show) showRoot(); 
+00085       \}
+00086     \}
+00087   \}
+00088   head.appendChild(script); 
+00089 \}
+00090 
+00091 \textcolor{keyword}{function} createIndent(o,domNode,node,level)
+00092 \{
+00093   var level=-1;
+00094   var n = node;
+00095   \textcolor{keywordflow}{while} (n.parentNode) \{ level++; n=n.parentNode; \}
+00096   \textcolor{keywordflow}{if} (node.childrenData) \{
+00097     var imgNode = document.createElement(\textcolor{stringliteral}{"img"});
+00098     imgNode.style.paddingLeft=(16*level).toString()+\textcolor{stringliteral}{'px'};
+00099     imgNode.width  = 16;
+00100     imgNode.height = 22;
+00101     imgNode.border = 0;
+00102     node.plus\_img = imgNode;
+00103     node.expandToggle = document.createElement(\textcolor{stringliteral}{"a"});
+00104     node.expandToggle.href = \textcolor{stringliteral}{"javascript:void(0)"};
+00105     node.expandToggle.onclick = \textcolor{keyword}{function}() \{
+00106       \textcolor{keywordflow}{if} (node.expanded) \{
+00107         $(node.getChildrenUL()).slideUp(\textcolor{stringliteral}{"fast"});
+00108         node.plus\_img.src = node.relpath+\textcolor{stringliteral}{"arrowright.png"};
+00109         node.expanded = \textcolor{keyword}{false};
+00110       \} \textcolor{keywordflow}{else} \{
+00111         expandNode(o, node, \textcolor{keyword}{false}, \textcolor{keyword}{false});
+00112       \}
+00113     \}
+00114     node.expandToggle.appendChild(imgNode);
+00115     domNode.appendChild(node.expandToggle);
+00116     imgNode.src = node.relpath+\textcolor{stringliteral}{"arrowright.png"};
+00117   \} \textcolor{keywordflow}{else} \{
+00118     var span = document.createElement(\textcolor{stringliteral}{"span"});
+00119     span.style.display = \textcolor{stringliteral}{'inline-block'};
+00120     span.style.width   = 16*(level+1)+\textcolor{stringliteral}{'px'};
+00121     span.style.height  = \textcolor{stringliteral}{'22px'};
+00122     span.innerHTML = \textcolor{stringliteral}{'&#160;'};
+00123     domNode.appendChild(span);
+00124   \} 
+00125 \}
+00126 
+00127 var animationInProgress = \textcolor{keyword}{false};
+00128 
+00129 \textcolor{keyword}{function} gotoAnchor(anchor,aname,updateLocation)
+00130 \{
+00131   var pos, docContent = $(\textcolor{stringliteral}{'#doc-content'});
+00132   var ancParent = $(anchor.parent());
+00133   \textcolor{keywordflow}{if} (ancParent.hasClass(\textcolor{stringliteral}{'memItemLeft'}) ||
+00134       ancParent.hasClass(\textcolor{stringliteral}{'fieldname'}) ||
+00135       ancParent.hasClass(\textcolor{stringliteral}{'fieldtype'}) ||
+00136       ancParent.is(\textcolor{stringliteral}{':header'}))
+00137   \{
+00138     pos = ancParent.position().top;
+00139   \} \textcolor{keywordflow}{else} \textcolor{keywordflow}{if} (anchor.position()) \{
+00140     pos = anchor.position().top;
+00141   \}
+00142   \textcolor{keywordflow}{if} (pos) \{
+00143     var dist = Math.abs(Math.min(
+00144                pos-docContent.offset().top,
+00145                docContent[0].scrollHeight-
+00146                docContent.height()-docContent.scrollTop()));
+00147     animationInProgress=\textcolor{keyword}{true};
+00148     docContent.animate(\{
+00149       scrollTop: pos + docContent.scrollTop() - docContent.offset().top
+00150     \},Math.max(50,Math.min(500,dist)),\textcolor{keyword}{function}()\{
+00151       \textcolor{keywordflow}{if} (updateLocation) window.location.href=aname;
+00152       animationInProgress=\textcolor{keyword}{false};
+00153     \});
+00154   \}
+00155 \}
+00156 
+00157 \textcolor{keyword}{function} newNode(o, po, text, link, childrenData, lastNode)
+00158 \{
+00159   var node = \textcolor{keyword}{new} Object();
+00160   node.children = Array();
+00161   node.childrenData = childrenData;
+00162   node.depth = po.depth + 1;
+00163   node.relpath = po.relpath;
+00164   node.isLast = lastNode;
+00165 
+00166   node.li = document.createElement(\textcolor{stringliteral}{"li"});
+00167   po.getChildrenUL().appendChild(node.li);
+00168   node.parentNode = po;
+00169 
+00170   node.itemDiv = document.createElement(\textcolor{stringliteral}{"div"});
+00171   node.itemDiv.className = \textcolor{stringliteral}{"item"};
+00172 
+00173   node.labelSpan = document.createElement(\textcolor{stringliteral}{"span"});
+00174   node.labelSpan.className = \textcolor{stringliteral}{"label"};
+00175 
+00176   createIndent(o,node.itemDiv,node,0);
+00177   node.itemDiv.appendChild(node.labelSpan);
+00178   node.li.appendChild(node.itemDiv);
+00179 
+00180   var a = document.createElement(\textcolor{stringliteral}{"a"});
+00181   node.labelSpan.appendChild(a);
+00182   node.label = document.createTextNode(text);
+00183   node.expanded = \textcolor{keyword}{false};
+00184   a.appendChild(node.label);
+00185   \textcolor{keywordflow}{if} (link) \{
+00186     var url;
+00187     \textcolor{keywordflow}{if} (link.substring(0,1)==\textcolor{charliteral}{'^'}) \{
+00188       url = link.substring(1);
+00189       link = url;
+00190     \} \textcolor{keywordflow}{else} \{
+00191       url = node.relpath+link;
+00192     \}
+00193     a.className = stripPath(link.replace(\textcolor{charliteral}{'#'},\textcolor{charliteral}{':'}));
+00194     \textcolor{keywordflow}{if} (link.indexOf(\textcolor{charliteral}{'#'})!=-1) \{
+00195       var aname = \textcolor{charliteral}{'#'}+link.split(\textcolor{charliteral}{'#'})[1];
+00196       var srcPage = stripPath(pathName());
+00197       var targetPage = stripPath(link.split(\textcolor{charliteral}{'#'})[0]);
+00198       a.href = srcPage!=targetPage ? url : \textcolor{stringliteral}{"javascript:void(0)"}; 
+00199       a.onclick = \textcolor{keyword}{function}()\{
+00200         storeLink(link);
+00201         \textcolor{keywordflow}{if} (!$(a).parent().parent().hasClass(\textcolor{stringliteral}{'selected'}))
+00202         \{
+00203           $(\textcolor{stringliteral}{'.item'}).removeClass(\textcolor{stringliteral}{'selected'});
+00204           $(\textcolor{stringliteral}{'.item'}).removeAttr(\textcolor{stringliteral}{'id'});
+00205           $(a).parent().parent().addClass(\textcolor{stringliteral}{'selected'});
+00206           $(a).parent().parent().attr(\textcolor{stringliteral}{'id'},\textcolor{stringliteral}{'selected'});
+00207         \}
+00208         var anchor = $(aname);
+00209         gotoAnchor(anchor,aname,\textcolor{keyword}{true});
+00210       \};
+00211     \} \textcolor{keywordflow}{else} \{
+00212       a.href = url;
+00213       a.onclick = \textcolor{keyword}{function}() \{ storeLink(link); \}
+00214     \}
+00215   \} \textcolor{keywordflow}{else} \{
+00216     \textcolor{keywordflow}{if} (childrenData != null) 
+00217     \{
+00218       a.className = \textcolor{stringliteral}{"nolink"};
+00219       a.href = \textcolor{stringliteral}{"javascript:void(0)"};
+00220       a.onclick = node.expandToggle.onclick;
+00221     \}
+00222   \}
+00223 
+00224   node.childrenUL = null;
+00225   node.getChildrenUL = \textcolor{keyword}{function}() \{
+00226     \textcolor{keywordflow}{if} (!node.childrenUL) \{
+00227       node.childrenUL = document.createElement(\textcolor{stringliteral}{"ul"});
+00228       node.childrenUL.className = \textcolor{stringliteral}{"children\_ul"};
+00229       node.childrenUL.style.display = \textcolor{stringliteral}{"none"};
+00230       node.li.appendChild(node.childrenUL);
+00231     \}
+00232     \textcolor{keywordflow}{return} node.childrenUL;
+00233   \};
+00234 
+00235   \textcolor{keywordflow}{return} node;
+00236 \}
+00237 
+00238 \textcolor{keyword}{function} showRoot()
+00239 \{
+00240   var headerHeight = $(\textcolor{stringliteral}{"#top"}).height();
+00241   var footerHeight = $(\textcolor{stringliteral}{"#nav-path"}).height();
+00242   var windowHeight = $(window).height() - headerHeight - footerHeight;
+00243   (\textcolor{keyword}{function} ()\{ \textcolor{comment}{// retry until we can scroll to the selected item}
+00244     \textcolor{keywordflow}{try} \{
+00245       var navtree=$(\textcolor{stringliteral}{'#nav-tree'});
+00246       navtree.scrollTo(\textcolor{stringliteral}{'#selected'},0,\{offset:-windowHeight/2\});
+00247     \} \textcolor{keywordflow}{catch} (err) \{
+00248       setTimeout(arguments.callee, 0);
+00249     \}
+00250   \})();
+00251 \}
+00252 
+00253 \textcolor{keyword}{function} expandNode(o, node, imm, showRoot)
+00254 \{
+00255   \textcolor{keywordflow}{if} (node.childrenData && !node.expanded) \{
+00256     \textcolor{keywordflow}{if} (typeof(node.childrenData)===\textcolor{stringliteral}{'string'}) \{
+00257       var varName    = node.childrenData;
+00258       getScript(node.relpath+varName,\textcolor{keyword}{function}()\{
+00259         node.childrenData = getData(varName);
+00260         expandNode(o, node, imm, showRoot);
+00261       \}, showRoot);
+00262     \} \textcolor{keywordflow}{else} \{
+00263       \textcolor{keywordflow}{if} (!node.childrenVisited) \{
+00264         getNode(o, node);
+00265       \} \textcolor{keywordflow}{if} (imm || ($.browser.msie && $.browser.version>8)) \{ 
+00266         \textcolor{comment}{// somehow slideDown jumps to the start of tree for IE9 :-(}
+00267         $(node.getChildrenUL()).show();
+00268       \} \textcolor{keywordflow}{else} \{
+00269         $(node.getChildrenUL()).slideDown(\textcolor{stringliteral}{"fast"});
+00270       \}
+00271       \textcolor{keywordflow}{if} (node.isLast) \{
+00272         node.plus\_img.src = node.relpath+\textcolor{stringliteral}{"arrowdown.png"};
+00273       \} \textcolor{keywordflow}{else} \{
+00274         node.plus\_img.src = node.relpath+\textcolor{stringliteral}{"arrowdown.png"};
+00275       \}
+00276       node.expanded = \textcolor{keyword}{true};
+00277     \}
+00278   \}
+00279 \}
+00280 
+00281 \textcolor{keyword}{function} glowEffect(n,duration)
+00282 \{
+00283   n.addClass(\textcolor{stringliteral}{'glow'}).delay(duration).queue(\textcolor{keyword}{function}(next)\{
+00284     $(\textcolor{keyword}{this}).removeClass(\textcolor{stringliteral}{'glow'});next();
+00285   \});
+00286 \}
+00287 
+00288 \textcolor{keyword}{function} highlightAnchor()
+00289 \{
+00290   var aname = hashUrl();
+00291   var anchor = $(aname);
+00292   \textcolor{keywordflow}{if} (anchor.parent().attr(\textcolor{stringliteral}{'class'})==\textcolor{stringliteral}{'memItemLeft'})\{
+00293     var rows = $(\textcolor{stringliteral}{'.memberdecls tr[class$="'}+hashValue()+\textcolor{stringliteral}{'"]'});
+00294     glowEffect(rows.children(),300); \textcolor{comment}{// member without details}
+00295   \} \textcolor{keywordflow}{else} \textcolor{keywordflow}{if} (anchor.parent().attr(\textcolor{stringliteral}{'class'})==\textcolor{stringliteral}{'fieldname'})\{
+00296     glowEffect(anchor.parent().parent(),1000); \textcolor{comment}{// enum value}
+00297   \} \textcolor{keywordflow}{else} \textcolor{keywordflow}{if} (anchor.parent().attr(\textcolor{stringliteral}{'class'})==\textcolor{stringliteral}{'fieldtype'})\{
+00298     glowEffect(anchor.parent().parent(),1000); \textcolor{comment}{// struct field}
+00299   \} \textcolor{keywordflow}{else} \textcolor{keywordflow}{if} (anchor.parent().is(\textcolor{stringliteral}{":header"})) \{
+00300     glowEffect(anchor.parent(),1000); \textcolor{comment}{// section header}
+00301   \} \textcolor{keywordflow}{else} \{
+00302     glowEffect(anchor.next(),1000); \textcolor{comment}{// normal member}
+00303   \}
+00304   gotoAnchor(anchor,aname,\textcolor{keyword}{false});
+00305 \}
+00306 
+00307 \textcolor{keyword}{function} selectAndHighlight(hash,n)
+00308 \{
+00309   var a;
+00310   \textcolor{keywordflow}{if} (hash) \{
+00311     var link=stripPath(pathName())+\textcolor{charliteral}{':'}+hash.substring(1);
+00312     a=$(\textcolor{stringliteral}{'.item a[class$="'}+link+\textcolor{stringliteral}{'"]'});
+00313   \}
+00314   \textcolor{keywordflow}{if} (a && a.length) \{
+00315     a.parent().parent().addClass(\textcolor{stringliteral}{'selected'});
+00316     a.parent().parent().attr(\textcolor{stringliteral}{'id'},\textcolor{stringliteral}{'selected'});
+00317     highlightAnchor();
+00318   \} \textcolor{keywordflow}{else} \textcolor{keywordflow}{if} (n) \{
+00319     $(n.itemDiv).addClass(\textcolor{stringliteral}{'selected'});
+00320     $(n.itemDiv).attr(\textcolor{stringliteral}{'id'},\textcolor{stringliteral}{'selected'});
+00321   \}
+00322   \textcolor{keywordflow}{if} ($(\textcolor{stringliteral}{'#nav-tree-contents .item:first'}).hasClass(\textcolor{stringliteral}{'selected'})) \{
+00323     $(\textcolor{stringliteral}{'#nav-sync'}).css(\textcolor{stringliteral}{'top'},\textcolor{stringliteral}{'30px'});
+00324   \} \textcolor{keywordflow}{else} \{
+00325     $(\textcolor{stringliteral}{'#nav-sync'}).css(\textcolor{stringliteral}{'top'},\textcolor{stringliteral}{'5px'});
+00326   \}
+00327   showRoot();
+00328 \}
+00329 
+00330 \textcolor{keyword}{function} showNode(o, node, index, hash)
+00331 \{
+00332   \textcolor{keywordflow}{if} (node && node.childrenData) \{
+00333     \textcolor{keywordflow}{if} (typeof(node.childrenData)===\textcolor{stringliteral}{'string'}) \{
+00334       var varName    = node.childrenData;
+00335       getScript(node.relpath+varName,\textcolor{keyword}{function}()\{
+00336         node.childrenData = getData(varName);
+00337         showNode(o,node,index,hash);
+00338       \},\textcolor{keyword}{true});
+00339     \} \textcolor{keywordflow}{else} \{
+00340       \textcolor{keywordflow}{if} (!node.childrenVisited) \{
+00341         getNode(o, node);
+00342       \}
+00343       $(node.getChildrenUL()).css(\{\textcolor{stringliteral}{'display'}:\textcolor{stringliteral}{'block'}\});
+00344       node.plus\_img.src = node.relpath+\textcolor{stringliteral}{"arrowdown.png"};
+00345       node.expanded = \textcolor{keyword}{true};
+00346       var n = node.children[o.breadcrumbs[index]];
+00347       \textcolor{keywordflow}{if} (index+1<o.breadcrumbs.length) \{
+00348         showNode(o,n,index+1,hash);
+00349       \} \textcolor{keywordflow}{else} \{
+00350         \textcolor{keywordflow}{if} (typeof(n.childrenData)===\textcolor{stringliteral}{'string'}) \{
+00351           var varName = n.childrenData;
+00352           getScript(n.relpath+varName,\textcolor{keyword}{function}()\{
+00353             n.childrenData = getData(varName);
+00354             node.expanded=false;
+00355             showNode(o,node,index,hash); \textcolor{comment}{// retry with child node expanded}
+00356           \},\textcolor{keyword}{true});
+00357         \} \textcolor{keywordflow}{else} \{
+00358           var rootBase = stripPath(o.toroot.replace(/\(\backslash\)..+$/, \textcolor{stringliteral}{''}));
+00359           \textcolor{keywordflow}{if} (rootBase==\textcolor{stringliteral}{"index"} || rootBase==\textcolor{stringliteral}{"pages"} || rootBase==\textcolor{stringliteral}{"search"}) \{
+00360             expandNode(o, n, \textcolor{keyword}{true}, \textcolor{keyword}{true});
+00361           \}
+00362           selectAndHighlight(hash,n);
+00363         \}
+00364       \}
+00365     \}
+00366   \} \textcolor{keywordflow}{else} \{
+00367     selectAndHighlight(hash);
+00368   \}
+00369 \}
+00370 
+00371 \textcolor{keyword}{function} removeToInsertLater(element) \{
+00372   var parentNode = element.parentNode;
+00373   var nextSibling = element.nextSibling;
+00374   parentNode.removeChild(element);
+00375   \textcolor{keywordflow}{return} \textcolor{keyword}{function}() \{
+00376     \textcolor{keywordflow}{if} (nextSibling) \{
+00377       parentNode.insertBefore(element, nextSibling);
+00378     \} \textcolor{keywordflow}{else} \{
+00379       parentNode.appendChild(element);
+00380     \}
+00381   \};
+00382 \}
+00383 
+00384 \textcolor{keyword}{function} getNode(o, po)
+00385 \{
+00386   var insertFunction = removeToInsertLater(po.li);
+00387   po.childrenVisited = \textcolor{keyword}{true};
+00388   var l = po.childrenData.length-1;
+00389   \textcolor{keywordflow}{for} (var i in po.childrenData) \{
+00390     var nodeData = po.childrenData[i];
+00391     po.children[i] = newNode(o, po, nodeData[0], nodeData[1], nodeData[2],
+00392       i==l);
+00393   \}
+00394   insertFunction();
+00395 \}
+00396 
+00397 \textcolor{keyword}{function} gotoNode(o,subIndex,root,hash,relpath)
+00398 \{
+00399   var nti = navTreeSubIndices[subIndex][root+hash];
+00400   o.breadcrumbs = $.extend(\textcolor{keyword}{true}, [], nti ? nti : navTreeSubIndices[subIndex][root]);
+00401   \textcolor{keywordflow}{if} (!o.breadcrumbs && root!=NAVTREE[0][1]) \{ \textcolor{comment}{// fallback: show index}
+00402     navTo(o,NAVTREE[0][1],\textcolor{stringliteral}{""},relpath);
+00403     $(\textcolor{stringliteral}{'.item'}).removeClass(\textcolor{stringliteral}{'selected'});
+00404     $(\textcolor{stringliteral}{'.item'}).removeAttr(\textcolor{stringliteral}{'id'});
+00405   \}
+00406   \textcolor{keywordflow}{if} (o.breadcrumbs) \{
+00407     o.breadcrumbs.unshift(0); \textcolor{comment}{// add 0 for root node}
+00408     showNode(o, o.node, 0, hash);
+00409   \}
+00410 \}
+00411 
+00412 \textcolor{keyword}{function} navTo(o,root,hash,relpath)
+00413 \{
+00414   var link = cachedLink();
+00415   \textcolor{keywordflow}{if} (link) \{
+00416     var parts = link.split(\textcolor{charliteral}{'#'});
+00417     root = parts[0];
+00418     \textcolor{keywordflow}{if} (parts.length>1) hash = \textcolor{charliteral}{'#'}+parts[1].replace(/[^\(\backslash\)w\(\backslash\)-]/g,\textcolor{stringliteral}{''});
+00419     \textcolor{keywordflow}{else} hash=\textcolor{stringliteral}{''};
+00420   \}
+00421   \textcolor{keywordflow}{if} (hash.match(/^#l\(\backslash\)d+$/)) \{
+00422     var anchor=$(\textcolor{stringliteral}{'a[name='}+hash.substring(1)+\textcolor{charliteral}{']'});
+00423     glowEffect(anchor.parent(),1000); \textcolor{comment}{// line number}
+00424     hash=\textcolor{stringliteral}{''}; \textcolor{comment}{// strip line number anchors}
+00425   \}
+00426   var url=root+hash;
+00427   var i=-1;
+00428   \textcolor{keywordflow}{while} (NAVTREEINDEX[i+1]<=url) i++;
+00429   \textcolor{keywordflow}{if} (i==-1) \{ i=0; root=NAVTREE[0][1]; \} \textcolor{comment}{// fallback: show index}
+00430   \textcolor{keywordflow}{if} (navTreeSubIndices[i]) \{
+00431     gotoNode(o,i,root,hash,relpath)
+00432   \} \textcolor{keywordflow}{else} \{
+00433     getScript(relpath+\textcolor{stringliteral}{'navtreeindex'}+i,\textcolor{keyword}{function}()\{
+00434       navTreeSubIndices[i] = eval(\textcolor{stringliteral}{'NAVTREEINDEX'}+i);
+00435       \textcolor{keywordflow}{if} (navTreeSubIndices[i]) \{
+00436         gotoNode(o,i,root,hash,relpath);
+00437       \}
+00438     \},\textcolor{keyword}{true});
+00439   \}
+00440 \}
+00441 
+00442 \textcolor{keyword}{function} showSyncOff(n,relpath)
+00443 \{
+00444     n.html(\textcolor{stringliteral}{'<img src="'}+relpath+\textcolor{stringliteral}{'sync\_off.png" title="'}+SYNCOFFMSG+\textcolor{stringliteral}{'"/>'});
+00445 \}
+00446 
+00447 \textcolor{keyword}{function} showSyncOn(n,relpath)
+00448 \{
+00449     n.html(\textcolor{stringliteral}{'<img src="'}+relpath+\textcolor{stringliteral}{'sync\_on.png" title="'}+SYNCONMSG+\textcolor{stringliteral}{'"/>'});
+00450 \}
+00451 
+00452 \textcolor{keyword}{function} toggleSyncButton(relpath)
+00453 \{
+00454   var navSync = $(\textcolor{stringliteral}{'#nav-sync'});
+00455   \textcolor{keywordflow}{if} (navSync.hasClass(\textcolor{stringliteral}{'sync'})) \{
+00456     navSync.removeClass(\textcolor{stringliteral}{'sync'});
+00457     showSyncOff(navSync,relpath);
+00458     storeLink(stripPath2(pathName())+hashUrl());
+00459   \} \textcolor{keywordflow}{else} \{
+00460     navSync.addClass(\textcolor{stringliteral}{'sync'});
+00461     showSyncOn(navSync,relpath);
+00462     deleteLink();
+00463   \}
+00464 \}
+00465 
+00466 \textcolor{keyword}{function} initNavTree(toroot,relpath)
+00467 \{
+00468   var o = \textcolor{keyword}{new} Object();
+00469   o.toroot = toroot;
+00470   o.node = \textcolor{keyword}{new} Object();
+00471   o.node.li = document.getElementById(\textcolor{stringliteral}{"nav-tree-contents"});
+00472   o.node.childrenData = NAVTREE;
+00473   o.node.children = \textcolor{keyword}{new} Array();
+00474   o.node.childrenUL = document.createElement(\textcolor{stringliteral}{"ul"});
+00475   o.node.getChildrenUL = \textcolor{keyword}{function}() \{ \textcolor{keywordflow}{return} o.node.childrenUL; \};
+00476   o.node.li.appendChild(o.node.childrenUL);
+00477   o.node.depth = 0;
+00478   o.node.relpath = relpath;
+00479   o.node.expanded = \textcolor{keyword}{false};
+00480   o.node.isLast = \textcolor{keyword}{true};
+00481   o.node.plus\_img = document.createElement(\textcolor{stringliteral}{"img"});
+00482   o.node.plus\_img.src = relpath+\textcolor{stringliteral}{"arrowright.png"};
+00483   o.node.plus\_img.width = 16;
+00484   o.node.plus\_img.height = 22;
+00485 
+00486   \textcolor{keywordflow}{if} (localStorageSupported()) \{
+00487     var navSync = $(\textcolor{stringliteral}{'#nav-sync'});
+00488     \textcolor{keywordflow}{if} (cachedLink()) \{
+00489       showSyncOff(navSync,relpath);
+00490       navSync.removeClass(\textcolor{stringliteral}{'sync'});
+00491     \} \textcolor{keywordflow}{else} \{
+00492       showSyncOn(navSync,relpath);
+00493     \}
+00494     navSync.click(\textcolor{keyword}{function}()\{ toggleSyncButton(relpath); \});
+00495   \}
+00496 
+00497   $(window).load(\textcolor{keyword}{function}()\{
+00498     navTo(o,toroot,hashUrl(),relpath);
+00499     showRoot();
+00500   \});
+00501 
+00502   $(window).bind(\textcolor{stringliteral}{'hashchange'}, \textcolor{keyword}{function}()\{
+00503      \textcolor{keywordflow}{if} (window.location.hash && window.location.hash.length>1)\{
+00504        var a;
+00505        \textcolor{keywordflow}{if} ($(location).attr(\textcolor{stringliteral}{'hash'}))\{
+00506          var clslink=stripPath(pathName())+\textcolor{charliteral}{':'}+hashValue();
+00507          a=$(\textcolor{stringliteral}{'.item a[class$="'}+clslink.replace(/</g,\textcolor{stringliteral}{'\(\backslash\)\(\backslash\)3c '})+\textcolor{stringliteral}{'"]'});
+00508        \}
+00509        \textcolor{keywordflow}{if} (a==null || !$(a).parent().parent().hasClass(\textcolor{stringliteral}{'selected'}))\{
+00510          $(\textcolor{stringliteral}{'.item'}).removeClass(\textcolor{stringliteral}{'selected'});
+00511          $(\textcolor{stringliteral}{'.item'}).removeAttr(\textcolor{stringliteral}{'id'});
+00512        \}
+00513        var link=stripPath2(pathName());
+00514        navTo(o,link,hashUrl(),relpath);
+00515      \} \textcolor{keywordflow}{else} \textcolor{keywordflow}{if} (!animationInProgress) \{
+00516        $(\textcolor{stringliteral}{'#doc-content'}).scrollTop(0);
+00517        $(\textcolor{stringliteral}{'.item'}).removeClass(\textcolor{stringliteral}{'selected'});
+00518        $(\textcolor{stringliteral}{'.item'}).removeAttr(\textcolor{stringliteral}{'id'});
+00519        navTo(o,toroot,hashUrl(),relpath);
+00520      \}
+00521   \})
+00522 \}
+00523 
+\end{DoxyCode}

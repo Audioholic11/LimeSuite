@@ -6,6 +6,15 @@ var searchData=
   ['agc_5fbyp_5frxtsp',['AGC_BYP_RXTSP',['../d4/d84/LMS7002M__parameters__compact_8h.html#a26e65f7d265dbeaeb51ab0c06b6e085a',1,'LMS7002M_parameters_compact.h']]],
   ['agc_5fk_5frxtsp',['AGC_K_RXTSP',['../d4/d84/LMS7002M__parameters__compact_8h.html#a63fcf99af3bb3efe81dd556da63e35a3',1,'LMS7002M_parameters_compact.h']]],
   ['agc_5fmode_5frxtsp',['AGC_MODE_RXTSP',['../d4/d84/LMS7002M__parameters__compact_8h.html#a57f269b16902e2a35c6e05d011ef9e8d',1,'LMS7002M_parameters_compact.h']]],
+  ['ansi_5fcolor_5fblue',['ANSI_COLOR_BLUE',['../df/da4/LoggerC_8cpp.html#aca16e6a49eb51333c5fd3eee19487315',1,'LoggerC.cpp']]],
+  ['ansi_5fcolor_5fbold',['ANSI_COLOR_BOLD',['../df/da4/LoggerC_8cpp.html#a192df37d7dfa835971480d2a1ca01d14',1,'LoggerC.cpp']]],
+  ['ansi_5fcolor_5fcyan',['ANSI_COLOR_CYAN',['../df/da4/LoggerC_8cpp.html#a8d0b0043e152438bb39b918a1f98c65f',1,'LoggerC.cpp']]],
+  ['ansi_5fcolor_5fgreen',['ANSI_COLOR_GREEN',['../df/da4/LoggerC_8cpp.html#a966c72d8d733c7734c6c784753d894c7',1,'LoggerC.cpp']]],
+  ['ansi_5fcolor_5fmagenta',['ANSI_COLOR_MAGENTA',['../df/da4/LoggerC_8cpp.html#acb30614ba1535da5b9d0c490b3c10515',1,'LoggerC.cpp']]],
+  ['ansi_5fcolor_5fred',['ANSI_COLOR_RED',['../df/da4/LoggerC_8cpp.html#a34995b955465f6bbb37c359173d50477',1,'LoggerC.cpp']]],
+  ['ansi_5fcolor_5freset',['ANSI_COLOR_RESET',['../df/da4/LoggerC_8cpp.html#a92a364c2b863dde1a024a77eac2a5b3b',1,'LoggerC.cpp']]],
+  ['ansi_5fcolor_5fyellow',['ANSI_COLOR_YELLOW',['../df/da4/LoggerC_8cpp.html#a5a123b382640b3aa65dd5db386002fbc',1,'LoggerC.cpp']]],
   ['api_5fexport',['API_EXPORT',['../d5/d07/LimeSuite_8h.html#a5e3652cae8b48c1ad174f0b06bbd06d0',1,'LimeSuite.h']]],
-  ['apientry',['APIENTRY',['../da/d33/glew_8h.html#a428a91acf2c2439dc1a257708ee1f805',1,'glew.h']]]
+  ['apientry',['APIENTRY',['../da/d33/glew_8h.html#a428a91acf2c2439dc1a257708ee1f805',1,'glew.h']]],
+  ['architecture_5fid',['ARCHITECTURE_ID',['../d0/d93/soapysdr_2build_2CMakeFiles_23_85_81_2CompilerIdC_2CMakeCCompilerId_8c.html#aba35d0d200deaeb06aee95ca297acb28',1,'ARCHITECTURE_ID():&#160;CMakeCCompilerId.c'],['../d1/d7e/soapysdr_2build_2CMakeFiles_23_85_81_2CompilerIdCXX_2CMakeCXXCompilerId_8cpp.html#aba35d0d200deaeb06aee95ca297acb28',1,'ARCHITECTURE_ID():&#160;CMakeCXXCompilerId.cpp'],['../de/d5d/gr-radar-dev_2build_2CMakeFiles_23_85_81_2CompilerIdC_2CMakeCCompilerId_8c.html#aba35d0d200deaeb06aee95ca297acb28',1,'ARCHITECTURE_ID():&#160;CMakeCCompilerId.c'],['../d8/d9e/gr-radar-dev_2build_2CMakeFiles_23_85_81_2CompilerIdCXX_2CMakeCXXCompilerId_8cpp.html#aba35d0d200deaeb06aee95ca297acb28',1,'ARCHITECTURE_ID():&#160;CMakeCXXCompilerId.cpp']]]
 ];

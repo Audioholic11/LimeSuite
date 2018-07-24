@@ -1,0 +1,211 @@
+\subsection{radar\+\_\+swig.\+os\+\_\+cfar\+\_\+c Class Reference}
+\label{classradar__swig_1_1os__cfar__c}\index{radar\+\_\+swig.\+os\+\_\+cfar\+\_\+c@{radar\+\_\+swig.\+os\+\_\+cfar\+\_\+c}}
+
+
+Inheritance diagram for radar\+\_\+swig.\+os\+\_\+cfar\+\_\+c\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=197pt]{d4/d11/classradar__swig_1_1os__cfar__c__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for radar\+\_\+swig.\+os\+\_\+cfar\+\_\+c\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=197pt]{dc/dc1/classradar__swig_1_1os__cfar__c__coll__graph}
+\end{center}
+\end{figure}
+\subsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+def {\bf \+\_\+\+\_\+init\+\_\+\+\_\+} (self, {\bf args}, kwargs)
+\item 
+def {\bf make} ({\bf args}, kwargs)
+\item 
+def {\bf set\+\_\+rel\+\_\+threshold} (self, {\bf args}, kwargs)
+\item 
+def {\bf set\+\_\+mult\+\_\+threshold} (self, {\bf args}, kwargs)
+\item 
+def {\bf set\+\_\+samp\+\_\+compare} (self, {\bf args}, kwargs)
+\item 
+def {\bf set\+\_\+samp\+\_\+protect} (self, {\bf args}, kwargs)
+\end{DoxyCompactItemize}
+\subsubsection*{Static Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+{\bf thisown} = {\bf \+\_\+swig\+\_\+property}(lambda x\+: x.\+this.\+own(), lambda {\bf x}, v\+: x.\+this.\+own(v), doc=\textquotesingle{}The membership flag\textquotesingle{})
+\item 
+{\bf make} = staticmethod(make)
+\end{DoxyCompactItemize}
+\subsubsection*{Static Private Attributes}
+\begin{DoxyCompactItemize}
+\item 
+{\bf \+\_\+\+\_\+repr\+\_\+\+\_\+} = {\bf \+\_\+swig\+\_\+repr}
+\item 
+{\bf \+\_\+\+\_\+swig\+\_\+destroy\+\_\+\+\_\+} = \+\_\+radar\+\_\+swig.\+delete\+\_\+os\+\_\+cfar\+\_\+c
+\end{DoxyCompactItemize}
+
+
+\subsubsection{Detailed Description}
+\begin{DoxyVerb}This block estimates peaks of a given FFT spectrum as tagged stream. Multi peak detection is implemented with the OS-CFAR algorithm. The algorithm uses around the cell under test (CUT) on each side samp_compare samples to estimate the noise floor. This relative threshold is defined by the bin of the vector within the sorted samp_compare samples. A standard value is rel_threshold = 0.78. The value of this bin is multiplied by mult_threshold and compared with the CUT. samp_protect samples are a protected are which is not used for acquiring compare samples. If consecutive bins are detected as valid peaks it is possible to merge these detections with merge_consecutive = true. Output data are f32vectors with the information of frequency, power and phase. The identifiers (symbols) are 'frequency', 'power' and 'phase'.\end{DoxyVerb}
+ 
+
+Definition at line {\bf 1156} of file {\bf radar\+\_\+swig.\+py}.
+
+
+
+\subsubsection{Constructor \& Destructor Documentation}
+\index{radar\+\_\+swig\+::os\+\_\+cfar\+\_\+c@{radar\+\_\+swig\+::os\+\_\+cfar\+\_\+c}!\+\_\+\+\_\+init\+\_\+\+\_\+@{\+\_\+\+\_\+init\+\_\+\+\_\+}}
+\index{\+\_\+\+\_\+init\+\_\+\+\_\+@{\+\_\+\+\_\+init\+\_\+\+\_\+}!radar\+\_\+swig\+::os\+\_\+cfar\+\_\+c@{radar\+\_\+swig\+::os\+\_\+cfar\+\_\+c}}
+\paragraph[{\+\_\+\+\_\+init\+\_\+\+\_\+(self, args, kwargs)}]{\setlength{\rightskip}{0pt plus 5cm}def radar\+\_\+swig.\+os\+\_\+cfar\+\_\+c.\+\_\+\+\_\+init\+\_\+\+\_\+ (
+\begin{DoxyParamCaption}
+\item[{}]{self, }
+\item[{}]{args, }
+\item[{}]{kwargs}
+\end{DoxyParamCaption}
+)}\label{classradar__swig_1_1os__cfar__c_a81b4e046f4a30731abc52d5e99a4cc28}
+
+
+Definition at line {\bf 1159} of file {\bf radar\+\_\+swig.\+py}.
+
+
+
+\subsubsection{Member Function Documentation}
+\index{radar\+\_\+swig\+::os\+\_\+cfar\+\_\+c@{radar\+\_\+swig\+::os\+\_\+cfar\+\_\+c}!make@{make}}
+\index{make@{make}!radar\+\_\+swig\+::os\+\_\+cfar\+\_\+c@{radar\+\_\+swig\+::os\+\_\+cfar\+\_\+c}}
+\paragraph[{make(args, kwargs)}]{\setlength{\rightskip}{0pt plus 5cm}def radar\+\_\+swig.\+os\+\_\+cfar\+\_\+c.\+make (
+\begin{DoxyParamCaption}
+\item[{}]{args, }
+\item[{}]{kwargs}
+\end{DoxyParamCaption}
+)}\label{classradar__swig_1_1os__cfar__c_ae40d0cea3c2e3804981b2bd352415a15}
+\begin{DoxyVerb}make(int samp_rate, int samp_compare, int samp_protect, float rel_threshold, float mult_threshold, 
+    bool merge_consecutive=True, std::string const & len_key="packet_len") -> os_cfar_c_sptr
+
+Return a shared_ptr to a new instance of radar::os_cfar_c.
+
+To avoid accidental use of raw pointers, radar::os_cfar_c's constructor is in a private implementation class. radar::os_cfar_c::make is the public interface for creating new instances.
+
+Params: (samp_rate, samp_compare, samp_protect, rel_threshold, mult_threshold, merge_consecutive, len_key)
+\end{DoxyVerb}
+ 
+
+Definition at line {\bf 1161} of file {\bf radar\+\_\+swig.\+py}.
+
+
+
+References {\bf radar\+\_\+swig.\+os\+\_\+cfar\+\_\+c.\+make}.
+
+\index{radar\+\_\+swig\+::os\+\_\+cfar\+\_\+c@{radar\+\_\+swig\+::os\+\_\+cfar\+\_\+c}!set\+\_\+mult\+\_\+threshold@{set\+\_\+mult\+\_\+threshold}}
+\index{set\+\_\+mult\+\_\+threshold@{set\+\_\+mult\+\_\+threshold}!radar\+\_\+swig\+::os\+\_\+cfar\+\_\+c@{radar\+\_\+swig\+::os\+\_\+cfar\+\_\+c}}
+\paragraph[{set\+\_\+mult\+\_\+threshold(self, args, kwargs)}]{\setlength{\rightskip}{0pt plus 5cm}def radar\+\_\+swig.\+os\+\_\+cfar\+\_\+c.\+set\+\_\+mult\+\_\+threshold (
+\begin{DoxyParamCaption}
+\item[{}]{self, }
+\item[{}]{args, }
+\item[{}]{kwargs}
+\end{DoxyParamCaption}
+)}\label{classradar__swig_1_1os__cfar__c_a66a0cbe5bbe682a5b2d788cdc86ed396}
+\begin{DoxyVerb}set_mult_threshold(os_cfar_c self, float inp)
+
+Params: (inp)
+\end{DoxyVerb}
+ 
+
+Definition at line {\bf 1183} of file {\bf radar\+\_\+swig.\+py}.
+
+\index{radar\+\_\+swig\+::os\+\_\+cfar\+\_\+c@{radar\+\_\+swig\+::os\+\_\+cfar\+\_\+c}!set\+\_\+rel\+\_\+threshold@{set\+\_\+rel\+\_\+threshold}}
+\index{set\+\_\+rel\+\_\+threshold@{set\+\_\+rel\+\_\+threshold}!radar\+\_\+swig\+::os\+\_\+cfar\+\_\+c@{radar\+\_\+swig\+::os\+\_\+cfar\+\_\+c}}
+\paragraph[{set\+\_\+rel\+\_\+threshold(self, args, kwargs)}]{\setlength{\rightskip}{0pt plus 5cm}def radar\+\_\+swig.\+os\+\_\+cfar\+\_\+c.\+set\+\_\+rel\+\_\+threshold (
+\begin{DoxyParamCaption}
+\item[{}]{self, }
+\item[{}]{args, }
+\item[{}]{kwargs}
+\end{DoxyParamCaption}
+)}\label{classradar__swig_1_1os__cfar__c_a3b591f9a10f88f39ec899fae8c7a39a0}
+\begin{DoxyVerb}set_rel_threshold(os_cfar_c self, float inp)
+
+Params: (inp)
+\end{DoxyVerb}
+ 
+
+Definition at line {\bf 1175} of file {\bf radar\+\_\+swig.\+py}.
+
+\index{radar\+\_\+swig\+::os\+\_\+cfar\+\_\+c@{radar\+\_\+swig\+::os\+\_\+cfar\+\_\+c}!set\+\_\+samp\+\_\+compare@{set\+\_\+samp\+\_\+compare}}
+\index{set\+\_\+samp\+\_\+compare@{set\+\_\+samp\+\_\+compare}!radar\+\_\+swig\+::os\+\_\+cfar\+\_\+c@{radar\+\_\+swig\+::os\+\_\+cfar\+\_\+c}}
+\paragraph[{set\+\_\+samp\+\_\+compare(self, args, kwargs)}]{\setlength{\rightskip}{0pt plus 5cm}def radar\+\_\+swig.\+os\+\_\+cfar\+\_\+c.\+set\+\_\+samp\+\_\+compare (
+\begin{DoxyParamCaption}
+\item[{}]{self, }
+\item[{}]{args, }
+\item[{}]{kwargs}
+\end{DoxyParamCaption}
+)}\label{classradar__swig_1_1os__cfar__c_ae9d0b242263f6384b052918db86b36ce}
+\begin{DoxyVerb}set_samp_compare(os_cfar_c self, int inp)
+
+Params: (inp)
+\end{DoxyVerb}
+ 
+
+Definition at line {\bf 1191} of file {\bf radar\+\_\+swig.\+py}.
+
+\index{radar\+\_\+swig\+::os\+\_\+cfar\+\_\+c@{radar\+\_\+swig\+::os\+\_\+cfar\+\_\+c}!set\+\_\+samp\+\_\+protect@{set\+\_\+samp\+\_\+protect}}
+\index{set\+\_\+samp\+\_\+protect@{set\+\_\+samp\+\_\+protect}!radar\+\_\+swig\+::os\+\_\+cfar\+\_\+c@{radar\+\_\+swig\+::os\+\_\+cfar\+\_\+c}}
+\paragraph[{set\+\_\+samp\+\_\+protect(self, args, kwargs)}]{\setlength{\rightskip}{0pt plus 5cm}def radar\+\_\+swig.\+os\+\_\+cfar\+\_\+c.\+set\+\_\+samp\+\_\+protect (
+\begin{DoxyParamCaption}
+\item[{}]{self, }
+\item[{}]{args, }
+\item[{}]{kwargs}
+\end{DoxyParamCaption}
+)}\label{classradar__swig_1_1os__cfar__c_a7e9e8f66fae0449d9e41ebc6811f96a3}
+\begin{DoxyVerb}set_samp_protect(os_cfar_c self, int inp)
+
+Params: (inp)
+\end{DoxyVerb}
+ 
+
+Definition at line {\bf 1199} of file {\bf radar\+\_\+swig.\+py}.
+
+
+
+\subsubsection{Member Data Documentation}
+\index{radar\+\_\+swig\+::os\+\_\+cfar\+\_\+c@{radar\+\_\+swig\+::os\+\_\+cfar\+\_\+c}!\+\_\+\+\_\+repr\+\_\+\+\_\+@{\+\_\+\+\_\+repr\+\_\+\+\_\+}}
+\index{\+\_\+\+\_\+repr\+\_\+\+\_\+@{\+\_\+\+\_\+repr\+\_\+\+\_\+}!radar\+\_\+swig\+::os\+\_\+cfar\+\_\+c@{radar\+\_\+swig\+::os\+\_\+cfar\+\_\+c}}
+\paragraph[{\+\_\+\+\_\+repr\+\_\+\+\_\+}]{\setlength{\rightskip}{0pt plus 5cm}radar\+\_\+swig.\+os\+\_\+cfar\+\_\+c.\+\_\+\+\_\+repr\+\_\+\+\_\+ = {\bf \+\_\+swig\+\_\+repr}\hspace{0.3cm}{\ttfamily [static]}, {\ttfamily [private]}}\label{classradar__swig_1_1os__cfar__c_a6c8e5f2c141be196b1ec108429a517f8}
+
+
+Definition at line {\bf 1160} of file {\bf radar\+\_\+swig.\+py}.
+
+\index{radar\+\_\+swig\+::os\+\_\+cfar\+\_\+c@{radar\+\_\+swig\+::os\+\_\+cfar\+\_\+c}!\+\_\+\+\_\+swig\+\_\+destroy\+\_\+\+\_\+@{\+\_\+\+\_\+swig\+\_\+destroy\+\_\+\+\_\+}}
+\index{\+\_\+\+\_\+swig\+\_\+destroy\+\_\+\+\_\+@{\+\_\+\+\_\+swig\+\_\+destroy\+\_\+\+\_\+}!radar\+\_\+swig\+::os\+\_\+cfar\+\_\+c@{radar\+\_\+swig\+::os\+\_\+cfar\+\_\+c}}
+\paragraph[{\+\_\+\+\_\+swig\+\_\+destroy\+\_\+\+\_\+}]{\setlength{\rightskip}{0pt plus 5cm}radar\+\_\+swig.\+os\+\_\+cfar\+\_\+c.\+\_\+\+\_\+swig\+\_\+destroy\+\_\+\+\_\+ = \+\_\+radar\+\_\+swig.\+delete\+\_\+os\+\_\+cfar\+\_\+c\hspace{0.3cm}{\ttfamily [static]}, {\ttfamily [private]}}\label{classradar__swig_1_1os__cfar__c_a53b7b35d4661efab85adcfa512e1e953}
+
+
+Definition at line {\bf 1207} of file {\bf radar\+\_\+swig.\+py}.
+
+\index{radar\+\_\+swig\+::os\+\_\+cfar\+\_\+c@{radar\+\_\+swig\+::os\+\_\+cfar\+\_\+c}!make@{make}}
+\index{make@{make}!radar\+\_\+swig\+::os\+\_\+cfar\+\_\+c@{radar\+\_\+swig\+::os\+\_\+cfar\+\_\+c}}
+\paragraph[{make}]{\setlength{\rightskip}{0pt plus 5cm}radar\+\_\+swig.\+os\+\_\+cfar\+\_\+c.\+make = staticmethod(make)\hspace{0.3cm}{\ttfamily [static]}}\label{classradar__swig_1_1os__cfar__c_a225f5441f1af3fede87a64f0b72d5d1f}
+
+
+Definition at line {\bf 1174} of file {\bf radar\+\_\+swig.\+py}.
+
+
+
+Referenced by {\bf radar\+\_\+swig.\+os\+\_\+cfar\+\_\+c.\+make()}.
+
+\index{radar\+\_\+swig\+::os\+\_\+cfar\+\_\+c@{radar\+\_\+swig\+::os\+\_\+cfar\+\_\+c}!thisown@{thisown}}
+\index{thisown@{thisown}!radar\+\_\+swig\+::os\+\_\+cfar\+\_\+c@{radar\+\_\+swig\+::os\+\_\+cfar\+\_\+c}}
+\paragraph[{thisown}]{\setlength{\rightskip}{0pt plus 5cm}radar\+\_\+swig.\+os\+\_\+cfar\+\_\+c.\+thisown = {\bf \+\_\+swig\+\_\+property}(lambda x\+: x.\+this.\+own(), lambda {\bf x}, v\+: x.\+this.\+own(v), doc=\textquotesingle{}The membership flag\textquotesingle{})\hspace{0.3cm}{\ttfamily [static]}}\label{classradar__swig_1_1os__cfar__c_adb61bdf6a269399a1cd342601406f803}
+
+
+Definition at line {\bf 1158} of file {\bf radar\+\_\+swig.\+py}.
+
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+/home/erik/prefix/default/src/gr-\/radar-\/dev/build/swig/{\bf radar\+\_\+swig.\+py}\end{DoxyCompactItemize}

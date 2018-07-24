@@ -1,0 +1,649 @@
+\subsection{I\+N\+I.\+h}
+\label{INI_8h_source}\index{/home/erik/prefix/default/src/limesuite-\/dev/external/cpp-\/feather-\/ini-\/parser/\+I\+N\+I.\+h@{/home/erik/prefix/default/src/limesuite-\/dev/external/cpp-\/feather-\/ini-\/parser/\+I\+N\+I.\+h}}
+
+\begin{DoxyCode}
+00001 \textcolor{comment}{/*}
+00002 \textcolor{comment}{   Feather INI Parser - 1.40}
+00003 \textcolor{comment}{   You are free to use this however you wish.}
+00004 \textcolor{comment}{}
+00005 \textcolor{comment}{   If you find a bug, please attept to debug the cause.}
+00006 \textcolor{comment}{   Post your environment details and the cause or fix in the issues section of GitHub.}
+00007 \textcolor{comment}{}
+00008 \textcolor{comment}{   Written by Turbine.}
+00009 \textcolor{comment}{}
+00010 \textcolor{comment}{   Website:}
+00011 \textcolor{comment}{   https://github.com/Turbine1991/feather-ini-parser}
+00012 \textcolor{comment}{   http://code.google.com/p/feather-ini-parser/downloads}
+00013 \textcolor{comment}{}
+00014 \textcolor{comment}{   Help:}
+00015 \textcolor{comment}{   Bundled example & readme.}
+00016 \textcolor{comment}{   http://code.google.com/p/feather-ini-parser/wiki/Tutorials}
+00017 \textcolor{comment}{*/}
+00018 
+00019 \textcolor{preprocessor}{#pragma once}
+00020 
+00021 \textcolor{preprocessor}{#include <string>}
+00022 \textcolor{preprocessor}{#include <fstream>}
+00023 \textcolor{preprocessor}{#include <sstream>}
+00024 \textcolor{preprocessor}{#include <stdint.h>}
+00025 \textcolor{preprocessor}{#include <stdio.h>}
+00026 \textcolor{preprocessor}{#include <stdlib.h>}
+00027 
+00028 \textcolor{preprocessor}{#define FINI\_SAFE}
+00029 \textcolor{preprocessor}{#define FINI\_BUFFER\_SIZE 128}
+00030 
+00031 \textcolor{preprocessor}{#if \_\_cplusplus >= 201103L}
+00032 \textcolor{preprocessor}{  #include <unordered\_map>}
+00033 \textcolor{preprocessor}{  #define FINI\_CPP11}
+00034 \textcolor{preprocessor}{  #define ALLOCATE\_SECTIONS 100}
+00035 \textcolor{preprocessor}{  #define ALLOCATE\_KEYS 5}
+00036 \textcolor{preprocessor}{#else}
+00037 \textcolor{preprocessor}{  #include <map>}
+00038 \textcolor{preprocessor}{#endif}
+00039 
+00040 \textcolor{preprocessor}{#ifdef FINI\_WIDE\_SUPPORT}
+00041 \textcolor{preprocessor}{  #include <wchar.h>}
+00042 
+00043   \textcolor{keyword}{typedef} std::wstringstream fini_sstream_t;
+00044   \textcolor{keyword}{typedef} std::wstring fini_string_t;
+00045   \textcolor{keyword}{typedef} \textcolor{keywordtype}{wchar\_t} fini_char_t;
+00046   \textcolor{keyword}{typedef} std::wifstream fini_ifstream_t;
+00047   \textcolor{keyword}{typedef} std::wofstream fini_ofstream_t;
+00048 
+00049 \textcolor{preprocessor}{  #define fini\_strlen(a) wcslen(a)}
+00050 \textcolor{preprocessor}{  #define fini\_strncpy(a, b) wcscpy(a, b)}
+00051 \textcolor{preprocessor}{  #define fini\_strncpy(a, b, c) wcsncpy(a, b, c)}
+00052 \textcolor{preprocessor}{  #define fini\_strtok(a, b) wcstok(a, b)}
+00053 
+00054 \textcolor{preprocessor}{  #define \_T(x) L ##x}
+00055 \textcolor{preprocessor}{#else}
+00056 \textcolor{preprocessor}{  #include <cstring>}
+00057 
+00058   \textcolor{keyword}{typedef} std::stringstream fini_sstream_t;
+00059   \textcolor{keyword}{typedef} std::string fini_string_t;
+00060   \textcolor{keyword}{typedef} \textcolor{keywordtype}{char} fini_char_t;
+00061   \textcolor{keyword}{typedef} std::ifstream fini_ifstream_t;
+00062   \textcolor{keyword}{typedef} std::ofstream fini_ofstream_t;
+00063 
+00064 \textcolor{preprocessor}{  #define fini\_strlen(a) strlen(a)}
+00065 \textcolor{preprocessor}{  #define fini\_strcpy(a, b) strcpy(a, b)}
+00066 \textcolor{preprocessor}{  #define fini\_strncpy(a, b, c) strncpy(a, b, c)}
+00067 \textcolor{preprocessor}{  #define fini\_strtok(a, b) strtok(a, b)}
+00068 
+00069 \textcolor{preprocessor}{  #define \_T(x) x}
+00070 \textcolor{preprocessor}{#endif}
+00071 
+00072 \textcolor{preprocessor}{#define CHAR\_SIZE sizeof(fini\_char\_t)}
+00073 
+00075 \textcolor{keyword}{class }Converters
+00076 \{
+00077 \textcolor{keyword}{public}:
+00078    \textcolor{keyword}{template} <\textcolor{keyword}{typename} T, \textcolor{keyword}{typename} U>
+00079      \textcolor{keyword}{static} T Convert(U value);
+00080    \textcolor{keyword}{template} <\textcolor{keyword}{typename} T>
+00081       \textcolor{keyword}{static} \textcolor{keywordtype}{void} GetLine(fini_sstream_t& out, T& value);
+00082    \textcolor{keyword}{static} \textcolor{keywordtype}{void} GetLine(fini_sstream_t& out, fini_string_t& value);
+00083    \textcolor{keyword}{template} <\textcolor{keyword}{typename} T>
+00084       \textcolor{keyword}{static} \textcolor{keywordtype}{size\_t} GetDataSize(T& value);
+00085    \textcolor{keyword}{static} \textcolor{keywordtype}{size\_t} GetDataSize(fini_string_t value);
+00086 \};
+00087 
+00089 \textcolor{keyword}{template} <\textcolor{keyword}{typename} T = fini\_\textcolor{keywordtype}{string}\_t, \textcolor{keyword}{typename} U = fini\_\textcolor{keywordtype}{string}\_t, \textcolor{keyword}{typename} V = fini\_\textcolor{keywordtype}{string}\_t>
+00090    \textcolor{keyword}{class }INI
+00091 \{
+00092 \textcolor{keyword}{public}:
+00093    \textcolor{keyword}{typedef} T section_t;
+00094    \textcolor{keyword}{typedef} U key_t;
+00095    \textcolor{keyword}{typedef} V value_t;
+00096    \textcolor{keyword}{typedef} INI<section_t, key_t, value_t> ini_t;
+00097 
+00099 \textcolor{preprocessor}{#ifdef FINI\_CPP11}
+00100    \textcolor{keyword}{typedef} \textcolor{keyword}{typename} std::unordered\_map<key\_t, value\_t> keys_t;
+00101    \textcolor{keyword}{typedef} \textcolor{keyword}{typename} std::unordered\_map<section\_t, keys\_t*> sections_t;
+00102 \textcolor{preprocessor}{#else}
+00103    \textcolor{keyword}{typedef} \textcolor{keyword}{typename} std::map<key\_t, value\_t> keys_t;
+00104    \textcolor{keyword}{typedef} \textcolor{keyword}{typename} std::map<section\_t, keys\_t*> sections_t;
+00105 \textcolor{preprocessor}{#endif}
+00106 
+00107    \textcolor{keyword}{typedef} \textcolor{keyword}{typename} keys\_t::iterator keysit_t;
+00108    \textcolor{keyword}{typedef} \textcolor{keyword}{typename} sections\_t::iterator sectionsit_t;
+00109 
+00110    \textcolor{keyword}{typedef} \textcolor{keyword}{typename} std::pair<key\_t, value\_t> keyspair_t;
+00111    \textcolor{keyword}{typedef} \textcolor{keyword}{typename} std::pair<section\_t, keys\_t*> sectionspair_t;
+00112 
+00113    \textcolor{keyword}{typedef} \textcolor{keywordtype}{char} data_t;
+00114 
+00115    \textcolor{keyword}{enum} source_e \{SOURCE\_FILE, SOURCE\_MEMORY\};
+00116 
+00118    std::string filename;
+00119    data\_t* data;
+00120    \textcolor{keywordtype}{size\_t} dataSize;
+00121    keys\_t* current;
+00122    sections\_t sections;
+00123    source_e source;
+00124 
+00126    \textcolor{comment}{//Specify the filename to associate and whether to parse immediately}
+00127    INI(\textcolor{keyword}{const} std::string filename, \textcolor{keywordtype}{bool} doParse): filename(filename)
+00128    \{
+00129       init(SOURCE\_FILE, doParse);
+00130    \}
+00131 
+00132    \textcolor{comment}{//Used for loading INI from memory}
+00133    INI(\textcolor{keywordtype}{void}* data, \textcolor{keywordtype}{size\_t} dataSize, \textcolor{keywordtype}{bool} doParse): data((data\_t*)data), dataSize(dataSize)
+00134    \{
+00135       init(SOURCE\_MEMORY, doParse);
+00136    \}
+00137 
+00138    ~INI()
+00139    \{
+00140       clear();
+00141    \}
+00142 
+00144    \textcolor{comment}{//Provide bracket access to section contents}
+00145    keys\_t& operator[](section\_t section)
+00146    \{
+00147 \textcolor{preprocessor}{   #ifdef FINI\_SAFE}
+00148      \textcolor{keywordflow}{if} (!sections[section])
+00149        sections[section] = \textcolor{keyword}{new} keys\_t;
+00150 \textcolor{preprocessor}{   #endif}
+00151 
+00152       \textcolor{keywordflow}{return} *sections[section];
+00153    \}
+00154 
+00155    \textcolor{comment}{//Create a new section and select it}
+00156    \textcolor{keywordtype}{bool} create(\textcolor{keyword}{const} section\_t section)
+00157    \{
+00158       \textcolor{keywordflow}{if} (select(section))
+00159          \textcolor{keywordflow}{return} \textcolor{keyword}{false};
+00160 
+00161       current = \textcolor{keyword}{new} keys\_t;
+00162       sections[section] = current;
+00163 
+00164       reserveKeys(current);
+00165 
+00166       \textcolor{keywordflow}{return} \textcolor{keyword}{true};
+00167    \}
+00168 
+00169    \textcolor{comment}{//Select a section for performing operations}
+00170    \textcolor{keywordtype}{bool} select(\textcolor{keyword}{const} section\_t section)
+00171    \{
+00172       sectionsit\_t sectionsit = sections.find(section);
+00173       \textcolor{keywordflow}{if} (sectionsit == sections.end())
+00174          \textcolor{keywordflow}{return} \textcolor{keyword}{false};
+00175 
+00176       current = sectionsit->second;
+00177 
+00178       \textcolor{keywordflow}{return} \textcolor{keyword}{true};
+00179    \}
+00180 
+00182    \textcolor{comment}{//Assign a value for key under the selected section}
+00183    \textcolor{keywordtype}{bool} \textcolor{keyword}{set}(\textcolor{keyword}{const} key\_t key, \textcolor{keyword}{const} value\_t value)
+00184    \{
+00185       \textcolor{keywordflow}{if} (current == NULL)
+00186          \textcolor{keywordflow}{return} \textcolor{keyword}{false};
+00187 
+00188       (*current)[key] = value;
+00189 
+00190       \textcolor{keywordflow}{return} \textcolor{keyword}{true};
+00191    \}
+00192 
+00193    \textcolor{keyword}{template} <\textcolor{keyword}{typename} W, \textcolor{keyword}{typename} X>
+00194       \textcolor{keywordtype}{bool} \textcolor{keyword}{set}(\textcolor{keyword}{const} W key, \textcolor{keyword}{const} X value)
+00195          \{ \textcolor{keywordflow}{return} \textcolor{keyword}{set}(Converters::Convert<key\_t>(key), Converters::Convert<value\_t>(value)); \}
+00196 
+00198    value\_t \textcolor{keyword}{get}(\textcolor{keyword}{const} key\_t key, value\_t def = value\_t())
+00199    \{
+00200       keysit\_t it = current->find(key);
+00201       \textcolor{keywordflow}{if} (current == NULL || it == current->end())
+00202          \textcolor{keywordflow}{return} def;
+00203 
+00204       \textcolor{keywordflow}{return} it->second;
+00205    \}
+00206 
+00207    value\_t \textcolor{keyword}{get}(\textcolor{keyword}{const} section\_t section, \textcolor{keyword}{const} key\_t key, value\_t def)
+00208    \{
+00209       \textcolor{keywordflow}{if} (!select(section))
+00210          \textcolor{keywordflow}{return} def;
+00211 
+00212       \textcolor{keywordflow}{return} \textcolor{keyword}{get}(key, def);
+00213    \}
+00214 
+00215    \textcolor{keyword}{template} <\textcolor{keyword}{typename} W, \textcolor{keyword}{typename} X>
+00216       X \textcolor{keyword}{get}(\textcolor{keyword}{const} W key, \textcolor{keyword}{const} X def = value\_t())
+00217          \{ \textcolor{keywordflow}{return} Converters::Convert<X>(\textcolor{keyword}{get}(Converters::Convert<key\_t>(key), Converters::Convert<value\_t>(
+      def))); \}
+00218 
+00219    \textcolor{keyword}{template} <\textcolor{keyword}{typename} W>
+00220       fini_string_t \textcolor{keyword}{get}(\textcolor{keyword}{const} W key, \textcolor{keyword}{const} fini_char_t* def = _T(\textcolor{stringliteral}{""}))  \textcolor{comment}{//Handle C string default value
+       without casting}
+00221          \{ \textcolor{keywordflow}{return} Converters::Convert<fini\_string\_t>(\textcolor{keyword}{get}(Converters::Convert<key\_t>(key), 
+      Converters::Convert<value\_t>(def))); \}
+00222 
+00223    \textcolor{keyword}{template} <\textcolor{keyword}{typename} W, \textcolor{keyword}{typename} X, \textcolor{keyword}{typename} Y>
+00224       Y \textcolor{keyword}{get}(\textcolor{keyword}{const} W section, \textcolor{keyword}{const} X key, \textcolor{keyword}{const} Y def)
+00225          \{ \textcolor{keywordflow}{return} Converters::Convert<Y>(\textcolor{keyword}{get}(Converters::Convert<section\_t>(section), 
+      Converters::Convert<key\_t>(key), Converters::Convert<value\_t>(def))); \}
+00226 
+00227    \textcolor{keyword}{template} <\textcolor{keyword}{typename} W, \textcolor{keyword}{typename} X>
+00228       fini_string_t \textcolor{keyword}{get}(\textcolor{keyword}{const} W section, \textcolor{keyword}{const} X key, \textcolor{keyword}{const} fini_char_t* def)  \textcolor{comment}{//Handle C string default
+       value without casting}
+00229          \{ \textcolor{keywordflow}{return} Converters::Convert<fini\_string\_t>(Converters::Convert<section\_t>(section), \textcolor{keyword}{get}(
+      Converters::Convert<key\_t>(key), Converters::Convert<value\_t>(def))); \}
+00230 
+00232    \textcolor{keywordtype}{void} parse(std::istream& file)
+00233    \{
+00234       fini_char_t line[FINI_BUFFER_SIZE];
+00235       \textcolor{keywordtype}{bool} first = \textcolor{keyword}{true};
+00236       fini_sstream_t out;
+00237 
+00238       \textcolor{keywordflow}{while}(!file.eof())
+00239       \{
+00240          file.getline(line, FINI_BUFFER_SIZE);
+00241 
+00242          \textcolor{keywordflow}{if} (first)
+00243          \{
+00244             first = \textcolor{keyword}{false};
+00245             \textcolor{keywordflow}{if} (line[0] == 0xEF) \textcolor{comment}{//Allows handling of UTF-16/32 documents}
+00246             \{
+00247                memmove(line, line + (CHAR_SIZE * 3), CHAR_SIZE * (
+      FINI_BUFFER_SIZE - 3));
+00248                \textcolor{keywordflow}{return};
+00249             \}
+00250          \}
+00251 
+00252          nake(line);
+00253 
+00254          \textcolor{keywordflow}{if} (line[0])
+00255          \{
+00256             \textcolor{keywordtype}{size\_t} len = fini_strlen(line);
+00257             \textcolor{keywordflow}{if} (len > 0 && !((len >= 2 && (line[0] == \textcolor{charliteral}{'/'} && line[1] == \textcolor{charliteral}{'/'})) || (len >= 1 && line[0] == \textcolor{charliteral}{
+      '#'})))  \textcolor{comment}{//Ignore comment and empty lines}
+00258             \{
+00259                \textcolor{keywordflow}{if} (line[0] == \textcolor{charliteral}{'['})  \textcolor{comment}{//Section}
+00260                \{
+00261                   section\_t section;
+00262                   \textcolor{keywordtype}{size\_t} length = fini_strlen(line) - 2;  \textcolor{comment}{//Without section brackets}
+00263                   \textcolor{keywordflow}{while}(isspace(line[length + 1]))  \textcolor{comment}{//Leave out any additional new line characters, not
+       "spaces" as the name suggests}
+00264                      --length;
+00265 
+00266                   fini_char_t* ssection = (fini_char_t*)calloc(CHAR_SIZE, length + 1);
+00267                   fini_strncpy(ssection, line + 1, length);  \textcolor{comment}{//Count after first bracket}
+00268 
+00269                   current = \textcolor{keyword}{new} keys\_t;
+00270 
+00271                   out << ssection;
+00272                   free(ssection);
+00273                   Converters::GetLine(out, section);
+00274 
+00275                   sections[section] = current;
+00276                \}
+00277                \textcolor{keywordflow}{else}  \textcolor{comment}{//Key}
+00278                \{
+00279                   key\_t key;
+00280                   value\_t value;
+00281 
+00282                   fini_char_t* skey;
+00283                   fini_char_t* svalue;
+00284 
+00285                   skey = fini_strtok(line, _T(\textcolor{stringliteral}{"="}));
+00286                   svalue = fini_strtok(NULL, _T(\textcolor{stringliteral}{"\(\backslash\)n"}));
+00287 
+00288                   \textcolor{keywordflow}{if} (skey && svalue)
+00289                   \{
+00290                      \textcolor{keywordtype}{size\_t} index = 0;  \textcolor{comment}{//Without section brackets}
+00291                      \textcolor{keywordflow}{while}(isspace(skey[index]))  \textcolor{comment}{//Leave out any additional new line characters, not
+       "spaces" as the name suggests}
+00292                         index++;
+00293 
+00294                      \textcolor{keywordflow}{if} (index != 0)  \textcolor{comment}{//Has preceeding white space}
+00295                         fini_strcpy(skey, skey + index);
+00296 
+00297                      out << skey;
+00298 
+00299                      Converters::GetLine(out, key);
+00300 
+00301                      out.clear();
+00302                      out.str(fini_string_t());
+00303 
+00304                      out << svalue;
+00305                      Converters::GetLine(out, value);
+00306 
+00307                      \textcolor{keywordflow}{if} (value != value\_t())
+00308                        (*current)[key] = value;
+00309                   \}
+00310                \}
+00311 
+00312                out.clear();
+00313                out.str(fini_string_t()); \textcolor{comment}{//Clear existing stream;}
+00314             \}
+00315          \}
+00316       \}
+00317    \}
+00318 
+00319    \textcolor{comment}{//Parse an INI's contents into memory from the filename given during construction}
+00320    \textcolor{keywordtype}{bool} parse()
+00321    \{
+00322       \textcolor{keywordflow}{switch}(source)
+00323       \{
+00324       \textcolor{keywordflow}{case} SOURCE\_FILE: \{
+00325             fini_ifstream_t file(filename.c\_str());
+00326 
+00327             \textcolor{keywordflow}{if} (!file.is\_open())
+00328                \textcolor{keywordflow}{return} \textcolor{keyword}{false};
+00329 
+00330             parse(file);
+00331 
+00332             file.close();
+00333          \}
+00334          \textcolor{keywordflow}{break};
+00335 
+00336       \textcolor{keywordflow}{case} SOURCE\_MEMORY: \{
+00337             std::stringstream sstream;
+00338             sstream.rdbuf()->pubsetbuf(data, dataSize);
+00339 
+00340             parse(sstream);
+00341          \}
+00342          \textcolor{keywordflow}{break};
+00343       \}
+00344 
+00345       \textcolor{keywordflow}{return} \textcolor{keyword}{true};
+00346    \}
+00347 
+00348    \textcolor{keywordtype}{bool} parseBinary()
+00349    \{
+00350       fini_ifstream_t file(filename.c\_str(), std::ios::binary);
+00351       \textcolor{keywordflow}{if} (!file.is\_open())
+00352          \textcolor{keywordflow}{return} \textcolor{keyword}{false};
+00353 
+00354       \textcolor{keywordtype}{size\_t} sectionCount;
+00355       \textcolor{keywordtype}{size\_t} keyCount;
+00356       key\_t key;
+00357       value\_t value;
+00358       section\_t section;
+00359 
+00360       \textcolor{comment}{//file.read((fini\_char\_t*)&sectionCount, sizeof(sectionCount));}
+00361       file >> sectionCount;
+00362 
+00363       \textcolor{keywordflow}{for}(\textcolor{keywordtype}{size\_t} i = 0; i < sectionCount; i++)
+00364       \{
+00365          \textcolor{keywordflow}{if} (i > 0)
+00366             file.seekg(1 + file.tellg());
+00367 
+00368          file.read((fini_char_t*)&keyCount, \textcolor{keyword}{sizeof}(keyCount));
+00369          file >> section;
+00370 
+00371          create(section);
+00372 
+00373          \textcolor{keywordflow}{for}(\textcolor{keywordtype}{size\_t} j = 0; j < keyCount; j++)
+00374          \{
+00375             file >> key;
+00376             file >> value;
+00377             \textcolor{keyword}{set}(key, value);
+00378          \}
+00379       \}
+00380 
+00381       file.close();
+00382 
+00383       \textcolor{keywordflow}{return} \textcolor{keyword}{true};
+00384    \}
+00385 
+00386    \textcolor{comment}{//Clear the contents from memory}
+00387    \textcolor{keywordtype}{void} clear()
+00388    \{
+00389       clean();
+00390       sections.clear();
+00391    \}
+00392 
+00394    \textcolor{comment}{//Save from memory into file}
+00395    \textcolor{keywordtype}{bool} save(\textcolor{keyword}{const} std::string filename = \textcolor{stringliteral}{""})
+00396    \{
+00397       \textcolor{keywordflow}{if} (!hasFileAssociation(filename))
+00398          \textcolor{keywordflow}{return} \textcolor{keyword}{false};
+00399 
+00400       fini_ofstream_t file(((filename == \textcolor{stringliteral}{""})? this->filename: filename).c\_str(), std::ios::trunc);
+00401       \textcolor{keywordflow}{if} (!file.is\_open())
+00402          \textcolor{keywordflow}{return} \textcolor{keyword}{false};
+00403 
+00404       \textcolor{comment}{//Loop through sections}
+00405       \textcolor{keywordflow}{for}(\textcolor{keyword}{typename} INI::sectionsit_t i = sections.begin(); i != sections.end(); 
+      i++)
+00406       \{
+00407          \textcolor{keywordflow}{if} (i->second->size() == 0)  \textcolor{comment}{//No keys/values in section, skip to next}
+00408             \textcolor{keywordflow}{continue};
+00409 
+00410          \textcolor{comment}{//Write section}
+00411          \textcolor{keyword}{const} fini_string_t temp = makeSection(i->first);
+00412          \textcolor{keyword}{const} fini_char_t* line = temp.c\_str();
+00413          file.write(line, fini_strlen(line));
+00414 
+00415          \textcolor{keywordflow}{for}(\textcolor{keyword}{typename} INI::keysit_t j = i->second->begin(); j != i->second->end(); j++)
+00416          \{
+00417             \textcolor{comment}{//Write key and value}
+00418             \textcolor{keyword}{const} fini_string_t temp = makeKeyValue(j->first, j->second);
+00419             \textcolor{keyword}{const} fini_char_t* line = temp.c\_str();
+00420             file.write(line, fini_strlen(line));
+00421          \}
+00422       \}
+00423 
+00424       file.close();
+00425 
+00426       \textcolor{keywordflow}{return} \textcolor{keyword}{true};
+00427    \}
+00428 
+00429    \textcolor{comment}{//Saves it without any conventional INI formatting characters, however it only uses string streams}
+00430    \textcolor{keywordtype}{bool} saveBinary(\textcolor{keyword}{const} std::string filename = \textcolor{stringliteral}{""})
+00431    \{
+00432       \textcolor{keywordflow}{if} (!hasFileAssociation(filename))
+00433          \textcolor{keywordflow}{return} \textcolor{keyword}{false};
+00434 
+00435       fini_ofstream_t file(((filename == \textcolor{stringliteral}{""})? this->filename: filename).c\_str(), std::ios::trunc | 
+      std::ios::binary);
+00436       \textcolor{keywordflow}{if} (!file.is\_open())
+00437          \textcolor{keywordflow}{return} \textcolor{keyword}{false};
+00438 
+00439       \textcolor{keywordtype}{size\_t} sectionCount = sections.size();
+00440       \textcolor{keywordtype}{size\_t} keyCount;
+00441 
+00442       file.write((fini_char_t*)&sectionCount, \textcolor{keyword}{sizeof}(sectionCount));
+00443 
+00444       \textcolor{comment}{//Loop through sections}
+00445       \textcolor{keywordflow}{for}(\textcolor{keyword}{typename} INI::sectionsit_t i = sections.begin(); i != sections.end(); 
+      i++)
+00446       \{
+00447          keyCount = i->second->size();
+00448          file.write((fini_char_t*)&keyCount, \textcolor{keyword}{sizeof}(keyCount));
+00449 
+00450          file << i->first << std::endl;
+00451 
+00452          \textcolor{keywordflow}{for}(\textcolor{keyword}{typename} INI::keysit_t j = i->second->begin(); j != i->second->end(); j++)
+00453          \{
+00454             file << j->first << std::endl;
+00455             file << j->second << std::endl;
+00456          \}
+00457       \}
+00458 
+00459       file.close();
+00460 
+00461       \textcolor{keywordflow}{return} \textcolor{keyword}{true};
+00462    \}
+00463 
+00464    \textcolor{comment}{//Saves it as a true binary file, intended to replace the existing one. Don't bother using it with all
+       strings.}
+00465    \textcolor{keywordtype}{bool} saveBinaryExperimental(std::string filename = \textcolor{stringliteral}{""})
+00466    \{
+00467       \textcolor{keywordflow}{if} (!hasFileAssociation(filename))
+00468          \textcolor{keywordflow}{return} \textcolor{keyword}{false};
+00469 
+00470       fini_ofstream_t file(((filename == \textcolor{stringliteral}{""})? this->filename: filename).c\_str(), std::ios::trunc | 
+      std::ios::binary);
+00471       \textcolor{keywordflow}{if} (!file.is\_open())
+00472          \textcolor{keywordflow}{return} \textcolor{keyword}{false};
+00473 
+00474       \textcolor{keywordtype}{size\_t} sectionCount = sections.size();
+00475       \textcolor{keywordtype}{size\_t} keyCount;
+00476 
+00477       file.write((fini_char_t*)&sectionCount, \textcolor{keyword}{sizeof}(sectionCount));
+00478 
+00479       \textcolor{comment}{//Loop through sections}
+00480       \textcolor{keywordflow}{for}(\textcolor{keyword}{typename} INI::sectionsit_t i = sections.begin(); i != sections.end(); 
+      i++)
+00481       \{
+00482          keyCount = i->second->size();
+00483          file.write((fini_char_t*)&keyCount, \textcolor{keyword}{sizeof}(keyCount));
+00484 
+00485          file.write((fini_char_t*)&i->first, Converters::GetDataSize(i->first));
+00486 
+00487          \textcolor{keywordflow}{for}(\textcolor{keyword}{typename} INI::keysit_t j = i->second->begin(); j != i->second->end(); j++)
+00488          \{
+00489             file.write((fini_char_t*)&j->first, Converters::GetDataSize(j->first));
+00490             file.write((fini_char_t*)&j->second, Converters::GetDataSize(j->second));
+00491          \}
+00492       \}
+00493 
+00494       file.close();
+00495 
+00496       \textcolor{keywordflow}{return} \textcolor{keyword}{true};
+00497    \}
+00498 
+00499    \textcolor{comment}{//Alows another INI's contents to be insert into another, with the ability to retain the original values}
+00500    \textcolor{keywordtype}{void} merge(ini\_t& other, \textcolor{keywordtype}{bool} retainValues = \textcolor{keyword}{true})
+00501    \{
+00502       \textcolor{keywordflow}{for}(\textcolor{keyword}{typename} INI::sectionsit_t i = other.sections.begin(); i != other.
+      sections.end(); i++)
+00503       \{
+00504          \textcolor{keywordflow}{if} (!select(i->first)) \textcolor{comment}{//Create and insert all key values into a missing section}
+00505          \{
+00506             keys\_t* keys = \textcolor{keyword}{new} keys\_t(*i->second);
+00507             sections.insert(std::make\_pair(i->first, keys));
+00508          \}
+00509          \textcolor{keywordflow}{else}
+00510          \{
+00511             \textcolor{keywordflow}{for}(\textcolor{keyword}{typename} INI::keysit_t j = i->second->begin(); j != i->second->end(); j++)
+00512             \{
+00513                keysit\_t it = current->find(j->first);
+00514                \textcolor{keywordflow}{if} (it == current->end())
+00515                   current->insert(std::make\_pair(j->first, j->second));
+00516                \textcolor{keywordflow}{else} \textcolor{keywordflow}{if} (!retainValues)
+00517                   it->second = j->second;
+00518             \}
+00519          \}
+00520       \}
+00521    \}
+00522 
+00523 \textcolor{keyword}{private}:
+00525    \textcolor{comment}{//Init the INI in with values set by constructor}
+00526    \textcolor{keywordtype}{void} init(source_e source, \textcolor{keywordtype}{bool} doParse)
+00527    \{
+00528       this->source = source;
+00529 
+00530       reserveSections();
+00531       \textcolor{keywordflow}{if} (doParse)
+00532          parse();
+00533    \}
+00534 
+00535    \textcolor{comment}{//Clean the contents for descruction}
+00536    \textcolor{keywordtype}{void} clean()
+00537    \{
+00538       \textcolor{keywordflow}{for}(sectionsit\_t i = sections.begin(); i != sections.end(); i++)
+00539          \textcolor{keyword}{delete} i->second;
+00540 
+00541       current = NULL;
+00542    \}
+00543 
+00544    \textcolor{comment}{//Make any alterations to the raw line}
+00545    \textcolor{keywordtype}{void} nake(\textcolor{keyword}{const} fini_char_t*)  \textcolor{comment}{//Strip the line of any non-interpretable characters}
+00546    \{
+00547 
+00548    \}
+00549 
+00550    \textcolor{keywordtype}{void} reserveSections()
+00551    \{
+00552 \textcolor{preprocessor}{   #ifdef FINI\_CPP11}
+00553       sections.reserve(ALLOCATE\_SECTIONS);
+00554 \textcolor{preprocessor}{   #endif}
+00555    \}
+00556 
+00557    \textcolor{keywordtype}{void} reserveKeys(keys\_t* current)
+00558    \{
+00559 \textcolor{preprocessor}{   #ifdef FINI\_CPP11}
+00560       current->reserve(ALLOCATE\_KEYS);
+00561 \textcolor{preprocessor}{   #endif}
+00562    \}
+00563 
+00564    \textcolor{keywordtype}{bool} hasFileAssociation(std::string filename)
+00565    \{
+00566       \textcolor{keywordflow}{if} (source == SOURCE\_MEMORY && filename == \textcolor{stringliteral}{""}) \textcolor{comment}{//No association to a file}
+00567          \textcolor{keywordflow}{return} \textcolor{keyword}{false};
+00568 
+00569       \textcolor{keywordflow}{return} \textcolor{keyword}{true};
+00570    \}
+00571 
+00573    \textcolor{comment}{//Creates a section as a string}
+00574    fini_string_t makeSection(\textcolor{keyword}{const} section\_t& section)
+00575    \{
+00576       fini_sstream_t line;
+00577       line << \textcolor{charliteral}{'['} << section << \textcolor{charliteral}{']'} << std::endl;
+00578 
+00579       \textcolor{keywordflow}{return} line.str();
+00580    \}
+00581 
+00582    \textcolor{comment}{//Creates a key and a value as a string}
+00583    fini_string_t makeKeyValue(\textcolor{keyword}{const} key\_t& key, \textcolor{keyword}{const} value\_t& value)
+00584    \{
+00585       fini_sstream_t line;
+00586       line << key << \textcolor{charliteral}{'='} << value << std::endl;
+00587 
+00588       \textcolor{keywordflow}{return} line.str();
+00589    \}
+00590 \};
+00591 
+00593 \textcolor{keyword}{template} <\textcolor{keyword}{typename} T, \textcolor{keyword}{typename} U>
+00594   \textcolor{keyword}{inline} T Converters::Convert(U value)
+00595 \{
+00596   fini_sstream_t sout;
+00597   T result;
+00598 
+00599   sout << value;
+00600   sout >> result;
+00601 
+00602   sout.str(fini_string_t());
+00603 
+00604   \textcolor{keywordflow}{return} result;
+00605 \}
+00606 
+00607 \textcolor{keyword}{template} <>
+00608   \textcolor{keyword}{inline} fini_string_t Converters::Convert<fini\_string\_t, fini\_string\_t>(
+      fini_string_t value)
+00609 \{
+00610   \textcolor{keywordflow}{return} value;
+00611 \}
+00612 
+00613 \textcolor{keyword}{template} <>
+00614   \textcolor{keyword}{inline} fini_string_t Converters::Convert<fini\_string\_t>(\textcolor{keyword}{const} fini_char_t* value)
+00615 \{
+00616   \textcolor{keywordflow}{return} value;
+00617 \}
+00618 
+00619 \textcolor{keyword}{template} <\textcolor{keyword}{typename} T>
+00620   \textcolor{keyword}{inline} \textcolor{keywordtype}{void} Converters::GetLine(fini_sstream_t& out, T& value)
+00621 \{
+00622   out >> value;
+00623 \}
+00624 
+00625 \textcolor{keyword}{inline} \textcolor{keywordtype}{void} Converters::GetLine(fini_sstream_t& out, fini_string_t& value)
+00626 \{
+00627   std::getline(out, value);
+00628 \}
+00629 
+00630 \textcolor{keyword}{template} <\textcolor{keyword}{typename} T>
+00631    \textcolor{keyword}{inline} \textcolor{keywordtype}{size\_t} Converters::GetDataSize(T& value)
+00632 \{
+00633    \textcolor{keywordflow}{return} \textcolor{keyword}{sizeof}(value);
+00634 \}
+00635 
+00636 \textcolor{keyword}{inline} \textcolor{keywordtype}{size\_t} Converters::GetDataSize(fini_string_t value)
+00637 \{
+00638    \textcolor{keywordflow}{return} value.size() + 1;
+00639 \}
+\end{DoxyCode}

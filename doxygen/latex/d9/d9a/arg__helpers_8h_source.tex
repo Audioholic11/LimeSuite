@@ -1,0 +1,170 @@
+\subsection{arg\+\_\+helpers.\+h}
+\label{arg__helpers_8h_source}\index{/home/erik/prefix/default/src/gr-\/radar-\/dev/lib/arg\+\_\+helpers.\+h@{/home/erik/prefix/default/src/gr-\/radar-\/dev/lib/arg\+\_\+helpers.\+h}}
+
+\begin{DoxyCode}
+00001 \textcolor{comment}{/* -*- c++ -*- */}
+00002 \textcolor{comment}{/*}
+00003 \textcolor{comment}{ * Copyright 2012 Dimitri Stolnikov <horiz0n@gmx.net>}
+00004 \textcolor{comment}{ *}
+00005 \textcolor{comment}{ * GNU Radio is free software; you can redistribute it and/or modify}
+00006 \textcolor{comment}{ * it under the terms of the GNU General Public License as published by}
+00007 \textcolor{comment}{ * the Free Software Foundation; either version 3, or (at your option)}
+00008 \textcolor{comment}{ * any later version.}
+00009 \textcolor{comment}{ *}
+00010 \textcolor{comment}{ * GNU Radio is distributed in the hope that it will be useful,}
+00011 \textcolor{comment}{ * but WITHOUT ANY WARRANTY; without even the implied warranty of}
+00012 \textcolor{comment}{ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the}
+00013 \textcolor{comment}{ * GNU General Public License for more details.}
+00014 \textcolor{comment}{ *}
+00015 \textcolor{comment}{ * You should have received a copy of the GNU General Public License}
+00016 \textcolor{comment}{ * along with GNU Radio; see the file COPYING.  If not, write to}
+00017 \textcolor{comment}{ * the Free Software Foundation, Inc., 51 Franklin Street,}
+00018 \textcolor{comment}{ * Boston, MA 02110-1301, USA.}
+00019 \textcolor{comment}{ */}
+00020 
+00021 \textcolor{preprocessor}{#ifndef OSMOSDR\_ARG\_HELPERS\_H}
+00022 \textcolor{preprocessor}{#define OSMOSDR\_ARG\_HELPERS\_H}
+00023 
+00024 \textcolor{preprocessor}{#include <iostream>}
+00025 \textcolor{preprocessor}{#include <vector>}
+00026 \textcolor{preprocessor}{#include <map>}
+00027 
+00028 \textcolor{preprocessor}{#include <gnuradio/io\_signature.h>}
+00029 
+00030 \textcolor{preprocessor}{#include <boost/lexical\_cast.hpp>}
+00031 \textcolor{preprocessor}{#include <boost/tokenizer.hpp>}
+00032 \textcolor{preprocessor}{#include <boost/foreach.hpp>}
+00033 \textcolor{preprocessor}{#include <ciso646>}
+00034 
+00035 \textcolor{keyword}{typedef} std::map< std::string, std::string > dict_t;
+00036 \textcolor{keyword}{typedef} std::pair< std::string, std::string > pair_t;
+00037 
+00038 \textcolor{keyword}{inline} std::string dict_to_args_string( \textcolor{keyword}{const} dict_t &d )
+00039 \{
+00040     std::string out;
+00041     BOOST\_FOREACH(\textcolor{keyword}{const} pair_t pair, d)
+00042     \{
+00043         \textcolor{keywordflow}{if} (not out.empty()) out += \textcolor{stringliteral}{","};
+00044         out += pair.first + \textcolor{stringliteral}{"='"} + pair.second + \textcolor{stringliteral}{"'"};
+00045     \}
+00046     \textcolor{keywordflow}{return} out;
+00047 \}
+00048 
+00049 \textcolor{keyword}{inline} std::vector< std::string > args_to_vector( \textcolor{keyword}{const} std::string &args )
+00050 \{
+00051   std::vector< std::string > result;
+00052 
+00053   boost::escaped\_list\_separator<char> separator(\textcolor{stringliteral}{"\(\backslash\)\(\backslash\)"}, \textcolor{stringliteral}{" "}, \textcolor{stringliteral}{"'"});
+00054   \textcolor{keyword}{typedef} boost::tokenizer< boost::escaped\_list\_separator<char> > tokenizer\_t;
+00055   tokenizer\_t tokens(args, separator);
+00056 
+00057   BOOST\_FOREACH(std::string token, tokens)
+00058     result.push\_back(token);
+00059 
+00060   \textcolor{keywordflow}{return} result;
+00061 \}
+00062 
+00063 \textcolor{keyword}{inline} std::vector< std::string > params_to_vector( \textcolor{keyword}{const} std::string &params )
+00064 \{
+00065   std::vector< std::string > result;
+00066 
+00067   boost::escaped\_list\_separator<char> separator(\textcolor{stringliteral}{"\(\backslash\)\(\backslash\)"}, \textcolor{stringliteral}{","}, \textcolor{stringliteral}{"'"});
+00068   \textcolor{keyword}{typedef} boost::tokenizer< boost::escaped\_list\_separator<char> > tokenizer\_t;
+00069   tokenizer\_t tokens(params, separator);
+00070 
+00071   BOOST\_FOREACH(std::string token, tokens)
+00072     result.push\_back(token);
+00073 
+00074   \textcolor{keywordflow}{return} result;
+00075 \}
+00076 
+00077 \textcolor{keyword}{inline} pair_t param_to_pair( \textcolor{keyword}{const} std::string &param )
+00078 \{
+00079   pair_t result;
+00080 
+00081   std::size\_t pos = param.find(\textcolor{charliteral}{'='});
+00082   \textcolor{keywordflow}{if}(pos != std::string::npos)
+00083   \{
+00084     result.first = param.substr(0, pos);
+00085     result.second = param.substr(pos + 1);
+00086   \}
+00087   \textcolor{keywordflow}{else}
+00088   \{
+00089     result.first = param;
+00090     result.second = \textcolor{stringliteral}{""};
+00091   \}
+00092 
+00093   \textcolor{keywordflow}{return} result;
+00094 \}
+00095 
+00096 \textcolor{keyword}{inline} dict_t params_to_dict( \textcolor{keyword}{const} std::string &params )
+00097 \{
+00098   dict_t result;
+00099 
+00100   std::vector< std::string > param\_list = params_to_vector( params );
+00101   BOOST\_FOREACH(std::string param, param\_list)
+00102   \{
+00103     pair_t pair = param_to_pair( param );
+00104     std::string value = pair.second;
+00105     \textcolor{keywordflow}{if} (value.length() && value[0] == \textcolor{charliteral}{'\(\backslash\)''} && value[ value.length() - 1 ] == \textcolor{charliteral}{'\(\backslash\)''})
+00106       value = value.substr(1, value.length() - 1);
+00107     result[ pair.first ] = value;
+00108   \}
+00109 
+00110   \textcolor{keywordflow}{return} result;
+00111 \}
+00112 
+00113 \textcolor{keyword}{struct }is_nchan_argument
+00114 \{
+00115   \textcolor{keywordtype}{bool} operator ()(\textcolor{keyword}{const} std::string &str)
+00116   \{
+00117     \textcolor{keywordflow}{return} str.find(\textcolor{stringliteral}{"numchan="}) == 0;
+00118   \}
+00119 \};
+00120 
+00121 \textcolor{keyword}{inline} gr::io\_signature::sptr args_to_io_signature( \textcolor{keyword}{const} std::string &args )
+00122 \{
+00123   \textcolor{keywordtype}{size\_t} max\_nchan = 0;
+00124   \textcolor{keywordtype}{size\_t} dev\_nchan = 0;
+00125   std::vector< std::string > arg\_list = args_to_vector( args );
+00126 
+00127   BOOST\_FOREACH( std::string arg, arg\_list )
+00128   \{
+00129     \textcolor{keywordflow}{if} ( arg.find( \textcolor{stringliteral}{"numchan="} ) == 0 ) \textcolor{comment}{// try to parse global nchan value}
+00130     \{
+00131       pair_t pair = param_to_pair( arg );
+00132       max\_nchan = boost::lexical\_cast<\textcolor{keywordtype}{size\_t}>( pair.second );
+00133     \}
+00134   \}
+00135 
+00136   arg\_list.erase( std::remove\_if( \textcolor{comment}{// remove any global nchan tokens}
+00137                     arg\_list.begin(),
+00138                     arg\_list.end(),
+00139                     is_nchan_argument() ),
+00140                   arg\_list.end() );
+00141 
+00142   \textcolor{comment}{// try to parse device specific nchan values, assume 1 channel if none given}
+00143 
+00144   BOOST\_FOREACH( std::string arg, arg\_list )
+00145   \{
+00146     dict_t dict = params_to_dict(arg);
+00147     \textcolor{keywordflow}{if} (dict.count(\textcolor{stringliteral}{"nchan"}))
+00148     \{
+00149       dev\_nchan += boost::lexical\_cast<\textcolor{keywordtype}{size\_t}>( dict[\textcolor{stringliteral}{"nchan"}] );
+00150     \}
+00151     \textcolor{keywordflow}{else} \textcolor{comment}{// no channels given via args}
+00152     \{
+00153       dev\_nchan++; \textcolor{comment}{// assume one channel}
+00154     \}
+00155   \}
+00156 
+00157   \textcolor{comment}{// if at least one nchan was given, perform a sanity check}
+00158   \textcolor{keywordflow}{if} ( max\_nchan && dev\_nchan && max\_nchan != dev\_nchan )
+00159     \textcolor{keywordflow}{throw} std::runtime\_error(\textcolor{stringliteral}{"Wrong device arguments specified. Missing nchan?"});
+00160 
+00161   \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} nchan = std::max<size\_t>(dev\_nchan, 1); \textcolor{comment}{// assume at least one}
+00162   \textcolor{keywordflow}{return} gr::io\_signature::make(nchan, nchan, \textcolor{keyword}{sizeof}(gr\_complex));
+00163 \}
+00164 
+00165 \textcolor{preprocessor}{#endif // OSMOSDR\_ARG\_HELPERS\_H}
+\end{DoxyCode}

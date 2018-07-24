@@ -1,0 +1,326 @@
+\subsection{Soapy\+S\+D\+R\+Util.\+cpp}
+\label{SoapySDRUtil_8cpp_source}\index{/home/erik/prefix/default/src/soapysdr/apps/\+Soapy\+S\+D\+R\+Util.\+cpp@{/home/erik/prefix/default/src/soapysdr/apps/\+Soapy\+S\+D\+R\+Util.\+cpp}}
+
+\begin{DoxyCode}
+00001 \textcolor{comment}{// Copyright (c) 2014-2018 Josh Blum}
+00002 \textcolor{comment}{// SPDX-License-Identifier: BSL-1.0}
+00003 
+00004 \textcolor{preprocessor}{#include <SoapySDR/Version.hpp>}
+00005 \textcolor{preprocessor}{#include <SoapySDR/Modules.hpp>}
+00006 \textcolor{preprocessor}{#include <SoapySDR/Registry.hpp>}
+00007 \textcolor{preprocessor}{#include <SoapySDR/Device.hpp>}
+00008 \textcolor{preprocessor}{#include <SoapySDR/ConverterRegistry.hpp>}
+00009 \textcolor{preprocessor}{#include <algorithm>} \textcolor{comment}{//sort, min, max}
+00010 \textcolor{preprocessor}{#include <cstdlib>}
+00011 \textcolor{preprocessor}{#include <cstddef>}
+00012 \textcolor{preprocessor}{#include <iostream>}
+00013 \textcolor{preprocessor}{#include <iomanip>}
+00014 \textcolor{preprocessor}{#include <getopt.h>}
+00015 
+00016 std::string SoapySDRDeviceProbe(SoapySDR::Device *);
+00017 \textcolor{keywordtype}{int} SoapySDRRateTest(
+00018     \textcolor{keyword}{const} std::string &argStr,
+00019     \textcolor{keyword}{const} \textcolor{keywordtype}{double} sampleRate,
+00020     \textcolor{keyword}{const} std::string &channelStr,
+00021     \textcolor{keyword}{const} std::string &directionStr);
+00022 
+00023 \textcolor{comment}{/***********************************************************************}
+00024 \textcolor{comment}{ * Print the banner}
+00025 \textcolor{comment}{ **********************************************************************/}
+00026 \textcolor{keyword}{static} \textcolor{keywordtype}{void} printBanner(\textcolor{keywordtype}{void})
+00027 \{
+00028     std::cout << \textcolor{stringliteral}{"######################################################"} << std::endl;
+00029     std::cout << \textcolor{stringliteral}{"##     Soapy SDR -- the SDR abstraction library     ##"} << std::endl;
+00030     std::cout << \textcolor{stringliteral}{"######################################################"} << std::endl;
+00031     std::cout << std::endl;
+00032 \}
+00033 
+00034 \textcolor{comment}{/***********************************************************************}
+00035 \textcolor{comment}{ * Print help message}
+00036 \textcolor{comment}{ **********************************************************************/}
+00037 \textcolor{keyword}{static} \textcolor{keywordtype}{int} printHelp(\textcolor{keywordtype}{void})
+00038 \{
+00039     std::cout << \textcolor{stringliteral}{"Usage SoapySDRUtil [options]"} << std::endl;
+00040     std::cout << \textcolor{stringliteral}{"  Options summary:"} << std::endl;
+00041     std::cout << \textcolor{stringliteral}{"    --help \(\backslash\)t\(\backslash\)t\(\backslash\)t\(\backslash\)t Print this help message"} << std::endl;
+00042     std::cout << \textcolor{stringliteral}{"    --info \(\backslash\)t\(\backslash\)t\(\backslash\)t\(\backslash\)t Print module information"} << std::endl;
+00043     std::cout << \textcolor{stringliteral}{"    --find[=\(\backslash\)"driver=foo,type=bar\(\backslash\)"] \(\backslash\)t Discover available devices"} << std::endl;
+00044     std::cout << \textcolor{stringliteral}{"    --make[=\(\backslash\)"driver=foo,type=bar\(\backslash\)"] \(\backslash\)t Create a device instance"} << std::endl;
+00045     std::cout << \textcolor{stringliteral}{"    --probe[=\(\backslash\)"driver=foo,type=bar\(\backslash\)"] \(\backslash\)t Print detailed information"} << std::endl;
+00046     std::cout << std::endl;
+00047 
+00048     std::cout << \textcolor{stringliteral}{"  Advanced options:"} << std::endl;
+00049     std::cout << \textcolor{stringliteral}{"    --check[=driverName] \(\backslash\)t\(\backslash\)t Check if driver is present"} << std::endl;
+00050     std::cout << \textcolor{stringliteral}{"    --sparse             \(\backslash\)t\(\backslash\)t Simplified output for --find"} << std::endl;
+00051     std::cout << std::endl;
+00052 
+00053     std::cout << \textcolor{stringliteral}{"  Rate testing options:"} << std::endl;
+00054     std::cout << \textcolor{stringliteral}{"    --args[=\(\backslash\)"driver=foo\(\backslash\)"] \(\backslash\)t\(\backslash\)t Arguments for testing"} << std::endl;
+00055     std::cout << \textcolor{stringliteral}{"    --rate[=stream rate Sps] \(\backslash\)t\(\backslash\)t Rate in samples per second"} << std::endl;
+00056     std::cout << \textcolor{stringliteral}{"    --channels[=\(\backslash\)"0, 1, 2\(\backslash\)"] \(\backslash\)t\(\backslash\)t List of channels, default 0"} << std::endl;
+00057     std::cout << \textcolor{stringliteral}{"    --direction[=RX or TX] \(\backslash\)t\(\backslash\)t Specify the channel direction"} << std::endl;
+00058     std::cout << std::endl;
+00059     \textcolor{keywordflow}{return} EXIT\_SUCCESS;
+00060 \}
+00061 
+00062 \textcolor{comment}{/***********************************************************************}
+00063 \textcolor{comment}{ * Print version and module info}
+00064 \textcolor{comment}{ **********************************************************************/}
+00065 \textcolor{keyword}{static} \textcolor{keywordtype}{int} printInfo(\textcolor{keywordtype}{void})
+00066 \{
+00067     std::cout << \textcolor{stringliteral}{"Lib Version: v"} << SoapySDR::getLibVersion() << std::endl;
+00068     std::cout << \textcolor{stringliteral}{"API Version: v"} << SoapySDR::getAPIVersion() << std::endl;
+00069     std::cout << \textcolor{stringliteral}{"ABI Version: v"} << SoapySDR::getABIVersion() << std::endl;
+00070     std::cout << \textcolor{stringliteral}{"Install root: "} << SoapySDR::getRootPath() << std::endl;
+00071 
+00072     \textcolor{keywordflow}{for} (\textcolor{keyword}{const} \textcolor{keyword}{auto} &path : SoapySDR::listSearchPaths())
+00073         std::cout << \textcolor{stringliteral}{"Search path: "} << path << std::endl;
+00074 
+00075     \textcolor{comment}{//get a list of module and calculate the max path length}
+00076     \textcolor{keyword}{const} \textcolor{keyword}{auto} modules = SoapySDR::listModules();
+00077     \textcolor{keywordtype}{size\_t} maxModulePathLen(0);
+00078     \textcolor{keywordflow}{for} (\textcolor{keyword}{const} \textcolor{keyword}{auto} &mod : modules) maxModulePathLen = std::max(maxModulePathLen, mod.size());
+00079 
+00080     \textcolor{comment}{//load each module and print information}
+00081     \textcolor{keywordflow}{for} (\textcolor{keyword}{const} \textcolor{keyword}{auto} &mod : modules)
+00082     \{
+00083         std::cout << \textcolor{stringliteral}{"Module found: "} << mod;
+00084         \textcolor{keyword}{const} \textcolor{keyword}{auto} &errMsg = SoapySDR::loadModule(mod);
+00085         \textcolor{keywordflow}{if} (not errMsg.empty()) std::cout << \textcolor{stringliteral}{"\(\backslash\)n  "} << errMsg;
+00086         \textcolor{keyword}{const} \textcolor{keyword}{auto} version = SoapySDR::getModuleVersion(mod);
+00087         \textcolor{keywordflow}{if} (not version.empty()) std::cout << std::string(maxModulePathLen-mod.size(), \textcolor{charliteral}{' '}) << \textcolor{stringliteral}{" ("} << 
+      version << \textcolor{stringliteral}{")"};
+00088         std::cout << std::endl;
+00089     \}
+00090     \textcolor{keywordflow}{if} (modules.empty()) std::cout << \textcolor{stringliteral}{"No modules found!"} << std::endl;
+00091 
+00092     std::cout << \textcolor{stringliteral}{"Available factories... "};
+00093     std::string factories;
+00094     \textcolor{keywordflow}{for} (\textcolor{keyword}{const} \textcolor{keyword}{auto} &it : SoapySDR::Registry::listFindFunctions())
+00095     \{
+00096         \textcolor{keywordflow}{if} (not factories.empty()) factories += \textcolor{stringliteral}{", "};
+00097         factories += it.first;
+00098     \}
+00099     \textcolor{keywordflow}{if} (factories.empty()) factories = \textcolor{stringliteral}{"No factories found!"};
+00100     std::cout << factories << std::endl;
+00101 
+00102     std::cout << \textcolor{stringliteral}{"Available converters..."} << std::endl;
+00103     \textcolor{keywordflow}{for} (\textcolor{keyword}{const} \textcolor{keyword}{auto} &source : 
+      SoapySDR::ConverterRegistry::listAvailableSourceFormats())
+00104     \{
+00105         std::string targets;
+00106         \textcolor{keywordflow}{for} (\textcolor{keyword}{const} \textcolor{keyword}{auto} &target : SoapySDR::ConverterRegistry::listTargetFormats(source))
+00107         \{
+00108             \textcolor{keywordflow}{if} (not targets.empty()) targets += \textcolor{stringliteral}{", "};
+00109             targets += target;
+00110         \}
+00111         std::cout << \textcolor{stringliteral}{" - "} << std::setw(5) << source << \textcolor{stringliteral}{" -> ["} << targets << \textcolor{stringliteral}{"]"} << std::endl;
+00112     \}
+00113 
+00114     \textcolor{keywordflow}{return} EXIT\_SUCCESS;
+00115 \}
+00116 
+00117 \textcolor{comment}{/***********************************************************************}
+00118 \textcolor{comment}{ * Find devices and print args}
+00119 \textcolor{comment}{ **********************************************************************/}
+00120 \textcolor{keyword}{static} \textcolor{keywordtype}{int} findDevices(\textcolor{keyword}{const} std::string &argStr, \textcolor{keyword}{const} \textcolor{keywordtype}{bool} sparse)
+00121 \{
+00122     \textcolor{keyword}{const} \textcolor{keyword}{auto} results = SoapySDR::Device::enumerate(argStr);
+00123     \textcolor{keywordflow}{if} (sparse)
+00124     \{
+00125         std::vector<std::string> sparseResults;
+00126         \textcolor{keywordflow}{for} (\textcolor{keywordtype}{size\_t} i = 0; i < results.size(); i++)
+00127         \{
+00128             \textcolor{keyword}{const} \textcolor{keyword}{auto} it = results[i].find(\textcolor{stringliteral}{"label"});
+00129             \textcolor{keywordflow}{if} (it != results[i].end()) sparseResults.push\_back(it->second);
+00130             \textcolor{keywordflow}{else} sparseResults.push\_back(SoapySDR::KwargsToString(results[i]));
+00131         \}
+00132         std::sort(sparseResults.begin(), sparseResults.end());
+00133         \textcolor{keywordflow}{for} (\textcolor{keywordtype}{size\_t} i = 0; i < sparseResults.size(); i++)
+00134         \{
+00135             std::cout << i << \textcolor{stringliteral}{": "} << sparseResults[i] << std::endl;
+00136         \}
+00137     \}
+00138     \textcolor{keywordflow}{else}
+00139     \{
+00140         \textcolor{keywordflow}{for} (\textcolor{keywordtype}{size\_t} i = 0; i < results.size(); i++)
+00141         \{
+00142             std::cout << \textcolor{stringliteral}{"Found device "} << i << std::endl;
+00143             \textcolor{keywordflow}{for} (\textcolor{keyword}{const} \textcolor{keyword}{auto} &it : results[i])
+00144             \{
+00145                 std::cout << \textcolor{stringliteral}{"  "} << it.first << \textcolor{stringliteral}{" = "} << it.second << std::endl;
+00146             \}
+00147             std::cout << std::endl;
+00148         \}
+00149         \textcolor{keywordflow}{if} (results.empty()) std::cerr << \textcolor{stringliteral}{"No devices found!"} << std::endl;
+00150         \textcolor{keywordflow}{else} std::cout << std::endl;
+00151     \}
+00152     \textcolor{keywordflow}{return} results.empty()?EXIT\_FAILURE:EXIT\_SUCCESS;
+00153 \}
+00154 
+00155 \textcolor{comment}{/***********************************************************************}
+00156 \textcolor{comment}{ * Make device and print hardware info}
+00157 \textcolor{comment}{ **********************************************************************/}
+00158 \textcolor{keyword}{static} \textcolor{keywordtype}{int} makeDevice(\textcolor{keyword}{const} std::string &argStr)
+00159 \{
+00160     std::cout << \textcolor{stringliteral}{"Make device "} << argStr << std::endl;
+00161     \textcolor{keywordflow}{try}
+00162     \{
+00163         \textcolor{keyword}{auto} device = SoapySDR::Device::make(argStr);
+00164         std::cout << \textcolor{stringliteral}{"  driver="} << device->getDriverKey() << std::endl;
+00165         std::cout << \textcolor{stringliteral}{"  hardware="} << device->getHardwareKey() << std::endl;
+00166         \textcolor{keywordflow}{for} (\textcolor{keyword}{const} \textcolor{keyword}{auto} &it : device->getHardwareInfo())
+00167         \{
+00168             std::cout << \textcolor{stringliteral}{"  "} << it.first << \textcolor{stringliteral}{"="} << it.second << std::endl;
+00169         \}
+00170         SoapySDR::Device::unmake(device);
+00171     \}
+00172     \textcolor{keywordflow}{catch} (\textcolor{keyword}{const} std::exception &ex)
+00173     \{
+00174         std::cerr << \textcolor{stringliteral}{"Error making device: "} << ex.what() << std::endl;
+00175         \textcolor{keywordflow}{return} EXIT\_FAILURE;
+00176     \}
+00177     std::cout << std::endl;
+00178     \textcolor{keywordflow}{return} EXIT\_SUCCESS;
+00179 \}
+00180 
+00181 \textcolor{comment}{/***********************************************************************}
+00182 \textcolor{comment}{ * Make device and print detailed info}
+00183 \textcolor{comment}{ **********************************************************************/}
+00184 \textcolor{keyword}{static} \textcolor{keywordtype}{int} probeDevice(\textcolor{keyword}{const} std::string &argStr)
+00185 \{
+00186     std::cout << \textcolor{stringliteral}{"Probe device "} << argStr << std::endl;
+00187     \textcolor{keywordflow}{try}
+00188     \{
+00189         \textcolor{keyword}{auto} device = SoapySDR::Device::make(argStr);
+00190         std::cout << SoapySDRDeviceProbe(device) << std::endl;
+00191         SoapySDR::Device::unmake(device);
+00192     \}
+00193     \textcolor{keywordflow}{catch} (\textcolor{keyword}{const} std::exception &ex)
+00194     \{
+00195         std::cerr << \textcolor{stringliteral}{"Error probing device: "} << ex.what() << std::endl;
+00196         \textcolor{keywordflow}{return} EXIT\_FAILURE;
+00197     \}
+00198     std::cout << std::endl;
+00199     \textcolor{keywordflow}{return} EXIT\_SUCCESS;
+00200 \}
+00201 
+00202 \textcolor{comment}{/***********************************************************************}
+00203 \textcolor{comment}{ * Check the registry for a specific driver}
+00204 \textcolor{comment}{ **********************************************************************/}
+00205 \textcolor{keyword}{static} \textcolor{keywordtype}{int} checkDriver(\textcolor{keyword}{const} std::string &driverName)
+00206 \{
+00207     std::cout << \textcolor{stringliteral}{"Loading modules... "} << std::flush;
+00208     SoapySDR::loadModules();
+00209     std::cout << \textcolor{stringliteral}{"done"} << std::endl;
+00210 
+00211     std::cout << \textcolor{stringliteral}{"Checking driver '"} << driverName << \textcolor{stringliteral}{"'... "} << std::flush;
+00212     \textcolor{keyword}{const} \textcolor{keyword}{auto} factories = SoapySDR::Registry::listFindFunctions();
+00213 
+00214     \textcolor{keywordflow}{if} (factories.find(driverName) == factories.end())
+00215     \{
+00216         std::cout << \textcolor{stringliteral}{"MISSING!"} << std::endl;
+00217         \textcolor{keywordflow}{return} EXIT\_FAILURE;
+00218     \}
+00219     \textcolor{keywordflow}{else}
+00220     \{
+00221         std::cout << \textcolor{stringliteral}{"PRESENT"} << std::endl;
+00222         \textcolor{keywordflow}{return} EXIT\_SUCCESS;
+00223     \}
+00224 \}
+00225 
+00226 \textcolor{comment}{/***********************************************************************}
+00227 \textcolor{comment}{ * main utility entry point}
+00228 \textcolor{comment}{ **********************************************************************/}
+00229 \textcolor{keywordtype}{int} main(\textcolor{keywordtype}{int} argc, \textcolor{keywordtype}{char} *argv[])
+00230 \{
+00231     std::string argStr;
+00232     std::string chanStr;
+00233     std::string dirStr;
+00234     \textcolor{keywordtype}{double} sampleRate(0.0);
+00235     std::string driverName;
+00236     \textcolor{keywordtype}{bool} findDevicesFlag(\textcolor{keyword}{false});
+00237     \textcolor{keywordtype}{bool} sparsePrintFlag(\textcolor{keyword}{false});
+00238     \textcolor{keywordtype}{bool} makeDeviceFlag(\textcolor{keyword}{false});
+00239     \textcolor{keywordtype}{bool} probeDeviceFlag(\textcolor{keyword}{false});
+00240 
+00241     \textcolor{comment}{/*******************************************************************}
+00242 \textcolor{comment}{     * parse command line options}
+00243 \textcolor{comment}{     ******************************************************************/}
+00244     \textcolor{keyword}{static} \textcolor{keyword}{struct }option long\_options[] = \{
+00245         \{\textcolor{stringliteral}{"help"}, no_argument, 0, \textcolor{charliteral}{'h'}\},
+00246         \{\textcolor{stringliteral}{"find"}, optional_argument, 0, \textcolor{charliteral}{'f'}\},
+00247         \{\textcolor{stringliteral}{"make"}, optional_argument, 0, \textcolor{charliteral}{'m'}\},
+00248         \{\textcolor{stringliteral}{"info"}, optional_argument, 0, \textcolor{charliteral}{'i'}\},
+00249         \{\textcolor{stringliteral}{"probe"}, optional_argument, 0, \textcolor{charliteral}{'p'}\},
+00250 
+00251         \{\textcolor{stringliteral}{"check"}, optional_argument, 0, \textcolor{charliteral}{'c'}\},
+00252         \{\textcolor{stringliteral}{"sparse"}, no_argument, 0, \textcolor{charliteral}{'s'}\},
+00253 
+00254         \{\textcolor{stringliteral}{"args"}, optional_argument, 0, \textcolor{charliteral}{'a'}\},
+00255         \{\textcolor{stringliteral}{"rate"}, optional_argument, 0, \textcolor{charliteral}{'r'}\},
+00256         \{\textcolor{stringliteral}{"channels"}, optional_argument, 0, \textcolor{charliteral}{'n'}\},
+00257         \{\textcolor{stringliteral}{"direction"}, optional_argument, 0, \textcolor{charliteral}{'d'}\},
+00258         \{0, 0, 0,  0\}
+00259     \};
+00260     \textcolor{keywordtype}{int} long\_index = 0;
+00261     \textcolor{keywordtype}{int} option = 0;
+00262     \textcolor{keywordflow}{while} ((option = getopt_long_only(argc, argv, \textcolor{stringliteral}{""}, long\_options, &long\_index)) != -1)
+00263     \{
+00264         \textcolor{keywordflow}{switch} (option)
+00265         \{
+00266         \textcolor{keywordflow}{case} \textcolor{charliteral}{'h'}:
+00267             printBanner();
+00268             \textcolor{keywordflow}{return} printHelp();
+00269         \textcolor{keywordflow}{case} \textcolor{charliteral}{'i'}:
+00270             printBanner();
+00271             \textcolor{keywordflow}{return} printInfo();
+00272         \textcolor{keywordflow}{case} \textcolor{charliteral}{'f'}:
+00273             findDevicesFlag = \textcolor{keyword}{true};
+00274             \textcolor{keywordflow}{if} (optarg != \textcolor{keyword}{nullptr}) argStr = optarg;
+00275             \textcolor{keywordflow}{break};
+00276         \textcolor{keywordflow}{case} \textcolor{charliteral}{'m'}:
+00277             makeDeviceFlag = \textcolor{keyword}{true};
+00278             \textcolor{keywordflow}{if} (optarg != \textcolor{keyword}{nullptr}) argStr = optarg;
+00279             \textcolor{keywordflow}{break};
+00280         \textcolor{keywordflow}{case} \textcolor{charliteral}{'p'}:
+00281             probeDeviceFlag = \textcolor{keyword}{true};
+00282             \textcolor{keywordflow}{if} (optarg != \textcolor{keyword}{nullptr}) argStr = optarg;
+00283             \textcolor{keywordflow}{break};
+00284         \textcolor{keywordflow}{case} \textcolor{charliteral}{'c'}:
+00285             \textcolor{keywordflow}{if} (optarg != \textcolor{keyword}{nullptr}) driverName = optarg;
+00286             \textcolor{keywordflow}{break};
+00287         \textcolor{keywordflow}{case} \textcolor{charliteral}{'s'}:
+00288             sparsePrintFlag = \textcolor{keyword}{true};
+00289             \textcolor{keywordflow}{break};
+00290         \textcolor{keywordflow}{case} \textcolor{charliteral}{'a'}:
+00291             \textcolor{keywordflow}{if} (optarg != \textcolor{keyword}{nullptr}) argStr = optarg;
+00292             \textcolor{keywordflow}{break};
+00293         \textcolor{keywordflow}{case} \textcolor{charliteral}{'r'}:
+00294             \textcolor{keywordflow}{if} (optarg != \textcolor{keyword}{nullptr}) sampleRate = std::stod(optarg);
+00295             \textcolor{keywordflow}{break};
+00296         \textcolor{keywordflow}{case} \textcolor{charliteral}{'n'}:
+00297             \textcolor{keywordflow}{if} (optarg != \textcolor{keyword}{nullptr}) chanStr = optarg;
+00298             \textcolor{keywordflow}{break};
+00299         \textcolor{keywordflow}{case} \textcolor{charliteral}{'d'}:
+00300             \textcolor{keywordflow}{if} (optarg != \textcolor{keyword}{nullptr}) dirStr = optarg;
+00301             \textcolor{keywordflow}{break};
+00302         \}
+00303     \}
+00304 
+00305     \textcolor{keywordflow}{if} (not sparsePrintFlag) printBanner();
+00306     \textcolor{keywordflow}{if} (not driverName.empty()) \textcolor{keywordflow}{return} checkDriver(driverName);
+00307     \textcolor{keywordflow}{if} (findDevicesFlag) \textcolor{keywordflow}{return} findDevices(argStr, sparsePrintFlag);
+00308     \textcolor{keywordflow}{if} (makeDeviceFlag)  \textcolor{keywordflow}{return} makeDevice(argStr);
+00309     \textcolor{keywordflow}{if} (probeDeviceFlag) \textcolor{keywordflow}{return} probeDevice(argStr);
+00310 
+00311     \textcolor{comment}{//invoke utilities that rely on multiple arguments}
+00312     \textcolor{keywordflow}{if} (sampleRate != 0.0)
+00313     \{
+00314         \textcolor{keywordflow}{return} SoapySDRRateTest(argStr, sampleRate, chanStr, dirStr);
+00315     \}
+00316 
+00317     \textcolor{comment}{//unknown or unspecified options, do help...}
+00318     \textcolor{keywordflow}{return} printHelp();
+00319 \}
+\end{DoxyCode}

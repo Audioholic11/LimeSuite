@@ -1,0 +1,56 @@
+\subsection{Factory\+C.\+cpp}
+\label{FactoryC_8cpp_source}\index{/home/erik/prefix/default/src/soapysdr/lib/\+Factory\+C.\+cpp@{/home/erik/prefix/default/src/soapysdr/lib/\+Factory\+C.\+cpp}}
+
+\begin{DoxyCode}
+00001 \textcolor{comment}{// Copyright (c) 2014-2017 Josh Blum}
+00002 \textcolor{comment}{// SPDX-License-Identifier: BSL-1.0}
+00003 
+00004 \textcolor{preprocessor}{#include "ErrorHelpers.hpp"}
+00005 \textcolor{preprocessor}{#include "TypeHelpers.hpp"}
+00006 \textcolor{preprocessor}{#include <SoapySDR/Device.h>}
+00007 \textcolor{preprocessor}{#include <SoapySDR/Device.hpp>}
+00008 \textcolor{preprocessor}{#include <cstdlib>}
+00009 \textcolor{preprocessor}{#include <cstring>}
+00010 
+00011 \textcolor{keyword}{extern} \textcolor{stringliteral}{"C"} \{
+00012 
+00013 SoapySDRKwargs *SoapySDRDevice_enumerate(\textcolor{keyword}{const} SoapySDRKwargs *args, \textcolor{keywordtype}{size\_t} *
+      length)
+00014 \{
+00015     *length = 0;
+00016     __SOAPY_SDR_C_TRY
+00017     \textcolor{keywordflow}{return} toKwargsList(SoapySDR::Device::enumerate(toKwargs(args)), length);
+00018     __SOAPY_SDR_C_CATCH_RET(\textcolor{keyword}{nullptr});
+00019 \}
+00020 
+00021 SoapySDRKwargs *SoapySDRDevice_enumerateStrArgs(\textcolor{keyword}{const} \textcolor{keywordtype}{char} *args, \textcolor{keywordtype}{size\_t} *length)
+00022 \{
+00023     *length = 0;
+00024     __SOAPY_SDR_C_TRY
+00025     \textcolor{keywordflow}{return} toKwargsList(SoapySDR::Device::enumerate(args), length);
+00026     __SOAPY_SDR_C_CATCH_RET(\textcolor{keyword}{nullptr});
+00027 \}
+00028 
+00029 SoapySDRDevice *SoapySDRDevice_make(\textcolor{keyword}{const} SoapySDRKwargs *args)
+00030 \{
+00031     __SOAPY_SDR_C_TRY
+00032     \textcolor{keywordflow}{return} (SoapySDRDevice *)SoapySDR::Device::make(toKwargs(args));
+00033     __SOAPY_SDR_C_CATCH_RET(\textcolor{keyword}{nullptr});
+00034 \}
+00035 
+00036 SoapySDRDevice *SoapySDRDevice_makeStrArgs(\textcolor{keyword}{const} \textcolor{keywordtype}{char} *args)
+00037 \{
+00038     __SOAPY_SDR_C_TRY
+00039     \textcolor{keywordflow}{return} (SoapySDRDevice *)SoapySDR::Device::make((args==\textcolor{keyword}{nullptr})?\textcolor{stringliteral}{""}:args);
+00040     __SOAPY_SDR_C_CATCH_RET(\textcolor{keyword}{nullptr});
+00041 \}
+00042 
+00043 \textcolor{keywordtype}{int} SoapySDRDevice_unmake(SoapySDRDevice *device)
+00044 \{
+00045     __SOAPY_SDR_C_TRY
+00046     SoapySDR::Device::unmake((SoapySDR::Device *)device);
+00047     __SOAPY_SDR_C_CATCH
+00048 \}
+00049 
+00050 \}
+\end{DoxyCode}

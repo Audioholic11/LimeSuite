@@ -1,0 +1,229 @@
+\subsection{gr\+:\+:radar\+:\+:signal\+\_\+generator\+\_\+fmcw\+\_\+c Class Reference}
+\label{classgr_1_1radar_1_1signal__generator__fmcw__c}\index{gr\+::radar\+::signal\+\_\+generator\+\_\+fmcw\+\_\+c@{gr\+::radar\+::signal\+\_\+generator\+\_\+fmcw\+\_\+c}}
+
+
+{\ttfamily \#include $<$signal\+\_\+generator\+\_\+fmcw\+\_\+c.\+h$>$}
+
+
+
+Inheritance diagram for gr\+:\+:radar\+:\+:signal\+\_\+generator\+\_\+fmcw\+\_\+c\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=550pt]{d0/d6b/classgr_1_1radar_1_1signal__generator__fmcw__c__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for gr\+:\+:radar\+:\+:signal\+\_\+generator\+\_\+fmcw\+\_\+c\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=220pt]{d0/db2/classgr_1_1radar_1_1signal__generator__fmcw__c__coll__graph}
+\end{center}
+\end{figure}
+\subsubsection*{Public Types}
+\begin{DoxyCompactItemize}
+\item 
+typedef boost\+::shared\+\_\+ptr$<$ {\bf signal\+\_\+generator\+\_\+fmcw\+\_\+c} $>$ {\bf sptr}
+\end{DoxyCompactItemize}
+\subsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+virtual {\bf void} {\bf set\+\_\+d\+\_\+chirp\+\_\+len} ({\bf int} chirp\+\_\+length)=0
+\item 
+virtual {\bf void} {\bf set\+\_\+d\+\_\+total\+\_\+len} ({\bf int} total\+\_\+length)=0
+\item 
+virtual {\bf void} {\bf set\+\_\+waveform} ()=0
+\item 
+virtual {\bf void} {\bf set\+\_\+d\+\_\+samp\+\_\+dead} ({\bf int} dead\+\_\+samples)=0
+\item 
+virtual {\bf void} {\bf set\+\_\+d\+\_\+samp\+\_\+dead\+\_\+round} ({\bf int} dead\+\_\+samples)=0
+\item 
+virtual {\bf void} {\bf set\+\_\+chirp} ({\bf int} up\+\_\+samples, {\bf int} up\+\_\+hold\+\_\+samples, {\bf int} down\+\_\+samples, {\bf int} down\+\_\+hold\+\_\+samples, {\bf int} cw\+\_\+samples)=0
+\end{DoxyCompactItemize}
+\subsubsection*{Static Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+static {\bf sptr} {\bf make} (const {\bf int} samp\+\_\+rate, const {\bf int} packet\+\_\+len, {\bf int} samp\+\_\+up, {\bf int} samp\+\_\+up\+\_\+hold, {\bf int} samp\+\_\+down, {\bf int} samp\+\_\+down\+\_\+hold, {\bf int} samp\+\_\+cw, {\bf int} samp\+\_\+dead, const float freq\+\_\+cw, const float freq\+\_\+sweep, const float amplitude, const {\bf std\+::string} \&len\+\_\+key=\char`\"{}packet\+\_\+len\char`\"{}, const {\bf std\+::string} \&chirp\+\_\+len\+\_\+key=\char`\"{}chirp\+\_\+len\char`\"{}, const {\bf std\+::string} \&total\+\_\+len\+\_\+key=\char`\"{}total\+\_\+len\char`\"{})
+\end{DoxyCompactItemize}
+
+
+\subsubsection{Detailed Description}
+Generates a signal for F\+M\+CW radar in baseband.
+
+The generated signal consists of three parts, in this order\+:
+
+
+\begin{DoxyEnumerate}
+\item CW part with constant frequency
+\item Up-\/chirp
+\item Down-\/chirp
+\end{DoxyEnumerate}
+
+The up-\/chirp goes from CW frequency to CW frequency plus sweep frequency and the down-\/chirp goes in the opposite direction. All of these parts can be disabled by setting the corresponding length to zero.
+
+The packet length for subsequent tagged streams is calculated by the sum of the number of samples of the single modulations parts. 
+
+Definition at line {\bf 47} of file {\bf signal\+\_\+generator\+\_\+fmcw\+\_\+c.\+h}.
+
+
+
+\subsubsection{Member Typedef Documentation}
+\index{gr\+::radar\+::signal\+\_\+generator\+\_\+fmcw\+\_\+c@{gr\+::radar\+::signal\+\_\+generator\+\_\+fmcw\+\_\+c}!sptr@{sptr}}
+\index{sptr@{sptr}!gr\+::radar\+::signal\+\_\+generator\+\_\+fmcw\+\_\+c@{gr\+::radar\+::signal\+\_\+generator\+\_\+fmcw\+\_\+c}}
+\paragraph[{sptr}]{\setlength{\rightskip}{0pt plus 5cm}typedef boost\+::shared\+\_\+ptr$<${\bf signal\+\_\+generator\+\_\+fmcw\+\_\+c}$>$ {\bf gr\+::radar\+::signal\+\_\+generator\+\_\+fmcw\+\_\+c\+::sptr}}\label{classgr_1_1radar_1_1signal__generator__fmcw__c_adbdf3f5fc8fa7994d997cf105b5198f6}
+
+
+Definition at line {\bf 50} of file {\bf signal\+\_\+generator\+\_\+fmcw\+\_\+c.\+h}.
+
+
+
+\subsubsection{Member Function Documentation}
+\index{gr\+::radar\+::signal\+\_\+generator\+\_\+fmcw\+\_\+c@{gr\+::radar\+::signal\+\_\+generator\+\_\+fmcw\+\_\+c}!make@{make}}
+\index{make@{make}!gr\+::radar\+::signal\+\_\+generator\+\_\+fmcw\+\_\+c@{gr\+::radar\+::signal\+\_\+generator\+\_\+fmcw\+\_\+c}}
+\paragraph[{make(const int samp\+\_\+rate, const int packet\+\_\+len, int samp\+\_\+up, int samp\+\_\+up\+\_\+hold, int samp\+\_\+down, int samp\+\_\+down\+\_\+hold, int samp\+\_\+cw, int samp\+\_\+dead, const float freq\+\_\+cw, const float freq\+\_\+sweep, const float amplitude, const std\+::string \&len\+\_\+key=""packet\+\_\+len"", const std\+::string \&chirp\+\_\+len\+\_\+key=""chirp\+\_\+len"", const std\+::string \&total\+\_\+len\+\_\+key=""total\+\_\+len"")}]{\setlength{\rightskip}{0pt plus 5cm}{\bf signal\+\_\+generator\+\_\+fmcw\+\_\+c\+::sptr} gr\+::radar\+::signal\+\_\+generator\+\_\+fmcw\+\_\+c\+::make (
+\begin{DoxyParamCaption}
+\item[{const {\bf int}}]{samp\+\_\+rate, }
+\item[{const {\bf int}}]{packet\+\_\+len, }
+\item[{{\bf int}}]{samp\+\_\+up, }
+\item[{{\bf int}}]{samp\+\_\+up\+\_\+hold, }
+\item[{{\bf int}}]{samp\+\_\+down, }
+\item[{{\bf int}}]{samp\+\_\+down\+\_\+hold, }
+\item[{{\bf int}}]{samp\+\_\+cw, }
+\item[{{\bf int}}]{samp\+\_\+dead, }
+\item[{const float}]{freq\+\_\+cw, }
+\item[{const float}]{freq\+\_\+sweep, }
+\item[{const float}]{amplitude, }
+\item[{const {\bf std\+::string} \&}]{len\+\_\+key = {\ttfamily \char`\"{}packet\+\_\+len\char`\"{}}, }
+\item[{const {\bf std\+::string} \&}]{chirp\+\_\+len\+\_\+key = {\ttfamily \char`\"{}chirp\+\_\+len\char`\"{}}, }
+\item[{const {\bf std\+::string} \&}]{total\+\_\+len\+\_\+key = {\ttfamily \char`\"{}total\+\_\+len\char`\"{}}}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [static]}}\label{classgr_1_1radar_1_1signal__generator__fmcw__c_afbfd3598d642279ef1909849477656d2}
+
+\begin{DoxyParams}{Parameters}
+{\em samp\+\_\+rate} & Signal sample rate (samples per second) \\
+\hline
+{\em packet\+\_\+len} & Processing packet length \\
+\hline
+{\em samp\+\_\+up} & Number samples of up-\/chirp part \\
+\hline
+{\em samp\+\_\+up\+\_\+hold} & Number of samples of up\+\_\+chirp hold part \\
+\hline
+{\em samp\+\_\+down} & Number samples of down-\/chirp part \\
+\hline
+{\em samp\+\_\+down\+\_\+hold} & Number of samples of down\+\_\+chirp hold part \\
+\hline
+{\em samp\+\_\+cw} & Number samples of CW part \\
+\hline
+{\em samp\+\_\+dead} & Number of dead samples \\
+\hline
+{\em freq\+\_\+cw} & CW signal frequency in baseband \\
+\hline
+{\em freq\+\_\+sweep} & Sweep frequency of up-\/ and down-\/chirp \\
+\hline
+{\em amplitude} & Signal amplitude \\
+\hline
+{\em len\+\_\+key} & Processing Packet length key for tagged stream \\
+\hline
+{\em chirp\+\_\+len\+\_\+key} & Chirp Length Key for tagged stream \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line {\bf 32} of file {\bf signal\+\_\+generator\+\_\+fmcw\+\_\+c\+\_\+impl.\+cc}.
+
+
+
+Referenced by {\bf \+\_\+wrap\+\_\+signal\+\_\+generator\+\_\+fmcw\+\_\+c\+\_\+make()}.
+
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{d3/d8a/classgr_1_1radar_1_1signal__generator__fmcw__c_afbfd3598d642279ef1909849477656d2_icgraph}
+\end{center}
+\end{figure}
+
+
+\index{gr\+::radar\+::signal\+\_\+generator\+\_\+fmcw\+\_\+c@{gr\+::radar\+::signal\+\_\+generator\+\_\+fmcw\+\_\+c}!set\+\_\+chirp@{set\+\_\+chirp}}
+\index{set\+\_\+chirp@{set\+\_\+chirp}!gr\+::radar\+::signal\+\_\+generator\+\_\+fmcw\+\_\+c@{gr\+::radar\+::signal\+\_\+generator\+\_\+fmcw\+\_\+c}}
+\paragraph[{set\+\_\+chirp(int up\+\_\+samples, int up\+\_\+hold\+\_\+samples, int down\+\_\+samples, int down\+\_\+hold\+\_\+samples, int cw\+\_\+samples)=0}]{\setlength{\rightskip}{0pt plus 5cm}virtual {\bf void} gr\+::radar\+::signal\+\_\+generator\+\_\+fmcw\+\_\+c\+::set\+\_\+chirp (
+\begin{DoxyParamCaption}
+\item[{{\bf int}}]{up\+\_\+samples, }
+\item[{{\bf int}}]{up\+\_\+hold\+\_\+samples, }
+\item[{{\bf int}}]{down\+\_\+samples, }
+\item[{{\bf int}}]{down\+\_\+hold\+\_\+samples, }
+\item[{{\bf int}}]{cw\+\_\+samples}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [pure virtual]}}\label{classgr_1_1radar_1_1signal__generator__fmcw__c_a6aff8498e4e118edc4235da6f5d0b61c}
+
+
+Implemented in {\bf gr\+::radar\+::signal\+\_\+generator\+\_\+fmcw\+\_\+c\+\_\+impl} \doxyref{}{p.}{dd/de4/classgr_1_1radar_1_1signal__generator__fmcw__c__impl_ac7a9ca2d9c2053bc771299aeca5617a0}.
+
+\index{gr\+::radar\+::signal\+\_\+generator\+\_\+fmcw\+\_\+c@{gr\+::radar\+::signal\+\_\+generator\+\_\+fmcw\+\_\+c}!set\+\_\+d\+\_\+chirp\+\_\+len@{set\+\_\+d\+\_\+chirp\+\_\+len}}
+\index{set\+\_\+d\+\_\+chirp\+\_\+len@{set\+\_\+d\+\_\+chirp\+\_\+len}!gr\+::radar\+::signal\+\_\+generator\+\_\+fmcw\+\_\+c@{gr\+::radar\+::signal\+\_\+generator\+\_\+fmcw\+\_\+c}}
+\paragraph[{set\+\_\+d\+\_\+chirp\+\_\+len(int chirp\+\_\+length)=0}]{\setlength{\rightskip}{0pt plus 5cm}virtual {\bf void} gr\+::radar\+::signal\+\_\+generator\+\_\+fmcw\+\_\+c\+::set\+\_\+d\+\_\+chirp\+\_\+len (
+\begin{DoxyParamCaption}
+\item[{{\bf int}}]{chirp\+\_\+length}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [pure virtual]}}\label{classgr_1_1radar_1_1signal__generator__fmcw__c_a589092763323365da79b72facb3bbe0a}
+
+
+Implemented in {\bf gr\+::radar\+::signal\+\_\+generator\+\_\+fmcw\+\_\+c\+\_\+impl} \doxyref{}{p.}{dd/de4/classgr_1_1radar_1_1signal__generator__fmcw__c__impl_a9b66a53b6b4e638425c49dd6887cd1f4}.
+
+\index{gr\+::radar\+::signal\+\_\+generator\+\_\+fmcw\+\_\+c@{gr\+::radar\+::signal\+\_\+generator\+\_\+fmcw\+\_\+c}!set\+\_\+d\+\_\+samp\+\_\+dead@{set\+\_\+d\+\_\+samp\+\_\+dead}}
+\index{set\+\_\+d\+\_\+samp\+\_\+dead@{set\+\_\+d\+\_\+samp\+\_\+dead}!gr\+::radar\+::signal\+\_\+generator\+\_\+fmcw\+\_\+c@{gr\+::radar\+::signal\+\_\+generator\+\_\+fmcw\+\_\+c}}
+\paragraph[{set\+\_\+d\+\_\+samp\+\_\+dead(int dead\+\_\+samples)=0}]{\setlength{\rightskip}{0pt plus 5cm}virtual {\bf void} gr\+::radar\+::signal\+\_\+generator\+\_\+fmcw\+\_\+c\+::set\+\_\+d\+\_\+samp\+\_\+dead (
+\begin{DoxyParamCaption}
+\item[{{\bf int}}]{dead\+\_\+samples}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [pure virtual]}}\label{classgr_1_1radar_1_1signal__generator__fmcw__c_ae1974efe1cb9d159e4e46eb49a7c1cf1}
+
+
+Implemented in {\bf gr\+::radar\+::signal\+\_\+generator\+\_\+fmcw\+\_\+c\+\_\+impl} \doxyref{}{p.}{dd/de4/classgr_1_1radar_1_1signal__generator__fmcw__c__impl_ae837d2a26dc37d96803ce0d052cacc6c}.
+
+\index{gr\+::radar\+::signal\+\_\+generator\+\_\+fmcw\+\_\+c@{gr\+::radar\+::signal\+\_\+generator\+\_\+fmcw\+\_\+c}!set\+\_\+d\+\_\+samp\+\_\+dead\+\_\+round@{set\+\_\+d\+\_\+samp\+\_\+dead\+\_\+round}}
+\index{set\+\_\+d\+\_\+samp\+\_\+dead\+\_\+round@{set\+\_\+d\+\_\+samp\+\_\+dead\+\_\+round}!gr\+::radar\+::signal\+\_\+generator\+\_\+fmcw\+\_\+c@{gr\+::radar\+::signal\+\_\+generator\+\_\+fmcw\+\_\+c}}
+\paragraph[{set\+\_\+d\+\_\+samp\+\_\+dead\+\_\+round(int dead\+\_\+samples)=0}]{\setlength{\rightskip}{0pt plus 5cm}virtual {\bf void} gr\+::radar\+::signal\+\_\+generator\+\_\+fmcw\+\_\+c\+::set\+\_\+d\+\_\+samp\+\_\+dead\+\_\+round (
+\begin{DoxyParamCaption}
+\item[{{\bf int}}]{dead\+\_\+samples}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [pure virtual]}}\label{classgr_1_1radar_1_1signal__generator__fmcw__c_a2684fa932606dc9ec2d9fb29a8863e3f}
+
+
+Implemented in {\bf gr\+::radar\+::signal\+\_\+generator\+\_\+fmcw\+\_\+c\+\_\+impl} \doxyref{}{p.}{dd/de4/classgr_1_1radar_1_1signal__generator__fmcw__c__impl_a301eb8896314e0e958061f1af0c0a203}.
+
+\index{gr\+::radar\+::signal\+\_\+generator\+\_\+fmcw\+\_\+c@{gr\+::radar\+::signal\+\_\+generator\+\_\+fmcw\+\_\+c}!set\+\_\+d\+\_\+total\+\_\+len@{set\+\_\+d\+\_\+total\+\_\+len}}
+\index{set\+\_\+d\+\_\+total\+\_\+len@{set\+\_\+d\+\_\+total\+\_\+len}!gr\+::radar\+::signal\+\_\+generator\+\_\+fmcw\+\_\+c@{gr\+::radar\+::signal\+\_\+generator\+\_\+fmcw\+\_\+c}}
+\paragraph[{set\+\_\+d\+\_\+total\+\_\+len(int total\+\_\+length)=0}]{\setlength{\rightskip}{0pt plus 5cm}virtual {\bf void} gr\+::radar\+::signal\+\_\+generator\+\_\+fmcw\+\_\+c\+::set\+\_\+d\+\_\+total\+\_\+len (
+\begin{DoxyParamCaption}
+\item[{{\bf int}}]{total\+\_\+length}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [pure virtual]}}\label{classgr_1_1radar_1_1signal__generator__fmcw__c_af0fb4eaa9e464933e3a4d0f76ce024f3}
+
+
+Implemented in {\bf gr\+::radar\+::signal\+\_\+generator\+\_\+fmcw\+\_\+c\+\_\+impl} \doxyref{}{p.}{dd/de4/classgr_1_1radar_1_1signal__generator__fmcw__c__impl_a7ed65a1338ea0b7e164a27d726534470}.
+
+\index{gr\+::radar\+::signal\+\_\+generator\+\_\+fmcw\+\_\+c@{gr\+::radar\+::signal\+\_\+generator\+\_\+fmcw\+\_\+c}!set\+\_\+waveform@{set\+\_\+waveform}}
+\index{set\+\_\+waveform@{set\+\_\+waveform}!gr\+::radar\+::signal\+\_\+generator\+\_\+fmcw\+\_\+c@{gr\+::radar\+::signal\+\_\+generator\+\_\+fmcw\+\_\+c}}
+\paragraph[{set\+\_\+waveform()=0}]{\setlength{\rightskip}{0pt plus 5cm}virtual {\bf void} gr\+::radar\+::signal\+\_\+generator\+\_\+fmcw\+\_\+c\+::set\+\_\+waveform (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [pure virtual]}}\label{classgr_1_1radar_1_1signal__generator__fmcw__c_ab07f4d2a41bfab7cf5b2e754754568e9}
+
+
+Implemented in {\bf gr\+::radar\+::signal\+\_\+generator\+\_\+fmcw\+\_\+c\+\_\+impl} \doxyref{}{p.}{dd/de4/classgr_1_1radar_1_1signal__generator__fmcw__c__impl_a4fc3f3cde89e3c4663e71ced99cf2b36}.
+
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+/home/erik/prefix/default/src/gr-\/radar-\/dev/include/radar/{\bf signal\+\_\+generator\+\_\+fmcw\+\_\+c.\+h}\item 
+/home/erik/prefix/default/src/gr-\/radar-\/dev/lib/{\bf signal\+\_\+generator\+\_\+fmcw\+\_\+c\+\_\+impl.\+cc}\end{DoxyCompactItemize}

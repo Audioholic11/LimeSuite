@@ -1,0 +1,164 @@
+\subsection{gr\+:\+:radar\+:\+:static\+\_\+target\+\_\+simulator\+\_\+cc Class Reference}
+\label{classgr_1_1radar_1_1static__target__simulator__cc}\index{gr\+::radar\+::static\+\_\+target\+\_\+simulator\+\_\+cc@{gr\+::radar\+::static\+\_\+target\+\_\+simulator\+\_\+cc}}
+
+
+{\ttfamily \#include $<$static\+\_\+target\+\_\+simulator\+\_\+cc.\+h$>$}
+
+
+
+Inheritance diagram for gr\+:\+:radar\+:\+:static\+\_\+target\+\_\+simulator\+\_\+cc\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=550pt]{d4/d07/classgr_1_1radar_1_1static__target__simulator__cc__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for gr\+:\+:radar\+:\+:static\+\_\+target\+\_\+simulator\+\_\+cc\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=193pt]{d9/df4/classgr_1_1radar_1_1static__target__simulator__cc__coll__graph}
+\end{center}
+\end{figure}
+\subsubsection*{Public Types}
+\begin{DoxyCompactItemize}
+\item 
+typedef boost\+::shared\+\_\+ptr$<$ {\bf static\+\_\+target\+\_\+simulator\+\_\+cc} $>$ {\bf sptr}
+\end{DoxyCompactItemize}
+\subsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+virtual {\bf void} {\bf setup\+\_\+targets} ({\bf std\+::vector}$<$ float $>$ {\bf range}, {\bf std\+::vector}$<$ float $>$ velocity, {\bf std\+::vector}$<$ float $>$ rcs, {\bf std\+::vector}$<$ float $>$ azimuth, {\bf std\+::vector}$<$ float $>$ position\+\_\+rx, {\bf int} samp\+\_\+rate, float center\+\_\+freq, float self\+\_\+coupling\+\_\+db, bool rndm\+\_\+phaseshift, bool self\+\_\+coupling)=0
+\end{DoxyCompactItemize}
+\subsubsection*{Static Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+static {\bf sptr} {\bf make} ({\bf std\+::vector}$<$ float $>$ {\bf range}, {\bf std\+::vector}$<$ float $>$ velocity, {\bf std\+::vector}$<$ float $>$ rcs, {\bf std\+::vector}$<$ float $>$ azimuth, {\bf std\+::vector}$<$ float $>$ position\+\_\+rx, {\bf int} samp\+\_\+rate, float center\+\_\+freq, float self\+\_\+coupling\+\_\+db, bool rndm\+\_\+phaseshift=true, bool self\+\_\+coupling=true, const {\bf std\+::string} \&len\+\_\+key=\char`\"{}packet\+\_\+len\char`\"{})
+\end{DoxyCompactItemize}
+
+
+\subsubsection{Detailed Description}
+Simulates the backscattering of a given signal on point targets.
+
+Implements the point scatter model. The input signal is the transmitted signal. The output signal is the received, backscattered signal, and contains one output signal per receive antenna.\subsubsection{Target modeling}\label{classgr_1_1radar_1_1static__target__simulator__cc_radar_target_modeling}
+The targets are modeled by the vectors {\ttfamily range}, {\ttfamily velocity}, {\ttfamily rcs}, and {\ttfamily azimuth}. All these vectors need to be of length H, where H describes the number of reflecting targets. The backscattered signal can either have a zero phase, or a random phase (controlled by {\ttfamily rndm\+\_\+phaseshift}). The received signal will be the linear superposition of H signals, each of which are derived from the input signal by the following equation\+:
+
+\[ r_h(t) = b_h s(t - \tau_h) e^{j2\pi f_{D,h}} \]
+
+The attenuation depends on the center frequency $f_C$, the radar cross section $\sigma_{\text{RCS},h}$, the distance of the target $d_h$ and the speed of light $c_0$\+: \[ b_h = \sqrt{\frac{c_0^2 \sigma_{\text{RCS},h}}{(4\pi)^3 d_h^4 f_C^2}} \]
+
+The delay $\tau_h$ depends on the distance of the target\+: \[ \tau_h = 2\frac{d_h}{c_0} \]
+
+The Doppler shift $f_{D,h}$ depends on the relative velocity and the center frequency\+: \[ f_{D,h} = 2\frac{v_{\text{rel},h}{c_0} f_C \]
+
+The signals are added up to produce the total sum signal\+: \[ r(t) = \sum_{h=0}^{H-1} r_h(t) \]\subsubsection{M\+I\+M\+O processing simulation}\label{classgr_1_1radar_1_1static__target__simulator__cc_radar_mimo_processing}
+This block has a limited capability of simulating multi-\/antenna reception. The {\ttfamily position\+\_\+rx} vector determines the distance of every RX antenna from the origin (Note\+: The TX antenna is always in the origin). The length of the {\ttfamily position\+\_\+rx} vector is thus also the number of output signals this block produces. For a simple, mono-\/static S\+I\+SO radar, simply set position\+\_\+rx to [0]. The RX antennas are always laid out in a straight line. When multiple antennas are given, the target azimuth plays a role; an azimuth of zero is perpendicular to the line in which the RX antennas are placed.\subsubsection{Self-\/coupling}\label{classgr_1_1radar_1_1static__target__simulator__cc_radar_hw_impairments}
+Self-\/coupling describes the amount of the TX signal that is directly coupled into the RX path. When {\ttfamily self\+\_\+coupling} is set to true, effectively, a target with zero velocity and range is added. The parameter {\ttfamily self\+\_\+coupling\+\_\+db} describes the attenuation of the self-\/coupling, a value of -\/10 means that the transmit signal is attenuated by 10 dB on the receive signal. 
+
+Definition at line {\bf 96} of file {\bf static\+\_\+target\+\_\+simulator\+\_\+cc.\+h}.
+
+
+
+\subsubsection{Member Typedef Documentation}
+\index{gr\+::radar\+::static\+\_\+target\+\_\+simulator\+\_\+cc@{gr\+::radar\+::static\+\_\+target\+\_\+simulator\+\_\+cc}!sptr@{sptr}}
+\index{sptr@{sptr}!gr\+::radar\+::static\+\_\+target\+\_\+simulator\+\_\+cc@{gr\+::radar\+::static\+\_\+target\+\_\+simulator\+\_\+cc}}
+\paragraph[{sptr}]{\setlength{\rightskip}{0pt plus 5cm}typedef boost\+::shared\+\_\+ptr$<${\bf static\+\_\+target\+\_\+simulator\+\_\+cc}$>$ {\bf gr\+::radar\+::static\+\_\+target\+\_\+simulator\+\_\+cc\+::sptr}}\label{classgr_1_1radar_1_1static__target__simulator__cc_a90305dccf3c7ff91d34b0ece826bb6bd}
+
+
+Definition at line {\bf 99} of file {\bf static\+\_\+target\+\_\+simulator\+\_\+cc.\+h}.
+
+
+
+\subsubsection{Member Function Documentation}
+\index{gr\+::radar\+::static\+\_\+target\+\_\+simulator\+\_\+cc@{gr\+::radar\+::static\+\_\+target\+\_\+simulator\+\_\+cc}!make@{make}}
+\index{make@{make}!gr\+::radar\+::static\+\_\+target\+\_\+simulator\+\_\+cc@{gr\+::radar\+::static\+\_\+target\+\_\+simulator\+\_\+cc}}
+\paragraph[{make(std\+::vector$<$ float $>$ range, std\+::vector$<$ float $>$ velocity, std\+::vector$<$ float $>$ rcs, std\+::vector$<$ float $>$ azimuth, std\+::vector$<$ float $>$ position\+\_\+rx, int samp\+\_\+rate, float center\+\_\+freq, float self\+\_\+coupling\+\_\+db, bool rndm\+\_\+phaseshift=true, bool self\+\_\+coupling=true, const std\+::string \&len\+\_\+key=""packet\+\_\+len"")}]{\setlength{\rightskip}{0pt plus 5cm}{\bf static\+\_\+target\+\_\+simulator\+\_\+cc\+::sptr} gr\+::radar\+::static\+\_\+target\+\_\+simulator\+\_\+cc\+::make (
+\begin{DoxyParamCaption}
+\item[{{\bf std\+::vector}$<$ float $>$}]{range, }
+\item[{{\bf std\+::vector}$<$ float $>$}]{velocity, }
+\item[{{\bf std\+::vector}$<$ float $>$}]{rcs, }
+\item[{{\bf std\+::vector}$<$ float $>$}]{azimuth, }
+\item[{{\bf std\+::vector}$<$ float $>$}]{position\+\_\+rx, }
+\item[{{\bf int}}]{samp\+\_\+rate, }
+\item[{float}]{center\+\_\+freq, }
+\item[{float}]{self\+\_\+coupling\+\_\+db, }
+\item[{bool}]{rndm\+\_\+phaseshift = {\ttfamily true}, }
+\item[{bool}]{self\+\_\+coupling = {\ttfamily true}, }
+\item[{const {\bf std\+::string} \&}]{len\+\_\+key = {\ttfamily \char`\"{}packet\+\_\+len\char`\"{}}}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [static]}}\label{classgr_1_1radar_1_1static__target__simulator__cc_a661c19e6f23500c36762ec9a90e97a71}
+
+\begin{DoxyParams}{Parameters}
+{\em range} & Target ranges as vector (length H) \\
+\hline
+{\em velocity} & Target velocities as vector (length H) \\
+\hline
+{\em rcs} & Target R\+CS as vector (length H) \\
+\hline
+{\em azimuth} & Target azimuth as vector (length H) \\
+\hline
+{\em position\+\_\+rx} & Position RX antennas. A value of [0] means there is one antenna, located in the origin (simple monostatic case). \\
+\hline
+{\em samp\+\_\+rate} & Sample rate (samples per second) \\
+\hline
+{\em center\+\_\+freq} & Center frequency (Hz) \\
+\hline
+{\em self\+\_\+coupling\+\_\+db} & Self coupling attenuation (dB) \\
+\hline
+{\em rndm\+\_\+phaseshift} & Toggle random phaseshift on targets \\
+\hline
+{\em self\+\_\+coupling} & Toggle self coupling \\
+\hline
+{\em packet\+\_\+len} & Packet length key for tagged stream \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line {\bf 36} of file {\bf static\+\_\+target\+\_\+simulator\+\_\+cc\+\_\+impl.\+cc}.
+
+
+
+Referenced by {\bf \+\_\+wrap\+\_\+static\+\_\+target\+\_\+simulator\+\_\+cc\+\_\+make()}.
+
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=336pt]{d0/d32/classgr_1_1radar_1_1static__target__simulator__cc_a661c19e6f23500c36762ec9a90e97a71_icgraph}
+\end{center}
+\end{figure}
+
+
+\index{gr\+::radar\+::static\+\_\+target\+\_\+simulator\+\_\+cc@{gr\+::radar\+::static\+\_\+target\+\_\+simulator\+\_\+cc}!setup\+\_\+targets@{setup\+\_\+targets}}
+\index{setup\+\_\+targets@{setup\+\_\+targets}!gr\+::radar\+::static\+\_\+target\+\_\+simulator\+\_\+cc@{gr\+::radar\+::static\+\_\+target\+\_\+simulator\+\_\+cc}}
+\paragraph[{setup\+\_\+targets(std\+::vector$<$ float $>$ range, std\+::vector$<$ float $>$ velocity, std\+::vector$<$ float $>$ rcs, std\+::vector$<$ float $>$ azimuth, std\+::vector$<$ float $>$ position\+\_\+rx, int samp\+\_\+rate, float center\+\_\+freq, float self\+\_\+coupling\+\_\+db, bool rndm\+\_\+phaseshift, bool self\+\_\+coupling)=0}]{\setlength{\rightskip}{0pt plus 5cm}virtual {\bf void} gr\+::radar\+::static\+\_\+target\+\_\+simulator\+\_\+cc\+::setup\+\_\+targets (
+\begin{DoxyParamCaption}
+\item[{{\bf std\+::vector}$<$ float $>$}]{range, }
+\item[{{\bf std\+::vector}$<$ float $>$}]{velocity, }
+\item[{{\bf std\+::vector}$<$ float $>$}]{rcs, }
+\item[{{\bf std\+::vector}$<$ float $>$}]{azimuth, }
+\item[{{\bf std\+::vector}$<$ float $>$}]{position\+\_\+rx, }
+\item[{{\bf int}}]{samp\+\_\+rate, }
+\item[{float}]{center\+\_\+freq, }
+\item[{float}]{self\+\_\+coupling\+\_\+db, }
+\item[{bool}]{rndm\+\_\+phaseshift, }
+\item[{bool}]{self\+\_\+coupling}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [pure virtual]}}\label{classgr_1_1radar_1_1static__target__simulator__cc_adf281db8c56797d1f150aeae6106ac32}
+
+
+Implemented in {\bf gr\+::radar\+::static\+\_\+target\+\_\+simulator\+\_\+cc\+\_\+impl} \doxyref{}{p.}{d6/dd6/classgr_1_1radar_1_1static__target__simulator__cc__impl_a0ca3096458f3a8acdfc6370c3c64f535}.
+
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+/home/erik/prefix/default/src/gr-\/radar-\/dev/include/radar/{\bf static\+\_\+target\+\_\+simulator\+\_\+cc.\+h}\item 
+/home/erik/prefix/default/src/gr-\/radar-\/dev/lib/{\bf static\+\_\+target\+\_\+simulator\+\_\+cc\+\_\+impl.\+cc}\end{DoxyCompactItemize}

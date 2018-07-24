@@ -1,0 +1,318 @@
+\subsection{/home/erik/prefix/default/src/soapysdr/include/\+Soapy\+S\+D\+R/\+Logger.h File Reference}
+\label{soapysdr_2include_2SoapySDR_2Logger_8h}\index{/home/erik/prefix/default/src/soapysdr/include/\+Soapy\+S\+D\+R/\+Logger.\+h@{/home/erik/prefix/default/src/soapysdr/include/\+Soapy\+S\+D\+R/\+Logger.\+h}}
+
+
+Logger A\+PI for \doxyref{Soapy\+S\+DR}{p.}{d6/d17/namespaceSoapySDR} devices.  
+
+
+{\ttfamily \#include $<$Soapy\+S\+D\+R/\+Config.\+h$>$}\\*
+{\ttfamily \#include $<$stdarg.\+h$>$}\\*
+Include dependency graph for Logger.\+h\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=272pt]{da/d96/soapysdr_2include_2SoapySDR_2Logger_8h__incl}
+\end{center}
+\end{figure}
+This graph shows which files directly or indirectly include this file\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{d1/d5d/soapysdr_2include_2SoapySDR_2Logger_8h__dep__incl}
+\end{center}
+\end{figure}
+\subsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define {\bf S\+O\+A\+P\+Y\+\_\+\+S\+D\+R\+\_\+\+S\+SI}~S\+O\+A\+P\+Y\+\_\+\+S\+D\+R\+\_\+\+S\+SI
+\begin{DoxyCompactList}\small\item\em Compile-\/time detection macro for S\+SI feature. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsubsection*{Typedefs}
+\begin{DoxyCompactItemize}
+\item 
+typedef {\bf void}($\ast$ {\bf Soapy\+S\+D\+R\+Log\+Handler}) (const {\bf Soapy\+S\+D\+R\+Log\+Level} log\+Level, const char $\ast${\bf message})
+\end{DoxyCompactItemize}
+\subsubsection*{Enumerations}
+\begin{DoxyCompactItemize}
+\item 
+enum {\bf Soapy\+S\+D\+R\+Log\+Level} \{ \\*
+{\bf S\+O\+A\+P\+Y\+\_\+\+S\+D\+R\+\_\+\+F\+A\+T\+AL} = 1, 
+{\bf S\+O\+A\+P\+Y\+\_\+\+S\+D\+R\+\_\+\+C\+R\+I\+T\+I\+C\+AL} = 2, 
+{\bf S\+O\+A\+P\+Y\+\_\+\+S\+D\+R\+\_\+\+E\+R\+R\+OR} = 3, 
+{\bf S\+O\+A\+P\+Y\+\_\+\+S\+D\+R\+\_\+\+W\+A\+R\+N\+I\+NG} = 4, 
+\\*
+{\bf S\+O\+A\+P\+Y\+\_\+\+S\+D\+R\+\_\+\+N\+O\+T\+I\+CE} = 5, 
+{\bf S\+O\+A\+P\+Y\+\_\+\+S\+D\+R\+\_\+\+I\+N\+FO} = 6, 
+{\bf S\+O\+A\+P\+Y\+\_\+\+S\+D\+R\+\_\+\+D\+E\+B\+UG} = 7, 
+{\bf S\+O\+A\+P\+Y\+\_\+\+S\+D\+R\+\_\+\+T\+R\+A\+CE} = 8, 
+\\*
+{\bf S\+O\+A\+P\+Y\+\_\+\+S\+D\+R\+\_\+\+S\+SI} = 9
+ \}
+\end{DoxyCompactItemize}
+\subsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+{\bf S\+O\+A\+P\+Y\+\_\+\+S\+D\+R\+\_\+\+A\+PI} {\bf void} {\bf Soapy\+S\+D\+R\+\_\+log} (const {\bf Soapy\+S\+D\+R\+Log\+Level} log\+Level, const char $\ast${\bf message})
+\item 
+{\bf S\+O\+A\+P\+Y\+\_\+\+S\+D\+R\+\_\+\+A\+PI} {\bf void} {\bf Soapy\+S\+D\+R\+\_\+vlogf} (const {\bf Soapy\+S\+D\+R\+Log\+Level} log\+Level, const char $\ast${\bf format}, va\+\_\+list arg\+List)
+\item 
+static {\bf void} {\bf Soapy\+S\+D\+R\+\_\+logf} (const {\bf Soapy\+S\+D\+R\+Log\+Level} log\+Level, const char $\ast${\bf format},...)
+\item 
+{\bf S\+O\+A\+P\+Y\+\_\+\+S\+D\+R\+\_\+\+A\+PI} {\bf void} {\bf Soapy\+S\+D\+R\+\_\+register\+Log\+Handler} (const {\bf Soapy\+S\+D\+R\+Log\+Handler} handler)
+\item 
+{\bf S\+O\+A\+P\+Y\+\_\+\+S\+D\+R\+\_\+\+A\+PI} {\bf void} {\bf Soapy\+S\+D\+R\+\_\+set\+Log\+Level} (const {\bf Soapy\+S\+D\+R\+Log\+Level} log\+Level)
+\end{DoxyCompactItemize}
+
+
+\subsubsection{Detailed Description}
+Logger A\+PI for \doxyref{Soapy\+S\+DR}{p.}{d6/d17/namespaceSoapySDR} devices. 
+
+Implementations should use the logger rather than stdio. The default log handler prints to stderr.
+
+\begin{DoxyCopyright}{Copyright}
+Copyright (c) 2014-\/2015 Josh Blum S\+P\+D\+X-\/\+License-\/\+Identifier\+: B\+S\+L-\/1.\+0 
+\end{DoxyCopyright}
+
+
+Definition in file {\bf Logger.\+h}.
+
+
+
+\subsubsection{Macro Definition Documentation}
+\index{soapysdr/include/\+Soapy\+S\+D\+R/\+Logger.\+h@{soapysdr/include/\+Soapy\+S\+D\+R/\+Logger.\+h}!S\+O\+A\+P\+Y\+\_\+\+S\+D\+R\+\_\+\+S\+SI@{S\+O\+A\+P\+Y\+\_\+\+S\+D\+R\+\_\+\+S\+SI}}
+\index{S\+O\+A\+P\+Y\+\_\+\+S\+D\+R\+\_\+\+S\+SI@{S\+O\+A\+P\+Y\+\_\+\+S\+D\+R\+\_\+\+S\+SI}!soapysdr/include/\+Soapy\+S\+D\+R/\+Logger.\+h@{soapysdr/include/\+Soapy\+S\+D\+R/\+Logger.\+h}}
+\paragraph[{S\+O\+A\+P\+Y\+\_\+\+S\+D\+R\+\_\+\+S\+SI}]{\setlength{\rightskip}{0pt plus 5cm}\#define S\+O\+A\+P\+Y\+\_\+\+S\+D\+R\+\_\+\+S\+SI~S\+O\+A\+P\+Y\+\_\+\+S\+D\+R\+\_\+\+S\+SI}\label{soapysdr_2include_2SoapySDR_2Logger_8h_a92bc98bee886659bf81444be215fafe2}
+
+
+Compile-\/time detection macro for S\+SI feature. 
+
+
+
+Definition at line {\bf 43} of file {\bf Logger.\+h}.
+
+
+
+\subsubsection{Typedef Documentation}
+\index{soapysdr/include/\+Soapy\+S\+D\+R/\+Logger.\+h@{soapysdr/include/\+Soapy\+S\+D\+R/\+Logger.\+h}!Soapy\+S\+D\+R\+Log\+Handler@{Soapy\+S\+D\+R\+Log\+Handler}}
+\index{Soapy\+S\+D\+R\+Log\+Handler@{Soapy\+S\+D\+R\+Log\+Handler}!soapysdr/include/\+Soapy\+S\+D\+R/\+Logger.\+h@{soapysdr/include/\+Soapy\+S\+D\+R/\+Logger.\+h}}
+\paragraph[{Soapy\+S\+D\+R\+Log\+Handler}]{\setlength{\rightskip}{0pt plus 5cm}typedef {\bf void}($\ast$ Soapy\+S\+D\+R\+Log\+Handler) (const {\bf Soapy\+S\+D\+R\+Log\+Level} log\+Level, const char $\ast${\bf message})}\label{soapysdr_2include_2SoapySDR_2Logger_8h_add2342a96f2500e9fb20218f9e796a95}
+Typedef for the registered log handler function. 
+
+Definition at line {\bf 80} of file {\bf Logger.\+h}.
+
+
+
+\subsubsection{Enumeration Type Documentation}
+\index{soapysdr/include/\+Soapy\+S\+D\+R/\+Logger.\+h@{soapysdr/include/\+Soapy\+S\+D\+R/\+Logger.\+h}!Soapy\+S\+D\+R\+Log\+Level@{Soapy\+S\+D\+R\+Log\+Level}}
+\index{Soapy\+S\+D\+R\+Log\+Level@{Soapy\+S\+D\+R\+Log\+Level}!soapysdr/include/\+Soapy\+S\+D\+R/\+Logger.\+h@{soapysdr/include/\+Soapy\+S\+D\+R/\+Logger.\+h}}
+\paragraph[{Soapy\+S\+D\+R\+Log\+Level}]{\setlength{\rightskip}{0pt plus 5cm}enum {\bf Soapy\+S\+D\+R\+Log\+Level}}\label{soapysdr_2include_2SoapySDR_2Logger_8h_acca12132060bee17ae201b1c9604f7f0}
+The available priority levels for log messages.
+
+The default log level threshold is S\+O\+A\+P\+Y\+\_\+\+S\+D\+R\+\_\+\+I\+N\+FO. Log messages with lower priorities are dropped.
+
+The default threshold can be set via the S\+O\+A\+P\+Y\+\_\+\+S\+D\+R\+\_\+\+L\+O\+G\+\_\+\+L\+E\+V\+EL environment variable. Set S\+O\+A\+P\+Y\+\_\+\+S\+D\+R\+\_\+\+L\+O\+G\+\_\+\+L\+E\+V\+EL to the string value\+: \char`\"{}\+W\+A\+R\+N\+I\+N\+G\char`\"{}, \char`\"{}\+E\+R\+R\+O\+R\char`\"{}, \char`\"{}\+D\+E\+B\+U\+G\char`\"{}, etc... or set it to the equivalent integer value. \begin{Desc}
+\item[Enumerator]\par
+\begin{description}
+\index{S\+O\+A\+P\+Y\+\_\+\+S\+D\+R\+\_\+\+F\+A\+T\+AL@{S\+O\+A\+P\+Y\+\_\+\+S\+D\+R\+\_\+\+F\+A\+T\+AL}!soapysdr/include/\+Soapy\+S\+D\+R/\+Logger.\+h@{soapysdr/include/\+Soapy\+S\+D\+R/\+Logger.\+h}}\index{soapysdr/include/\+Soapy\+S\+D\+R/\+Logger.\+h@{soapysdr/include/\+Soapy\+S\+D\+R/\+Logger.\+h}!S\+O\+A\+P\+Y\+\_\+\+S\+D\+R\+\_\+\+F\+A\+T\+AL@{S\+O\+A\+P\+Y\+\_\+\+S\+D\+R\+\_\+\+F\+A\+T\+AL}}\item[{\em 
+S\+O\+A\+P\+Y\+\_\+\+S\+D\+R\+\_\+\+F\+A\+T\+AL\label{soapysdr_2include_2SoapySDR_2Logger_8h_acca12132060bee17ae201b1c9604f7f0ada5d1fb7f2b331f0d96eb580c0277b35}
+}]A fatal error. The application will most likely terminate. This is the highest priority. \index{S\+O\+A\+P\+Y\+\_\+\+S\+D\+R\+\_\+\+C\+R\+I\+T\+I\+C\+AL@{S\+O\+A\+P\+Y\+\_\+\+S\+D\+R\+\_\+\+C\+R\+I\+T\+I\+C\+AL}!soapysdr/include/\+Soapy\+S\+D\+R/\+Logger.\+h@{soapysdr/include/\+Soapy\+S\+D\+R/\+Logger.\+h}}\index{soapysdr/include/\+Soapy\+S\+D\+R/\+Logger.\+h@{soapysdr/include/\+Soapy\+S\+D\+R/\+Logger.\+h}!S\+O\+A\+P\+Y\+\_\+\+S\+D\+R\+\_\+\+C\+R\+I\+T\+I\+C\+AL@{S\+O\+A\+P\+Y\+\_\+\+S\+D\+R\+\_\+\+C\+R\+I\+T\+I\+C\+AL}}\item[{\em 
+S\+O\+A\+P\+Y\+\_\+\+S\+D\+R\+\_\+\+C\+R\+I\+T\+I\+C\+AL\label{soapysdr_2include_2SoapySDR_2Logger_8h_acca12132060bee17ae201b1c9604f7f0a401ac651498b42fe79616c40c1208d63}
+}]A critical error. The application might not be able to continue running successfully. \index{S\+O\+A\+P\+Y\+\_\+\+S\+D\+R\+\_\+\+E\+R\+R\+OR@{S\+O\+A\+P\+Y\+\_\+\+S\+D\+R\+\_\+\+E\+R\+R\+OR}!soapysdr/include/\+Soapy\+S\+D\+R/\+Logger.\+h@{soapysdr/include/\+Soapy\+S\+D\+R/\+Logger.\+h}}\index{soapysdr/include/\+Soapy\+S\+D\+R/\+Logger.\+h@{soapysdr/include/\+Soapy\+S\+D\+R/\+Logger.\+h}!S\+O\+A\+P\+Y\+\_\+\+S\+D\+R\+\_\+\+E\+R\+R\+OR@{S\+O\+A\+P\+Y\+\_\+\+S\+D\+R\+\_\+\+E\+R\+R\+OR}}\item[{\em 
+S\+O\+A\+P\+Y\+\_\+\+S\+D\+R\+\_\+\+E\+R\+R\+OR\label{soapysdr_2include_2SoapySDR_2Logger_8h_acca12132060bee17ae201b1c9604f7f0abb47f680ab313edd7c2df112dddec119}
+}]An error. An operation did not complete successfully, but the application as a whole is not affected. \index{S\+O\+A\+P\+Y\+\_\+\+S\+D\+R\+\_\+\+W\+A\+R\+N\+I\+NG@{S\+O\+A\+P\+Y\+\_\+\+S\+D\+R\+\_\+\+W\+A\+R\+N\+I\+NG}!soapysdr/include/\+Soapy\+S\+D\+R/\+Logger.\+h@{soapysdr/include/\+Soapy\+S\+D\+R/\+Logger.\+h}}\index{soapysdr/include/\+Soapy\+S\+D\+R/\+Logger.\+h@{soapysdr/include/\+Soapy\+S\+D\+R/\+Logger.\+h}!S\+O\+A\+P\+Y\+\_\+\+S\+D\+R\+\_\+\+W\+A\+R\+N\+I\+NG@{S\+O\+A\+P\+Y\+\_\+\+S\+D\+R\+\_\+\+W\+A\+R\+N\+I\+NG}}\item[{\em 
+S\+O\+A\+P\+Y\+\_\+\+S\+D\+R\+\_\+\+W\+A\+R\+N\+I\+NG\label{soapysdr_2include_2SoapySDR_2Logger_8h_acca12132060bee17ae201b1c9604f7f0a1a3819dc406bd21bbd45707a197475e9}
+}]A warning. An operation completed with an unexpected result. \index{S\+O\+A\+P\+Y\+\_\+\+S\+D\+R\+\_\+\+N\+O\+T\+I\+CE@{S\+O\+A\+P\+Y\+\_\+\+S\+D\+R\+\_\+\+N\+O\+T\+I\+CE}!soapysdr/include/\+Soapy\+S\+D\+R/\+Logger.\+h@{soapysdr/include/\+Soapy\+S\+D\+R/\+Logger.\+h}}\index{soapysdr/include/\+Soapy\+S\+D\+R/\+Logger.\+h@{soapysdr/include/\+Soapy\+S\+D\+R/\+Logger.\+h}!S\+O\+A\+P\+Y\+\_\+\+S\+D\+R\+\_\+\+N\+O\+T\+I\+CE@{S\+O\+A\+P\+Y\+\_\+\+S\+D\+R\+\_\+\+N\+O\+T\+I\+CE}}\item[{\em 
+S\+O\+A\+P\+Y\+\_\+\+S\+D\+R\+\_\+\+N\+O\+T\+I\+CE\label{soapysdr_2include_2SoapySDR_2Logger_8h_acca12132060bee17ae201b1c9604f7f0a54c1850baf6680417814f69afa8c53c0}
+}]A notice, which is an information with just a higher priority. \index{S\+O\+A\+P\+Y\+\_\+\+S\+D\+R\+\_\+\+I\+N\+FO@{S\+O\+A\+P\+Y\+\_\+\+S\+D\+R\+\_\+\+I\+N\+FO}!soapysdr/include/\+Soapy\+S\+D\+R/\+Logger.\+h@{soapysdr/include/\+Soapy\+S\+D\+R/\+Logger.\+h}}\index{soapysdr/include/\+Soapy\+S\+D\+R/\+Logger.\+h@{soapysdr/include/\+Soapy\+S\+D\+R/\+Logger.\+h}!S\+O\+A\+P\+Y\+\_\+\+S\+D\+R\+\_\+\+I\+N\+FO@{S\+O\+A\+P\+Y\+\_\+\+S\+D\+R\+\_\+\+I\+N\+FO}}\item[{\em 
+S\+O\+A\+P\+Y\+\_\+\+S\+D\+R\+\_\+\+I\+N\+FO\label{soapysdr_2include_2SoapySDR_2Logger_8h_acca12132060bee17ae201b1c9604f7f0a8b002edc291937deea0b17fbe187cc83}
+}]An informational message, usually denoting the successful completion of an operation. \index{S\+O\+A\+P\+Y\+\_\+\+S\+D\+R\+\_\+\+D\+E\+B\+UG@{S\+O\+A\+P\+Y\+\_\+\+S\+D\+R\+\_\+\+D\+E\+B\+UG}!soapysdr/include/\+Soapy\+S\+D\+R/\+Logger.\+h@{soapysdr/include/\+Soapy\+S\+D\+R/\+Logger.\+h}}\index{soapysdr/include/\+Soapy\+S\+D\+R/\+Logger.\+h@{soapysdr/include/\+Soapy\+S\+D\+R/\+Logger.\+h}!S\+O\+A\+P\+Y\+\_\+\+S\+D\+R\+\_\+\+D\+E\+B\+UG@{S\+O\+A\+P\+Y\+\_\+\+S\+D\+R\+\_\+\+D\+E\+B\+UG}}\item[{\em 
+S\+O\+A\+P\+Y\+\_\+\+S\+D\+R\+\_\+\+D\+E\+B\+UG\label{soapysdr_2include_2SoapySDR_2Logger_8h_acca12132060bee17ae201b1c9604f7f0ad5e1a3415a37da063bfb2fefdae15595}
+}]A debugging message. \index{S\+O\+A\+P\+Y\+\_\+\+S\+D\+R\+\_\+\+T\+R\+A\+CE@{S\+O\+A\+P\+Y\+\_\+\+S\+D\+R\+\_\+\+T\+R\+A\+CE}!soapysdr/include/\+Soapy\+S\+D\+R/\+Logger.\+h@{soapysdr/include/\+Soapy\+S\+D\+R/\+Logger.\+h}}\index{soapysdr/include/\+Soapy\+S\+D\+R/\+Logger.\+h@{soapysdr/include/\+Soapy\+S\+D\+R/\+Logger.\+h}!S\+O\+A\+P\+Y\+\_\+\+S\+D\+R\+\_\+\+T\+R\+A\+CE@{S\+O\+A\+P\+Y\+\_\+\+S\+D\+R\+\_\+\+T\+R\+A\+CE}}\item[{\em 
+S\+O\+A\+P\+Y\+\_\+\+S\+D\+R\+\_\+\+T\+R\+A\+CE\label{soapysdr_2include_2SoapySDR_2Logger_8h_acca12132060bee17ae201b1c9604f7f0ae9731acb67a5a4c49730c2e191324e76}
+}]A tracing message. This is the lowest priority. \index{S\+O\+A\+P\+Y\+\_\+\+S\+D\+R\+\_\+\+S\+SI@{S\+O\+A\+P\+Y\+\_\+\+S\+D\+R\+\_\+\+S\+SI}!soapysdr/include/\+Soapy\+S\+D\+R/\+Logger.\+h@{soapysdr/include/\+Soapy\+S\+D\+R/\+Logger.\+h}}\index{soapysdr/include/\+Soapy\+S\+D\+R/\+Logger.\+h@{soapysdr/include/\+Soapy\+S\+D\+R/\+Logger.\+h}!S\+O\+A\+P\+Y\+\_\+\+S\+D\+R\+\_\+\+S\+SI@{S\+O\+A\+P\+Y\+\_\+\+S\+D\+R\+\_\+\+S\+SI}}\item[{\em 
+S\+O\+A\+P\+Y\+\_\+\+S\+D\+R\+\_\+\+S\+SI\label{soapysdr_2include_2SoapySDR_2Logger_8h_acca12132060bee17ae201b1c9604f7f0a8c55dbee3516d310db4d08e79cb1573f}
+}]Streaming status indicators such as \char`\"{}\+U\char`\"{} (underflow) and \char`\"{}\+O\char`\"{} (overflow). \end{description}
+\end{Desc}
+
+
+Definition at line {\bf 29} of file {\bf Logger.\+h}.
+
+
+
+\subsubsection{Function Documentation}
+\index{soapysdr/include/\+Soapy\+S\+D\+R/\+Logger.\+h@{soapysdr/include/\+Soapy\+S\+D\+R/\+Logger.\+h}!Soapy\+S\+D\+R\+\_\+log@{Soapy\+S\+D\+R\+\_\+log}}
+\index{Soapy\+S\+D\+R\+\_\+log@{Soapy\+S\+D\+R\+\_\+log}!soapysdr/include/\+Soapy\+S\+D\+R/\+Logger.\+h@{soapysdr/include/\+Soapy\+S\+D\+R/\+Logger.\+h}}
+\paragraph[{Soapy\+S\+D\+R\+\_\+log(const Soapy\+S\+D\+R\+Log\+Level log\+Level, const char $\ast$message)}]{\setlength{\rightskip}{0pt plus 5cm}{\bf S\+O\+A\+P\+Y\+\_\+\+S\+D\+R\+\_\+\+A\+PI} {\bf void} Soapy\+S\+D\+R\+\_\+log (
+\begin{DoxyParamCaption}
+\item[{const {\bf Soapy\+S\+D\+R\+Log\+Level}}]{log\+Level, }
+\item[{const char $\ast$}]{message}
+\end{DoxyParamCaption}
+)}\label{soapysdr_2include_2SoapySDR_2Logger_8h_a2fc7bfd354e6625cb3fa2316f13d39c0}
+Send a message to the registered logger. 
+\begin{DoxyParams}{Parameters}
+{\em log\+Level} & a possible logging level \\
+\hline
+{\em message} & a logger message string \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line {\bf 88} of file {\bf Logger\+C.\+cpp}.
+
+
+
+References {\bf registered\+Log\+Handler}, {\bf registered\+Log\+Level}, and {\bf S\+O\+A\+P\+Y\+\_\+\+S\+D\+R\+\_\+\+S\+SI}.
+
+
+
+Referenced by {\bf Soapy\+S\+D\+R\+\_\+vlogf()}.
+
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{db/dd4/soapysdr_2include_2SoapySDR_2Logger_8h_a2fc7bfd354e6625cb3fa2316f13d39c0_icgraph}
+\end{center}
+\end{figure}
+
+
+\index{soapysdr/include/\+Soapy\+S\+D\+R/\+Logger.\+h@{soapysdr/include/\+Soapy\+S\+D\+R/\+Logger.\+h}!Soapy\+S\+D\+R\+\_\+logf@{Soapy\+S\+D\+R\+\_\+logf}}
+\index{Soapy\+S\+D\+R\+\_\+logf@{Soapy\+S\+D\+R\+\_\+logf}!soapysdr/include/\+Soapy\+S\+D\+R/\+Logger.\+h@{soapysdr/include/\+Soapy\+S\+D\+R/\+Logger.\+h}}
+\paragraph[{Soapy\+S\+D\+R\+\_\+logf(const Soapy\+S\+D\+R\+Log\+Level log\+Level, const char $\ast$format,...)}]{\setlength{\rightskip}{0pt plus 5cm}static {\bf void} Soapy\+S\+D\+R\+\_\+logf (
+\begin{DoxyParamCaption}
+\item[{const {\bf Soapy\+S\+D\+R\+Log\+Level}}]{log\+Level, }
+\item[{const char $\ast$}]{format, }
+\item[{}]{...}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [static]}}\label{soapysdr_2include_2SoapySDR_2Logger_8h_a11d7220d73c527ba984f2368bcaf96f7}
+Send a message to the registered logger. 
+\begin{DoxyParams}{Parameters}
+{\em log\+Level} & a possible logging level \\
+\hline
+{\em format} & a printf style format string \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line {\bf 69} of file {\bf Logger.\+h}.
+
+
+
+References {\bf Soapy\+S\+D\+R\+\_\+vlogf()}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{db/dd4/soapysdr_2include_2SoapySDR_2Logger_8h_a11d7220d73c527ba984f2368bcaf96f7_cgraph}
+\end{center}
+\end{figure}
+
+
+\index{soapysdr/include/\+Soapy\+S\+D\+R/\+Logger.\+h@{soapysdr/include/\+Soapy\+S\+D\+R/\+Logger.\+h}!Soapy\+S\+D\+R\+\_\+register\+Log\+Handler@{Soapy\+S\+D\+R\+\_\+register\+Log\+Handler}}
+\index{Soapy\+S\+D\+R\+\_\+register\+Log\+Handler@{Soapy\+S\+D\+R\+\_\+register\+Log\+Handler}!soapysdr/include/\+Soapy\+S\+D\+R/\+Logger.\+h@{soapysdr/include/\+Soapy\+S\+D\+R/\+Logger.\+h}}
+\paragraph[{Soapy\+S\+D\+R\+\_\+register\+Log\+Handler(const Soapy\+S\+D\+R\+Log\+Handler handler)}]{\setlength{\rightskip}{0pt plus 5cm}{\bf S\+O\+A\+P\+Y\+\_\+\+S\+D\+R\+\_\+\+A\+PI} {\bf void} Soapy\+S\+D\+R\+\_\+register\+Log\+Handler (
+\begin{DoxyParamCaption}
+\item[{const {\bf Soapy\+S\+D\+R\+Log\+Handler}}]{handler}
+\end{DoxyParamCaption}
+)}\label{soapysdr_2include_2SoapySDR_2Logger_8h_ad4ed0ed16e3133ea6150067336bb83a0}
+Register a new system log handler. Platforms should call this to replace the default stdio handler. 
+
+Definition at line {\bf 105} of file {\bf Logger\+C.\+cpp}.
+
+
+
+References {\bf registered\+Log\+Handler}.
+
+
+
+Referenced by {\bf Soapy\+S\+D\+R\+::register\+Log\+Handler()}.
+
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{db/dd4/soapysdr_2include_2SoapySDR_2Logger_8h_ad4ed0ed16e3133ea6150067336bb83a0_icgraph}
+\end{center}
+\end{figure}
+
+
+\index{soapysdr/include/\+Soapy\+S\+D\+R/\+Logger.\+h@{soapysdr/include/\+Soapy\+S\+D\+R/\+Logger.\+h}!Soapy\+S\+D\+R\+\_\+set\+Log\+Level@{Soapy\+S\+D\+R\+\_\+set\+Log\+Level}}
+\index{Soapy\+S\+D\+R\+\_\+set\+Log\+Level@{Soapy\+S\+D\+R\+\_\+set\+Log\+Level}!soapysdr/include/\+Soapy\+S\+D\+R/\+Logger.\+h@{soapysdr/include/\+Soapy\+S\+D\+R/\+Logger.\+h}}
+\paragraph[{Soapy\+S\+D\+R\+\_\+set\+Log\+Level(const Soapy\+S\+D\+R\+Log\+Level log\+Level)}]{\setlength{\rightskip}{0pt plus 5cm}{\bf S\+O\+A\+P\+Y\+\_\+\+S\+D\+R\+\_\+\+A\+PI} {\bf void} Soapy\+S\+D\+R\+\_\+set\+Log\+Level (
+\begin{DoxyParamCaption}
+\item[{const {\bf Soapy\+S\+D\+R\+Log\+Level}}]{log\+Level}
+\end{DoxyParamCaption}
+)}\label{soapysdr_2include_2SoapySDR_2Logger_8h_a93915ded5b954d73f0bf7f04d22abfc2}
+Set the log level threshold. Log messages with lower priority are dropped. 
+
+Definition at line {\bf 110} of file {\bf Logger\+C.\+cpp}.
+
+
+
+References {\bf registered\+Log\+Level}.
+
+\index{soapysdr/include/\+Soapy\+S\+D\+R/\+Logger.\+h@{soapysdr/include/\+Soapy\+S\+D\+R/\+Logger.\+h}!Soapy\+S\+D\+R\+\_\+vlogf@{Soapy\+S\+D\+R\+\_\+vlogf}}
+\index{Soapy\+S\+D\+R\+\_\+vlogf@{Soapy\+S\+D\+R\+\_\+vlogf}!soapysdr/include/\+Soapy\+S\+D\+R/\+Logger.\+h@{soapysdr/include/\+Soapy\+S\+D\+R/\+Logger.\+h}}
+\paragraph[{Soapy\+S\+D\+R\+\_\+vlogf(const Soapy\+S\+D\+R\+Log\+Level log\+Level, const char $\ast$format, va\+\_\+list arg\+List)}]{\setlength{\rightskip}{0pt plus 5cm}{\bf S\+O\+A\+P\+Y\+\_\+\+S\+D\+R\+\_\+\+A\+PI} {\bf void} Soapy\+S\+D\+R\+\_\+vlogf (
+\begin{DoxyParamCaption}
+\item[{const {\bf Soapy\+S\+D\+R\+Log\+Level}}]{log\+Level, }
+\item[{const char $\ast$}]{format, }
+\item[{va\+\_\+list}]{arg\+List}
+\end{DoxyParamCaption}
+)}\label{soapysdr_2include_2SoapySDR_2Logger_8h_a95536e86eb2330c6fede2c54028bd943}
+Send a message to the registered logger. 
+\begin{DoxyParams}{Parameters}
+{\em log\+Level} & a possible logging level \\
+\hline
+{\em format} & a printf style format string \\
+\hline
+{\em arg\+List} & an argument list for the formatter \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line {\bf 94} of file {\bf Logger\+C.\+cpp}.
+
+
+
+References {\bf message()}, {\bf registered\+Log\+Level}, and {\bf Soapy\+S\+D\+R\+\_\+log()}.
+
+
+
+Referenced by {\bf Soapy\+S\+D\+R\+\_\+logf()}, and {\bf Soapy\+S\+D\+R\+::vlogf()}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=292pt]{db/dd4/soapysdr_2include_2SoapySDR_2Logger_8h_a95536e86eb2330c6fede2c54028bd943_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{db/dd4/soapysdr_2include_2SoapySDR_2Logger_8h_a95536e86eb2330c6fede2c54028bd943_icgraph}
+\end{center}
+\end{figure}
+
+

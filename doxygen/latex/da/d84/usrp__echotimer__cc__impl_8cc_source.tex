@@ -1,0 +1,315 @@
+\subsection{usrp\+\_\+echotimer\+\_\+cc\+\_\+impl.\+cc}
+\label{usrp__echotimer__cc__impl_8cc_source}\index{/home/erik/prefix/default/src/gr-\/radar-\/dev/lib/usrp\+\_\+echotimer\+\_\+cc\+\_\+impl.\+cc@{/home/erik/prefix/default/src/gr-\/radar-\/dev/lib/usrp\+\_\+echotimer\+\_\+cc\+\_\+impl.\+cc}}
+
+\begin{DoxyCode}
+00001 \textcolor{comment}{/* -*- c++ -*- */}
+00002 \textcolor{comment}{/*}
+00003 \textcolor{comment}{ * Copyright 2014 Communications Engineering Lab, KIT.}
+00004 \textcolor{comment}{ *}
+00005 \textcolor{comment}{ * This is free software; you can redistribute it and/or modify}
+00006 \textcolor{comment}{ * it under the terms of the GNU General Public License as published by}
+00007 \textcolor{comment}{ * the Free Software Foundation; either version 3, or (at your option)}
+00008 \textcolor{comment}{ * any later version.}
+00009 \textcolor{comment}{ *}
+00010 \textcolor{comment}{ * This software is distributed in the hope that it will be useful,}
+00011 \textcolor{comment}{ * but WITHOUT ANY WARRANTY; without even the implied warranty of}
+00012 \textcolor{comment}{ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the}
+00013 \textcolor{comment}{ * GNU General Public License for more details.}
+00014 \textcolor{comment}{ *}
+00015 \textcolor{comment}{ * You should have received a copy of the GNU General Public License}
+00016 \textcolor{comment}{ * along with this software; see the file COPYING.  If not, write to}
+00017 \textcolor{comment}{ * the Free Software Foundation, Inc., 51 Franklin Street,}
+00018 \textcolor{comment}{ * Boston, MA 02110-1301, USA.}
+00019 \textcolor{comment}{ */}
+00020 
+00021 \textcolor{preprocessor}{#ifdef HAVE\_CONFIG\_H}
+00022 \textcolor{preprocessor}{#include "config.h"}
+00023 \textcolor{preprocessor}{#endif}
+00024 
+00025 \textcolor{preprocessor}{#include <gnuradio/io\_signature.h>}
+00026 \textcolor{preprocessor}{#include "usrp_echotimer_cc_impl.h"}
+00027 \textcolor{preprocessor}{#include <iostream>}
+00028 
+00029 \textcolor{keyword}{namespace }gr \{
+00030   \textcolor{keyword}{namespace }radar \{
+00031 
+00032     usrp_echotimer_cc::sptr
+00033     usrp_echotimer_cc::make(\textcolor{keywordtype}{int} samp_rate, \textcolor{keywordtype}{float} center_freq, \textcolor{keywordtype}{int} num\_delay\_samps,
+00034         std::string args\_tx, std::string wire\_tx, std::string clock\_source\_tx, 
+      std::string time\_source\_tx, std::string antenna\_tx, \textcolor{keywordtype}{float} gain\_tx,
+00035         \textcolor{keywordtype}{float} timeout\_tx, \textcolor{keywordtype}{float} wait\_tx, \textcolor{keywordtype}{float} lo\_offset\_tx,
+00036         std::string args\_rx, std::string wire\_rx, std::string clock\_source\_rx, 
+      std::string time\_source\_rx, std::string antenna\_rx, \textcolor{keywordtype}{float} gain\_rx,
+00037         \textcolor{keywordtype}{float} timeout\_rx, \textcolor{keywordtype}{float} wait\_rx, \textcolor{keywordtype}{float} lo\_offset\_rx,
+00038         \textcolor{keyword}{const} std::string& len\_key)
+00039     \{
+00040       \textcolor{keywordflow}{return} gnuradio::get\_initial\_sptr
+00041         (\textcolor{keyword}{new} usrp_echotimer_cc_impl(samp\_rate, center\_freq, num\_delay\_samps,
+00042         args\_tx, wire\_tx, clock\_source\_tx, time\_source\_tx, antenna\_tx, gain\_tx,
+00043         timeout\_tx, wait\_tx, lo\_offset\_tx,
+00044         args\_rx, wire\_rx, clock\_source\_rx, time\_source\_rx, antenna\_rx, gain\_rx,
+00045         timeout\_rx, wait\_rx, lo\_offset\_rx,
+00046         len\_key));
+00047     \}
+00048 
+00049     \textcolor{comment}{/*}
+00050 \textcolor{comment}{     * The private constructor}
+00051 \textcolor{comment}{     */}
+00052     usrp_echotimer_cc_impl::usrp_echotimer_cc_impl(\textcolor{keywordtype}{int} samp_rate, \textcolor{keywordtype}{float} 
+      center_freq, \textcolor{keywordtype}{int} num\_delay\_samps,
+00053         std::string args\_tx, std::string wire\_tx, std::string clock\_source\_tx, 
+      std::string time\_source\_tx, std::string antenna\_tx, \textcolor{keywordtype}{float} gain\_tx,
+00054         \textcolor{keywordtype}{float} timeout\_tx, \textcolor{keywordtype}{float} wait\_tx, \textcolor{keywordtype}{float} lo\_offset\_tx,
+00055         std::string args\_rx, std::string wire\_rx, std::string clock\_source\_rx, 
+      std::string time\_source\_rx, std::string antenna\_rx, \textcolor{keywordtype}{float} gain\_rx,
+00056         \textcolor{keywordtype}{float} timeout\_rx, \textcolor{keywordtype}{float} wait\_rx, \textcolor{keywordtype}{float} lo\_offset\_rx,
+00057         \textcolor{keyword}{const} std::string& len\_key)
+00058     :gr::tagged\_stream\_block ( \textcolor{stringliteral}{"usrp\_echotimer\_cc"} ,
+00059               gr::io\_signature::make(1, 1, sizeof(gr\_complex)),
+00060               gr::io\_signature::make(1, 1, sizeof(gr\_complex)), len\_key)
+00061     \{
+00062     d_samp_rate = samp_rate;
+00063         d_center_freq = center_freq;
+00064         d_num_delay_samps = num\_delay\_samps;
+00065         d_out_buffer.resize(0);
+00066 
+00067         \textcolor{comment}{//***** Setup USRP TX *****//}
+00068 
+00069         d_args_tx = args\_tx;
+00070         d_wire_tx = wire\_tx;
+00071         d_clock_source_tx = clock\_source\_tx;
+00072         d_time_source_tx = time\_source\_tx;
+00073         d_antenna_tx = antenna\_tx;
+00074         d_lo_offset_tx = lo\_offset\_tx;
+00075         d_gain_tx = gain\_tx;
+00076         d_timeout_tx = timeout\_tx; \textcolor{comment}{// timeout for sending}
+00077         d_wait_tx = wait\_tx; \textcolor{comment}{// secs to wait befor sending}
+00078 
+00079         \textcolor{comment}{// Setup USRP TX: args (addr,...)}
+00080         d_usrp_tx = uhd::usrp::multi\_usrp::make(d_args_tx);
+00081         std::cout << \textcolor{stringliteral}{"Using USRP Device (TX): "} << std::endl << d_usrp_tx->get\_pp\_string() << std::endl;
+00082 
+00083         \textcolor{comment}{// Setup USRP TX: sample rate}
+00084         std::cout << \textcolor{stringliteral}{"Setting TX Rate: "} << d_samp_rate << std::endl;
+00085         d_usrp_tx->set\_tx\_rate(d_samp_rate);
+00086         std::cout << \textcolor{stringliteral}{"Actual TX Rate: "} << d_usrp_tx->get\_tx\_rate() << std::endl;
+00087 
+00088         \textcolor{comment}{// Setup USRP TX: gain}
+00089         set_tx_gain(d_gain_tx);
+00090 
+00091         \textcolor{comment}{// Setup USRP TX: tune request}
+00092         d_tune_request_tx = uhd::tune\_request\_t(d_center_freq); \textcolor{comment}{// FIXME: add alternative tune requests}
+00093         d_usrp_tx->set\_tx\_freq(d_tune_request_tx);
+00094 
+00095         \textcolor{comment}{// Setup USRP TX: antenna}
+00096         d_usrp_tx->set\_tx\_antenna(d_antenna_tx);
+00097 
+00098         \textcolor{comment}{// Setup USRP TX: clock source}
+00099         d_usrp_tx->set\_clock\_source(d_clock_source_tx); \textcolor{comment}{// Set TX clock, TX is master}
+00100 
+00101         \textcolor{comment}{// Setup USRP TX: time source}
+00102         d_usrp_tx->set\_time\_source(d_time_source_tx); \textcolor{comment}{// Set TX time, TX is master}
+00103 
+00104         \textcolor{comment}{// Setup USRP TX: timestamp}
+00105         \textcolor{keywordflow}{if}(d_time_source_tx!=\textcolor{stringliteral}{"gpsdo"})\{
+00106             d_usrp_tx->set\_time\_now(uhd::time\_spec\_t(0.0)); \textcolor{comment}{// Do set time on startup if not gpsdo is
+       activated.}
+00107         \}
+00108 
+00109         \textcolor{comment}{// Setup transmit streamer}
+00110         uhd::stream\_args\_t stream\_args\_tx(\textcolor{stringliteral}{"fc32"}, d_wire_tx); \textcolor{comment}{// complex floats}
+00111         d_tx_stream = d_usrp_tx->get\_tx\_stream(stream\_args\_tx);
+00112 
+00113         \textcolor{comment}{//***** Setup USRP RX *****//}
+00114 
+00115         d_args_rx = args\_rx;
+00116         d_wire_rx = wire\_rx;
+00117         d_clock_source_rx = clock\_source\_rx;
+00118         d_time_source_rx = time\_source\_rx;
+00119         d_antenna_rx = antenna\_rx;
+00120         d_lo_offset_rx = lo\_offset\_rx;
+00121         d_gain_rx = gain\_rx;
+00122         d_timeout_rx = timeout\_rx; \textcolor{comment}{// timeout for receiving}
+00123         d_wait_rx = wait\_rx; \textcolor{comment}{// secs to wait befor receiving}
+00124 
+00125         \textcolor{comment}{// Setup USRP RX: args (addr,...)}
+00126         d_usrp_rx = uhd::usrp::multi\_usrp::make(d_args_rx);
+00127         std::cout << \textcolor{stringliteral}{"Using USRP Device (RX): "} << std::endl << d_usrp_rx->get\_pp\_string() << std::endl;
+00128 
+00129         \textcolor{comment}{// Setup USRP RX: sample rate}
+00130         std::cout << \textcolor{stringliteral}{"Setting RX Rate: "} << d_samp_rate << std::endl;
+00131         d_usrp_rx->set\_rx\_rate(d_samp_rate);
+00132         std::cout << \textcolor{stringliteral}{"Actual RX Rate: "} << d_usrp_rx->get\_rx\_rate() << std::endl;
+00133 
+00134         \textcolor{comment}{// Setup USRP RX: gain}
+00135         set_rx_gain(d_gain_rx);
+00136 
+00137         \textcolor{comment}{// Setup USRP RX: tune request}
+00138         d_tune_request_rx = uhd::tune\_request\_t(d_center_freq, d_lo_offset_rx); \textcolor{comment}{// FIXME: add alternative
+       tune requests}
+00139         d_usrp_rx->set\_rx\_freq(d_tune_request_rx);
+00140 
+00141         \textcolor{comment}{// Setup USRP RX: antenna}
+00142         d_usrp_rx->set\_rx\_antenna(d_antenna_rx);
+00143 
+00144         \textcolor{comment}{// Setup USRP RX: clock source}
+00145         d_usrp_rx->set\_clock\_source(d_clock_source_rx); \textcolor{comment}{// RX is slave, clock is set on TX}
+00146 
+00147         \textcolor{comment}{// Setup USRP RX: time source}
+00148         d_usrp_rx->set\_time\_source(d_time_source_rx);
+00149 
+00150         \textcolor{comment}{// Setup receive streamer}
+00151         uhd::stream\_args\_t stream\_args\_rx(\textcolor{stringliteral}{"fc32"}, d_wire_rx); \textcolor{comment}{// complex floats}
+00152         std::vector<size\_t> channel\_nums; channel\_nums.push\_back(0); \textcolor{comment}{// define channel!}
+00153         stream\_args\_rx.channels = channel\_nums;
+00154         d_rx_stream = d_usrp_rx->get\_rx\_stream(stream\_args\_rx);
+00155 
+00156         \textcolor{comment}{//***** Misc *****//}
+00157 
+00158         \textcolor{comment}{// Setup rx\_time pmt}
+00159         d_time_key = pmt::string\_to\_symbol(\textcolor{stringliteral}{"rx\_time"});
+00160         d_srcid = pmt::string\_to\_symbol(\textcolor{stringliteral}{"usrp\_echotimer"});
+00161 
+00162         \textcolor{comment}{// Setup thread priority}
+00163         \textcolor{comment}{//uhd::set\_thread\_priority\_safe(); // necessary? doesnt work...}
+00164 
+00165         \textcolor{comment}{// Sleep to get sync done}
+00166         boost::this_thread::sleep(boost::posix\_time::milliseconds(1000)); \textcolor{comment}{// FIXME: necessary?}
+00167     \}
+00168 
+00169     \textcolor{comment}{/*}
+00170 \textcolor{comment}{     * Our virtual destructor.}
+00171 \textcolor{comment}{     */}
+00172     usrp_echotimer_cc_impl::~usrp_echotimer_cc_impl()
+00173     \{
+00174     \}
+00175 
+00176     \textcolor{keywordtype}{int}
+00177     usrp_echotimer_cc_impl::calculate_output_stream_length(\textcolor{keyword}{const} gr\_vector\_int &ninput\_items)
+00178     \{
+00179       \textcolor{keywordtype}{int} noutput\_items = ninput\_items[0];
+00180       \textcolor{keywordflow}{return} noutput\_items ;
+00181     \}
+00182 
+00183     \textcolor{keywordtype}{void}
+00184     usrp_echotimer_cc_impl::set_num_delay_samps(\textcolor{keywordtype}{int} num\_samps)\{
+00185         d_num_delay_samps = num\_samps;
+00186     \}
+00187 
+00188     \textcolor{keywordtype}{void}
+00189     usrp_echotimer_cc_impl::set_rx_gain(\textcolor{keywordtype}{float} gain)\{
+00190         d_usrp_rx->set\_rx\_gain(gain);
+00191     \}
+00192 
+00193     \textcolor{keywordtype}{void}
+00194     usrp_echotimer_cc_impl::set_tx_gain(\textcolor{keywordtype}{float} gain)\{
+00195         d_usrp_tx->set\_tx\_gain(gain);
+00196     \}
+00197 
+00198     \textcolor{keywordtype}{void}
+00199     usrp_echotimer_cc_impl::send()
+00200     \{
+00201         \textcolor{comment}{// Setup metadata for first package}
+00202         d_metadata_tx.start\_of\_burst = \textcolor{keyword}{true};
+00203         d_metadata_tx.end\_of\_burst = \textcolor{keyword}{false};
+00204         d_metadata_tx.has\_time\_spec = \textcolor{keyword}{true};
+00205         d_metadata_tx.time\_spec = d_time_now_tx+uhd::time\_spec\_t(d_wait_tx); \textcolor{comment}{// Timespec needed?}
+00206 
+00207         \textcolor{comment}{// Send input buffer}
+00208         \textcolor{keywordtype}{size\_t} num\_acc\_samps = 0; \textcolor{comment}{// Number of accumulated samples}
+00209         \textcolor{keywordtype}{size\_t} num\_tx\_samps, total\_num\_samps;
+00210         total\_num\_samps = d_noutput_items_send;
+00211         \textcolor{comment}{// Data to USRP}
+00212         num\_tx\_samps = d_tx_stream->send(d_in_send, total\_num\_samps, 
+      d_metadata_tx, total\_num\_samps/(\textcolor{keywordtype}{float})d_samp_rate+d_timeout_tx);
+00213         \textcolor{comment}{// Get timeout}
+00214         \textcolor{keywordflow}{if} (num\_tx\_samps < total\_num\_samps) std::cerr << \textcolor{stringliteral}{"Send timeout..."} << std::endl;
+00215 
+00216         \textcolor{comment}{//send a mini EOB packet}
+00217         d_metadata_tx.start\_of\_burst = \textcolor{keyword}{false};
+00218         d_metadata_tx.end\_of\_burst = \textcolor{keyword}{true};
+00219         d_metadata_tx.has\_time\_spec = \textcolor{keyword}{false};
+00220         d_tx_stream->send(\textcolor{stringliteral}{""}, 0, d_metadata_tx);
+00221     \}
+00222 
+00223     \textcolor{keywordtype}{void}
+00224     usrp_echotimer_cc_impl::receive()
+00225     \{
+00226         \textcolor{comment}{// Setup RX streaming}
+00227         \textcolor{keywordtype}{size\_t} total\_num\_samps = d_noutput_items_recv;
+00228         uhd::stream\_cmd\_t stream\_cmd(uhd::stream\_cmd\_t::STREAM\_MODE\_NUM\_SAMPS\_AND\_DONE);
+00229         stream\_cmd.num\_samps = total\_num\_samps;
+00230         stream\_cmd.stream\_now = \textcolor{keyword}{false};
+00231         stream\_cmd.time\_spec = d_time_now_rx+uhd::time\_spec\_t(d_wait_rx);
+00232         d_rx_stream->issue\_stream\_cmd(stream\_cmd);
+00233 
+00234         \textcolor{keywordtype}{size\_t} num\_rx\_samps;
+00235         \textcolor{comment}{// Receive a packet}
+00236         num\_rx\_samps = d_rx_stream->recv(d_out_recv, total\_num\_samps, 
+      d_metadata_rx, total\_num\_samps/(\textcolor{keywordtype}{float})d_samp_rate+d_timeout_rx);
+00237 
+00238         \textcolor{comment}{// Save timestamp}
+00239         d_time_val = pmt::make\_tuple
+00240             (pmt::from\_uint64(d_metadata_rx.time\_spec.get\_full\_secs()),
+00241              pmt::from\_double(d_metadata_rx.time\_spec.get\_frac\_secs()));
+00242 
+00243         \textcolor{comment}{// Handle the error code}
+00244         \textcolor{keywordflow}{if} (d_metadata_rx.error\_code != uhd::rx\_metadata\_t::ERROR\_CODE\_NONE)\{
+00245             \textcolor{keywordflow}{throw} std::runtime\_error(str(boost::format(\textcolor{stringliteral}{"Receiver error %s"}) % 
+      d_metadata_rx.strerror()));
+00246         \}
+00247 
+00248         \textcolor{keywordflow}{if} (num\_rx\_samps < total\_num\_samps) std::cerr << \textcolor{stringliteral}{"Receive timeout before all samples received..."} <
+      < std::endl;
+00249     \}
+00250 
+00251     \textcolor{keywordtype}{int}
+00252     usrp_echotimer_cc_impl::work (\textcolor{keywordtype}{int} noutput\_items,
+00253                        gr\_vector\_int &ninput\_items,
+00254                        gr\_vector\_const\_void\_star &input\_items,
+00255                        gr\_vector\_void\_star &output\_items)
+00256     \{
+00257         gr\_complex *in = (gr\_complex *) input\_items[0]; \textcolor{comment}{// remove const}
+00258         gr\_complex *out = (gr\_complex *) output\_items[0];
+00259 
+00260         \textcolor{comment}{// Set output items on packet length}
+00261         noutput\_items = ninput\_items[0];
+00262 
+00263         \textcolor{comment}{// Resize output buffer}
+00264         \textcolor{keywordflow}{if}(d_out_buffer.size()!=noutput\_items) d_out_buffer.resize(noutput\_items);
+00265 
+00266         \textcolor{comment}{// Get time from USRP TX}
+00267         d_time_now_tx = d_usrp_tx->get\_time\_now();
+00268         d_time_now_rx = d_time_now_tx;
+00269 
+00270         \textcolor{comment}{// Send thread}
+00271         d_in_send = in;
+00272         d_noutput_items_send = noutput\_items;
+00273         d_thread_send = gr::thread::thread(boost::bind(&
+      usrp_echotimer_cc_impl::send, \textcolor{keyword}{this}));
+00274 
+00275         \textcolor{comment}{// Receive thread}
+00276         d_out_recv = &d_out_buffer[0];
+00277         d_noutput_items_recv = noutput\_items;
+00278         d_thread_recv = gr::thread::thread(boost::bind(&
+      usrp_echotimer_cc_impl::receive, \textcolor{keyword}{this}));
+00279 
+00280         \textcolor{comment}{// Wait for threads to complete}
+00281         d_thread_send.join();
+00282         d_thread_recv.join();
+00283 
+00284         \textcolor{comment}{// Shift of number delay samples (fill with zeros)}
+00285         memcpy(out,&d_out_buffer[0]+d_num_delay_samps,(noutput\_items-
+      d_num_delay_samps)*\textcolor{keyword}{sizeof}(gr\_complex)); \textcolor{comment}{// push buffer to output}
+00286         memset(out+(noutput\_items-d_num_delay_samps),0,d_num_delay_samps*\textcolor{keyword}{sizeof}(gr\_complex)); \textcolor{comment}{// set zeros}
+00287 
+00288         \textcolor{comment}{// Setup rx\_time tag}
+00289         add\_item\_tag(0, nitems\_written(0), d_time_key, d_time_val, d_srcid);
+00290 
+00291         \textcolor{comment}{// Tell runtime system how many output items we produced.}
+00292         \textcolor{keywordflow}{return} noutput\_items;
+00293     \}
+00294 
+00295   \} \textcolor{comment}{/* namespace radar */}
+00296 \} \textcolor{comment}{/* namespace gr */}
+\end{DoxyCode}

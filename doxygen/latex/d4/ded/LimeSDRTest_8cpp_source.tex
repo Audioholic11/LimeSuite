@@ -1,0 +1,532 @@
+\subsection{Lime\+S\+D\+R\+Test.\+cpp}
+\label{LimeSDRTest_8cpp_source}\index{/home/erik/prefix/default/src/limesuite-\/dev/\+Quick\+Test/\+Lime\+S\+D\+R\+Test.\+cpp@{/home/erik/prefix/default/src/limesuite-\/dev/\+Quick\+Test/\+Lime\+S\+D\+R\+Test.\+cpp}}
+
+\begin{DoxyCode}
+00001 \textcolor{preprocessor}{#include <chrono>}
+00002 \textcolor{preprocessor}{#include "Logger.h"}
+00003 \textcolor{preprocessor}{#include "LMS64CProtocol.h"}
+00004 \textcolor{preprocessor}{#include "LimeSDRTest.h"}
+00005 \textcolor{preprocessor}{#include <thread>}
+00006 \textcolor{preprocessor}{#include "kiss_fft.h"}
+00007 \textcolor{preprocessor}{#include "FPGA_Mini.h"}
+00008 \textcolor{preprocessor}{#include <ctime>}
+00009 \textcolor{preprocessor}{#include <iostream>}
+00010 
+00011 \textcolor{keyword}{using namespace }lime;
+00012 
+00013 \textcolor{keyword}{const} std::vector<std::string>testNames =
+00014 \{\textcolor{stringliteral}{"Clock Network Test"}, \textcolor{stringliteral}{"FPGA EEPROM Test"}, \textcolor{stringliteral}{"LMS7002M Test"}, \textcolor{stringliteral}{"RF Loopback Test"}\};
+00015 
+00016 \textcolor{keywordtype}{int} LimeSDRTest::step = 0;
+00017 std::atomic<bool> LimeSDRTest::running(\textcolor{keyword}{false});
+00018 LimeSDRTest::TestCallback LimeSDRTest::callback = \textcolor{keyword}{nullptr};
+00019 std::chrono::steady\_clock::time\_point LimeSDRTest::tp_start;
+00020 
+00021 LimeSDRTest::LimeSDRTest(LMS7_Device* dev)
+00022 \{
+00023     step = 0;
+00024     device = dev;
+00025 \}
+00026 
+00027 LimeSDRTest::~LimeSDRTest()
+00028 \{
+00029     \textcolor{keywordflow}{if} (device != \textcolor{keyword}{nullptr})
+00030     \{
+00031         \textcolor{keyword}{delete} device;
+00032         device = \textcolor{keyword}{nullptr};
+00033     \}
+00034 \}
+00035 
+00036 \textcolor{keywordtype}{void} LimeSDRTest::UpdateStatus(\textcolor{keywordtype}{int} event, \textcolor{keyword}{const} \textcolor{keywordtype}{char}* msg)
+00037 \{
+00038     \textcolor{keywordflow}{if} (callback)
+00039         callback(step,event,msg);
+00040 \}
+00041 
+00042 \textcolor{keywordtype}{void} LimeSDRTest::OnLogEvent(\textcolor{keyword}{const} lime::LogLevel level, \textcolor{keyword}{const} \textcolor{keywordtype}{char} *msg)
+00043 \{
+00044     \textcolor{keywordflow}{if} (running.load() && level<= 2)
+00045         UpdateStatus(LMS_TEST_INFO,msg);
+00046 \}
+00047 
+00048 LimeSDRTest* LimeSDRTest::Connect()
+00049 \{
+00050     \textcolor{keyword}{auto} handles = LMS7_Device::GetDeviceList();
+00051 
+00052     \textcolor{keywordflow}{if} (handles.size() < 1)
+00053     \{
+00054         UpdateStatus(LMS_TEST_FAIL, \textcolor{stringliteral}{"Error: No Devices Connected"});
+00055         \textcolor{keywordflow}{return} \textcolor{keyword}{nullptr};
+00056     \}
+00057     \textcolor{keywordflow}{if} (handles.size() > 1)
+00058     \{
+00059         UpdateStatus(LMS_TEST_FAIL, \textcolor{stringliteral}{"Error: Multiple Devices Connected"});
+00060         \textcolor{keywordflow}{return} \textcolor{keyword}{nullptr};
+00061     \}
+00062 
+00063     \textcolor{keyword}{auto} dev = LMS7_Device::CreateDevice(handles[0]);
+00064 
+00065     \textcolor{keywordflow}{if} (dev == \textcolor{keyword}{nullptr})
+00066     \{
+00067         UpdateStatus(LMS_TEST_FAIL, \textcolor{stringliteral}{"Error: Unable to connect"});
+00068         \textcolor{keywordflow}{return} \textcolor{keyword}{nullptr};
+00069     \}
+00070 
+00071     std::string str = \textcolor{stringliteral}{"->Device: "};
+00072     str += handles[0].serialize();
+00073     UpdateStatus(LMS_TEST_INFO, str.c\_str());
+00074     \textcolor{keywordflow}{if} (str.find(\textcolor{stringliteral}{"USB 3"}) == std::string::npos)
+00075     \{
+00076         str = \textcolor{stringliteral}{"Warning: USB3 not available"};
+00077         UpdateStatus(LMS_TEST_INFO, str.c\_str());
+00078     \}
+00079     UpdateStatus(LMS_TEST_LOGFILE, handles[0].serial.c\_str());
+00080 
+00081     \textcolor{keyword}{auto} info = dev->GetInfo();
+00082     \textcolor{keywordflow}{if} (strstr(info->deviceName, lime::GetDeviceName(lime::LMS_DEV_LIMESDR)))
+00083         \textcolor{keywordflow}{return} \textcolor{keyword}{new} LimeSDRTest_USB(dev);
+00084     \textcolor{keywordflow}{else} \textcolor{keywordflow}{if} (strstr(info->deviceName, lime::GetDeviceName(
+      lime::LMS_DEV_LIMESDRMINI)))
+00085         \textcolor{keywordflow}{return} \textcolor{keyword}{new} LimeSDRTest_Mini(dev);
+00086     \textcolor{keywordflow}{else}
+00087         \textcolor{keywordflow}{return} \textcolor{keyword}{nullptr};
+00088 
+00089 \}
+00090 
+00091 \textcolor{keywordtype}{int} LimeSDRTest::TransferLMS64C(\textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{char}* packet)
+00092 \{
+00093     \textcolor{keyword}{auto} stream = \textcolor{keyword}{dynamic\_cast<}LMS64CProtocol*\textcolor{keyword}{>}(device->GetConnection());
+00094     \textcolor{keywordflow}{if} (stream->Write(packet, 64) != 64)
+00095     \{
+00096         UpdateStatus(LMS_TEST_FAIL, \textcolor{stringliteral}{"  Error:Write failed"});
+00097         \textcolor{keywordflow}{return} -1;
+00098     \}
+00099     memset(packet, 0, 64);
+00100     \textcolor{keywordflow}{if} (stream->Read(packet, 64, 5000) != 64)
+00101     \{
+00102         UpdateStatus(LMS_TEST_FAIL, \textcolor{stringliteral}{"  Error: Read failed"});
+00103         \textcolor{keywordflow}{return} -1;
+00104     \}
+00105 
+00106     \textcolor{keywordflow}{if} (packet[1] != 1)
+00107     \{
+00108         std::string str = \textcolor{stringliteral}{"Operation failed: error code "} + std::to\_string(packet[1]);
+00109         UpdateStatus(LMS_TEST_FAIL, str.c\_str());
+00110         \textcolor{keywordflow}{return} -1;
+00111     \}
+00112     \textcolor{keywordflow}{return} 0;
+00113 \}
+00114 
+00115 \textcolor{keywordtype}{int} LimeSDRTest::FPGA_EEPROM_Test()
+00116 \{
+00117     \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{char} buf[64];
+00118     \textcolor{keywordtype}{char} str[64];
+00119     UpdateStatus(LMS_TEST_INFO, \textcolor{stringliteral}{"->Read EEPROM"});
+00120 
+00121     memset(buf, 0, 64);
+00122     buf[0] = CMD_MEMORY_RD;
+00123     buf[2] = 56;
+00124     buf[13] = 7;                \textcolor{comment}{//read count}
+00125     buf[19] = 3;
+00126 
+00127     \textcolor{keywordflow}{if} (TransferLMS64C(buf) != 0)
+00128         \textcolor{keywordflow}{return} -1;
+00129 
+00130     std::snprintf(str, \textcolor{keyword}{sizeof}(str), \textcolor{stringliteral}{"->Read data: %02X %02X %02X %02X %02X %02X %02X"}, buf[32], buf[33], 
+      buf[34], buf[35], buf[36], buf[37], buf[38]);
+00131     UpdateStatus(LMS_TEST_INFO, str);
+00132 
+00133     \textcolor{keywordflow}{if} (buf[32]<16 || buf[35]<16 || buf[33]>12 || buf[36]>12 || buf[34]>31 || buf[37]>31 || buf[34]==0 || 
+      buf[37]==0)
+00134         \textcolor{keywordflow}{return} -1;
+00135     \textcolor{keywordflow}{return} 0;
+00136 \}
+00137 
+00138 \textcolor{keywordtype}{int} LimeSDRTest::LMS7002mTest()
+00139 \{
+00140     UpdateStatus(LMS_TEST_INFO, \textcolor{stringliteral}{"->Perform Registers Test"});
+00141 
+00142     \textcolor{keyword}{auto} lmsControl = device->GetLMS();
+00143     \textcolor{keywordtype}{int} st = lmsControl->SPI_write(0xA6, 0x0001);
+00144     \textcolor{keywordflow}{if} (st != 0)  UpdateStatus(LMS_TEST_INFO, \textcolor{stringliteral}{"SPI\_write() failed"});
+00145     st = lmsControl->SPI_write(0x92, 0xFFFF);
+00146     \textcolor{keywordflow}{if} (st != 0)  UpdateStatus(LMS_TEST_INFO, \textcolor{stringliteral}{"SPI\_write() failed"});
+00147     st = lmsControl->SPI_write(0x93, 0x03FF);
+00148     \textcolor{keywordflow}{if} (st != 0)  UpdateStatus(LMS_TEST_INFO, \textcolor{stringliteral}{"SPI\_write() failed"});
+00149 
+00150     \textcolor{keywordflow}{if} (lmsControl->RegistersTest(\textcolor{keyword}{nullptr}) != 0)
+00151         \textcolor{keywordflow}{return} -1;
+00152 
+00153     lmsControl->ResetChip();
+00154 
+00155     UpdateStatus(LMS_TEST_INFO, \textcolor{stringliteral}{"->External Reset line test"});
+00156     \textcolor{keywordflow}{if} (lmsControl->SPI_write(0x0020, 0xFFFD) != 0)
+00157         \textcolor{keywordflow}{return} -1;
+00158     \textcolor{keywordtype}{int} status;
+00159     \textcolor{keywordtype}{int} val = lmsControl->SPI_read(0x20, \textcolor{keyword}{true}, &status);
+00160     \textcolor{keywordflow}{if} (status != 0)
+00161         \textcolor{keywordflow}{return} -1;
+00162 
+00163     \textcolor{keywordtype}{char} str[64];
+00164     std::snprintf(str, \textcolor{keyword}{sizeof}(str), \textcolor{stringliteral}{"  Reg 0x20: Write value 0xFFFD, Read value 0x%04X"}, val);
+00165     UpdateStatus(LMS_TEST_INFO, str);
+00166     \textcolor{keywordflow}{if} (val != 0xFFFD)
+00167         \textcolor{keywordflow}{return} -1;
+00168 
+00169     lmsControl->ResetChip();
+00170     val = lmsControl->SPI_read(0x20, \textcolor{keyword}{true}, &status);
+00171     \textcolor{keywordflow}{if} (status != 0)
+00172         \textcolor{keywordflow}{return} -1;
+00173 
+00174     std::snprintf(str, \textcolor{keyword}{sizeof}(str), \textcolor{stringliteral}{"  Reg 0x20: value after reset 0x0%4X"}, val);
+00175     UpdateStatus(LMS_TEST_INFO, str);
+00176     \textcolor{keywordflow}{if} (val != 0xFFFF)
+00177         \textcolor{keywordflow}{return} -1;
+00178     \textcolor{keywordflow}{return} 0;
+00179 \}
+00180 
+00181 \textcolor{keywordtype}{int} LimeSDRTest::InitFPGATest(\textcolor{keywordtype}{unsigned} test, \textcolor{keywordtype}{double} timeout)
+00182 \{
+00183     \textcolor{keyword}{auto} conn = device->GetConnection();
+00184     \textcolor{keywordtype}{unsigned} completed;
+00185     uint32\_t addr[] = \{ 0x61, 0x63\};
+00186     uint32\_t vals[] = \{ 0x0, 0x0\};
+00187     \textcolor{keywordflow}{if} (conn->WriteRegisters(addr, vals, 2) != 0)
+00188         \textcolor{keywordflow}{return} -1;
+00189 
+00190     \textcolor{keyword}{auto} start = std::chrono::steady\_clock::now();
+00191     \textcolor{keywordflow}{if} (conn->WriteRegister(0x61, test) != 0)
+00192         \textcolor{keywordflow}{return} -1;
+00193 
+00194     \textcolor{keywordflow}{if} (timeout < 0)
+00195         \textcolor{keywordflow}{return} 0;
+00196 
+00197     \textcolor{keywordflow}{while} (1)
+00198     \{
+00199         \textcolor{keywordflow}{if} (conn->ReadRegister(0x65, completed) != 0)
+00200             \textcolor{keywordflow}{return} -1;
+00201 
+00202         \textcolor{keywordflow}{if} ((completed & test) == test)
+00203             \textcolor{keywordflow}{return} completed;
+00204 
+00205         \textcolor{keyword}{auto} end = std::chrono::steady\_clock::now();
+00206         std::chrono::duration<double> elapsed\_seconds = end - start;
+00207         \textcolor{keywordflow}{if} (elapsed\_seconds.count() > timeout)
+00208         \{
+00209             std::string str = \textcolor{stringliteral}{"  Test Timeout. Last result: "};
+00210             str += std::to\_string(completed & test);
+00211             UpdateStatus(LMS_TEST_INFO, str.c\_str());
+00212             \textcolor{keywordflow}{return} completed;
+00213         \}
+00214     \}
+00215 \}
+00216 
+00217 \textcolor{keywordtype}{int} LimeSDRTest::GPIFClkTest()
+00218 \{
+00219     \textcolor{keywordflow}{if} ((InitFPGATest(0x01, 1.0) & 0x1) != 0x1)
+00220         \textcolor{keywordflow}{return} -1;
+00221 
+00222     uint32\_t addr[] = \{ 0x69, 0x69, 0x69 \};
+00223     uint32\_t vals[3];
+00224     \textcolor{keyword}{auto} conn = device->GetConnection();
+00225     \textcolor{keywordflow}{if} (conn->ReadRegisters(addr, vals, 3) != 0)
+00226         \textcolor{keywordflow}{return} -1;
+00227 
+00228     std::string str = \textcolor{stringliteral}{"  Test results: "} + std::to\_string(vals[0]) + \textcolor{stringliteral}{"; "} + std::to\_string(vals[1]) + \textcolor{stringliteral}{"; "} 
+      + std::to\_string(vals[2]);
+00229     \textcolor{keywordflow}{if} (vals[0] == vals[1] && vals[1] == vals[2])
+00230     \{
+00231         str += \textcolor{stringliteral}{" - FAILED"};
+00232         UpdateStatus(LMS_TEST_INFO, str.c\_str());
+00233         \textcolor{keywordflow}{return} -1;
+00234     \}
+00235     str += \textcolor{stringliteral}{" - PASSED"};
+00236     UpdateStatus(LMS_TEST_INFO, str.c\_str());
+00237     \textcolor{keywordflow}{return} 0;
+00238 \}
+00239 
+00240 \textcolor{keywordtype}{int} LimeSDRTest::VCTCXOTest()
+00241 \{
+00242     \textcolor{keyword}{const} uint8\_t \textcolor{keywordtype}{id} = 0;
+00243     \textcolor{keywordtype}{double} val = 0;
+00244     \textcolor{keywordtype}{unsigned} count1;
+00245     \textcolor{keywordtype}{unsigned} count2;
+00246     \textcolor{keywordtype}{double} dac\_value;
+00247     std::string units = \textcolor{stringliteral}{""};
+00248     \textcolor{keyword}{auto} conn = device->GetConnection();
+00249 
+00250     \textcolor{keywordflow}{if} (conn->CustomParameterRead(&\textcolor{keywordtype}{id}, &dac\_value, 1, \textcolor{keyword}{nullptr}) != 0)
+00251         \textcolor{keywordflow}{return} -1;
+00252 
+00253     \textcolor{keyword}{auto} restore\_dac = [&,id](\textcolor{keywordtype}{int} ret)\{
+00254         \textcolor{keywordflow}{if} (conn->CustomParameterWrite(&\textcolor{keywordtype}{id}, &dac\_value, 1, units) != 0)
+00255             \textcolor{keywordflow}{return} -1;
+00256         \textcolor{keywordflow}{return} ret;
+00257     \};
+00258 
+00259     \textcolor{keywordflow}{if} (conn->CustomParameterWrite(&\textcolor{keywordtype}{id}, &val, 1, units) != 0)
+00260         \textcolor{keywordflow}{return} -1;
+00261 
+00262     \textcolor{keywordflow}{if} ((InitFPGATest(0x04, 1.0) & 0x4) != 0x4)
+00263         \textcolor{keywordflow}{return} restore\_dac(-1);
+00264 
+00265     uint32\_t addr[] = \{ 0x72, 0x73 \};
+00266     uint32\_t vals[2];
+00267     \textcolor{keywordflow}{if} (conn->ReadRegisters(addr, vals, 2) != 0)
+00268         \textcolor{keywordflow}{return} restore\_dac(-1);
+00269 
+00270     count1 = vals[0] + (vals[1] << 16);
+00271     val = 254;
+00272     \textcolor{keywordflow}{if} (conn->CustomParameterWrite(&\textcolor{keywordtype}{id}, &val, 1, units) != 0)
+00273         \textcolor{keywordflow}{return} -1;
+00274 
+00275     \textcolor{keywordflow}{if} ((InitFPGATest(0x04, 1.0) & 0x4) != 0x4)
+00276         \textcolor{keywordflow}{return} restore\_dac(-1);;
+00277 
+00278     \textcolor{keywordflow}{if} (conn->ReadRegisters(addr, vals, 2) != 0)
+00279         \textcolor{keywordflow}{return} restore\_dac(-1);;
+00280 
+00281     count2 = vals[0] + (vals[1] << 16);
+00282     std::string str = \textcolor{stringliteral}{"  Results : "} + std::to\_string(count1) + \textcolor{stringliteral}{" (min); "} + std::to\_string(count2) + \textcolor{stringliteral}{"
+       (max)"};
+00283 
+00284     \textcolor{keywordflow}{if} ((count1 + 50 > count2) || (count1 + 300 < count2))
+00285     \{
+00286         str += \textcolor{stringliteral}{" - FAILED"};
+00287         UpdateStatus(LMS_TEST_INFO, str.c\_str());
+00288         \textcolor{keywordflow}{return} restore\_dac(-1);;
+00289     \}
+00290     str += \textcolor{stringliteral}{" - PASSED"};
+00291     UpdateStatus(LMS_TEST_INFO, str.c\_str());
+00292     \textcolor{keywordflow}{return} restore\_dac(0);
+00293 \}
+00294 
+00295 \textcolor{keywordtype}{int} LimeSDRTest::Reg_write(uint16\_t address, uint16\_t data)
+00296 \{
+00297     \textcolor{keyword}{auto} conn = device->GetConnection();
+00298     \textcolor{keywordflow}{if} (conn == \textcolor{keyword}{nullptr}) \textcolor{keywordflow}{return} -1;
+00299     \textcolor{keywordtype}{int} status;
+00300     status = conn->WriteRegister(address, data);
+00301     \textcolor{keywordflow}{return} status == 0 ? 0 : -1;
+00302 \}
+00303 
+00304 uint16\_t LimeSDRTest::Reg_read(uint16\_t address)
+00305 \{
+00306     \textcolor{keyword}{auto} conn = device->GetConnection();
+00307     \textcolor{keywordflow}{if} (conn == \textcolor{keyword}{nullptr}) \textcolor{keywordflow}{return} 0;
+00308     uint32\_t dataRd = 0;
+00309     \textcolor{keywordtype}{int} status;
+00310     status = conn->ReadRegister(address, dataRd);
+00311     \textcolor{keywordflow}{if} (status == 0)
+00312         \textcolor{keywordflow}{return} dataRd & 0xFFFF;
+00313     \textcolor{keywordflow}{else}
+00314         \textcolor{keywordflow}{return} 0;
+00315 \}
+00316 
+00317 \textcolor{keywordtype}{bool} LimeSDRTest::RunTest(\textcolor{keywordtype}{float} &peakval, \textcolor{keywordtype}{float} &peakfreq, \textcolor{keywordtype}{int} ch)
+00318 \{
+00319     \textcolor{keyword}{const} \textcolor{keywordtype}{double} rfTestTolerance\_dB = 6.0;
+00320     \textcolor{keyword}{const} \textcolor{keywordtype}{double} rfTestTolerance\_Hz = 50e3;
+00321 
+00322     \textcolor{keywordtype}{float} samplerate = device->GetRate(\textcolor{keyword}{false},0);
+00323     \textcolor{keywordtype}{float} peakAmplitude = -1000, peakFrequency = 0;
+00324     \textcolor{keywordtype}{bool} passed = \textcolor{keyword}{false};
+00325 
+00326     \textcolor{keyword}{const} \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{int} buffer\_size = 16*\textcolor{keyword}{sizeof}(lime::FPGA_DataPacket);
+00327     \textcolor{keyword}{const} \textcolor{keywordtype}{int} fftSize = buffer\_size/8;
+00328 
+00329     \textcolor{keywordtype}{char} data\_buffer[buffer\_size] = \{0\};
+00330     \textcolor{keywordtype}{long} totalBytesReceived = 0;
+00331 
+00332     uint16\_t regA = Reg\_read(0x000A)&(~0x3);     \textcolor{comment}{//switch off Rx/Tx}
+00333     Reg\_write(0x000A, regA);
+00334     Reg\_write(0x0007, 1<<ch);
+00335     Reg\_write(0x0008, device->ReadParam(LMS7_LML1_SISODDR)? 0x40 : 0x100);
+00336 
+00337     \textcolor{comment}{//Receive samples}
+00338     \textcolor{keyword}{auto} conn = device->GetConnection();
+00339     conn->ResetStreamBuffers();
+00340     \textcolor{keywordtype}{int} handle = conn->BeginDataReading(data\_buffer, buffer\_size,0);
+00341     Reg\_write(0x000A, regA | 0x1); \textcolor{comment}{//switch on Rx}
+00342     \textcolor{keywordflow}{if} (conn->WaitForReading(handle, 1000) == \textcolor{keyword}{false})
+00343     \{
+00344         UpdateStatus(LMS_TEST_INFO, \textcolor{stringliteral}{"  Failed to read samples: Timeout"});
+00345         \textcolor{keywordflow}{return} \textcolor{keyword}{false};
+00346     \}
+00347     \textcolor{keywordflow}{if} (( totalBytesReceived =  conn->FinishDataReading(data\_buffer, buffer\_size, handle))<=0)
+00348     \{
+00349         UpdateStatus(LMS_TEST_INFO, \textcolor{stringliteral}{"  Failed to read samples: No samples received"});
+00350         \textcolor{keywordflow}{return} \textcolor{keyword}{false};
+00351     \}
+00352 
+00353     Reg\_write(0x000A, regA & ~0x3); \textcolor{comment}{//stop Tx Rx}
+00354 
+00355     kiss_fft_cpx* m\_fftCalcOut = \textcolor{keyword}{new} kiss_fft_cpx[fftSize];
+00356     kiss_fft_cpx* m\_fftCalcIn = \textcolor{keyword}{new} kiss_fft_cpx[fftSize];
+00357     kiss_fft_cfg m\_kissBuffer = kiss_fft_alloc(fftSize, 0, NULL, NULL);
+00358     int16\_t* bufStart = (int16\_t*)(data\_buffer+2*\textcolor{keyword}{sizeof}(lime::FPGA_DataPacket)); \textcolor{comment}{// pointer buffer}
+00359     \textcolor{comment}{//Parse samples from packet}
+00360     \textcolor{keywordflow}{for} (\textcolor{keywordtype}{int} samplesCollected = 0; samplesCollected < fftSize; samplesCollected++)
+00361     \{
+00362         \textcolor{keywordflow}{if} ((samplesCollected%1020) == 0)       \textcolor{comment}{//skip packet headers}
+00363             bufStart += 8;
+00364         m\_fftCalcIn[samplesCollected].r = (float)*bufStart++;
+00365         m\_fftCalcIn[samplesCollected].i = (float)*bufStart++;
+00366     \}
+00367 
+00368     kiss_fft(m\_kissBuffer, m\_fftCalcIn, m\_fftCalcOut);    \textcolor{comment}{// FFT calculation}
+00369 
+00370     \textcolor{keywordflow}{for} (\textcolor{keywordtype}{int} i = 1; i<fftSize; ++i)                     \textcolor{comment}{//skip DC}
+00371     \{
+00372         \textcolor{keywordtype}{float} output = 20*log10(sqrt(m\_fftCalcOut[i].r*m\_fftCalcOut[i].r + m\_fftCalcOut[
+      i].i*m\_fftCalcOut[i].i)/(fftSize*(1<<15)));
+00373         \textcolor{keywordflow}{if} (output > peakAmplitude)
+00374         \{
+00375             peakAmplitude = output;
+00376             peakFrequency = i * samplerate / fftSize;
+00377         \}
+00378     \}
+00379 
+00380     \textcolor{keywordflow}{if} (peakFrequency > samplerate/2)
+00381         peakFrequency = peakFrequency-samplerate;
+00382 
+00383     \textcolor{keywordflow}{if} ((peakAmplitude > peakval - rfTestTolerance\_dB)
+00384      && (peakAmplitude < peakval + rfTestTolerance\_dB)
+00385      && (peakFrequency < peakfreq+ rfTestTolerance\_Hz)
+00386      && (peakFrequency > peakfreq- rfTestTolerance\_Hz))
+00387     \{
+00388         passed = \textcolor{keyword}{true};
+00389     \}
+00390 
+00391     free(m\_kissBuffer);
+00392     \textcolor{keyword}{delete}[] m\_fftCalcOut;
+00393     \textcolor{keyword}{delete}[] m\_fftCalcIn;
+00394 
+00395     peakval = peakAmplitude;
+00396     peakfreq = peakFrequency;
+00397 
+00398     \textcolor{keywordflow}{return} passed;
+00399 \}
+00400 
+00401 std::string LimeSDRTest::RFTestInfo(\textcolor{keyword}{const} RFTestData& data, \textcolor{keywordtype}{bool} passed)
+00402 \{
+00403     \textcolor{keywordtype}{char} buffer[128];
+00404     \textcolor{keywordflow}{if} (data.peakval < -999)
+00405         snprintf(buffer, \textcolor{keyword}{sizeof}(buffer)-1, \textcolor{stringliteral}{"  CH%d (SXR=%3.1fMHz, SXT=%3.1fMHz) - "}, data.
+      ch, data.rxfreq / 1e6, data.txfreq / 1e6);
+00406     \textcolor{keywordflow}{else}
+00407     snprintf(buffer, \textcolor{keyword}{sizeof}(buffer)-1, \textcolor{stringliteral}{"  CH%d (SXR=%3.1fMHz, SXT=%3.1fMHz): Result:(%3.1f dBFS, %3.2f MHz)
+       - "}, data.ch, data.rxfreq/1e6, data.txfreq/1e6,data.peakval,data.peakfreq/1e6);
+00408     std::string str = buffer;
+00409     str += passed == \textcolor{keyword}{true} ? \textcolor{stringliteral}{"PASSED"} : \textcolor{stringliteral}{"FAILED"};
+00410     \textcolor{keywordflow}{return} str;
+00411 \}
+00412 
+00413 \textcolor{keywordtype}{int} LimeSDRTest::Perform_tests()
+00414 \{
+00415     \textcolor{keywordtype}{int} status = 0;
+00416     step = 0;
+00417     \textcolor{keywordtype}{int} tests\_failed = 0;
+00418     \textcolor{keywordflow}{while} (running.load() == \textcolor{keyword}{true})
+00419     \{
+00420         \textcolor{keywordtype}{int} ret = 0;
+00421         std::string str;
+00422         \textcolor{keywordflow}{if} (step < testNames.size())
+00423         \{
+00424             str = \textcolor{stringliteral}{"\(\backslash\)n[ "} + testNames[step] + \textcolor{stringliteral}{" ]"};
+00425             UpdateStatus(LMS_TEST_INFO, str.c\_str());
+00426         \}
+00427         \textcolor{keywordflow}{else}
+00428         \{
+00429             callback(-1, status == 0 ? LMS_TEST_SUCCESS : LMS_TEST_FAIL, status == 0 ? \textcolor{stringliteral}{"\(\backslash\)n=> Board tests
+       PASSED <=\(\backslash\)n"} : \textcolor{stringliteral}{"\(\backslash\)n=> Board tests FAILED <=\(\backslash\)n"});
+00430             running.store(\textcolor{keyword}{false});
+00431             \textcolor{keyword}{auto} end = std::chrono::steady\_clock::now();
+00432             std::chrono::duration<double> duration = end - tp\_start;
+00433             \textcolor{keywordtype}{char} str[64];
+00434             std::snprintf(str, \textcolor{keyword}{sizeof}(str), \textcolor{stringliteral}{"Elapsed time: %1.2f seconds\(\backslash\)n"},duration.count());
+00435             callback(-1,  LMS_TEST_INFO, str);
+00436             \textcolor{keywordflow}{break};
+00437         \}
+00438 
+00439         \textcolor{keywordflow}{switch} (step)
+00440         \{
+00441             \textcolor{keywordflow}{case} 0: ret = ClockNetworkTest(); \textcolor{keywordflow}{break};
+00442             \textcolor{keywordflow}{case} 1: ret = FPGA\_EEPROM\_Test(); \textcolor{keywordflow}{break};
+00443             \textcolor{keywordflow}{case} 2: ret = LMS7002mTest(); \textcolor{keywordflow}{break};
+00444             \textcolor{keywordflow}{case} 3: ret = RFTest(); \textcolor{keywordflow}{break};
+00445         \}
+00446 
+00447         str = \textcolor{stringliteral}{"->"} + testNames[step];
+00448         str += (ret == 0) ? \textcolor{stringliteral}{" PASSED"} : \textcolor{stringliteral}{" FAILED"};
+00449         UpdateStatus((ret == 0) ? LMS_TEST_SUCCESS : LMS_TEST_FAIL, str.c\_str());
+00450         \textcolor{keywordflow}{if} (ret != 0)
+00451             tests\_failed |= (1<<step);
+00452         status += ret;
+00453         step++;
+00454     \}
+00455     running.store(\textcolor{keyword}{false});
+00456     \textcolor{keyword}{delete} \textcolor{keyword}{this};
+00457     \textcolor{keywordflow}{return} tests\_failed;
+00458 \}
+00459 
+00460 \textcolor{keywordtype}{int} LimeSDRTest::RunTests(TestCallback cb, \textcolor{keywordtype}{bool} nonblock)
+00461 \{
+00462     lime::registerLogHandler(&LimeSDRTest::OnLogEvent);
+00463     step = -1;
+00464     callback = cb;
+00465     \textcolor{keywordflow}{if} (running.load() == \textcolor{keyword}{true})
+00466         \textcolor{keywordflow}{return} -1;
+00467     running.store(\textcolor{keyword}{true});
+00468     tp\_start = std::chrono::steady\_clock::now();
+00469     std::string str = \textcolor{stringliteral}{"[ TESTING STARTED ]\(\backslash\)n->Start time: "};
+00470     std::time\_t time = std::chrono::system\_clock::to\_time\_t(std::chrono::system\_clock::now());
+00471     str += std::ctime(&time);
+00472     UpdateStatus(LMS_TEST_INFO, str.c\_str());
+00473 
+00474     \textcolor{keyword}{auto} testObj = Connect();
+00475     \textcolor{keywordflow}{if} (!testObj)
+00476     \{
+00477         UpdateStatus(LMS_TEST_FAIL, \textcolor{stringliteral}{"Failed to connect"});
+00478         running.store(\textcolor{keyword}{false});
+00479         \textcolor{keywordflow}{return} -1;
+00480     \}
+00481     \textcolor{keywordtype}{int} ret = 0;
+00482     \textcolor{keywordflow}{if} (nonblock)
+00483     \{
+00484         \textcolor{keyword}{auto} testFunc = std::bind(&LimeSDRTest::Perform_tests, testObj);
+00485         \textcolor{keyword}{auto} workThread = std::thread(testFunc, testObj);
+00486         workThread.detach();
+00487     \}
+00488     \textcolor{keywordflow}{else}
+00489         ret = testObj->Perform\_tests();
+00490     \textcolor{keywordflow}{return} ret;
+00491 \}
+00492 
+00493 \textcolor{keywordtype}{int} LimeSDRTest::CheckDevice(std::string &str)
+00494 \{
+00495     \textcolor{keywordflow}{if} (running.load() == \textcolor{keyword}{true})
+00496         \textcolor{keywordflow}{return} 0;
+00497 
+00498     \textcolor{keyword}{auto} handles = LMS7_Device::GetDeviceList();
+00499     \textcolor{keywordflow}{if} (handles.size() < 1)
+00500     \{
+00501         str = \textcolor{stringliteral}{"Error: No Board Detected"};
+00502         \textcolor{keywordflow}{return} -1;
+00503     \}
+00504     \textcolor{keywordflow}{else} \textcolor{keywordflow}{if} (handles.size() > 1)
+00505     \{
+00506         str = \textcolor{stringliteral}{"Error: Multiple Board Detected"};
+00507         \textcolor{keywordflow}{return} -2;
+00508     \}
+00509     str = \textcolor{stringliteral}{"Device: "};
+00510     str += handles[0].name;
+00511 
+00512     \textcolor{keywordflow}{if} (handles[0].serial.length() > 4)
+00513     \{
+00514         str += \textcolor{stringliteral}{" ("};
+00515         str += handles[0].serial + \textcolor{stringliteral}{")"};
+00516     \}
+00517     \textcolor{keywordflow}{return} 0;
+00518 \}
+\end{DoxyCode}

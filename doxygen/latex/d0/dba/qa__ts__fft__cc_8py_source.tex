@@ -1,0 +1,129 @@
+\subsection{qa\+\_\+ts\+\_\+fft\+\_\+cc.\+py}
+\label{qa__ts__fft__cc_8py_source}\index{/home/erik/prefix/default/src/gr-\/radar-\/dev/python/qa\+\_\+ts\+\_\+fft\+\_\+cc.\+py@{/home/erik/prefix/default/src/gr-\/radar-\/dev/python/qa\+\_\+ts\+\_\+fft\+\_\+cc.\+py}}
+
+\begin{DoxyCode}
+00001 \textcolor{comment}{#!/usr/bin/env python}
+00002 \textcolor{comment}{# -*- coding: utf-8 -*-}
+00003 \textcolor{comment}{#}
+00004 \textcolor{comment}{# Copyright 2014 Communications Engineering Lab, KIT.}
+00005 \textcolor{comment}{#}
+00006 \textcolor{comment}{# This is free software; you can redistribute it and/or modify}
+00007 \textcolor{comment}{# it under the terms of the GNU General Public License as published by}
+00008 \textcolor{comment}{# the Free Software Foundation; either version 3, or (at your option)}
+00009 \textcolor{comment}{# any later version.}
+00010 \textcolor{comment}{#}
+00011 \textcolor{comment}{# This software is distributed in the hope that it will be useful,}
+00012 \textcolor{comment}{# but WITHOUT ANY WARRANTY; without even the implied warranty of}
+00013 \textcolor{comment}{# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the}
+00014 \textcolor{comment}{# GNU General Public License for more details.}
+00015 \textcolor{comment}{#}
+00016 \textcolor{comment}{# You should have received a copy of the GNU General Public License}
+00017 \textcolor{comment}{# along with this software; see the file COPYING.  If not, write to}
+00018 \textcolor{comment}{# the Free Software Foundation, Inc., 51 Franklin Street,}
+00019 \textcolor{comment}{# Boston, MA 02110-1301, USA.}
+00020 \textcolor{comment}{#}
+00021 
+00022 \textcolor{keyword}{from} gnuradio \textcolor{keyword}{import} gr, gr\_unittest
+00023 \textcolor{keyword}{from} gnuradio \textcolor{keyword}{import} blocks, fft
+00024 \textcolor{keyword}{import} radar\_swig \textcolor{keyword}{as} radar
+00025 \textcolor{keyword}{import} numpy \textcolor{keyword}{as} np
+00026 \textcolor{keyword}{import} numpy.fft
+00027 
+00028 \textcolor{keyword}{class }qa_ts_fft_cc (gr\_unittest.TestCase):
+00029 
+00030     \textcolor{keyword}{def }setUp (self):
+00031         self.tb = gr.top\_block ()
+00032 
+00033     \textcolor{keyword}{def }tearDown (self):
+00034         self.tb = \textcolor{keywordtype}{None}
+00035 
+00036     \textcolor{keyword}{def }test_001_t (self):
+00037         \textcolor{comment}{# set up fg}
+00038         test\_len = 1024
+00039 
+00040         packet\_len = test\_len
+00041         samp\_rate = 2000
+00042         frequency = (100,100)
+00043         amplitude = 1
+00044 
+00045         src = radar.signal\_generator\_cw\_c(packet\_len,samp\_rate,frequency,amplitude)
+00046         head = blocks.head(8,test\_len)
+00047         fft = radar.ts\_fft\_cc(packet\_len)
+00048         snk1 = blocks.vector\_sink\_c()
+00049         snk2 = blocks.vector\_sink\_c()
+00050 
+00051         self.tb.connect(src,head,fft,snk2) \textcolor{comment}{# snk2 holds fft data}
+00052         self.tb.connect(head,snk1) \textcolor{comment}{# snk1 holds time samples}
+00053         self.tb.run ()
+00054         \textcolor{comment}{# check data}
+00055         data = snk1.data()
+00056         np\_fft = numpy.fft.fft(data) \textcolor{comment}{# get fft}
+00057         self.assertComplexTuplesAlmostEqual(snk2.data(),np\_fft,4) \textcolor{comment}{# compare numpy fft and fft from block}
+00058 
+00059     \textcolor{keyword}{def }test_002_t (self):
+00060         \textcolor{comment}{# set up fg}
+00061         \textcolor{comment}{# purpse is testing fft on high sample rates}
+00062         test\_len = 2**19
+00063 
+00064         packet\_len = 2**17
+00065         min\_output\_buffer = packet\_len*2
+00066         samp\_rate = 10000000
+00067         frequency = 200000
+00068         amplitude = 1
+00069 
+00070         src = radar.signal\_generator\_cw\_c(packet\_len,samp\_rate,(frequency,frequency),amplitude)
+00071         src.set\_min\_output\_buffer(min\_output\_buffer)
+00072 
+00073         head = blocks.head(8,test\_len)
+00074         head.set\_min\_output\_buffer(min\_output\_buffer)
+00075 
+00076         fft1 = radar.ts\_fft\_cc(packet\_len)
+00077         fft1.set\_min\_output\_buffer(min\_output\_buffer)
+00078         fft2 = radar.ts\_fft\_cc(packet\_len)
+00079         fft2.set\_min\_output\_buffer(min\_output\_buffer)
+00080 
+00081         snk1 = blocks.vector\_sink\_c()
+00082         snk2 = blocks.vector\_sink\_c()
+00083 
+00084         self.tb.connect(src,head,fft1,snk1)
+00085         self.tb.connect(head,fft2,snk2)
+00086         self.tb.run ()
+00087 
+00088         \textcolor{comment}{# check both ffts}
+00089         self.assertComplexTuplesAlmostEqual(snk1.data(),snk2.data(),2) \textcolor{comment}{# compare both ffts}
+00090 
+00091     \textcolor{keyword}{def }test_003_t (self):
+00092         \textcolor{comment}{# test fft against gnuradio fft}
+00093         \textcolor{comment}{# set up fg}
+00094         test\_len = 1024*2
+00095 
+00096         packet\_len = test\_len
+00097         samp\_rate = 2000
+00098         frequency = (100,100)
+00099         amplitude = 1
+00100 
+00101         src = radar.signal\_generator\_cw\_c(packet\_len,samp\_rate,frequency,amplitude)
+00102         head = blocks.head(8,test\_len)
+00103         tsfft = radar.ts\_fft\_cc(packet\_len)
+00104         snk1 = blocks.vector\_sink\_c()
+00105         self.tb.connect(src,head,tsfft,snk1)
+00106 
+00107         s2v = blocks.stream\_to\_vector(8, packet\_len)
+00108         fft\_inbuild = fft.fft\_vcc(test\_len,\textcolor{keyword}{True},fft.window\_rectangular(0))
+00109         snk2 = blocks.vector\_sink\_c()
+00110         v2s = blocks.vector\_to\_stream(8, packet\_len);
+00111         self.tb.connect(head,s2v,fft\_inbuild,v2s,snk2)
+00112 
+00113         self.tb.run()
+00114 
+00115         \textcolor{comment}{# compaire ffts}
+00116         data\_tsfft = snk1.data()
+00117         data\_fft\_inbuild = snk2.data()
+00118 
+00119         self.assertComplexTuplesAlmostEqual(data\_tsfft,data\_fft\_inbuild,2) \textcolor{comment}{# compare inbuild fft and fft
+       from block}
+00120 
+00121 \textcolor{keywordflow}{if} \_\_name\_\_ == \textcolor{stringliteral}{'\_\_main\_\_'}:
+00122     \textcolor{comment}{#raw\_input('block for gdb',)}
+00123     gr\_unittest.run(qa\_ts\_fft\_cc)\textcolor{comment}{#, "qa\_ts\_fft\_cc.xml")}
+\end{DoxyCode}

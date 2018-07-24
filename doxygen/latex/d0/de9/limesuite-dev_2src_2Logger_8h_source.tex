@@ -1,0 +1,131 @@
+\subsection{Logger.\+h}
+\label{limesuite-dev_2src_2Logger_8h_source}\index{/home/erik/prefix/default/src/limesuite-\/dev/src/\+Logger.\+h@{/home/erik/prefix/default/src/limesuite-\/dev/src/\+Logger.\+h}}
+
+\begin{DoxyCode}
+00001 
+00007 \textcolor{preprocessor}{#ifndef LIMESUITE\_LOGGER\_H}
+00008 \textcolor{preprocessor}{#define LIMESUITE\_LOGGER\_H}
+00009 
+00010 \textcolor{preprocessor}{#include "LimeSuiteConfig.h"}
+00011 \textcolor{preprocessor}{#include <string>}
+00012 \textcolor{preprocessor}{#include <cstdarg>}
+00013 \textcolor{preprocessor}{#include <cerrno>}
+00014 \textcolor{preprocessor}{#include <stdexcept>}
+00015 
+00016 \textcolor{keyword}{namespace }lime
+00017 \{
+00018 
+00019 \textcolor{keyword}{enum} LogLevel
+00020 \{
+00021     LOG_LEVEL_CRITICAL = 0, 
+00022     LOG_LEVEL_ERROR    = 1, 
+00023     LOG_LEVEL_WARNING  = 2, 
+00024     LOG_LEVEL_INFO     = 3, 
+00025     LOG_LEVEL_DEBUG    = 4, 
+00026 \};
+00027 
+00029 \textcolor{keyword}{static} \textcolor{keyword}{inline} \textcolor{keywordtype}{void} critical(\textcolor{keyword}{const} \textcolor{keywordtype}{char} *format, ...);
+00030 
+00032 \textcolor{keyword}{static} \textcolor{keyword}{inline} \textcolor{keywordtype}{void} error(\textcolor{keyword}{const} \textcolor{keywordtype}{char} *format, ...);
+00033 
+00035 \textcolor{keyword}{static} \textcolor{keyword}{inline} \textcolor{keywordtype}{void} warning(\textcolor{keyword}{const} \textcolor{keywordtype}{char} *format, ...);
+00036 
+00038 \textcolor{keyword}{static} \textcolor{keyword}{inline} \textcolor{keywordtype}{void} info(\textcolor{keyword}{const} \textcolor{keywordtype}{char} *format, ...);
+00039 
+00041 \textcolor{keyword}{static} \textcolor{keyword}{inline} \textcolor{keywordtype}{void} debug(\textcolor{keyword}{const} \textcolor{keywordtype}{char} *format, ...);
+00042 
+00044 \textcolor{keyword}{static} \textcolor{keyword}{inline} \textcolor{keywordtype}{void} log(\textcolor{keyword}{const} LogLevel level, \textcolor{keyword}{const} \textcolor{keywordtype}{char} *format, ...);
+00045 
+00052 LIME_API \textcolor{keywordtype}{void} log(\textcolor{keyword}{const} LogLevel level, \textcolor{keyword}{const} \textcolor{keywordtype}{char} *format, va\_list argList);
+00053 
+00057 \textcolor{keyword}{typedef} void (*LogHandler)(\textcolor{keyword}{const} LogLevel level, \textcolor{keyword}{const} \textcolor{keywordtype}{char} *message);
+00058 
+00063 LIME_API \textcolor{keywordtype}{void} registerLogHandler(\textcolor{keyword}{const} LogHandler handler);
+00064 
+00066 LIME_API \textcolor{keyword}{const} \textcolor{keywordtype}{char} *logLevelToName(\textcolor{keyword}{const} LogLevel level);
+00067 
+00068 \}
+00069 
+00070 \textcolor{keyword}{static} \textcolor{keyword}{inline} \textcolor{keywordtype}{void} lime::log(\textcolor{keyword}{const} LogLevel level, \textcolor{keyword}{const} \textcolor{keywordtype}{char} *format, ...)
+00071 \{
+00072     va\_list args;
+00073     va\_start(args, format);
+00074     lime::log(level, format, args);
+00075     va\_end(args);
+00076 \}
+00077 
+00078 \textcolor{keyword}{static} \textcolor{keyword}{inline} \textcolor{keywordtype}{void} lime::critical(\textcolor{keyword}{const} \textcolor{keywordtype}{char} *format, ...)
+00079 \{
+00080     va\_list args;
+00081     va\_start(args, format);
+00082     lime::log(lime::LOG_LEVEL_CRITICAL, format, args);
+00083     va\_end(args);
+00084 \}
+00085 
+00086 \textcolor{keyword}{static} \textcolor{keyword}{inline} \textcolor{keywordtype}{void} lime::error(\textcolor{keyword}{const} \textcolor{keywordtype}{char} *format, ...)
+00087 \{
+00088     va\_list args;
+00089     va\_start(args, format);
+00090     lime::log(lime::LOG_LEVEL_ERROR, format, args);
+00091     va\_end(args);
+00092 \}
+00093 
+00094 \textcolor{keyword}{static} \textcolor{keyword}{inline} \textcolor{keywordtype}{void} lime::warning(\textcolor{keyword}{const} \textcolor{keywordtype}{char} *format, ...)
+00095 \{
+00096     va\_list args;
+00097     va\_start(args, format);
+00098     lime::log(lime::LOG_LEVEL_WARNING, format, args);
+00099     va\_end(args);
+00100 \}
+00101 
+00102 \textcolor{keyword}{static} \textcolor{keyword}{inline} \textcolor{keywordtype}{void} lime::info(\textcolor{keyword}{const} \textcolor{keywordtype}{char} *format, ...)
+00103 \{
+00104     va\_list args;
+00105     va\_start(args, format);
+00106     lime::log(lime::LOG_LEVEL_INFO, format, args);
+00107     va\_end(args);
+00108 \}
+00109 
+00110 \textcolor{keyword}{static} \textcolor{keyword}{inline} \textcolor{keywordtype}{void} lime::debug(\textcolor{keyword}{const} \textcolor{keywordtype}{char} *format, ...)
+00111 \{
+00112     va\_list args;
+00113     va\_start(args, format);
+00114     lime::log(lime::LOG_LEVEL_DEBUG, format, args);
+00115     va\_end(args);
+00116 \}
+00117 
+00118 \textcolor{keyword}{namespace }lime
+00119 \{
+00120 
+00124 LIME_API \textcolor{keyword}{const} \textcolor{keywordtype}{char} *GetLastErrorMessage(\textcolor{keywordtype}{void});
+00125 
+00132 LIME_API \textcolor{keywordtype}{int} ReportError(\textcolor{keyword}{const} \textcolor{keywordtype}{int} errnum);
+00133 
+00140 \textcolor{keyword}{inline} \textcolor{keywordtype}{int} ReportError(\textcolor{keyword}{const} \textcolor{keywordtype}{int} errnum, \textcolor{keyword}{const} \textcolor{keywordtype}{char} *format, ...);
+00141 
+00148 \textcolor{keyword}{inline} \textcolor{keywordtype}{int} ReportError(\textcolor{keyword}{const} \textcolor{keywordtype}{char} *format, ...);
+00149 
+00157 LIME_API \textcolor{keywordtype}{int} ReportError(\textcolor{keyword}{const} \textcolor{keywordtype}{int} errnum, \textcolor{keyword}{const} \textcolor{keywordtype}{char} *format, va\_list argList);
+00158 
+00159 \}
+00160 
+00161 \textcolor{keyword}{inline} \textcolor{keywordtype}{int} lime::ReportError(\textcolor{keyword}{const} \textcolor{keywordtype}{int} errnum, \textcolor{keyword}{const} \textcolor{keywordtype}{char} *format, ...)
+00162 \{
+00163     va\_list argList;
+00164     va\_start(argList, format);
+00165     \textcolor{keywordtype}{int} status = lime::ReportError(errnum, format, argList);
+00166     va\_end(argList);
+00167     \textcolor{keywordflow}{return} status;
+00168 \}
+00169 
+00170 \textcolor{keyword}{inline} \textcolor{keywordtype}{int} lime::ReportError(\textcolor{keyword}{const} \textcolor{keywordtype}{char} *format, ...)
+00171 \{
+00172     va\_list argList;
+00173     va\_start(argList, format);
+00174     \textcolor{keywordtype}{int} status = lime::ReportError(-1, format, argList);
+00175     va\_end(argList);
+00176     \textcolor{keywordflow}{return} status;
+00177 \}
+00178 
+00179 \textcolor{preprocessor}{#endif //LIMESUITE\_LOGGER\_H}
+\end{DoxyCode}

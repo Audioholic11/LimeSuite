@@ -287,32 +287,30 @@ static const char $\ast$ {\bf Get\+Device\+Name} (const {\bf e\+L\+M\+S\+\_\+\+D
 \item 
 static const char $\ast$ {\bf Get\+Expansion\+Board\+Name} (const {\bf e\+E\+X\+P\+\_\+\+B\+O\+A\+RD} board)
 \item 
-std\+::string {\bf get\+Lime\+Suite\+Root} ({\bf void})
+{\bf std\+::string} {\bf get\+Lime\+Suite\+Root} ({\bf void})
 \item 
-std\+::string {\bf get\+Home\+Directory} ({\bf void})
+{\bf std\+::string} {\bf get\+Home\+Directory} ({\bf void})
 \item 
-std\+::string {\bf get\+App\+Data\+Directory} ({\bf void})
+{\bf std\+::string} {\bf get\+App\+Data\+Directory} ({\bf void})
 \item 
-std\+::string {\bf get\+Config\+Directory} ({\bf void})
+{\bf std\+::string} {\bf get\+Config\+Directory} ({\bf void})
 \item 
-{\bf std\+::vector}$<$ std\+::string $>$ {\bf list\+Image\+Search\+Paths} ({\bf void})
+{\bf std\+::vector}$<$ {\bf std\+::string} $>$ {\bf list\+Image\+Search\+Paths} ({\bf void})
 \item 
-std\+::string {\bf locate\+Image\+Resource} (const std\+::string \&{\bf name})
+{\bf std\+::string} {\bf locate\+Image\+Resource} (const {\bf std\+::string} \&{\bf name})
 \item 
-{\bf int} {\bf download\+Image\+Resource} (const std\+::string \&{\bf name})
+{\bf int} {\bf download\+Image\+Resource} (const {\bf std\+::string} \&{\bf name})
 \item 
-std\+::string {\bf Get\+Library\+Version} ({\bf void})
+{\bf std\+::string} {\bf Get\+Library\+Version} ({\bf void})
 \item 
-std\+::string {\bf Get\+Build\+Timestamp} ({\bf void})
+{\bf std\+::string} {\bf Get\+Build\+Timestamp} ({\bf void})
 \item 
-std\+::string {\bf Get\+A\+P\+I\+Version} ({\bf void})
+{\bf std\+::string} {\bf Get\+A\+P\+I\+Version} ({\bf void})
 \item 
-std\+::string {\bf Get\+A\+B\+I\+Version} ({\bf void})
+{\bf std\+::string} {\bf Get\+A\+B\+I\+Version} ({\bf void})
 \end{DoxyCompactItemize}
 \subsubsection*{Variables}
 \begin{DoxyCompactItemize}
-\item 
-class {\bf L\+I\+M\+E\+\_\+\+A\+PI} {\bf L\+M\+S7\+\_\+\+Device}
 \item 
 const double {\bf cgen\+Max} = 640e6
 \item 
@@ -340,15 +338,19 @@ const uint16\+\_\+t {\bf busy\+Addr} = 0x0021
 \item 
 static const char {\bf adc\+\_\+units\+\_\+text} [$\,$][8] = \{\char`\"{}\char`\"{}, \char`\"{}V\char`\"{}, \char`\"{}A\char`\"{}, \char`\"{}Ohm\char`\"{}, \char`\"{}W\char`\"{}, \char`\"{}C\char`\"{}\}
 \item 
-const {\bf int} {\bf samples12\+In\+Pkt} = 1360
+const {\bf int} {\bf data\+Length} = 2016
 \item 
-const {\bf int} {\bf samples16\+In\+Pkt} = 1020
+const {\bf int} {\bf samples12\+In\+Pkt} = {\bf data\+Length}$\ast$8/12/2
+\item 
+const {\bf int} {\bf samples16\+In\+Pkt} = {\bf data\+Length}$\ast$8/16/2
 \item 
 static const char {\bf status\+\_\+text} [$\,$][32]
 \item 
 const char {\bf L\+M\+S\+\_\+\+D\+E\+V\+\_\+\+N\+A\+M\+ES} [$\,$][80]
 \item 
 const char {\bf E\+X\+P\+\_\+\+B\+O\+A\+R\+D\+\_\+\+N\+A\+M\+ES} [$\,$][80]
+\item 
+class {\bf L\+I\+M\+E\+\_\+\+A\+PI} {\bf L\+M\+S7\+\_\+\+Device}
 \end{DoxyCompactItemize}
 
 
@@ -774,7 +776,7 @@ Here is the caller graph for this function\+:
 \index{download\+Image\+Resource@{download\+Image\+Resource}!lime@{lime}}
 \paragraph[{download\+Image\+Resource(const std\+::string \&name)}]{\setlength{\rightskip}{0pt plus 5cm}{\bf int} lime\+::download\+Image\+Resource (
 \begin{DoxyParamCaption}
-\item[{const std\+::string \&}]{name}
+\item[{const {\bf std\+::string} \&}]{name}
 \end{DoxyParamCaption}
 )}\label{namespacelime_ad72fe62b462dcd3789d02dc05cf9c423}
 Download an image resource given only the file name. The resource will be downloaded in the user\textquotesingle{}s application data directory. 
@@ -791,7 +793,7 @@ Definition at line {\bf 164} of file {\bf System\+Resources.\+in.\+cpp}.
 
 
 
-References {\bf get\+App\+Data\+Directory()}, and {\bf Report\+Error()}.
+References {\bf get\+App\+Data\+Directory()}, {\bf Report\+Error()}, {\bf get\+\_\+pic\+::s}, {\bf string()}, and {\bf system}.
 
 
 
@@ -864,14 +866,14 @@ Here is the caller graph for this function\+:
 \begin{figure}[H]
 \begin{center}
 \leavevmode
-\includegraphics[width=350pt]{d5/d6c/namespacelime_ae9d8b86234e3827271197852facdc649_icgraph}
+\includegraphics[height=550pt]{d5/d6c/namespacelime_ae9d8b86234e3827271197852facdc649_icgraph}
 \end{center}
 \end{figure}
 
 
 \index{lime@{lime}!Get\+A\+B\+I\+Version@{Get\+A\+B\+I\+Version}}
 \index{Get\+A\+B\+I\+Version@{Get\+A\+B\+I\+Version}!lime@{lime}}
-\paragraph[{Get\+A\+B\+I\+Version(void)}]{\setlength{\rightskip}{0pt plus 5cm}std\+::string lime\+::\+Get\+A\+B\+I\+Version (
+\paragraph[{Get\+A\+B\+I\+Version(void)}]{\setlength{\rightskip}{0pt plus 5cm}{\bf std\+::string} lime\+::\+Get\+A\+B\+I\+Version (
 \begin{DoxyParamCaption}
 \item[{{\bf void}}]{}
 \end{DoxyParamCaption}
@@ -880,25 +882,9 @@ Get the A\+B\+I/so version of the library.
 
 Definition at line {\bf 33} of file {\bf Version\+Info.\+in.\+cpp}.
 
-
-
-Referenced by {\bf print\+Info()}.
-
-
-
-Here is the caller graph for this function\+:
-\nopagebreak
-\begin{figure}[H]
-\begin{center}
-\leavevmode
-\includegraphics[width=348pt]{d5/d6c/namespacelime_a8161b60a8146c181c49fc37885c24bb1_icgraph}
-\end{center}
-\end{figure}
-
-
 \index{lime@{lime}!Get\+A\+P\+I\+Version@{Get\+A\+P\+I\+Version}}
 \index{Get\+A\+P\+I\+Version@{Get\+A\+P\+I\+Version}!lime@{lime}}
-\paragraph[{Get\+A\+P\+I\+Version(void)}]{\setlength{\rightskip}{0pt plus 5cm}std\+::string lime\+::\+Get\+A\+P\+I\+Version (
+\paragraph[{Get\+A\+P\+I\+Version(void)}]{\setlength{\rightskip}{0pt plus 5cm}{\bf std\+::string} lime\+::\+Get\+A\+P\+I\+Version (
 \begin{DoxyParamCaption}
 \item[{{\bf void}}]{}
 \end{DoxyParamCaption}
@@ -909,27 +895,23 @@ Definition at line {\bf 23} of file {\bf Version\+Info.\+in.\+cpp}.
 
 
 
-References {\bf L\+I\+M\+E\+\_\+\+S\+U\+I\+T\+E\+\_\+\+A\+P\+I\+\_\+\+V\+E\+R\+S\+I\+ON}, and {\bf Q\+U\+O\+TE}.
+References {\bf L\+I\+M\+E\+\_\+\+S\+U\+I\+T\+E\+\_\+\+A\+P\+I\+\_\+\+V\+E\+R\+S\+I\+ON}, {\bf Q\+U\+O\+TE}, and {\bf string()}.
 
 
 
-Referenced by {\bf print\+Info()}.
-
-
-
-Here is the caller graph for this function\+:
+Here is the call graph for this function\+:
 \nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
-\includegraphics[width=348pt]{d5/d6c/namespacelime_ae0f8ba168b521861eaaa7d293f187122_icgraph}
+\includegraphics[width=350pt]{d5/d6c/namespacelime_ae0f8ba168b521861eaaa7d293f187122_cgraph}
 \end{center}
 \end{figure}
 
 
 \index{lime@{lime}!get\+App\+Data\+Directory@{get\+App\+Data\+Directory}}
 \index{get\+App\+Data\+Directory@{get\+App\+Data\+Directory}!lime@{lime}}
-\paragraph[{get\+App\+Data\+Directory(void)}]{\setlength{\rightskip}{0pt plus 5cm}std\+::string lime\+::get\+App\+Data\+Directory (
+\paragraph[{get\+App\+Data\+Directory(void)}]{\setlength{\rightskip}{0pt plus 5cm}{\bf std\+::string} lime\+::get\+App\+Data\+Directory (
 \begin{DoxyParamCaption}
 \item[{{\bf void}}]{}
 \end{DoxyParamCaption}
@@ -944,7 +926,7 @@ References {\bf get\+Bare\+App\+Data\+Directory()}.
 
 
 
-Referenced by {\bf download\+Image\+Resource()}, {\bf list\+Image\+Search\+Paths()}, and {\bf print\+Info()}.
+Referenced by {\bf download\+Image\+Resource()}, and {\bf list\+Image\+Search\+Paths()}.
 
 
 
@@ -972,7 +954,7 @@ Here is the caller graph for this function\+:
 
 \index{lime@{lime}!Get\+Build\+Timestamp@{Get\+Build\+Timestamp}}
 \index{Get\+Build\+Timestamp@{Get\+Build\+Timestamp}!lime@{lime}}
-\paragraph[{Get\+Build\+Timestamp(void)}]{\setlength{\rightskip}{0pt plus 5cm}std\+::string lime\+::\+Get\+Build\+Timestamp (
+\paragraph[{Get\+Build\+Timestamp(void)}]{\setlength{\rightskip}{0pt plus 5cm}{\bf std\+::string} lime\+::\+Get\+Build\+Timestamp (
 \begin{DoxyParamCaption}
 \item[{{\bf void}}]{}
 \end{DoxyParamCaption}
@@ -983,7 +965,7 @@ Definition at line {\bf 18} of file {\bf Version\+Info.\+in.\+cpp}.
 
 
 
-Referenced by {\bf dlg\+About\+::\+On\+Init()}, and {\bf print\+Info()}.
+Referenced by {\bf dlg\+About\+::\+On\+Init()}.
 
 
 
@@ -992,14 +974,14 @@ Here is the caller graph for this function\+:
 \begin{figure}[H]
 \begin{center}
 \leavevmode
-\includegraphics[width=350pt]{d5/d6c/namespacelime_ab3b413b0e4a1a8f7187608f179998a19_icgraph}
+\includegraphics[width=330pt]{d5/d6c/namespacelime_ab3b413b0e4a1a8f7187608f179998a19_icgraph}
 \end{center}
 \end{figure}
 
 
 \index{lime@{lime}!get\+Config\+Directory@{get\+Config\+Directory}}
 \index{get\+Config\+Directory@{get\+Config\+Directory}!lime@{lime}}
-\paragraph[{get\+Config\+Directory(void)}]{\setlength{\rightskip}{0pt plus 5cm}std\+::string lime\+::get\+Config\+Directory (
+\paragraph[{get\+Config\+Directory(void)}]{\setlength{\rightskip}{0pt plus 5cm}{\bf std\+::string} lime\+::get\+Config\+Directory (
 \begin{DoxyParamCaption}
 \item[{{\bf void}}]{}
 \end{DoxyParamCaption}
@@ -1014,28 +996,12 @@ References {\bf get\+Home\+Directory()}.
 
 
 
-Referenced by {\bf print\+Info()}.
-
-
-
 Here is the call graph for this function\+:
 \nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
 \includegraphics[width=350pt]{d5/d6c/namespacelime_a862c2ad2631cbfb6edd263d5140c7d3a_cgraph}
-\end{center}
-\end{figure}
-
-
-
-
-Here is the caller graph for this function\+:
-\nopagebreak
-\begin{figure}[H]
-\begin{center}
-\leavevmode
-\includegraphics[width=350pt]{d5/d6c/namespacelime_a862c2ad2631cbfb6edd263d5140c7d3a_icgraph}
 \end{center}
 \end{figure}
 
@@ -1057,7 +1023,7 @@ References {\bf device}, {\bf L\+M\+S\+\_\+\+D\+E\+V\+\_\+\+C\+O\+U\+NT}, and {\
 
 
 
-Referenced by {\bf lime\+::\+L\+M\+S7\+\_\+\+Device\+::\+Create\+Device()}, {\bf pnl\+Board\+Controls\+::get\+Board\+Params()}, {\bf lime\+::\+L\+M\+S64\+C\+Protocol\+::\+Get\+Device\+Info()}, {\bf lime\+::\+I\+Connection\+::\+Get\+Device\+Info()}, {\bf Get\+Ext\+Loop\+Pair()}, {\bf pnl\+Lime\+S\+D\+R\+::\+Initialize()}, {\bf Si5351\+C\+\_\+wxgui\+::\+Modify\+Clocks\+G\+U\+I()}, {\bf L\+M\+S\+\_\+\+Programing\+\_\+wxgui\+::\+Onbtn\+Open\+Click()}, {\bf pnl\+Board\+Controls\+::\+On\+User\+Changed\+Board\+Type()}, {\bf pnl\+Board\+Controls\+::pnl\+Board\+Controls()}, {\bf lime\+::\+L\+M\+S64\+C\+Protocol\+::\+Program\+Update()}, {\bf Set\+Ext\+Loopback()}, {\bf lime\+::\+F\+P\+G\+A\+::\+Set\+Pll\+Frequency()}, and {\bf pnl\+Board\+Controls\+::\+Setup\+Controls()}.
+Referenced by {\bf Lime\+S\+D\+R\+Test\+::\+Connect()}, {\bf lime\+::\+L\+M\+S7\+\_\+\+Device\+::\+Create\+Device()}, {\bf pnl\+Board\+Controls\+::get\+Board\+Params()}, {\bf lime\+::\+L\+M\+S64\+C\+Protocol\+::\+Get\+Device\+Info()}, {\bf lime\+::\+I\+Connection\+::\+Get\+Device\+Info()}, {\bf Get\+Ext\+Loop\+Pair()}, {\bf pnl\+Lime\+S\+D\+R\+::\+Initialize()}, {\bf Si5351\+C\+\_\+wxgui\+::\+Modify\+Clocks\+G\+U\+I()}, {\bf L\+M\+S\+\_\+\+Programing\+\_\+wxgui\+::\+Onbtn\+Open\+Click()}, {\bf pnl\+Board\+Controls\+::\+On\+User\+Changed\+Board\+Type()}, {\bf pnl\+Board\+Controls\+::pnl\+Board\+Controls()}, {\bf lime\+::\+L\+M\+S64\+C\+Protocol\+::\+Program\+Update()}, {\bf Set\+Ext\+Loopback()}, {\bf lime\+::\+F\+P\+G\+A\+::\+Set\+Pll\+Frequency()}, and {\bf pnl\+Board\+Controls\+::\+Setup\+Controls()}.
 
 
 
@@ -1104,7 +1070,7 @@ Here is the caller graph for this function\+:
 
 \index{lime@{lime}!get\+Home\+Directory@{get\+Home\+Directory}}
 \index{get\+Home\+Directory@{get\+Home\+Directory}!lime@{lime}}
-\paragraph[{get\+Home\+Directory(void)}]{\setlength{\rightskip}{0pt plus 5cm}std\+::string lime\+::get\+Home\+Directory (
+\paragraph[{get\+Home\+Directory(void)}]{\setlength{\rightskip}{0pt plus 5cm}{\bf std\+::string} lime\+::get\+Home\+Directory (
 \begin{DoxyParamCaption}
 \item[{{\bf void}}]{}
 \end{DoxyParamCaption}
@@ -1115,7 +1081,7 @@ Definition at line {\bf 66} of file {\bf System\+Resources.\+in.\+cpp}.
 
 
 
-Referenced by {\bf get\+Bare\+App\+Data\+Directory()}, {\bf get\+Config\+Directory()}, and {\bf print\+Info()}.
+Referenced by {\bf get\+Bare\+App\+Data\+Directory()}, and {\bf get\+Config\+Directory()}.
 
 
 
@@ -1146,7 +1112,7 @@ References {\bf \+\_\+reported\+Error\+Message}.
 
 
 
-Referenced by {\bf debug()}, {\bf L\+M\+S\+\_\+\+Get\+Last\+Error\+Message()}, {\bf program\+Firmware()}, {\bf program\+Gateware()}, {\bf program\+Update()}, {\bf Soapy\+L\+M\+S7\+::read\+G\+P\+I\+O()}, {\bf Soapy\+L\+M\+S7\+::read\+G\+P\+I\+O\+Dir()}, {\bf Soapy\+L\+M\+S7\+::set\+Bandwidth()}, {\bf Soapy\+L\+M\+S7\+::setup\+Stream()}, {\bf Soapy\+L\+M\+S7\+::write\+G\+P\+I\+O()}, {\bf Soapy\+L\+M\+S7\+::write\+G\+P\+I\+O\+Dir()}, and {\bf Soapy\+L\+M\+S7\+::write\+Setting()}.
+Referenced by {\bf debug()}, {\bf get\+Module\+Versions()}, {\bf L\+M\+S\+\_\+\+Get\+Last\+Error\+Message()}, {\bf Soapy\+L\+M\+S7\+::read\+G\+P\+I\+O()}, {\bf Soapy\+L\+M\+S7\+::read\+G\+P\+I\+O\+Dir()}, {\bf Soapy\+L\+M\+S7\+::set\+Bandwidth()}, {\bf Soapy\+L\+M\+S7\+::setup\+Stream()}, {\bf Soapy\+L\+M\+S7\+::write\+G\+P\+I\+O()}, {\bf Soapy\+L\+M\+S7\+::write\+G\+P\+I\+O\+Dir()}, and {\bf Soapy\+L\+M\+S7\+::write\+Setting()}.
 
 
 
@@ -1162,7 +1128,7 @@ Here is the caller graph for this function\+:
 
 \index{lime@{lime}!Get\+Library\+Version@{Get\+Library\+Version}}
 \index{Get\+Library\+Version@{Get\+Library\+Version}!lime@{lime}}
-\paragraph[{Get\+Library\+Version(void)}]{\setlength{\rightskip}{0pt plus 5cm}std\+::string lime\+::\+Get\+Library\+Version (
+\paragraph[{Get\+Library\+Version(void)}]{\setlength{\rightskip}{0pt plus 5cm}{\bf std\+::string} lime\+::\+Get\+Library\+Version (
 \begin{DoxyParamCaption}
 \item[{{\bf void}}]{}
 \end{DoxyParamCaption}
@@ -1173,7 +1139,7 @@ Definition at line {\bf 13} of file {\bf Version\+Info.\+in.\+cpp}.
 
 
 
-Referenced by {\bf L\+M\+S\+\_\+\+Get\+Library\+Version()}, {\bf dlg\+About\+::\+On\+Init()}, and {\bf print\+Info()}.
+Referenced by {\bf L\+M\+S\+\_\+\+Get\+Library\+Version()}, and {\bf dlg\+About\+::\+On\+Init()}.
 
 
 
@@ -1189,7 +1155,7 @@ Here is the caller graph for this function\+:
 
 \index{lime@{lime}!get\+Lime\+Suite\+Root@{get\+Lime\+Suite\+Root}}
 \index{get\+Lime\+Suite\+Root@{get\+Lime\+Suite\+Root}!lime@{lime}}
-\paragraph[{get\+Lime\+Suite\+Root(void)}]{\setlength{\rightskip}{0pt plus 5cm}std\+::string lime\+::get\+Lime\+Suite\+Root (
+\paragraph[{get\+Lime\+Suite\+Root(void)}]{\setlength{\rightskip}{0pt plus 5cm}{\bf std\+::string} lime\+::get\+Lime\+Suite\+Root (
 \begin{DoxyParamCaption}
 \item[{{\bf void}}]{}
 \end{DoxyParamCaption}
@@ -1200,7 +1166,23 @@ Definition at line {\bf 34} of file {\bf System\+Resources.\+in.\+cpp}.
 
 
 
-Referenced by {\bf list\+Image\+Search\+Paths()}, and {\bf print\+Info()}.
+References {\bf string()}.
+
+
+
+Referenced by {\bf list\+Image\+Search\+Paths()}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{d5/d6c/namespacelime_a76f6248a37464bd14ad58433b5b37195_cgraph}
+\end{center}
+\end{figure}
+
 
 
 
@@ -1236,7 +1218,7 @@ References {\bf args}, {\bf log()}, and {\bf L\+O\+G\+\_\+\+L\+E\+V\+E\+L\+\_\+\
 
 
 
-Referenced by {\bf lime\+::\+Si5351\+C\+::\+Configure\+Clocks()}, {\bf lime\+::\+L\+M\+S7\+\_\+\+Device\+::\+Configure\+T\+X\+L\+P\+F()}, {\bf lime\+::\+L\+M\+S7\+\_\+\+Device\+::\+Create\+Device()}, {\bf lime\+::\+F\+P\+G\+A\+::\+Detect\+Ref\+Clk()}, {\bf lime\+::\+Connection\+S\+T\+R\+E\+A\+M\+\_\+\+U\+N\+I\+T\+E\+Entry\+::enumerate()}, {\bf lime\+::\+I\+Connection\+::\+Get\+Device\+Info()}, {\bf lime\+::\+L\+M\+S64\+C\+Protocol\+::\+Get\+F\+P\+G\+A\+Info()}, {\bf lime\+::\+Connection\+Novena\+R\+F7\+::\+Stream\+Channel\+::\+Get\+Info()}, {\bf lime\+::\+L\+M\+S7\+\_\+\+Device\+::\+Get\+Info()}, {\bf lime\+::\+Stream\+Channel\+::\+Get\+Info()}, {\bf lime\+::\+L\+M\+S64\+C\+Protocol\+::\+Get\+Info()}, {\bf Soapy\+L\+M\+S7\+::get\+Stream\+Args\+Info()}, {\bf pnl\+Lime\+S\+D\+R\+::\+Initialize()}, {\bf lime\+::\+L\+M\+S7002\+M\+::\+Log()}, {\bf make\+Device()}, {\bf lime\+::\+L\+M\+S7\+\_\+\+Device\+::\+M\+C\+U\+\_\+\+A\+G\+C\+Start()}, {\bf lime\+::\+Connection\+F\+X3\+::\+Open()}, {\bf lime\+::\+L\+M\+S64\+C\+Protocol\+::\+Program\+Update()}, {\bf lime\+::\+L\+M\+S7\+\_\+\+Device\+::\+Set\+Clock\+Freq()}, {\bf lime\+::\+L\+M\+S7002\+M\+::\+Set\+Frequency\+S\+X()}, {\bf lime\+::\+L\+M\+S7\+\_\+\+Device\+::\+Set\+L\+P\+F()}, {\bf Myriad7\+\_\+wxgui\+::\+Update\+Panel()}, and {\bf lime\+::\+L\+M\+S64\+C\+Protocol\+::\+Version\+Check()}.
+Referenced by {\bf lime\+::\+Si5351\+C\+::\+Configure\+Clocks()}, {\bf lime\+::\+L\+M\+S7\+\_\+\+Device\+::\+Configure\+T\+X\+L\+P\+F()}, {\bf Lime\+S\+D\+R\+Test\+::\+Connect()}, {\bf lime\+::\+L\+M\+S7\+\_\+\+Device\+::\+Create\+Device()}, {\bf lime\+::\+F\+P\+G\+A\+::\+Detect\+Ref\+Clk()}, {\bf lime\+::\+Connection\+S\+T\+R\+E\+A\+M\+\_\+\+U\+N\+I\+T\+E\+Entry\+::enumerate()}, {\bf lime\+::\+I\+Connection\+::\+Get\+Device\+Info()}, {\bf lime\+::\+L\+M\+S64\+C\+Protocol\+::\+Get\+F\+P\+G\+A\+Info()}, {\bf lime\+::\+Connection\+Novena\+R\+F7\+::\+Stream\+Channel\+::\+Get\+Info()}, {\bf lime\+::\+L\+M\+S7\+\_\+\+Device\+::\+Get\+Info()}, {\bf lime\+::\+Stream\+Channel\+::\+Get\+Info()}, {\bf lime\+::\+L\+M\+S64\+C\+Protocol\+::\+Get\+Info()}, {\bf Soapy\+L\+M\+S7\+::get\+Stream\+Args\+Info()}, {\bf pnl\+Lime\+S\+D\+R\+::\+Initialize()}, {\bf lime\+::\+L\+M\+S7002\+M\+::\+Log()}, {\bf lime\+::\+L\+M\+S7\+\_\+\+Device\+::\+M\+C\+U\+\_\+\+A\+G\+C\+Start()}, {\bf lime\+::\+Connection\+F\+X3\+::\+Open()}, {\bf lime\+::\+L\+M\+S64\+C\+Protocol\+::\+Program\+Update()}, {\bf lime\+::\+L\+M\+S7\+\_\+\+Device\+::\+Set\+Clock\+Freq()}, {\bf lime\+::\+L\+M\+S7002\+M\+::\+Set\+Frequency\+S\+X()}, {\bf lime\+::\+L\+M\+S7\+\_\+\+Device\+::\+Set\+L\+P\+F()}, {\bf Myriad7\+\_\+wxgui\+::\+Update\+Panel()}, and {\bf lime\+::\+L\+M\+S64\+C\+Protocol\+::\+Version\+Check()}.
 
 
 
@@ -1264,7 +1246,7 @@ Here is the caller graph for this function\+:
 
 \index{lime@{lime}!list\+Image\+Search\+Paths@{list\+Image\+Search\+Paths}}
 \index{list\+Image\+Search\+Paths@{list\+Image\+Search\+Paths}!lime@{lime}}
-\paragraph[{list\+Image\+Search\+Paths(void)}]{\setlength{\rightskip}{0pt plus 5cm}{\bf std\+::vector}$<$ std\+::string $>$ lime\+::list\+Image\+Search\+Paths (
+\paragraph[{list\+Image\+Search\+Paths(void)}]{\setlength{\rightskip}{0pt plus 5cm}{\bf std\+::vector}$<$ {\bf std\+::string} $>$ lime\+::list\+Image\+Search\+Paths (
 \begin{DoxyParamCaption}
 \item[{{\bf void}}]{}
 \end{DoxyParamCaption}
@@ -1275,11 +1257,11 @@ Definition at line {\bf 121} of file {\bf System\+Resources.\+in.\+cpp}.
 
 
 
-References {\bf get\+App\+Data\+Directory()}, and {\bf get\+Lime\+Suite\+Root()}.
+References {\bf get\+App\+Data\+Directory()}, {\bf get\+Lime\+Suite\+Root()}, and {\bf string()}.
 
 
 
-Referenced by {\bf locate\+Image\+Resource()}, and {\bf print\+Info()}.
+Referenced by {\bf locate\+Image\+Resource()}.
 
 
 
@@ -1307,9 +1289,9 @@ Here is the caller graph for this function\+:
 
 \index{lime@{lime}!locate\+Image\+Resource@{locate\+Image\+Resource}}
 \index{locate\+Image\+Resource@{locate\+Image\+Resource}!lime@{lime}}
-\paragraph[{locate\+Image\+Resource(const std\+::string \&name)}]{\setlength{\rightskip}{0pt plus 5cm}std\+::string lime\+::locate\+Image\+Resource (
+\paragraph[{locate\+Image\+Resource(const std\+::string \&name)}]{\setlength{\rightskip}{0pt plus 5cm}{\bf std\+::string} lime\+::locate\+Image\+Resource (
 \begin{DoxyParamCaption}
-\item[{const std\+::string \&}]{name}
+\item[{const {\bf std\+::string} \&}]{name}
 \end{DoxyParamCaption}
 )}\label{namespacelime_abaa36939a298e08950e194d8f98ab550}
 Get the full file path to an image resource given only the file name. 
@@ -1326,7 +1308,7 @@ Definition at line {\bf 154} of file {\bf System\+Resources.\+in.\+cpp}.
 
 
 
-References {\bf list\+Image\+Search\+Paths()}.
+References {\bf list\+Image\+Search\+Paths()}, and {\bf string()}.
 
 
 
@@ -1379,7 +1361,7 @@ References {\bf args}.
 
 
 
-Referenced by {\bf Soapy\+L\+M\+S7\+::\+\_\+read\+Stream\+Aligned()}, {\bf critical()}, {\bf debug()}, {\bf error()}, {\bf info()}, {\bf lime\+Suite\+Log\+Handler()}, {\bf Report\+Error()}, and {\bf warning()}.
+Referenced by {\bf critical()}, {\bf debug()}, {\bf error()}, {\bf info()}, {\bf Report\+Error()}, and {\bf warning()}.
 
 
 
@@ -1463,7 +1445,7 @@ Definition at line {\bf 79} of file {\bf Logger.\+cpp}.
 
 
 
-Referenced by {\bf find\+I\+Connection()}, {\bf L\+M\+S7\+Suite\+App\+Frame\+::\+L\+M\+S7\+Suite\+App\+Frame()}, {\bf L\+M\+S\+\_\+\+Register\+Log\+Handler()}, {\bf main()}, and {\bf make\+I\+Connection()}.
+Referenced by {\bf find\+I\+Connection()}, {\bf L\+M\+S7\+Suite\+App\+Frame\+::\+L\+M\+S7\+Suite\+App\+Frame()}, {\bf L\+M\+S\+\_\+\+Register\+Log\+Handler()}, {\bf main()}, {\bf make\+I\+Connection()}, and {\bf Lime\+S\+D\+R\+Test\+::\+Run\+Tests()}.
 
 
 
@@ -1739,6 +1721,17 @@ Definition at line {\bf 7} of file {\bf device\+\_\+constants.\+h}.
 
 Referenced by {\bf lime\+::\+L\+M\+S7\+\_\+\+Lime\+S\+D\+R\+\_\+mini\+::\+Set\+Rate()}, and {\bf lime\+::\+L\+M\+S7\+\_\+\+Device\+::\+Set\+Rate()}.
 
+\index{lime@{lime}!data\+Length@{data\+Length}}
+\index{data\+Length@{data\+Length}!lime@{lime}}
+\paragraph[{data\+Length}]{\setlength{\rightskip}{0pt plus 5cm}const {\bf int} lime\+::data\+Length = 2016}\label{namespacelime_a6e3f21338f1b497ea8214cdb51c00265}
+
+
+Definition at line {\bf 11} of file {\bf data\+Types.\+h}.
+
+
+
+Referenced by {\bf lime\+::\+Streamer\+::\+Receive\+Packets\+Loop()}.
+
 \index{lime@{lime}!E\+X\+P\+\_\+\+B\+O\+A\+R\+D\+\_\+\+N\+A\+M\+ES@{E\+X\+P\+\_\+\+B\+O\+A\+R\+D\+\_\+\+N\+A\+M\+ES}}
 \index{E\+X\+P\+\_\+\+B\+O\+A\+R\+D\+\_\+\+N\+A\+M\+ES@{E\+X\+P\+\_\+\+B\+O\+A\+R\+D\+\_\+\+N\+A\+M\+ES}!lime@{lime}}
 \paragraph[{E\+X\+P\+\_\+\+B\+O\+A\+R\+D\+\_\+\+N\+A\+M\+ES}]{\setlength{\rightskip}{0pt plus 5cm}const char lime\+::\+E\+X\+P\+\_\+\+B\+O\+A\+R\+D\+\_\+\+N\+A\+M\+ES[$\,$][80]}\label{namespacelime_abebcc4708d1ffbd9282f39d62683e034}
@@ -1820,21 +1813,21 @@ Referenced by {\bf lime\+::\+F\+P\+G\+A\+::\+Start\+Streaming()}.
 
 \index{lime@{lime}!samples12\+In\+Pkt@{samples12\+In\+Pkt}}
 \index{samples12\+In\+Pkt@{samples12\+In\+Pkt}!lime@{lime}}
-\paragraph[{samples12\+In\+Pkt}]{\setlength{\rightskip}{0pt plus 5cm}const {\bf int} lime\+::samples12\+In\+Pkt = 1360}\label{namespacelime_a0bd9221448ccdfc16ddb4b1a416f8a0b}
+\paragraph[{samples12\+In\+Pkt}]{\setlength{\rightskip}{0pt plus 5cm}const {\bf int} lime\+::samples12\+In\+Pkt = {\bf data\+Length}$\ast$8/12/2}\label{namespacelime_a0bd9221448ccdfc16ddb4b1a416f8a0b}
 
 
-Definition at line {\bf 22} of file {\bf data\+Types.\+h}.
+Definition at line {\bf 32} of file {\bf data\+Types.\+h}.
 
 
 
-Referenced by {\bf lime\+::\+Streamer\+::\+Get\+Stream\+Size()}, {\bf lime\+::\+Streamer\+::\+Receive\+Packets\+Loop()}, {\bf lime\+::\+Streamer\+::\+Transmit\+Packets\+Loop()}, and {\bf lime\+::\+F\+P\+G\+A\+::\+Upload\+W\+F\+M()}.
+Referenced by {\bf lime\+::\+Streamer\+::\+Get\+Stream\+Size()}, {\bf lime\+::\+Streamer\+::\+Receive\+Packets\+Loop()}, {\bf T\+E\+S\+T\+\_\+\+F()}, {\bf lime\+::\+Streamer\+::\+Transmit\+Packets\+Loop()}, and {\bf lime\+::\+F\+P\+G\+A\+::\+Upload\+W\+F\+M()}.
 
 \index{lime@{lime}!samples16\+In\+Pkt@{samples16\+In\+Pkt}}
 \index{samples16\+In\+Pkt@{samples16\+In\+Pkt}!lime@{lime}}
-\paragraph[{samples16\+In\+Pkt}]{\setlength{\rightskip}{0pt plus 5cm}const {\bf int} lime\+::samples16\+In\+Pkt = 1020}\label{namespacelime_a7f71e605386bdf602b9499119babdb76}
+\paragraph[{samples16\+In\+Pkt}]{\setlength{\rightskip}{0pt plus 5cm}const {\bf int} lime\+::samples16\+In\+Pkt = {\bf data\+Length}$\ast$8/16/2}\label{namespacelime_a7f71e605386bdf602b9499119babdb76}
 
 
-Definition at line {\bf 23} of file {\bf data\+Types.\+h}.
+Definition at line {\bf 34} of file {\bf data\+Types.\+h}.
 
 
 

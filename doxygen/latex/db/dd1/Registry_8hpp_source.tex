@@ -1,0 +1,45 @@
+\subsection{Registry.\+hpp}
+\label{Registry_8hpp_source}\index{/home/erik/prefix/default/src/soapysdr/include/\+Soapy\+S\+D\+R/\+Registry.\+hpp@{/home/erik/prefix/default/src/soapysdr/include/\+Soapy\+S\+D\+R/\+Registry.\+hpp}}
+
+\begin{DoxyCode}
+00001 
+00011 \textcolor{preprocessor}{#pragma once}
+00012 \textcolor{preprocessor}{#include <SoapySDR/Config.hpp>}
+00013 \textcolor{preprocessor}{#include <SoapySDR/Version.hpp>}
+00014 \textcolor{preprocessor}{#include <SoapySDR/Types.hpp>}
+00015 \textcolor{preprocessor}{#include <vector>}
+00016 \textcolor{preprocessor}{#include <string>}
+00017 \textcolor{preprocessor}{#include <map>}
+00018 
+00019 \textcolor{keyword}{namespace }SoapySDR
+00020 \{
+00021 
+00023 \textcolor{keyword}{class }Device;
+00024 
+00026 \textcolor{keyword}{typedef} KwargsList (*FindFunction)(\textcolor{keyword}{const} Kwargs &);
+00027 
+00029 \textcolor{keyword}{typedef} Device* (*MakeFunction)(\textcolor{keyword}{const} Kwargs &);
+00030 
+00032 \textcolor{keyword}{typedef} std::map<std::string, FindFunction> FindFunctions;
+00033 
+00035 \textcolor{keyword}{typedef} std::map<std::string, MakeFunction> MakeFunctions;
+00036 
+00040 \textcolor{keyword}{class }SOAPY_SDR_API Registry
+00041 \{
+00042 \textcolor{keyword}{public}:
+00043 
+00051     Registry(\textcolor{keyword}{const} std::string &name, \textcolor{keyword}{const} FindFunction &find, \textcolor{keyword}{const} 
+      MakeFunction &make, \textcolor{keyword}{const} std::string &abi);
+00052 
+00054     ~Registry(\textcolor{keywordtype}{void});
+00055 
+00060     \textcolor{keyword}{static} FindFunctions listFindFunctions(\textcolor{keywordtype}{void});
+00061 
+00066     \textcolor{keyword}{static} MakeFunctions listMakeFunctions(\textcolor{keywordtype}{void});
+00067 
+00068 \textcolor{keyword}{private}:
+00069     std::string _name;
+00070 \};
+00071 
+00072 \}
+\end{DoxyCode}

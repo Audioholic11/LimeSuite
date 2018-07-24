@@ -36,9 +36,9 @@ enum {\bf Stream\+Flags} \{ {\bf S\+Y\+N\+C\+\_\+\+T\+I\+M\+E\+S\+T\+A\+MP} = 1,
 \begin{DoxyCompactList}\small\item\em Initializes F\+I\+FO memory. \end{DoxyCompactList}\item 
 {\bf $\sim$\+Ring\+F\+I\+FO} ()
 \item 
-uint32\+\_\+t {\bf push\+\_\+samples} (const {\bf complex16\+\_\+t} $\ast${\bf buffer}, const uint32\+\_\+t samples\+Count, const uint8\+\_\+t channels\+Count, uint64\+\_\+t timestamp, const uint32\+\_\+t {\bf timeout\+\_\+ms}, const uint32\+\_\+t {\bf flags}=0)
+uint32\+\_\+t {\bf push\+\_\+samples} (const {\bf complex16\+\_\+t} $\ast${\bf buffer}, const uint32\+\_\+t samples\+Count, const uint8\+\_\+t channels\+Count, uint64\+\_\+t timestamp, const uint32\+\_\+t {\bf timeout\+\_\+ms}, const uint32\+\_\+t {\bf flags}=0, uint64\+\_\+t lastchirp\+\_\+timestamp=0, uint64\+\_\+t chirptime=0)
 \begin{DoxyCompactList}\small\item\em inserts samples to F\+I\+FO, operation is thread-\/safe \end{DoxyCompactList}\item 
-uint32\+\_\+t {\bf pop\+\_\+samples} ({\bf complex16\+\_\+t} $\ast${\bf buffer}, const uint32\+\_\+t samples\+Count, const uint8\+\_\+t channels\+Count, uint64\+\_\+t $\ast$timestamp, const uint32\+\_\+t {\bf timeout\+\_\+ms}, uint32\+\_\+t $\ast${\bf flags}=nullptr)
+uint32\+\_\+t {\bf pop\+\_\+samples} ({\bf complex16\+\_\+t} $\ast${\bf buffer}, const uint32\+\_\+t samples\+Count, const uint8\+\_\+t channels\+Count, uint64\+\_\+t $\ast$timestamp, const uint32\+\_\+t {\bf timeout\+\_\+ms}, uint32\+\_\+t $\ast${\bf flags}=nullptr, uint64\+\_\+t $\ast$lastchirp\+\_\+timestamp=0, uint64\+\_\+t $\ast$chirptime=0)
 \begin{DoxyCompactList}\small\item\em Takes samples out of F\+I\+FO, operation is thread-\/safe. \end{DoxyCompactList}\item 
 {\bf void} {\bf Clear} ()
 \end{DoxyCompactItemize}
@@ -148,7 +148,7 @@ References {\bf m\+Buffer}.
 )\hspace{0.3cm}{\ttfamily [inline]}}\label{classlime_1_1RingFIFO_a372922d302d9ccacdf8fa60078e522b2}
 
 
-Definition at line {\bf 171} of file {\bf fifo.\+h}.
+Definition at line {\bf 180} of file {\bf fifo.\+h}.
 
 
 
@@ -207,16 +207,18 @@ Here is the caller graph for this function\+:
 
 \index{lime\+::\+Ring\+F\+I\+FO@{lime\+::\+Ring\+F\+I\+FO}!pop\+\_\+samples@{pop\+\_\+samples}}
 \index{pop\+\_\+samples@{pop\+\_\+samples}!lime\+::\+Ring\+F\+I\+FO@{lime\+::\+Ring\+F\+I\+FO}}
-\paragraph[{pop\+\_\+samples(complex16\+\_\+t $\ast$buffer, const uint32\+\_\+t samples\+Count, const uint8\+\_\+t channels\+Count, uint64\+\_\+t $\ast$timestamp, const uint32\+\_\+t timeout\+\_\+ms, uint32\+\_\+t $\ast$flags=nullptr)}]{\setlength{\rightskip}{0pt plus 5cm}uint32\+\_\+t lime\+::\+Ring\+F\+I\+F\+O\+::pop\+\_\+samples (
+\paragraph[{pop\+\_\+samples(complex16\+\_\+t $\ast$buffer, const uint32\+\_\+t samples\+Count, const uint8\+\_\+t channels\+Count, uint64\+\_\+t $\ast$timestamp, const uint32\+\_\+t timeout\+\_\+ms, uint32\+\_\+t $\ast$flags=nullptr, uint64\+\_\+t $\ast$lastchirp\+\_\+timestamp=0, uint64\+\_\+t $\ast$chirptime=0)}]{\setlength{\rightskip}{0pt plus 5cm}uint32\+\_\+t lime\+::\+Ring\+F\+I\+F\+O\+::pop\+\_\+samples (
 \begin{DoxyParamCaption}
 \item[{{\bf complex16\+\_\+t} $\ast$}]{buffer, }
 \item[{const uint32\+\_\+t}]{samples\+Count, }
 \item[{const uint8\+\_\+t}]{channels\+Count, }
 \item[{uint64\+\_\+t $\ast$}]{timestamp, }
 \item[{const uint32\+\_\+t}]{timeout\+\_\+ms, }
-\item[{uint32\+\_\+t $\ast$}]{flags = {\ttfamily nullptr}}
+\item[{uint32\+\_\+t $\ast$}]{flags = {\ttfamily nullptr}, }
+\item[{uint64\+\_\+t $\ast$}]{lastchirp\+\_\+timestamp = {\ttfamily 0}, }
+\item[{uint64\+\_\+t $\ast$}]{chirptime = {\ttfamily 0}}
 \end{DoxyParamCaption}
-)\hspace{0.3cm}{\ttfamily [inline]}}\label{classlime_1_1RingFIFO_ae54a42ddc5616b4a465659ff6eda00cd}
+)\hspace{0.3cm}{\ttfamily [inline]}}\label{classlime_1_1RingFIFO_aa091522cd3ae92cdb2b9d172cf8740a5}
 
 
 Takes samples out of F\+I\+FO, operation is thread-\/safe. 
@@ -241,11 +243,11 @@ number of samples popped
 \end{DoxyReturn}
 
 
-Definition at line {\bf 121} of file {\bf fifo.\+h}.
+Definition at line {\bf 123} of file {\bf fifo.\+h}.
 
 
 
-References {\bf E\+N\+D\+\_\+\+B\+U\+R\+ST}, {\bf lime\+::\+Samples\+Packet\+::first}, {\bf lime\+::\+Samples\+Packet\+::flags}, {\bf flags}, {\bf has\+Items}, {\bf lime\+::\+Samples\+Packet\+::last}, {\bf lock}, {\bf m\+Buffer}, {\bf m\+Buffer\+Size}, {\bf m\+Elements\+Filled}, {\bf m\+Head}, {\bf samples}, and {\bf lime\+::\+Samples\+Packet\+::timestamp}.
+References {\bf lime\+::\+Samples\+Packet\+::chirptime}, {\bf E\+N\+D\+\_\+\+B\+U\+R\+ST}, {\bf lime\+::\+Samples\+Packet\+::first}, {\bf lime\+::\+Samples\+Packet\+::flags}, {\bf flags}, {\bf has\+Items}, {\bf lime\+::\+Samples\+Packet\+::last}, {\bf lime\+::\+Samples\+Packet\+::lastchirp\+\_\+timestamp}, {\bf lock}, {\bf m\+Buffer}, {\bf m\+Buffer\+Size}, {\bf m\+Elements\+Filled}, {\bf m\+Head}, {\bf samples}, and {\bf lime\+::\+Samples\+Packet\+::timestamp}.
 
 
 
@@ -258,23 +260,25 @@ Here is the caller graph for this function\+:
 \begin{figure}[H]
 \begin{center}
 \leavevmode
-\includegraphics[width=350pt]{d2/d97/classlime_1_1RingFIFO_ae54a42ddc5616b4a465659ff6eda00cd_icgraph}
+\includegraphics[width=350pt]{d2/d97/classlime_1_1RingFIFO_aa091522cd3ae92cdb2b9d172cf8740a5_icgraph}
 \end{center}
 \end{figure}
 
 
 \index{lime\+::\+Ring\+F\+I\+FO@{lime\+::\+Ring\+F\+I\+FO}!push\+\_\+samples@{push\+\_\+samples}}
 \index{push\+\_\+samples@{push\+\_\+samples}!lime\+::\+Ring\+F\+I\+FO@{lime\+::\+Ring\+F\+I\+FO}}
-\paragraph[{push\+\_\+samples(const complex16\+\_\+t $\ast$buffer, const uint32\+\_\+t samples\+Count, const uint8\+\_\+t channels\+Count, uint64\+\_\+t timestamp, const uint32\+\_\+t timeout\+\_\+ms, const uint32\+\_\+t flags=0)}]{\setlength{\rightskip}{0pt plus 5cm}uint32\+\_\+t lime\+::\+Ring\+F\+I\+F\+O\+::push\+\_\+samples (
+\paragraph[{push\+\_\+samples(const complex16\+\_\+t $\ast$buffer, const uint32\+\_\+t samples\+Count, const uint8\+\_\+t channels\+Count, uint64\+\_\+t timestamp, const uint32\+\_\+t timeout\+\_\+ms, const uint32\+\_\+t flags=0, uint64\+\_\+t lastchirp\+\_\+timestamp=0, uint64\+\_\+t chirptime=0)}]{\setlength{\rightskip}{0pt plus 5cm}uint32\+\_\+t lime\+::\+Ring\+F\+I\+F\+O\+::push\+\_\+samples (
 \begin{DoxyParamCaption}
 \item[{const {\bf complex16\+\_\+t} $\ast$}]{buffer, }
 \item[{const uint32\+\_\+t}]{samples\+Count, }
 \item[{const uint8\+\_\+t}]{channels\+Count, }
 \item[{uint64\+\_\+t}]{timestamp, }
 \item[{const uint32\+\_\+t}]{timeout\+\_\+ms, }
-\item[{const uint32\+\_\+t}]{flags = {\ttfamily 0}}
+\item[{const uint32\+\_\+t}]{flags = {\ttfamily 0}, }
+\item[{uint64\+\_\+t}]{lastchirp\+\_\+timestamp = {\ttfamily 0}, }
+\item[{uint64\+\_\+t}]{chirptime = {\ttfamily 0}}
 \end{DoxyParamCaption}
-)\hspace{0.3cm}{\ttfamily [inline]}}\label{classlime_1_1RingFIFO_a72300f9751c4dd10b7e6a30588803cfa}
+)\hspace{0.3cm}{\ttfamily [inline]}}\label{classlime_1_1RingFIFO_a283e956a127a6ad95d2d14f5f506ccdf}
 
 
 inserts samples to F\+I\+FO, operation is thread-\/safe 
@@ -301,7 +305,7 @@ Definition at line {\bf 64} of file {\bf fifo.\+h}.
 
 
 
-References {\bf lime\+::\+Samples\+Packet\+::first}, {\bf lime\+::\+Samples\+Packet\+::flags}, {\bf flags}, {\bf has\+Items}, {\bf lime\+::\+Samples\+Packet\+::last}, {\bf lock}, {\bf lime\+::\+Samples\+Packet\+::max\+Samples\+In\+Packet}, {\bf m\+Buffer}, {\bf m\+Buffer\+Size}, {\bf m\+Elements\+Filled}, {\bf m\+Head}, {\bf m\+Tail}, {\bf O\+V\+E\+R\+W\+R\+I\+T\+E\+\_\+\+O\+LD}, {\bf samples}, {\bf S\+Y\+N\+C\+\_\+\+T\+I\+M\+E\+S\+T\+A\+MP}, {\bf t1}, {\bf t2}, and {\bf lime\+::\+Samples\+Packet\+::timestamp}.
+References {\bf lime\+::\+Samples\+Packet\+::chirptime}, {\bf lime\+::\+Samples\+Packet\+::first}, {\bf lime\+::\+Samples\+Packet\+::flags}, {\bf flags}, {\bf has\+Items}, {\bf lime\+::\+Samples\+Packet\+::last}, {\bf lime\+::\+Samples\+Packet\+::lastchirp\+\_\+timestamp}, {\bf lock}, {\bf lime\+::\+Samples\+Packet\+::max\+Samples\+In\+Packet}, {\bf m\+Buffer}, {\bf m\+Buffer\+Size}, {\bf m\+Elements\+Filled}, {\bf m\+Head}, {\bf m\+Tail}, {\bf O\+V\+E\+R\+W\+R\+I\+T\+E\+\_\+\+O\+LD}, {\bf samples}, {\bf S\+Y\+N\+C\+\_\+\+T\+I\+M\+E\+S\+T\+A\+MP}, {\bf t1}, {\bf t2}, and {\bf lime\+::\+Samples\+Packet\+::timestamp}.
 
 
 
@@ -314,7 +318,7 @@ Here is the caller graph for this function\+:
 \begin{figure}[H]
 \begin{center}
 \leavevmode
-\includegraphics[width=350pt]{d2/d97/classlime_1_1RingFIFO_a72300f9751c4dd10b7e6a30588803cfa_icgraph}
+\includegraphics[width=350pt]{d2/d97/classlime_1_1RingFIFO_a283e956a127a6ad95d2d14f5f506ccdf_icgraph}
 \end{center}
 \end{figure}
 
@@ -327,7 +331,7 @@ Here is the caller graph for this function\+:
 \paragraph[{has\+Items}]{\setlength{\rightskip}{0pt plus 5cm}std\+::condition\+\_\+variable lime\+::\+Ring\+F\+I\+F\+O\+::has\+Items\hspace{0.3cm}{\ttfamily [protected]}}\label{classlime_1_1RingFIFO_a5916b95554475303110371a3dc022c24}
 
 
-Definition at line {\bf 186} of file {\bf fifo.\+h}.
+Definition at line {\bf 195} of file {\bf fifo.\+h}.
 
 
 
@@ -338,7 +342,7 @@ Referenced by {\bf pop\+\_\+samples()}, and {\bf push\+\_\+samples()}.
 \paragraph[{lock}]{\setlength{\rightskip}{0pt plus 5cm}std\+::mutex lime\+::\+Ring\+F\+I\+F\+O\+::lock\hspace{0.3cm}{\ttfamily [protected]}}\label{classlime_1_1RingFIFO_a71a641d759a357d3f0d011100b179872}
 
 
-Definition at line {\bf 185} of file {\bf fifo.\+h}.
+Definition at line {\bf 194} of file {\bf fifo.\+h}.
 
 
 
@@ -349,7 +353,7 @@ Referenced by {\bf Clear()}, {\bf lime\+::\+Concurrent\+Queue$<$ T $>$\+::empty(
 \paragraph[{m\+Buffer}]{\setlength{\rightskip}{0pt plus 5cm}{\bf Samples\+Packet}$\ast$ lime\+::\+Ring\+F\+I\+F\+O\+::m\+Buffer\hspace{0.3cm}{\ttfamily [protected]}}\label{classlime_1_1RingFIFO_ad3b9ef198edb51819d6500638d83a2df}
 
 
-Definition at line {\bf 181} of file {\bf fifo.\+h}.
+Definition at line {\bf 190} of file {\bf fifo.\+h}.
 
 
 
@@ -360,7 +364,7 @@ Referenced by {\bf Get\+Info()}, {\bf pop\+\_\+samples()}, {\bf push\+\_\+sample
 \paragraph[{m\+Buffer\+Size}]{\setlength{\rightskip}{0pt plus 5cm}const uint32\+\_\+t lime\+::\+Ring\+F\+I\+F\+O\+::m\+Buffer\+Size\hspace{0.3cm}{\ttfamily [protected]}}\label{classlime_1_1RingFIFO_a3d252067ce4324188b1bc46459e7678a}
 
 
-Definition at line {\bf 180} of file {\bf fifo.\+h}.
+Definition at line {\bf 189} of file {\bf fifo.\+h}.
 
 
 
@@ -371,7 +375,7 @@ Referenced by {\bf Get\+Info()}, {\bf pop\+\_\+samples()}, {\bf push\+\_\+sample
 \paragraph[{m\+Elements\+Filled}]{\setlength{\rightskip}{0pt plus 5cm}uint32\+\_\+t lime\+::\+Ring\+F\+I\+F\+O\+::m\+Elements\+Filled\hspace{0.3cm}{\ttfamily [protected]}}\label{classlime_1_1RingFIFO_a48d0a36f75ecde0cd9b1dc6e47042d20}
 
 
-Definition at line {\bf 184} of file {\bf fifo.\+h}.
+Definition at line {\bf 193} of file {\bf fifo.\+h}.
 
 
 
@@ -382,7 +386,7 @@ Referenced by {\bf Clear()}, {\bf Get\+Info()}, {\bf pop\+\_\+samples()}, and {\
 \paragraph[{m\+Head}]{\setlength{\rightskip}{0pt plus 5cm}uint32\+\_\+t lime\+::\+Ring\+F\+I\+F\+O\+::m\+Head\hspace{0.3cm}{\ttfamily [protected]}}\label{classlime_1_1RingFIFO_afe97521130b0ad257f4cf2dea3f1a699}
 
 
-Definition at line {\bf 182} of file {\bf fifo.\+h}.
+Definition at line {\bf 191} of file {\bf fifo.\+h}.
 
 
 
@@ -393,7 +397,7 @@ Referenced by {\bf Clear()}, {\bf pop\+\_\+samples()}, and {\bf push\+\_\+sample
 \paragraph[{m\+Tail}]{\setlength{\rightskip}{0pt plus 5cm}uint32\+\_\+t lime\+::\+Ring\+F\+I\+F\+O\+::m\+Tail\hspace{0.3cm}{\ttfamily [protected]}}\label{classlime_1_1RingFIFO_a6b05435dbd1b5b466eea5859a3e7166c}
 
 
-Definition at line {\bf 183} of file {\bf fifo.\+h}.
+Definition at line {\bf 192} of file {\bf fifo.\+h}.
 
 
 

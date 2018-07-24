@@ -1,0 +1,70 @@
+\subsection{scatter\+\_\+plot.\+h}
+\label{scatter__plot_8h_source}\index{/home/erik/prefix/default/src/gr-\/radar-\/dev/lib/scatter\+\_\+plot.\+h@{/home/erik/prefix/default/src/gr-\/radar-\/dev/lib/scatter\+\_\+plot.\+h}}
+
+\begin{DoxyCode}
+00001 \textcolor{comment}{/* -*- c++ -*- */}
+00002 \textcolor{comment}{/* }
+00003 \textcolor{comment}{ * Copyright 2014 Communications Engineering Lab, KIT.}
+00004 \textcolor{comment}{ * }
+00005 \textcolor{comment}{ * This is free software; you can redistribute it and/or modify}
+00006 \textcolor{comment}{ * it under the terms of the GNU General Public License as published by}
+00007 \textcolor{comment}{ * the Free Software Foundation; either version 3, or (at your option)}
+00008 \textcolor{comment}{ * any later version.}
+00009 \textcolor{comment}{ * }
+00010 \textcolor{comment}{ * This software is distributed in the hope that it will be useful,}
+00011 \textcolor{comment}{ * but WITHOUT ANY WARRANTY; without even the implied warranty of}
+00012 \textcolor{comment}{ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the}
+00013 \textcolor{comment}{ * GNU General Public License for more details.}
+00014 \textcolor{comment}{ * }
+00015 \textcolor{comment}{ * You should have received a copy of the GNU General Public License}
+00016 \textcolor{comment}{ * along with this software; see the file COPYING.  If not, write to}
+00017 \textcolor{comment}{ * the Free Software Foundation, Inc., 51 Franklin Street,}
+00018 \textcolor{comment}{ * Boston, MA 02110-1301, USA.}
+00019 \textcolor{comment}{ */}
+00020 
+00021 \textcolor{preprocessor}{#include <QApplication>}
+00022 \textcolor{preprocessor}{#include <QTimer>}
+00023 
+00024 \textcolor{preprocessor}{#include <qwt\_plot.h>}
+00025 \textcolor{preprocessor}{#include <qwt\_plot\_grid.h>}
+00026 \textcolor{preprocessor}{#include <qwt\_plot\_curve.h>}
+00027 \textcolor{preprocessor}{#include <qwt\_symbol.h>}
+00028 \textcolor{preprocessor}{#include <qwt\_plot\_marker.h>}
+00029 
+00030 \textcolor{keyword}{namespace }gr \{
+00031     \textcolor{keyword}{namespace }radar \{
+00032         
+00033         \textcolor{keyword}{class }scatter_plot : \textcolor{keyword}{public} QWidget
+00034         \{
+00035         Q\_OBJECT
+00036 
+00037         \textcolor{keyword}{public}:
+00038             scatter_plot(\textcolor{keywordtype}{int} interval, std::vector<float> axis\_x, std::vector<float> axis\_y, 
+      std::vector<float>* x, std::vector<float>* y, std::string label\_x, std::string label\_y, \textcolor{keywordtype}{bool}* xy\_read, 
+      std::string label,
+00039             QWidget* parent = 0);
+00040             ~scatter_plot();
+00041             
+00042         \textcolor{keyword}{private}:
+00043             \textcolor{keywordtype}{int} d_interval;
+00044             std::string d_label_x, d_label_y;
+00045             std::vector<float> d_axis_x, d_axis_y;
+00046             std::vector<float>* d_x, *d_y;
+00047             \textcolor{keywordtype}{bool}* d_xy_read;
+00048             QwtPlot* d_plot;
+00049             QwtSymbol* d_symbol;
+00050             QwtPlotGrid* d_grid;
+00051             std::vector<QwtPlotMarker*> d_marker;
+00052             QTimer *d_timer;
+00053             
+00054         \textcolor{keyword}{protected}:
+00055             \textcolor{keywordtype}{void} resizeEvent(QResizeEvent * event);
+00056             
+00057         \textcolor{keyword}{public} slots:
+00058             \textcolor{keywordtype}{void} refresh();
+00059             
+00060         \};
+00061 
+00062     \}
+00063 \}
+\end{DoxyCode}

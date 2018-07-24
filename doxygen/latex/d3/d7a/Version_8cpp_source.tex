@@ -1,0 +1,30 @@
+\subsection{Version.\+cpp}
+\label{Version_8cpp_source}\index{/home/erik/prefix/default/src/soapysdr/build/lib/\+Version.\+cpp@{/home/erik/prefix/default/src/soapysdr/build/lib/\+Version.\+cpp}}
+
+\begin{DoxyCode}
+00001 \textcolor{comment}{// Copyright (c) 2014-2017 Josh Blum}
+00002 \textcolor{comment}{// SPDX-License-Identifier: BSL-1.0}
+00003 
+00004 \textcolor{preprocessor}{#include <SoapySDR/Version.hpp>}
+00005 \textcolor{preprocessor}{#include <sstream>}
+00006 
+00007 std::string SoapySDR::getAPIVersion(\textcolor{keywordtype}{void})
+00008 \{
+00009     std::stringstream ss;
+00010     ss << std::hex << int((SOAPY\_SDR\_API\_VERSION >> 24) & 0xff) << \textcolor{stringliteral}{"."}
+00011        << std::hex << int((SOAPY\_SDR\_API\_VERSION >> 16) & 0xff) << \textcolor{stringliteral}{"."}
+00012        << std::hex << int((SOAPY\_SDR\_API\_VERSION >> 0) & 0xffff)
+00013        << std::dec;
+00014     \textcolor{keywordflow}{return} ss.str();
+00015 \}
+00016 
+00017 std::string SoapySDR::getABIVersion(\textcolor{keywordtype}{void})
+00018 \{
+00019     \textcolor{keywordflow}{return} SOAPY_SDR_ABI_VERSION;
+00020 \}
+00021 
+00022 std::string SoapySDR::getLibVersion(\textcolor{keywordtype}{void})
+00023 \{
+00024     \textcolor{keywordflow}{return} \textcolor{stringliteral}{"0.7.0-g824d83e8"};
+00025 \}
+\end{DoxyCode}

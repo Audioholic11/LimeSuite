@@ -2,6 +2,7 @@ var searchData=
 [
   ['failed',['FAILED',['../d2/d61/classlime_1_1Si5351C.html#a232443a12bd02c1607bc10bcb1216126a5e4aedbc618e39afe8012fb885a0f20c',1,'lime::Si5351C']]],
   ['failure',['FAILURE',['../d8/d9c/classlime_1_1MCU__BD.html#ac4b5f0a3ed2c7270300bf9117ac62c70a654d64a18719c9b69e6a267c0468ffe2',1,'lime::MCU_BD']]],
+  ['float',['FLOAT',['../d9/dee/classSoapySDR_1_1ArgInfo.html#acf2322d6142ab0ae1f137730b6b54aeda045db7a2cc5466ff8a643177b0d3b15e',1,'SoapySDR::ArgInfo']]],
   ['fmt_5ffloat32',['FMT_FLOAT32',['../d4/d52/structlime_1_1StreamConfig.html#aeba178b2150eaa53f383c88befcd4bc9a83a7ee8d91d13e7081f27a9d018678d8',1,'lime::StreamConfig']]],
   ['fmt_5fint12',['FMT_INT12',['../d4/d52/structlime_1_1StreamConfig.html#aeba178b2150eaa53f383c88befcd4bc9a052e9d49def7858fbbe5a37fed61650d',1,'lime::StreamConfig']]],
   ['fmt_5fint16',['FMT_INT16',['../d4/d52/structlime_1_1StreamConfig.html#aeba178b2150eaa53f383c88befcd4bc9a29b9e9c41981a667cde7ce48ac8977ac',1,'lime::StreamConfig']]],

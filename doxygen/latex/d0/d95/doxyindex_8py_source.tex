@@ -1,0 +1,242 @@
+\subsection{doxyindex.\+py}
+\label{doxyindex_8py_source}\index{/home/erik/prefix/default/src/gr-\/radar-\/dev/docs/doxygen/doxyxml/doxyindex.\+py@{/home/erik/prefix/default/src/gr-\/radar-\/dev/docs/doxygen/doxyxml/doxyindex.\+py}}
+
+\begin{DoxyCode}
+00001 \textcolor{comment}{#}
+00002 \textcolor{comment}{# Copyright 2010 Free Software Foundation, Inc.}
+00003 \textcolor{comment}{#}
+00004 \textcolor{comment}{# This file is part of GNU Radio}
+00005 \textcolor{comment}{#}
+00006 \textcolor{comment}{# GNU Radio is free software; you can redistribute it and/or modify}
+00007 \textcolor{comment}{# it under the terms of the GNU General Public License as published by}
+00008 \textcolor{comment}{# the Free Software Foundation; either version 3, or (at your option)}
+00009 \textcolor{comment}{# any later version.}
+00010 \textcolor{comment}{#}
+00011 \textcolor{comment}{# GNU Radio is distributed in the hope that it will be useful,}
+00012 \textcolor{comment}{# but WITHOUT ANY WARRANTY; without even the implied warranty of}
+00013 \textcolor{comment}{# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the}
+00014 \textcolor{comment}{# GNU General Public License for more details.}
+00015 \textcolor{comment}{#}
+00016 \textcolor{comment}{# You should have received a copy of the GNU General Public License}
+00017 \textcolor{comment}{# along with GNU Radio; see the file COPYING.  If not, write to}
+00018 \textcolor{comment}{# the Free Software Foundation, Inc., 51 Franklin Street,}
+00019 \textcolor{comment}{# Boston, MA 02110-1301, USA.}
+00020 \textcolor{comment}{#}
+00021 \textcolor{stringliteral}{"""}
+00022 \textcolor{stringliteral}{Classes providing more user-friendly interfaces to the doxygen xml}
+00023 \textcolor{stringliteral}{docs than the generated classes provide.}
+00024 \textcolor{stringliteral}{"""}
+00025 
+00026 \textcolor{keyword}{import} os
+00027 
+00028 \textcolor{keyword}{from} generated \textcolor{keyword}{import} index
+00029 \textcolor{keyword}{from} base \textcolor{keyword}{import} Base
+00030 \textcolor{keyword}{from} text \textcolor{keyword}{import} description
+00031 
+00032 \textcolor{keyword}{class }DoxyIndex(Base):
+00033     \textcolor{stringliteral}{"""}
+00034 \textcolor{stringliteral}{    Parses a doxygen xml directory.}
+00035 \textcolor{stringliteral}{    """}
+00036 
+00037     \_\_module\_\_ = \textcolor{stringliteral}{"gnuradio.utils.doxyxml"}
+00038 
+00039     \textcolor{keyword}{def }_parse(self):
+00040         \textcolor{keywordflow}{if} self.\_parsed:
+00041             \textcolor{keywordflow}{return}
+00042         super(DoxyIndex, self)._parse()
+00043         self._root = index.parse(os.path.join(self.\_xml\_path, \textcolor{stringliteral}{'index.xml'}))
+00044         \textcolor{keywordflow}{for} mem \textcolor{keywordflow}{in} self.\_root.compound:
+00045             converted = self.convert\_mem(mem)
+00046             \textcolor{comment}{# For files we want the contents to be accessible directly}
+00047             \textcolor{comment}{# from the parent rather than having to go through the file}
+00048             \textcolor{comment}{# object.}
+00049             \textcolor{keywordflow}{if} self.get\_cls(mem) == DoxyFile:
+00050                 \textcolor{keywordflow}{if} mem.name.endswith(\textcolor{stringliteral}{'.h'}):
+00051                     self.\_members += converted.members()
+00052                     self.\_members.append(converted)
+00053             \textcolor{keywordflow}{else}:
+00054                 self.\_members.append(converted)
+00055 
+00056 
+00057 \textcolor{keyword}{def }generate_swig_doc_i(self):
+00058     \textcolor{stringliteral}{"""}
+00059 \textcolor{stringliteral}{    %feature("docstring") gr\_make\_align\_on\_samplenumbers\_ss::align\_state "}
+00060 \textcolor{stringliteral}{    Wraps the C++: gr\_align\_on\_samplenumbers\_ss::align\_state";}
+00061 \textcolor{stringliteral}{    """}
+00062     \textcolor{keywordflow}{pass}
+00063 
+00064 
+00065 \textcolor{keyword}{class }DoxyCompMem(Base):
+00066 
+00067 
+00068     kind = \textcolor{keywordtype}{None}
+00069 
+00070     \textcolor{keyword}{def }__init__(self, *args, **kwargs):
+00071         super(DoxyCompMem, self).__init__(*args, **kwargs)
+00072 
+00073     @classmethod
+00074     \textcolor{keyword}{def }can_parse(cls, obj):
+00075         \textcolor{keywordflow}{return} obj.kind == cls.kind
+00076 
+00077     \textcolor{keyword}{def }set_descriptions(self, parse\_data):
+00078         bd = description(getattr(parse\_data, \textcolor{stringliteral}{'briefdescription'}, \textcolor{keywordtype}{None}))
+00079         dd = description(getattr(parse\_data, \textcolor{stringliteral}{'detaileddescription'}, \textcolor{keywordtype}{None}))
+00080         self.\_data[\textcolor{stringliteral}{'brief\_description'}] = bd
+00081         self.\_data[\textcolor{stringliteral}{'detailed\_description'}] = dd
+00082 
+00083 \textcolor{keyword}{class }DoxyCompound(DoxyCompMem):
+00084     \textcolor{keywordflow}{pass}
+00085 
+00086 \textcolor{keyword}{class }DoxyMember(DoxyCompMem):
+00087     \textcolor{keywordflow}{pass}
+00088 
+00089 
+00090 \textcolor{keyword}{class }DoxyFunction(DoxyMember):
+00091 
+00092     \_\_module\_\_ = \textcolor{stringliteral}{"gnuradio.utils.doxyxml"}
+00093 
+00094     kind = \textcolor{stringliteral}{'function'}
+00095 
+00096     \textcolor{keyword}{def }_parse(self):
+00097         \textcolor{keywordflow}{if} self.\_parsed:
+00098             \textcolor{keywordflow}{return}
+00099         super(DoxyFunction, self)._parse()
+00100         self.set_descriptions(self.\_parse\_data)
+00101         self.\_data[\textcolor{stringliteral}{'params'}] = []
+00102         prms = self.\_parse\_data.param
+00103         \textcolor{keywordflow}{for} prm \textcolor{keywordflow}{in} prms:
+00104             self.\_data[\textcolor{stringliteral}{'params'}].append(DoxyParam(prm))
+00105 
+00106     brief\_description = property(\textcolor{keyword}{lambda} self: self.data()[\textcolor{stringliteral}{'brief\_description'}])
+00107     detailed\_description = property(\textcolor{keyword}{lambda} self: self.data()[\textcolor{stringliteral}{'detailed\_description'}])
+00108     params = property(\textcolor{keyword}{lambda} self: self.data()[\textcolor{stringliteral}{'params'}])
+00109 
+00110 Base.mem\_classes.append(DoxyFunction)
+00111 
+00112 
+00113 \textcolor{keyword}{class }DoxyParam(DoxyMember):
+00114 
+00115     \_\_module\_\_ = \textcolor{stringliteral}{"gnuradio.utils.doxyxml"}
+00116 
+00117     \textcolor{keyword}{def }_parse(self):
+00118         \textcolor{keywordflow}{if} self.\_parsed:
+00119             \textcolor{keywordflow}{return}
+00120         super(DoxyParam, self)._parse()
+00121         self.set_descriptions(self.\_parse\_data)
+00122         self.\_data[\textcolor{stringliteral}{'declname'}] = self.\_parse\_data.declname
+00123 
+00124     brief\_description = property(\textcolor{keyword}{lambda} self: self.data()[\textcolor{stringliteral}{'brief\_description'}])
+00125     detailed\_description = property(\textcolor{keyword}{lambda} self: self.data()[\textcolor{stringliteral}{'detailed\_description'}])
+00126     declname = property(\textcolor{keyword}{lambda} self: self.data()[\textcolor{stringliteral}{'declname'}])
+00127 
+00128 \textcolor{keyword}{class }DoxyClass(DoxyCompound):
+00129 
+00130     \_\_module\_\_ = \textcolor{stringliteral}{"gnuradio.utils.doxyxml"}
+00131 
+00132     kind = \textcolor{stringliteral}{'class'}
+00133 
+00134     \textcolor{keyword}{def }_parse(self):
+00135         \textcolor{keywordflow}{if} self.\_parsed:
+00136             \textcolor{keywordflow}{return}
+00137         super(DoxyClass, self)._parse()
+00138         self.retrieve\_data()
+00139         \textcolor{keywordflow}{if} self.\_error:
+00140             \textcolor{keywordflow}{return}
+00141         self.set_descriptions(self.\_retrieved\_data.compounddef)
+00142         \textcolor{comment}{# Sectiondef.kind tells about whether private or public.}
+00143         \textcolor{comment}{# We just ignore this for now.}
+00144         self.process\_memberdefs()
+00145 
+00146     brief\_description = property(\textcolor{keyword}{lambda} self: self.data()[\textcolor{stringliteral}{'brief\_description'}])
+00147     detailed\_description = property(\textcolor{keyword}{lambda} self: self.data()[\textcolor{stringliteral}{'detailed\_description'}])
+00148 
+00149 Base.mem\_classes.append(DoxyClass)
+00150 
+00151 
+00152 \textcolor{keyword}{class }DoxyFile(DoxyCompound):
+00153 
+00154     \_\_module\_\_ = \textcolor{stringliteral}{"gnuradio.utils.doxyxml"}
+00155 
+00156     kind = \textcolor{stringliteral}{'file'}
+00157 
+00158     \textcolor{keyword}{def }_parse(self):
+00159         \textcolor{keywordflow}{if} self.\_parsed:
+00160             \textcolor{keywordflow}{return}
+00161         super(DoxyFile, self)._parse()
+00162         self.retrieve\_data()
+00163         self.set_descriptions(self.\_retrieved\_data.compounddef)
+00164         \textcolor{keywordflow}{if} self.\_error:
+00165             \textcolor{keywordflow}{return}
+00166         self.process\_memberdefs()
+00167 
+00168     brief\_description = property(\textcolor{keyword}{lambda} self: self.data()[\textcolor{stringliteral}{'brief\_description'}])
+00169     detailed\_description = property(\textcolor{keyword}{lambda} self: self.data()[\textcolor{stringliteral}{'detailed\_description'}])
+00170 
+00171 Base.mem\_classes.append(DoxyFile)
+00172 
+00173 
+00174 \textcolor{keyword}{class }DoxyNamespace(DoxyCompound):
+00175 
+00176     \_\_module\_\_ = \textcolor{stringliteral}{"gnuradio.utils.doxyxml"}
+00177 
+00178     kind = \textcolor{stringliteral}{'namespace'}
+00179 
+00180 Base.mem\_classes.append(DoxyNamespace)
+00181 
+00182 
+00183 \textcolor{keyword}{class }DoxyGroup(DoxyCompound):
+00184 
+00185     \_\_module\_\_ = \textcolor{stringliteral}{"gnuradio.utils.doxyxml"}
+00186 
+00187     kind = \textcolor{stringliteral}{'group'}
+00188 
+00189     \textcolor{keyword}{def }_parse(self):
+00190         \textcolor{keywordflow}{if} self.\_parsed:
+00191             \textcolor{keywordflow}{return}
+00192         super(DoxyGroup, self)._parse()
+00193         self.retrieve\_data()
+00194         \textcolor{keywordflow}{if} self.\_error:
+00195             \textcolor{keywordflow}{return}
+00196         cdef = self.\_retrieved\_data.compounddef
+00197         self.\_data[\textcolor{stringliteral}{'title'}] = description(cdef.title)
+00198         \textcolor{comment}{# Process inner groups}
+00199         grps = cdef.innergroup
+00200         \textcolor{keywordflow}{for} grp \textcolor{keywordflow}{in} grps:
+00201             converted = DoxyGroup.from\_refid(grp.refid, top=self.top)
+00202             self.\_members.append(converted)
+00203         \textcolor{comment}{# Process inner classes}
+00204         klasses = cdef.innerclass
+00205         \textcolor{keywordflow}{for} kls \textcolor{keywordflow}{in} klasses:
+00206             converted = DoxyClass.from\_refid(kls.refid, top=self.top)
+00207             self.\_members.append(converted)
+00208         \textcolor{comment}{# Process normal members}
+00209         self.process\_memberdefs()
+00210 
+00211     title = property(\textcolor{keyword}{lambda} self: self.data()[\textcolor{stringliteral}{'title'}])
+00212 
+00213 
+00214 Base.mem\_classes.append(DoxyGroup)
+00215 
+00216 
+00217 \textcolor{keyword}{class }DoxyFriend(DoxyMember):
+00218 
+00219     \_\_module\_\_ = \textcolor{stringliteral}{"gnuradio.utils.doxyxml"}
+00220 
+00221     kind = \textcolor{stringliteral}{'friend'}
+00222 
+00223 Base.mem\_classes.append(DoxyFriend)
+00224 
+00225 
+00226 \textcolor{keyword}{class }DoxyOther(Base):
+00227 
+00228     \_\_module\_\_ = \textcolor{stringliteral}{"gnuradio.utils.doxyxml"}
+00229 
+00230     kinds = set([\textcolor{stringliteral}{'variable'}, \textcolor{stringliteral}{'struct'}, \textcolor{stringliteral}{'union'}, \textcolor{stringliteral}{'define'}, \textcolor{stringliteral}{'typedef'}, \textcolor{stringliteral}{'enum'}, \textcolor{stringliteral}{'dir'}, \textcolor{stringliteral}{'page'}])
+00231 
+00232     @classmethod
+00233     \textcolor{keyword}{def }can_parse(cls, obj):
+00234         \textcolor{keywordflow}{return} obj.kind \textcolor{keywordflow}{in} cls.kinds
+00235 
+00236 Base.mem\_classes.append(DoxyOther)
+00237 
+\end{DoxyCode}

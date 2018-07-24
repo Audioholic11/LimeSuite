@@ -4,7 +4,7 @@
  * and open the template in the editor.
  */
 
-/* 
+/*
  * File:   Streamer.h
  * Author: ignas
  *
@@ -20,7 +20,7 @@
 
 namespace lime
 {
-   
+
 class IConnection;
 class FPGA;
 class Streamer;
@@ -68,7 +68,7 @@ struct LIME_API StreamConfig
     StreamDataFormat linkFormat;
 };
 
-class LIME_API StreamChannel 
+class LIME_API StreamChannel
 {
 public:
     struct Frame
@@ -77,13 +77,15 @@ public:
         static const uint16_t samplesCount = samples12InPkt;
         complex16_t samples[samplesCount];
     };
-    
+
     struct Metadata
     {
         uint64_t timestamp;
         uint32_t flags;
+        uint64_t lastchirp_timestamp;
+        uint64_t chirptime;
     };
-    
+
     struct Info
     {
         int fifoSize;
@@ -95,11 +97,11 @@ public:
         int droppedPackets;
         uint64_t timestamp;
     };
-    
+
     StreamChannel(Streamer* streamer);
     ~StreamChannel();
-    
-    
+
+
     void Setup(StreamConfig conf);
     void Close();
     int Read(void* samples, const uint32_t count, Metadata* meta, const int32_t timeout_ms = 100);
@@ -117,11 +119,11 @@ public:
     unsigned pktLost;
     bool mActive;
     bool used;
-       
+
 protected:
-    RingFIFO* fifo;  
+    RingFIFO* fifo;
 };
-    
+
 class Streamer
 {
 public:
@@ -133,6 +135,8 @@ public:
 
     uint64_t GetHardwareTimestamp(void);
     void SetHardwareTimestamp(const uint64_t now);
+    uint64_t GetChirpTimePeriod(void);
+    uint64_t GetChirpTimeStamp(void);
     int UpdateThreads(bool stopAll = false);
 
     std::atomic<uint32_t> rxDataRate_Bps;
@@ -147,6 +151,8 @@ public:
     std::vector<StreamChannel> mTxStreams;
     std::atomic<uint64_t> rxLastTimestamp;
     std::atomic<uint64_t> txLastTimestamp;
+    std::atomic<uint64_t> chirpLastTimeStamp;
+    std::atomic<uint64_t> chirpLastTimePeriod;
     uint64_t mTimestampOffset;
     int streamSize;
     unsigned txBatchSize;
@@ -167,4 +173,3 @@ private:
 }
 
 #endif /* STREAMER_H */
-

@@ -1,0 +1,123 @@
+\subsection{gr\+:\+:radar\+:\+:tracking\+\_\+singletarget Class Reference}
+\label{classgr_1_1radar_1_1tracking__singletarget}\index{gr\+::radar\+::tracking\+\_\+singletarget@{gr\+::radar\+::tracking\+\_\+singletarget}}
+
+
+This block tracks a singletarget detection with a particle or kalman filter. As input values with identifiers \textquotesingle{}range\textquotesingle{} and \textquotesingle{}velocity\textquotesingle{} are needed and should hold a f32vector with only one element. All input variables tagged with std gives the standard deviation of the parameter. The threshold\+\_\+track is a value which decides with the likelihood of the data if the new data is accepted as a track. A good starting value is threshold\+\_\+track = 0.\+001. threshold\+\_\+lost is the number of false tracks unitel the track is lost and the tracker begins with a new one. The string filter decides which tracking kernel should be used. \textquotesingle{}kalman\textquotesingle{} or \textquotesingle{}particle\textquotesingle{} are valid. If \textquotesingle{}particle\textquotesingle{} is chosen num\+\_\+particle gives the number of particles for the particle filter. If \textquotesingle{}kalman\textquotesingle{} is chosen there is no effect on the tracker.  
+
+
+
+
+{\ttfamily \#include $<$tracking\+\_\+singletarget.\+h$>$}
+
+
+
+Inheritance diagram for gr\+:\+:radar\+:\+:tracking\+\_\+singletarget\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=231pt]{d0/d8a/classgr_1_1radar_1_1tracking__singletarget__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for gr\+:\+:radar\+:\+:tracking\+\_\+singletarget\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=173pt]{d9/dcf/classgr_1_1radar_1_1tracking__singletarget__coll__graph}
+\end{center}
+\end{figure}
+\subsubsection*{Public Types}
+\begin{DoxyCompactItemize}
+\item 
+typedef boost\+::shared\+\_\+ptr$<$ {\bf tracking\+\_\+singletarget} $>$ {\bf sptr}
+\end{DoxyCompactItemize}
+\subsubsection*{Static Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+static {\bf sptr} {\bf make} ({\bf int} num\+\_\+particle, float std\+\_\+range\+\_\+meas, float std\+\_\+velocity\+\_\+meas, float std\+\_\+accel\+\_\+sys, float threshold\+\_\+track, {\bf int} threshold\+\_\+lost, {\bf std\+::string} {\bf filter})
+\begin{DoxyCompactList}\small\item\em Return a shared\+\_\+ptr to a new instance of \doxyref{radar\+::tracking\+\_\+singletarget}{p.}{d9/d1c/classgr_1_1radar_1_1tracking__singletarget}. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsubsection{Detailed Description}
+This block tracks a singletarget detection with a particle or kalman filter. As input values with identifiers \textquotesingle{}range\textquotesingle{} and \textquotesingle{}velocity\textquotesingle{} are needed and should hold a f32vector with only one element. All input variables tagged with std gives the standard deviation of the parameter. The threshold\+\_\+track is a value which decides with the likelihood of the data if the new data is accepted as a track. A good starting value is threshold\+\_\+track = 0.\+001. threshold\+\_\+lost is the number of false tracks unitel the track is lost and the tracker begins with a new one. The string filter decides which tracking kernel should be used. \textquotesingle{}kalman\textquotesingle{} or \textquotesingle{}particle\textquotesingle{} are valid. If \textquotesingle{}particle\textquotesingle{} is chosen num\+\_\+particle gives the number of particles for the particle filter. If \textquotesingle{}kalman\textquotesingle{} is chosen there is no effect on the tracker. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em num\+\_\+particle} & Number of particles for particle filter. There is no effect if kalman filter is chosen. \\
+\hline
+{\em std\+\_\+range\+\_\+meas} & Standard deviation of the range measurement \\
+\hline
+{\em std\+\_\+velocity\+\_\+meas} & Standard deviation of the velocity measurement \\
+\hline
+{\em std\+\_\+accel\+\_\+sys} & Standard deviation of the system acceleration \\
+\hline
+{\em threshold\+\_\+track} & Value to decide if data is valid for the track \\
+\hline
+{\em theshold\+\_\+lost} & Number of false tracks until the current track is lost \\
+\hline
+{\em filter} & Filter kernel to be used. \textquotesingle{}kalman\textquotesingle{} or \textquotesingle{}particle\textquotesingle{} are valid. \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line {\bf 45} of file {\bf tracking\+\_\+singletarget.\+h}.
+
+
+
+\subsubsection{Member Typedef Documentation}
+\index{gr\+::radar\+::tracking\+\_\+singletarget@{gr\+::radar\+::tracking\+\_\+singletarget}!sptr@{sptr}}
+\index{sptr@{sptr}!gr\+::radar\+::tracking\+\_\+singletarget@{gr\+::radar\+::tracking\+\_\+singletarget}}
+\paragraph[{sptr}]{\setlength{\rightskip}{0pt plus 5cm}typedef boost\+::shared\+\_\+ptr$<${\bf tracking\+\_\+singletarget}$>$ {\bf gr\+::radar\+::tracking\+\_\+singletarget\+::sptr}}\label{classgr_1_1radar_1_1tracking__singletarget_a2c7519146ed63bff2b19fe66fd239f15}
+
+
+Definition at line {\bf 48} of file {\bf tracking\+\_\+singletarget.\+h}.
+
+
+
+\subsubsection{Member Function Documentation}
+\index{gr\+::radar\+::tracking\+\_\+singletarget@{gr\+::radar\+::tracking\+\_\+singletarget}!make@{make}}
+\index{make@{make}!gr\+::radar\+::tracking\+\_\+singletarget@{gr\+::radar\+::tracking\+\_\+singletarget}}
+\paragraph[{make(int num\+\_\+particle, float std\+\_\+range\+\_\+meas, float std\+\_\+velocity\+\_\+meas, float std\+\_\+accel\+\_\+sys, float threshold\+\_\+track, int threshold\+\_\+lost, std\+::string filter)}]{\setlength{\rightskip}{0pt plus 5cm}{\bf tracking\+\_\+singletarget\+::sptr} gr\+::radar\+::tracking\+\_\+singletarget\+::make (
+\begin{DoxyParamCaption}
+\item[{{\bf int}}]{num\+\_\+particle, }
+\item[{float}]{std\+\_\+range\+\_\+meas, }
+\item[{float}]{std\+\_\+velocity\+\_\+meas, }
+\item[{float}]{std\+\_\+accel\+\_\+sys, }
+\item[{float}]{threshold\+\_\+track, }
+\item[{{\bf int}}]{threshold\+\_\+lost, }
+\item[{{\bf std\+::string}}]{filter}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [static]}}\label{classgr_1_1radar_1_1tracking__singletarget_a6c3641b3a6dc68b5331d90c6d7d558a6}
+
+
+Return a shared\+\_\+ptr to a new instance of \doxyref{radar\+::tracking\+\_\+singletarget}{p.}{d9/d1c/classgr_1_1radar_1_1tracking__singletarget}. 
+
+To avoid accidental use of raw pointers, \doxyref{radar\+::tracking\+\_\+singletarget}{p.}{d9/d1c/classgr_1_1radar_1_1tracking__singletarget}\textquotesingle{}s constructor is in a private implementation class. \doxyref{radar\+::tracking\+\_\+singletarget\+::make}{p.}{d9/d1c/classgr_1_1radar_1_1tracking__singletarget_a6c3641b3a6dc68b5331d90c6d7d558a6} is the public interface for creating new instances. 
+
+Definition at line {\bf 33} of file {\bf tracking\+\_\+singletarget\+\_\+impl.\+cc}.
+
+
+
+Referenced by {\bf \+\_\+wrap\+\_\+tracking\+\_\+singletarget\+\_\+make()}.
+
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{d9/d1c/classgr_1_1radar_1_1tracking__singletarget_a6c3641b3a6dc68b5331d90c6d7d558a6_icgraph}
+\end{center}
+\end{figure}
+
+
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+/home/erik/prefix/default/src/gr-\/radar-\/dev/include/radar/{\bf tracking\+\_\+singletarget.\+h}\item 
+/home/erik/prefix/default/src/gr-\/radar-\/dev/lib/{\bf tracking\+\_\+singletarget\+\_\+impl.\+cc}\end{DoxyCompactItemize}

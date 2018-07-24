@@ -1,0 +1,31 @@
+\subsection{Error\+Helpers.\+hpp}
+\label{ErrorHelpers_8hpp_source}\index{/home/erik/prefix/default/src/soapysdr/lib/\+Error\+Helpers.\+hpp@{/home/erik/prefix/default/src/soapysdr/lib/\+Error\+Helpers.\+hpp}}
+
+\begin{DoxyCode}
+00001 \textcolor{comment}{// Copyright (c) 2016-2016 Josh Blum}
+00002 \textcolor{comment}{// SPDX-License-Identifier: BSL-1.0}
+00003 
+00004 \textcolor{preprocessor}{#pragma once}
+00005 \textcolor{preprocessor}{#include <SoapySDR/Config.hpp>}
+00006 \textcolor{preprocessor}{#include <stdexcept>}
+00007 
+00008 \textcolor{comment}{/*******************************************************************}
+00009 \textcolor{comment}{ * Helper macros for dealing with error messages}
+00010 \textcolor{comment}{ ******************************************************************/}
+00011 
+00013 \textcolor{preprocessor}{#define \_\_SOAPY\_SDR\_C\_TRY \(\backslash\)}
+00014 \textcolor{preprocessor}{    SoapySDRDevice\_clearError(); try \{}
+00015 
+00017 \textcolor{preprocessor}{#define \_\_SOAPY\_SDR\_C\_CATCH\_RET(ret) \} \(\backslash\)}
+00018 \textcolor{preprocessor}{    catch (const std::exception &ex) \{ SoapySDRDevice\_reportError(ex.what()); return ret; \} \(\backslash\)}
+00019 \textcolor{preprocessor}{    catch (...) \{ SoapySDRDevice\_reportError("unknown"); return ret; \}}
+00020 
+00022 \textcolor{preprocessor}{#define \_\_SOAPY\_SDR\_C\_CATCH \(\backslash\)}
+00023 \textcolor{preprocessor}{    \_\_SOAPY\_SDR\_C\_CATCH\_RET(-1) return 0;}
+00024 
+00026 \textcolor{preprocessor}{#define SoapySDRVoidRet}
+00027 
+00029 \textcolor{keywordtype}{void} SoapySDRDevice_clearError(\textcolor{keywordtype}{void});
+00030 
+00032 \textcolor{keywordtype}{void} SoapySDRDevice_reportError(\textcolor{keyword}{const} \textcolor{keywordtype}{char} *msg);
+\end{DoxyCode}

@@ -68,13 +68,13 @@ int StreamChannel::Write(const void* samples, const uint32_t count, const Metada
         for(size_t i=0; i<2*count; ++i)
             samplesShort[i] = samplesFloat[i]*32767.0f;
         const complex16_t* ptr = (const complex16_t*)samplesShort ;
-        pushed = fifo->push_samples(ptr, count, 1, meta->timestamp, timeout_ms, meta->flags);
+        pushed = fifo->push_samples(ptr, count, 1, meta->timestamp, timeout_ms, meta->flags, meta->lastchirp_timestamp,meta->chirptime);
         delete[] samplesShort;
     }
     else
     {
         const complex16_t* ptr = (const complex16_t*)samples;
-        pushed = fifo->push_samples(ptr, count, 1, meta->timestamp, timeout_ms, meta->flags);
+        pushed = fifo->push_samples(ptr, count, 1, meta->timestamp, timeout_ms, meta->flags, meta->lastchirp_timestamp,meta->chirptime);
     }
     return pushed;
 }
@@ -88,7 +88,7 @@ int StreamChannel::Read(void* samples, const uint32_t count, Metadata* meta, con
         complex16_t* ptr = (complex16_t*)samples;
         int16_t* samplesShort = (int16_t*)samples;
         float* samplesFloat = (float*)samples;
-        popped = fifo->pop_samples(ptr, count, 1, &meta->timestamp, timeout_ms, &meta->flags);
+        popped = fifo->pop_samples(ptr, count, 1, &meta->timestamp, timeout_ms, &meta->flags, &meta->lastchirp_timestamp, &meta->chirptime);
         for(int i=2*popped-1; i>=0; --i)
             samplesFloat[i] = (float)samplesShort[i]/32767.0f;
     }
@@ -161,6 +161,8 @@ Streamer::Streamer(FPGA* f, LMS7002M* chip, int id) : mRxStreams(2, this), mTxSt
     dataPort = f->GetConnection();
     mTimestampOffset = 0;
     rxLastTimestamp = 0;
+    chirpLastTimeStamp = 0;
+    chirpLastTimePeriod = 0;
     terminateRx = false;
     terminateTx = false;
     rxDataRate_Bps = 0;
@@ -168,6 +170,8 @@ Streamer::Streamer(FPGA* f, LMS7002M* chip, int id) : mRxStreams(2, this), mTxSt
     txBatchSize = 1;
     rxBatchSize = 1;
     streamSize = 1;
+    //rxChirpLength = 0;
+    //rxLastchirp = 0;
 }
 
 Streamer::~Streamer()
@@ -250,6 +254,40 @@ uint64_t Streamer::GetHardwareTimestamp(void)
 void Streamer::SetHardwareTimestamp(const uint64_t now)
 {
     mTimestampOffset = now - rxLastTimestamp.load();
+}
+
+uint64_t Streamer::GetChirpTimePeriod(void)
+{
+    if(!(rxThread.joinable() || txThread.joinable()))
+    {
+        //stop streaming just in case the board has not been configured
+        dataPort->WriteRegister(0xFFFF, 1 << chipId);
+        fpga->StopStreaming();
+        fpga->ResetTimestamp();
+        mTimestampOffset = 0;
+        return 0;
+    }
+    else
+    {
+        return chirpLastTimePeriod.load();
+    }
+}
+
+uint64_t Streamer::GetChirpTimeStamp(void)
+{
+    if(!(rxThread.joinable() || txThread.joinable()))
+    {
+        //stop streaming just in case the board has not been configured
+        dataPort->WriteRegister(0xFFFF, 1 << chipId);
+        fpga->StopStreaming();
+        fpga->ResetTimestamp();
+        mTimestampOffset = 0;
+        return 0;
+    }
+    else
+    {
+        return chirpLastTimeStamp.load()+mTimestampOffset;
+    }
 }
 
 void Streamer::RstRxIQGen()
@@ -642,7 +680,7 @@ void Streamer::TransmitPacketsLoop()
     const bool packed = dataLinkFormat == StreamConfig::FMT_INT12;
     const int epIndex = chipId;
     const uint8_t buffersCount = dataPort->GetBuffersCount();
-    const uint8_t packetsToBatch = dataPort->CheckStreamSize(rxBatchSize);
+    const uint8_t packetsToBatch = dataPort->CheckStreamSize(txBatchSize);
     const uint32_t bufferSize = packetsToBatch*sizeof(FPGA_DataPacket);
     const uint32_t popTimeout_ms = 500;
 
@@ -859,6 +897,7 @@ void Streamer::ReceivePacketsLoop()
         {
             const FPGA_DataPacket* pkt = (FPGA_DataPacket*)&buffers[bi*bufferSize];
             const uint8_t byte0 = pkt[pktIndex].reserved[0];
+
             if ((byte0 & (1 << 3)) != 0 && !txLate) //report only once per batch
             {
                 txLate = true;
@@ -884,11 +923,15 @@ void Streamer::ReceivePacketsLoop()
             }
             prevTs = pkt[pktIndex].counter;
             rxLastTimestamp.store(prevTs);
+
+            chirpLastTimeStamp.store(pkt[pktIndex].ftr0);
+            chirpLastTimePeriod.store(pkt[pktIndex].ftr1);
+
             //parse samples
             std::vector<complex16_t*> dest(chCount);
             for(uint8_t c=0; c<chCount; ++c)
                 dest[c] = (chFrames[c].samples);
-            int samplesCount = FPGA::FPGAPacketPayload2Samples(pktStart, 4080, chCount==2, packed, dest.data());
+            int samplesCount = FPGA::FPGAPacketPayload2Samples(pktStart, dataLength, chCount==2, packed, dest.data());
 
             for(int ch=0; ch<maxChannelCount; ++ch)
             {
@@ -897,6 +940,8 @@ void Streamer::ReceivePacketsLoop()
                 const int ind = chCount == maxChannelCount ? ch : 0;
                 StreamChannel::Metadata meta;
                 meta.timestamp = pkt[pktIndex].counter;
+                meta.lastchirp_timestamp = pkt[pktIndex].ftr0;
+                meta.chirptime = pkt[pktIndex].ftr1;
                 meta.flags = RingFIFO::OVERWRITE_OLD | RingFIFO::SYNC_TIMESTAMP;
                 int samplesPushed = mRxStreams[ch].Write((const void*)chFrames[ind].samples, samplesCount, &meta, 100);
                 if(samplesPushed != samplesCount)

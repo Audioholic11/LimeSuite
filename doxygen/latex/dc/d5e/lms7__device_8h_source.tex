@@ -102,34 +102,36 @@
 00092     \textcolor{keywordtype}{int} DestroyStream(lime::StreamChannel* streamID);
 00093     uint64\_t GetHardwareTimestamp(\textcolor{keywordtype}{void}) \textcolor{keyword}{const};
 00094     \textcolor{keywordtype}{void} SetHardwareTimestamp(\textcolor{keyword}{const} uint64\_t now);
-00095 
-00096     \textcolor{keywordtype}{int} MCU\_AGCStart(uint32\_t wantedRSSI);
-00097     \textcolor{keywordtype}{int} MCU\_AGCStop();
-00098 
-00099 \textcolor{keyword}{protected}:
+00095     uint64\_t GetChirpTimePeriod(\textcolor{keywordtype}{void}) \textcolor{keyword}{const};
+00096     uint64\_t GetChirpTimeStamp(\textcolor{keywordtype}{void}) \textcolor{keyword}{const};
+00097 
+00098     \textcolor{keywordtype}{int} MCU\_AGCStart(uint32\_t wantedRSSI);
+00099     \textcolor{keywordtype}{int} MCU\_AGCStop();
 00100 
-00101     \textcolor{keyword}{struct }ChannelInfo
-00102     \{
-00103     \textcolor{keyword}{public}:
-00104         ChannelInfo():lpf\_bw(5e6),cF\_offset\_nco(0),sample\_rate(30e6),freq(-1.0)\{\}
-00105         \textcolor{keywordtype}{double} lpf_bw;
-00106         \textcolor{keywordtype}{double} cF_offset_nco;
-00107         \textcolor{keywordtype}{double} sample_rate;
-00108         \textcolor{keywordtype}{double} freq;
-00109     \};
-00110     lms_dev_info_t devInfo;
-00111     std::vector<ChannelInfo> tx_channels;
-00112     std::vector<ChannelInfo> rx_channels;
-00113     lime::IConnection* connection;
-00114     std::vector<lime::LMS7002M*> lms_list;
-00115     lime::LMS7002M* SelectChannel(\textcolor{keywordtype}{unsigned} chan) \textcolor{keyword}{const};
-00116     \textcolor{keywordtype}{int} ConfigureTXLPF(\textcolor{keywordtype}{bool} enabled,\textcolor{keywordtype}{int} ch, \textcolor{keywordtype}{double} bandwidth);
-00117     \textcolor{keywordtype}{unsigned} lms_chip_id;
-00118     std::vector<lime::Streamer*> mStreamers;
-00119     lime::FPGA* fpga;
-00120 \};
-00121 
-00122 \}
+00101 \textcolor{keyword}{protected}:
+00102 
+00103     \textcolor{keyword}{struct }ChannelInfo
+00104     \{
+00105     \textcolor{keyword}{public}:
+00106         ChannelInfo():lpf\_bw(5e6),cF\_offset\_nco(0),sample\_rate(30e6),freq(-1.0)\{\}
+00107         \textcolor{keywordtype}{double} lpf_bw;
+00108         \textcolor{keywordtype}{double} cF_offset_nco;
+00109         \textcolor{keywordtype}{double} sample_rate;
+00110         \textcolor{keywordtype}{double} freq;
+00111     \};
+00112     lms_dev_info_t devInfo;
+00113     std::vector<ChannelInfo> tx_channels;
+00114     std::vector<ChannelInfo> rx_channels;
+00115     lime::IConnection* connection;
+00116     std::vector<lime::LMS7002M*> lms_list;
+00117     lime::LMS7002M* SelectChannel(\textcolor{keywordtype}{unsigned} chan) \textcolor{keyword}{const};
+00118     \textcolor{keywordtype}{int} ConfigureTXLPF(\textcolor{keywordtype}{bool} enabled,\textcolor{keywordtype}{int} ch, \textcolor{keywordtype}{double} bandwidth);
+00119     \textcolor{keywordtype}{unsigned} lms_chip_id;
+00120     std::vector<lime::Streamer*> mStreamers;
+00121     lime::FPGA* fpga;
+00122 \};
 00123 
-00124 \textcolor{preprocessor}{#endif  }\textcolor{comment}{/* LMS7\_DEVICE\_H */}\textcolor{preprocessor}{}
+00124 \}
+00125 
+00126 \textcolor{preprocessor}{#endif  }\textcolor{comment}{/* LMS7\_DEVICE\_H */}\textcolor{preprocessor}{}
 \end{DoxyCode}

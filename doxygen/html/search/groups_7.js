@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['version_20and_20update_20functions',['Version and update functions',['../dc/dfd/group__FN__VERSION.html',1,'']]]
+  ['sample_20streaming_20functions',['Sample Streaming functions',['../d1/dd8/group__FN__STREAM.html',1,'']]]
 ];

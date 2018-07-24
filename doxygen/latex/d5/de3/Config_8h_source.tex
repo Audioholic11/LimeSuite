@@ -1,0 +1,52 @@
+\subsection{Config.\+h}
+\label{Config_8h_source}\index{/home/erik/prefix/default/src/soapysdr/include/\+Soapy\+S\+D\+R/\+Config.\+h@{/home/erik/prefix/default/src/soapysdr/include/\+Soapy\+S\+D\+R/\+Config.\+h}}
+
+\begin{DoxyCode}
+00001 
+00011 \textcolor{preprocessor}{#pragma once}
+00012 \textcolor{comment}{// http://gcc.gnu.org/wiki/Visibility}
+00013 \textcolor{comment}{// Generic helper definitions for shared library support}
+00014 \textcolor{preprocessor}{#if defined \_WIN32 || defined \_\_CYGWIN\_\_}
+00015 \textcolor{preprocessor}{  #define SOAPY\_SDR\_HELPER\_DLL\_IMPORT \_\_declspec(dllimport)}
+00016 \textcolor{preprocessor}{  #define SOAPY\_SDR\_HELPER\_DLL\_EXPORT \_\_declspec(dllexport)}
+00017 \textcolor{preprocessor}{  #define SOAPY\_SDR\_HELPER\_DLL\_LOCAL}
+00018 \textcolor{preprocessor}{#else}
+00019 \textcolor{preprocessor}{  #if \_\_GNUC\_\_ >= 4}
+00020 \textcolor{preprocessor}{    #define SOAPY\_SDR\_HELPER\_DLL\_IMPORT \_\_attribute\_\_ ((visibility ("default")))}
+00021 \textcolor{preprocessor}{    #define SOAPY\_SDR\_HELPER\_DLL\_EXPORT \_\_attribute\_\_ ((visibility ("default")))}
+00022 \textcolor{preprocessor}{    #define SOAPY\_SDR\_HELPER\_DLL\_LOCAL  \_\_attribute\_\_ ((visibility ("hidden")))}
+00023 \textcolor{preprocessor}{  #else}
+00024 \textcolor{preprocessor}{    #define SOAPY\_SDR\_HELPER\_DLL\_IMPORT}
+00025 \textcolor{preprocessor}{    #define SOAPY\_SDR\_HELPER\_DLL\_EXPORT}
+00026 \textcolor{preprocessor}{    #define SOAPY\_SDR\_HELPER\_DLL\_LOCAL}
+00027 \textcolor{preprocessor}{  #endif}
+00028 \textcolor{preprocessor}{#endif}
+00029 
+00030 \textcolor{comment}{// Now we use the generic helper definitions above to define SOAPY\_SDR\_API and SOAPY\_SDR\_LOCAL.}
+00031 \textcolor{comment}{// SOAPY\_SDR\_API is used for the public API symbols. It either DLL imports or DLL exports (or does nothing
+       for static build)}
+00032 \textcolor{comment}{// SOAPY\_SDR\_LOCAL is used for non-api symbols.}
+00033 
+00034 \textcolor{preprocessor}{#define SOAPY\_SDR\_DLL //always building a DLL}
+00035 
+00036 \textcolor{preprocessor}{#ifdef SOAPY\_SDR\_DLL // defined if SOAPY is compiled as a DLL}
+00037 \textcolor{preprocessor}{  #ifdef SOAPY\_SDR\_DLL\_EXPORTS // defined if we are building the SOAPY DLL (instead of using it)}
+00038 \textcolor{preprocessor}{    #define SOAPY\_SDR\_API SOAPY\_SDR\_HELPER\_DLL\_EXPORT}
+00039 \textcolor{preprocessor}{    #define SOAPY\_SDR\_EXTERN}
+00040 \textcolor{preprocessor}{  #else}
+00041 \textcolor{preprocessor}{    #define SOAPY\_SDR\_API SOAPY\_SDR\_HELPER\_DLL\_IMPORT}
+00042 \textcolor{preprocessor}{    #define SOAPY\_SDR\_EXTERN extern}
+00043 \textcolor{preprocessor}{  #endif // SOAPY\_SDR\_DLL\_EXPORTS}
+00044 \textcolor{preprocessor}{  #define SOAPY\_SDR\_LOCAL SOAPY\_SDR\_HELPER\_DLL\_LOCAL}
+00045 \textcolor{preprocessor}{#else // SOAPY\_SDR\_DLL is not defined: this means SOAPY is a static lib.}
+00046 \textcolor{preprocessor}{  #define SOAPY\_SDR\_API}
+00047 \textcolor{preprocessor}{  #define SOAPY\_SDR\_LOCAL}
+00048 \textcolor{preprocessor}{  #define SOAPY\_SDR\_EXTERN}
+00049 \textcolor{preprocessor}{#endif // SOAPY\_SDR\_DLL}
+00050 
+00051 \textcolor{preprocessor}{#include <iso646.h>}
+00052 
+00053 \textcolor{preprocessor}{#ifndef \_MSC\_VER}
+00054 \textcolor{preprocessor}{#include <stdbool.h>}
+00055 \textcolor{preprocessor}{#endif}
+\end{DoxyCode}

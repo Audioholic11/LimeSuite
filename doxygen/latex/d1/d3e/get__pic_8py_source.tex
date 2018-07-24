@@ -1,0 +1,15 @@
+\subsection{get\+\_\+pic.\+py}
+\label{get__pic_8py_source}\index{/home/erik/prefix/default/src/gr-\/radar-\/dev/misc/trigger\+\_\+scripts/get\+\_\+pic.\+py@{/home/erik/prefix/default/src/gr-\/radar-\/dev/misc/trigger\+\_\+scripts/get\+\_\+pic.\+py}}
+
+\begin{DoxyCode}
+00001 \textcolor{keyword}{from} cv2 \textcolor{keyword}{import} VideoCapture, imwrite
+00002 \textcolor{keyword}{from} datetime \textcolor{keyword}{import} datetime
+00003 
+00004 cam = VideoCapture(0) \textcolor{comment}{# 0 -> index of camera}
+00005 s, img = cam.read()
+00006 \textcolor{keywordflow}{if} s:
+00007     tm = datetime.now()
+00008     filename = \textcolor{stringliteral}{"date-"}+str(tm.year)+\textcolor{stringliteral}{"-"}+ str(tm.month)+\textcolor{stringliteral}{"-"}+ str(tm.day)+\textcolor{stringliteral}{"\_time-"}+ str(tm.hour)+\textcolor{stringliteral}{"-"}+ str(
+      tm.minute)+\textcolor{stringliteral}{"-"}+ str(tm.second)+\textcolor{stringliteral}{"-"}+str(tm.microsecond)+\textcolor{stringliteral}{".jpg"}
+00009     imwrite(filename,img)
+\end{DoxyCode}

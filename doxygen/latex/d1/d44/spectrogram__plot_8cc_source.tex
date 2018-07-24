@@ -1,0 +1,152 @@
+\subsection{spectrogram\+\_\+plot.\+cc}
+\label{spectrogram__plot_8cc_source}\index{/home/erik/prefix/default/src/gr-\/radar-\/dev/lib/spectrogram\+\_\+plot.\+cc@{/home/erik/prefix/default/src/gr-\/radar-\/dev/lib/spectrogram\+\_\+plot.\+cc}}
+
+\begin{DoxyCode}
+00001 \textcolor{comment}{/* -*- c++ -*- */}
+00002 \textcolor{comment}{/* }
+00003 \textcolor{comment}{ * Copyright 2014 Communications Engineering Lab, KIT.}
+00004 \textcolor{comment}{ * }
+00005 \textcolor{comment}{ * This is free software; you can redistribute it and/or modify}
+00006 \textcolor{comment}{ * it under the terms of the GNU General Public License as published by}
+00007 \textcolor{comment}{ * the Free Software Foundation; either version 3, or (at your option)}
+00008 \textcolor{comment}{ * any later version.}
+00009 \textcolor{comment}{ * }
+00010 \textcolor{comment}{ * This software is distributed in the hope that it will be useful,}
+00011 \textcolor{comment}{ * but WITHOUT ANY WARRANTY; without even the implied warranty of}
+00012 \textcolor{comment}{ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the}
+00013 \textcolor{comment}{ * GNU General Public License for more details.}
+00014 \textcolor{comment}{ * }
+00015 \textcolor{comment}{ * You should have received a copy of the GNU General Public License}
+00016 \textcolor{comment}{ * along with this software; see the file COPYING.  If not, write to}
+00017 \textcolor{comment}{ * the Free Software Foundation, Inc., 51 Franklin Street,}
+00018 \textcolor{comment}{ * Boston, MA 02110-1301, USA.}
+00019 \textcolor{comment}{ */}
+00020 
+00021 \textcolor{preprocessor}{#include "spectrogram_plot.h"}
+00022 \textcolor{preprocessor}{#include <iostream>}
+00023 \textcolor{preprocessor}{#include <stdexcept>}
+00024 
+00025 \textcolor{keyword}{namespace }gr \{
+00026     \textcolor{keyword}{namespace }radar \{
+00027 
+00028         spectrogram_plot::spectrogram_plot(\textcolor{keywordtype}{int} interval, \textcolor{keywordtype}{int} vlen, std::vector<float> *
+      buffer, std::string label\_x, std::string label\_y, std::string label, std::vector<float> axis\_x, 
+      std::vector<float> axis\_y, std::vector<float> axis\_z, \textcolor{keywordtype}{bool} autoscale\_z,
+00029         QWidget* parent) : QWidget(parent)
+00030         \{
+00031             d_interval = interval;
+00032             d_vlen = vlen;
+00033             d_buffer = buffer;
+00034             d_axis_x = axis\_x;
+00035             d_axis_y = axis\_y;
+00036             d_axis_z = axis\_z;
+00037             d_autoscale_z = autoscale\_z;
+00038             
+00039             \textcolor{comment}{// Setup GUI}
+00040             resize(QSize(600,600));
+00041             
+00042             d_plot = \textcolor{keyword}{new} QwtPlot(\textcolor{keyword}{this}); \textcolor{comment}{// make main plot}
+00043             d_spectrogram = \textcolor{keyword}{new} QwtPlotSpectrogram(); \textcolor{comment}{// make spectrogram}
+00044             d_spectrogram->attach(d_plot); \textcolor{comment}{// attach spectrogram to plot}
+00045             
+00046             d_data = \textcolor{keyword}{new} QwtMatrixRasterData(); \textcolor{comment}{// make data structure}
+00047             
+00048             \textcolor{comment}{// Setup colormap}
+00049             d_colormap = \textcolor{keyword}{new} QwtLinearColorMap(Qt::darkCyan, Qt::red);
+00050             d_colormap->addColorStop(0.25, Qt::cyan);
+00051             d_colormap->addColorStop(0.5, Qt::green);
+00052             d_colormap->addColorStop(0.75, Qt::yellow);
+00053             
+00054             d_spectrogram->setColorMap(d_colormap);
+00055             
+00056             \textcolor{comment}{// Plot axis and title}
+00057             std::string label\_title = \textcolor{stringliteral}{"Spectrogram Plot: "};
+00058             label\_title.append(label\_x);
+00059             label\_title.append(\textcolor{stringliteral}{"/"});
+00060             label\_title.append(label\_y);
+00061             \textcolor{keywordflow}{if}(label!=\textcolor{stringliteral}{""})\{
+00062                 label\_title.append(\textcolor{stringliteral}{" ("});
+00063                 label\_title.append(label);
+00064                 label\_title.append(\textcolor{stringliteral}{")"});
+00065             \}
+00066             d_plot->setTitle(QwtText(label\_title.c\_str())); 
+00067             d_plot->setAxisTitle(QwtPlot::xBottom, label\_x.c\_str());
+00068             d_plot->setAxisTitle(QwtPlot::yLeft, label\_y.c\_str());
+00069             
+00070             \textcolor{comment}{// Do replot}
+00071             d_plot->replot();
+00072             
+00073             \textcolor{comment}{// Setup timer and connect refreshing plot}
+00074             d_timer = \textcolor{keyword}{new} QTimer(\textcolor{keyword}{this});
+00075             connect(d_timer, SIGNAL(timeout()), \textcolor{keyword}{this}, SLOT(refresh()));
+00076             d_timer->start(d_interval);
+00077         \}
+00078 
+00079         spectrogram_plot::~spectrogram_plot()\{
+00080         \}
+00081         
+00082         \textcolor{keywordtype}{void}
+00083         spectrogram_plot::resizeEvent( QResizeEvent * event )\{
+00084             d_plot->setGeometry(0,0,this->width(),this->height());
+00085         \}
+00086         
+00087         \textcolor{keywordtype}{void}
+00088         spectrogram_plot::refresh()\{
+00089             \textcolor{comment}{// Fetch new data and push to matrix}
+00090             d_plot_data.clear();
+00091             d_plot_data.resize(d_buffer->size());
+00092             \textcolor{keywordtype}{float} maximum, minimum; \textcolor{comment}{// get maximum and minimum}
+00093             \textcolor{keywordflow}{if}(d_buffer->size()!=0)\{
+00094                 maximum = (*d\_buffer)[0];
+00095                 minimum = (*d\_buffer)[0];
+00096             \}
+00097             \textcolor{keywordflow}{else} \textcolor{keywordflow}{throw} std::runtime\_error(\textcolor{stringliteral}{"data buffer has size zero"});
+00098             
+00099             \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} k=0; k<d_buffer->size(); k++)\{
+00100                 d_plot_data[k] = (*d\_buffer)[k];
+00101                 \textcolor{keywordflow}{if}(d_plot_data[k]<minimum) minimum = d_plot_data[k];
+00102                 \textcolor{keywordflow}{if}(d_plot_data[k]>maximum) maximum = d_plot_data[k];
+00103             \}
+00104             \textcolor{keywordflow}{if}(std::isnan(minimum)||std::isnan(maximum)) \textcolor{keywordflow}{throw} std::runtime\_error(\textcolor{stringliteral}{"minimum or maximum for z
+       axis is NaN"});
+00105             
+00106             \textcolor{comment}{// Get rows and columns}
+00107             \textcolor{keywordtype}{int} columns, rows;
+00108             columns = d_vlen;
+00109             rows = d_buffer->size()/d_vlen;
+00110             
+00111             \textcolor{comment}{// Fill data in spectrogram}
+00112             d_data->setValueMatrix(d_plot_data, columns);
+00113             d_data->setInterval(Qt::XAxis,QwtInterval(d_axis_x[0], d_axis_x[1]));
+00114             d_data->setInterval(Qt::YAxis,QwtInterval(d_axis_y[0], d_axis_y[1]));
+00115             \textcolor{keywordflow}{if}(d_autoscale_z)\{
+00116                 d_data->setInterval(Qt::ZAxis,QwtInterval(minimum, maximum));
+00117             \}
+00118             \textcolor{keywordflow}{else}\{
+00119                 d_data->setInterval(Qt::ZAxis,QwtInterval(d_axis_z[0], d_axis_z[1]));
+00120             \}
+00121             
+00122             d_spectrogram->setData(d_data);
+00123             
+00124             \textcolor{comment}{// Set colorbar}
+00125             d_scale = d_plot->axisWidget(QwtPlot::yRight);
+00126             d_scale->setColorBarEnabled(\textcolor{keyword}{true});
+00127             d_scale->setColorBarWidth(20);
+00128             \textcolor{keywordflow}{if}(d_autoscale_z)\{
+00129                 d_scale->setColorMap(QwtInterval(minimum, maximum), d_colormap);
+00130                 d_plot->setAxisScale(QwtPlot::yRight,minimum,maximum);
+00131             \}
+00132             \textcolor{keywordflow}{else}\{
+00133                 d_scale->setColorMap(QwtInterval(d_axis_z[0], d_axis_z[1]), 
+      d_colormap);
+00134                 d_plot->setAxisScale(QwtPlot::yRight,d_axis_z[0],d_axis_z[1]);
+00135             \}
+00136             d_plot->enableAxis(QwtPlot::yRight);
+00137             
+00138             \textcolor{comment}{// Do replot}
+00139             d_plot->replot();
+00140         \}
+00141 
+00142     \}
+00143 \}
+\end{DoxyCode}

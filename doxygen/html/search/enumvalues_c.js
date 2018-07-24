@@ -1,19 +1,12 @@
 var searchData=
 [
-  ['raw',['RAW',['../d5/d6c/namespacelime.html#a328d4103048fe1b747432e38973f5b3ca2b4ceb74755c44884fd003ccb9c27c22',1,'lime']]],
-  ['rbb',['RBB',['../db/d1d/classlime_1_1LMS7002M.html#aab027a372573478b6d09f34a3e7cdf41ab3b2fb4709667f0f7837593cf41d0e01',1,'lime::LMS7002M']]],
-  ['reset',['RESET',['../d2/de5/classlime_1_1IConnection.html#a33a752b6152fc26337fbb488b2510863a46b5c87f0709cdfcc4e48b3ed345d22f',1,'lime::IConnection']]],
-  ['resistance',['RESISTANCE',['../d5/d6c/namespacelime.html#a328d4103048fe1b747432e38973f5b3ca6a3cc90358530bfcf9fe39eb3a94fc22',1,'lime']]],
-  ['rfe',['RFE',['../db/d1d/classlime_1_1LMS7002M.html#aab027a372573478b6d09f34a3e7cdf41aae7bccc3f2dfc0f81594a373f0312d52',1,'lime::LMS7002M']]],
-  ['rssi_5fdc_5fcalibration',['RSSI_DC_CALIBRATION',['../db/d1d/classlime_1_1LMS7002M.html#aab027a372573478b6d09f34a3e7cdf41a7072b63a8cd9b23f2a1c484e0f35278c',1,'lime::LMS7002M']]],
-  ['rssi_5fdc_5fconfig',['RSSI_DC_CONFIG',['../db/d1d/classlime_1_1LMS7002M.html#aab027a372573478b6d09f34a3e7cdf41a44726746b9732ad3918f44927173556b',1,'lime::LMS7002M']]],
-  ['rssi_5fpdet_5ftemp_5fconfig',['RSSI_PDET_TEMP_CONFIG',['../db/d1d/classlime_1_1LMS7002M.html#aab027a372573478b6d09f34a3e7cdf41ab49a1848330e17ea2deaf368b3e3cca0',1,'lime::LMS7002M']]],
-  ['rx',['Rx',['../db/d1d/classlime_1_1LMS7002M.html#aa64db1320fc0e60161bb11652df25a28a21474dfbe6548953738f183673fabcc3',1,'lime::LMS7002M']]],
-  ['rxgfir1',['RxGFIR1',['../db/d1d/classlime_1_1LMS7002M.html#aab027a372573478b6d09f34a3e7cdf41ac4780c8f6a2b9deb884ab37f53a1f2ef',1,'lime::LMS7002M']]],
-  ['rxgfir2',['RxGFIR2',['../db/d1d/classlime_1_1LMS7002M.html#aab027a372573478b6d09f34a3e7cdf41afb7646bf4d6c6535d632231266916daf',1,'lime::LMS7002M']]],
-  ['rxgfir3a',['RxGFIR3a',['../db/d1d/classlime_1_1LMS7002M.html#aab027a372573478b6d09f34a3e7cdf41a32582623751285b50854cfdda64c363b',1,'lime::LMS7002M']]],
-  ['rxgfir3b',['RxGFIR3b',['../db/d1d/classlime_1_1LMS7002M.html#aab027a372573478b6d09f34a3e7cdf41abc2b388fce29233c610e6cfb8d674316',1,'lime::LMS7002M']]],
-  ['rxgfir3c',['RxGFIR3c',['../db/d1d/classlime_1_1LMS7002M.html#aab027a372573478b6d09f34a3e7cdf41a471d97fa677cd662f252b753b96ab3eb',1,'lime::LMS7002M']]],
-  ['rxnco',['RxNCO',['../db/d1d/classlime_1_1LMS7002M.html#aab027a372573478b6d09f34a3e7cdf41a2ff131791877e83e418171cc60479a34',1,'lime::LMS7002M']]],
-  ['rxtsp',['RxTSP',['../db/d1d/classlime_1_1LMS7002M.html#aab027a372573478b6d09f34a3e7cdf41a5a7b264a41e1cf28726cc372474c1774',1,'lime::LMS7002M']]]
+  ['path_5frfe_5flb1',['PATH_RFE_LB1',['../db/d1d/classlime_1_1LMS7002M.html#af9f2522e013ccfd5f4093e3e848219aba5844d7b8d47a25789dc347911a7e8b50',1,'lime::LMS7002M']]],
+  ['path_5frfe_5flb2',['PATH_RFE_LB2',['../db/d1d/classlime_1_1LMS7002M.html#af9f2522e013ccfd5f4093e3e848219aba69ef5094e164fd64f5f7666f69290da4',1,'lime::LMS7002M']]],
+  ['path_5frfe_5flnah',['PATH_RFE_LNAH',['../db/d1d/classlime_1_1LMS7002M.html#af9f2522e013ccfd5f4093e3e848219abaf0fee9a50556e499a7dacdb417c85390',1,'lime::LMS7002M']]],
+  ['path_5frfe_5flnal',['PATH_RFE_LNAL',['../db/d1d/classlime_1_1LMS7002M.html#af9f2522e013ccfd5f4093e3e848219aba8d491b14e232016991f98c3ba046747e',1,'lime::LMS7002M']]],
+  ['path_5frfe_5flnaw',['PATH_RFE_LNAW',['../db/d1d/classlime_1_1LMS7002M.html#af9f2522e013ccfd5f4093e3e848219aba0f2ff3892f268e5f65408a8139a3c339',1,'lime::LMS7002M']]],
+  ['path_5frfe_5fnone',['PATH_RFE_NONE',['../db/d1d/classlime_1_1LMS7002M.html#af9f2522e013ccfd5f4093e3e848219aba0f024a5eebca4fc656b9dc87bc98a4a4',1,'lime::LMS7002M']]],
+  ['pcie_5fport',['PCIE_PORT',['../de/d46/classlime_1_1LMS64CProtocol.html#ad5fb599a04aa53bb2bf295c6b272f5aba836bee64b583dddd00e2b778422f28af',1,'lime::LMS64CProtocol']]],
+  ['power',['POWER',['../d5/d6c/namespacelime.html#a328d4103048fe1b747432e38973f5b3caf5fb05d054539ad5816b26dc199700b5',1,'lime']]],
+  ['program_5fwrite_5ftarget_5fcount',['PROGRAM_WRITE_TARGET_COUNT',['../de/d46/classlime_1_1LMS64CProtocol.html#a92c37d03920ab9c67c33babc3b0c2d19ae971be57e459a003a67d41151979032e',1,'lime::LMS64CProtocol']]]
 ];

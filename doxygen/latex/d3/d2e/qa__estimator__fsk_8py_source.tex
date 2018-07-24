@@ -1,0 +1,122 @@
+\subsection{qa\+\_\+estimator\+\_\+fsk.\+py}
+\label{qa__estimator__fsk_8py_source}\index{/home/erik/prefix/default/src/gr-\/radar-\/dev/python/qa\+\_\+estimator\+\_\+fsk.\+py@{/home/erik/prefix/default/src/gr-\/radar-\/dev/python/qa\+\_\+estimator\+\_\+fsk.\+py}}
+
+\begin{DoxyCode}
+00001 \textcolor{comment}{#!/usr/bin/env python}
+00002 \textcolor{comment}{# -*- coding: utf-8 -*-}
+00003 \textcolor{comment}{# }
+00004 \textcolor{comment}{# Copyright 2014 Communications Engineering Lab, KIT.}
+00005 \textcolor{comment}{# }
+00006 \textcolor{comment}{# This is free software; you can redistribute it and/or modify}
+00007 \textcolor{comment}{# it under the terms of the GNU General Public License as published by}
+00008 \textcolor{comment}{# the Free Software Foundation; either version 3, or (at your option)}
+00009 \textcolor{comment}{# any later version.}
+00010 \textcolor{comment}{# }
+00011 \textcolor{comment}{# This software is distributed in the hope that it will be useful,}
+00012 \textcolor{comment}{# but WITHOUT ANY WARRANTY; without even the implied warranty of}
+00013 \textcolor{comment}{# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the}
+00014 \textcolor{comment}{# GNU General Public License for more details.}
+00015 \textcolor{comment}{# }
+00016 \textcolor{comment}{# You should have received a copy of the GNU General Public License}
+00017 \textcolor{comment}{# along with this software; see the file COPYING.  If not, write to}
+00018 \textcolor{comment}{# the Free Software Foundation, Inc., 51 Franklin Street,}
+00019 \textcolor{comment}{# Boston, MA 02110-1301, USA.}
+00020 \textcolor{comment}{# }
+00021 
+00022 \textcolor{keyword}{from} gnuradio \textcolor{keyword}{import} gr, gr\_unittest
+00023 \textcolor{keyword}{from} gnuradio \textcolor{keyword}{import} blocks
+00024 \textcolor{keyword}{import} radar\_swig \textcolor{keyword}{as} radar
+00025 \textcolor{keyword}{from} time \textcolor{keyword}{import} sleep
+00026 \textcolor{keyword}{import} pmt
+00027 
+00028 \textcolor{keyword}{class }qa_estimator_fsk (gr\_unittest.TestCase):
+00029 
+00030     \textcolor{keyword}{def }setUp (self):
+00031         self.tb = gr.top\_block ()
+00032 
+00033     \textcolor{keyword}{def }tearDown (self):
+00034         self.tb = \textcolor{keywordtype}{None}
+00035 
+00036     \textcolor{keyword}{def }test_001_t (self):
+00037         \textcolor{comment}{# run full fsk setup on high sample rates}
+00038         test\_len = 2**19
+00039 
+00040         packet\_len = 2**19
+00041         min\_output\_buffer = packet\_len*2
+00042         samp\_rate = 5000000
+00043         
+00044         center\_freq = 2.45e9
+00045         
+00046         Range = 50
+00047         velocity = 5
+00048                 
+00049         samp\_per\_freq = 1
+00050         blocks\_per\_tag = packet\_len/2
+00051         freq\_low = 0
+00052         freq\_high = 1250000
+00053         amplitude = 1
+00054         samp\_discard = 0
+00055 
+00056         src = radar.signal\_generator\_fsk\_c(samp\_rate, samp\_per\_freq, blocks\_per\_tag, freq\_low, freq\_high, 
+      amplitude)
+00057         src.set\_min\_output\_buffer(min\_output\_buffer)
+00058         
+00059         head = blocks.head(8,test\_len)
+00060         head.set\_min\_output\_buffer(min\_output\_buffer)
+00061         
+00062         sim = radar.static\_target\_simulator\_cc((Range,),(velocity,),(1e20,),(0,),(0,),samp\_rate,center\_freq
+      ,1,\textcolor{keyword}{False},\textcolor{keyword}{False})
+00063         sim.set\_min\_output\_buffer(min\_output\_buffer)
+00064         
+00065         mult = blocks.multiply\_conjugate\_cc()
+00066         mult.set\_min\_output\_buffer(min\_output\_buffer)
+00067         
+00068         fft1 = radar.ts\_fft\_cc(packet\_len/2)
+00069         fft1.set\_min\_output\_buffer(min\_output\_buffer)
+00070         fft2 = radar.ts\_fft\_cc(packet\_len/2)
+00071         fft2.set\_min\_output\_buffer(min\_output\_buffer)
+00072         
+00073         split = radar.split\_fsk\_cc(samp\_per\_freq,samp\_discard)
+00074         split.set\_min\_output\_buffer(min\_output\_buffer)
+00075         
+00076         mult\_conj = blocks.multiply\_conjugate\_cc()
+00077         mult\_conj.set\_min\_output\_buffer(min\_output\_buffer)
+00078         
+00079         cfar = radar.find\_max\_peak\_c(samp\_rate/2,-120,0,(),\textcolor{keyword}{False})
+00080         cfar.set\_min\_output\_buffer(min\_output\_buffer)
+00081         
+00082         est = radar.estimator\_fsk(center\_freq,freq\_high-freq\_low)
+00083         res = radar.print\_results()
+00084         debug = blocks.message\_debug()
+00085 
+00086         self.tb.connect(src,head,(mult,1))
+00087         self.tb.connect(head,sim,(mult,0))
+00088         self.tb.connect(mult,split)
+00089         self.tb.connect((split,0),fft1)
+00090         self.tb.connect((split,1),fft2)
+00091         self.tb.connect(fft1,(mult\_conj,0))
+00092         self.tb.connect(fft2,(mult\_conj,1))
+00093         self.tb.connect(mult\_conj,cfar)
+00094         self.tb.msg\_connect(cfar,\textcolor{stringliteral}{'Msg out'},est,\textcolor{stringliteral}{'Msg in'})
+00095         self.tb.msg\_connect(est,\textcolor{stringliteral}{'Msg out'},res,\textcolor{stringliteral}{'Msg in'})
+00096         self.tb.msg\_connect(est,\textcolor{stringliteral}{'Msg out'},debug,\textcolor{stringliteral}{'store'})
+00097 
+00098         self.tb.start()
+00099         sleep(0.5)
+00100         self.tb.stop()
+00101         self.tb.wait()
+00102         
+00103         \textcolor{comment}{# check data}
+00104         msg = debug.get\_message(0)
+00105         \textcolor{comment}{#print "VELOCITY:", pmt.f32vector\_ref(pmt.nth(1,(pmt.nth(1,msg))),0), velocity}
+00106         \textcolor{comment}{#print "RANGE:", pmt.f32vector\_ref(pmt.nth(1,(pmt.nth(2,msg))),0), Range}
+00107         self.assertAlmostEqual( 1, velocity/pmt.f32vector\_ref(pmt.nth(1,(pmt.nth(1,msg))),0), 1 ) \textcolor{comment}{# check
+       velocity value}
+00108         self.assertAlmostEqual( 1, Range/pmt.f32vector\_ref(pmt.nth(1,(pmt.nth(2,msg))),0), 1 ) \textcolor{comment}{# check
+       range value}
+00109 
+00110 
+00111 \textcolor{keywordflow}{if} \_\_name\_\_ == \textcolor{stringliteral}{'\_\_main\_\_'}:
+00112     \textcolor{comment}{#raw\_input('Block for running gdb',)}
+00113     gr\_unittest.run(qa\_estimator\_fsk)\textcolor{comment}{#, "qa\_estimator\_fsk.xml")}
+\end{DoxyCode}

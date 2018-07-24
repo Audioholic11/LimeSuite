@@ -1,0 +1,58 @@
+\subsection{print\+\_\+results\+\_\+impl.\+h}
+\label{print__results__impl_8h_source}\index{/home/erik/prefix/default/src/gr-\/radar-\/dev/lib/print\+\_\+results\+\_\+impl.\+h@{/home/erik/prefix/default/src/gr-\/radar-\/dev/lib/print\+\_\+results\+\_\+impl.\+h}}
+
+\begin{DoxyCode}
+00001 \textcolor{comment}{/* -*- c++ -*- */}
+00002 \textcolor{comment}{/* }
+00003 \textcolor{comment}{ * Copyright 2014 Communications Engineering Lab, KIT.}
+00004 \textcolor{comment}{ * }
+00005 \textcolor{comment}{ * This is free software; you can redistribute it and/or modify}
+00006 \textcolor{comment}{ * it under the terms of the GNU General Public License as published by}
+00007 \textcolor{comment}{ * the Free Software Foundation; either version 3, or (at your option)}
+00008 \textcolor{comment}{ * any later version.}
+00009 \textcolor{comment}{ * }
+00010 \textcolor{comment}{ * This software is distributed in the hope that it will be useful,}
+00011 \textcolor{comment}{ * but WITHOUT ANY WARRANTY; without even the implied warranty of}
+00012 \textcolor{comment}{ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the}
+00013 \textcolor{comment}{ * GNU General Public License for more details.}
+00014 \textcolor{comment}{ * }
+00015 \textcolor{comment}{ * You should have received a copy of the GNU General Public License}
+00016 \textcolor{comment}{ * along with this software; see the file COPYING.  If not, write to}
+00017 \textcolor{comment}{ * the Free Software Foundation, Inc., 51 Franklin Street,}
+00018 \textcolor{comment}{ * Boston, MA 02110-1301, USA.}
+00019 \textcolor{comment}{ */}
+00020  
+00021 \textcolor{preprocessor}{#ifndef INCLUDED\_RADAR\_PRINT\_RESULTS\_IMPL\_H}
+00022 \textcolor{preprocessor}{#define INCLUDED\_RADAR\_PRINT\_RESULTS\_IMPL\_H}
+00023 
+00024 \textcolor{preprocessor}{#include <radar/print_results.h>}
+00025 \textcolor{preprocessor}{#include <fstream>}
+00026 
+00027 \textcolor{keyword}{namespace }gr \{
+00028   \textcolor{keyword}{namespace }radar \{
+00029 
+00030     \textcolor{keyword}{class }print_results_impl : \textcolor{keyword}{public} print_results
+00031     \{
+00032      \textcolor{keyword}{private}:
+00033       \textcolor{comment}{// Nothing to declare in this block.}
+00034 
+00035      \textcolor{keyword}{public}:
+00036       print_results_impl(\textcolor{keywordtype}{bool} store\_msg, \textcolor{keyword}{const} std::string filename);
+00037       ~print_results_impl();
+00038       \textcolor{keywordtype}{void} handle_msg(pmt::pmt\_t msg);
+00039       
+00040       pmt::pmt\_t d_port_id_in;
+00041       \textcolor{keywordtype}{size\_t} d_size_msg, d_size_part;
+00042       pmt::pmt\_t d_msg_part;
+00043       
+00044       std::ofstream d_file;
+00045       std::string d_filename;
+00046       \textcolor{keywordtype}{bool} d_store_msg;
+00047     \};
+00048 
+00049   \} \textcolor{comment}{// namespace radar}
+00050 \} \textcolor{comment}{// namespace gr}
+00051 
+00052 \textcolor{preprocessor}{#endif }\textcolor{comment}{/* INCLUDED\_RADAR\_PRINT\_RESULTS\_IMPL\_H */}\textcolor{preprocessor}{}
+00053 
+\end{DoxyCode}

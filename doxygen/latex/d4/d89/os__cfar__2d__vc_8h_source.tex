@@ -1,0 +1,53 @@
+\subsection{os\+\_\+cfar\+\_\+2d\+\_\+vc.\+h}
+\label{os__cfar__2d__vc_8h_source}\index{/home/erik/prefix/default/src/gr-\/radar-\/dev/include/radar/os\+\_\+cfar\+\_\+2d\+\_\+vc.\+h@{/home/erik/prefix/default/src/gr-\/radar-\/dev/include/radar/os\+\_\+cfar\+\_\+2d\+\_\+vc.\+h}}
+
+\begin{DoxyCode}
+00001 \textcolor{comment}{/* -*- c++ -*- */}
+00002 \textcolor{comment}{/* }
+00003 \textcolor{comment}{ * Copyright 2014 Communications Engineering Lab, KIT.}
+00004 \textcolor{comment}{ * }
+00005 \textcolor{comment}{ * This is free software; you can redistribute it and/or modify}
+00006 \textcolor{comment}{ * it under the terms of the GNU General Public License as published by}
+00007 \textcolor{comment}{ * the Free Software Foundation; either version 3, or (at your option)}
+00008 \textcolor{comment}{ * any later version.}
+00009 \textcolor{comment}{ * }
+00010 \textcolor{comment}{ * This software is distributed in the hope that it will be useful,}
+00011 \textcolor{comment}{ * but WITHOUT ANY WARRANTY; without even the implied warranty of}
+00012 \textcolor{comment}{ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the}
+00013 \textcolor{comment}{ * GNU General Public License for more details.}
+00014 \textcolor{comment}{ * }
+00015 \textcolor{comment}{ * You should have received a copy of the GNU General Public License}
+00016 \textcolor{comment}{ * along with this software; see the file COPYING.  If not, write to}
+00017 \textcolor{comment}{ * the Free Software Foundation, Inc., 51 Franklin Street,}
+00018 \textcolor{comment}{ * Boston, MA 02110-1301, USA.}
+00019 \textcolor{comment}{ */}
+00020 
+00021 
+00022 \textcolor{preprocessor}{#ifndef INCLUDED\_RADAR\_OS\_CFAR\_2D\_VC\_H}
+00023 \textcolor{preprocessor}{#define INCLUDED\_RADAR\_OS\_CFAR\_2D\_VC\_H}
+00024 
+00025 \textcolor{preprocessor}{#include <radar/api.h>}
+00026 \textcolor{preprocessor}{#include <gnuradio/tagged\_stream\_block.h>}
+00027 
+00028 \textcolor{keyword}{namespace }gr \{
+00029   \textcolor{keyword}{namespace }radar \{
+00030 
+00044     \textcolor{keyword}{class }RADAR_API os_cfar_2d_vc : \textcolor{keyword}{virtual} \textcolor{keyword}{public} gr::tagged\_stream\_block
+00045     \{
+00046      \textcolor{keyword}{public}:
+00047       \textcolor{keyword}{typedef} boost::shared\_ptr<os\_cfar\_2d\_vc> sptr;
+00048 
+00057       \textcolor{keyword}{static} sptr make(\textcolor{keywordtype}{int} vlen, std::vector<int> samp\_compare, std::vector<int> samp\_protect, \textcolor{keywordtype}{float} 
+      rel\_threshold, \textcolor{keywordtype}{float} mult\_threshold, \textcolor{keyword}{const} std::string& len\_key=\textcolor{stringliteral}{"packet\_len"});
+00058       \textcolor{keyword}{virtual} \textcolor{keywordtype}{void} set\_rel\_threshold(\textcolor{keywordtype}{float} inp) = 0;
+00059       \textcolor{keyword}{virtual} \textcolor{keywordtype}{void} set\_mult\_threshold(\textcolor{keywordtype}{float} inp) = 0;
+00060       \textcolor{keyword}{virtual} \textcolor{keywordtype}{void} set\_samp\_compare(std::vector<int> inp) = 0;
+00061       \textcolor{keyword}{virtual} \textcolor{keywordtype}{void} set\_samp\_protect(std::vector<int> inp) = 0;
+00062     \};
+00063 
+00064   \} \textcolor{comment}{// namespace radar}
+00065 \} \textcolor{comment}{// namespace gr}
+00066 
+00067 \textcolor{preprocessor}{#endif }\textcolor{comment}{/* INCLUDED\_RADAR\_OS\_CFAR\_2D\_VC\_H */}\textcolor{preprocessor}{}
+00068 
+\end{DoxyCode}

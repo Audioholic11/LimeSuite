@@ -1,0 +1,329 @@
+\subsection{Modules.\+cpp}
+\label{Modules_8cpp_source}\index{/home/erik/prefix/default/src/soapysdr/build/lib/\+Modules.\+cpp@{/home/erik/prefix/default/src/soapysdr/build/lib/\+Modules.\+cpp}}
+
+\begin{DoxyCode}
+00001 \textcolor{comment}{// Copyright (c) 2014-2018 Josh Blum}
+00002 \textcolor{comment}{// SPDX-License-Identifier: BSL-1.0}
+00003 
+00004 \textcolor{preprocessor}{#include <SoapySDR/Modules.hpp>}
+00005 \textcolor{preprocessor}{#include <SoapySDR/Logger.hpp>}
+00006 \textcolor{preprocessor}{#include <SoapySDR/Version.hpp>}
+00007 \textcolor{preprocessor}{#include <vector>}
+00008 \textcolor{preprocessor}{#include <string>}
+00009 \textcolor{preprocessor}{#include <cstdlib>} \textcolor{comment}{//getenv}
+00010 \textcolor{preprocessor}{#include <sstream>}
+00011 \textcolor{preprocessor}{#include <map>}
+00012 
+00013 \textcolor{preprocessor}{#ifdef \_MSC\_VER}
+00014 \textcolor{preprocessor}{#include <windows.h>}
+00015 \textcolor{preprocessor}{#else}
+00016 \textcolor{preprocessor}{#include <dlfcn.h>}
+00017 \textcolor{preprocessor}{#include <glob.h>}
+00018 \textcolor{preprocessor}{#endif}
+00019 
+00020 \textcolor{comment}{/***********************************************************************}
+00021 \textcolor{comment}{ * root installation path}
+00022 \textcolor{comment}{ **********************************************************************/}
+00023 std::string getEnvImpl(\textcolor{keyword}{const} \textcolor{keywordtype}{char} *name)
+00024 \{
+00025 \textcolor{preprocessor}{    #ifdef \_MSC\_VER}
+00026     \textcolor{keyword}{const} DWORD len = GetEnvironmentVariableA(name, 0, 0);
+00027     \textcolor{keywordflow}{if} (len == 0) \textcolor{keywordflow}{return} \textcolor{stringliteral}{""};
+00028     \textcolor{keywordtype}{char}* buffer = \textcolor{keyword}{new} \textcolor{keywordtype}{char}[len];
+00029     GetEnvironmentVariableA(name, buffer, len);
+00030     std::string result(buffer);
+00031     \textcolor{keyword}{delete} [] buffer;
+00032     \textcolor{keywordflow}{return} result;
+00033 \textcolor{preprocessor}{    #else}
+00034     \textcolor{keyword}{const} \textcolor{keywordtype}{char} *result = getenv(name);
+00035     \textcolor{keywordflow}{if} (result != NULL) \textcolor{keywordflow}{return} result;
+00036 \textcolor{preprocessor}{    #endif}
+00037     \textcolor{keywordflow}{return} \textcolor{stringliteral}{""};
+00038 \}
+00039 
+00040 std::string SoapySDR::getRootPath(\textcolor{keywordtype}{void})
+00041 \{
+00042     \textcolor{keyword}{const} std::string rootPathEnv = getEnvImpl(\textcolor{stringliteral}{"SOAPY\_SDR\_ROOT"});
+00043     \textcolor{keywordflow}{if} (not rootPathEnv.empty()) \textcolor{keywordflow}{return} rootPathEnv;
+00044 
+00045     \textcolor{comment}{// Get the path to the current dynamic linked library.}
+00046     \textcolor{comment}{// The path to this library can be used to determine}
+00047     \textcolor{comment}{// the installation root without prior knowledge.}
+00048 \textcolor{preprocessor}{    #ifdef \_MSC\_VER}
+00049     \textcolor{keywordtype}{char} path[MAX\_PATH];
+00050     HMODULE hm = NULL;
+00051     \textcolor{keywordflow}{if} (GetModuleHandleExA(
+00052         GET\_MODULE\_HANDLE\_EX\_FLAG\_FROM\_ADDRESS |
+00053         GET\_MODULE\_HANDLE\_EX\_FLAG\_UNCHANGED\_REFCOUNT,
+00054         (LPCSTR) &SoapySDR::getRootPath, &hm))
+00055     \{
+00056         \textcolor{keyword}{const} DWORD size = GetModuleFileNameA(hm, path, \textcolor{keyword}{sizeof}(path));
+00057         \textcolor{keywordflow}{if} (size != 0)
+00058         \{
+00059             \textcolor{keyword}{const} std::string libPath(path, size);
+00060             \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} slash0Pos = libPath.find\_last\_of(\textcolor{stringliteral}{"/\(\backslash\)\(\backslash\)"});
+00061             \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} slash1Pos = libPath.substr(0, slash0Pos).find\_last\_of(\textcolor{stringliteral}{"/\(\backslash\)\(\backslash\)"});
+00062             \textcolor{keywordflow}{if} (slash0Pos != std::string::npos and slash1Pos != std::string::npos)
+00063                 \textcolor{keywordflow}{return} libPath.substr(0, slash1Pos);
+00064         \}
+00065     \}
+00066 \textcolor{preprocessor}{    #endif}
+00067 
+00068     \textcolor{keywordflow}{return} \textcolor{stringliteral}{"/home/erik/prefix/default"};
+00069 \}
+00070 
+00071 \textcolor{comment}{/***********************************************************************}
+00072 \textcolor{comment}{ * list modules API call}
+00073 \textcolor{comment}{ **********************************************************************/}
+00074 \textcolor{keyword}{static} std::vector<std::string> searchModulePath(\textcolor{keyword}{const} std::string &path)
+00075 \{
+00076     std::vector<std::string> modulePaths;
+00077 
+00078 \textcolor{preprocessor}{#ifdef \_MSC\_VER}
+00079     \textcolor{keyword}{const} std::string pattern = path + \textcolor{stringliteral}{"*.dll"};
+00080 
+00081     \textcolor{comment}{//http://stackoverflow.com/questions/612097/how-can-i-get-a-list-of-files-in-a-directory-using-c-or-c}
+00082     WIN32\_FIND\_DATA fd; 
+00083     HANDLE hFind = ::FindFirstFile(pattern.c\_str(), &fd); 
+00084     \textcolor{keywordflow}{if}(hFind != INVALID\_HANDLE\_VALUE) 
+00085     \{ 
+00086         \textcolor{keywordflow}{do} 
+00087         \{ 
+00088             \textcolor{comment}{// read all (real) files in current folder}
+00089             \textcolor{comment}{// , delete '!' read other 2 default folder . and ..}
+00090             \textcolor{keywordflow}{if}(! (fd.dwFileAttributes & FILE\_ATTRIBUTE\_DIRECTORY) ) 
+00091             \{
+00092                 modulePaths.push\_back(path + fd.cFileName);
+00093             \}
+00094         \}\textcolor{keywordflow}{while}(::FindNextFile(hFind, &fd)); 
+00095         ::FindClose(hFind); 
+00096     \}
+00097 
+00098 \textcolor{preprocessor}{#else}
+00099     \textcolor{keyword}{const} std::string pattern = path + \textcolor{stringliteral}{"*.so"};
+00100 
+00101     glob\_t globResults;
+00102 
+00103     \textcolor{keyword}{const} \textcolor{keywordtype}{int} ret = glob(pattern.c\_str(), 0\textcolor{comment}{/*no flags*/}, NULL, &globResults);
+00104     \textcolor{keywordflow}{if} (ret == 0) \textcolor{keywordflow}{for} (\textcolor{keywordtype}{size\_t} i = 0; i < globResults.gl\_pathc; i++)
+00105     \{
+00106         modulePaths.push\_back(globResults.gl\_pathv[i]);
+00107     \}
+00108     \textcolor{keywordflow}{else} \textcolor{keywordflow}{if} (ret == GLOB\_NOMATCH) \{\textcolor{comment}{/* acceptable error condition, do not print error */}\}
+00109     \textcolor{keywordflow}{else} SoapySDR::logf(SOAPY_SDR_ERROR, \textcolor{stringliteral}{"SoapySDR::listModules(%s) glob(%s) error %d"}, path.c\_str(), 
+      pattern.c\_str(), ret);
+00110 
+00111     globfree(&globResults);
+00112 
+00113 \textcolor{preprocessor}{#endif}
+00114 
+00115     \textcolor{keywordflow}{return} modulePaths;
+00116 \}
+00117 
+00118 std::vector<std::string> SoapySDR::listSearchPaths(\textcolor{keywordtype}{void})
+00119 \{
+00120     \textcolor{comment}{//the default search path}
+00121     std::vector<std::string> searchPaths;
+00122     searchPaths.push\_back(SoapySDR::getRootPath() + \textcolor{stringliteral}{"/lib/SoapySDR/modules"} + 
+      SoapySDR::getABIVersion());
+00123 
+00124     \textcolor{comment}{//support /usr/local module installs when the install prefix is /usr}
+00125     \textcolor{keywordflow}{if} (SoapySDR::getRootPath() == \textcolor{stringliteral}{"/usr"})
+00126     \{
+00127         searchPaths.push\_back(\textcolor{stringliteral}{"/usr/local/lib/SoapySDR/modules"} + 
+      SoapySDR::getABIVersion());
+00128         \textcolor{comment}{//when using a multi-arch directory, support single-arch path as well}
+00129         \textcolor{keyword}{static} \textcolor{keyword}{const} std::string libsuffix(\textcolor{stringliteral}{""});
+00130         \textcolor{keywordflow}{if} (not libsuffix.empty() and libsuffix.at(0) == \textcolor{charliteral}{'/'})
+00131             searchPaths.push\_back(\textcolor{stringliteral}{"/usr/local/lib/SoapySDR/modules"} + 
+      SoapySDR::getABIVersion());
+00132     \}
+00133 
+00134     \textcolor{comment}{//separator for search paths}
+00135 \textcolor{preprocessor}{    #ifdef \_MSC\_VER}
+00136     \textcolor{keyword}{static} \textcolor{keyword}{const} \textcolor{keywordtype}{char} sep = \textcolor{charliteral}{';'};
+00137 \textcolor{preprocessor}{    #else}
+00138     \textcolor{keyword}{static} \textcolor{keyword}{const} \textcolor{keywordtype}{char} sep = \textcolor{charliteral}{':'};
+00139 \textcolor{preprocessor}{    #endif}
+00140 
+00141     \textcolor{comment}{//check the environment's search path}
+00142     std::stringstream pluginPaths(getEnvImpl(\textcolor{stringliteral}{"SOAPY\_SDR\_PLUGIN\_PATH"}));
+00143     std::string pluginPath;
+00144     \textcolor{keywordflow}{while} (std::getline(pluginPaths, pluginPath, sep))
+00145     \{
+00146         \textcolor{keywordflow}{if} (pluginPath.empty()) \textcolor{keywordflow}{continue};
+00147         searchPaths.push\_back(pluginPath);
+00148     \}
+00149 
+00150     \textcolor{keywordflow}{return} searchPaths;
+00151 \}
+00152 
+00153 std::vector<std::string> SoapySDR::listModules(\textcolor{keywordtype}{void})
+00154 \{
+00155     \textcolor{comment}{//traverse the search paths}
+00156     std::vector<std::string> modules;
+00157     \textcolor{keywordflow}{for} (\textcolor{keyword}{const} \textcolor{keyword}{auto} &searchPath : SoapySDR::listSearchPaths())
+00158     \{
+00159         \textcolor{keyword}{const} std::vector<std::string> subModules = SoapySDR::listModules(searchPath);
+00160         modules.insert(modules.end(), subModules.begin(), subModules.end());
+00161     \}
+00162     \textcolor{keywordflow}{return} modules;
+00163 \}
+00164 
+00165 std::vector<std::string> SoapySDR::listModules(\textcolor{keyword}{const} std::string &path)
+00166 \{
+00167     \textcolor{keywordflow}{return} searchModulePath(path + \textcolor{stringliteral}{"/"}); \textcolor{comment}{//requires trailing slash}
+00168 \}
+00169 
+00170 \textcolor{comment}{/***********************************************************************}
+00171 \textcolor{comment}{ * load module API call}
+00172 \textcolor{comment}{ **********************************************************************/}
+00173 std::map<std::string, void *> &getModuleHandles(\textcolor{keywordtype}{void})
+00174 \{
+00175     \textcolor{keyword}{static} std::map<std::string, void *> handles;
+00176     \textcolor{keywordflow}{return} handles;
+00177 \}
+00178 
+00180 std::string &getModuleLoading(\textcolor{keywordtype}{void})
+00181 \{
+00182     \textcolor{keyword}{static} std::string moduleLoading;
+00183     \textcolor{keywordflow}{return} moduleLoading;
+00184 \}
+00185 
+00187 std::map<std::string, SoapySDR::Kwargs> &getLoaderResults(\textcolor{keywordtype}{void})
+00188 \{
+00189     \textcolor{keyword}{static} std::map<std::string, SoapySDR::Kwargs> results;
+00190     \textcolor{keywordflow}{return} results;
+00191 \}
+00192 
+00193 std::map<std::string, std::string> &getModuleVersions(\textcolor{keywordtype}{void})
+00194 \{
+00195     \textcolor{keyword}{static} std::map<std::string, std::string> versions;
+00196     \textcolor{keywordflow}{return} versions;
+00197 \}
+00198 
+00199 SoapySDR::ModuleVersion::ModuleVersion(\textcolor{keyword}{const} std::string &version)
+00200 \{
+00201     getModuleVersions()[getModuleLoading()] = version;
+00202 \}
+00203 
+00204 \textcolor{preprocessor}{#ifdef \_MSC\_VER}
+00205 \textcolor{keyword}{static} std::string GetLastErrorMessage(\textcolor{keywordtype}{void})
+00206 \{
+00207     LPVOID lpMsgBuf;
+00208     DWORD dw = GetLastError();
+00209 
+00210     FormatMessage(
+00211         FORMAT\_MESSAGE\_ALLOCATE\_BUFFER |
+00212         FORMAT\_MESSAGE\_FROM\_SYSTEM |
+00213         FORMAT\_MESSAGE\_IGNORE\_INSERTS,
+00214         NULL,
+00215         dw,
+00216         MAKELANGID(LANG\_NEUTRAL, SUBLANG\_DEFAULT),
+00217         (LPTSTR) &lpMsgBuf,
+00218         0, NULL );
+00219 
+00220     std::string msg((\textcolor{keywordtype}{char} *)lpMsgBuf);
+00221     LocalFree(lpMsgBuf);
+00222     \textcolor{keywordflow}{return} msg;
+00223 \}
+00224 \textcolor{preprocessor}{#endif}
+00225 
+00226 std::string SoapySDR::loadModule(\textcolor{keyword}{const} std::string &path)
+00227 \{
+00228     \textcolor{comment}{//check if already loaded}
+00229     \textcolor{keywordflow}{if} (getModuleHandles().count(path) != 0) \textcolor{keywordflow}{return} path + \textcolor{stringliteral}{" already loaded"};
+00230 
+00231     \textcolor{comment}{//stash the path for registry access}
+00232     getModuleLoading().assign(path);
+00233 
+00234     \textcolor{comment}{//load the module}
+00235 \textcolor{preprocessor}{#ifdef \_MSC\_VER}
+00236 
+00237     \textcolor{comment}{//SetThreadErrorMode() - disable error pop-ups when DLLs are not found}
+00238     DWORD oldMode;
+00239     SetThreadErrorMode(SEM\_FAILCRITICALERRORS | SEM\_NOGPFAULTERRORBOX | SEM\_NOOPENFILEERRORBOX, &oldMode);
+00240     HMODULE handle = LoadLibrary(path.c\_str());
+00241     SetThreadErrorMode(oldMode, \textcolor{keyword}{nullptr});
+00242 
+00243     getModuleLoading().clear();
+00244     \textcolor{keywordflow}{if} (handle == NULL) \textcolor{keywordflow}{return} \textcolor{stringliteral}{"LoadLibrary() failed: "} + GetLastErrorMessage();
+00245 \textcolor{preprocessor}{#else}
+00246     \textcolor{keywordtype}{void} *handle = dlopen(path.c\_str(), RTLD\_LAZY);
+00247     getModuleLoading().clear();
+00248     \textcolor{keywordflow}{if} (handle == NULL) \textcolor{keywordflow}{return} \textcolor{stringliteral}{"dlopen() failed: "} + std::string(dlerror());
+00249 \textcolor{preprocessor}{#endif}
+00250 
+00251     \textcolor{comment}{//stash the handle}
+00252     getModuleHandles()[path] = handle;
+00253     \textcolor{keywordflow}{return} \textcolor{stringliteral}{""};
+00254 \}
+00255 
+00256 SoapySDR::Kwargs SoapySDR::getLoaderResult(\textcolor{keyword}{const} std::string &path)
+00257 \{
+00258     \textcolor{keywordflow}{if} (getLoaderResults().count(path) == 0) \textcolor{keywordflow}{return} SoapySDR::Kwargs();
+00259     \textcolor{keywordflow}{return} getLoaderResults()[path];
+00260 \}
+00261 
+00262 std::string SoapySDR::getModuleVersion(\textcolor{keyword}{const} std::string &path)
+00263 \{
+00264     \textcolor{keywordflow}{if} (getModuleVersions().count(path) == 0) \textcolor{keywordflow}{return} \textcolor{stringliteral}{""};
+00265     \textcolor{keywordflow}{return} getModuleVersions()[path];
+00266 \}
+00267 
+00268 std::string SoapySDR::unloadModule(\textcolor{keyword}{const} std::string &path)
+00269 \{
+00270     \textcolor{comment}{//check if already loaded}
+00271     \textcolor{keywordflow}{if} (getModuleHandles().count(path) == 0) \textcolor{keywordflow}{return} path + \textcolor{stringliteral}{" never loaded"};
+00272 
+00273     \textcolor{comment}{//stash the path for registry access}
+00274     getModuleLoading().assign(path);
+00275 
+00276     \textcolor{comment}{//unload the module}
+00277     \textcolor{keywordtype}{void} *handle = getModuleHandles()[path];
+00278 \textcolor{preprocessor}{#ifdef \_MSC\_VER}
+00279     BOOL success = FreeLibrary((HMODULE)handle);
+00280     getModuleLoading().clear();
+00281     \textcolor{keywordflow}{if} (not success) \textcolor{keywordflow}{return} \textcolor{stringliteral}{"FreeLibrary() failed: "} + GetLastErrorMessage();
+00282 \textcolor{preprocessor}{#else}
+00283     \textcolor{keywordtype}{int} status = dlclose(handle);
+00284     getModuleLoading().clear();
+00285     \textcolor{keywordflow}{if} (status != 0) \textcolor{keywordflow}{return} \textcolor{stringliteral}{"dlclose() failed: "} + std::string(dlerror());
+00286 \textcolor{preprocessor}{#endif}
+00287 
+00288     \textcolor{comment}{//clear the handle}
+00289     getLoaderResults().erase(path);
+00290     getModuleVersions().erase(path);
+00291     getModuleHandles().erase(path);
+00292     \textcolor{keywordflow}{return} \textcolor{stringliteral}{""};
+00293 \}
+00294 
+00295 \textcolor{comment}{/***********************************************************************}
+00296 \textcolor{comment}{ * load modules API call}
+00297 \textcolor{comment}{ **********************************************************************/}
+00298 
+00299 \textcolor{keywordtype}{void} lateLoadNullDevice(\textcolor{keywordtype}{void});
+00300 
+00301 \textcolor{keywordtype}{void} SoapySDR::loadModules(\textcolor{keywordtype}{void})
+00302 \{
+00303     \textcolor{keyword}{static} \textcolor{keywordtype}{bool} loaded = \textcolor{keyword}{false};
+00304     \textcolor{keywordflow}{if} (loaded) \textcolor{keywordflow}{return};
+00305     loaded = \textcolor{keyword}{true};
+00306     lateLoadNullDevice();
+00307 
+00308     \textcolor{keyword}{const} \textcolor{keyword}{auto} paths = listModules();
+00309     \textcolor{keywordflow}{for} (\textcolor{keywordtype}{size\_t} i = 0; i < paths.size(); i++)
+00310     \{
+00311         \textcolor{keywordflow}{if} (getModuleHandles().count(paths[i]) != 0) \textcolor{keywordflow}{continue}; \textcolor{comment}{//was manually loaded}
+00312         \textcolor{keyword}{const} std::string errorMsg = loadModule(paths[i]);
+00313         \textcolor{keywordflow}{if} (not errorMsg.empty()) SoapySDR::logf(SOAPY_SDR_ERROR, \textcolor{stringliteral}{"SoapySDR::loadModule(%s)\(\backslash\)n  %s"}, paths[i
+      ].c\_str(), errorMsg.c\_str());
+00314         \textcolor{keywordflow}{for} (\textcolor{keyword}{const} \textcolor{keyword}{auto} &it : SoapySDR::getLoaderResult(paths[i]))
+00315         \{
+00316             \textcolor{keywordflow}{if} (it.second.empty()) \textcolor{keywordflow}{continue};
+00317             SoapySDR::logf(SOAPY_SDR_ERROR, \textcolor{stringliteral}{"SoapySDR::loadModule(%s)\(\backslash\)n  %s"}, paths[i].c\_str(), it.second.
+      c\_str());
+00318         \}
+00319     \}
+00320 \}
+\end{DoxyCode}

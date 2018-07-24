@@ -1,5 +1,24 @@
 var searchData=
 [
-  ['testbasicstreaming',['TestBasicStreaming',['../d3/d77/classBasicStreamTests_1_1TestBasicStreaming.html',1,'BasicStreamTests']]],
-  ['threaddata',['ThreadData',['../d0/d06/structlime_1_1ConnectionNovenaRF7_1_1ThreadData.html',1,'lime::ConnectionNovenaRF7']]]
+  ['range',['Range',['../d2/d77/structlime_1_1LMS7__Device_1_1Range.html',1,'lime::LMS7_Device']]],
+  ['range',['Range',['../d7/de1/classSoapySDR_1_1Range.html',1,'SoapySDR']]],
+  ['reachrssiparams',['ReachRSSIparams',['../d0/d55/structReachRSSIparams.html',1,'']]],
+  ['read',['read',['../de/d3e/classdoxyxml_1_1generated_1_1compoundsuper_1_1read.html',1,'doxyxml::generated::compoundsuper']]],
+  ['referencetype',['referenceType',['../d7/d95/classdoxyxml_1_1generated_1_1compoundsuper_1_1referenceType.html',1,'doxyxml::generated::compoundsuper']]],
+  ['referencetypesub',['referenceTypeSub',['../da/d1f/classdoxyxml_1_1generated_1_1compound_1_1referenceTypeSub.html',1,'doxyxml::generated::compound']]],
+  ['reftexttype',['refTextType',['../de/da2/classdoxyxml_1_1generated_1_1compoundsuper_1_1refTextType.html',1,'doxyxml::generated::compoundsuper']]],
+  ['reftexttypesub',['refTextTypeSub',['../d8/de6/classdoxyxml_1_1generated_1_1compound_1_1refTextTypeSub.html',1,'doxyxml::generated::compound']]],
+  ['reftype',['refType',['../d3/d5c/classdoxyxml_1_1generated_1_1compoundsuper_1_1refType.html',1,'doxyxml::generated::compoundsuper']]],
+  ['reftypesub',['refTypeSub',['../d5/df9/classdoxyxml_1_1generated_1_1compound_1_1refTypeSub.html',1,'doxyxml::generated::compound']]],
+  ['register',['Register',['../d5/d95/structlime_1_1LMS7002M__RegistersMap_1_1Register.html',1,'lime::LMS7002M_RegistersMap']]],
+  ['register',['Register',['../de/d71/structpnlQSpark_1_1Register.html',1,'pnlQSpark']]],
+  ['registerbatch',['RegisterBatch',['../d1/d14/structRegisterBatch.html',1,'']]],
+  ['registry',['Registry',['../d6/d07/classSoapySDR_1_1Registry.html',1,'SoapySDR']]],
+  ['reimplementtype',['reimplementType',['../dc/da3/classdoxyxml_1_1generated_1_1compoundsuper_1_1reimplementType.html',1,'doxyxml::generated::compoundsuper']]],
+  ['reimplementtypesub',['reimplementTypeSub',['../d4/dbc/classdoxyxml_1_1generated_1_1compound_1_1reimplementTypeSub.html',1,'doxyxml::generated::compound']]],
+  ['resourcedeallocator',['ResourceDeallocator',['../d6/d8b/classResourceDeallocator.html',1,'']]],
+  ['rfspark_5fwxgui',['RFSpark_wxgui',['../d0/d75/classRFSpark__wxgui.html',1,'']]],
+  ['rftestdata',['RFTestData',['../dc/d56/structLimeSDRTest_1_1RFTestData.html',1,'LimeSDRTest']]],
+  ['ringfifo',['RingFIFO',['../d2/d97/classlime_1_1RingFIFO.html',1,'lime']]],
+  ['rssi_5fmeasurements',['RSSI_measurements',['../d9/d10/structlime_1_1RSSI__measurements.html',1,'lime']]]
 ];

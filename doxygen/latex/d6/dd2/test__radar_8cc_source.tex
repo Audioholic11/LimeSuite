@@ -1,0 +1,52 @@
+\subsection{test\+\_\+radar.\+cc}
+\label{test__radar_8cc_source}\index{/home/erik/prefix/default/src/gr-\/radar-\/dev/lib/test\+\_\+radar.\+cc@{/home/erik/prefix/default/src/gr-\/radar-\/dev/lib/test\+\_\+radar.\+cc}}
+
+\begin{DoxyCode}
+00001 \textcolor{comment}{/* -*- c++ -*- */}
+00002 \textcolor{comment}{/*}
+00003 \textcolor{comment}{ * Copyright 2012 Free Software Foundation, Inc.}
+00004 \textcolor{comment}{ *}
+00005 \textcolor{comment}{ * This file is part of GNU Radio}
+00006 \textcolor{comment}{ *}
+00007 \textcolor{comment}{ * GNU Radio is free software; you can redistribute it and/or modify}
+00008 \textcolor{comment}{ * it under the terms of the GNU General Public License as published by}
+00009 \textcolor{comment}{ * the Free Software Foundation; either version 3, or (at your option)}
+00010 \textcolor{comment}{ * any later version.}
+00011 \textcolor{comment}{ *}
+00012 \textcolor{comment}{ * GNU Radio is distributed in the hope that it will be useful,}
+00013 \textcolor{comment}{ * but WITHOUT ANY WARRANTY; without even the implied warranty of}
+00014 \textcolor{comment}{ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the}
+00015 \textcolor{comment}{ * GNU General Public License for more details.}
+00016 \textcolor{comment}{ *}
+00017 \textcolor{comment}{ * You should have received a copy of the GNU General Public License}
+00018 \textcolor{comment}{ * along with GNU Radio; see the file COPYING.  If not, write to}
+00019 \textcolor{comment}{ * the Free Software Foundation, Inc., 51 Franklin Street,}
+00020 \textcolor{comment}{ * Boston, MA 02110-1301, USA.}
+00021 \textcolor{comment}{ */}
+00022 
+00023 \textcolor{preprocessor}{#ifdef HAVE\_CONFIG\_H}
+00024 \textcolor{preprocessor}{#include "config.h"}
+00025 \textcolor{preprocessor}{#endif}
+00026 
+00027 \textcolor{preprocessor}{#include <cppunit/TextTestRunner.h>}
+00028 \textcolor{preprocessor}{#include <cppunit/XmlOutputter.h>}
+00029 
+00030 \textcolor{preprocessor}{#include <gnuradio/unittests.h>}
+00031 \textcolor{preprocessor}{#include "qa_radar.h"}
+00032 \textcolor{preprocessor}{#include <iostream>}
+00033 
+00034 \textcolor{keywordtype}{int}
+00035 main (\textcolor{keywordtype}{int} argc, \textcolor{keywordtype}{char} **argv)
+00036 \{
+00037   CppUnit::TextTestRunner runner;
+00038   std::ofstream xmlfile(get\_unittest\_path(\textcolor{stringliteral}{"radar.xml"}).c\_str());
+00039   CppUnit::XmlOutputter *xmlout = \textcolor{keyword}{new} CppUnit::XmlOutputter(&runner.result(), xmlfile);
+00040 
+00041   runner.addTest(qa_radar::suite());
+00042   runner.setOutputter(xmlout);
+00043 
+00044   \textcolor{keywordtype}{bool} was\_successful = runner.run(\textcolor{stringliteral}{""}, \textcolor{keyword}{false});
+00045 
+00046   \textcolor{keywordflow}{return} was\_successful ? 0 : 1;
+00047 \}
+\end{DoxyCode}

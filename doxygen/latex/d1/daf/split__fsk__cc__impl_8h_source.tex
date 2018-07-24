@@ -1,0 +1,60 @@
+\subsection{split\+\_\+fsk\+\_\+cc\+\_\+impl.\+h}
+\label{split__fsk__cc__impl_8h_source}\index{/home/erik/prefix/default/src/gr-\/radar-\/dev/lib/split\+\_\+fsk\+\_\+cc\+\_\+impl.\+h@{/home/erik/prefix/default/src/gr-\/radar-\/dev/lib/split\+\_\+fsk\+\_\+cc\+\_\+impl.\+h}}
+
+\begin{DoxyCode}
+00001 \textcolor{comment}{/* -*- c++ -*- */}
+00002 \textcolor{comment}{/* }
+00003 \textcolor{comment}{ * Copyright 2014 Communications Engineering Lab, KIT.}
+00004 \textcolor{comment}{ * }
+00005 \textcolor{comment}{ * This is free software; you can redistribute it and/or modify}
+00006 \textcolor{comment}{ * it under the terms of the GNU General Public License as published by}
+00007 \textcolor{comment}{ * the Free Software Foundation; either version 3, or (at your option)}
+00008 \textcolor{comment}{ * any later version.}
+00009 \textcolor{comment}{ * }
+00010 \textcolor{comment}{ * This software is distributed in the hope that it will be useful,}
+00011 \textcolor{comment}{ * but WITHOUT ANY WARRANTY; without even the implied warranty of}
+00012 \textcolor{comment}{ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the}
+00013 \textcolor{comment}{ * GNU General Public License for more details.}
+00014 \textcolor{comment}{ * }
+00015 \textcolor{comment}{ * You should have received a copy of the GNU General Public License}
+00016 \textcolor{comment}{ * along with this software; see the file COPYING.  If not, write to}
+00017 \textcolor{comment}{ * the Free Software Foundation, Inc., 51 Franklin Street,}
+00018 \textcolor{comment}{ * Boston, MA 02110-1301, USA.}
+00019 \textcolor{comment}{ */}
+00020  
+00021 \textcolor{preprocessor}{#ifndef INCLUDED\_RADAR\_SPLIT\_FSK\_CC\_IMPL\_H}
+00022 \textcolor{preprocessor}{#define INCLUDED\_RADAR\_SPLIT\_FSK\_CC\_IMPL\_H}
+00023 
+00024 \textcolor{preprocessor}{#include <radar/split_fsk_cc.h>}
+00025 
+00026 \textcolor{keyword}{namespace }gr \{
+00027   \textcolor{keyword}{namespace }radar \{
+00028 
+00029     \textcolor{keyword}{class }split_fsk_cc_impl : \textcolor{keyword}{public} split_fsk_cc
+00030     \{
+00031      \textcolor{keyword}{private}:
+00032       \textcolor{comment}{// Nothing to declare in this block.}
+00033 
+00034      \textcolor{keyword}{protected}:
+00035       \textcolor{keywordtype}{int} calculate_output_stream_length(\textcolor{keyword}{const} gr\_vector\_int &ninput\_items);
+00036 
+00037      \textcolor{keyword}{public}:
+00038       split_fsk_cc_impl(\textcolor{keywordtype}{int} samp_per_freq, \textcolor{keywordtype}{int} samp\_discard, \textcolor{keyword}{const} std::string& len\_key);
+00039       ~split_fsk_cc_impl();
+00040       
+00041       \textcolor{keywordtype}{int} d_samp_per_freq, d_samp_discard, d_nblocks;
+00042       std::vector< tag\_t > d_tags;
+00043 
+00044       \textcolor{comment}{// Where all the action really happens}
+00045       \textcolor{keywordtype}{int} work(\textcolor{keywordtype}{int} noutput\_items,
+00046                gr\_vector\_int &ninput\_items,
+00047                gr\_vector\_const\_void\_star &input\_items,
+00048                gr\_vector\_void\_star &output\_items);
+00049     \};
+00050 
+00051   \} \textcolor{comment}{// namespace radar}
+00052 \} \textcolor{comment}{// namespace gr}
+00053 
+00054 \textcolor{preprocessor}{#endif }\textcolor{comment}{/* INCLUDED\_RADAR\_SPLIT\_FSK\_CC\_IMPL\_H */}\textcolor{preprocessor}{}
+00055 
+\end{DoxyCode}

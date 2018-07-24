@@ -1,0 +1,58 @@
+\subsection{usrp\+\_\+echotimer\+\_\+cc.\+h}
+\label{usrp__echotimer__cc_8h_source}\index{/home/erik/prefix/default/src/gr-\/radar-\/dev/include/radar/usrp\+\_\+echotimer\+\_\+cc.\+h@{/home/erik/prefix/default/src/gr-\/radar-\/dev/include/radar/usrp\+\_\+echotimer\+\_\+cc.\+h}}
+
+\begin{DoxyCode}
+00001 \textcolor{comment}{/* -*- c++ -*- */}
+00002 \textcolor{comment}{/* }
+00003 \textcolor{comment}{ * Copyright 2014 Communications Engineering Lab, KIT.}
+00004 \textcolor{comment}{ * }
+00005 \textcolor{comment}{ * This is free software; you can redistribute it and/or modify}
+00006 \textcolor{comment}{ * it under the terms of the GNU General Public License as published by}
+00007 \textcolor{comment}{ * the Free Software Foundation; either version 3, or (at your option)}
+00008 \textcolor{comment}{ * any later version.}
+00009 \textcolor{comment}{ * }
+00010 \textcolor{comment}{ * This software is distributed in the hope that it will be useful,}
+00011 \textcolor{comment}{ * but WITHOUT ANY WARRANTY; without even the implied warranty of}
+00012 \textcolor{comment}{ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the}
+00013 \textcolor{comment}{ * GNU General Public License for more details.}
+00014 \textcolor{comment}{ * }
+00015 \textcolor{comment}{ * You should have received a copy of the GNU General Public License}
+00016 \textcolor{comment}{ * along with this software; see the file COPYING.  If not, write to}
+00017 \textcolor{comment}{ * the Free Software Foundation, Inc., 51 Franklin Street,}
+00018 \textcolor{comment}{ * Boston, MA 02110-1301, USA.}
+00019 \textcolor{comment}{ */}
+00020 
+00021 \textcolor{preprocessor}{#ifndef INCLUDED\_RADAR\_USRP\_ECHOTIMER\_CC\_H}
+00022 \textcolor{preprocessor}{#define INCLUDED\_RADAR\_USRP\_ECHOTIMER\_CC\_H}
+00023 
+00024 \textcolor{preprocessor}{#include <radar/api.h>}
+00025 \textcolor{preprocessor}{#include <gnuradio/tagged\_stream\_block.h>}
+00026 
+00027 \textcolor{keyword}{namespace }gr \{
+00028   \textcolor{keyword}{namespace }radar \{
+00029 
+00035     \textcolor{keyword}{class }RADAR_API usrp_echotimer_cc : \textcolor{keyword}{virtual} \textcolor{keyword}{public} gr::tagged\_stream\_block
+00036     \{
+00037      \textcolor{keyword}{public}:
+00038       \textcolor{keyword}{typedef} boost::shared\_ptr<usrp\_echotimer\_cc> sptr;
+00039 
+00048       \textcolor{keyword}{static} sptr make(\textcolor{keywordtype}{int} samp_rate, \textcolor{keywordtype}{float} center_freq, \textcolor{keywordtype}{int} num\_delay\_samps,
+00049         std::string args\_tx, std::string wire\_tx, std::string clock\_source\_tx, 
+      std::string time\_source\_tx, std::string antenna\_tx, \textcolor{keywordtype}{float} gain\_tx,
+00050         \textcolor{keywordtype}{float} timeout\_tx, \textcolor{keywordtype}{float} wait\_tx, \textcolor{keywordtype}{float} lo\_offset\_tx,
+00051         std::string args\_rx, std::string wire\_rx, std::string clock\_source\_rx, 
+      std::string time\_source\_rx, std::string antenna\_rx, \textcolor{keywordtype}{float} gain\_rx,
+00052         \textcolor{keywordtype}{float} timeout\_rx, \textcolor{keywordtype}{float} wait\_rx, \textcolor{keywordtype}{float} lo\_offset\_rx,
+00053         \textcolor{keyword}{const} std::string& len\_key=\textcolor{stringliteral}{"packet\_len"});
+00054         
+00055       \textcolor{keyword}{virtual} \textcolor{keywordtype}{void} set\_num\_delay\_samps(\textcolor{keywordtype}{int} num\_samps) = 0;
+00056       \textcolor{keyword}{virtual} \textcolor{keywordtype}{void} set\_rx\_gain(\textcolor{keywordtype}{float} gain) = 0;
+00057       \textcolor{keyword}{virtual} \textcolor{keywordtype}{void} set\_tx\_gain(\textcolor{keywordtype}{float} gain) = 0;
+00058     \};
+00059 
+00060   \} \textcolor{comment}{// namespace radar}
+00061 \} \textcolor{comment}{// namespace gr}
+00062 
+00063 \textcolor{preprocessor}{#endif }\textcolor{comment}{/* INCLUDED\_RADAR\_USRP\_ECHOTIMER\_CC\_H */}\textcolor{preprocessor}{}
+00064 
+\end{DoxyCode}

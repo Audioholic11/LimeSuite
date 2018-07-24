@@ -1,0 +1,175 @@
+\subsection{gr\+:\+:radar\+:\+:os\+\_\+cfar\+\_\+2d\+\_\+vc Class Reference}
+\label{classgr_1_1radar_1_1os__cfar__2d__vc}\index{gr\+::radar\+::os\+\_\+cfar\+\_\+2d\+\_\+vc@{gr\+::radar\+::os\+\_\+cfar\+\_\+2d\+\_\+vc}}
+
+
+This block estimates peaks of a given matrix. A matrix can be represented as a combination of vectors and tagged streams. Input has to be a matrix with linear scaled values (N\+OT logarithmic scaled!). Used algorithm is a 2D O\+S-\/\+C\+F\+AR algorithm. The algorithm uses around the cell under test (C\+UT) on each side samp\+\_\+compare samples to estimate the noise floor. samp\+\_\+protect is a protected are around the C\+UT which is not used for acquiring compare samples. Index 0 of a input vector refers to x axis properties and index 1 refers to y axis properties. The relative threshold is defined by the bin of the vector within the sorted samp\+\_\+compare samples. A standard value is rel\+\_\+threshold = 0.\+78. The value of this bin is multiplied by mult\+\_\+threshold and compared with the C\+UT. If the magnitude square of the C\+UT is greater than the threshold the matrix item is accepted. Used identifiers (symbols) for data are \textquotesingle{}axis\+\_\+x\textquotesingle{}, \textquotesingle{}axis\+\_\+y\textquotesingle{} and \textquotesingle{}power\textquotesingle{}.  
+
+
+
+
+{\ttfamily \#include $<$os\+\_\+cfar\+\_\+2d\+\_\+vc.\+h$>$}
+
+
+
+Inheritance diagram for gr\+:\+:radar\+:\+:os\+\_\+cfar\+\_\+2d\+\_\+vc\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=550pt]{d9/df5/classgr_1_1radar_1_1os__cfar__2d__vc__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for gr\+:\+:radar\+:\+:os\+\_\+cfar\+\_\+2d\+\_\+vc\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=197pt]{da/d97/classgr_1_1radar_1_1os__cfar__2d__vc__coll__graph}
+\end{center}
+\end{figure}
+\subsubsection*{Public Types}
+\begin{DoxyCompactItemize}
+\item 
+typedef boost\+::shared\+\_\+ptr$<$ {\bf os\+\_\+cfar\+\_\+2d\+\_\+vc} $>$ {\bf sptr}
+\end{DoxyCompactItemize}
+\subsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+virtual {\bf void} {\bf set\+\_\+rel\+\_\+threshold} (float inp)=0
+\item 
+virtual {\bf void} {\bf set\+\_\+mult\+\_\+threshold} (float inp)=0
+\item 
+virtual {\bf void} {\bf set\+\_\+samp\+\_\+compare} ({\bf std\+::vector}$<$ {\bf int} $>$ inp)=0
+\item 
+virtual {\bf void} {\bf set\+\_\+samp\+\_\+protect} ({\bf std\+::vector}$<$ {\bf int} $>$ inp)=0
+\end{DoxyCompactItemize}
+\subsubsection*{Static Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+static {\bf sptr} {\bf make} ({\bf int} vlen, {\bf std\+::vector}$<$ {\bf int} $>$ samp\+\_\+compare, {\bf std\+::vector}$<$ {\bf int} $>$ samp\+\_\+protect, float rel\+\_\+threshold, float mult\+\_\+threshold, const {\bf std\+::string} \&len\+\_\+key=\char`\"{}packet\+\_\+len\char`\"{})
+\begin{DoxyCompactList}\small\item\em Return a shared\+\_\+ptr to a new instance of \doxyref{radar\+::os\+\_\+cfar\+\_\+2d\+\_\+vc}{p.}{d5/d09/classgr_1_1radar_1_1os__cfar__2d__vc}. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsubsection{Detailed Description}
+This block estimates peaks of a given matrix. A matrix can be represented as a combination of vectors and tagged streams. Input has to be a matrix with linear scaled values (N\+OT logarithmic scaled!). Used algorithm is a 2D O\+S-\/\+C\+F\+AR algorithm. The algorithm uses around the cell under test (C\+UT) on each side samp\+\_\+compare samples to estimate the noise floor. samp\+\_\+protect is a protected are around the C\+UT which is not used for acquiring compare samples. Index 0 of a input vector refers to x axis properties and index 1 refers to y axis properties. The relative threshold is defined by the bin of the vector within the sorted samp\+\_\+compare samples. A standard value is rel\+\_\+threshold = 0.\+78. The value of this bin is multiplied by mult\+\_\+threshold and compared with the C\+UT. If the magnitude square of the C\+UT is greater than the threshold the matrix item is accepted. Used identifiers (symbols) for data are \textquotesingle{}axis\+\_\+x\textquotesingle{}, \textquotesingle{}axis\+\_\+y\textquotesingle{} and \textquotesingle{}power\textquotesingle{}. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em vlen} & Input vector length \\
+\hline
+{\em samp\+\_\+compare} & Compare samples (vector index refers to axis) \\
+\hline
+{\em samp\+\_\+protect} & Protected samples (vector index refers to axis) \\
+\hline
+{\em rel\+\_\+threshold} & Relative threshold \\
+\hline
+{\em mult\+\_\+threshold} & Multiplier threshold \\
+\hline
+{\em len\+\_\+key} & Packet length key for tagged stream \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line {\bf 44} of file {\bf os\+\_\+cfar\+\_\+2d\+\_\+vc.\+h}.
+
+
+
+\subsubsection{Member Typedef Documentation}
+\index{gr\+::radar\+::os\+\_\+cfar\+\_\+2d\+\_\+vc@{gr\+::radar\+::os\+\_\+cfar\+\_\+2d\+\_\+vc}!sptr@{sptr}}
+\index{sptr@{sptr}!gr\+::radar\+::os\+\_\+cfar\+\_\+2d\+\_\+vc@{gr\+::radar\+::os\+\_\+cfar\+\_\+2d\+\_\+vc}}
+\paragraph[{sptr}]{\setlength{\rightskip}{0pt plus 5cm}typedef boost\+::shared\+\_\+ptr$<${\bf os\+\_\+cfar\+\_\+2d\+\_\+vc}$>$ {\bf gr\+::radar\+::os\+\_\+cfar\+\_\+2d\+\_\+vc\+::sptr}}\label{classgr_1_1radar_1_1os__cfar__2d__vc_a40f845fbdebf70ea2e266315209aebfd}
+
+
+Definition at line {\bf 47} of file {\bf os\+\_\+cfar\+\_\+2d\+\_\+vc.\+h}.
+
+
+
+\subsubsection{Member Function Documentation}
+\index{gr\+::radar\+::os\+\_\+cfar\+\_\+2d\+\_\+vc@{gr\+::radar\+::os\+\_\+cfar\+\_\+2d\+\_\+vc}!make@{make}}
+\index{make@{make}!gr\+::radar\+::os\+\_\+cfar\+\_\+2d\+\_\+vc@{gr\+::radar\+::os\+\_\+cfar\+\_\+2d\+\_\+vc}}
+\paragraph[{make(int vlen, std\+::vector$<$ int $>$ samp\+\_\+compare, std\+::vector$<$ int $>$ samp\+\_\+protect, float rel\+\_\+threshold, float mult\+\_\+threshold, const std\+::string \&len\+\_\+key=""packet\+\_\+len"")}]{\setlength{\rightskip}{0pt plus 5cm}{\bf os\+\_\+cfar\+\_\+2d\+\_\+vc\+::sptr} gr\+::radar\+::os\+\_\+cfar\+\_\+2d\+\_\+vc\+::make (
+\begin{DoxyParamCaption}
+\item[{{\bf int}}]{vlen, }
+\item[{{\bf std\+::vector}$<$ {\bf int} $>$}]{samp\+\_\+compare, }
+\item[{{\bf std\+::vector}$<$ {\bf int} $>$}]{samp\+\_\+protect, }
+\item[{float}]{rel\+\_\+threshold, }
+\item[{float}]{mult\+\_\+threshold, }
+\item[{const {\bf std\+::string} \&}]{len\+\_\+key = {\ttfamily \char`\"{}packet\+\_\+len\char`\"{}}}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [static]}}\label{classgr_1_1radar_1_1os__cfar__2d__vc_ad66ba7910c5c4c0445112001bffc4758}
+
+
+Return a shared\+\_\+ptr to a new instance of \doxyref{radar\+::os\+\_\+cfar\+\_\+2d\+\_\+vc}{p.}{d5/d09/classgr_1_1radar_1_1os__cfar__2d__vc}. 
+
+To avoid accidental use of raw pointers, \doxyref{radar\+::os\+\_\+cfar\+\_\+2d\+\_\+vc}{p.}{d5/d09/classgr_1_1radar_1_1os__cfar__2d__vc}\textquotesingle{}s constructor is in a private implementation class. \doxyref{radar\+::os\+\_\+cfar\+\_\+2d\+\_\+vc\+::make}{p.}{d5/d09/classgr_1_1radar_1_1os__cfar__2d__vc_ad66ba7910c5c4c0445112001bffc4758} is the public interface for creating new instances. 
+
+Definition at line {\bf 32} of file {\bf os\+\_\+cfar\+\_\+2d\+\_\+vc\+\_\+impl.\+cc}.
+
+
+
+Referenced by {\bf \+\_\+wrap\+\_\+os\+\_\+cfar\+\_\+2d\+\_\+vc\+\_\+make()}.
+
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=348pt]{d5/d09/classgr_1_1radar_1_1os__cfar__2d__vc_ad66ba7910c5c4c0445112001bffc4758_icgraph}
+\end{center}
+\end{figure}
+
+
+\index{gr\+::radar\+::os\+\_\+cfar\+\_\+2d\+\_\+vc@{gr\+::radar\+::os\+\_\+cfar\+\_\+2d\+\_\+vc}!set\+\_\+mult\+\_\+threshold@{set\+\_\+mult\+\_\+threshold}}
+\index{set\+\_\+mult\+\_\+threshold@{set\+\_\+mult\+\_\+threshold}!gr\+::radar\+::os\+\_\+cfar\+\_\+2d\+\_\+vc@{gr\+::radar\+::os\+\_\+cfar\+\_\+2d\+\_\+vc}}
+\paragraph[{set\+\_\+mult\+\_\+threshold(float inp)=0}]{\setlength{\rightskip}{0pt plus 5cm}virtual {\bf void} gr\+::radar\+::os\+\_\+cfar\+\_\+2d\+\_\+vc\+::set\+\_\+mult\+\_\+threshold (
+\begin{DoxyParamCaption}
+\item[{float}]{inp}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [pure virtual]}}\label{classgr_1_1radar_1_1os__cfar__2d__vc_a3cb44d8c4d817e788b13ddd216a1a5a4}
+
+
+Implemented in {\bf gr\+::radar\+::os\+\_\+cfar\+\_\+2d\+\_\+vc\+\_\+impl} \doxyref{}{p.}{da/d49/classgr_1_1radar_1_1os__cfar__2d__vc__impl_a5e7d37f3d3f83f8c22ac19e2353940f3}.
+
+\index{gr\+::radar\+::os\+\_\+cfar\+\_\+2d\+\_\+vc@{gr\+::radar\+::os\+\_\+cfar\+\_\+2d\+\_\+vc}!set\+\_\+rel\+\_\+threshold@{set\+\_\+rel\+\_\+threshold}}
+\index{set\+\_\+rel\+\_\+threshold@{set\+\_\+rel\+\_\+threshold}!gr\+::radar\+::os\+\_\+cfar\+\_\+2d\+\_\+vc@{gr\+::radar\+::os\+\_\+cfar\+\_\+2d\+\_\+vc}}
+\paragraph[{set\+\_\+rel\+\_\+threshold(float inp)=0}]{\setlength{\rightskip}{0pt plus 5cm}virtual {\bf void} gr\+::radar\+::os\+\_\+cfar\+\_\+2d\+\_\+vc\+::set\+\_\+rel\+\_\+threshold (
+\begin{DoxyParamCaption}
+\item[{float}]{inp}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [pure virtual]}}\label{classgr_1_1radar_1_1os__cfar__2d__vc_a6b5f01cebda7b41e32d438b574572a5c}
+
+
+Implemented in {\bf gr\+::radar\+::os\+\_\+cfar\+\_\+2d\+\_\+vc\+\_\+impl} \doxyref{}{p.}{da/d49/classgr_1_1radar_1_1os__cfar__2d__vc__impl_a236d34917c911a7d8a5e0c5fab9dc943}.
+
+\index{gr\+::radar\+::os\+\_\+cfar\+\_\+2d\+\_\+vc@{gr\+::radar\+::os\+\_\+cfar\+\_\+2d\+\_\+vc}!set\+\_\+samp\+\_\+compare@{set\+\_\+samp\+\_\+compare}}
+\index{set\+\_\+samp\+\_\+compare@{set\+\_\+samp\+\_\+compare}!gr\+::radar\+::os\+\_\+cfar\+\_\+2d\+\_\+vc@{gr\+::radar\+::os\+\_\+cfar\+\_\+2d\+\_\+vc}}
+\paragraph[{set\+\_\+samp\+\_\+compare(std\+::vector$<$ int $>$ inp)=0}]{\setlength{\rightskip}{0pt plus 5cm}virtual {\bf void} gr\+::radar\+::os\+\_\+cfar\+\_\+2d\+\_\+vc\+::set\+\_\+samp\+\_\+compare (
+\begin{DoxyParamCaption}
+\item[{{\bf std\+::vector}$<$ {\bf int} $>$}]{inp}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [pure virtual]}}\label{classgr_1_1radar_1_1os__cfar__2d__vc_a0ade86b62ae5f7067231d612938f4dd3}
+
+
+Implemented in {\bf gr\+::radar\+::os\+\_\+cfar\+\_\+2d\+\_\+vc\+\_\+impl} \doxyref{}{p.}{da/d49/classgr_1_1radar_1_1os__cfar__2d__vc__impl_a12a2d2fd2a3ba86558b5e3d0aea1a9ee}.
+
+\index{gr\+::radar\+::os\+\_\+cfar\+\_\+2d\+\_\+vc@{gr\+::radar\+::os\+\_\+cfar\+\_\+2d\+\_\+vc}!set\+\_\+samp\+\_\+protect@{set\+\_\+samp\+\_\+protect}}
+\index{set\+\_\+samp\+\_\+protect@{set\+\_\+samp\+\_\+protect}!gr\+::radar\+::os\+\_\+cfar\+\_\+2d\+\_\+vc@{gr\+::radar\+::os\+\_\+cfar\+\_\+2d\+\_\+vc}}
+\paragraph[{set\+\_\+samp\+\_\+protect(std\+::vector$<$ int $>$ inp)=0}]{\setlength{\rightskip}{0pt plus 5cm}virtual {\bf void} gr\+::radar\+::os\+\_\+cfar\+\_\+2d\+\_\+vc\+::set\+\_\+samp\+\_\+protect (
+\begin{DoxyParamCaption}
+\item[{{\bf std\+::vector}$<$ {\bf int} $>$}]{inp}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [pure virtual]}}\label{classgr_1_1radar_1_1os__cfar__2d__vc_ad33d6067a6e010744ccbf43748203e99}
+
+
+Implemented in {\bf gr\+::radar\+::os\+\_\+cfar\+\_\+2d\+\_\+vc\+\_\+impl} \doxyref{}{p.}{da/d49/classgr_1_1radar_1_1os__cfar__2d__vc__impl_afeb4e407362b2eeb2908d6dc052c5f27}.
+
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+/home/erik/prefix/default/src/gr-\/radar-\/dev/include/radar/{\bf os\+\_\+cfar\+\_\+2d\+\_\+vc.\+h}\item 
+/home/erik/prefix/default/src/gr-\/radar-\/dev/lib/{\bf os\+\_\+cfar\+\_\+2d\+\_\+vc\+\_\+impl.\+cc}\end{DoxyCompactItemize}

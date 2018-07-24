@@ -1,0 +1,111 @@
+\subsection{Types\+C.\+cpp}
+\label{TypesC_8cpp_source}\index{/home/erik/prefix/default/src/soapysdr/lib/\+Types\+C.\+cpp@{/home/erik/prefix/default/src/soapysdr/lib/\+Types\+C.\+cpp}}
+
+\begin{DoxyCode}
+00001 \textcolor{comment}{// Copyright (c) 2014-2016 Josh Blum}
+00002 \textcolor{comment}{// SPDX-License-Identifier: BSL-1.0}
+00003 
+00004 \textcolor{preprocessor}{#include "TypeHelpers.hpp"}
+00005 \textcolor{preprocessor}{#include <SoapySDR/Types.h>}
+00006 \textcolor{preprocessor}{#include <cstdlib>}
+00007 \textcolor{preprocessor}{#include <cstring>}
+00008 
+00009 \textcolor{keyword}{extern} \textcolor{stringliteral}{"C"} \{
+00010 
+00011 SoapySDRKwargs SoapySDRKwargs_fromString(\textcolor{keyword}{const} \textcolor{keywordtype}{char} *markup)
+00012 \{
+00013     \textcolor{keywordflow}{return} toKwargs(SoapySDR::KwargsFromString(markup));
+00014 \}
+00015 
+00016 \textcolor{keywordtype}{char} *SoapySDRKwargs_toString(\textcolor{keyword}{const} SoapySDRKwargs *args)
+00017 \{
+00018     \textcolor{keywordflow}{return} strdup(SoapySDR::KwargsToString(toKwargs(args)).c\_str());
+00019 \}
+00020 
+00021 \textcolor{keywordtype}{void} SoapySDRStrings_clear(\textcolor{keywordtype}{char} ***elems, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} length)
+00022 \{
+00023     \textcolor{keywordflow}{for} (\textcolor{keywordtype}{size\_t} i = 0; i < length; i++)
+00024     \{
+00025         free((*elems)[i]);
+00026     \}
+00027     free(*elems);
+00028     *elems = NULL;
+00029 \}
+00030 
+00031 \textcolor{keywordtype}{void} SoapySDRKwargs_set(SoapySDRKwargs *args, \textcolor{keyword}{const} \textcolor{keywordtype}{char} *key, \textcolor{keyword}{const} \textcolor{keywordtype}{char} *val)
+00032 \{
+00033     \textcolor{keywordflow}{for} (\textcolor{keywordtype}{size\_t} i = 0; i < args->size; i++)
+00034     \{
+00035         \textcolor{keywordflow}{if} (strcmp(args->keys[i], key) == 0)
+00036         \{
+00037             free(args->vals[i]);
+00038             args->vals[i] = strdup(val);
+00039             \textcolor{keywordflow}{return};
+00040         \}
+00041     \}
+00042 
+00043     args->size++;
+00044     args->keys = (\textcolor{keywordtype}{char} **)realloc(args->keys, \textcolor{keyword}{sizeof}(\textcolor{keywordtype}{char} *)*args->size);
+00045     args->vals = (\textcolor{keywordtype}{char} **)realloc(args->vals, \textcolor{keyword}{sizeof}(\textcolor{keywordtype}{char} *)*args->size);
+00046 
+00047     args->keys[args->size-1] = strdup(key);
+00048     args->vals[args->size-1] = strdup(val);
+00049 \}
+00050 
+00051 \textcolor{keyword}{const} \textcolor{keywordtype}{char} *SoapySDRKwargs_get(SoapySDRKwargs *args, \textcolor{keyword}{const} \textcolor{keywordtype}{char} *key)
+00052 \{
+00053     \textcolor{keywordflow}{for} (\textcolor{keywordtype}{size\_t} i = 0; i < args->size; i++)
+00054     \{
+00055         \textcolor{keywordflow}{if} (strcmp(args->keys[i], key) == 0)
+00056         \{
+00057             \textcolor{keywordflow}{return} args->vals[i];
+00058         \}
+00059     \}
+00060     \textcolor{keywordflow}{return} NULL;
+00061 \}
+00062 
+00063 \textcolor{keywordtype}{void} SoapySDRKwargs_clear(SoapySDRKwargs *args)
+00064 \{
+00065     SoapySDRStrings_clear(&args->keys, args->size);
+00066     SoapySDRStrings_clear(&args->vals, args->size);
+00067     args->size = 0;
+00068 \}
+00069 
+00070 \textcolor{keywordtype}{void} SoapySDRKwargsList_clear(SoapySDRKwargs *args, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} length)
+00071 \{
+00072     \textcolor{keywordflow}{for} (\textcolor{keywordtype}{size\_t} i = 0; i < length; i++) SoapySDRKwargs_clear(args+i);
+00073     free(args);
+00074 \}
+00075 
+00076 \textcolor{keywordtype}{void} SoapySDRArgInfo_clear(SoapySDRArgInfo *info)
+00077 \{
+00078     \textcolor{comment}{//clear strings}
+00079     free(info->key);
+00080     info->key = NULL;
+00081 
+00082     free(info->value);
+00083     info->value = NULL;
+00084 
+00085     free(info->name);
+00086     info->name = NULL;
+00087 
+00088     free(info->description);
+00089     info->description = NULL;
+00090 
+00091     free(info->units);
+00092     info->units = NULL;
+00093 
+00094     \textcolor{comment}{//clear options}
+00095     SoapySDRStrings_clear(&info->options, info->numOptions);
+00096     SoapySDRStrings_clear(&info->optionNames, info->numOptions);
+00097     info->numOptions = 0;
+00098 \}
+00099 
+00100 \textcolor{keywordtype}{void} SoapySDRArgInfoList_clear(SoapySDRArgInfo *info, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} length)
+00101 \{
+00102     \textcolor{keywordflow}{for} (\textcolor{keywordtype}{size\_t} i = 0; i < length; i++) SoapySDRArgInfo_clear(info+i);
+00103     free(info);
+00104 \}
+00105 
+00106 \}
+\end{DoxyCode}

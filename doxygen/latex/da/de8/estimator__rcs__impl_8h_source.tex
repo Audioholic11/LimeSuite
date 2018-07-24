@@ -1,0 +1,76 @@
+\subsection{estimator\+\_\+rcs\+\_\+impl.\+h}
+\label{estimator__rcs__impl_8h_source}\index{/home/erik/prefix/default/src/gr-\/radar-\/dev/lib/estimator\+\_\+rcs\+\_\+impl.\+h@{/home/erik/prefix/default/src/gr-\/radar-\/dev/lib/estimator\+\_\+rcs\+\_\+impl.\+h}}
+
+\begin{DoxyCode}
+00001 \textcolor{comment}{/* -*- c++ -*- */}
+00002 \textcolor{comment}{/* }
+00003 \textcolor{comment}{ * Copyright 2014 Communications Engineering Lab, KIT.}
+00004 \textcolor{comment}{ * }
+00005 \textcolor{comment}{ * This is free software; you can redistribute it and/or modify}
+00006 \textcolor{comment}{ * it under the terms of the GNU General Public License as published by}
+00007 \textcolor{comment}{ * the Free Software Foundation; either version 3, or (at your option)}
+00008 \textcolor{comment}{ * any later version.}
+00009 \textcolor{comment}{ * }
+00010 \textcolor{comment}{ * This software is distributed in the hope that it will be useful,}
+00011 \textcolor{comment}{ * but WITHOUT ANY WARRANTY; without even the implied warranty of}
+00012 \textcolor{comment}{ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the}
+00013 \textcolor{comment}{ * GNU General Public License for more details.}
+00014 \textcolor{comment}{ * }
+00015 \textcolor{comment}{ * You should have received a copy of the GNU General Public License}
+00016 \textcolor{comment}{ * along with this software; see the file COPYING.  If not, write to}
+00017 \textcolor{comment}{ * the Free Software Foundation, Inc., 51 Franklin Street,}
+00018 \textcolor{comment}{ * Boston, MA 02110-1301, USA.}
+00019 \textcolor{comment}{ */}
+00020 
+00021 \textcolor{preprocessor}{#ifndef INCLUDED\_RADAR\_ESTIMATOR\_RCS\_IMPL\_H}
+00022 \textcolor{preprocessor}{#define INCLUDED\_RADAR\_ESTIMATOR\_RCS\_IMPL\_H}
+00023 
+00024 \textcolor{preprocessor}{#include <radar/estimator_rcs.h>}
+00025 
+00026 \textcolor{keyword}{namespace }gr \{
+00027   \textcolor{keyword}{namespace }radar \{
+00028 
+00029     \textcolor{keyword}{class }estimator_rcs_impl : \textcolor{keyword}{public} estimator_rcs
+00030     \{
+00031      \textcolor{keyword}{private}:
+00032       \textcolor{comment}{// Nothing to declare in this block}
+00033 
+00034      \textcolor{keyword}{public}:
+00035       estimator_rcs_impl(\textcolor{keywordtype}{int} num\_mean, \textcolor{keywordtype}{float} center_freq, \textcolor{keywordtype}{float} antenna\_gain\_tx, \textcolor{keywordtype}{float} antenna\_gain\_rx, \textcolor{keywordtype}{
+      float} usrp\_gain\_rx, \textcolor{keywordtype}{float} power\_tx, \textcolor{keywordtype}{float} corr\_factor, \textcolor{keywordtype}{float} exponent);
+00036       ~estimator_rcs_impl();
+00037       \textcolor{keywordtype}{void} handle_msg(pmt::pmt\_t msg);
+00038       \textcolor{keywordtype}{float} calculate_rcs();
+00039       \textcolor{keywordtype}{float} calculate_vector_mean(boost::circular\_buffer<float>*);
+00040       \textcolor{keywordtype}{void} set_num_mean(\textcolor{keywordtype}{int} val);
+00041       \textcolor{keywordtype}{void} set_center_freq(\textcolor{keywordtype}{float} val);
+00042       \textcolor{keywordtype}{void} set_antenna_gain_tx(\textcolor{keywordtype}{float} val);
+00043       \textcolor{keywordtype}{void} set_antenna_gain_rx(\textcolor{keywordtype}{float} val);
+00044       \textcolor{keywordtype}{void} set_usrp_gain_rx(\textcolor{keywordtype}{float} val);
+00045       \textcolor{keywordtype}{void} set_power_tx(\textcolor{keywordtype}{float} val);
+00046       \textcolor{keywordtype}{void} set_corr_factor(\textcolor{keywordtype}{float} val);
+00047 
+00048 
+00049       boost::circular\_buffer<float> d_rcs_vals;
+00050       \textcolor{keywordtype}{int} d_num_mean, d_loop_counter;
+00051 
+00052       \textcolor{keywordtype}{float} d_center_freq, d_antenna_gain_tx, d_antenna_gain_rx, d_usrp_gain_rx, 
+      d_power_tx, d_fak, d_lambda, d_antenna_gain_abs_rx,
+00053         d_antenna_gain_abs_tx, d_corr_factor, d_exponent;
+00054 
+00055       pmt::pmt\_t d_port_id_in, d_port_id_out;
+00056       pmt::pmt\_t d_prange, d_ppower, d_value;
+00057       pmt::pmt\_t d_rcs_value, d_rcs_key, d_rcs_pack;
+00058       std::vector<float> d_range, d_power, d_rcs;
+00059       std::vector<pmt::pmt\_t> d_msg_hold;
+00060 
+00061       constexpr \textcolor{keyword}{static} \textcolor{keywordtype}{float} c_light = 3e8;
+00062 
+00063     \};
+00064 
+00065   \} \textcolor{comment}{// namespace radar}
+00066 \} \textcolor{comment}{// namespace gr}
+00067 
+00068 \textcolor{preprocessor}{#endif }\textcolor{comment}{/* INCLUDED\_RADAR\_ESTIMATOR\_RCS\_IMPL\_H */}\textcolor{preprocessor}{}
+00069 
+\end{DoxyCode}

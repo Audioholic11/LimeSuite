@@ -10,43 +10,59 @@
 00006 
 00007 \textcolor{keyword}{namespace }lime\{
 00008 
-00009 \textcolor{keyword}{struct }FPGA_DataPacket
-00010 \{
-00011     uint8\_t reserved[8];
-00012     uint64\_t counter;
-00013     uint8\_t data[4080];
-00014 \};
-00015 
-00016 \textcolor{keyword}{struct }complex16_t
-00017 \{
-00018     int16\_t i;
-00019     int16\_t q;
-00020 \};
-00021 
-00022 \textcolor{keyword}{const} \textcolor{keywordtype}{int} samples12InPkt = 1360;
-00023 \textcolor{keyword}{const} \textcolor{keywordtype}{int} samples16InPkt = 1020; 
-00024 
-00025 \textcolor{keyword}{class }SamplesPacket
-00026 \{
-00027 \textcolor{keyword}{public}:
-00028     \textcolor{keyword}{static} \textcolor{keyword}{const} int16\_t maxSamplesInPacket = samples12InPkt; \textcolor{comment}{//total number of samples in all channels
+00009 
+00010   \textcolor{comment}{//const int dataLength = 4080;}
+00011   \textcolor{keyword}{const} \textcolor{keywordtype}{int} dataLength = 2016;
+00012 
+00013 \textcolor{keyword}{struct }FPGA_DataPacket
+00014 \{
+00015     uint8\_t reserved[8];
+00016     uint64\_t counter;
+00017     uint8\_t data[dataLength];
+00018     \textcolor{comment}{//uint8\_t data[2016];}
+00019     uint64\_t ftr0;\textcolor{comment}{//lastchirp\_timestamp}
+00020     uint64\_t ftr1;\textcolor{comment}{//chirptime}
+00021 \};
+00022 
+00023 \textcolor{keyword}{struct }complex16_t
+00024 \{
+00025     int16\_t i;
+00026     int16\_t q;
+00027 \};
+00028 
+00029 
+00030 \textcolor{comment}{//const int samples12InPkt = 1360;}
+00031 \textcolor{comment}{//const int samples12InPkt = 672;}
+00032 \textcolor{keyword}{const} \textcolor{keywordtype}{int} samples12InPkt = dataLength*8/12/2;
+00033 \textcolor{comment}{//const int samples16InPkt = 1020;}
+00034 \textcolor{keyword}{const} \textcolor{keywordtype}{int} samples16InPkt = dataLength*8/16/2;
+00035 
+00036 \textcolor{keyword}{class }SamplesPacket
+00037 \{
+00038 \textcolor{keyword}{public}:
+00039     \textcolor{keyword}{static} \textcolor{keyword}{const} int16\_t maxSamplesInPacket = samples12InPkt; \textcolor{comment}{//total number of samples in all channels
        combined}
-00029     uint64\_t timestamp; \textcolor{comment}{//timestamp of the packet}
-00030     uint16\_t first; \textcolor{comment}{//index of first unused sample in samples}
-00031     uint16\_t last; \textcolor{comment}{//end index of samples}
-00032     complex16_t samples[maxSamplesInPacket];
-00033     uint32\_t flags;
-00034 
-00035     SamplesPacket()
-00036     \{
-00037         timestamp = 0;
-00038         first = 0;
-00039         last = 0;
-00040         flags = 0;
-00041     \}
-00042 \};
-00043 
-00044 \}\textcolor{comment}{// namespace lime}
+00040     uint64\_t timestamp; \textcolor{comment}{//timestamp of the packet}
+00041     uint16\_t first; \textcolor{comment}{//index of first unused sample in samples}
+00042     uint16\_t last; \textcolor{comment}{//end index of samples}
+00043     complex16_t samples[maxSamplesInPacket];
+00044     uint32\_t flags;
 00045 
-00046 \textcolor{preprocessor}{#endif}
+00046     uint64\_t lastchirp_timestamp;
+00047     uint64\_t chirptime;
+00048 
+00049     SamplesPacket()
+00050     \{
+00051         timestamp = 0;
+00052         first = 0;
+00053         last = 0;
+00054         flags = 0;
+00055         lastchirp\_timestamp = 0;
+00056         chirptime = 0;
+00057     \}
+00058 \};
+00059 
+00060 \}\textcolor{comment}{// namespace lime}
+00061 
+00062 \textcolor{preprocessor}{#endif}
 \end{DoxyCode}

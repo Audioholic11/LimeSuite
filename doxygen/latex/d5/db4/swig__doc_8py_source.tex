@@ -1,0 +1,260 @@
+\subsection{swig\+\_\+doc.\+py}
+\label{swig__doc_8py_source}\index{/home/erik/prefix/default/src/gr-\/radar-\/dev/docs/doxygen/swig\+\_\+doc.\+py@{/home/erik/prefix/default/src/gr-\/radar-\/dev/docs/doxygen/swig\+\_\+doc.\+py}}
+
+\begin{DoxyCode}
+00001 \textcolor{comment}{#}
+00002 \textcolor{comment}{# Copyright 2010,2011 Free Software Foundation, Inc.}
+00003 \textcolor{comment}{#}
+00004 \textcolor{comment}{# This file is part of GNU Radio}
+00005 \textcolor{comment}{#}
+00006 \textcolor{comment}{# GNU Radio is free software; you can redistribute it and/or modify}
+00007 \textcolor{comment}{# it under the terms of the GNU General Public License as published by}
+00008 \textcolor{comment}{# the Free Software Foundation; either version 3, or (at your option)}
+00009 \textcolor{comment}{# any later version.}
+00010 \textcolor{comment}{#}
+00011 \textcolor{comment}{# GNU Radio is distributed in the hope that it will be useful,}
+00012 \textcolor{comment}{# but WITHOUT ANY WARRANTY; without even the implied warranty of}
+00013 \textcolor{comment}{# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the}
+00014 \textcolor{comment}{# GNU General Public License for more details.}
+00015 \textcolor{comment}{#}
+00016 \textcolor{comment}{# You should have received a copy of the GNU General Public License}
+00017 \textcolor{comment}{# along with GNU Radio; see the file COPYING.  If not, write to}
+00018 \textcolor{comment}{# the Free Software Foundation, Inc., 51 Franklin Street,}
+00019 \textcolor{comment}{# Boston, MA 02110-1301, USA.}
+00020 \textcolor{comment}{#}
+00021 \textcolor{stringliteral}{"""}
+00022 \textcolor{stringliteral}{Creates the swig\_doc.i SWIG interface file.}
+00023 \textcolor{stringliteral}{Execute using: python swig\_doc.py xml\_path outputfilename}
+00024 \textcolor{stringliteral}{}
+00025 \textcolor{stringliteral}{The file instructs SWIG to transfer the doxygen comments into the}
+00026 \textcolor{stringliteral}{python docstrings.}
+00027 \textcolor{stringliteral}{}
+00028 \textcolor{stringliteral}{"""}
+00029 
+00030 \textcolor{keyword}{import} sys
+00031 
+00032 \textcolor{keywordflow}{try}:
+00033     \textcolor{keyword}{from} doxyxml \textcolor{keyword}{import} DoxyIndex, DoxyClass, DoxyFriend, DoxyFunction, DoxyFile, base
+00034 \textcolor{keywordflow}{except} ImportError:
+00035     \textcolor{keyword}{from} gnuradio.doxyxml \textcolor{keyword}{import} DoxyIndex, DoxyClass, DoxyFriend, DoxyFunction, DoxyFile, base
+00036 
+00037 
+00038 \textcolor{keyword}{def }py_name(name):
+00039     bits = name.split(\textcolor{stringliteral}{'\_'})
+00040     \textcolor{keywordflow}{return} \textcolor{stringliteral}{'\_'}.join(bits[1:])
+00041 
+00042 \textcolor{keyword}{def }make_name(name):
+00043     bits = name.split(\textcolor{stringliteral}{'\_'})
+00044     \textcolor{keywordflow}{return} bits[0] + \textcolor{stringliteral}{'\_make\_'} + \textcolor{stringliteral}{'\_'}.join(bits[1:])
+00045 
+00046 
+00047 \textcolor{keyword}{class }Block(object):
+00048     \textcolor{stringliteral}{"""}
+00049 \textcolor{stringliteral}{    Checks if doxyxml produced objects correspond to a gnuradio block.}
+00050 \textcolor{stringliteral}{    """}
+00051 
+00052     @classmethod
+00053     \textcolor{keyword}{def }includes(cls, item):
+00054         \textcolor{keywordflow}{if} \textcolor{keywordflow}{not} isinstance(item, DoxyClass):
+00055             \textcolor{keywordflow}{return} \textcolor{keyword}{False}
+00056         \textcolor{comment}{# Check for a parsing error.}
+00057         \textcolor{keywordflow}{if} item.error():
+00058             \textcolor{keywordflow}{return} \textcolor{keyword}{False}
+00059         \textcolor{keywordflow}{return} item.has\_member(make_name(item.name()), DoxyFriend)
+00060 
+00061 
+00062 \textcolor{keyword}{def }utoascii(text):
+00063     \textcolor{stringliteral}{"""}
+00064 \textcolor{stringliteral}{    Convert unicode text into ascii and escape quotes.}
+00065 \textcolor{stringliteral}{    """}
+00066     \textcolor{keywordflow}{if} text \textcolor{keywordflow}{is} \textcolor{keywordtype}{None}:
+00067         \textcolor{keywordflow}{return} \textcolor{stringliteral}{''}
+00068     out = text.encode(\textcolor{stringliteral}{'ascii'}, \textcolor{stringliteral}{'replace'})
+00069     out = out.replace(\textcolor{stringliteral}{'"'}, \textcolor{stringliteral}{'\(\backslash\)\(\backslash\)"'})
+00070     \textcolor{keywordflow}{return} out
+00071 
+00072 
+00073 \textcolor{keyword}{def }combine_descriptions(obj):
+00074     \textcolor{stringliteral}{"""}
+00075 \textcolor{stringliteral}{    Combines the brief and detailed descriptions of an object together.}
+00076 \textcolor{stringliteral}{    """}
+00077     description = []
+00078     bd = obj.brief\_description.strip()
+00079     dd = obj.detailed\_description.strip()
+00080     \textcolor{keywordflow}{if} bd:
+00081         description.append(bd)
+00082     \textcolor{keywordflow}{if} dd:
+00083         description.append(dd)
+00084     \textcolor{keywordflow}{return} utoascii(\textcolor{stringliteral}{'\(\backslash\)n\(\backslash\)n'}.join(description)).strip()
+00085 
+00086 
+00087 entry\_templ = \textcolor{stringliteral}{'%feature("docstring") \{name\} "\{docstring\}"'}
+00088 \textcolor{keyword}{def }make_entry(obj, name=None, templ="\{description\}", description=None):
+00089     \textcolor{stringliteral}{"""}
+00090 \textcolor{stringliteral}{    Create a docstring entry for a swig interface file.}
+00091 \textcolor{stringliteral}{}
+00092 \textcolor{stringliteral}{    obj - a doxyxml object from which documentation will be extracted.}
+00093 \textcolor{stringliteral}{    name - the name of the C object (defaults to obj.name())}
+00094 \textcolor{stringliteral}{    templ - an optional template for the docstring containing only one}
+00095 \textcolor{stringliteral}{            variable named 'description'.}
+00096 \textcolor{stringliteral}{    description - if this optional variable is set then it's value is}
+00097 \textcolor{stringliteral}{            used as the description instead of extracting it from obj.}
+00098 \textcolor{stringliteral}{    """}
+00099     \textcolor{keywordflow}{if} name \textcolor{keywordflow}{is} \textcolor{keywordtype}{None}:
+00100         name=obj.name()
+00101     \textcolor{keywordflow}{if} \textcolor{stringliteral}{"operator "} \textcolor{keywordflow}{in} name:
+00102         \textcolor{keywordflow}{return} \textcolor{stringliteral}{''}
+00103     \textcolor{keywordflow}{if} description \textcolor{keywordflow}{is} \textcolor{keywordtype}{None}:
+00104         description = combine_descriptions(obj)
+00105     docstring = templ.format(description=description)
+00106     \textcolor{keywordflow}{if} \textcolor{keywordflow}{not} docstring:
+00107         \textcolor{keywordflow}{return} \textcolor{stringliteral}{''}
+00108     \textcolor{keywordflow}{return} entry\_templ.format(
+00109         name=name,
+00110         docstring=docstring,
+00111         )
+00112 
+00113 
+00114 \textcolor{keyword}{def }make_func_entry(func, name=None, description=None, params=None):
+00115     \textcolor{stringliteral}{"""}
+00116 \textcolor{stringliteral}{    Create a function docstring entry for a swig interface file.}
+00117 \textcolor{stringliteral}{}
+00118 \textcolor{stringliteral}{    func - a doxyxml object from which documentation will be extracted.}
+00119 \textcolor{stringliteral}{    name - the name of the C object (defaults to func.name())}
+00120 \textcolor{stringliteral}{    description - if this optional variable is set then it's value is}
+00121 \textcolor{stringliteral}{            used as the description instead of extracting it from func.}
+00122 \textcolor{stringliteral}{    params - a parameter list that overrides using func.params.}
+00123 \textcolor{stringliteral}{    """}
+00124     \textcolor{keywordflow}{if} params \textcolor{keywordflow}{is} \textcolor{keywordtype}{None}:
+00125         params = func.params
+00126     params = [prm.declname \textcolor{keywordflow}{for} prm \textcolor{keywordflow}{in} params]
+00127     \textcolor{keywordflow}{if} params:
+00128         sig = \textcolor{stringliteral}{"Params: (%s)"} % \textcolor{stringliteral}{", "}.join(params)
+00129     \textcolor{keywordflow}{else}:
+00130         sig = \textcolor{stringliteral}{"Params: (NONE)"}
+00131     templ = \textcolor{stringliteral}{"\{description\}\(\backslash\)n\(\backslash\)n"} + sig
+00132     \textcolor{keywordflow}{return} make_entry(func, name=name, templ=utoascii(templ),
+00133                       description=description)
+00134 
+00135 
+00136 \textcolor{keyword}{def }make_class_entry(klass, description=None):
+00137     \textcolor{stringliteral}{"""}
+00138 \textcolor{stringliteral}{    Create a class docstring for a swig interface file.}
+00139 \textcolor{stringliteral}{    """}
+00140     output = []
+00141     output.append(make_entry(klass, description=description))
+00142     \textcolor{keywordflow}{for} func \textcolor{keywordflow}{in} klass.in\_category(DoxyFunction):
+00143         name = klass.name() + \textcolor{stringliteral}{'::'} + func.name()
+00144         output.append(make_func_entry(func, name=name))
+00145     \textcolor{keywordflow}{return} \textcolor{stringliteral}{"\(\backslash\)n\(\backslash\)n"}.join(output)
+00146 
+00147 
+00148 \textcolor{keyword}{def }make_block_entry(di, block):
+00149     \textcolor{stringliteral}{"""}
+00150 \textcolor{stringliteral}{    Create class and function docstrings of a gnuradio block for a}
+00151 \textcolor{stringliteral}{    swig interface file.}
+00152 \textcolor{stringliteral}{    """}
+00153     descriptions = []
+00154     \textcolor{comment}{# Get the documentation associated with the class.}
+00155     class\_desc = combine_descriptions(block)
+00156     \textcolor{keywordflow}{if} class\_desc:
+00157         descriptions.append(class\_desc)
+00158     \textcolor{comment}{# Get the documentation associated with the make function}
+00159     make\_func = di.get\_member(make_name(block.name()), DoxyFunction)
+00160     make\_func\_desc = combine_descriptions(make\_func)
+00161     \textcolor{keywordflow}{if} make\_func\_desc:
+00162         descriptions.append(make\_func\_desc)
+00163     \textcolor{comment}{# Get the documentation associated with the file}
+00164     \textcolor{keywordflow}{try}:
+00165         block\_file = di.get\_member(block.name() + \textcolor{stringliteral}{".h"}, DoxyFile)
+00166         file\_desc = combine_descriptions(block\_file)
+00167         \textcolor{keywordflow}{if} file\_desc:
+00168             descriptions.append(file\_desc)
+00169     \textcolor{keywordflow}{except} base.Base.NoSuchMember:
+00170         \textcolor{comment}{# Don't worry if we can't find a matching file.}
+00171         \textcolor{keywordflow}{pass}
+00172     \textcolor{comment}{# And join them all together to make a super duper description.}
+00173     super\_description = \textcolor{stringliteral}{"\(\backslash\)n\(\backslash\)n"}.join(descriptions)
+00174     \textcolor{comment}{# Associate the combined description with the class and}
+00175     \textcolor{comment}{# the make function.}
+00176     output = []
+00177     output.append(make_class_entry(block, description=super\_description))
+00178     creator = block.get\_member(block.name(), DoxyFunction)
+00179     output.append(make_func_entry(make\_func, description=super\_description,
+00180                                   params=creator.params))
+00181     \textcolor{keywordflow}{return} \textcolor{stringliteral}{"\(\backslash\)n\(\backslash\)n"}.join(output)
+00182 
+00183 
+00184 \textcolor{keyword}{def }make_swig_interface_file(di, swigdocfilename, custom\_output=None):
+00185 
+00186     output = [\textcolor{stringliteral}{"""}
+00187 \textcolor{stringliteral}{/*}
+00188 \textcolor{stringliteral}{ * This file was automatically generated using swig\_doc.py.}
+00189 \textcolor{stringliteral}{ *}
+00190 \textcolor{stringliteral}{ * Any changes to it will be lost next time it is regenerated.}
+00191 \textcolor{stringliteral}{ */}
+00192 \textcolor{stringliteral}{"""}]
+00193 
+00194     \textcolor{keywordflow}{if} custom\_output \textcolor{keywordflow}{is} \textcolor{keywordflow}{not} \textcolor{keywordtype}{None}:
+00195         output.append(custom\_output)
+00196 
+00197     \textcolor{comment}{# Create docstrings for the blocks.}
+00198     blocks = di.in\_category(Block)
+00199     make\_funcs = set([])
+00200     \textcolor{keywordflow}{for} block \textcolor{keywordflow}{in} blocks:
+00201         \textcolor{keywordflow}{try}:
+00202             make\_func = di.get\_member(make_name(block.name()), DoxyFunction)
+00203             make\_funcs.add(make\_func.name())
+00204             output.append(make_block_entry(di, block))
+00205         \textcolor{keywordflow}{except} block.ParsingError:
+00206             print(\textcolor{stringliteral}{'Parsing error for block %s'} % block.name())
+00207 
+00208     \textcolor{comment}{# Create docstrings for functions}
+00209     \textcolor{comment}{# Don't include the make functions since they have already been dealt with.}
+00210     funcs = [f \textcolor{keywordflow}{for} f \textcolor{keywordflow}{in} di.in\_category(DoxyFunction) \textcolor{keywordflow}{if} f.name() \textcolor{keywordflow}{not} \textcolor{keywordflow}{in} make\_funcs]
+00211     \textcolor{keywordflow}{for} f \textcolor{keywordflow}{in} funcs:
+00212         \textcolor{keywordflow}{try}:
+00213             output.append(make_func_entry(f))
+00214         \textcolor{keywordflow}{except} f.ParsingError:
+00215             print(\textcolor{stringliteral}{'Parsing error for function %s'} % f.name())
+00216 
+00217     \textcolor{comment}{# Create docstrings for classes}
+00218     block\_names = [block.name() \textcolor{keywordflow}{for} block \textcolor{keywordflow}{in} blocks]
+00219     klasses = [k \textcolor{keywordflow}{for} k \textcolor{keywordflow}{in} di.in\_category(DoxyClass) \textcolor{keywordflow}{if} k.name() \textcolor{keywordflow}{not} \textcolor{keywordflow}{in} block\_names]
+00220     \textcolor{keywordflow}{for} k \textcolor{keywordflow}{in} klasses:
+00221         \textcolor{keywordflow}{try}:
+00222             output.append(make_class_entry(k))
+00223         \textcolor{keywordflow}{except} k.ParsingError:
+00224             print(\textcolor{stringliteral}{'Parsing error for class %s'} % k.name())
+00225 
+00226     \textcolor{comment}{# Docstrings are not created for anything that is not a function or a class.}
+00227     \textcolor{comment}{# If this excludes anything important please add it here.}
+00228 
+00229     output = \textcolor{stringliteral}{"\(\backslash\)n\(\backslash\)n"}.join(output)
+00230 
+00231     swig\_doc = file(swigdocfilename, \textcolor{stringliteral}{'w'})
+00232     swig\_doc.write(output)
+00233     swig\_doc.close()
+00234 
+00235 \textcolor{keywordflow}{if} \_\_name\_\_ == \textcolor{stringliteral}{"\_\_main\_\_"}:
+00236     \textcolor{comment}{# Parse command line options and set up doxyxml.}
+00237     err\_msg = \textcolor{stringliteral}{"Execute using: python swig\_doc.py xml\_path outputfilename"}
+00238     \textcolor{keywordflow}{if} len(sys.argv) != 3:
+00239         \textcolor{keywordflow}{raise} StandardError(err\_msg)
+00240     xml\_path = sys.argv[1]
+00241     swigdocfilename = sys.argv[2]
+00242     di = DoxyIndex(xml\_path)
+00243 
+00244     \textcolor{comment}{# gnuradio.gr.msq\_queue.insert\_tail and delete\_head create errors unless docstrings are defined!}
+00245     \textcolor{comment}{# This is presumably a bug in SWIG.}
+00246     \textcolor{comment}{#msg\_q = di.get\_member(u'gr\_msg\_queue', DoxyClass)}
+00247     \textcolor{comment}{#insert\_tail = msg\_q.get\_member(u'insert\_tail', DoxyFunction)}
+00248     \textcolor{comment}{#delete\_head = msg\_q.get\_member(u'delete\_head', DoxyFunction)}
+00249     output = []
+00250     \textcolor{comment}{#output.append(make\_func\_entry(insert\_tail, name='gr\_py\_msg\_queue\_\_insert\_tail'))}
+00251     \textcolor{comment}{#output.append(make\_func\_entry(delete\_head, name='gr\_py\_msg\_queue\_\_delete\_head'))}
+00252     custom\_output = \textcolor{stringliteral}{"\(\backslash\)n\(\backslash\)n"}.join(output)
+00253 
+00254     \textcolor{comment}{# Generate the docstrings interface file.}
+00255     make_swig_interface_file(di, swigdocfilename, custom\_output=custom\_output)
+\end{DoxyCode}

@@ -1005,8 +1005,8 @@
 00992 \}
 00993 
 00994 
-00995 \textcolor{keywordtype}{int} LMS7_Device::SetGain(\textcolor{keywordtype}{bool} dir_tx, \textcolor{keywordtype}{unsigned} chan, \textcolor{keywordtype}{double} value, \textcolor{keyword}{const} std::string &
-      name)
+00995 \textcolor{keywordtype}{int} LMS7_Device::SetGain(\textcolor{keywordtype}{bool} dir_tx, \textcolor{keywordtype}{unsigned} chan, \textcolor{keywordtype}{double} value, \textcolor{keyword}{const} 
+      std::string &name)
 00996 \{
 00997     lime::LMS7002M* lms = SelectChannel(chan);
 00998 
@@ -1101,8 +1101,8 @@
 01087         \textcolor{keywordflow}{return} lms->GetRFELNA_dB() + lms->GetRFETIA_dB() + lms->GetRBBPGA_dB();
 01088 \}
 01089 
-01090 LMS7_Device::Range LMS7_Device::GetGainRange(\textcolor{keywordtype}{bool} isTx, \textcolor{keywordtype}{unsigned} chan, \textcolor{keyword}{const} std::string &
-      name)\textcolor{keyword}{ const}
+01090 LMS7_Device::Range LMS7_Device::GetGainRange(\textcolor{keywordtype}{bool} isTx, \textcolor{keywordtype}{unsigned} chan, \textcolor{keyword}{const} 
+      std::string &name)\textcolor{keyword}{ const}
 01091 \textcolor{keyword}{}\{
 01092     \textcolor{keywordflow}{if} (name == \textcolor{stringliteral}{"LNA"}) \textcolor{keywordflow}{return} Range(0.0, 30.0);
 01093     \textcolor{keywordflow}{if} (name == \textcolor{stringliteral}{"LB\_LNA"}) \textcolor{keywordflow}{return} Range(0.0, 40.0);
@@ -1827,39 +1827,49 @@
 01787     mStreamers[0]->SetHardwareTimestamp(now);
 01788 \}
 01789 
-01790 \textcolor{keywordtype}{int} LMS7_Device::MCU_AGCStart(uint32\_t wantedRSSI)
-01791 \{
-01792     lime::MCU_BD *mcu = lms_list.at(lms_chip_id)->GetMCUControls();
-01793     lms_list.at(lms_chip_id)->Modify\_SPI\_Reg\_bits(0x0006, 0, 0, 0);
+01790 uint64\_t LMS7_Device::GetChirpTimePeriod(\textcolor{keywordtype}{void})\textcolor{keyword}{ const}
+01791 \textcolor{keyword}{}\{
+01792     \textcolor{keywordflow}{return} mStreamers[0]->GetChirpTimePeriod();
+01793 \}
 01794 
-01795     uint8\_t mcuID = mcu->ReadMCUProgramID();
-01796     lime::debug(\textcolor{stringliteral}{"Current MCU firmware: %i, expected %i"}, mcuID, 
+01795 uint64\_t LMS7_Device::GetChirpTimeStamp(\textcolor{keywordtype}{void})\textcolor{keyword}{ const}
+01796 \textcolor{keyword}{}\{
+01797     \textcolor{keywordflow}{return} mStreamers[0]->GetChirpTimeStamp();
+01798 \}
+01799 
+01800 \textcolor{keywordtype}{int} LMS7_Device::MCU_AGCStart(uint32\_t wantedRSSI)
+01801 \{
+01802     lime::MCU_BD *mcu = lms_list.at(lms_chip_id)->GetMCUControls();
+01803     lms_list.at(lms_chip_id)->Modify\_SPI\_Reg\_bits(0x0006, 0, 0, 0);
+01804 
+01805     uint8\_t mcuID = mcu->ReadMCUProgramID();
+01806     lime::debug(\textcolor{stringliteral}{"Current MCU firmware: %i, expected %i"}, mcuID, 
       MCU_ID_CALIBRATIONS_SINGLE_IMAGE);
-01797     \textcolor{keywordflow}{if}(mcuID != MCU_ID_CALIBRATIONS_SINGLE_IMAGE)
-01798     \{
-01799         lime::debug(\textcolor{stringliteral}{"Uploading MCU AGC firmware"});
-01800         \textcolor{keywordtype}{int} status = mcu->Program_MCU(mcu_program_lms7_dc_iq_calibration_bin, 
+01807     \textcolor{keywordflow}{if}(mcuID != MCU_ID_CALIBRATIONS_SINGLE_IMAGE)
+01808     \{
+01809         lime::debug(\textcolor{stringliteral}{"Uploading MCU AGC firmware"});
+01810         \textcolor{keywordtype}{int} status = mcu->Program_MCU(mcu_program_lms7_dc_iq_calibration_bin, 
       lime::IConnection::MCU\_PROG\_MODE::SRAM);
-01801         lime::info(\textcolor{stringliteral}{"MCU AGC firmware uploaded"});
-01802         \textcolor{keywordflow}{if}(status != 0)
-01803             \textcolor{keywordflow}{return} status;
-01804     \}
-01805 
-01806     \textcolor{keywordtype}{long} refClk = lms_list.at(lms_chip_id)->GetReferenceClk\_SX(\textcolor{keyword}{false});
-01807     mcu->SetParameter(MCU_BD::MCU_REF_CLK, refClk);
-01808 
-01809     lms_list.at(lms_chip_id)->Modify\_SPI\_Reg\_bits(0x002D, 15, 0, wantedRSSI >> 2);
-01810     mcu->RunProcedure(MCU_FUNCTION_AGC);
-01811     \textcolor{keywordflow}{return} 0;
-01812 \}
-01813 
-01814 \textcolor{keywordtype}{int} LMS7_Device::MCU_AGCStop()
-01815 \{
-01816     lime::MCU_BD *mcu = lms_list.at(lms_chip_id)->GetMCUControls();
-01817     mcu->RunProcedure(0);
-01818     lms_list.at(lms_chip_id)->Modify\_SPI\_Reg\_bits(0x0006, 0, 0, 0);
-01819     \textcolor{keywordflow}{return} 0;
-01820 \}
-01821 
-01822 \}\textcolor{comment}{//namespace lime}
+01811         lime::info(\textcolor{stringliteral}{"MCU AGC firmware uploaded"});
+01812         \textcolor{keywordflow}{if}(status != 0)
+01813             \textcolor{keywordflow}{return} status;
+01814     \}
+01815 
+01816     \textcolor{keywordtype}{long} refClk = lms_list.at(lms_chip_id)->GetReferenceClk\_SX(\textcolor{keyword}{false});
+01817     mcu->SetParameter(MCU_BD::MCU_REF_CLK, refClk);
+01818 
+01819     lms_list.at(lms_chip_id)->Modify\_SPI\_Reg\_bits(0x002D, 15, 0, wantedRSSI >> 2);
+01820     mcu->RunProcedure(MCU_FUNCTION_AGC);
+01821     \textcolor{keywordflow}{return} 0;
+01822 \}
+01823 
+01824 \textcolor{keywordtype}{int} LMS7_Device::MCU_AGCStop()
+01825 \{
+01826     lime::MCU_BD *mcu = lms_list.at(lms_chip_id)->GetMCUControls();
+01827     mcu->RunProcedure(0);
+01828     lms_list.at(lms_chip_id)->Modify\_SPI\_Reg\_bits(0x0006, 0, 0, 0);
+01829     \textcolor{keywordflow}{return} 0;
+01830 \}
+01831 
+01832 \}\textcolor{comment}{//namespace lime}
 \end{DoxyCode}

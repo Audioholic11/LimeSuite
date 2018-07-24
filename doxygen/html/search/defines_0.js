@@ -1,5 +1,7 @@
 var searchData=
 [
+  ['_5f_5fgetopt_5fh_5f_5f',['__GETOPT_H__',['../d5/ded/limesuite-dev_2external_2msvc_2getopt_8h.html#ab74b871ab5bc8fdcf0977a911c46f0b4',1,'__GETOPT_H__():&#160;getopt.h'],['../df/da5/soapysdr_2apps_2msvc_2getopt_8h.html#ab74b871ab5bc8fdcf0977a911c46f0b4',1,'__GETOPT_H__():&#160;getopt.h']]],
+  ['_5f_5fgetopt_5flong_5fh_5f_5f',['__GETOPT_LONG_H__',['../d5/ded/limesuite-dev_2external_2msvc_2getopt_8h.html#ad4e526cd7d8899b3032ecde2a6a9fa68',1,'__GETOPT_LONG_H__():&#160;getopt.h'],['../df/da5/soapysdr_2apps_2msvc_2getopt_8h.html#ad4e526cd7d8899b3032ecde2a6a9fa68',1,'__GETOPT_LONG_H__():&#160;getopt.h']]],
   ['_5f_5fgl2_5fh_5f',['__gl2_h_',['../da/d33/glew_8h.html#ae70d3a3393545b174ffc3159eb995001',1,'glew.h']]],
   ['_5f_5fgl_5fati_5fh_5f',['__gl_ATI_h_',['../da/d33/glew_8h.html#a487e27b4f197d51afc2cfbff7dd76a1f',1,'glew.h']]],
   ['_5f_5fgl_5fh_5f',['__gl_h_',['../da/d33/glew_8h.html#a48a8940dccea5b6219320face7198075',1,'glew.h']]],
@@ -11,10 +13,15 @@ var searchData=
   ['_5f_5fglx_5fh_5f_5f',['__glx_h__',['../d5/d82/glxew_8h.html#a2b2b0b7077692e0806e9081087712a0e',1,'glxew.h']]],
   ['_5f_5fglxew_5fh_5f_5f',['__GLXEW_H__',['../d5/d82/glxew_8h.html#aa7125c3f5052f02624a3a036fffd6dd4',1,'glxew.h']]],
   ['_5f_5fglxext_5fh_5f',['__glxext_h_',['../d5/d82/glxew_8h.html#a208c385335a6f63b1cf4246b0813ded3',1,'glxew.h']]],
+  ['_5f_5fprogname',['__progname',['../d5/ded/limesuite-dev_2external_2msvc_2getopt_8h.html#a41c2f9db0a7e23392fbbebb1d1c185ec',1,'__progname():&#160;getopt.h'],['../df/da5/soapysdr_2apps_2msvc_2getopt_8h.html#a41c2f9db0a7e23392fbbebb1d1c185ec',1,'__progname():&#160;getopt.h']]],
   ['_5f_5fregal_5fh_5f_5f',['__REGAL_H__',['../da/d33/glew_8h.html#a459e1d66593ce1b14e2cadf37c24a412',1,'glew.h']]],
+  ['_5f_5fsoapy_5fsdr_5fc_5fcatch',['__SOAPY_SDR_C_CATCH',['../db/d3f/ErrorHelpers_8hpp.html#ac07beca90f1c407d82022fc18e22a30c',1,'ErrorHelpers.hpp']]],
+  ['_5f_5fsoapy_5fsdr_5fc_5fcatch_5fret',['__SOAPY_SDR_C_CATCH_RET',['../db/d3f/ErrorHelpers_8hpp.html#a75e44f96cb09687db2fb4c8422fe399d',1,'ErrorHelpers.hpp']]],
+  ['_5f_5fsoapy_5fsdr_5fc_5ftry',['__SOAPY_SDR_C_TRY',['../db/d3f/ErrorHelpers_8hpp.html#a9761dfc4f2709f2bab3d28b847ecfaa8',1,'ErrorHelpers.hpp']]],
   ['_5f_5fwglew_5fh_5f_5f',['__WGLEW_H__',['../db/d82/wglew_8h.html#a751c24c3631aa4abee81a5d1fe3e96de',1,'wglew.h']]],
   ['_5f_5fwglext_5fh_5f',['__wglext_h_',['../db/d82/wglew_8h.html#ad280bef26e8b92343568301ed5134878',1,'wglew.h']]],
   ['_5f_5fx_5fgl_5fh',['__X_GL_H',['../da/d33/glew_8h.html#a1a4d2e6b44a13a38af34dbfcfb73af28',1,'glew.h']]],
   ['_5fgl_5fh',['_GL_H',['../da/d33/glew_8h.html#a596af8b5e3f887806efdd7c27ba3d329',1,'glew.h']]],
+  ['_5ft',['_T',['../d9/dba/INI_8h.html#ae936e4c15227768f7da4e0951def89c8',1,'INI.h']]],
   ['_5fuse_5fmath_5fdefines',['_USE_MATH_DEFINES',['../d1/d10/LMS7002M_8cpp.html#a525335710b53cb064ca56b936120431e',1,'LMS7002M.cpp']]]
 ];

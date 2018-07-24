@@ -11,5 +11,9 @@ var searchData=
   ['_5fft_5fpipe_5finformation',['_FT_PIPE_INFORMATION',['../d8/da6/struct__FT__PIPE__INFORMATION.html',1,'']]],
   ['_5fft_5fsetup_5fpacket',['_FT_SETUP_PACKET',['../d8/d74/struct__FT__SETUP__PACKET.html',1,'']]],
   ['_5fft_5fstring_5fdescriptor',['_FT_STRING_DESCRIPTOR',['../dd/d58/struct__FT__STRING__DESCRIPTOR.html',1,'']]],
-  ['_5fgpu_5fdevice',['_GPU_DEVICE',['../d1/d37/struct__GPU__DEVICE.html',1,'']]]
+  ['_5fgpu_5fdevice',['_GPU_DEVICE',['../d1/d37/struct__GPU__DEVICE.html',1,'']]],
+  ['_5fmemberspec',['_MemberSpec',['../d7/d08/classdoxyxml_1_1generated_1_1compoundsuper_1_1__MemberSpec.html',1,'doxyxml::generated::compoundsuper']]],
+  ['_5fmemberspec',['_MemberSpec',['../d8/d2b/classdoxyxml_1_1generated_1_1indexsuper_1_1__MemberSpec.html',1,'doxyxml::generated::indexsuper']]],
+  ['_5fobject',['_object',['../dc/d36/classradar__swig_1_1__object.html',1,'radar_swig']]],
+  ['_5fobject',['_object',['../dd/d71/classSoapySDR_1_1__object.html',1,'SoapySDR']]]
 ];

@@ -29,6 +29,10 @@ uint64\+\_\+t {\bf Get\+Hardware\+Timestamp} ({\bf void})
 \item 
 {\bf void} {\bf Set\+Hardware\+Timestamp} (const uint64\+\_\+t now)
 \item 
+uint64\+\_\+t {\bf Get\+Chirp\+Time\+Period} ({\bf void})
+\item 
+uint64\+\_\+t {\bf Get\+Chirp\+Time\+Stamp} ({\bf void})
+\item 
 {\bf int} {\bf Update\+Threads} (bool stop\+All=false)
 \item 
 {\bf void} {\bf Receive\+Packets\+Loop} ()
@@ -59,6 +63,10 @@ std\+::atomic$<$ bool $>$ {\bf terminate\+Tx}
 std\+::atomic$<$ uint64\+\_\+t $>$ {\bf rx\+Last\+Timestamp}
 \item 
 std\+::atomic$<$ uint64\+\_\+t $>$ {\bf tx\+Last\+Timestamp}
+\item 
+std\+::atomic$<$ uint64\+\_\+t $>$ {\bf chirp\+Last\+Time\+Stamp}
+\item 
+std\+::atomic$<$ uint64\+\_\+t $>$ {\bf chirp\+Last\+Time\+Period}
 \item 
 uint64\+\_\+t {\bf m\+Timestamp\+Offset}
 \item 
@@ -97,7 +105,7 @@ double {\bf Get\+Phase\+Offset} ({\bf int} bin)
 \subsubsection{Detailed Description}
 
 
-Definition at line {\bf 125} of file {\bf Streamer.\+h}.
+Definition at line {\bf 127} of file {\bf Streamer.\+h}.
 
 
 
@@ -117,7 +125,7 @@ Definition at line {\bf 156} of file {\bf Streamer.\+cpp}.
 
 
 
-References {\bf chip\+Id}, {\bf data\+Port}, {\bf fpga}, {\bf lime\+::\+F\+P\+G\+A\+::\+Get\+Connection()}, {\bf id}, {\bf lms}, {\bf m\+Timestamp\+Offset}, {\bf rx\+Batch\+Size}, {\bf rx\+Data\+Rate\+\_\+\+Bps}, {\bf rx\+Last\+Timestamp}, {\bf stream\+Size}, {\bf terminate\+Rx}, {\bf terminate\+Tx}, {\bf tx\+Batch\+Size}, and {\bf tx\+Data\+Rate\+\_\+\+Bps}.
+References {\bf chip\+Id}, {\bf chirp\+Last\+Time\+Period}, {\bf chirp\+Last\+Time\+Stamp}, {\bf data\+Port}, {\bf fpga}, {\bf lime\+::\+F\+P\+G\+A\+::\+Get\+Connection()}, {\bf id}, {\bf lms}, {\bf m\+Timestamp\+Offset}, {\bf rx\+Batch\+Size}, {\bf rx\+Data\+Rate\+\_\+\+Bps}, {\bf rx\+Last\+Timestamp}, {\bf stream\+Size}, {\bf terminate\+Rx}, {\bf terminate\+Tx}, {\bf tx\+Batch\+Size}, and {\bf tx\+Data\+Rate\+\_\+\+Bps}.
 
 
 
@@ -140,7 +148,7 @@ Here is the call graph for this function\+:
 )}\label{classlime_1_1Streamer_ad03f3a748f2398711d044b6710e40740}
 
 
-Definition at line {\bf 173} of file {\bf Streamer.\+cpp}.
+Definition at line {\bf 177} of file {\bf Streamer.\+cpp}.
 
 
 
@@ -158,7 +166,7 @@ References {\bf rx\+Thread}, {\bf terminate\+Rx}, {\bf terminate\+Tx}, and {\bf 
 )\hspace{0.3cm}{\ttfamily [private]}}\label{classlime_1_1Streamer_a44a390ff3b22aabf1c112ba0f13a9e7f}
 
 
-Definition at line {\bf 458} of file {\bf Streamer.\+cpp}.
+Definition at line {\bf 496} of file {\bf Streamer.\+cpp}.
 
 
 
@@ -201,7 +209,7 @@ Here is the caller graph for this function\+:
 )\hspace{0.3cm}{\ttfamily [private]}}\label{classlime_1_1Streamer_a05cbd39a0d43b90b7fc2543ec246e9bb}
 
 
-Definition at line {\bf 385} of file {\bf Streamer.\+cpp}.
+Definition at line {\bf 423} of file {\bf Streamer.\+cpp}.
 
 
 
@@ -244,7 +252,7 @@ Here is the caller graph for this function\+:
 )\hspace{0.3cm}{\ttfamily [private]}}\label{classlime_1_1Streamer_af72084cb1bf47cd49edb8395eea1f04b}
 
 
-Definition at line {\bf 281} of file {\bf Streamer.\+cpp}.
+Definition at line {\bf 319} of file {\bf Streamer.\+cpp}.
 
 
 
@@ -278,6 +286,60 @@ Here is the caller graph for this function\+:
 \end{figure}
 
 
+\index{lime\+::\+Streamer@{lime\+::\+Streamer}!Get\+Chirp\+Time\+Period@{Get\+Chirp\+Time\+Period}}
+\index{Get\+Chirp\+Time\+Period@{Get\+Chirp\+Time\+Period}!lime\+::\+Streamer@{lime\+::\+Streamer}}
+\paragraph[{Get\+Chirp\+Time\+Period(void)}]{\setlength{\rightskip}{0pt plus 5cm}uint64\+\_\+t lime\+::\+Streamer\+::\+Get\+Chirp\+Time\+Period (
+\begin{DoxyParamCaption}
+\item[{{\bf void}}]{}
+\end{DoxyParamCaption}
+)}\label{classlime_1_1Streamer_a8c852d872171b58559eba5605fc3e742}
+
+
+Definition at line {\bf 259} of file {\bf Streamer.\+cpp}.
+
+
+
+References {\bf chip\+Id}, {\bf chirp\+Last\+Time\+Period}, {\bf data\+Port}, {\bf fpga}, {\bf m\+Timestamp\+Offset}, {\bf lime\+::\+F\+P\+G\+A\+::\+Reset\+Timestamp()}, {\bf rx\+Thread}, {\bf lime\+::\+F\+P\+G\+A\+::\+Stop\+Streaming()}, {\bf tx\+Thread}, and {\bf lime\+::\+I\+Connection\+::\+Write\+Register()}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{d9/d5d/classlime_1_1Streamer_a8c852d872171b58559eba5605fc3e742_cgraph}
+\end{center}
+\end{figure}
+
+
+\index{lime\+::\+Streamer@{lime\+::\+Streamer}!Get\+Chirp\+Time\+Stamp@{Get\+Chirp\+Time\+Stamp}}
+\index{Get\+Chirp\+Time\+Stamp@{Get\+Chirp\+Time\+Stamp}!lime\+::\+Streamer@{lime\+::\+Streamer}}
+\paragraph[{Get\+Chirp\+Time\+Stamp(void)}]{\setlength{\rightskip}{0pt plus 5cm}uint64\+\_\+t lime\+::\+Streamer\+::\+Get\+Chirp\+Time\+Stamp (
+\begin{DoxyParamCaption}
+\item[{{\bf void}}]{}
+\end{DoxyParamCaption}
+)}\label{classlime_1_1Streamer_a66c1d8839737b944a243f18d9f0b0057}
+
+
+Definition at line {\bf 276} of file {\bf Streamer.\+cpp}.
+
+
+
+References {\bf chip\+Id}, {\bf chirp\+Last\+Time\+Stamp}, {\bf data\+Port}, {\bf fpga}, {\bf m\+Timestamp\+Offset}, {\bf lime\+::\+F\+P\+G\+A\+::\+Reset\+Timestamp()}, {\bf rx\+Thread}, {\bf lime\+::\+F\+P\+G\+A\+::\+Stop\+Streaming()}, {\bf tx\+Thread}, and {\bf lime\+::\+I\+Connection\+::\+Write\+Register()}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{d9/d5d/classlime_1_1Streamer_a66c1d8839737b944a243f18d9f0b0057_cgraph}
+\end{center}
+\end{figure}
+
+
 \index{lime\+::\+Streamer@{lime\+::\+Streamer}!Get\+Hardware\+Timestamp@{Get\+Hardware\+Timestamp}}
 \index{Get\+Hardware\+Timestamp@{Get\+Hardware\+Timestamp}!lime\+::\+Streamer@{lime\+::\+Streamer}}
 \paragraph[{Get\+Hardware\+Timestamp(void)}]{\setlength{\rightskip}{0pt plus 5cm}uint64\+\_\+t lime\+::\+Streamer\+::\+Get\+Hardware\+Timestamp (
@@ -287,7 +349,7 @@ Here is the caller graph for this function\+:
 )}\label{classlime_1_1Streamer_a3b515dd1d151c18ddb8050e14eca1928}
 
 
-Definition at line {\bf 233} of file {\bf Streamer.\+cpp}.
+Definition at line {\bf 237} of file {\bf Streamer.\+cpp}.
 
 
 
@@ -314,7 +376,7 @@ Here is the call graph for this function\+:
 )\hspace{0.3cm}{\ttfamily [private]}}\label{classlime_1_1Streamer_ace46b832a3e2e6ea6ae23c6672bca45f}
 
 
-Definition at line {\bf 348} of file {\bf Streamer.\+cpp}.
+Definition at line {\bf 386} of file {\bf Streamer.\+cpp}.
 
 
 
@@ -357,7 +419,7 @@ Here is the caller graph for this function\+:
 )}\label{classlime_1_1Streamer_a15a75e77c4efa75674b0e78319e79cf3}
 
 
-Definition at line {\bf 219} of file {\bf Streamer.\+cpp}.
+Definition at line {\bf 223} of file {\bf Streamer.\+cpp}.
 
 
 
@@ -397,11 +459,11 @@ Function dedicated for receiving data samples from board.
 \end{DoxyParams}
 
 
-Definition at line {\bf 780} of file {\bf Streamer.\+cpp}.
+Definition at line {\bf 818} of file {\bf Streamer.\+cpp}.
 
 
 
-References {\bf lime\+::\+I\+Connection\+::\+Abort\+Reading()}, {\bf lime\+::\+I\+Connection\+::\+Begin\+Data\+Reading()}, {\bf ch\+Count}, {\bf lime\+::\+I\+Connection\+::\+Check\+Stream\+Size()}, {\bf chip\+Id}, {\bf lime\+::\+F\+P\+G\+A\+\_\+\+Data\+Packet\+::counter}, {\bf data\+Link\+Format}, {\bf data\+Port}, {\bf lime\+::error()}, {\bf lime\+::\+I\+Connection\+::\+Finish\+Data\+Reading()}, {\bf lime\+::\+Stream\+Channel\+::\+Metadata\+::flags}, {\bf lime\+::\+Stream\+Config\+::\+F\+M\+T\+\_\+\+I\+N\+T12}, {\bf lime\+::\+F\+P\+G\+A\+::\+F\+P\+G\+A\+Packet\+Payload2\+Samples()}, {\bf lime\+::\+I\+Connection\+::\+Get\+Buffers\+Count()}, {\bf i}, {\bf ind}, {\bf meta}, {\bf m\+Rx\+Streams}, {\bf m\+Tx\+Streams}, {\bf lime\+::\+Ring\+F\+I\+F\+O\+::\+O\+V\+E\+R\+W\+R\+I\+T\+E\+\_\+\+O\+LD}, {\bf port}, {\bf lime\+::\+I\+Connection\+::\+Read\+Register()}, {\bf lime\+::\+F\+P\+G\+A\+\_\+\+Data\+Packet\+::reserved}, {\bf rx\+Batch\+Size}, {\bf rx\+Data\+Rate\+\_\+\+Bps}, {\bf rx\+Last\+Timestamp}, {\bf samples}, {\bf lime\+::samples12\+In\+Pkt}, {\bf lime\+::samples16\+In\+Pkt}, {\bf stream\+Size}, {\bf lime\+::\+Ring\+F\+I\+F\+O\+::\+S\+Y\+N\+C\+\_\+\+T\+I\+M\+E\+S\+T\+A\+MP}, {\bf t1}, {\bf t2}, {\bf terminate\+Rx}, {\bf lime\+::\+Stream\+Channel\+::\+Metadata\+::timestamp}, {\bf lime\+::\+I\+Connection\+::\+Wait\+For\+Reading()}, {\bf lime\+::warning()}, and {\bf lime\+::\+I\+Connection\+::\+Write\+Registers()}.
+References {\bf lime\+::\+I\+Connection\+::\+Abort\+Reading()}, {\bf lime\+::\+I\+Connection\+::\+Begin\+Data\+Reading()}, {\bf c}, {\bf ch\+Count}, {\bf lime\+::\+I\+Connection\+::\+Check\+Stream\+Size()}, {\bf chip\+Id}, {\bf chirp\+Last\+Time\+Period}, {\bf chirp\+Last\+Time\+Stamp}, {\bf lime\+::\+Stream\+Channel\+::\+Metadata\+::chirptime}, {\bf lime\+::\+F\+P\+G\+A\+\_\+\+Data\+Packet\+::counter}, {\bf lime\+::data\+Length}, {\bf data\+Link\+Format}, {\bf data\+Port}, {\bf lime\+::error()}, {\bf lime\+::\+I\+Connection\+::\+Finish\+Data\+Reading()}, {\bf lime\+::\+Stream\+Channel\+::\+Metadata\+::flags}, {\bf lime\+::\+Stream\+Config\+::\+F\+M\+T\+\_\+\+I\+N\+T12}, {\bf lime\+::\+F\+P\+G\+A\+::\+F\+P\+G\+A\+Packet\+Payload2\+Samples()}, {\bf lime\+::\+F\+P\+G\+A\+\_\+\+Data\+Packet\+::ftr0}, {\bf lime\+::\+F\+P\+G\+A\+\_\+\+Data\+Packet\+::ftr1}, {\bf lime\+::\+I\+Connection\+::\+Get\+Buffers\+Count()}, {\bf i}, {\bf ind}, {\bf lime\+::\+Stream\+Channel\+::\+Metadata\+::lastchirp\+\_\+timestamp}, {\bf meta}, {\bf m\+Rx\+Streams}, {\bf m\+Tx\+Streams}, {\bf lime\+::\+Ring\+F\+I\+F\+O\+::\+O\+V\+E\+R\+W\+R\+I\+T\+E\+\_\+\+O\+LD}, {\bf port}, {\bf lime\+::\+I\+Connection\+::\+Read\+Register()}, {\bf lime\+::\+F\+P\+G\+A\+\_\+\+Data\+Packet\+::reserved}, {\bf rx\+Batch\+Size}, {\bf rx\+Data\+Rate\+\_\+\+Bps}, {\bf rx\+Last\+Timestamp}, {\bf samples}, {\bf lime\+::samples12\+In\+Pkt}, {\bf lime\+::samples16\+In\+Pkt}, {\bf stream\+Size}, {\bf lime\+::\+Ring\+F\+I\+F\+O\+::\+S\+Y\+N\+C\+\_\+\+T\+I\+M\+E\+S\+T\+A\+MP}, {\bf t1}, {\bf t2}, {\bf terminate\+Rx}, {\bf lime\+::\+Stream\+Channel\+::\+Metadata\+::timestamp}, {\bf lime\+::\+I\+Connection\+::\+Wait\+For\+Reading()}, {\bf lime\+::warning()}, and {\bf lime\+::\+I\+Connection\+::\+Write\+Registers()}.
 
 
 
@@ -440,7 +502,7 @@ Here is the caller graph for this function\+:
 )\hspace{0.3cm}{\ttfamily [private]}}\label{classlime_1_1Streamer_a7dc600168a329a5c20e8ffb4ed444765}
 
 
-Definition at line {\bf 255} of file {\bf Streamer.\+cpp}.
+Definition at line {\bf 293} of file {\bf Streamer.\+cpp}.
 
 
 
@@ -483,7 +545,7 @@ Here is the caller graph for this function\+:
 )}\label{classlime_1_1Streamer_a2faa8c29f887b7d5ab5788bb7b677b62}
 
 
-Definition at line {\bf 250} of file {\bf Streamer.\+cpp}.
+Definition at line {\bf 254} of file {\bf Streamer.\+cpp}.
 
 
 
@@ -498,7 +560,7 @@ References {\bf m\+Timestamp\+Offset}, and {\bf rx\+Last\+Timestamp}.
 )}\label{classlime_1_1Streamer_aaa946b5fe7814a97160d6efd015295e7}
 
 
-Definition at line {\bf 184} of file {\bf Streamer.\+cpp}.
+Definition at line {\bf 188} of file {\bf Streamer.\+cpp}.
 
 
 
@@ -525,11 +587,11 @@ Here is the call graph for this function\+:
 )}\label{classlime_1_1Streamer_a7609688279492ce5938fcee2e9a5cfb2}
 
 
-Definition at line {\bf 637} of file {\bf Streamer.\+cpp}.
+Definition at line {\bf 675} of file {\bf Streamer.\+cpp}.
 
 
 
-References {\bf lime\+::\+I\+Connection\+::\+Abort\+Sending()}, {\bf lime\+::\+I\+Connection\+::\+Begin\+Data\+Sending()}, {\bf ch\+Count}, {\bf lime\+::\+I\+Connection\+::\+Check\+Stream\+Size()}, {\bf chip\+Id}, {\bf lime\+::\+F\+P\+G\+A\+\_\+\+Data\+Packet\+::counter}, {\bf data\+Link\+Format}, {\bf data\+Port}, {\bf lime\+::\+Ring\+F\+I\+F\+O\+::\+E\+N\+D\+\_\+\+B\+U\+R\+ST}, {\bf lime\+::error()}, {\bf lime\+::\+I\+Connection\+::\+Finish\+Data\+Sending()}, {\bf lime\+::\+Stream\+Channel\+::\+Metadata\+::flags}, {\bf lime\+::\+Stream\+Config\+::\+F\+M\+T\+\_\+\+I\+N\+T12}, {\bf lime\+::\+I\+Connection\+::\+Get\+Buffers\+Count()}, {\bf i}, {\bf ind}, {\bf int()}, {\bf meta}, {\bf m\+Tx\+Streams}, {\bf lime\+::\+F\+P\+G\+A\+\_\+\+Data\+Packet\+::reserved}, {\bf rx\+Batch\+Size}, {\bf samples}, {\bf lime\+::samples12\+In\+Pkt}, {\bf lime\+::samples16\+In\+Pkt}, {\bf lime\+::\+F\+P\+G\+A\+::\+Samples2\+F\+P\+G\+A\+Packet\+Payload()}, {\bf src}, {\bf stream\+Size}, {\bf lime\+::\+Ring\+F\+I\+F\+O\+::\+S\+Y\+N\+C\+\_\+\+T\+I\+M\+E\+S\+T\+A\+MP}, {\bf t1}, {\bf t2}, {\bf terminate\+Tx}, {\bf lime\+::\+Stream\+Channel\+::\+Metadata\+::timestamp}, {\bf tx\+Data\+Rate\+\_\+\+Bps}, {\bf tx\+Last\+Timestamp}, {\bf lime\+::\+I\+Connection\+::\+Wait\+For\+Sending()}, and {\bf lime\+::warning()}.
+References {\bf lime\+::\+I\+Connection\+::\+Abort\+Sending()}, {\bf lime\+::\+I\+Connection\+::\+Begin\+Data\+Sending()}, {\bf c}, {\bf ch\+Count}, {\bf lime\+::\+I\+Connection\+::\+Check\+Stream\+Size()}, {\bf chip\+Id}, {\bf lime\+::\+F\+P\+G\+A\+\_\+\+Data\+Packet\+::counter}, {\bf data\+Link\+Format}, {\bf data\+Port}, {\bf lime\+::\+Ring\+F\+I\+F\+O\+::\+E\+N\+D\+\_\+\+B\+U\+R\+ST}, {\bf lime\+::error()}, {\bf lime\+::\+I\+Connection\+::\+Finish\+Data\+Sending()}, {\bf lime\+::\+Stream\+Channel\+::\+Metadata\+::flags}, {\bf lime\+::\+Stream\+Config\+::\+F\+M\+T\+\_\+\+I\+N\+T12}, {\bf lime\+::\+I\+Connection\+::\+Get\+Buffers\+Count()}, {\bf i}, {\bf ind}, {\bf int()}, {\bf meta}, {\bf m\+Tx\+Streams}, {\bf lime\+::\+F\+P\+G\+A\+\_\+\+Data\+Packet\+::reserved}, {\bf rx\+Batch\+Size}, {\bf samples}, {\bf lime\+::samples12\+In\+Pkt}, {\bf lime\+::samples16\+In\+Pkt}, {\bf lime\+::\+F\+P\+G\+A\+::\+Samples2\+F\+P\+G\+A\+Packet\+Payload()}, {\bf src}, {\bf stream\+Size}, {\bf lime\+::\+Ring\+F\+I\+F\+O\+::\+S\+Y\+N\+C\+\_\+\+T\+I\+M\+E\+S\+T\+A\+MP}, {\bf t1}, {\bf t2}, {\bf terminate\+Tx}, {\bf lime\+::\+Stream\+Channel\+::\+Metadata\+::timestamp}, {\bf tx\+Data\+Rate\+\_\+\+Bps}, {\bf tx\+Last\+Timestamp}, {\bf lime\+::\+I\+Connection\+::\+Wait\+For\+Sending()}, and {\bf lime\+::warning()}.
 
 
 
@@ -568,7 +630,7 @@ Here is the caller graph for this function\+:
 )}\label{classlime_1_1Streamer_a33a233f1c863b9710f3b685d5fb494f6}
 
 
-Definition at line {\bf 520} of file {\bf Streamer.\+cpp}.
+Definition at line {\bf 558} of file {\bf Streamer.\+cpp}.
 
 
 
@@ -610,18 +672,40 @@ Here is the caller graph for this function\+:
 \paragraph[{chip\+Id}]{\setlength{\rightskip}{0pt plus 5cm}{\bf int} lime\+::\+Streamer\+::chip\+Id\hspace{0.3cm}{\ttfamily [private]}}\label{classlime_1_1Streamer_abefd7afb714673aa37ebb56132571e7f}
 
 
-Definition at line {\bf 165} of file {\bf Streamer.\+h}.
+Definition at line {\bf 171} of file {\bf Streamer.\+h}.
 
 
 
-Referenced by {\bf Align\+Quadrature()}, {\bf Align\+Rx\+R\+F()}, {\bf Align\+Rx\+T\+S\+P()}, {\bf Get\+Hardware\+Timestamp()}, {\bf Get\+Phase\+Offset()}, {\bf Receive\+Packets\+Loop()}, {\bf Rst\+Rx\+I\+Q\+Gen()}, {\bf Streamer()}, {\bf Transmit\+Packets\+Loop()}, and {\bf Update\+Threads()}.
+Referenced by {\bf Align\+Quadrature()}, {\bf Align\+Rx\+R\+F()}, {\bf Align\+Rx\+T\+S\+P()}, {\bf Get\+Chirp\+Time\+Period()}, {\bf Get\+Chirp\+Time\+Stamp()}, {\bf Get\+Hardware\+Timestamp()}, {\bf Get\+Phase\+Offset()}, {\bf Receive\+Packets\+Loop()}, {\bf Rst\+Rx\+I\+Q\+Gen()}, {\bf Streamer()}, {\bf Transmit\+Packets\+Loop()}, and {\bf Update\+Threads()}.
+
+\index{lime\+::\+Streamer@{lime\+::\+Streamer}!chirp\+Last\+Time\+Period@{chirp\+Last\+Time\+Period}}
+\index{chirp\+Last\+Time\+Period@{chirp\+Last\+Time\+Period}!lime\+::\+Streamer@{lime\+::\+Streamer}}
+\paragraph[{chirp\+Last\+Time\+Period}]{\setlength{\rightskip}{0pt plus 5cm}std\+::atomic$<$uint64\+\_\+t$>$ lime\+::\+Streamer\+::chirp\+Last\+Time\+Period}\label{classlime_1_1Streamer_a274d6c62015f7ee03db9c9a0236fdc26}
+
+
+Definition at line {\bf 155} of file {\bf Streamer.\+h}.
+
+
+
+Referenced by {\bf Get\+Chirp\+Time\+Period()}, {\bf Receive\+Packets\+Loop()}, and {\bf Streamer()}.
+
+\index{lime\+::\+Streamer@{lime\+::\+Streamer}!chirp\+Last\+Time\+Stamp@{chirp\+Last\+Time\+Stamp}}
+\index{chirp\+Last\+Time\+Stamp@{chirp\+Last\+Time\+Stamp}!lime\+::\+Streamer@{lime\+::\+Streamer}}
+\paragraph[{chirp\+Last\+Time\+Stamp}]{\setlength{\rightskip}{0pt plus 5cm}std\+::atomic$<$uint64\+\_\+t$>$ lime\+::\+Streamer\+::chirp\+Last\+Time\+Stamp}\label{classlime_1_1Streamer_a293a652cc85723793ad62f15d9baba56}
+
+
+Definition at line {\bf 154} of file {\bf Streamer.\+h}.
+
+
+
+Referenced by {\bf Get\+Chirp\+Time\+Stamp()}, {\bf Receive\+Packets\+Loop()}, and {\bf Streamer()}.
 
 \index{lime\+::\+Streamer@{lime\+::\+Streamer}!data\+Link\+Format@{data\+Link\+Format}}
 \index{data\+Link\+Format@{data\+Link\+Format}!lime\+::\+Streamer@{lime\+::\+Streamer}}
 \paragraph[{data\+Link\+Format}]{\setlength{\rightskip}{0pt plus 5cm}{\bf Stream\+Config\+::\+Stream\+Data\+Format} lime\+::\+Streamer\+::data\+Link\+Format}\label{classlime_1_1Streamer_a4d54c12664e65d2cceae1428e2d7d7fe}
 
 
-Definition at line {\bf 154} of file {\bf Streamer.\+h}.
+Definition at line {\bf 160} of file {\bf Streamer.\+h}.
 
 
 
@@ -632,29 +716,29 @@ Referenced by {\bf Receive\+Packets\+Loop()}, {\bf Transmit\+Packets\+Loop()}, a
 \paragraph[{data\+Port}]{\setlength{\rightskip}{0pt plus 5cm}{\bf I\+Connection}$\ast$ lime\+::\+Streamer\+::data\+Port}\label{classlime_1_1Streamer_a7282280d633007bb7fd2d1e27a698ae7}
 
 
-Definition at line {\bf 140} of file {\bf Streamer.\+h}.
+Definition at line {\bf 144} of file {\bf Streamer.\+h}.
 
 
 
-Referenced by {\bf Align\+Quadrature()}, {\bf Align\+Rx\+R\+F()}, {\bf Align\+Rx\+T\+S\+P()}, {\bf Get\+Hardware\+Timestamp()}, {\bf Get\+Phase\+Offset()}, {\bf Receive\+Packets\+Loop()}, {\bf Rst\+Rx\+I\+Q\+Gen()}, {\bf Streamer()}, {\bf Transmit\+Packets\+Loop()}, and {\bf Update\+Threads()}.
+Referenced by {\bf Align\+Quadrature()}, {\bf Align\+Rx\+R\+F()}, {\bf Align\+Rx\+T\+S\+P()}, {\bf Get\+Chirp\+Time\+Period()}, {\bf Get\+Chirp\+Time\+Stamp()}, {\bf Get\+Hardware\+Timestamp()}, {\bf Get\+Phase\+Offset()}, {\bf Receive\+Packets\+Loop()}, {\bf Rst\+Rx\+I\+Q\+Gen()}, {\bf Streamer()}, {\bf Transmit\+Packets\+Loop()}, and {\bf Update\+Threads()}.
 
 \index{lime\+::\+Streamer@{lime\+::\+Streamer}!fpga@{fpga}}
 \index{fpga@{fpga}!lime\+::\+Streamer@{lime\+::\+Streamer}}
 \paragraph[{fpga}]{\setlength{\rightskip}{0pt plus 5cm}{\bf F\+P\+GA}$\ast$ lime\+::\+Streamer\+::fpga\hspace{0.3cm}{\ttfamily [private]}}\label{classlime_1_1Streamer_a729560ce9527503e12f21c64e6e5d781}
 
 
-Definition at line {\bf 163} of file {\bf Streamer.\+h}.
+Definition at line {\bf 169} of file {\bf Streamer.\+h}.
 
 
 
-Referenced by {\bf Align\+Quadrature()}, {\bf Align\+Rx\+R\+F()}, {\bf Align\+Rx\+T\+S\+P()}, {\bf Get\+Hardware\+Timestamp()}, {\bf Get\+Phase\+Offset()}, {\bf Streamer()}, and {\bf Update\+Threads()}.
+Referenced by {\bf Align\+Quadrature()}, {\bf Align\+Rx\+R\+F()}, {\bf Align\+Rx\+T\+S\+P()}, {\bf Get\+Chirp\+Time\+Period()}, {\bf Get\+Chirp\+Time\+Stamp()}, {\bf Get\+Hardware\+Timestamp()}, {\bf Get\+Phase\+Offset()}, {\bf Streamer()}, and {\bf Update\+Threads()}.
 
 \index{lime\+::\+Streamer@{lime\+::\+Streamer}!lms@{lms}}
 \index{lms@{lms}!lime\+::\+Streamer@{lime\+::\+Streamer}}
 \paragraph[{lms}]{\setlength{\rightskip}{0pt plus 5cm}{\bf L\+M\+S7002M}$\ast$ lime\+::\+Streamer\+::lms\hspace{0.3cm}{\ttfamily [private]}}\label{classlime_1_1Streamer_acccfcc9efdf3f4b3df92860e8daa92cb}
 
 
-Definition at line {\bf 164} of file {\bf Streamer.\+h}.
+Definition at line {\bf 170} of file {\bf Streamer.\+h}.
 
 
 
@@ -665,7 +749,7 @@ Referenced by {\bf Align\+Quadrature()}, {\bf Align\+Rx\+R\+F()}, {\bf Setup\+St
 \paragraph[{m\+Rx\+Streams}]{\setlength{\rightskip}{0pt plus 5cm}{\bf std\+::vector}$<${\bf Stream\+Channel}$>$ lime\+::\+Streamer\+::m\+Rx\+Streams}\label{classlime_1_1Streamer_a9f1b1c40c42bc8a02dfde53d9596cd96}
 
 
-Definition at line {\bf 146} of file {\bf Streamer.\+h}.
+Definition at line {\bf 150} of file {\bf Streamer.\+h}.
 
 
 
@@ -676,18 +760,18 @@ Referenced by {\bf Get\+Stream\+Size()}, {\bf Receive\+Packets\+Loop()}, {\bf Se
 \paragraph[{m\+Timestamp\+Offset}]{\setlength{\rightskip}{0pt plus 5cm}uint64\+\_\+t lime\+::\+Streamer\+::m\+Timestamp\+Offset}\label{classlime_1_1Streamer_a8c3e9262ec599581a75dc12bc3e45583}
 
 
-Definition at line {\bf 150} of file {\bf Streamer.\+h}.
+Definition at line {\bf 156} of file {\bf Streamer.\+h}.
 
 
 
-Referenced by {\bf Get\+Hardware\+Timestamp()}, {\bf Set\+Hardware\+Timestamp()}, and {\bf Streamer()}.
+Referenced by {\bf Get\+Chirp\+Time\+Period()}, {\bf Get\+Chirp\+Time\+Stamp()}, {\bf Get\+Hardware\+Timestamp()}, {\bf Set\+Hardware\+Timestamp()}, and {\bf Streamer()}.
 
 \index{lime\+::\+Streamer@{lime\+::\+Streamer}!m\+Tx\+Streams@{m\+Tx\+Streams}}
 \index{m\+Tx\+Streams@{m\+Tx\+Streams}!lime\+::\+Streamer@{lime\+::\+Streamer}}
 \paragraph[{m\+Tx\+Streams}]{\setlength{\rightskip}{0pt plus 5cm}{\bf std\+::vector}$<${\bf Stream\+Channel}$>$ lime\+::\+Streamer\+::m\+Tx\+Streams}\label{classlime_1_1Streamer_a76ba9dc33e6bdccbda735faa6953c180}
 
 
-Definition at line {\bf 147} of file {\bf Streamer.\+h}.
+Definition at line {\bf 151} of file {\bf Streamer.\+h}.
 
 
 
@@ -698,7 +782,7 @@ Referenced by {\bf Get\+Stream\+Size()}, {\bf Receive\+Packets\+Loop()}, {\bf Se
 \paragraph[{rx\+Batch\+Size}]{\setlength{\rightskip}{0pt plus 5cm}unsigned lime\+::\+Streamer\+::rx\+Batch\+Size}\label{classlime_1_1Streamer_ab9836edafedfa653415ca6ae2d8acd2e}
 
 
-Definition at line {\bf 153} of file {\bf Streamer.\+h}.
+Definition at line {\bf 159} of file {\bf Streamer.\+h}.
 
 
 
@@ -709,7 +793,7 @@ Referenced by {\bf Get\+Stream\+Size()}, {\bf Receive\+Packets\+Loop()}, {\bf Se
 \paragraph[{rx\+Data\+Rate\+\_\+\+Bps}]{\setlength{\rightskip}{0pt plus 5cm}std\+::atomic$<$uint32\+\_\+t$>$ lime\+::\+Streamer\+::rx\+Data\+Rate\+\_\+\+Bps}\label{classlime_1_1Streamer_adc125cfae72d5e94f775a3f5e3fdd2e9}
 
 
-Definition at line {\bf 138} of file {\bf Streamer.\+h}.
+Definition at line {\bf 142} of file {\bf Streamer.\+h}.
 
 
 
@@ -720,7 +804,7 @@ Referenced by {\bf lime\+::\+Stream\+Channel\+::\+Get\+Info()}, {\bf Receive\+Pa
 \paragraph[{rx\+Last\+Timestamp}]{\setlength{\rightskip}{0pt plus 5cm}std\+::atomic$<$uint64\+\_\+t$>$ lime\+::\+Streamer\+::rx\+Last\+Timestamp}\label{classlime_1_1Streamer_a63dbdc66ed33bb6f503605d9c1f66924}
 
 
-Definition at line {\bf 148} of file {\bf Streamer.\+h}.
+Definition at line {\bf 152} of file {\bf Streamer.\+h}.
 
 
 
@@ -731,18 +815,18 @@ Referenced by {\bf Get\+Hardware\+Timestamp()}, {\bf lime\+::\+Stream\+Channel\+
 \paragraph[{rx\+Thread}]{\setlength{\rightskip}{0pt plus 5cm}std\+::thread lime\+::\+Streamer\+::rx\+Thread}\label{classlime_1_1Streamer_a7417e97c63b56482c2730b6df05a6526}
 
 
-Definition at line {\bf 141} of file {\bf Streamer.\+h}.
+Definition at line {\bf 145} of file {\bf Streamer.\+h}.
 
 
 
-Referenced by {\bf Get\+Hardware\+Timestamp()}, {\bf Setup\+Stream()}, {\bf Update\+Threads()}, and {\bf $\sim$\+Streamer()}.
+Referenced by {\bf Get\+Chirp\+Time\+Period()}, {\bf Get\+Chirp\+Time\+Stamp()}, {\bf Get\+Hardware\+Timestamp()}, {\bf Setup\+Stream()}, {\bf Update\+Threads()}, and {\bf $\sim$\+Streamer()}.
 
 \index{lime\+::\+Streamer@{lime\+::\+Streamer}!stream\+Size@{stream\+Size}}
 \index{stream\+Size@{stream\+Size}!lime\+::\+Streamer@{lime\+::\+Streamer}}
 \paragraph[{stream\+Size}]{\setlength{\rightskip}{0pt plus 5cm}{\bf int} lime\+::\+Streamer\+::stream\+Size}\label{classlime_1_1Streamer_a09f4d312f6ee5f04494455fe2fe7b482}
 
 
-Definition at line {\bf 151} of file {\bf Streamer.\+h}.
+Definition at line {\bf 157} of file {\bf Streamer.\+h}.
 
 
 
@@ -753,7 +837,7 @@ Referenced by {\bf Get\+Stream\+Size()}, {\bf Receive\+Packets\+Loop()}, {\bf Se
 \paragraph[{terminate\+Rx}]{\setlength{\rightskip}{0pt plus 5cm}std\+::atomic$<$bool$>$ lime\+::\+Streamer\+::terminate\+Rx}\label{classlime_1_1Streamer_a88834a0ea3ec6d9df65d75db0091fd28}
 
 
-Definition at line {\bf 143} of file {\bf Streamer.\+h}.
+Definition at line {\bf 147} of file {\bf Streamer.\+h}.
 
 
 
@@ -764,7 +848,7 @@ Referenced by {\bf Receive\+Packets\+Loop()}, {\bf Streamer()}, {\bf Update\+Thr
 \paragraph[{terminate\+Tx}]{\setlength{\rightskip}{0pt plus 5cm}std\+::atomic$<$bool$>$ lime\+::\+Streamer\+::terminate\+Tx}\label{classlime_1_1Streamer_ac08fdbdb56cbe888e14c0d9daece9ac5}
 
 
-Definition at line {\bf 144} of file {\bf Streamer.\+h}.
+Definition at line {\bf 148} of file {\bf Streamer.\+h}.
 
 
 
@@ -775,7 +859,7 @@ Referenced by {\bf Streamer()}, {\bf Transmit\+Packets\+Loop()}, {\bf Update\+Th
 \paragraph[{tx\+Batch\+Size}]{\setlength{\rightskip}{0pt plus 5cm}unsigned lime\+::\+Streamer\+::tx\+Batch\+Size}\label{classlime_1_1Streamer_ac3f56ce0e84b1556b77bf6a081e2fe09}
 
 
-Definition at line {\bf 152} of file {\bf Streamer.\+h}.
+Definition at line {\bf 158} of file {\bf Streamer.\+h}.
 
 
 
@@ -786,7 +870,7 @@ Referenced by {\bf Get\+Stream\+Size()}, {\bf Setup\+Stream()}, and {\bf Streame
 \paragraph[{tx\+Data\+Rate\+\_\+\+Bps}]{\setlength{\rightskip}{0pt plus 5cm}std\+::atomic$<$uint32\+\_\+t$>$ lime\+::\+Streamer\+::tx\+Data\+Rate\+\_\+\+Bps}\label{classlime_1_1Streamer_af0888ee52ab1dd461c8dd15f5d20182c}
 
 
-Definition at line {\bf 139} of file {\bf Streamer.\+h}.
+Definition at line {\bf 143} of file {\bf Streamer.\+h}.
 
 
 
@@ -797,7 +881,7 @@ Referenced by {\bf lime\+::\+Stream\+Channel\+::\+Get\+Info()}, {\bf Streamer()}
 \paragraph[{tx\+Last\+Timestamp}]{\setlength{\rightskip}{0pt plus 5cm}std\+::atomic$<$uint64\+\_\+t$>$ lime\+::\+Streamer\+::tx\+Last\+Timestamp}\label{classlime_1_1Streamer_ad6489237eecb85f84c4fdc9a4619a648}
 
 
-Definition at line {\bf 149} of file {\bf Streamer.\+h}.
+Definition at line {\bf 153} of file {\bf Streamer.\+h}.
 
 
 
@@ -808,11 +892,11 @@ Referenced by {\bf lime\+::\+Stream\+Channel\+::\+Get\+Info()}, and {\bf Transmi
 \paragraph[{tx\+Thread}]{\setlength{\rightskip}{0pt plus 5cm}std\+::thread lime\+::\+Streamer\+::tx\+Thread}\label{classlime_1_1Streamer_aa90caa658ae054c9dd389f6b09bad00a}
 
 
-Definition at line {\bf 142} of file {\bf Streamer.\+h}.
+Definition at line {\bf 146} of file {\bf Streamer.\+h}.
 
 
 
-Referenced by {\bf Get\+Hardware\+Timestamp()}, {\bf Setup\+Stream()}, {\bf Update\+Threads()}, and {\bf $\sim$\+Streamer()}.
+Referenced by {\bf Get\+Chirp\+Time\+Period()}, {\bf Get\+Chirp\+Time\+Stamp()}, {\bf Get\+Hardware\+Timestamp()}, {\bf Setup\+Stream()}, {\bf Update\+Threads()}, and {\bf $\sim$\+Streamer()}.
 
 
 

@@ -1,0 +1,309 @@
+\subsection{static\+\_\+target\+\_\+simulator\+\_\+cc\+\_\+impl.\+cc}
+\label{static__target__simulator__cc__impl_8cc_source}\index{/home/erik/prefix/default/src/gr-\/radar-\/dev/lib/static\+\_\+target\+\_\+simulator\+\_\+cc\+\_\+impl.\+cc@{/home/erik/prefix/default/src/gr-\/radar-\/dev/lib/static\+\_\+target\+\_\+simulator\+\_\+cc\+\_\+impl.\+cc}}
+
+\begin{DoxyCode}
+00001 \textcolor{comment}{/* -*- c++ -*- */}
+00002 \textcolor{comment}{/*}
+00003 \textcolor{comment}{ * Copyright 2014 Communications Engineering Lab, KIT.}
+00004 \textcolor{comment}{ *}
+00005 \textcolor{comment}{ * This is free software; you can redistribute it and/or modify}
+00006 \textcolor{comment}{ * it under the terms of the GNU General Public License as published by}
+00007 \textcolor{comment}{ * the Free Software Foundation; either version 3, or (at your option)}
+00008 \textcolor{comment}{ * any later version.}
+00009 \textcolor{comment}{ *}
+00010 \textcolor{comment}{ * This software is distributed in the hope that it will be useful,}
+00011 \textcolor{comment}{ * but WITHOUT ANY WARRANTY; without even the implied warranty of}
+00012 \textcolor{comment}{ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the}
+00013 \textcolor{comment}{ * GNU General Public License for more details.}
+00014 \textcolor{comment}{ *}
+00015 \textcolor{comment}{ * You should have received a copy of the GNU General Public License}
+00016 \textcolor{comment}{ * along with this software; see the file COPYING.  If not, write to}
+00017 \textcolor{comment}{ * the Free Software Foundation, Inc., 51 Franklin Street,}
+00018 \textcolor{comment}{ * Boston, MA 02110-1301, USA.}
+00019 \textcolor{comment}{ */}
+00020 
+00021 \textcolor{preprocessor}{#ifdef HAVE\_CONFIG\_H}
+00022 \textcolor{preprocessor}{#include "config.h"}
+00023 \textcolor{preprocessor}{#endif}
+00024 
+00025 \textcolor{preprocessor}{#include <gnuradio/io\_signature.h>}
+00026 \textcolor{preprocessor}{#include "static_target_simulator_cc_impl.h"}
+00027 \textcolor{preprocessor}{#include <volk/volk.h>}
+00028 
+00029 \textcolor{keyword}{namespace }gr \{ \textcolor{keyword}{namespace }radar \{
+00030     \textcolor{keyword}{namespace }\{
+00032         \textcolor{keyword}{const} \textcolor{keywordtype}{double} FOUR\_PI\_CUBED\_SQRT = 44.54662397465366;
+00033     \}
+00034 
+00035     static_target_simulator_cc::sptr
+00036     static_target_simulator_cc::make(
+00037             std::vector<float> range,
+00038             std::vector<float> velocity,
+00039             std::vector<float> rcs,
+00040             std::vector<float> azimuth,
+00041             std::vector<float> position\_rx,
+00042             \textcolor{keywordtype}{int} samp_rate,
+00043             \textcolor{keywordtype}{float} center_freq,
+00044             \textcolor{keywordtype}{float} self\_coupling\_db,
+00045             \textcolor{keywordtype}{bool} rndm\_phaseshift,
+00046             \textcolor{keywordtype}{bool} self\_coupling,
+00047             \textcolor{keyword}{const} std::string& len\_key
+00048     )
+00049     \{
+00050       \textcolor{keywordflow}{return} gnuradio::get\_initial\_sptr(\textcolor{keyword}{new} static_target_simulator_cc_impl(
+00051             range, velocity, rcs, azimuth, position\_rx, samp\_rate, center\_freq,
+00052             self\_coupling\_db, rndm\_phaseshift, self\_coupling, len\_key
+00053       ));
+00054     \}
+00055 
+00056     static_target_simulator_cc_impl::static_target_simulator_cc_impl(
+00057             std::vector<float> range,
+00058             std::vector<float> velocity,
+00059             std::vector<float> rcs,
+00060             std::vector<float> azimuth,
+00061             std::vector<float> position\_rx,
+00062             \textcolor{keywordtype}{int} samp_rate,
+00063             \textcolor{keywordtype}{float} center_freq,
+00064             \textcolor{keywordtype}{float} self\_coupling\_db,
+00065             \textcolor{keywordtype}{bool} rndm\_phaseshift,
+00066             \textcolor{keywordtype}{bool} self\_coupling,
+00067             \textcolor{keyword}{const} std::string& len\_key)
+00068         : gr::tagged\_stream\_block(\textcolor{stringliteral}{"static\_target\_simulator\_cc"},
+00069                 gr::io\_signature::make(1, 1, sizeof(gr\_complex)),
+00070                 gr::io\_signature::make(position\_rx.size(), position\_rx.size(), sizeof(gr\_complex)), len\_key
+      )
+00071     \{
+00072         setup_targets(range, velocity, rcs, azimuth, position\_rx, samp\_rate,
+00073                 center\_freq, self\_coupling\_db, rndm\_phaseshift, self\_coupling);
+00074     \}
+00075 
+00076     static_target_simulator_cc_impl::~static_target_simulator_cc_impl()
+00077     \{
+00078     \}
+00079 
+00080     \textcolor{keywordtype}{void}
+00081     static_target_simulator_cc_impl::setup_targets(
+00082         std::vector<float> range,
+00083         std::vector<float> velocity,
+00084         std::vector<float> rcs,
+00085         std::vector<float> azimuth,
+00086         std::vector<float> position\_rx,
+00087         \textcolor{keywordtype}{int} samp_rate,
+00088         \textcolor{keywordtype}{float} center_freq,
+00089         \textcolor{keywordtype}{float} self\_coupling\_db,
+00090         \textcolor{keywordtype}{bool} rndm\_phaseshift,
+00091         \textcolor{keywordtype}{bool} self\_coupling
+00092     )\{
+00093         d_range = range;
+00094         d_velocity = velocity;
+00095         d_rcs = rcs;
+00096         d_azimuth = azimuth;
+00097         d_position_rx = position\_rx;
+00098         d_center_freq = center_freq; \textcolor{comment}{// center frequency of simulated hardware for doppler estimation}
+00099         d_samp_rate = samp_rate;
+00100         d_hold_noutput = -1;
+00101         d_rndm_phaseshift = rndm\_phaseshift;
+00102         d_self_coupling = self\_coupling;
+00103         d_self_coupling_db = self\_coupling\_db;
+00104 
+00105         \textcolor{comment}{// Setup rx\_time tag}
+00106         d_key = pmt::string\_to\_symbol(\textcolor{stringliteral}{"rx\_time"});
+00107         d_srcid = pmt::string\_to\_symbol(\textcolor{stringliteral}{"stat\_targ\_sim"});
+00108 
+00109         \textcolor{comment}{// Get num targets}
+00110         d_num_targets = range.size(); \textcolor{comment}{// FIXME: throw exceptions for len(range)!=len(velocity)!=...}
+00111 
+00112         \textcolor{comment}{// Get doppler frequencies}
+00113         d_doppler.resize(d_num_targets);
+00114         d_filt_doppler.resize(d_num_targets);
+00115         \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} k=0; k<d_num_targets; k++) d_doppler[k] = 2*d_velocity[k]*
+      d_center_freq/c_light;
+00116 
+00117         \textcolor{comment}{// Get timeshifts}
+00118         d_timeshift.resize(d\_num\_targets);
+00119         d_timeshift_azimuth.resize(d_position_rx.size());
+00120         d_filt_time.resize(d\_num\_targets);
+00121         d_filt_time_azimuth.resize(d_position_rx.size());
+00122         \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} l=0; l<d_position_rx.size(); l++)\{
+00123             d_filt_time_azimuth[l].resize(d\_num\_targets);
+00124             d_timeshift_azimuth[l].resize(d\_num\_targets);
+00125             \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} k=0; k<d_num_targets; k++)\{
+00126                 d_timeshift_azimuth[l][k] = d_position_rx[l]*std::sin(d_azimuth[
+      k]*M\_PI/180.0);
+00127             \}
+00128         \}
+00129         \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} k=0; k<d_num_targets; k++) d_timeshift[k] = 2.0*d_range[k]/
+      c_light;
+00130 
+00131         \textcolor{comment}{// Get signal amplitude of reflection with free space path loss and rcs (radar equation)}
+00132         d_scale_ampl.resize(d\_num\_targets);
+00133         \textcolor{keywordflow}{for} (\textcolor{keywordtype}{int} k = 0; k < d_num_targets; k++) \{
+00134             \textcolor{comment}{// Factor out all terms out of the sqrt except the RCS:}
+00135             d_scale_ampl[k] = c_light
+00136                 * std::sqrt(d_rcs[k])
+00137                 / FOUR\_PI\_CUBED\_SQRT
+00138                 / (d_range[k] * d_range[k])
+00139                 / d_center_freq;
+00140         \}
+00141 
+00142         \textcolor{keywordflow}{if}(d_rndm_phaseshift)\{
+00143             \textcolor{comment}{// Resize phase shift filter}
+00144             d_filt_phase.resize(d\_num\_targets);
+00145 
+00146             \textcolor{comment}{// Setup random numbers}
+00147             std::srand(std::time(NULL)); \textcolor{comment}{// initial with time}
+00148         \}
+00149     \}
+00150 
+00151     \textcolor{keywordtype}{int}
+00152     static_target_simulator_cc_impl::calculate_output_stream_length(\textcolor{keyword}{const} gr\_vector\_int &ninput\_items)
+00153     \{
+00154         \textcolor{keywordtype}{int} noutput\_items = ninput\_items[0];
+00155         \textcolor{keywordflow}{return} noutput\_items ;
+00156     \}
+00157 
+00158     \textcolor{keywordtype}{int}
+00159     static_target_simulator_cc_impl::work(
+00160             \textcolor{keywordtype}{int} noutput\_items,
+00161             gr\_vector\_int &ninput\_items,
+00162             gr\_vector\_const\_void\_star &input\_items,
+00163             gr\_vector\_void\_star &output\_items)
+00164     \{
+00165         \textcolor{keyword}{const} gr\_complex *in = (\textcolor{keyword}{const} gr\_complex *) input\_items[0];
+00166         gr\_complex *out;
+00167 
+00168         \textcolor{comment}{// Set output items to tagged stream length}
+00169         noutput\_items = ninput\_items[0];
+00170 
+00171         \textcolor{comment}{// Check if new filter, buffer or fft plan is necessary}
+00172         \textcolor{keywordflow}{if}(d_hold_noutput!=noutput\_items)\{
+00173             \textcolor{comment}{// Set length buffer in loop}
+00174             d_hold_in.resize(noutput\_items);
+00175 
+00176             \textcolor{comment}{// Setup fft and ifft}
+00177             d_in_fft.resize(noutput\_items);
+00178             d_fft_plan = fftwf\_plan\_dft\_1d(noutput\_items, reinterpret\_cast<fftwf\_complex *>(&
+      d_hold_in[0]),
+00179                     reinterpret\_cast<fftwf\_complex *>(&d_in_fft[0]), FFTW\_FORWARD, FFTW\_ESTIMATE);
+00180             d_ifft_plan = fftwf\_plan\_dft\_1d(noutput\_items, reinterpret\_cast<fftwf\_complex *>(&
+      d_in_fft[0]),
+00181                     reinterpret\_cast<fftwf\_complex *>(&d_hold_in[0]), FFTW\_BACKWARD, FFTW\_ESTIMATE);
+00182 
+00183             \textcolor{comment}{// Setup frequency vector for shift in frequency domain}
+00184             d_freq.resize(noutput\_items);
+00185             \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} i=0; i<noutput\_items; i++)\{
+00186                 \textcolor{keywordflow}{if}(i<noutput\_items/2) d_freq[i] = i*(float)d_samp_rate/(\textcolor{keywordtype}{float})noutput\_items; \textcolor{comment}{// zero to
+       samp\_rate/2}
+00187                 \textcolor{keywordflow}{else} d_freq[i] = i*(float)d_samp_rate/(\textcolor{keywordtype}{float})noutput\_items - (float)
+      d_samp_rate; \textcolor{comment}{// -samp\_rate/2 to zero}
+00188             \}
+00189 
+00190             \textcolor{comment}{// Setup freq and time shift filter, resize phase shift filter}
+00191             \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} k=0; k<d_num_targets; k++)\{
+00192                 d_filt_doppler[k].resize(noutput\_items);
+00193                 \textcolor{keywordflow}{if}(d_rndm_phaseshift) d_filt_phase[k].resize(noutput\_items);
+00194 
+00195                 d_phase_doppler = 0;
+00196                 \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} i=0; i<noutput\_items; i++)\{
+00197                     \textcolor{comment}{// Doppler shift filter and rescaling amplitude with rcs}
+00198                     d_filt_doppler[k][i] = std::exp(d_phase_doppler)*
+      d_scale_ampl[k];
+00199                     d_phase_doppler = 1j*std::fmod(std::imag(d_phase_doppler)+2*M\_PI*
+      d_doppler[k]/(\textcolor{keywordtype}{float})d_samp_rate,2*M\_PI); \textcolor{comment}{// integrate phase (with plus!)}
+00200                 \}
+00201 
+00202                 d_filt_time[k].resize(noutput\_items);
+00203                 d_phase_time = 0;
+00204                 \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} i=0; i<noutput\_items; i++)\{
+00205                     \textcolor{comment}{// Time shift filter, uses target range}
+00206                     d_phase_time = 1j*std::fmod(2*M\_PI*(d_timeshift[k]) \textcolor{comment}{// range time shift}
+00207                             *d_freq[i],2*M\_PI); \textcolor{comment}{// integrate phase (with minus!)}
+00208                     d_filt_time[k][i] = std::exp(-d_phase_time)/(float)noutput\_items; \textcolor{comment}{// div with
+       noutput\_item to correct amplitude after fft->ifft}
+00209                 \}
+00210 
+00211                 \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} l=0; l<d_position_rx.size(); l++)\{ \textcolor{comment}{// Do time shift filter with azimuth and
+       position, there are two time shift filters to avoid problems with significant digits of float}
+00212                     d_filt_time_azimuth[l][k].resize(noutput\_items);
+00213                     d_phase_time = 0;
+00214                     \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} i=0; i<noutput\_items; i++)\{
+00215                         \textcolor{comment}{// Time shift filter, uses azimuth and RX position}
+00216                         d_phase_time = 1j*std::fmod(2*M\_PI*(d_timeshift_azimuth[l][
+      k]) \textcolor{comment}{// azimuth time shift}
+00217                                 *d_freq[i],2*M\_PI); \textcolor{comment}{// integrate phase (with minus!)}
+00218                         d_filt_time_azimuth[l][k][i] = std::exp(-d_phase_time); \textcolor{comment}{// do not div with
+       noutput\_items, is done with range timeshift filter}
+00219                     \}
+00220                 \}
+00221             \}
+00222 
+00223             \textcolor{comment}{// Resize hold of noutput\_items}
+00224             d_hold_noutput = noutput\_items;
+00225         \}
+00226 
+00227         \textcolor{comment}{// Setup random phase shift}
+00228         \textcolor{keywordflow}{if}(d_rndm_phaseshift)\{
+00229             gr\_complex phase\_random\_hold;
+00230             \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} k=0; k<d_num_targets; k++)\{
+00231                 phase\_random\_hold = 1j*2*M\_PI*float((std::rand()%1000+1)/1000.0);
+00232                 d_phase_random = std::exp(phase\_random\_hold);
+00233                 std::fill\_n(&d_filt_phase[k][0],noutput\_items,d_phase_random);
+00234             \}
+00235         \}
+00236 
+00237         \textcolor{comment}{// Go through RXs}
+00238         \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} l=0; l<d_position_rx.size(); l++)\{
+00239             \textcolor{comment}{// Setup pointer on output buffer}
+00240             out = (gr\_complex *) output\_items[l];
+00241 
+00242             \textcolor{comment}{// Set rx\_time tag}
+00243             d_time_sec = nitems\_written(l)/d_samp_rate;
+00244             d_time_frac_sec = nitems\_written(l)/(float)d_samp_rate-d_time_sec;
+00245             d_val = pmt::make\_tuple
+00246                 (pmt::from\_uint64(d_time_sec),
+00247                  pmt::from\_double(d_time_frac_sec)); \textcolor{comment}{// FIXME: correct implementation?}
+00248             add\_item\_tag(l, nitems\_written(l), d_key, d_val, d_srcid);
+00249 
+00250             \textcolor{comment}{// Set output to zero}
+00251             std::memset(out, 0, noutput\_items*\textcolor{keyword}{sizeof}(gr\_complex));
+00252 
+00253             \textcolor{comment}{// Go through targets and apply filters}
+00254             \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} k=0; k<d_num_targets; k++)\{
+00255                 \textcolor{comment}{// Add doppler shift}
+00256                 volk\_32fc\_x2\_multiply\_32fc(&d_hold_in[0], in, &d_filt_doppler[k][0], noutput\_items); \textcolor{comment}{// add
+       doppler shift with rescaled amplitude}
+00257 
+00258                 \textcolor{comment}{// Add time shift}
+00259                 fftwf\_execute(d_fft_plan); \textcolor{comment}{// go to freq domain}
+00260                 volk\_32fc\_x2\_multiply\_32fc(&d_in_fft[0], &d_in_fft[0], &
+      d_filt_time[k][0], noutput\_items); \textcolor{comment}{// add timeshift with multiply exp-func in freq domain (range)}
+00261                 volk\_32fc\_x2\_multiply\_32fc(&d_in_fft[0], &d_in_fft[0], &
+      d_filt_time_azimuth[l][k][0], noutput\_items); \textcolor{comment}{// add timeshift with multiply exp-func in freq domain (rx
+       position with azimuth and range)}
+00262                 fftwf\_execute(d_ifft_plan); \textcolor{comment}{// back in time domain}
+00263 
+00264                 \textcolor{keywordflow}{if}(d_rndm_phaseshift)\{
+00265                     \textcolor{comment}{// Add random phase shift}
+00266                     volk\_32fc\_x2\_multiply\_32fc(&d_hold_in[0], &d_hold_in[0], &
+      d_filt_phase[k][0], noutput\_items); \textcolor{comment}{// add random phase shift}
+00267                 \}
+00268 
+00269                 \textcolor{comment}{// Add to output}
+00270                 \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} i=0; i<noutput\_items; i++) out[i] += d_hold_in[i];
+00271             \}
+00272 
+00273             \textcolor{comment}{// Add self coupling}
+00274             \textcolor{keywordflow}{if}(d_self_coupling)\{
+00275                 \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} i=0; i<noutput\_items; i++) out[i] += (gr\_complex)pow(10,
+      d_self_coupling_db/20.0)*in[i]; \textcolor{comment}{// d\_self\_coupling\_db gives scaling of power}
+00276             \}
+00277         \}
+00278 
+00279         \textcolor{comment}{// Tell runtime system how many output items we produced.}
+00280         \textcolor{keywordflow}{return} noutput\_items;
+00281     \}
+00282 
+00283   \} \textcolor{comment}{/* namespace radar */}
+00284 \} \textcolor{comment}{/* namespace gr */}
+00285 
+\end{DoxyCode}

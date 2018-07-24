@@ -1,0 +1,60 @@
+\subsection{\+\_\+\+\_\+init\+\_\+\+\_\+.\+py}
+\label{python_2____init_____8py_source}\index{/home/erik/prefix/default/src/gr-\/radar-\/dev/python/\+\_\+\+\_\+init\+\_\+\+\_\+.\+py@{/home/erik/prefix/default/src/gr-\/radar-\/dev/python/\+\_\+\+\_\+init\+\_\+\+\_\+.\+py}}
+
+\begin{DoxyCode}
+00001 \textcolor{comment}{#}
+00002 \textcolor{comment}{# Copyright 2008,2009 Free Software Foundation, Inc.}
+00003 \textcolor{comment}{#}
+00004 \textcolor{comment}{# This application is free software; you can redistribute it and/or modify}
+00005 \textcolor{comment}{# it under the terms of the GNU General Public License as published by}
+00006 \textcolor{comment}{# the Free Software Foundation; either version 3, or (at your option)}
+00007 \textcolor{comment}{# any later version.}
+00008 \textcolor{comment}{#}
+00009 \textcolor{comment}{# This application is distributed in the hope that it will be useful,}
+00010 \textcolor{comment}{# but WITHOUT ANY WARRANTY; without even the implied warranty of}
+00011 \textcolor{comment}{# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the}
+00012 \textcolor{comment}{# GNU General Public License for more details.}
+00013 \textcolor{comment}{#}
+00014 \textcolor{comment}{# You should have received a copy of the GNU General Public License along}
+00015 \textcolor{comment}{# with this program; if not, write to the Free Software Foundation, Inc.,}
+00016 \textcolor{comment}{# 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.}
+00017 \textcolor{comment}{#}
+00018 
+00019 \textcolor{comment}{# The presence of this file turns this directory into a Python package}
+00020 
+00021 \textcolor{stringliteral}{'''}
+00022 \textcolor{stringliteral}{This is the GNU Radio RADAR module. Place your Python package}
+00023 \textcolor{stringliteral}{description here (python/\_\_init\_\_.py).}
+00024 \textcolor{stringliteral}{'''}
+00025 
+00026 \textcolor{comment}{# ----------------------------------------------------------------}
+00027 \textcolor{comment}{# Temporary workaround for ticket:181 (swig+python problem)}
+00028 \textcolor{keyword}{import} sys
+00029 \_RTLD\_GLOBAL = 0
+00030 \textcolor{keywordflow}{try}:
+00031     \textcolor{keyword}{from} dl \textcolor{keyword}{import} RTLD\_GLOBAL \textcolor{keyword}{as} \_RTLD\_GLOBAL
+00032 \textcolor{keywordflow}{except} ImportError:
+00033     \textcolor{keywordflow}{try}:
+00034     \textcolor{keyword}{from} DLFCN \textcolor{keyword}{import} RTLD\_GLOBAL \textcolor{keyword}{as} \_RTLD\_GLOBAL
+00035     \textcolor{keywordflow}{except} ImportError:
+00036     \textcolor{keywordflow}{pass}
+00037 
+00038 \textcolor{keywordflow}{if} \_RTLD\_GLOBAL != 0:
+00039     \_dlopenflags = sys.getdlopenflags()
+00040     sys.setdlopenflags(\_dlopenflags|\_RTLD\_GLOBAL)
+00041 \textcolor{comment}{# ----------------------------------------------------------------}
+00042 
+00043 
+00044 \textcolor{comment}{# import swig generated symbols into the radar namespace}
+00045 \textcolor{keyword}{from} radar\_swig \textcolor{keyword}{import} *
+00046 
+00047 \textcolor{comment}{# import any pure python here}
+00048 
+00049 \textcolor{comment}{#}
+00050 
+00051 \textcolor{comment}{# ----------------------------------------------------------------}
+00052 \textcolor{comment}{# Tail of workaround}
+00053 \textcolor{keywordflow}{if} \_RTLD\_GLOBAL != 0:
+00054     sys.setdlopenflags(\_dlopenflags)      \textcolor{comment}{# Restore original flags}
+00055 \textcolor{comment}{# ----------------------------------------------------------------}
+\end{DoxyCode}

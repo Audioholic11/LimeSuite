@@ -1,0 +1,830 @@
+\subsection{Device.\+cpp}
+\label{Device_8cpp_source}\index{/home/erik/prefix/default/src/soapysdr/lib/\+Device.\+cpp@{/home/erik/prefix/default/src/soapysdr/lib/\+Device.\+cpp}}
+
+\begin{DoxyCode}
+00001 \textcolor{comment}{// Copyright (c) 2014-2017 Josh Blum}
+00002 \textcolor{comment}{// Copyright (c) 2016-2016 Bastille Networks}
+00003 \textcolor{comment}{// SPDX-License-Identifier: BSL-1.0}
+00004 
+00005 \textcolor{preprocessor}{#include <SoapySDR/Device.hpp>}
+00006 \textcolor{preprocessor}{#include <SoapySDR/Formats.hpp>}
+00007 \textcolor{preprocessor}{#include <cstdlib>}
+00008 \textcolor{preprocessor}{#include <algorithm>} \textcolor{comment}{//min/max/find}
+00009 
+00010 SoapySDR::Device::~Device(\textcolor{keywordtype}{void})
+00011 \{
+00012     \textcolor{keywordflow}{return};
+00013 \}
+00014 
+00015 \textcolor{comment}{/*******************************************************************}
+00016 \textcolor{comment}{ * Identification API}
+00017 \textcolor{comment}{ ******************************************************************/}
+00018 std::string SoapySDR::Device::getDriverKey(\textcolor{keywordtype}{void})\textcolor{keyword}{ const}
+00019 \textcolor{keyword}{}\{
+00020     \textcolor{keywordflow}{return} \textcolor{stringliteral}{""};
+00021 \}
+00022 
+00023 std::string SoapySDR::Device::getHardwareKey(\textcolor{keywordtype}{void})\textcolor{keyword}{ const}
+00024 \textcolor{keyword}{}\{
+00025     \textcolor{keywordflow}{return} \textcolor{stringliteral}{""};
+00026 \}
+00027 
+00028 SoapySDR::Kwargs SoapySDR::Device::getHardwareInfo(\textcolor{keywordtype}{void})\textcolor{keyword}{ const}
+00029 \textcolor{keyword}{}\{
+00030     \textcolor{keywordflow}{return} SoapySDR::Kwargs();
+00031 \}
+00032 
+00033 \textcolor{comment}{/*******************************************************************}
+00034 \textcolor{comment}{ * Channels API}
+00035 \textcolor{comment}{ ******************************************************************/}
+00036 \textcolor{keywordtype}{void} SoapySDR::Device::setFrontendMapping(\textcolor{keyword}{const} \textcolor{keywordtype}{int}, \textcolor{keyword}{const} std::string &)
+00037 \{
+00038     \textcolor{keywordflow}{return};
+00039 \}
+00040 
+00041 std::string SoapySDR::Device::getFrontendMapping(\textcolor{keyword}{const} \textcolor{keywordtype}{int})\textcolor{keyword}{ const}
+00042 \textcolor{keyword}{}\{
+00043     \textcolor{keywordflow}{return} \textcolor{stringliteral}{""};
+00044 \}
+00045 
+00046 \textcolor{keywordtype}{size\_t} SoapySDR::Device::getNumChannels(\textcolor{keyword}{const} \textcolor{keywordtype}{int})\textcolor{keyword}{ const}
+00047 \textcolor{keyword}{}\{
+00048     \textcolor{keywordflow}{return} 0;
+00049 \}
+00050 
+00051 SoapySDR::Kwargs SoapySDR::Device::getChannelInfo(\textcolor{keyword}{const} \textcolor{keywordtype}{int}, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t})\textcolor{keyword}{ const}
+00052 \textcolor{keyword}{}\{
+00053     \textcolor{keywordflow}{return} SoapySDR::Kwargs();
+00054 \}
+00055 
+00056 \textcolor{keywordtype}{bool} SoapySDR::Device::getFullDuplex(\textcolor{keyword}{const} \textcolor{keywordtype}{int}, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t})\textcolor{keyword}{ const}
+00057 \textcolor{keyword}{}\{
+00058     \textcolor{keywordflow}{return} \textcolor{keyword}{true};
+00059 \}
+00060 
+00061 \textcolor{comment}{/*******************************************************************}
+00062 \textcolor{comment}{ * Stream API}
+00063 \textcolor{comment}{ ******************************************************************/}
+00064 std::vector<std::string> SoapySDR::Device::getStreamFormats(\textcolor{keyword}{const} \textcolor{keywordtype}{int}, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t})\textcolor{keyword}{ const}
+00065 \textcolor{keyword}{}\{
+00066     \textcolor{keywordflow}{return} std::vector<std::string>();
+00067 \}
+00068 
+00069 std::string SoapySDR::Device::getNativeStreamFormat(\textcolor{keyword}{const} \textcolor{keywordtype}{int}, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t}, \textcolor{keywordtype}{double} &fullScale)\textcolor{keyword}{ const}
+00070 \textcolor{keyword}{}\{
+00071     fullScale = double(1 << 15);
+00072     \textcolor{keywordflow}{return} SOAPY_SDR_CS16;
+00073 \}
+00074 
+00075 SoapySDR::ArgInfoList SoapySDR::Device::getStreamArgsInfo(\textcolor{keyword}{const} \textcolor{keywordtype}{int}, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t})\textcolor{keyword}{ const}
+00076 \textcolor{keyword}{}\{
+00077     \textcolor{keywordflow}{return} SoapySDR::ArgInfoList();
+00078 \}
+00079 
+00080 SoapySDR::Stream *SoapySDR::Device::setupStream(\textcolor{keyword}{const} \textcolor{keywordtype}{int}, \textcolor{keyword}{const} std::string &, \textcolor{keyword}{const} std::vector<size\_t> &
+      , \textcolor{keyword}{const} Kwargs &)
+00081 \{
+00082     \textcolor{keywordflow}{return} \textcolor{keyword}{nullptr};
+00083 \}
+00084 
+00085 \textcolor{keywordtype}{void} SoapySDR::Device::closeStream(Stream *)
+00086 \{
+00087     \textcolor{keywordflow}{return};
+00088 \}
+00089 
+00090 \textcolor{keywordtype}{size\_t} SoapySDR::Device::getStreamMTU(Stream *)\textcolor{keyword}{ const}
+00091 \textcolor{keyword}{}\{
+00092     \textcolor{comment}{//provide a non-zero default when the implementation does not overload the MTU}
+00093     \textcolor{keywordflow}{return} 1024;
+00094 \}
+00095 
+00096 \textcolor{keywordtype}{int} SoapySDR::Device::activateStream(Stream *, \textcolor{keyword}{const} \textcolor{keywordtype}{int} flags, \textcolor{keyword}{const} \textcolor{keywordtype}{long} \textcolor{keywordtype}{long}, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t})
+00097 \{
+00098     \textcolor{keywordflow}{return} (flags == 0)? 0 : SOAPY_SDR_NOT_SUPPORTED;
+00099 \}
+00100 
+00101 \textcolor{keywordtype}{int} SoapySDR::Device::deactivateStream(Stream *, \textcolor{keyword}{const} \textcolor{keywordtype}{int} flags, \textcolor{keyword}{const} \textcolor{keywordtype}{long} \textcolor{keywordtype}{long})
+00102 \{
+00103     \textcolor{keywordflow}{return} (flags == 0)? 0 : SOAPY_SDR_NOT_SUPPORTED;
+00104 \}
+00105 
+00106 \textcolor{keywordtype}{int} SoapySDR::Device::readStream(Stream *, \textcolor{keywordtype}{void} * \textcolor{keyword}{const} *, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t}, \textcolor{keywordtype}{int} &, \textcolor{keywordtype}{long} \textcolor{keywordtype}{long} &, \textcolor{keyword}{const} \textcolor{keywordtype}{long})
+00107 \{
+00108     \textcolor{keywordflow}{return} SOAPY_SDR_NOT_SUPPORTED;
+00109 \}
+00110 
+00111 \textcolor{keywordtype}{int} SoapySDR::Device::writeStream(Stream *, \textcolor{keyword}{const} \textcolor{keywordtype}{void} * \textcolor{keyword}{const} *, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t}, \textcolor{keywordtype}{int} &, \textcolor{keyword}{const} \textcolor{keywordtype}{long} \textcolor{keywordtype}{long}, \textcolor{keyword}{
+      const} \textcolor{keywordtype}{long})
+00112 \{
+00113     \textcolor{keywordflow}{return} SOAPY_SDR_NOT_SUPPORTED;
+00114 \}
+00115 
+00116 \textcolor{keywordtype}{int} SoapySDR::Device::readStreamStatus(Stream *, \textcolor{keywordtype}{size\_t} &, \textcolor{keywordtype}{int} &, \textcolor{keywordtype}{long} \textcolor{keywordtype}{long} &, \textcolor{keyword}{const} \textcolor{keywordtype}{long})
+00117 \{
+00118     \textcolor{keywordflow}{return} SOAPY_SDR_NOT_SUPPORTED;
+00119 \}
+00120 
+00121 \textcolor{comment}{/*******************************************************************}
+00122 \textcolor{comment}{ * Direct buffer access API}
+00123 \textcolor{comment}{ ******************************************************************/}
+00124 \textcolor{keywordtype}{size\_t} SoapySDR::Device::getNumDirectAccessBuffers(Stream *)
+00125 \{
+00126     \textcolor{keywordflow}{return} 0;
+00127 \}
+00128 
+00129 \textcolor{keywordtype}{int} SoapySDR::Device::getDirectAccessBufferAddrs(Stream *, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t}, \textcolor{keywordtype}{void} **)
+00130 \{
+00131     \textcolor{keywordflow}{return} SOAPY_SDR_NOT_SUPPORTED;
+00132 \}
+00133 
+00134 \textcolor{keywordtype}{int} SoapySDR::Device::acquireReadBuffer(Stream *, \textcolor{keywordtype}{size\_t} &, \textcolor{keyword}{const} \textcolor{keywordtype}{void} **, \textcolor{keywordtype}{int} &, \textcolor{keywordtype}{long} \textcolor{keywordtype}{long} &, \textcolor{keyword}{const} \textcolor{keywordtype}{long})
+00135 \{
+00136     \textcolor{keywordflow}{return} SOAPY_SDR_NOT_SUPPORTED;
+00137 \}
+00138 
+00139 \textcolor{keywordtype}{void} SoapySDR::Device::releaseReadBuffer(Stream *, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t})
+00140 \{
+00141     \textcolor{keywordflow}{return};
+00142 \}
+00143 
+00144 \textcolor{keywordtype}{int} SoapySDR::Device::acquireWriteBuffer(Stream *, \textcolor{keywordtype}{size\_t} &, \textcolor{keywordtype}{void} **, \textcolor{keyword}{const} \textcolor{keywordtype}{long})
+00145 \{
+00146     \textcolor{keywordflow}{return} SOAPY_SDR_NOT_SUPPORTED;
+00147 \}
+00148 
+00149 \textcolor{keywordtype}{void} SoapySDR::Device::releaseWriteBuffer(Stream *, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t}, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t}, \textcolor{keywordtype}{int} &, \textcolor{keyword}{const} \textcolor{keywordtype}{long} \textcolor{keywordtype}{long})
+00150 \{
+00151     \textcolor{keywordflow}{return};
+00152 \}
+00153 
+00154 \textcolor{comment}{/*******************************************************************}
+00155 \textcolor{comment}{ * Antenna API}
+00156 \textcolor{comment}{ ******************************************************************/}
+00157 std::vector<std::string> SoapySDR::Device::listAntennas(\textcolor{keyword}{const} \textcolor{keywordtype}{int}, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t})\textcolor{keyword}{ const}
+00158 \textcolor{keyword}{}\{
+00159     \textcolor{keywordflow}{return} std::vector<std::string>();
+00160 \}
+00161 
+00162 \textcolor{keywordtype}{void} SoapySDR::Device::setAntenna(\textcolor{keyword}{const} \textcolor{keywordtype}{int}, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t}, \textcolor{keyword}{const} std::string &)
+00163 \{
+00164     \textcolor{keywordflow}{return};
+00165 \}
+00166 
+00167 std::string SoapySDR::Device::getAntenna(\textcolor{keyword}{const} \textcolor{keywordtype}{int}, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t})\textcolor{keyword}{ const}
+00168 \textcolor{keyword}{}\{
+00169     \textcolor{keywordflow}{return} \textcolor{stringliteral}{""};
+00170 \}
+00171 
+00172 \textcolor{comment}{/*******************************************************************}
+00173 \textcolor{comment}{ * Frontend corrections API}
+00174 \textcolor{comment}{ ******************************************************************/}
+00175 
+00176 \textcolor{keywordtype}{bool} SoapySDR::Device::hasDCOffsetMode(\textcolor{keyword}{const} \textcolor{keywordtype}{int}, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t})\textcolor{keyword}{ const}
+00177 \textcolor{keyword}{}\{
+00178     \textcolor{keywordflow}{return} \textcolor{keyword}{false};
+00179 \}
+00180 
+00181 \textcolor{keywordtype}{void} SoapySDR::Device::setDCOffsetMode(\textcolor{keyword}{const} \textcolor{keywordtype}{int}, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t}, \textcolor{keyword}{const} \textcolor{keywordtype}{bool})
+00182 \{
+00183     \textcolor{keywordflow}{return};
+00184 \}
+00185 
+00186 \textcolor{keywordtype}{bool} SoapySDR::Device::getDCOffsetMode(\textcolor{keyword}{const} \textcolor{keywordtype}{int}, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t})\textcolor{keyword}{ const}
+00187 \textcolor{keyword}{}\{
+00188     \textcolor{keywordflow}{return} \textcolor{keyword}{false};
+00189 \}
+00190 
+00191 \textcolor{keywordtype}{bool} SoapySDR::Device::hasDCOffset(\textcolor{keyword}{const} \textcolor{keywordtype}{int}, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t})\textcolor{keyword}{ const}
+00192 \textcolor{keyword}{}\{
+00193     \textcolor{keywordflow}{return} \textcolor{keyword}{false};
+00194 \}
+00195 
+00196 \textcolor{keywordtype}{void} SoapySDR::Device::setDCOffset(\textcolor{keyword}{const} \textcolor{keywordtype}{int}, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t}, \textcolor{keyword}{const} std::complex<double> &)
+00197 \{
+00198     \textcolor{keywordflow}{return};
+00199 \}
+00200 
+00201 std::complex<double> SoapySDR::Device::getDCOffset(\textcolor{keyword}{const} \textcolor{keywordtype}{int}, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t})\textcolor{keyword}{ const}
+00202 \textcolor{keyword}{}\{
+00203     \textcolor{keywordflow}{return} std::complex<double>();
+00204 \}
+00205 
+00206 \textcolor{keywordtype}{bool} SoapySDR::Device::hasIQBalance(\textcolor{keyword}{const} \textcolor{keywordtype}{int}, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t})\textcolor{keyword}{ const}
+00207 \textcolor{keyword}{}\{
+00208     \textcolor{keywordflow}{return} \textcolor{keyword}{false};
+00209 \}
+00210 
+00211 \textcolor{keywordtype}{void} SoapySDR::Device::setIQBalance(\textcolor{keyword}{const} \textcolor{keywordtype}{int}, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t}, \textcolor{keyword}{const} std::complex<double> &)
+00212 \{
+00213     \textcolor{keywordflow}{return};
+00214 \}
+00215 
+00216 std::complex<double> SoapySDR::Device::getIQBalance(\textcolor{keyword}{const} \textcolor{keywordtype}{int}, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t})\textcolor{keyword}{ const}
+00217 \textcolor{keyword}{}\{
+00218     \textcolor{keywordflow}{return} std::complex<double>();
+00219 \}
+00220 
+00221 \textcolor{keywordtype}{bool} SoapySDR::Device::hasFrequencyCorrection(\textcolor{keyword}{const} \textcolor{keywordtype}{int} direction, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} channel)\textcolor{keyword}{ const}
+00222 \textcolor{keyword}{}\{
+00223     \textcolor{comment}{//backwards compatibility with "CORR" string arg}
+00224     \textcolor{keyword}{const} \textcolor{keyword}{auto} components = this->listFrequencies(direction, channel);
+00225     \textcolor{keywordflow}{return} (std::find(components.begin(), components.end(), \textcolor{stringliteral}{"CORR"}) != components.end());
+00226 \}
+00227 
+00228 \textcolor{keywordtype}{void} SoapySDR::Device::setFrequencyCorrection(\textcolor{keyword}{const} \textcolor{keywordtype}{int} direction, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} channel, \textcolor{keyword}{const} \textcolor{keywordtype}{double} value
+      )
+00229 \{
+00230     \textcolor{comment}{//backwards compatibility with "CORR" string arg}
+00231     \textcolor{keyword}{const} \textcolor{keyword}{auto} components = this->listFrequencies(direction, channel);
+00232     \textcolor{keywordflow}{if} (std::find(components.begin(), components.end(), \textcolor{stringliteral}{"CORR"}) != components.end())
+00233     \{
+00234         this->setFrequency(direction, channel, \textcolor{stringliteral}{"CORR"}, value);
+00235     \}
+00236 \}
+00237 
+00238 \textcolor{keywordtype}{double} SoapySDR::Device::getFrequencyCorrection(\textcolor{keyword}{const} \textcolor{keywordtype}{int} direction, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} channel)\textcolor{keyword}{ const}
+00239 \textcolor{keyword}{}\{
+00240     \textcolor{comment}{//backwards compatibility with "CORR" string arg}
+00241     \textcolor{keyword}{const} \textcolor{keyword}{auto} components = this->listFrequencies(direction, channel);
+00242     \textcolor{keywordflow}{if} (std::find(components.begin(), components.end(), \textcolor{stringliteral}{"CORR"}) != components.end())
+00243     \{
+00244         \textcolor{keywordflow}{return} this->getFrequency(direction, channel, \textcolor{stringliteral}{"CORR"});
+00245     \}
+00246     \textcolor{keywordflow}{return} 0.0;
+00247 \}
+00248 
+00249 \textcolor{comment}{/*******************************************************************}
+00250 \textcolor{comment}{ * Gain API}
+00251 \textcolor{comment}{ ******************************************************************/}
+00252 std::vector<std::string> SoapySDR::Device::listGains(\textcolor{keyword}{const} \textcolor{keywordtype}{int}, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t})\textcolor{keyword}{ const}
+00253 \textcolor{keyword}{}\{
+00254     \textcolor{keywordflow}{return} std::vector<std::string>();
+00255 \}
+00256 
+00257 \textcolor{keywordtype}{bool} SoapySDR::Device::hasGainMode(\textcolor{keyword}{const} \textcolor{keywordtype}{int}, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t})\textcolor{keyword}{ const}
+00258 \textcolor{keyword}{}\{
+00259     \textcolor{keywordflow}{return} \textcolor{keyword}{false};
+00260 \}
+00261 
+00262 \textcolor{keywordtype}{void} SoapySDR::Device::setGainMode(\textcolor{keyword}{const} \textcolor{keywordtype}{int}, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t}, \textcolor{keyword}{const} \textcolor{keywordtype}{bool})
+00263 \{
+00264     \textcolor{keywordflow}{return};
+00265 \}
+00266 
+00267 \textcolor{keywordtype}{bool} SoapySDR::Device::getGainMode(\textcolor{keyword}{const} \textcolor{keywordtype}{int}, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t})\textcolor{keyword}{ const}
+00268 \textcolor{keyword}{}\{
+00269     \textcolor{keywordflow}{return} \textcolor{keyword}{false};
+00270 \}
+00271 
+00272 \textcolor{keywordtype}{void} SoapySDR::Device::setGain(\textcolor{keyword}{const} \textcolor{keywordtype}{int} dir, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} channel, \textcolor{keywordtype}{double} gain)
+00273 \{
+00274     \textcolor{comment}{//algorithm to distribute overall gain (TX gets BB first, RX gets RF first)}
+00275     \textcolor{keyword}{const} \textcolor{keyword}{auto} names = this->listGains(dir, channel);
+00276     \textcolor{keywordflow}{if} (dir == SOAPY_SDR_TX)
+00277     \{
+00278         \textcolor{keywordflow}{for} (\textcolor{keywordtype}{int} i = names.size()-1; i >= 0; i--)
+00279         \{
+00280             \textcolor{keyword}{const} \textcolor{keyword}{auto} r = this->getGainRange(dir, channel, names[i]);
+00281             \textcolor{keyword}{const} \textcolor{keywordtype}{double} g = std::min(gain, r.maximum()-r.minimum());
+00282             this->setGain(dir, channel, names[i], g+r.minimum());
+00283             gain -= this->getGain(dir, channel, names[i])-r.minimum();
+00284         \}
+00285     \}
+00286     \textcolor{keywordflow}{if} (dir == SOAPY_SDR_RX)
+00287     \{
+00288         \textcolor{keywordflow}{for} (\textcolor{keywordtype}{size\_t} i = 0; i < names.size(); i++)
+00289         \{
+00290             \textcolor{keyword}{const} \textcolor{keyword}{auto} r = this->getGainRange(dir, channel, names[i]);
+00291             \textcolor{keyword}{const} \textcolor{keywordtype}{double} g = std::min(gain, r.maximum()-r.minimum());
+00292             this->setGain(dir, channel, names[i], g+r.minimum());
+00293             gain -= this->getGain(dir, channel, names[i])-r.minimum();
+00294         \}
+00295     \}
+00296 \}
+00297 
+00298 \textcolor{keywordtype}{void} SoapySDR::Device::setGain(\textcolor{keyword}{const} \textcolor{keywordtype}{int}, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t}, \textcolor{keyword}{const} std::string &, \textcolor{keyword}{const} \textcolor{keywordtype}{double})
+00299 \{
+00300     \textcolor{keywordflow}{return};
+00301 \}
+00302 
+00303 \textcolor{keywordtype}{double} SoapySDR::Device::getGain(\textcolor{keyword}{const} \textcolor{keywordtype}{int} dir, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} channel)\textcolor{keyword}{ const}
+00304 \textcolor{keyword}{}\{
+00305     \textcolor{comment}{//algorithm to return an overall gain (summing each normalized gain)}
+00306     \textcolor{keywordtype}{double} gain = 0.0;
+00307     \textcolor{keywordflow}{for} (\textcolor{keyword}{const} \textcolor{keyword}{auto} &name : this->listGains(dir, channel))
+00308     \{
+00309         \textcolor{keyword}{const} \textcolor{keyword}{auto} r = this->getGainRange(dir, channel, name);
+00310         gain += this->getGain(dir, channel, name)-r.minimum();
+00311     \}
+00312     \textcolor{keywordflow}{return} gain;
+00313 \}
+00314 
+00315 \textcolor{keywordtype}{double} SoapySDR::Device::getGain(\textcolor{keyword}{const} \textcolor{keywordtype}{int}, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t}, \textcolor{keyword}{const} std::string &)\textcolor{keyword}{ const}
+00316 \textcolor{keyword}{}\{
+00317     \textcolor{keywordflow}{return} 0.0;
+00318 \}
+00319 
+00320 SoapySDR::Range SoapySDR::Device::getGainRange(\textcolor{keyword}{const} \textcolor{keywordtype}{int}, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t}, \textcolor{keyword}{const} 
+      std::string &)\textcolor{keyword}{ const}
+00321 \textcolor{keyword}{}\{
+00322     \textcolor{keywordflow}{return} SoapySDR::Range(0.0, 0.0);
+00323 \}
+00324 
+00325 SoapySDR::Range SoapySDR::Device::getGainRange(\textcolor{keyword}{const} \textcolor{keywordtype}{int} dir, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} channel)\textcolor{keyword}{ const}
+00326 \textcolor{keyword}{}\{
+00327     \textcolor{comment}{//algorithm to return an overall gain range (use 0 to max possible on each element)}
+00328     \textcolor{keywordtype}{double} gain = 0.0;
+00329     \textcolor{keywordflow}{for} (\textcolor{keyword}{const} \textcolor{keyword}{auto} &name : this->listGains(dir, channel))
+00330     \{
+00331         \textcolor{keyword}{const} \textcolor{keyword}{auto} r = this->getGainRange(dir, channel, name);
+00332         gain += r.maximum()-r.minimum();
+00333     \}
+00334     \textcolor{keywordflow}{return} SoapySDR::Range(0.0, gain);
+00335 \}
+00336 
+00337 \textcolor{comment}{/*******************************************************************}
+00338 \textcolor{comment}{ * Frequency API}
+00339 \textcolor{comment}{ ******************************************************************/}
+00340 \textcolor{keywordtype}{void} SoapySDR::Device::setFrequency(\textcolor{keyword}{const} \textcolor{keywordtype}{int} dir, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} chan, \textcolor{keywordtype}{double} 
+      freq, \textcolor{keyword}{const} Kwargs &args)
+00341 \{
+00342     \textcolor{keyword}{const} \textcolor{keyword}{auto} comps = this->listFrequencies(dir, chan);
+00343     \textcolor{keywordflow}{if} (comps.empty()) \textcolor{keywordflow}{return};
+00344 
+00345     \textcolor{comment}{//optional offset, use on RF element when specified}
+00346     \textcolor{keyword}{const} \textcolor{keywordtype}{double} offset = (args.count(\textcolor{stringliteral}{"OFFSET"}) != 0)?std::atof(args.at(\textcolor{stringliteral}{"OFFSET"}).c\_str()):0.0;
+00347 
+00348     \textcolor{comment}{//distribute freq into RF then baseband components}
+00349     \textcolor{keywordflow}{for} (\textcolor{keywordtype}{size\_t} comp\_i = 0; comp\_i < comps.size(); comp\_i++)
+00350     \{
+00351         \textcolor{keyword}{const} std::string &name = comps[comp\_i];
+00352 
+00353         \textcolor{comment}{//add offset for RF element (first element)}
+00354         \textcolor{keywordflow}{if} (comp\_i == 0) freq += offset;
+00355 
+00356         \textcolor{keywordflow}{if} (args.count(name) != 0 and args.at(name) == \textcolor{stringliteral}{"IGNORE"})
+00357         \{
+00358             \textcolor{comment}{//do nothing, dont change component}
+00359         \}
+00360         \textcolor{keywordflow}{else} \textcolor{keywordflow}{if} (args.count(name) != 0 and args.at(name) != \textcolor{stringliteral}{"DEFAULT"})
+00361         \{
+00362             \textcolor{comment}{//specific frequency for component specified}
+00363             \textcolor{keyword}{const} \textcolor{keywordtype}{double} f(std::atof(args.at(name).c\_str()));
+00364             this->setFrequency(dir, chan, name, f, args);
+00365         \}
+00366         \textcolor{keywordflow}{else}
+00367         \{
+00368             \textcolor{comment}{//otherwise use the remainder frequency}
+00369             this->setFrequency(dir, chan, name, freq, args);
+00370         \}
+00371 
+00372         \textcolor{comment}{//adjust overall freq for the remainder}
+00373         freq -= this->getFrequency(dir, chan, name);
+00374 
+00375         \textcolor{comment}{//then remove to compensate}
+00376         \textcolor{keywordflow}{if} (comp\_i == 0) freq -= offset;
+00377     \}
+00378 \}
+00379 
+00380 \textcolor{keywordtype}{void} SoapySDR::Device::setFrequency(\textcolor{keyword}{const} \textcolor{keywordtype}{int}, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t}, \textcolor{keyword}{const} std::string &, \textcolor{keyword}{const} \textcolor{keywordtype}{double}, \textcolor{keyword}{const} 
+      Kwargs &)
+00381 \{
+00382     \textcolor{keywordflow}{return};
+00383 \}
+00384 
+00385 \textcolor{keywordtype}{double} SoapySDR::Device::getFrequency(\textcolor{keyword}{const} \textcolor{keywordtype}{int} dir, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} chan)\textcolor{keyword}{ const}
+00386 \textcolor{keyword}{}\{
+00387     \textcolor{keywordtype}{double} freq = 0.0;
+00388 
+00389     \textcolor{comment}{//overall frequency is the sum of components}
+00390     \textcolor{keywordflow}{for} (\textcolor{keyword}{const} \textcolor{keyword}{auto} &comp : this->listFrequencies(dir, chan))
+00391     \{
+00392         \textcolor{keyword}{const} std::string &name = comp;
+00393         freq += this->getFrequency(dir, chan, name);
+00394     \}
+00395 
+00396     \textcolor{keywordflow}{return} freq;
+00397 \}
+00398 
+00399 \textcolor{keywordtype}{double} SoapySDR::Device::getFrequency(\textcolor{keyword}{const} \textcolor{keywordtype}{int}, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t}, \textcolor{keyword}{const} std::string &)\textcolor{keyword}{ const}
+00400 \textcolor{keyword}{}\{
+00401     \textcolor{keywordflow}{return} 0.0;
+00402 \}
+00403 
+00404 std::vector<std::string> SoapySDR::Device::listFrequencies(\textcolor{keyword}{const} \textcolor{keywordtype}{int}, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t})\textcolor{keyword}{ const}
+00405 \textcolor{keyword}{}\{
+00406     \textcolor{keywordflow}{return} std::vector<std::string>();
+00407 \}
+00408 
+00409 SoapySDR::RangeList SoapySDR::Device::getFrequencyRange(\textcolor{keyword}{const} \textcolor{keywordtype}{int} dir, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} 
+      chan)\textcolor{keyword}{ const}
+00410 \textcolor{keyword}{}\{
+00411     \textcolor{comment}{//get a list of tunable components}
+00412     \textcolor{keyword}{const} \textcolor{keyword}{auto} comps = this->listFrequencies(dir, chan);
+00413     \textcolor{keywordflow}{if} (comps.empty()) \textcolor{keywordflow}{return} SoapySDR::RangeList();
+00414 
+00415     \textcolor{comment}{//get the range list for the RF component}
+00416     \textcolor{keyword}{auto} ranges = this->getFrequencyRange(dir, chan, comps.front());
+00417 
+00418     \textcolor{comment}{//use bandwidth setting to clip the range}
+00419     \textcolor{keyword}{const} \textcolor{keywordtype}{double} bw = this->getBandwidth(dir, chan);
+00420 
+00421     \textcolor{comment}{//add to the range list given subsequent components}
+00422     \textcolor{keywordflow}{for} (\textcolor{keywordtype}{size\_t} comp\_i = 1; comp\_i < comps.size(); comp\_i++)
+00423     \{
+00424         \textcolor{keyword}{const} \textcolor{keyword}{auto} subRange = this->getFrequencyRange(dir, chan, comps[comp\_i]);
+00425         \textcolor{keywordflow}{if} (subRange.empty()) \textcolor{keywordflow}{continue};
+00426 
+00427         \textcolor{keywordtype}{double} subRangeLow = subRange.front().minimum();
+00428         \textcolor{keywordflow}{if} (bw > 0.0) subRangeLow = std::max(-bw/2, subRangeLow);
+00429 
+00430         \textcolor{keywordtype}{double} subRangeHigh = subRange.back().maximum();
+00431         \textcolor{keywordflow}{if} (bw > 0.0) subRangeHigh = std::min(bw/2, subRangeHigh);
+00432 
+00433         \textcolor{keywordflow}{for} (\textcolor{keywordtype}{size\_t} range\_i = 0; range\_i < ranges.size(); range\_i++)
+00434         \{
+00435             SoapySDR::Range &range = ranges[range\_i];
+00436             range = SoapySDR::Range(
+00437                 range.minimum() + subRangeLow,
+00438                 range.maximum() + subRangeHigh);
+00439         \}
+00440     \}
+00441 
+00442     \textcolor{keywordflow}{return} ranges;
+00443 \}
+00444 
+00445 SoapySDR::RangeList SoapySDR::Device::getFrequencyRange(\textcolor{keyword}{const} \textcolor{keywordtype}{int}, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t}, \textcolor{keyword}{const} 
+      std::string &)\textcolor{keyword}{ const}
+00446 \textcolor{keyword}{}\{
+00447     \textcolor{keywordflow}{return} SoapySDR::RangeList();
+00448 \}
+00449 
+00450 SoapySDR::ArgInfoList SoapySDR::Device::getFrequencyArgsInfo(\textcolor{keyword}{const} \textcolor{keywordtype}{int} dir, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} 
+      chan)\textcolor{keyword}{ const}
+00451 \textcolor{keyword}{}\{
+00452     SoapySDR::ArgInfoList args;
+00453 
+00454     \textcolor{keyword}{const} \textcolor{keyword}{auto} comps = this->listFrequencies(dir, chan);
+00455 
+00456     \textcolor{keywordflow}{if} (comps.size() < 2) \textcolor{keywordflow}{return} args; \textcolor{comment}{//no tuning options with single components}
+00457 
+00458     \textcolor{comment}{//support offset tuning}
+00459     \{
+00460         SoapySDR::ArgInfo info;
+00461         info.key = \textcolor{stringliteral}{"OFFSET"};
+00462         info.name = \textcolor{stringliteral}{"LO Offset"};
+00463         info.value = \textcolor{stringliteral}{"0.0"};
+00464         info.units = \textcolor{stringliteral}{"Hz"};
+00465         info.type = SoapySDR::ArgInfo::FLOAT;
+00466         info.description = \textcolor{stringliteral}{"Tune the LO with an offset and compensate with the baseband CORDIC."};
+00467         SoapySDR::RangeList ranges = this->getFrequencyRange(dir, chan, comps.at(1));
+00468         \textcolor{keywordflow}{if} (not ranges.empty()) info.range = ranges.front();
+00469         args.push\_back(info);
+00470     \}
+00471 
+00472     \textcolor{comment}{//every tunable component becomes an option}
+00473     \textcolor{keywordflow}{for} (\textcolor{keywordtype}{size\_t} comp\_i = 1; comp\_i < comps.size(); comp\_i++)
+00474     \{
+00475         SoapySDR::ArgInfo info;
+00476         info.key = comps[comp\_i];
+00477         info.value = \textcolor{stringliteral}{"DEFAULT"};
+00478         info.units = \textcolor{stringliteral}{"Hz"};
+00479         info.type = SoapySDR::ArgInfo::FLOAT;
+00480         info.description = \textcolor{stringliteral}{"Specify a specific value for this component or IGNORE to skip tuning it."};
+00481         info.options.push\_back(\textcolor{stringliteral}{"DEFAULT"});
+00482         info.optionNames.push\_back(\textcolor{stringliteral}{"Default"});
+00483         info.options.push\_back(\textcolor{stringliteral}{"IGNORE"});
+00484         info.optionNames.push\_back(\textcolor{stringliteral}{"Ignore"});
+00485         SoapySDR::RangeList ranges = this->getFrequencyRange(dir, chan, comps.at(comp\_i));
+00486         \textcolor{keywordflow}{if} (not ranges.empty()) info.range = ranges.front();
+00487         args.push\_back(info);
+00488     \}
+00489 
+00490     \textcolor{keywordflow}{return} args;
+00491 \}
+00492 
+00493 \textcolor{comment}{/*******************************************************************}
+00494 \textcolor{comment}{ * Sample Rate API}
+00495 \textcolor{comment}{ ******************************************************************/}
+00496 \textcolor{keywordtype}{void} SoapySDR::Device::setSampleRate(\textcolor{keyword}{const} \textcolor{keywordtype}{int}, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t}, \textcolor{keyword}{const} \textcolor{keywordtype}{double})
+00497 \{
+00498     \textcolor{keywordflow}{return};
+00499 \}
+00500 
+00501 \textcolor{keywordtype}{double} SoapySDR::Device::getSampleRate(\textcolor{keyword}{const} \textcolor{keywordtype}{int}, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t})\textcolor{keyword}{ const}
+00502 \textcolor{keyword}{}\{
+00503     \textcolor{keywordflow}{return} 0.0;
+00504 \}
+00505 
+00506 std::vector<double> SoapySDR::Device::listSampleRates(\textcolor{keyword}{const} \textcolor{keywordtype}{int}, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t})\textcolor{keyword}{ const}
+00507 \textcolor{keyword}{}\{
+00508     \textcolor{keywordflow}{return} std::vector<double>();
+00509 \}
+00510 
+00511 SoapySDR::RangeList SoapySDR::Device::getSampleRateRange(\textcolor{keyword}{const} \textcolor{keywordtype}{int} direction, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} channel)\textcolor{keyword}{ const}
+00512 \textcolor{keyword}{}\{
+00513     SoapySDR::RangeList ranges;
+00514     \textcolor{comment}{//call into the older deprecated listSampleRates() call}
+00515     \textcolor{keywordflow}{for} (\textcolor{keyword}{auto} &bw : this->listSampleRates(direction, channel))
+00516     \{
+00517         ranges.push\_back(SoapySDR::Range(bw, bw));
+00518     \}
+00519     \textcolor{keywordflow}{return} ranges;
+00520 \}
+00521 
+00522 \textcolor{comment}{/*******************************************************************}
+00523 \textcolor{comment}{ * Bandwidth API}
+00524 \textcolor{comment}{ ******************************************************************/}
+00525 \textcolor{keywordtype}{void} SoapySDR::Device::setBandwidth(\textcolor{keyword}{const} \textcolor{keywordtype}{int}, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t}, \textcolor{keyword}{const} \textcolor{keywordtype}{double})
+00526 \{
+00527     \textcolor{keywordflow}{return};
+00528 \}
+00529 
+00530 \textcolor{keywordtype}{double} SoapySDR::Device::getBandwidth(\textcolor{keyword}{const} \textcolor{keywordtype}{int}, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t})\textcolor{keyword}{ const}
+00531 \textcolor{keyword}{}\{
+00532     \textcolor{keywordflow}{return} 0.0;
+00533 \}
+00534 
+00535 std::vector<double> SoapySDR::Device::listBandwidths(\textcolor{keyword}{const} \textcolor{keywordtype}{int}, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t})\textcolor{keyword}{ const}
+00536 \textcolor{keyword}{}\{
+00537     \textcolor{keywordflow}{return} std::vector<double>();
+00538 \}
+00539 
+00540 SoapySDR::RangeList SoapySDR::Device::getBandwidthRange(\textcolor{keyword}{const} \textcolor{keywordtype}{int} direction, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} channel)\textcolor{keyword}{ const}
+00541 \textcolor{keyword}{}\{
+00542     SoapySDR::RangeList ranges;
+00543     \textcolor{comment}{//call into the older deprecated listBandwidths() call}
+00544     \textcolor{keywordflow}{for} (\textcolor{keyword}{auto} &bw : this->listBandwidths(direction, channel))
+00545     \{
+00546         ranges.push\_back(SoapySDR::Range(bw, bw));
+00547     \}
+00548     \textcolor{keywordflow}{return} ranges;
+00549 \}
+00550 
+00551 \textcolor{comment}{/*******************************************************************}
+00552 \textcolor{comment}{ * Clocking API}
+00553 \textcolor{comment}{ ******************************************************************/}
+00554 \textcolor{keywordtype}{void} SoapySDR::Device::setMasterClockRate(\textcolor{keyword}{const} \textcolor{keywordtype}{double})
+00555 \{
+00556     \textcolor{keywordflow}{return};
+00557 \}
+00558 
+00559 \textcolor{keywordtype}{double} SoapySDR::Device::getMasterClockRate(\textcolor{keywordtype}{void})\textcolor{keyword}{ const}
+00560 \textcolor{keyword}{}\{
+00561     \textcolor{keywordflow}{return} 0.0;
+00562 \}
+00563 
+00564 SoapySDR::RangeList SoapySDR::Device::getMasterClockRates(\textcolor{keywordtype}{void})\textcolor{keyword}{ const}
+00565 \textcolor{keyword}{}\{
+00566     \textcolor{keywordflow}{return} SoapySDR::RangeList();
+00567 \}
+00568 
+00569 std::vector<std::string> SoapySDR::Device::listClockSources(\textcolor{keywordtype}{void})\textcolor{keyword}{ const}
+00570 \textcolor{keyword}{}\{
+00571     \textcolor{keywordflow}{return} std::vector<std::string>();
+00572 \}
+00573 
+00574 \textcolor{keywordtype}{void} SoapySDR::Device::setClockSource(\textcolor{keyword}{const} std::string &)
+00575 \{
+00576     \textcolor{keywordflow}{return};
+00577 \}
+00578 
+00579 std::string SoapySDR::Device::getClockSource(\textcolor{keywordtype}{void})\textcolor{keyword}{ const}
+00580 \textcolor{keyword}{}\{
+00581     \textcolor{keywordflow}{return} \textcolor{stringliteral}{""};
+00582 \}
+00583 
+00584 \textcolor{comment}{/*******************************************************************}
+00585 \textcolor{comment}{ * Time API}
+00586 \textcolor{comment}{ ******************************************************************/}
+00587 
+00588 std::vector<std::string> SoapySDR::Device::listTimeSources(\textcolor{keywordtype}{void})\textcolor{keyword}{ const}
+00589 \textcolor{keyword}{}\{
+00590     \textcolor{keywordflow}{return} std::vector<std::string>();
+00591 \}
+00592 
+00593 \textcolor{keywordtype}{void} SoapySDR::Device::setTimeSource(\textcolor{keyword}{const} std::string &)
+00594 \{
+00595     \textcolor{keywordflow}{return};
+00596 \}
+00597 
+00598 std::string SoapySDR::Device::getTimeSource(\textcolor{keywordtype}{void})\textcolor{keyword}{ const}
+00599 \textcolor{keyword}{}\{
+00600     \textcolor{keywordflow}{return} \textcolor{stringliteral}{""};
+00601 \}
+00602 
+00603 \textcolor{keywordtype}{bool} SoapySDR::Device::hasHardwareTime(\textcolor{keyword}{const} std::string &)\textcolor{keyword}{ const}
+00604 \textcolor{keyword}{}\{
+00605     \textcolor{keywordflow}{return} \textcolor{keyword}{false};
+00606 \}
+00607 
+00608 \textcolor{keywordtype}{long} \textcolor{keywordtype}{long} SoapySDR::Device::getHardwareTime(\textcolor{keyword}{const} std::string &)\textcolor{keyword}{ const}
+00609 \textcolor{keyword}{}\{
+00610     \textcolor{keywordflow}{return} 0;
+00611 \}
+00612 
+00613 \textcolor{keywordtype}{void} SoapySDR::Device::setHardwareTime(\textcolor{keyword}{const} \textcolor{keywordtype}{long} \textcolor{keywordtype}{long} timeNs, \textcolor{keyword}{const} std::string &what)
+00614 \{
+00615     \textcolor{keywordflow}{if} (what == \textcolor{stringliteral}{"CMD"}) this->setCommandTime(timeNs, what);
+00616 \}
+00617 
+00618 \textcolor{keywordtype}{void} SoapySDR::Device::setCommandTime(\textcolor{keyword}{const} \textcolor{keywordtype}{long} \textcolor{keywordtype}{long}, \textcolor{keyword}{const} std::string &)
+00619 \{
+00620     \textcolor{keywordflow}{return};
+00621 \}
+00622 
+00623 \textcolor{comment}{/*******************************************************************}
+00624 \textcolor{comment}{ * Sensor API}
+00625 \textcolor{comment}{ ******************************************************************/}
+00626 std::vector<std::string> SoapySDR::Device::listSensors(\textcolor{keywordtype}{void})\textcolor{keyword}{ const}
+00627 \textcolor{keyword}{}\{
+00628     \textcolor{keywordflow}{return} std::vector<std::string>();
+00629 \}
+00630 
+00631 SoapySDR::ArgInfo SoapySDR::Device::getSensorInfo(\textcolor{keyword}{const} std::string &)\textcolor{keyword}{ const}
+00632 \textcolor{keyword}{}\{
+00633     \textcolor{keywordflow}{return} SoapySDR::ArgInfo();
+00634 \}
+00635 
+00636 std::string SoapySDR::Device::readSensor(\textcolor{keyword}{const} std::string &)\textcolor{keyword}{ const}
+00637 \textcolor{keyword}{}\{
+00638     \textcolor{keywordflow}{return} \textcolor{stringliteral}{""};
+00639 \}
+00640 
+00641 std::vector<std::string> SoapySDR::Device::listSensors(\textcolor{keyword}{const} \textcolor{keywordtype}{int}, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t})\textcolor{keyword}{ const}
+00642 \textcolor{keyword}{}\{
+00643     \textcolor{keywordflow}{return} std::vector<std::string>();
+00644 \}
+00645 
+00646 SoapySDR::ArgInfo SoapySDR::Device::getSensorInfo(\textcolor{keyword}{const} \textcolor{keywordtype}{int}, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t}, \textcolor{keyword}{const} 
+      std::string &)\textcolor{keyword}{ const}
+00647 \textcolor{keyword}{}\{
+00648     \textcolor{keywordflow}{return} SoapySDR::ArgInfo();
+00649 \}
+00650 
+00651 std::string SoapySDR::Device::readSensor(\textcolor{keyword}{const} \textcolor{keywordtype}{int}, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t}, \textcolor{keyword}{const} 
+      std::string &)\textcolor{keyword}{ const}
+00652 \textcolor{keyword}{}\{
+00653     \textcolor{keywordflow}{return} \textcolor{stringliteral}{""};
+00654 \}
+00655 
+00656 \textcolor{comment}{/*******************************************************************}
+00657 \textcolor{comment}{ * Register API}
+00658 \textcolor{comment}{ ******************************************************************/}
+00659 std::vector<std::string> SoapySDR::Device::listRegisterInterfaces(\textcolor{keywordtype}{void})\textcolor{keyword}{ const}
+00660 \textcolor{keyword}{}\{
+00661     \textcolor{keywordflow}{return} std::vector<std::string>();
+00662 \}
+00663 
+00664 \textcolor{keywordtype}{void} SoapySDR::Device::writeRegister(\textcolor{keyword}{const} std::string &, \textcolor{keyword}{const} \textcolor{keywordtype}{unsigned} addr, \textcolor{keyword}{const} \textcolor{keywordtype}{unsigned} value)
+00665 \{
+00666     this->writeRegister(addr, value);
+00667 \}
+00668 
+00669 \textcolor{keywordtype}{unsigned} SoapySDR::Device::readRegister(\textcolor{keyword}{const} std::string &, \textcolor{keyword}{const} \textcolor{keywordtype}{unsigned} addr)\textcolor{keyword}{ const}
+00670 \textcolor{keyword}{}\{
+00671     \textcolor{keywordflow}{return} this->readRegister(addr);
+00672 \}
+00673 
+00674 \textcolor{keywordtype}{void} SoapySDR::Device::writeRegister(\textcolor{keyword}{const} \textcolor{keywordtype}{unsigned}, \textcolor{keyword}{const} \textcolor{keywordtype}{unsigned})
+00675 \{
+00676     \textcolor{keywordflow}{return};
+00677 \}
+00678 
+00679 \textcolor{keywordtype}{unsigned} SoapySDR::Device::readRegister(\textcolor{keyword}{const} \textcolor{keywordtype}{unsigned})\textcolor{keyword}{ const}
+00680 \textcolor{keyword}{}\{
+00681     \textcolor{keywordflow}{return} 0;
+00682 \}
+00683 
+00684 \textcolor{keywordtype}{void} SoapySDR::Device::writeRegisters(\textcolor{keyword}{const} std::string &, \textcolor{keyword}{const} \textcolor{keywordtype}{unsigned}, \textcolor{keyword}{const} std::vector<unsigned> &)
+00685 \{
+00686     \textcolor{keywordflow}{return};
+00687 \}
+00688 
+00689 std::vector<unsigned> SoapySDR::Device::readRegisters(\textcolor{keyword}{const} std::string &, \textcolor{keyword}{const} \textcolor{keywordtype}{unsigned}, \textcolor{keywordtype}{size\_t} 
+      length)\textcolor{keyword}{ const}
+00690 \textcolor{keyword}{}\{
+00691     \textcolor{keywordflow}{return} std::vector<unsigned>(length, 0);
+00692 \}
+00693 
+00694 \textcolor{comment}{/*******************************************************************}
+00695 \textcolor{comment}{ * Settings API}
+00696 \textcolor{comment}{ ******************************************************************/}
+00697 SoapySDR::ArgInfoList SoapySDR::Device::getSettingInfo(\textcolor{keywordtype}{void})\textcolor{keyword}{ const}
+00698 \textcolor{keyword}{}\{
+00699     \textcolor{keywordflow}{return} SoapySDR::ArgInfoList();
+00700 \}
+00701 
+00702 \textcolor{keywordtype}{void} SoapySDR::Device::writeSetting(\textcolor{keyword}{const} std::string &, \textcolor{keyword}{const} std::string &)
+00703 \{
+00704     \textcolor{keywordflow}{return};
+00705 \}
+00706 
+00707 std::string SoapySDR::Device::readSetting(\textcolor{keyword}{const} std::string &)\textcolor{keyword}{ const}
+00708 \textcolor{keyword}{}\{
+00709     \textcolor{keywordflow}{return} \textcolor{stringliteral}{""};
+00710 \}
+00711 
+00712 SoapySDR::ArgInfoList SoapySDR::Device::getSettingInfo(\textcolor{keyword}{const} \textcolor{keywordtype}{int}, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t})\textcolor{keyword}{ const}
+00713 \textcolor{keyword}{}\{
+00714     \textcolor{keywordflow}{return} SoapySDR::ArgInfoList();
+00715 \}
+00716 
+00717 \textcolor{keywordtype}{void} SoapySDR::Device::writeSetting(\textcolor{keyword}{const} \textcolor{keywordtype}{int}, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t}, \textcolor{keyword}{const} std::string &, \textcolor{keyword}{const} 
+      std::string &)
+00718 \{
+00719     \textcolor{keywordflow}{return};
+00720 \}
+00721 
+00722 std::string SoapySDR::Device::readSetting(\textcolor{keyword}{const} \textcolor{keywordtype}{int}, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t}, \textcolor{keyword}{const} 
+      std::string &)\textcolor{keyword}{ const}
+00723 \textcolor{keyword}{}\{
+00724     \textcolor{keywordflow}{return} \textcolor{stringliteral}{""};
+00725 \}
+00726 
+00727 \textcolor{comment}{/*******************************************************************}
+00728 \textcolor{comment}{ * GPIO API}
+00729 \textcolor{comment}{ ******************************************************************/}
+00730 std::vector<std::string> SoapySDR::Device::listGPIOBanks(\textcolor{keywordtype}{void})\textcolor{keyword}{ const}
+00731 \textcolor{keyword}{}\{
+00732     \textcolor{keywordflow}{return} std::vector<std::string>();
+00733 \}
+00734 
+00735 \textcolor{keywordtype}{void} SoapySDR::Device::writeGPIO(\textcolor{keyword}{const} std::string &, \textcolor{keyword}{const} \textcolor{keywordtype}{unsigned})
+00736 \{
+00737     \textcolor{keywordflow}{return};
+00738 \}
+00739 
+00740 \textcolor{keywordtype}{void} SoapySDR::Device::writeGPIO(\textcolor{keyword}{const} std::string &bank, \textcolor{keyword}{const} \textcolor{keywordtype}{unsigned} value, \textcolor{keyword}{const} \textcolor{keywordtype}{unsigned} 
+      mask)
+00741 \{
+00742     \textcolor{comment}{//read, modify, write}
+00743     \textcolor{keywordtype}{unsigned} readback = this->readGPIO(bank);
+00744     \textcolor{keywordtype}{unsigned} newValue = value | (readback & (~mask));
+00745     this->writeGPIO(bank, newValue);
+00746 \}
+00747 
+00748 \textcolor{keywordtype}{unsigned} SoapySDR::Device::readGPIO(\textcolor{keyword}{const} std::string &)\textcolor{keyword}{ const}
+00749 \textcolor{keyword}{}\{
+00750     \textcolor{keywordflow}{return} 0;
+00751 \}
+00752 
+00753 \textcolor{keywordtype}{void} SoapySDR::Device::writeGPIODir(\textcolor{keyword}{const} std::string &, \textcolor{keyword}{const} \textcolor{keywordtype}{unsigned})
+00754 \{
+00755     \textcolor{keywordflow}{return};
+00756 \}
+00757 
+00758 \textcolor{keywordtype}{void} SoapySDR::Device::writeGPIODir(\textcolor{keyword}{const} std::string &bank, \textcolor{keyword}{const} \textcolor{keywordtype}{unsigned} dir, \textcolor{keyword}{const} \textcolor{keywordtype}{unsigned} 
+      mask)
+00759 \{
+00760     \textcolor{comment}{//read, modify, write}
+00761     \textcolor{keywordtype}{unsigned} readback = this->readGPIODir(bank);
+00762     \textcolor{keywordtype}{unsigned} newValue = dir | (readback & (~mask));
+00763     this->writeGPIODir(bank, newValue);
+00764 \}
+00765 
+00766 \textcolor{keywordtype}{unsigned} SoapySDR::Device::readGPIODir(\textcolor{keyword}{const} std::string &)\textcolor{keyword}{ const}
+00767 \textcolor{keyword}{}\{
+00768     \textcolor{keywordflow}{return} 0;
+00769 \}
+00770 
+00771 
+00772 \textcolor{comment}{/*******************************************************************}
+00773 \textcolor{comment}{ * I2C API}
+00774 \textcolor{comment}{ ******************************************************************/}
+00775 \textcolor{keywordtype}{void} SoapySDR::Device::writeI2C(\textcolor{keyword}{const} \textcolor{keywordtype}{int}, \textcolor{keyword}{const} std::string &)
+00776 \{
+00777     \textcolor{keywordflow}{return};
+00778 \}
+00779 
+00780 std::string SoapySDR::Device::readI2C(\textcolor{keyword}{const} \textcolor{keywordtype}{int}, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t})
+00781 \{
+00782     \textcolor{keywordflow}{return} \textcolor{stringliteral}{""};
+00783 \}
+00784 
+00785 \textcolor{comment}{/*******************************************************************}
+00786 \textcolor{comment}{ * SPI API}
+00787 \textcolor{comment}{ ******************************************************************/}
+00788 \textcolor{keywordtype}{unsigned} SoapySDR::Device::transactSPI(\textcolor{keyword}{const} \textcolor{keywordtype}{int}, \textcolor{keyword}{const} \textcolor{keywordtype}{unsigned}, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t})
+00789 \{
+00790     \textcolor{keywordflow}{return} 0;
+00791 \}
+00792 
+00793 \textcolor{comment}{/*******************************************************************}
+00794 \textcolor{comment}{ * UART API}
+00795 \textcolor{comment}{ ******************************************************************/}
+00796 std::vector<std::string> SoapySDR::Device::listUARTs(\textcolor{keywordtype}{void})\textcolor{keyword}{ const}
+00797 \textcolor{keyword}{}\{
+00798     \textcolor{keywordflow}{return} std::vector<std::string>();
+00799 \}
+00800 
+00801 \textcolor{keywordtype}{void} SoapySDR::Device::writeUART(\textcolor{keyword}{const} std::string &, \textcolor{keyword}{const} std::string &)
+00802 \{
+00803     \textcolor{keywordflow}{return};
+00804 \}
+00805 
+00806 std::string SoapySDR::Device::readUART(\textcolor{keyword}{const} std::string &, \textcolor{keyword}{const} \textcolor{keywordtype}{long})\textcolor{keyword}{ const}
+00807 \textcolor{keyword}{}\{
+00808     \textcolor{keywordflow}{return} \textcolor{stringliteral}{""};
+00809 \}
+\end{DoxyCode}

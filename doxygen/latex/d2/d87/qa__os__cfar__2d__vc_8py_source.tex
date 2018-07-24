@@ -1,0 +1,101 @@
+\subsection{qa\+\_\+os\+\_\+cfar\+\_\+2d\+\_\+vc.\+py}
+\label{qa__os__cfar__2d__vc_8py_source}\index{/home/erik/prefix/default/src/gr-\/radar-\/dev/python/qa\+\_\+os\+\_\+cfar\+\_\+2d\+\_\+vc.\+py@{/home/erik/prefix/default/src/gr-\/radar-\/dev/python/qa\+\_\+os\+\_\+cfar\+\_\+2d\+\_\+vc.\+py}}
+
+\begin{DoxyCode}
+00001 \textcolor{comment}{#!/usr/bin/env python}
+00002 \textcolor{comment}{# -*- coding: utf-8 -*-}
+00003 \textcolor{comment}{# }
+00004 \textcolor{comment}{# Copyright 2014 Communications Engineering Lab, KIT.}
+00005 \textcolor{comment}{# }
+00006 \textcolor{comment}{# This is free software; you can redistribute it and/or modify}
+00007 \textcolor{comment}{# it under the terms of the GNU General Public License as published by}
+00008 \textcolor{comment}{# the Free Software Foundation; either version 3, or (at your option)}
+00009 \textcolor{comment}{# any later version.}
+00010 \textcolor{comment}{# }
+00011 \textcolor{comment}{# This software is distributed in the hope that it will be useful,}
+00012 \textcolor{comment}{# but WITHOUT ANY WARRANTY; without even the implied warranty of}
+00013 \textcolor{comment}{# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the}
+00014 \textcolor{comment}{# GNU General Public License for more details.}
+00015 \textcolor{comment}{# }
+00016 \textcolor{comment}{# You should have received a copy of the GNU General Public License}
+00017 \textcolor{comment}{# along with this software; see the file COPYING.  If not, write to}
+00018 \textcolor{comment}{# the Free Software Foundation, Inc., 51 Franklin Street,}
+00019 \textcolor{comment}{# Boston, MA 02110-1301, USA.}
+00020 \textcolor{comment}{# }
+00021 
+00022 \textcolor{keyword}{from} gnuradio \textcolor{keyword}{import} gr, gr\_unittest
+00023 \textcolor{keyword}{from} gnuradio \textcolor{keyword}{import} blocks
+00024 \textcolor{keyword}{import} radar\_swig \textcolor{keyword}{as} radar
+00025 \textcolor{keyword}{import} random
+00026 \textcolor{keyword}{import} pmt
+00027 
+00028 \textcolor{keyword}{class }qa_os_cfar_2d_vc (gr\_unittest.TestCase):
+00029 
+00030     \textcolor{keyword}{def }setUp (self):
+00031         self.tb = gr.top\_block ()
+00032 
+00033     \textcolor{keyword}{def }tearDown (self):
+00034         self.tb = \textcolor{keywordtype}{None}
+00035 
+00036     \textcolor{keyword}{def }test_001_t (self):
+00037         \textcolor{comment}{# set up variables}
+00038         xlen = 50
+00039         ylen = 100
+00040         test\_len = xlen*ylen
+00041         
+00042         samp\_compare = (5,10)
+00043         samp\_protect = (2,4)
+00044         rel\_threshold = 0.78
+00045         mult\_threshold = 4
+00046         
+00047         \textcolor{comment}{# setup input data}
+00048         in\_data = [0]*test\_len
+00049         \textcolor{keywordflow}{for} k \textcolor{keywordflow}{in} range(test\_len):
+00050             in\_data[k] = random.random()
+00051         
+00052         x0 = 10
+00053         y0 = 10
+00054         in\_data[x0+xlen*y0] = 2
+00055         
+00056         x1 = 40
+00057         y1 = 15
+00058         in\_data[x1+xlen*y1] = 3
+00059         
+00060         x2 = 41
+00061         y2 = 13
+00062         in\_data[x2+xlen*y2] = 3
+00063         
+00064         \textcolor{comment}{# set up fg}
+00065         src = blocks.vector\_source\_c(in\_data)
+00066         s2v = blocks.stream\_to\_vector(8,xlen)
+00067         s2ts = blocks.stream\_to\_tagged\_stream(8,xlen,ylen,\textcolor{stringliteral}{'packet\_len'})
+00068         cfar = radar.os\_cfar\_2d\_vc(xlen,samp\_compare,samp\_protect,rel\_threshold,mult\_threshold)
+00069         debug = blocks.message\_debug()
+00070         
+00071         self.tb.connect(src,s2v,s2ts,cfar)
+00072         self.tb.msg\_connect(cfar,\textcolor{stringliteral}{"Msg out"},debug,\textcolor{stringliteral}{"store"})
+00073         self.tb.msg\_connect(cfar,\textcolor{stringliteral}{"Msg out"},debug,\textcolor{stringliteral}{"print"})
+00074         
+00075         self.tb.run ()
+00076         
+00077         \textcolor{comment}{# check data}
+00078         msg = debug.get\_message(0)
+00079         cfar\_x0 =  pmt.f32vector\_ref(pmt.nth(1,pmt.nth(1,msg)),0)
+00080         cfar\_x1 =  pmt.f32vector\_ref(pmt.nth(1,pmt.nth(1,msg)),1)
+00081         cfar\_x2 =  pmt.f32vector\_ref(pmt.nth(1,pmt.nth(1,msg)),2)
+00082         cfar\_y0 =  pmt.f32vector\_ref(pmt.nth(1,pmt.nth(2,msg)),0)
+00083         cfar\_y1 =  pmt.f32vector\_ref(pmt.nth(1,pmt.nth(2,msg)),1)
+00084         cfar\_y2 =  pmt.f32vector\_ref(pmt.nth(1,pmt.nth(2,msg)),2)
+00085         
+00086         self.assertAlmostEqual(x0,cfar\_x0,4)
+00087         self.assertAlmostEqual(x1,cfar\_x1,4)
+00088         self.assertAlmostEqual(x2,cfar\_x2,4)
+00089         
+00090         self.assertAlmostEqual(y0,cfar\_y0,4)
+00091         self.assertAlmostEqual(y1,cfar\_y1,4)
+00092         self.assertAlmostEqual(y2,cfar\_y2,4)
+00093 
+00094 
+00095 \textcolor{keywordflow}{if} \_\_name\_\_ == \textcolor{stringliteral}{'\_\_main\_\_'}:
+00096     gr\_unittest.run(qa\_os\_cfar\_2d\_vc)\textcolor{comment}{#, "qa\_os\_cfar\_2d\_vc.xml")}
+\end{DoxyCode}

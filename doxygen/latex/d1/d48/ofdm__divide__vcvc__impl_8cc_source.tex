@@ -1,0 +1,136 @@
+\subsection{ofdm\+\_\+divide\+\_\+vcvc\+\_\+impl.\+cc}
+\label{ofdm__divide__vcvc__impl_8cc_source}\index{/home/erik/prefix/default/src/gr-\/radar-\/dev/lib/ofdm\+\_\+divide\+\_\+vcvc\+\_\+impl.\+cc@{/home/erik/prefix/default/src/gr-\/radar-\/dev/lib/ofdm\+\_\+divide\+\_\+vcvc\+\_\+impl.\+cc}}
+
+\begin{DoxyCode}
+00001 \textcolor{comment}{/* -*- c++ -*- */}
+00002 \textcolor{comment}{/* }
+00003 \textcolor{comment}{ * Copyright 2014 Communications Engineering Lab, KIT.}
+00004 \textcolor{comment}{ * }
+00005 \textcolor{comment}{ * This is free software; you can redistribute it and/or modify}
+00006 \textcolor{comment}{ * it under the terms of the GNU General Public License as published by}
+00007 \textcolor{comment}{ * the Free Software Foundation; either version 3, or (at your option)}
+00008 \textcolor{comment}{ * any later version.}
+00009 \textcolor{comment}{ * }
+00010 \textcolor{comment}{ * This software is distributed in the hope that it will be useful,}
+00011 \textcolor{comment}{ * but WITHOUT ANY WARRANTY; without even the implied warranty of}
+00012 \textcolor{comment}{ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the}
+00013 \textcolor{comment}{ * GNU General Public License for more details.}
+00014 \textcolor{comment}{ * }
+00015 \textcolor{comment}{ * You should have received a copy of the GNU General Public License}
+00016 \textcolor{comment}{ * along with this software; see the file COPYING.  If not, write to}
+00017 \textcolor{comment}{ * the Free Software Foundation, Inc., 51 Franklin Street,}
+00018 \textcolor{comment}{ * Boston, MA 02110-1301, USA.}
+00019 \textcolor{comment}{ */}
+00020 
+00021 \textcolor{preprocessor}{#ifdef HAVE\_CONFIG\_H}
+00022 \textcolor{preprocessor}{#include "config.h"}
+00023 \textcolor{preprocessor}{#endif}
+00024 
+00025 \textcolor{preprocessor}{#include <gnuradio/io\_signature.h>}
+00026 \textcolor{preprocessor}{#include "ofdm_divide_vcvc_impl.h"}
+00027 
+00028 \textcolor{keyword}{namespace }gr \{
+00029   \textcolor{keyword}{namespace }radar \{
+00030 
+00031     ofdm_divide_vcvc::sptr
+00032     ofdm_divide_vcvc::make(\textcolor{keywordtype}{int} vlen\_in, \textcolor{keywordtype}{int} vlen\_out, std::vector<int> discarded\_carriers, \textcolor{keywordtype}{int} 
+      num\_sync\_words, std::string len\_key)
+00033     \{
+00034       \textcolor{keywordflow}{return} gnuradio::get\_initial\_sptr
+00035         (\textcolor{keyword}{new} ofdm_divide_vcvc_impl(vlen\_in, vlen\_out, discarded\_carriers, num\_sync\_words, len\_key));
+00036     \}
+00037 
+00038     \textcolor{comment}{/*}
+00039 \textcolor{comment}{     * The private constructor}
+00040 \textcolor{comment}{     */}
+00041     ofdm_divide_vcvc_impl::ofdm_divide_vcvc_impl(\textcolor{keywordtype}{int} vlen\_in, \textcolor{keywordtype}{int} vlen\_out, std::vector<int> 
+      discarded\_carriers, \textcolor{keywordtype}{int} num\_sync\_words, std::string len\_key)
+00042       : gr::tagged\_stream\_block(\textcolor{stringliteral}{"ofdm\_divide\_vcvc"},
+00043               gr::io\_signature::make(2, 2, sizeof(gr\_complex)*vlen\_in),
+00044               gr::io\_signature::make(1, 1, sizeof(gr\_complex)*vlen\_out), len\_key)
+00045     \{
+00046         d_vlen_in = vlen\_in;
+00047         d_vlen_out = vlen\_out;
+00048         d_discarded_carriers = discarded\_carriers;
+00049         d_num_sync_words = num\_sync\_words;
+00050         
+00051         \textcolor{comment}{// Shift discarded carriers}
+00052         \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} k=0; k<discarded\_carriers.size(); k++)\{
+00053             d_discarded_carriers[k] = discarded\_carriers[k]+vlen\_in/2;
+00054         \}
+00055         
+00056         \textcolor{comment}{// Error handling}
+00057         \textcolor{keywordflow}{if}(d_vlen_out<d_vlen_in) \textcolor{keywordflow}{throw} std::runtime\_error(\textcolor{stringliteral}{"Input vector length is greater than output
+       vector length"});
+00058     \}
+00059 
+00060     \textcolor{comment}{/*}
+00061 \textcolor{comment}{     * Our virtual destructor.}
+00062 \textcolor{comment}{     */}
+00063     ofdm_divide_vcvc_impl::~ofdm_divide_vcvc_impl()
+00064     \{
+00065     \}
+00066 
+00067     \textcolor{keywordtype}{int}
+00068     ofdm_divide_vcvc_impl::calculate_output_stream_length(\textcolor{keyword}{const} gr\_vector\_int &ninput\_items)
+00069     \{
+00070       \textcolor{keywordtype}{int} noutput\_items = ninput\_items[0];
+00071       \textcolor{keywordflow}{return} noutput\_items ;
+00072     \}
+00073 
+00074     \textcolor{keywordtype}{int}
+00075     ofdm_divide_vcvc_impl::work (\textcolor{keywordtype}{int} noutput\_items,
+00076                        gr\_vector\_int &ninput\_items,
+00077                        gr\_vector\_const\_void\_star &input\_items,
+00078                        gr\_vector\_void\_star &output\_items)
+00079     \{
+00080         \textcolor{keyword}{const} gr\_complex *in0 = (\textcolor{keyword}{const} gr\_complex *) input\_items[0];
+00081         \textcolor{keyword}{const} gr\_complex *in1 = (\textcolor{keyword}{const} gr\_complex *) input\_items[1];
+00082         gr\_complex *out = (gr\_complex *) output\_items[0];
+00083 
+00084         \textcolor{comment}{// Set noutput\_items}
+00085         noutput\_items = ninput\_items[0];
+00086         
+00087         \textcolor{comment}{// Set output buffer to zero -> is zeropadding}
+00088         std::memset(out,0,\textcolor{keyword}{sizeof}(gr\_complex)*noutput\_items*d_vlen_out);
+00089         
+00090         \textcolor{comment}{// Do division and keep spaces between packets if vlen\_out>vlen\_in}
+00091         \textcolor{comment}{// If actual vector is a sync words (given with num\_sync\_words) do not apply discarded carriers
+       rule}
+00092         
+00093         \textcolor{keywordtype}{int} next\_discarded\_element = 0; \textcolor{comment}{// set first discarded element on first vector item}
+00094         \textcolor{keywordflow}{if}(d_discarded_carriers.size()==0)\{ \textcolor{comment}{// set first discarded element on first vector item}
+00095             d_discarded_carriers.resize(1);
+00096             d_discarded_carriers[0] = d_vlen_in; \textcolor{comment}{// this disables discarded carriers}
+00097         \}
+00098         
+00099         \textcolor{comment}{// Divide items and discard carriers}
+00100         \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} k=0; k<noutput\_items; k++)\{
+00101             \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} l=0; l<d_vlen_in; l++)\{
+00102                 \textcolor{keywordflow}{if}(k<d_num_sync_words)\{ \textcolor{comment}{// if actual vector is a sync word}
+00103                     out[k*d\_vlen\_out+l] = (in0[k*d\_vlen\_in+l])/(in1[k*d\_vlen\_in+l]);
+00104                 \}
+00105                 \textcolor{keywordflow}{else}\{ \textcolor{comment}{// if actual vector is NOT a sync word}
+00106                     \textcolor{keywordflow}{if}(l==d_discarded_carriers[next\_discarded\_element])\{ \textcolor{comment}{// if actual element shall be
+       discarded and set to zero}
+00107                         out[k*d\_vlen\_out+l] = 0;
+00108                         \textcolor{keywordflow}{if}(next\_discarded\_element<d_discarded_carriers.size()-1) next\_discarded\_element++; \textcolor{comment}{
+      // set next discarded element on next vector item}
+00109                         \textcolor{keywordflow}{else} next\_discarded\_element=0; \textcolor{comment}{// if item is last one jump back to first item in
+       vector}
+00110                     \}
+00111                     \textcolor{keywordflow}{else}\{ \textcolor{comment}{// if actual element shall be divided}
+00112                         out[k*d\_vlen\_out+l] = (in0[k*d\_vlen\_in+l])/(in1[k*d\_vlen\_in+l]);
+00113                     \}
+00114                 \}
+00115             \}
+00116         \}
+00117 
+00118         \textcolor{comment}{// Tell runtime system how many output items we produced.}
+00119         \textcolor{keywordflow}{return} noutput\_items;
+00120     \}
+00121 
+00122   \} \textcolor{comment}{/* namespace radar */}
+00123 \} \textcolor{comment}{/* namespace gr */}
+00124 
+\end{DoxyCode}

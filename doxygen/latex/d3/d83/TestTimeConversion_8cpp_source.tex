@@ -1,0 +1,95 @@
+\subsection{Test\+Time\+Conversion.\+cpp}
+\label{TestTimeConversion_8cpp_source}\index{/home/erik/prefix/default/src/soapysdr/tests/\+Test\+Time\+Conversion.\+cpp@{/home/erik/prefix/default/src/soapysdr/tests/\+Test\+Time\+Conversion.\+cpp}}
+
+\begin{DoxyCode}
+00001 \textcolor{comment}{// Copyright (c) 2015-2015 Josh Blum}
+00002 \textcolor{comment}{// SPDX-License-Identifier: BSL-1.0}
+00003 
+00004 \textcolor{preprocessor}{#include <SoapySDR/Time.hpp>}
+00005 \textcolor{preprocessor}{#include <cstdlib>}
+00006 \textcolor{preprocessor}{#include <cstdio>}
+00007 \textcolor{preprocessor}{#include <cmath>}
+00008 
+00009 \textcolor{keyword}{static} \textcolor{keywordtype}{bool} loopbackTimeToTicks(\textcolor{keyword}{const} \textcolor{keywordtype}{long} \textcolor{keywordtype}{long} timeNs, \textcolor{keyword}{const} \textcolor{keywordtype}{double} rate)
+00010 \{
+00011     \textcolor{keyword}{const} \textcolor{keywordtype}{long} \textcolor{keywordtype}{long} ticks = SoapySDR::timeNsToTicks(timeNs, rate);
+00012     \textcolor{keyword}{const} \textcolor{keywordtype}{long} \textcolor{keywordtype}{long} outTime = SoapySDR::ticksToTimeNs(ticks, rate);
+00013     \textcolor{comment}{//we expect error because timeNs specifies a sub-tick}
+00014     \textcolor{keywordflow}{if} (std::abs(timeNs - outTime)/1e9 < rate) \textcolor{keywordflow}{return} \textcolor{keyword}{true};
+00015     printf(\textcolor{stringliteral}{"FAIL: loopbackTimeToTicks(%lld, %f)\(\backslash\)n"}, timeNs, rate);
+00016     printf(\textcolor{stringliteral}{"    ticks = %lld, outTime = %lld\(\backslash\)n"}, ticks, outTime);
+00017     printf(\textcolor{stringliteral}{"    error = %f secs\(\backslash\)n"}, std::abs(timeNs - outTime)/1e9);
+00018     \textcolor{keywordflow}{return} \textcolor{keyword}{false};
+00019 \}
+00020 
+00021 \textcolor{keyword}{static} \textcolor{keywordtype}{bool} loopbackTicksToTime(\textcolor{keyword}{const} \textcolor{keywordtype}{long} \textcolor{keywordtype}{long} ticks, \textcolor{keyword}{const} \textcolor{keywordtype}{double} rate)
+00022 \{
+00023     \textcolor{keyword}{const} \textcolor{keywordtype}{long} \textcolor{keywordtype}{long} timeNs = SoapySDR::ticksToTimeNs(ticks, rate);
+00024     \textcolor{keyword}{const} \textcolor{keywordtype}{long} \textcolor{keywordtype}{long} outTicks = SoapySDR::timeNsToTicks(timeNs, rate);
+00025     \textcolor{keywordflow}{if} (std::abs(ticks - outTicks) == 0) \textcolor{keywordflow}{return} \textcolor{keyword}{true};
+00026     printf(\textcolor{stringliteral}{"FAIL: loopbackTicksToTime(%lld, %f)\(\backslash\)n"}, ticks, rate);
+00027     printf(\textcolor{stringliteral}{"    timeNs = %lld, outTicks = %lld\(\backslash\)n"}, timeNs, outTicks);
+00028     printf(\textcolor{stringliteral}{"    error = %d ticks\(\backslash\)n"}, \textcolor{keywordtype}{int}(std::abs(ticks - outTicks)));
+00029     \textcolor{keywordflow}{return} \textcolor{keyword}{false};
+00030 \}
+00031 
+00032 \textcolor{comment}{//http://stackoverflow.com/questions/8120062/generate-random-64-bit-integer}
+00033 \textcolor{keyword}{static} \textcolor{keywordtype}{unsigned} rand256(\textcolor{keywordtype}{void})
+00034 \{
+00035     \textcolor{keyword}{static} \textcolor{keywordtype}{unsigned} \textcolor{keyword}{const} limit = RAND\_MAX - RAND\_MAX % 256;
+00036     \textcolor{keywordtype}{unsigned} result = std::rand();
+00037     \textcolor{keywordflow}{while} ( result >= limit )
+00038     \{
+00039         result = std::rand();
+00040     \}
+00041     \textcolor{keywordflow}{return} result % 256;
+00042 \}
+00043 
+00044 \textcolor{keyword}{static} \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{long} \textcolor{keywordtype}{long} rand64bits(\textcolor{keywordtype}{void})
+00045 \{
+00046     \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{long} \textcolor{keywordtype}{long} results = 0ULL;
+00047     \textcolor{keywordflow}{for} ( \textcolor{keywordtype}{int} count = 8; count > 0; -- count)
+00048     \{
+00049         results = 256U * results + rand256();
+00050     \}
+00051     \textcolor{keywordflow}{return} results;
+00052 \}
+00053 
+00054 \textcolor{keywordtype}{int} main(\textcolor{keywordtype}{void})
+00055 \{
+00056     \textcolor{comment}{//test that random times can make it through the conversion}
+00057     printf(\textcolor{stringliteral}{"Test random times...\(\backslash\)n"});
+00058     \textcolor{keywordflow}{for} (\textcolor{keywordtype}{size\_t} i = 0; i < 100; i++)
+00059     \{
+00060         \textcolor{keyword}{const} \textcolor{keywordtype}{long} \textcolor{keywordtype}{long} timeNs = rand64bits();
+00061         \textcolor{keywordflow}{if} (not loopbackTimeToTicks(timeNs, 1e9)) \textcolor{keywordflow}{return} EXIT\_FAILURE;
+00062         \textcolor{keywordflow}{if} (not loopbackTimeToTicks(-timeNs, 1e9)) \textcolor{keywordflow}{return} EXIT\_FAILURE;
+00063         \textcolor{keywordflow}{if} (not loopbackTimeToTicks(timeNs, 52e6)) \textcolor{keywordflow}{return} EXIT\_FAILURE;
+00064         \textcolor{keywordflow}{if} (not loopbackTimeToTicks(-timeNs, 52e6)) \textcolor{keywordflow}{return} EXIT\_FAILURE;
+00065         \textcolor{keywordflow}{if} (not loopbackTimeToTicks(timeNs, 61.44e6)) \textcolor{keywordflow}{return} EXIT\_FAILURE;
+00066         \textcolor{keywordflow}{if} (not loopbackTimeToTicks(-timeNs, 61.44e6)) \textcolor{keywordflow}{return} EXIT\_FAILURE;
+00067         \textcolor{keywordflow}{if} (not loopbackTimeToTicks(timeNs, 100e6/3)) \textcolor{keywordflow}{return} EXIT\_FAILURE;
+00068         \textcolor{keywordflow}{if} (not loopbackTimeToTicks(-timeNs, 100e6/3)) \textcolor{keywordflow}{return} EXIT\_FAILURE;
+00069     \}
+00070     printf(\textcolor{stringliteral}{"OK\(\backslash\)n"});
+00071 
+00072     \textcolor{comment}{//test random ticks for several different rates}
+00073     printf(\textcolor{stringliteral}{"Test random ticks...\(\backslash\)n"});
+00074     \textcolor{keywordflow}{for} (\textcolor{keywordtype}{size\_t} i = 0; i < 100; i++)
+00075     \{
+00076         \textcolor{keyword}{const} \textcolor{keywordtype}{long} \textcolor{keywordtype}{long} ticks = rand64bits() >> 8; \textcolor{comment}{//room for max rate}
+00077         \textcolor{keywordflow}{if} (not loopbackTicksToTime(ticks, 1e9)) \textcolor{keywordflow}{return} EXIT\_FAILURE;
+00078         \textcolor{keywordflow}{if} (not loopbackTicksToTime(-ticks, 1e9)) \textcolor{keywordflow}{return} EXIT\_FAILURE;
+00079         \textcolor{keywordflow}{if} (not loopbackTicksToTime(ticks, 52e6)) \textcolor{keywordflow}{return} EXIT\_FAILURE;
+00080         \textcolor{keywordflow}{if} (not loopbackTicksToTime(-ticks, 52e6)) \textcolor{keywordflow}{return} EXIT\_FAILURE;
+00081         \textcolor{keywordflow}{if} (not loopbackTicksToTime(ticks, 61.44e6)) \textcolor{keywordflow}{return} EXIT\_FAILURE;
+00082         \textcolor{keywordflow}{if} (not loopbackTicksToTime(-ticks, 61.44e6)) \textcolor{keywordflow}{return} EXIT\_FAILURE;
+00083         \textcolor{keywordflow}{if} (not loopbackTicksToTime(ticks, 100e6/3)) \textcolor{keywordflow}{return} EXIT\_FAILURE;
+00084         \textcolor{keywordflow}{if} (not loopbackTicksToTime(-ticks, 100e6/3)) \textcolor{keywordflow}{return} EXIT\_FAILURE;
+00085     \}
+00086     printf(\textcolor{stringliteral}{"OK\(\backslash\)n"});
+00087 
+00088     printf(\textcolor{stringliteral}{"DONE!\(\backslash\)n"});
+00089     \textcolor{keywordflow}{return} EXIT\_SUCCESS;
+00090 \}
+\end{DoxyCode}

@@ -1,0 +1,786 @@
+\subsection{Lime\+S\+D\+R\+Test Class Reference}
+\label{classLimeSDRTest}\index{Lime\+S\+D\+R\+Test@{Lime\+S\+D\+R\+Test}}
+
+
+{\ttfamily \#include $<$Lime\+S\+D\+R\+Test.\+h$>$}
+
+
+
+Inheritance diagram for Lime\+S\+D\+R\+Test\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=330pt]{db/d4e/classLimeSDRTest__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for Lime\+S\+D\+R\+Test\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=550pt]{d7/d1c/classLimeSDRTest__coll__graph}
+\end{center}
+\end{figure}
+\subsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct {\bf R\+F\+Test\+Data}
+\end{DoxyCompactItemize}
+\subsubsection*{Static Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+static {\bf int} {\bf Run\+Tests} ({\bf Test\+Callback} cb, bool nonblock=true)
+\item 
+static {\bf int} {\bf Check\+Device} ({\bf std\+::string} \&str)
+\end{DoxyCompactItemize}
+\subsubsection*{Protected Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+{\bf Lime\+S\+D\+R\+Test} ({\bf lime\+::\+L\+M\+S7\+\_\+\+Device} $\ast$dev)
+\item 
+virtual {\bf $\sim$\+Lime\+S\+D\+R\+Test} ()
+\item 
+{\bf int} {\bf Init\+F\+P\+G\+A\+Test} (unsigned test, double timeout)
+\item 
+{\bf int} {\bf G\+P\+I\+F\+Clk\+Test} ()
+\item 
+{\bf int} {\bf V\+C\+T\+C\+X\+O\+Test} ()
+\item 
+bool {\bf Run\+Test} (float \&peakval, float \&peak\+Freq, {\bf int} ch=0)
+\end{DoxyCompactItemize}
+\subsubsection*{Static Protected Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+static {\bf void} {\bf Update\+Status} ({\bf int} event, const char $\ast$msg=nullptr)
+\item 
+static {\bf std\+::string} {\bf R\+F\+Test\+Info} (const {\bf R\+F\+Test\+Data} \&{\bf data}, bool passed)
+\end{DoxyCompactItemize}
+\subsubsection*{Protected Attributes}
+\begin{DoxyCompactItemize}
+\item 
+{\bf lime\+::\+L\+M\+S7\+\_\+\+Device} $\ast$ {\bf device}
+\end{DoxyCompactItemize}
+\subsubsection*{Private Types}
+\begin{DoxyCompactItemize}
+\item 
+typedef std\+::function$<$ {\bf int}({\bf int} test\+ID, {\bf int} event, const char $\ast$msg)$>$ {\bf Test\+Callback}
+\end{DoxyCompactItemize}
+\subsubsection*{Private Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+{\bf int} {\bf F\+P\+G\+A\+\_\+\+E\+E\+P\+R\+O\+M\+\_\+\+Test} ()
+\item 
+virtual {\bf int} {\bf Clock\+Network\+Test} ()=0
+\item 
+virtual {\bf int} {\bf R\+F\+Test} ()=0
+\item 
+{\bf int} {\bf L\+M\+S7002m\+Test} ()
+\item 
+{\bf int} {\bf Reg\+\_\+write} (uint16\+\_\+t {\bf address}, uint16\+\_\+t {\bf data})
+\item 
+uint16\+\_\+t {\bf Reg\+\_\+read} (uint16\+\_\+t {\bf address})
+\item 
+{\bf int} {\bf Perform\+\_\+tests} ()
+\item 
+{\bf int} {\bf Transfer\+L\+M\+S64C} (unsigned char $\ast$packet)
+\end{DoxyCompactItemize}
+\subsubsection*{Static Private Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+static {\bf Lime\+S\+D\+R\+Test} $\ast$ {\bf Connect} ()
+\item 
+static {\bf void} {\bf On\+Log\+Event} (const {\bf lime\+::\+Log\+Level} level, const char $\ast${\bf message})
+\end{DoxyCompactItemize}
+\subsubsection*{Static Private Attributes}
+\begin{DoxyCompactItemize}
+\item 
+static {\bf int} {\bf step} = 0
+\item 
+static {\bf Test\+Callback} {\bf callback} = nullptr
+\item 
+static std\+::atomic$<$ bool $>$ {\bf running}
+\item 
+static std\+::chrono\+::steady\+\_\+clock\+::time\+\_\+point {\bf tp\+\_\+start}
+\end{DoxyCompactItemize}
+
+
+\subsubsection{Detailed Description}
+
+
+Definition at line {\bf 29} of file {\bf Lime\+S\+D\+R\+Test.\+h}.
+
+
+
+\subsubsection{Member Typedef Documentation}
+\index{Lime\+S\+D\+R\+Test@{Lime\+S\+D\+R\+Test}!Test\+Callback@{Test\+Callback}}
+\index{Test\+Callback@{Test\+Callback}!Lime\+S\+D\+R\+Test@{Lime\+S\+D\+R\+Test}}
+\paragraph[{Test\+Callback}]{\setlength{\rightskip}{0pt plus 5cm}typedef std\+::function$<${\bf int}({\bf int} test\+ID, {\bf int} event, const char$\ast$ msg)$>$ {\bf Lime\+S\+D\+R\+Test\+::\+Test\+Callback}\hspace{0.3cm}{\ttfamily [private]}}\label{classLimeSDRTest_a60bfd4407aba7a78278766c17242a9cd}
+
+
+Definition at line {\bf 31} of file {\bf Lime\+S\+D\+R\+Test.\+h}.
+
+
+
+\subsubsection{Constructor \& Destructor Documentation}
+\index{Lime\+S\+D\+R\+Test@{Lime\+S\+D\+R\+Test}!Lime\+S\+D\+R\+Test@{Lime\+S\+D\+R\+Test}}
+\index{Lime\+S\+D\+R\+Test@{Lime\+S\+D\+R\+Test}!Lime\+S\+D\+R\+Test@{Lime\+S\+D\+R\+Test}}
+\paragraph[{Lime\+S\+D\+R\+Test(lime\+::\+L\+M\+S7\+\_\+\+Device $\ast$dev)}]{\setlength{\rightskip}{0pt plus 5cm}Lime\+S\+D\+R\+Test\+::\+Lime\+S\+D\+R\+Test (
+\begin{DoxyParamCaption}
+\item[{{\bf lime\+::\+L\+M\+S7\+\_\+\+Device} $\ast$}]{dev}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [protected]}}\label{classLimeSDRTest_aff259af9f7e5887a1032286f7b97fcd2}
+
+
+Definition at line {\bf 21} of file {\bf Lime\+S\+D\+R\+Test.\+cpp}.
+
+
+
+References {\bf device}.
+
+\index{Lime\+S\+D\+R\+Test@{Lime\+S\+D\+R\+Test}!````~Lime\+S\+D\+R\+Test@{$\sim$\+Lime\+S\+D\+R\+Test}}
+\index{````~Lime\+S\+D\+R\+Test@{$\sim$\+Lime\+S\+D\+R\+Test}!Lime\+S\+D\+R\+Test@{Lime\+S\+D\+R\+Test}}
+\paragraph[{$\sim$\+Lime\+S\+D\+R\+Test()}]{\setlength{\rightskip}{0pt plus 5cm}Lime\+S\+D\+R\+Test\+::$\sim$\+Lime\+S\+D\+R\+Test (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [protected]}, {\ttfamily [virtual]}}\label{classLimeSDRTest_aa58c3c517dece1f8a051a4bf2e29ff99}
+
+
+Definition at line {\bf 27} of file {\bf Lime\+S\+D\+R\+Test.\+cpp}.
+
+
+
+References {\bf device}.
+
+
+
+\subsubsection{Member Function Documentation}
+\index{Lime\+S\+D\+R\+Test@{Lime\+S\+D\+R\+Test}!Check\+Device@{Check\+Device}}
+\index{Check\+Device@{Check\+Device}!Lime\+S\+D\+R\+Test@{Lime\+S\+D\+R\+Test}}
+\paragraph[{Check\+Device(std\+::string \&str)}]{\setlength{\rightskip}{0pt plus 5cm}{\bf int} Lime\+S\+D\+R\+Test\+::\+Check\+Device (
+\begin{DoxyParamCaption}
+\item[{{\bf std\+::string} \&}]{str}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [static]}}\label{classLimeSDRTest_a6ccefda083ebde93ab2cff0199bdc621}
+
+
+Definition at line {\bf 493} of file {\bf Lime\+S\+D\+R\+Test.\+cpp}.
+
+
+
+References {\bf lime\+::\+L\+M\+S7\+\_\+\+Device\+::\+Get\+Device\+List()}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{d6/d96/classLimeSDRTest_a6ccefda083ebde93ab2cff0199bdc621_cgraph}
+\end{center}
+\end{figure}
+
+
+\index{Lime\+S\+D\+R\+Test@{Lime\+S\+D\+R\+Test}!Clock\+Network\+Test@{Clock\+Network\+Test}}
+\index{Clock\+Network\+Test@{Clock\+Network\+Test}!Lime\+S\+D\+R\+Test@{Lime\+S\+D\+R\+Test}}
+\paragraph[{Clock\+Network\+Test()=0}]{\setlength{\rightskip}{0pt plus 5cm}virtual {\bf int} Lime\+S\+D\+R\+Test\+::\+Clock\+Network\+Test (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [private]}, {\ttfamily [pure virtual]}}\label{classLimeSDRTest_a759d7deeb56418d02cdc76a69e96fa76}
+
+
+Implemented in {\bf Lime\+S\+D\+R\+Test\+\_\+\+U\+SB} \doxyref{}{p.}{d0/dab/classLimeSDRTest__USB_a04bb0d52ac3cc7091af6c56a6134161a}, and {\bf Lime\+S\+D\+R\+Test\+\_\+\+Mini} \doxyref{}{p.}{dd/d68/classLimeSDRTest__Mini_a95d1a4f40e85d9d19bb65006e4851d57}.
+
+
+
+Referenced by {\bf Lime\+S\+D\+R\+Test\+\_\+\+Mini\+::\+Lime\+S\+D\+R\+Test\+\_\+\+Mini()}, and {\bf Lime\+S\+D\+R\+Test\+\_\+\+U\+S\+B\+::\+Lime\+S\+D\+R\+Test\+\_\+\+U\+S\+B()}.
+
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{d6/d96/classLimeSDRTest_a759d7deeb56418d02cdc76a69e96fa76_icgraph}
+\end{center}
+\end{figure}
+
+
+\index{Lime\+S\+D\+R\+Test@{Lime\+S\+D\+R\+Test}!Connect@{Connect}}
+\index{Connect@{Connect}!Lime\+S\+D\+R\+Test@{Lime\+S\+D\+R\+Test}}
+\paragraph[{Connect()}]{\setlength{\rightskip}{0pt plus 5cm}{\bf Lime\+S\+D\+R\+Test} $\ast$ Lime\+S\+D\+R\+Test\+::\+Connect (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [static]}, {\ttfamily [private]}}\label{classLimeSDRTest_adbc2a048c65c6e8c55ab12f718c91bd6}
+
+
+Definition at line {\bf 48} of file {\bf Lime\+S\+D\+R\+Test.\+cpp}.
+
+
+
+References {\bf lime\+::\+L\+M\+S7\+\_\+\+Device\+::\+Create\+Device()}, {\bf lime\+::\+L\+M\+S7\+\_\+\+Device\+::\+Get\+Device\+List()}, {\bf lime\+::\+Get\+Device\+Name()}, {\bf lime\+::info()}, {\bf lime\+::\+L\+M\+S\+\_\+\+D\+E\+V\+\_\+\+L\+I\+M\+E\+S\+DR}, {\bf lime\+::\+L\+M\+S\+\_\+\+D\+E\+V\+\_\+\+L\+I\+M\+E\+S\+D\+R\+M\+I\+NI}, {\bf L\+M\+S\+\_\+\+T\+E\+S\+T\+\_\+\+F\+A\+IL}, {\bf L\+M\+S\+\_\+\+T\+E\+S\+T\+\_\+\+I\+N\+FO}, {\bf L\+M\+S\+\_\+\+T\+E\+S\+T\+\_\+\+L\+O\+G\+F\+I\+LE}, and {\bf string()}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{d6/d96/classLimeSDRTest_adbc2a048c65c6e8c55ab12f718c91bd6_cgraph}
+\end{center}
+\end{figure}
+
+
+\index{Lime\+S\+D\+R\+Test@{Lime\+S\+D\+R\+Test}!F\+P\+G\+A\+\_\+\+E\+E\+P\+R\+O\+M\+\_\+\+Test@{F\+P\+G\+A\+\_\+\+E\+E\+P\+R\+O\+M\+\_\+\+Test}}
+\index{F\+P\+G\+A\+\_\+\+E\+E\+P\+R\+O\+M\+\_\+\+Test@{F\+P\+G\+A\+\_\+\+E\+E\+P\+R\+O\+M\+\_\+\+Test}!Lime\+S\+D\+R\+Test@{Lime\+S\+D\+R\+Test}}
+\paragraph[{F\+P\+G\+A\+\_\+\+E\+E\+P\+R\+O\+M\+\_\+\+Test()}]{\setlength{\rightskip}{0pt plus 5cm}{\bf int} Lime\+S\+D\+R\+Test\+::\+F\+P\+G\+A\+\_\+\+E\+E\+P\+R\+O\+M\+\_\+\+Test (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [private]}}\label{classLimeSDRTest_ac54f3427826cbe8166f004c06314fc20}
+
+
+Definition at line {\bf 115} of file {\bf Lime\+S\+D\+R\+Test.\+cpp}.
+
+
+
+References {\bf lime\+::\+C\+M\+D\+\_\+\+M\+E\+M\+O\+R\+Y\+\_\+\+RD}, and {\bf L\+M\+S\+\_\+\+T\+E\+S\+T\+\_\+\+I\+N\+FO}.
+
+\index{Lime\+S\+D\+R\+Test@{Lime\+S\+D\+R\+Test}!G\+P\+I\+F\+Clk\+Test@{G\+P\+I\+F\+Clk\+Test}}
+\index{G\+P\+I\+F\+Clk\+Test@{G\+P\+I\+F\+Clk\+Test}!Lime\+S\+D\+R\+Test@{Lime\+S\+D\+R\+Test}}
+\paragraph[{G\+P\+I\+F\+Clk\+Test()}]{\setlength{\rightskip}{0pt plus 5cm}{\bf int} Lime\+S\+D\+R\+Test\+::\+G\+P\+I\+F\+Clk\+Test (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [protected]}}\label{classLimeSDRTest_a7de38c1e04124ef14cdd3041995eb00a}
+
+
+Definition at line {\bf 217} of file {\bf Lime\+S\+D\+R\+Test.\+cpp}.
+
+
+
+References {\bf device}, {\bf L\+M\+S\+\_\+\+T\+E\+S\+T\+\_\+\+I\+N\+FO}, and {\bf string()}.
+
+
+
+Referenced by {\bf Lime\+S\+D\+R\+Test\+\_\+\+Mini\+::\+Clock\+Network\+Test()}, and {\bf Lime\+S\+D\+R\+Test\+\_\+\+U\+S\+B\+::\+Clock\+Network\+Test()}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{d6/d96/classLimeSDRTest_a7de38c1e04124ef14cdd3041995eb00a_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{d6/d96/classLimeSDRTest_a7de38c1e04124ef14cdd3041995eb00a_icgraph}
+\end{center}
+\end{figure}
+
+
+\index{Lime\+S\+D\+R\+Test@{Lime\+S\+D\+R\+Test}!Init\+F\+P\+G\+A\+Test@{Init\+F\+P\+G\+A\+Test}}
+\index{Init\+F\+P\+G\+A\+Test@{Init\+F\+P\+G\+A\+Test}!Lime\+S\+D\+R\+Test@{Lime\+S\+D\+R\+Test}}
+\paragraph[{Init\+F\+P\+G\+A\+Test(unsigned test, double timeout)}]{\setlength{\rightskip}{0pt plus 5cm}{\bf int} Lime\+S\+D\+R\+Test\+::\+Init\+F\+P\+G\+A\+Test (
+\begin{DoxyParamCaption}
+\item[{unsigned}]{test, }
+\item[{double}]{timeout}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [protected]}}\label{classLimeSDRTest_a3d79374a4e82cc26154bbd73c02bdbe0}
+
+
+Definition at line {\bf 181} of file {\bf Lime\+S\+D\+R\+Test.\+cpp}.
+
+
+
+References {\bf device}, {\bf L\+M\+S\+\_\+\+T\+E\+S\+T\+\_\+\+I\+N\+FO}, and {\bf string()}.
+
+
+
+Referenced by {\bf Lime\+S\+D\+R\+Test\+\_\+\+U\+S\+B\+::\+A\+D\+F4002\+Test()}, and {\bf Lime\+S\+D\+R\+Test\+\_\+\+U\+S\+B\+::\+Si5351\+C\+Test()}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{d6/d96/classLimeSDRTest_a3d79374a4e82cc26154bbd73c02bdbe0_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{d6/d96/classLimeSDRTest_a3d79374a4e82cc26154bbd73c02bdbe0_icgraph}
+\end{center}
+\end{figure}
+
+
+\index{Lime\+S\+D\+R\+Test@{Lime\+S\+D\+R\+Test}!L\+M\+S7002m\+Test@{L\+M\+S7002m\+Test}}
+\index{L\+M\+S7002m\+Test@{L\+M\+S7002m\+Test}!Lime\+S\+D\+R\+Test@{Lime\+S\+D\+R\+Test}}
+\paragraph[{L\+M\+S7002m\+Test()}]{\setlength{\rightskip}{0pt plus 5cm}{\bf int} Lime\+S\+D\+R\+Test\+::\+L\+M\+S7002m\+Test (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [private]}}\label{classLimeSDRTest_a787e60c3a2357d3b3856470ec5541c7a}
+
+
+Definition at line {\bf 138} of file {\bf Lime\+S\+D\+R\+Test.\+cpp}.
+
+
+
+References {\bf device}, {\bf L\+M\+S\+\_\+\+T\+E\+S\+T\+\_\+\+I\+N\+FO}, {\bf lms\+Control}, {\bf lime\+::\+L\+M\+S7002\+M\+::\+Registers\+Test()}, {\bf lime\+::\+L\+M\+S7002\+M\+::\+Reset\+Chip()}, {\bf lime\+::\+L\+M\+S7002\+M\+::\+S\+P\+I\+\_\+read()}, {\bf lime\+::\+L\+M\+S7002\+M\+::\+S\+P\+I\+\_\+write()}, {\bf status}, and {\bf val}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{d6/d96/classLimeSDRTest_a787e60c3a2357d3b3856470ec5541c7a_cgraph}
+\end{center}
+\end{figure}
+
+
+\index{Lime\+S\+D\+R\+Test@{Lime\+S\+D\+R\+Test}!On\+Log\+Event@{On\+Log\+Event}}
+\index{On\+Log\+Event@{On\+Log\+Event}!Lime\+S\+D\+R\+Test@{Lime\+S\+D\+R\+Test}}
+\paragraph[{On\+Log\+Event(const lime\+::\+Log\+Level level, const char $\ast$message)}]{\setlength{\rightskip}{0pt plus 5cm}{\bf void} Lime\+S\+D\+R\+Test\+::\+On\+Log\+Event (
+\begin{DoxyParamCaption}
+\item[{const {\bf lime\+::\+Log\+Level}}]{level, }
+\item[{const char $\ast$}]{message}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [static]}, {\ttfamily [private]}}\label{classLimeSDRTest_ab06eb67f4e5e054382c08b3912d0fdfc}
+
+
+Definition at line {\bf 42} of file {\bf Lime\+S\+D\+R\+Test.\+cpp}.
+
+
+
+References {\bf L\+M\+S\+\_\+\+T\+E\+S\+T\+\_\+\+I\+N\+FO}.
+
+
+
+Referenced by {\bf Run\+Tests()}.
+
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{d6/d96/classLimeSDRTest_ab06eb67f4e5e054382c08b3912d0fdfc_icgraph}
+\end{center}
+\end{figure}
+
+
+\index{Lime\+S\+D\+R\+Test@{Lime\+S\+D\+R\+Test}!Perform\+\_\+tests@{Perform\+\_\+tests}}
+\index{Perform\+\_\+tests@{Perform\+\_\+tests}!Lime\+S\+D\+R\+Test@{Lime\+S\+D\+R\+Test}}
+\paragraph[{Perform\+\_\+tests()}]{\setlength{\rightskip}{0pt plus 5cm}{\bf int} Lime\+S\+D\+R\+Test\+::\+Perform\+\_\+tests (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [private]}}\label{classLimeSDRTest_a94773ab8e31de9c70a090978e0a2c02b}
+
+
+Definition at line {\bf 413} of file {\bf Lime\+S\+D\+R\+Test.\+cpp}.
+
+
+
+References {\bf callback}, {\bf L\+M\+S\+\_\+\+T\+E\+S\+T\+\_\+\+F\+A\+IL}, {\bf L\+M\+S\+\_\+\+T\+E\+S\+T\+\_\+\+I\+N\+FO}, {\bf L\+M\+S\+\_\+\+T\+E\+S\+T\+\_\+\+S\+U\+C\+C\+E\+SS}, {\bf status}, and {\bf string()}.
+
+
+
+Referenced by {\bf Run\+Tests()}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{d6/d96/classLimeSDRTest_a94773ab8e31de9c70a090978e0a2c02b_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{d6/d96/classLimeSDRTest_a94773ab8e31de9c70a090978e0a2c02b_icgraph}
+\end{center}
+\end{figure}
+
+
+\index{Lime\+S\+D\+R\+Test@{Lime\+S\+D\+R\+Test}!Reg\+\_\+read@{Reg\+\_\+read}}
+\index{Reg\+\_\+read@{Reg\+\_\+read}!Lime\+S\+D\+R\+Test@{Lime\+S\+D\+R\+Test}}
+\paragraph[{Reg\+\_\+read(uint16\+\_\+t address)}]{\setlength{\rightskip}{0pt plus 5cm}uint16\+\_\+t Lime\+S\+D\+R\+Test\+::\+Reg\+\_\+read (
+\begin{DoxyParamCaption}
+\item[{uint16\+\_\+t}]{address}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [private]}}\label{classLimeSDRTest_a83863f82576ea34f33926d0a943ec8d7}
+
+
+Definition at line {\bf 304} of file {\bf Lime\+S\+D\+R\+Test.\+cpp}.
+
+
+
+References {\bf device}, and {\bf status}.
+
+\index{Lime\+S\+D\+R\+Test@{Lime\+S\+D\+R\+Test}!Reg\+\_\+write@{Reg\+\_\+write}}
+\index{Reg\+\_\+write@{Reg\+\_\+write}!Lime\+S\+D\+R\+Test@{Lime\+S\+D\+R\+Test}}
+\paragraph[{Reg\+\_\+write(uint16\+\_\+t address, uint16\+\_\+t data)}]{\setlength{\rightskip}{0pt plus 5cm}{\bf int} Lime\+S\+D\+R\+Test\+::\+Reg\+\_\+write (
+\begin{DoxyParamCaption}
+\item[{uint16\+\_\+t}]{address, }
+\item[{uint16\+\_\+t}]{data}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [private]}}\label{classLimeSDRTest_a4940b178a618733d7bfe0b5ff5a29663}
+
+
+Definition at line {\bf 295} of file {\bf Lime\+S\+D\+R\+Test.\+cpp}.
+
+
+
+References {\bf device}, and {\bf status}.
+
+\index{Lime\+S\+D\+R\+Test@{Lime\+S\+D\+R\+Test}!R\+F\+Test@{R\+F\+Test}}
+\index{R\+F\+Test@{R\+F\+Test}!Lime\+S\+D\+R\+Test@{Lime\+S\+D\+R\+Test}}
+\paragraph[{R\+F\+Test()=0}]{\setlength{\rightskip}{0pt plus 5cm}virtual {\bf int} Lime\+S\+D\+R\+Test\+::\+R\+F\+Test (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [private]}, {\ttfamily [pure virtual]}}\label{classLimeSDRTest_afc46ef550dbf7196fbad23bc441d92c8}
+
+
+Implemented in {\bf Lime\+S\+D\+R\+Test\+\_\+\+U\+SB} \doxyref{}{p.}{d0/dab/classLimeSDRTest__USB_a58fc5a12a69e59666848fee3efc4177c}, and {\bf Lime\+S\+D\+R\+Test\+\_\+\+Mini} \doxyref{}{p.}{dd/d68/classLimeSDRTest__Mini_ac304d1e4786f7c26910b5bd458bb27c1}.
+
+
+
+Referenced by {\bf Lime\+S\+D\+R\+Test\+\_\+\+Mini\+::\+Lime\+S\+D\+R\+Test\+\_\+\+Mini()}, and {\bf Lime\+S\+D\+R\+Test\+\_\+\+U\+S\+B\+::\+Lime\+S\+D\+R\+Test\+\_\+\+U\+S\+B()}.
+
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{d6/d96/classLimeSDRTest_afc46ef550dbf7196fbad23bc441d92c8_icgraph}
+\end{center}
+\end{figure}
+
+
+\index{Lime\+S\+D\+R\+Test@{Lime\+S\+D\+R\+Test}!R\+F\+Test\+Info@{R\+F\+Test\+Info}}
+\index{R\+F\+Test\+Info@{R\+F\+Test\+Info}!Lime\+S\+D\+R\+Test@{Lime\+S\+D\+R\+Test}}
+\paragraph[{R\+F\+Test\+Info(const R\+F\+Test\+Data \&data, bool passed)}]{\setlength{\rightskip}{0pt plus 5cm}{\bf std\+::string} Lime\+S\+D\+R\+Test\+::\+R\+F\+Test\+Info (
+\begin{DoxyParamCaption}
+\item[{const {\bf R\+F\+Test\+Data} \&}]{data, }
+\item[{bool}]{passed}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [static]}, {\ttfamily [protected]}}\label{classLimeSDRTest_abb8e68f434db5742de3c87282fc7e176}
+
+
+Definition at line {\bf 401} of file {\bf Lime\+S\+D\+R\+Test.\+cpp}.
+
+
+
+References {\bf buffer}, {\bf Lime\+S\+D\+R\+Test\+::\+R\+F\+Test\+Data\+::ch}, {\bf Lime\+S\+D\+R\+Test\+::\+R\+F\+Test\+Data\+::peakfreq}, {\bf Lime\+S\+D\+R\+Test\+::\+R\+F\+Test\+Data\+::peakval}, {\bf Lime\+S\+D\+R\+Test\+::\+R\+F\+Test\+Data\+::rxfreq}, {\bf string()}, and {\bf Lime\+S\+D\+R\+Test\+::\+R\+F\+Test\+Data\+::txfreq}.
+
+
+
+Referenced by {\bf Lime\+S\+D\+R\+Test\+\_\+\+Mini\+::\+R\+F\+Test()}, and {\bf Lime\+S\+D\+R\+Test\+\_\+\+U\+S\+B\+::\+R\+F\+Test()}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{d6/d96/classLimeSDRTest_abb8e68f434db5742de3c87282fc7e176_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{d6/d96/classLimeSDRTest_abb8e68f434db5742de3c87282fc7e176_icgraph}
+\end{center}
+\end{figure}
+
+
+\index{Lime\+S\+D\+R\+Test@{Lime\+S\+D\+R\+Test}!Run\+Test@{Run\+Test}}
+\index{Run\+Test@{Run\+Test}!Lime\+S\+D\+R\+Test@{Lime\+S\+D\+R\+Test}}
+\paragraph[{Run\+Test(float \&peakval, float \&peak\+Freq, int ch=0)}]{\setlength{\rightskip}{0pt plus 5cm}bool Lime\+S\+D\+R\+Test\+::\+Run\+Test (
+\begin{DoxyParamCaption}
+\item[{float \&}]{peakval, }
+\item[{float \&}]{peak\+Freq, }
+\item[{{\bf int}}]{ch = {\ttfamily 0}}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [protected]}}\label{classLimeSDRTest_a9639a50cfae044ed0aaa9861fc51ee1a}
+
+
+Definition at line {\bf 317} of file {\bf Lime\+S\+D\+R\+Test.\+cpp}.
+
+
+
+References {\bf device}, {\bf i}, {\bf kiss\+\_\+fft\+\_\+cpx\+::i}, {\bf kiss\+\_\+fft()}, {\bf kiss\+\_\+fft\+\_\+alloc()}, {\bf L\+M\+S7\+\_\+\+L\+M\+L1\+\_\+\+S\+I\+S\+O\+D\+DR}, {\bf L\+M\+S\+\_\+\+T\+E\+S\+T\+\_\+\+I\+N\+FO}, {\bf swig\+\_\+doc\+::output}, {\bf calc\+\_\+fmcw\+\_\+peaks\+::r}, and {\bf kiss\+\_\+fft\+\_\+cpx\+::r}.
+
+
+
+Referenced by {\bf Lime\+S\+D\+R\+Test\+\_\+\+Mini\+::\+R\+F\+Test()}, and {\bf Lime\+S\+D\+R\+Test\+\_\+\+U\+S\+B\+::\+R\+F\+Test()}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{d6/d96/classLimeSDRTest_a9639a50cfae044ed0aaa9861fc51ee1a_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{d6/d96/classLimeSDRTest_a9639a50cfae044ed0aaa9861fc51ee1a_icgraph}
+\end{center}
+\end{figure}
+
+
+\index{Lime\+S\+D\+R\+Test@{Lime\+S\+D\+R\+Test}!Run\+Tests@{Run\+Tests}}
+\index{Run\+Tests@{Run\+Tests}!Lime\+S\+D\+R\+Test@{Lime\+S\+D\+R\+Test}}
+\paragraph[{Run\+Tests(\+Test\+Callback cb, bool nonblock=true)}]{\setlength{\rightskip}{0pt plus 5cm}{\bf int} Lime\+S\+D\+R\+Test\+::\+Run\+Tests (
+\begin{DoxyParamCaption}
+\item[{{\bf Test\+Callback}}]{cb, }
+\item[{bool}]{nonblock = {\ttfamily true}}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [static]}}\label{classLimeSDRTest_ae7184997dfe7b88c30e4eb1b840b3a37}
+
+
+Definition at line {\bf 460} of file {\bf Lime\+S\+D\+R\+Test.\+cpp}.
+
+
+
+References {\bf callback}, {\bf L\+M\+S\+\_\+\+T\+E\+S\+T\+\_\+\+F\+A\+IL}, {\bf L\+M\+S\+\_\+\+T\+E\+S\+T\+\_\+\+I\+N\+FO}, {\bf On\+Log\+Event()}, {\bf Perform\+\_\+tests()}, {\bf lime\+::register\+Log\+Handler()}, and {\bf string()}.
+
+
+
+Referenced by {\bf main()}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{d6/d96/classLimeSDRTest_ae7184997dfe7b88c30e4eb1b840b3a37_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=282pt]{d6/d96/classLimeSDRTest_ae7184997dfe7b88c30e4eb1b840b3a37_icgraph}
+\end{center}
+\end{figure}
+
+
+\index{Lime\+S\+D\+R\+Test@{Lime\+S\+D\+R\+Test}!Transfer\+L\+M\+S64C@{Transfer\+L\+M\+S64C}}
+\index{Transfer\+L\+M\+S64C@{Transfer\+L\+M\+S64C}!Lime\+S\+D\+R\+Test@{Lime\+S\+D\+R\+Test}}
+\paragraph[{Transfer\+L\+M\+S64\+C(unsigned char $\ast$packet)}]{\setlength{\rightskip}{0pt plus 5cm}{\bf int} Lime\+S\+D\+R\+Test\+::\+Transfer\+L\+M\+S64C (
+\begin{DoxyParamCaption}
+\item[{unsigned char $\ast$}]{packet}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [private]}}\label{classLimeSDRTest_a3faa39068323aa5689f99b83aace6e47}
+
+
+Definition at line {\bf 91} of file {\bf Lime\+S\+D\+R\+Test.\+cpp}.
+
+
+
+References {\bf device}, {\bf L\+M\+S\+\_\+\+T\+E\+S\+T\+\_\+\+F\+A\+IL}, {\bf stream}, and {\bf string()}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{d6/d96/classLimeSDRTest_a3faa39068323aa5689f99b83aace6e47_cgraph}
+\end{center}
+\end{figure}
+
+
+\index{Lime\+S\+D\+R\+Test@{Lime\+S\+D\+R\+Test}!Update\+Status@{Update\+Status}}
+\index{Update\+Status@{Update\+Status}!Lime\+S\+D\+R\+Test@{Lime\+S\+D\+R\+Test}}
+\paragraph[{Update\+Status(int event, const char $\ast$msg=nullptr)}]{\setlength{\rightskip}{0pt plus 5cm}{\bf void} Lime\+S\+D\+R\+Test\+::\+Update\+Status (
+\begin{DoxyParamCaption}
+\item[{{\bf int}}]{event, }
+\item[{const char $\ast$}]{msg = {\ttfamily nullptr}}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [static]}, {\ttfamily [protected]}}\label{classLimeSDRTest_a926c34517dbdc4f23efcf73168d9fa1f}
+
+
+Definition at line {\bf 36} of file {\bf Lime\+S\+D\+R\+Test.\+cpp}.
+
+
+
+References {\bf callback}.
+
+
+
+Referenced by {\bf Lime\+S\+D\+R\+Test\+\_\+\+U\+S\+B\+::\+A\+D\+F4002\+Test()}, {\bf Lime\+S\+D\+R\+Test\+\_\+\+Mini\+::\+Clock\+Network\+Test()}, {\bf Lime\+S\+D\+R\+Test\+\_\+\+U\+S\+B\+::\+Clock\+Network\+Test()}, {\bf Lime\+S\+D\+R\+Test\+\_\+\+Mini\+::\+R\+F\+Test()}, {\bf Lime\+S\+D\+R\+Test\+\_\+\+U\+S\+B\+::\+R\+F\+Test()}, and {\bf Lime\+S\+D\+R\+Test\+\_\+\+U\+S\+B\+::\+Si5351\+C\+Test()}.
+
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{d6/d96/classLimeSDRTest_a926c34517dbdc4f23efcf73168d9fa1f_icgraph}
+\end{center}
+\end{figure}
+
+
+\index{Lime\+S\+D\+R\+Test@{Lime\+S\+D\+R\+Test}!V\+C\+T\+C\+X\+O\+Test@{V\+C\+T\+C\+X\+O\+Test}}
+\index{V\+C\+T\+C\+X\+O\+Test@{V\+C\+T\+C\+X\+O\+Test}!Lime\+S\+D\+R\+Test@{Lime\+S\+D\+R\+Test}}
+\paragraph[{V\+C\+T\+C\+X\+O\+Test()}]{\setlength{\rightskip}{0pt plus 5cm}{\bf int} Lime\+S\+D\+R\+Test\+::\+V\+C\+T\+C\+X\+O\+Test (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [protected]}}\label{classLimeSDRTest_a368890300401d9d36f7d62c1d710be1a}
+
+
+Definition at line {\bf 240} of file {\bf Lime\+S\+D\+R\+Test.\+cpp}.
+
+
+
+References {\bf device}, {\bf id}, {\bf L\+M\+S\+\_\+\+T\+E\+S\+T\+\_\+\+I\+N\+FO}, {\bf string()}, {\bf units}, and {\bf val}.
+
+
+
+Referenced by {\bf Lime\+S\+D\+R\+Test\+\_\+\+Mini\+::\+Clock\+Network\+Test()}, and {\bf Lime\+S\+D\+R\+Test\+\_\+\+U\+S\+B\+::\+Clock\+Network\+Test()}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{d6/d96/classLimeSDRTest_a368890300401d9d36f7d62c1d710be1a_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{d6/d96/classLimeSDRTest_a368890300401d9d36f7d62c1d710be1a_icgraph}
+\end{center}
+\end{figure}
+
+
+
+
+\subsubsection{Member Data Documentation}
+\index{Lime\+S\+D\+R\+Test@{Lime\+S\+D\+R\+Test}!callback@{callback}}
+\index{callback@{callback}!Lime\+S\+D\+R\+Test@{Lime\+S\+D\+R\+Test}}
+\paragraph[{callback}]{\setlength{\rightskip}{0pt plus 5cm}{\bf Lime\+S\+D\+R\+Test\+::\+Test\+Callback} Lime\+S\+D\+R\+Test\+::callback = nullptr\hspace{0.3cm}{\ttfamily [static]}, {\ttfamily [private]}}\label{classLimeSDRTest_a0e506f404cbb65e07e72e52e00389fcc}
+
+
+Definition at line {\bf 69} of file {\bf Lime\+S\+D\+R\+Test.\+h}.
+
+\index{Lime\+S\+D\+R\+Test@{Lime\+S\+D\+R\+Test}!device@{device}}
+\index{device@{device}!Lime\+S\+D\+R\+Test@{Lime\+S\+D\+R\+Test}}
+\paragraph[{device}]{\setlength{\rightskip}{0pt plus 5cm}{\bf lime\+::\+L\+M\+S7\+\_\+\+Device}$\ast$ Lime\+S\+D\+R\+Test\+::device\hspace{0.3cm}{\ttfamily [protected]}}\label{classLimeSDRTest_a8d44af0f15a1189f5a9d9ba273b9b091}
+
+
+Definition at line {\bf 56} of file {\bf Lime\+S\+D\+R\+Test.\+h}.
+
+\index{Lime\+S\+D\+R\+Test@{Lime\+S\+D\+R\+Test}!running@{running}}
+\index{running@{running}!Lime\+S\+D\+R\+Test@{Lime\+S\+D\+R\+Test}}
+\paragraph[{running}]{\setlength{\rightskip}{0pt plus 5cm}std\+::atomic$<$ bool $>$ Lime\+S\+D\+R\+Test\+::running\hspace{0.3cm}{\ttfamily [static]}, {\ttfamily [private]}}\label{classLimeSDRTest_a1c8617d3dbeae30c5c9696accf50be2f}
+
+
+Definition at line {\bf 73} of file {\bf Lime\+S\+D\+R\+Test.\+h}.
+
+\index{Lime\+S\+D\+R\+Test@{Lime\+S\+D\+R\+Test}!step@{step}}
+\index{step@{step}!Lime\+S\+D\+R\+Test@{Lime\+S\+D\+R\+Test}}
+\paragraph[{step}]{\setlength{\rightskip}{0pt plus 5cm}{\bf int} Lime\+S\+D\+R\+Test\+::step = 0\hspace{0.3cm}{\ttfamily [static]}, {\ttfamily [private]}}\label{classLimeSDRTest_a5a453e59209876b5c195ef6c131e9d73}
+
+
+Definition at line {\bf 68} of file {\bf Lime\+S\+D\+R\+Test.\+h}.
+
+
+
+Referenced by {\bf Soapy\+S\+D\+R.\+Range\+::\+\_\+\+\_\+str\+\_\+\+\_\+()}.
+
+\index{Lime\+S\+D\+R\+Test@{Lime\+S\+D\+R\+Test}!tp\+\_\+start@{tp\+\_\+start}}
+\index{tp\+\_\+start@{tp\+\_\+start}!Lime\+S\+D\+R\+Test@{Lime\+S\+D\+R\+Test}}
+\paragraph[{tp\+\_\+start}]{\setlength{\rightskip}{0pt plus 5cm}std\+::chrono\+::steady\+\_\+clock\+::time\+\_\+point Lime\+S\+D\+R\+Test\+::tp\+\_\+start\hspace{0.3cm}{\ttfamily [static]}, {\ttfamily [private]}}\label{classLimeSDRTest_ab19521d0982bfc60199e5f7f48693a3c}
+
+
+Definition at line {\bf 74} of file {\bf Lime\+S\+D\+R\+Test.\+h}.
+
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+/home/erik/prefix/default/src/limesuite-\/dev/\+Quick\+Test/{\bf Lime\+S\+D\+R\+Test.\+h}\item 
+/home/erik/prefix/default/src/limesuite-\/dev/\+Quick\+Test/{\bf Lime\+S\+D\+R\+Test.\+cpp}\end{DoxyCompactItemize}

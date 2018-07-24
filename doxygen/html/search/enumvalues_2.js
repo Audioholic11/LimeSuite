@@ -77,5 +77,6 @@ var searchData=
   ['configuration_5foptional_5ffeature_5fsupport_5fenable_5ffifo_5fin_5fsuspend',['CONFIGURATION_OPTIONAL_FEATURE_SUPPORT_ENABLE_FIFO_IN_SUSPEND',['../da/dca/FTD3XX_8h.html#ad593a2a2220706fd9b88100d54fb9842a3eca3815a5220a3960e3122db0d25e60',1,'FTD3XX.h']]],
   ['connection_5ftypes_5fcount',['CONNECTION_TYPES_COUNT',['../de/d46/classlime_1_1LMS64CProtocol.html#ad5fb599a04aa53bb2bf295c6b272f5aba5fbc4eee41035b004634c1c333dc30c4',1,'lime::LMS64CProtocol']]],
   ['connection_5fundefined',['CONNECTION_UNDEFINED',['../de/d46/classlime_1_1LMS64CProtocol.html#ad5fb599a04aa53bb2bf295c6b272f5ababfd19dd112036be0c744b26313964b17',1,'lime::LMS64CProtocol']]],
-  ['current',['CURRENT',['../d5/d6c/namespacelime.html#a328d4103048fe1b747432e38973f5b3cab2d98a753b400a9eb6b136a8744b118b',1,'lime']]]
+  ['current',['CURRENT',['../d5/d6c/namespacelime.html#a328d4103048fe1b747432e38973f5b3cab2d98a753b400a9eb6b136a8744b118b',1,'lime']]],
+  ['custom',['CUSTOM',['../dc/daf/classSoapySDR_1_1ConverterRegistry.html#a93a150b8e96ffd99ff6fa3da63e1c75da8b91af0b17d0ab8960829605e5fdd9e1',1,'SoapySDR::ConverterRegistry']]]
 ];

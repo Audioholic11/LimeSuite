@@ -1,0 +1,143 @@
+\subsection{Converter\+Primatives.\+hpp}
+\label{ConverterPrimatives_8hpp_source}\index{/home/erik/prefix/default/src/soapysdr/include/\+Soapy\+S\+D\+R/\+Converter\+Primatives.\+hpp@{/home/erik/prefix/default/src/soapysdr/include/\+Soapy\+S\+D\+R/\+Converter\+Primatives.\+hpp}}
+
+\begin{DoxyCode}
+00001 
+00011 \textcolor{preprocessor}{#pragma once}
+00012 \textcolor{preprocessor}{#include <stdint.h>}
+00013 
+00014 \textcolor{keyword}{namespace }SoapySDR
+00015 \{
+00016   
+00017 \textcolor{keyword}{const} uint32\_t U32_ZERO_OFFSET = uint32\_t(1<<31);
+00018 \textcolor{keyword}{const} uint16\_t U16_ZERO_OFFSET = uint16\_t(1<<15);
+00019 \textcolor{keyword}{const} uint8\_t   U8_ZERO_OFFSET =  uint8\_t(1<<7);
+00020 
+00021 \textcolor{keyword}{const} uint32\_t S32_FULL_SCALE = (U32\_ZERO\_OFFSET-1);
+00022 \textcolor{keyword}{const} uint16\_t S16_FULL_SCALE = (U16\_ZERO\_OFFSET-1);
+00023 \textcolor{keyword}{const} uint8\_t   S8_FULL_SCALE =  (U8\_ZERO\_OFFSET-1);
+00024   
+00031 \textcolor{comment}{// type conversion: float <> signed integers}
+00032 
+00033 \textcolor{keyword}{inline} int32\_t F32toS32(\textcolor{keywordtype}{float} from)\{
+00034   \textcolor{keywordflow}{return} int32\_t(from * S32\_FULL\_SCALE);
+00035 \}
+00036 \textcolor{keyword}{inline} \textcolor{keywordtype}{float} S32toF32(int32\_t from)\{
+00037   \textcolor{keywordflow}{return} float(from) / S32_FULL_SCALE;
+00038 \}
+00039 
+00040 \textcolor{keyword}{inline} int16\_t F32toS16(\textcolor{keywordtype}{float} from)\{
+00041   \textcolor{keywordflow}{return} int16\_t(from * S16\_FULL\_SCALE);
+00042 \}
+00043 \textcolor{keyword}{inline} \textcolor{keywordtype}{float} S16toF32(int16\_t from)\{
+00044   \textcolor{keywordflow}{return} float(from) / S16_FULL_SCALE;
+00045 \}
+00046 
+00047 \textcolor{keyword}{inline} int8\_t F32toS8(\textcolor{keywordtype}{float} from)\{
+00048   \textcolor{keywordflow}{return} int8\_t(from * S8\_FULL\_SCALE);
+00049 \}
+00050 \textcolor{keyword}{inline} \textcolor{keywordtype}{float} S8toF32(int8\_t from)\{
+00051   \textcolor{keywordflow}{return} float(from) / S8_FULL_SCALE;
+00052 \}
+00053 
+00054 
+00055 \textcolor{comment}{// type conversion: offset binary <> two's complement (signed) integers}
+00056 
+00057 \textcolor{keyword}{inline} int32\_t U32toS32(uint32\_t from)\{
+00058   \textcolor{keywordflow}{return} int32\_t(from - U32\_ZERO\_OFFSET);
+00059 \}
+00060 
+00061 \textcolor{keyword}{inline} uint32\_t S32toU32(int32\_t from)\{
+00062   \textcolor{keywordflow}{return} uint32\_t(from) + U32_ZERO_OFFSET;
+00063 \}
+00064 
+00065 \textcolor{keyword}{inline} int16\_t U16toS16(uint16\_t from)\{
+00066   \textcolor{keywordflow}{return} int16\_t(from - U16\_ZERO\_OFFSET);
+00067 \}
+00068 
+00069 \textcolor{keyword}{inline} uint16\_t S16toU16(int16\_t from)\{
+00070   \textcolor{keywordflow}{return} uint16\_t(from) + U16_ZERO_OFFSET;
+00071 \}
+00072 
+00073 \textcolor{keyword}{inline} int8\_t U8toS8(uint8\_t from)\{
+00074   \textcolor{keywordflow}{return} int8\_t(from - U8\_ZERO\_OFFSET);
+00075 \}
+00076 
+00077 \textcolor{keyword}{inline} uint8\_t S8toU8(int8\_t from)\{
+00078   \textcolor{keywordflow}{return} uint8\_t(from) + U8_ZERO_OFFSET;
+00079 \}
+00080 
+00081 \textcolor{comment}{// size conversion: signed <> signed}
+00082 
+00083 \textcolor{keyword}{inline} int16\_t S32toS16(int32\_t from)\{
+00084   \textcolor{keywordflow}{return} int16\_t(from >> 16);
+00085 \}
+00086 \textcolor{keyword}{inline} int32\_t S16toS32(int16\_t from)\{
+00087   \textcolor{keywordflow}{return} int32\_t(from << 16);
+00088 \}
+00089 
+00090 \textcolor{keyword}{inline} int8\_t S16toS8(int16\_t from)\{
+00091   \textcolor{keywordflow}{return} int8\_t(from >> 8);
+00092 \}
+00093 \textcolor{keyword}{inline} int16\_t S8toS16(int8\_t from)\{
+00094   \textcolor{keywordflow}{return} int16\_t(from << 8);
+00095 \}
+00096 
+00097 \textcolor{comment}{// compound conversions}
+00098 
+00099 \textcolor{comment}{// float <> unsigned (type and size)}
+00100 
+00101 \textcolor{keyword}{inline} uint32\_t F32toU32(\textcolor{keywordtype}{float} from)\{
+00102   \textcolor{keywordflow}{return} S32toU32(F32toS32(from));
+00103 \}
+00104 \textcolor{keyword}{inline} \textcolor{keywordtype}{float} U32toF32(uint32\_t from)\{
+00105   \textcolor{keywordflow}{return} S32toF32(U32toS32(from));
+00106 \}
+00107 
+00108 \textcolor{keyword}{inline} uint16\_t F32toU16(\textcolor{keywordtype}{float} from)\{
+00109   \textcolor{keywordflow}{return} S16toU16(F32toS16(from));
+00110 \}
+00111 \textcolor{keyword}{inline} \textcolor{keywordtype}{float} U16toF32(uint16\_t from)\{
+00112   \textcolor{keywordflow}{return} S16toF32(U16toS16(from));
+00113 \}
+00114 
+00115 \textcolor{keyword}{inline} uint8\_t F32toU8(\textcolor{keywordtype}{float} from)\{
+00116   \textcolor{keywordflow}{return} S8toU8(F32toS8(from));
+00117 \}
+00118 \textcolor{keyword}{inline} \textcolor{keywordtype}{float} U8toF32(uint8\_t from)\{
+00119   \textcolor{keywordflow}{return} S8toF32(U8toS8(from));
+00120 \}
+00121 
+00122 \textcolor{comment}{// signed <> unsigned (type and size)}
+00123 
+00124 \textcolor{keyword}{inline} uint16\_t S32toU16(int32\_t from)\{
+00125   \textcolor{keywordflow}{return} S16toU16(S32toS16(from));
+00126 \}
+00127 \textcolor{keyword}{inline} int32\_t U16toS32(uint16\_t from)\{
+00128   \textcolor{keywordflow}{return} S16toS32(U16toS16(from));
+00129 \}
+00130 
+00131 \textcolor{keyword}{inline} uint8\_t S32toU8(int32\_t from)\{
+00132   \textcolor{keywordflow}{return} S8toU8(S16toS8(S32toS16(from)));
+00133 \}
+00134 \textcolor{keyword}{inline} int32\_t U8toS32(uint8\_t from)\{
+00135   \textcolor{keywordflow}{return} S16toS32(S8toS16(U8toS8(from)));
+00136 \}
+00137 
+00138 \textcolor{keyword}{inline} uint8\_t S16toU8(int16\_t from)\{
+00139   \textcolor{keywordflow}{return} S8toU8(S16toS8(from));
+00140 \}
+00141 \textcolor{keyword}{inline} int16\_t U8toS16(uint8\_t from)\{
+00142   \textcolor{keywordflow}{return} S8toS16(U8toS8(from));
+00143 \}
+00144 
+00145 \textcolor{keyword}{inline} uint16\_t S8toU16(int8\_t from)\{
+00146   \textcolor{keywordflow}{return} S16toU16(S8toS16(from));
+00147 \}
+00148 \textcolor{keyword}{inline} int8\_t U16toS8(uint16\_t from)\{
+00149   \textcolor{keywordflow}{return} S16toS8(U16toS16(from));
+00150 \}
+00151 
+00152 
+00153 \}
+\end{DoxyCode}

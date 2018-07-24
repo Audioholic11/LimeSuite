@@ -1,0 +1,112 @@
+\subsection{static\+\_\+target\+\_\+simulator\+\_\+cc\+\_\+impl.\+h}
+\label{static__target__simulator__cc__impl_8h_source}\index{/home/erik/prefix/default/src/gr-\/radar-\/dev/lib/static\+\_\+target\+\_\+simulator\+\_\+cc\+\_\+impl.\+h@{/home/erik/prefix/default/src/gr-\/radar-\/dev/lib/static\+\_\+target\+\_\+simulator\+\_\+cc\+\_\+impl.\+h}}
+
+\begin{DoxyCode}
+00001 \textcolor{comment}{/* -*- c++ -*- */}
+00002 \textcolor{comment}{/*}
+00003 \textcolor{comment}{ * Copyright 2014 Communications Engineering Lab, KIT.}
+00004 \textcolor{comment}{ *}
+00005 \textcolor{comment}{ * This is free software; you can redistribute it and/or modify}
+00006 \textcolor{comment}{ * it under the terms of the GNU General Public License as published by}
+00007 \textcolor{comment}{ * the Free Software Foundation; either version 3, or (at your option)}
+00008 \textcolor{comment}{ * any later version.}
+00009 \textcolor{comment}{ *}
+00010 \textcolor{comment}{ * This software is distributed in the hope that it will be useful,}
+00011 \textcolor{comment}{ * but WITHOUT ANY WARRANTY; without even the implied warranty of}
+00012 \textcolor{comment}{ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the}
+00013 \textcolor{comment}{ * GNU General Public License for more details.}
+00014 \textcolor{comment}{ *}
+00015 \textcolor{comment}{ * You should have received a copy of the GNU General Public License}
+00016 \textcolor{comment}{ * along with this software; see the file COPYING.  If not, write to}
+00017 \textcolor{comment}{ * the Free Software Foundation, Inc., 51 Franklin Street,}
+00018 \textcolor{comment}{ * Boston, MA 02110-1301, USA.}
+00019 \textcolor{comment}{ */}
+00020 
+00021 \textcolor{preprocessor}{#ifndef INCLUDED\_RADAR\_STATIC\_TARGET\_SIMULATOR\_CC\_IMPL\_H}
+00022 \textcolor{preprocessor}{#define INCLUDED\_RADAR\_STATIC\_TARGET\_SIMULATOR\_CC\_IMPL\_H}
+00023 
+00024 \textcolor{preprocessor}{#include <radar/static_target_simulator_cc.h>}
+00025 \textcolor{preprocessor}{#include <fftw3.h>}
+00026 
+00027 \textcolor{keyword}{namespace }gr \{
+00028   \textcolor{keyword}{namespace }radar \{
+00029 
+00030     \textcolor{keyword}{class }static_target_simulator_cc_impl : \textcolor{keyword}{public} static_target_simulator_cc
+00031     \{
+00032      \textcolor{keyword}{private}:
+00033       \textcolor{comment}{// Nothing to declare in this block.}
+00034 
+00035      \textcolor{keyword}{protected}:
+00036       \textcolor{keywordtype}{int} calculate_output_stream_length(\textcolor{keyword}{const} gr\_vector\_int &ninput\_items);
+00037 
+00038      \textcolor{keyword}{public}:
+00039       static_target_simulator_cc_impl(
+00040           std::vector<float> range,
+00041           std::vector<float> velocity,
+00042           std::vector<float> rcs,
+00043           std::vector<float> azimuth,
+00044           std::vector<float> position\_rx,
+00045           \textcolor{keywordtype}{int} samp_rate,
+00046           \textcolor{keywordtype}{float} center_freq,
+00047           \textcolor{keywordtype}{float} self\_coupling\_db,
+00048           \textcolor{keywordtype}{bool} rndm\_phaseshift,
+00049           \textcolor{keywordtype}{bool} self\_coupling,
+00050           \textcolor{keyword}{const} std::string& len\_key
+00051       );
+00052       ~static_target_simulator_cc_impl();
+00053 
+00054       \textcolor{keywordtype}{void} setup_targets(
+00055           std::vector<float> range,
+00056           std::vector<float> velocity,
+00057           std::vector<float> rcs,
+00058           std::vector<float> azimuth,
+00059           std::vector<float> position\_rx,
+00060           \textcolor{keywordtype}{int} samp\_rate,
+00061           \textcolor{keywordtype}{float} center\_freq,
+00062           \textcolor{keywordtype}{float} self\_coupling\_db,
+00063           \textcolor{keywordtype}{bool} rndm\_phaseshift,
+00064           \textcolor{keywordtype}{bool} self\_coupling
+00065       );
+00066 
+00067       std::vector<float> d_range, d_velocity, d_rcs, d_azimuth, d_position_rx;
+00068       \textcolor{keywordtype}{int} d_samp_rate;
+00069       \textcolor{keywordtype}{float} d_center_freq;
+00070       \textcolor{keywordtype}{int} d_hold_noutput;
+00071       \textcolor{keywordtype}{bool} d_rndm_phaseshift;
+00072 
+00073       \textcolor{keywordtype}{bool} d_self_coupling;
+00074       \textcolor{keywordtype}{float} d_self_coupling_db;
+00075 
+00076       \textcolor{keywordtype}{int} d_num_targets;
+00077       std::vector<float> d_freq;
+00078       std::vector<float> d_doppler, d_scale_ampl, d_timeshift;
+00079       std::vector<std::vector<float> > d_timeshift_azimuth;
+00080       gr\_complex d_phase_doppler, d_phase_time, d_phase_random;
+00081       std::vector<gr\_complex> d_hold_in;
+00082 
+00083       fftwf\_plan d_fft_plan, d_ifft_plan;
+00084       std::vector<gr\_complex> d_in_fft;
+00085       std::vector<std::vector<gr\_complex> > d_filt_doppler, d_filt_phase, 
+      d_filt_self_coupling;
+00086       std::vector<std::vector<gr\_complex> > d_filt_time;
+00087       std::vector<std::vector<std::vector<gr\_complex> > > d_filt_time_azimuth;
+00088 
+00089       pmt::pmt\_t d_key, d_val, d_srcid;
+00090       uint64\_t d_time_sec;
+00091       \textcolor{keywordtype}{double} d_time_frac_sec;
+00092 
+00093       constexpr \textcolor{keyword}{static} \textcolor{keywordtype}{float} c_light = 3e8;
+00094 
+00095       \textcolor{comment}{// Where all the action really happens}
+00096       \textcolor{keywordtype}{int} work(\textcolor{keywordtype}{int} noutput\_items,
+00097               gr\_vector\_int &ninput\_items,
+00098               gr\_vector\_const\_void\_star &input\_items,
+00099               gr\_vector\_void\_star &output\_items);
+00100     \};
+00101 
+00102   \} \textcolor{comment}{// namespace radar}
+00103 \} \textcolor{comment}{// namespace gr}
+00104 
+00105 \textcolor{preprocessor}{#endif }\textcolor{comment}{/* INCLUDED\_RADAR\_STATIC\_TARGET\_SIMULATOR\_CC\_IMPL\_H */}\textcolor{preprocessor}{}
+00106 
+\end{DoxyCode}

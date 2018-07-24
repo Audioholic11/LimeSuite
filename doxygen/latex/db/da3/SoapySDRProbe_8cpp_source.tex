@@ -1,0 +1,287 @@
+\subsection{Soapy\+S\+D\+R\+Probe.\+cpp}
+\label{SoapySDRProbe_8cpp_source}\index{/home/erik/prefix/default/src/soapysdr/apps/\+Soapy\+S\+D\+R\+Probe.\+cpp@{/home/erik/prefix/default/src/soapysdr/apps/\+Soapy\+S\+D\+R\+Probe.\+cpp}}
+
+\begin{DoxyCode}
+00001 \textcolor{comment}{// Copyright (c) 2015-2017 Josh Blum}
+00002 \textcolor{comment}{// Copyright (c) 2016-2016 Bastille Networks}
+00003 \textcolor{comment}{// SPDX-License-Identifier: BSL-1.0}
+00004 
+00005 \textcolor{preprocessor}{#include <SoapySDR/Device.hpp>}
+00006 \textcolor{preprocessor}{#include <sstream>}
+00007 
+00008 \textcolor{keyword}{template} <\textcolor{keyword}{typename} Type>
+00009 std::string toString(\textcolor{keyword}{const} std::vector<Type> &options)
+00010 \{
+00011     std::stringstream ss;
+00012     \textcolor{keywordflow}{if} (options.empty()) \textcolor{keywordflow}{return} \textcolor{stringliteral}{""};
+00013     \textcolor{keywordflow}{for} (\textcolor{keywordtype}{size\_t} i = 0; i < options.size(); i++)
+00014     \{
+00015         \textcolor{keywordflow}{if} (not ss.str().empty()) ss << \textcolor{stringliteral}{", "};
+00016         ss << options[i];
+00017     \}
+00018     \textcolor{keywordflow}{return} ss.str();
+00019 \}
+00020 
+00021 std::string toString(\textcolor{keyword}{const} SoapySDR::Range &range)
+00022 \{
+00023     std::stringstream ss;
+00024     ss << \textcolor{stringliteral}{"["} << range.minimum() << \textcolor{stringliteral}{", "} << range.maximum();
+00025     \textcolor{keywordflow}{if} (range.step() != 0.0) ss << \textcolor{stringliteral}{", "} << range.step();
+00026     ss << \textcolor{stringliteral}{"]"};
+00027     \textcolor{keywordflow}{return} ss.str();
+00028 \}
+00029 
+00030 std::string toString(\textcolor{keyword}{const} SoapySDR::RangeList &range, \textcolor{keyword}{const} \textcolor{keywordtype}{double} scale)
+00031 \{
+00032     \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} MAXRLEN = 10; \textcolor{comment}{//for abbreviating long lists}
+00033     std::stringstream ss;
+00034     \textcolor{keywordflow}{for} (\textcolor{keywordtype}{size\_t} i = 0; i < range.size(); i++)
+00035     \{
+00036         \textcolor{keywordflow}{if} (range.size() >= MAXRLEN and i >= MAXRLEN/2 and i < (range.size()-MAXRLEN/2))
+00037         \{
+00038             \textcolor{keywordflow}{if} (i == MAXRLEN) ss << \textcolor{stringliteral}{", ..."};
+00039             \textcolor{keywordflow}{continue};
+00040         \}
+00041         \textcolor{keywordflow}{if} (not ss.str().empty()) ss << \textcolor{stringliteral}{", "};
+00042         \textcolor{keywordflow}{if} (range[i].minimum() == range[i].maximum()) ss << (range[i].minimum()/scale);
+00043         \textcolor{keywordflow}{else} ss << \textcolor{stringliteral}{"["} << (range[i].minimum()/scale) << \textcolor{stringliteral}{", "} << (range[i].maximum()/scale) << \textcolor{stringliteral}{"]"};
+00044     \}
+00045     \textcolor{keywordflow}{return} ss.str();
+00046 \}
+00047 
+00048 std::string toString(\textcolor{keyword}{const} std::vector<double> &nums, \textcolor{keyword}{const} \textcolor{keywordtype}{double} scale)
+00049 \{
+00050     std::stringstream ss;
+00051 
+00052     \textcolor{keywordflow}{if} (nums.size() > 3)
+00053     \{
+00054         ss << \textcolor{stringliteral}{"["} << (nums.front()/scale) << \textcolor{stringliteral}{", "} << (nums.back()/scale) << \textcolor{stringliteral}{"]"};
+00055         \textcolor{keywordflow}{return} ss.str();
+00056     \}
+00057 
+00058     \textcolor{keywordflow}{for} (\textcolor{keywordtype}{size\_t} i = 0; i < nums.size(); i++)
+00059     \{
+00060         \textcolor{keywordflow}{if} (not ss.str().empty()) ss << \textcolor{stringliteral}{", "};
+00061         ss << (nums[i]/scale);
+00062     \}
+00063     \textcolor{keywordflow}{return} \textcolor{stringliteral}{"["} + ss.str() + \textcolor{stringliteral}{"]"};
+00064 \}
+00065 
+00066 std::string toString(\textcolor{keyword}{const} SoapySDR::ArgInfo &argInfo, \textcolor{keyword}{const} std::string indent = \textcolor{stringliteral}{"    "})
+00067 \{
+00068     std::stringstream ss;
+00069 
+00070     \textcolor{comment}{//name, or use key if missing}
+00071     std::string name = argInfo.name;
+00072     \textcolor{keywordflow}{if} (argInfo.name.empty()) name = argInfo.key;
+00073     ss << indent << \textcolor{stringliteral}{" * "} << name;
+00074 
+00075     \textcolor{comment}{//optional description}
+00076     std::string desc = argInfo.description;
+00077     \textcolor{keyword}{const} std::string replace(\textcolor{stringliteral}{"\(\backslash\)n"}+indent+\textcolor{stringliteral}{"   "});
+00078     \textcolor{keywordflow}{for} (\textcolor{keywordtype}{size\_t} pos = 0; (pos=desc.find(\textcolor{stringliteral}{"\(\backslash\)n"}, pos)) != std::string::npos; pos+=replace.size())
+00079     \{
+00080         desc.replace(pos, 1, replace);
+00081     \}
+00082     \textcolor{keywordflow}{if} (not desc.empty()) ss << \textcolor{stringliteral}{" - "} << desc << std::endl << indent << \textcolor{stringliteral}{"  "};
+00083 
+00084     \textcolor{comment}{//other fields}
+00085     ss << \textcolor{stringliteral}{" [key="} << argInfo.key;
+00086     \textcolor{keywordflow}{if} (not argInfo.units.empty()) ss << \textcolor{stringliteral}{", units="} << argInfo.units;
+00087     if (not argInfo.value.empty()) ss << \textcolor{stringliteral}{", default="} << argInfo.value;
+00088 
+00089     \textcolor{comment}{//type}
+00090     switch (argInfo.type)
+00091     \{
+00092     \textcolor{keywordflow}{case} SoapySDR::ArgInfo::BOOL: ss << \textcolor{stringliteral}{", type=bool"}; \textcolor{keywordflow}{break};
+00093     \textcolor{keywordflow}{case} SoapySDR::ArgInfo::INT: ss << \textcolor{stringliteral}{", type=int"}; \textcolor{keywordflow}{break};
+00094     \textcolor{keywordflow}{case} SoapySDR::ArgInfo::FLOAT: ss << \textcolor{stringliteral}{", type=float"}; \textcolor{keywordflow}{break};
+00095     \textcolor{keywordflow}{case} SoapySDR::ArgInfo::STRING: ss << \textcolor{stringliteral}{", type=string"}; \textcolor{keywordflow}{break};
+00096     \}
+00097 
+00098     \textcolor{comment}{//optional range/enumeration}
+00099     \textcolor{keywordflow}{if} (argInfo.range.minimum() < argInfo.range.maximum()) ss << \textcolor{stringliteral}{", range="} << 
+      toString(argInfo.range);
+00100     \textcolor{keywordflow}{if} (not argInfo.options.empty()) ss << \textcolor{stringliteral}{", options=("} << toString(argInfo.
+      options) << \textcolor{stringliteral}{")"};
+00101 
+00102     ss << \textcolor{stringliteral}{"]"};
+00103 
+00104     \textcolor{keywordflow}{return} ss.str();
+00105 \}
+00106 
+00107 std::string toString(\textcolor{keyword}{const} SoapySDR::ArgInfoList &argInfos)
+00108 \{
+00109     std::stringstream ss;
+00110 
+00111     \textcolor{keywordflow}{for} (\textcolor{keywordtype}{size\_t} i = 0; i < argInfos.size(); i++)
+00112     \{
+00113         ss << toString(argInfos[i]) << std::endl;
+00114     \}
+00115 
+00116     \textcolor{keywordflow}{return} ss.str();
+00117 \}
+00118 
+00119 \textcolor{keyword}{static} std::string probeChannel(SoapySDR::Device *device, \textcolor{keyword}{const} \textcolor{keywordtype}{int} dir, \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} 
+      chan)
+00120 \{
+00121     std::stringstream ss;
+00122 
+00123     std::string dirName = (dir==SOAPY_SDR_TX)?\textcolor{stringliteral}{"TX"}:\textcolor{stringliteral}{"RX"};
+00124     ss << std::endl;
+00125     ss << \textcolor{stringliteral}{"----------------------------------------------------"} << std::endl;
+00126     ss << \textcolor{stringliteral}{"-- "} << dirName << \textcolor{stringliteral}{" Channel "} << chan << std::endl;
+00127     ss << \textcolor{stringliteral}{"----------------------------------------------------"} << std::endl;
+00128 
+00129     \textcolor{comment}{// info}
+00130     \textcolor{keyword}{const} \textcolor{keyword}{auto} info = device->getChannelInfo(dir, chan);
+00131     \textcolor{keywordflow}{if} (info.size() > 0)
+00132     \{
+00133         ss << \textcolor{stringliteral}{"  Channel Information:"} << std::endl;
+00134         \textcolor{keywordflow}{for} (\textcolor{keyword}{const} \textcolor{keyword}{auto} &it : info)
+00135         \{
+00136             ss << \textcolor{stringliteral}{"    "} << it.first << \textcolor{stringliteral}{"="} << it.second << std::endl;
+00137         \}
+00138     \}
+00139 
+00140     ss << \textcolor{stringliteral}{"  Full-duplex: "} << (device->getFullDuplex(dir, chan)?\textcolor{stringliteral}{"YES"}:\textcolor{stringliteral}{"NO"}) << std::endl;
+00141     ss << \textcolor{stringliteral}{"  Supports AGC: "} << (device->hasGainMode(dir, chan)?\textcolor{stringliteral}{"YES"}:\textcolor{stringliteral}{"NO"}) << std::endl;
+00142 
+00143     \textcolor{comment}{//formats}
+00144     std::string formats = toString(device->getStreamFormats(dir, chan));
+00145     \textcolor{keywordflow}{if} (not formats.empty()) ss << \textcolor{stringliteral}{"  Stream formats: "} << formats << std::endl;
+00146 
+00147     \textcolor{comment}{//native}
+00148     \textcolor{keywordtype}{double} fullScale = 0.0;
+00149     std::string native = device->getNativeStreamFormat(dir, chan, fullScale);
+00150     ss << \textcolor{stringliteral}{"  Native format: "} << native << \textcolor{stringliteral}{" [full-scale="} << fullScale << \textcolor{stringliteral}{"]"} << std::endl;    
+00151 
+00152     \textcolor{comment}{//stream args}
+00153     std::string streamArgs = toString(device->getStreamArgsInfo(dir, chan));
+00154     \textcolor{keywordflow}{if} (not streamArgs.empty()) ss << \textcolor{stringliteral}{"  Stream args:"} << std::endl << streamArgs;
+00155 
+00156     \textcolor{comment}{//antennas}
+00157     std::string antennas = toString(device->listAntennas(dir, chan));
+00158     \textcolor{keywordflow}{if} (not antennas.empty()) ss << \textcolor{stringliteral}{"  Antennas: "} << antennas << std::endl;
+00159 
+00160     \textcolor{comment}{//corrections}
+00161     std::vector<std::string> correctionsList;
+00162     \textcolor{keywordflow}{if} (device->hasDCOffsetMode(dir, chan)) correctionsList.push\_back(\textcolor{stringliteral}{"DC removal"});
+00163     \textcolor{keywordflow}{if} (device->hasDCOffset(dir, chan)) correctionsList.push\_back(\textcolor{stringliteral}{"DC offset"});
+00164     \textcolor{keywordflow}{if} (device->hasIQBalance(dir, chan)) correctionsList.push\_back(\textcolor{stringliteral}{"IQ balance"});
+00165     std::string corrections = toString(correctionsList);
+00166     \textcolor{keywordflow}{if} (not corrections.empty()) ss << \textcolor{stringliteral}{"  Corrections: "} << corrections << std::endl;
+00167 
+00168     \textcolor{comment}{//gains}
+00169     ss << \textcolor{stringliteral}{"  Full gain range: "} << toString(device->getGainRange(dir, chan)) << \textcolor{stringliteral}{" dB"} << std::endl;
+00170     std::vector<std::string> gainsList = device->listGains(dir, chan);
+00171     \textcolor{keywordflow}{for} (\textcolor{keywordtype}{size\_t} i = 0; i < gainsList.size(); i++)
+00172     \{
+00173         \textcolor{keyword}{const} std::string name = gainsList[i];
+00174         ss << \textcolor{stringliteral}{"    "} << name << \textcolor{stringliteral}{" gain range: "} << toString(device->getGainRange(dir, chan, name)) << \textcolor{stringliteral}{" dB"}
+       << std::endl;
+00175     \}
+00176 
+00177     \textcolor{comment}{//frequencies}
+00178     ss << \textcolor{stringliteral}{"  Full freq range: "} << toString(device->getFrequencyRange(dir, chan), 1e6) << \textcolor{stringliteral}{" MHz"} << 
+      std::endl;
+00179     std::vector<std::string> freqsList = device->listFrequencies(dir, chan);
+00180     \textcolor{keywordflow}{for} (\textcolor{keywordtype}{size\_t} i = 0; i < freqsList.size(); i++)
+00181     \{
+00182         \textcolor{keyword}{const} std::string name = freqsList[i];
+00183         ss << \textcolor{stringliteral}{"    "} << name << \textcolor{stringliteral}{" freq range: "} << toString(device->
+      getFrequencyRange(dir, chan, name), 1e6) << \textcolor{stringliteral}{" MHz"} << std::endl;
+00184     \}
+00185 
+00186     \textcolor{comment}{//freq args}
+00187     std::string freqArgs = toString(device->getFrequencyArgsInfo(dir, chan));
+00188     \textcolor{keywordflow}{if} (not freqArgs.empty()) ss << \textcolor{stringliteral}{"  Tune args:"} << std::endl << freqArgs;
+00189 
+00190     \textcolor{comment}{//rates}
+00191     ss << \textcolor{stringliteral}{"  Sample rates: "} << toString(device->getSampleRateRange(dir, chan), 1e6) << \textcolor{stringliteral}{" MSps"} << 
+      std::endl;
+00192 
+00193     \textcolor{comment}{//bandwidths}
+00194     \textcolor{keyword}{const} \textcolor{keyword}{auto} bws = device->getBandwidthRange(dir, chan);
+00195     \textcolor{keywordflow}{if} (not bws.empty()) ss << \textcolor{stringliteral}{"  Filter bandwidths: "} << toString(bws, 1e6) << \textcolor{stringliteral}{" MHz"} << std::endl;
+00196 
+00197     \textcolor{comment}{//sensors}
+00198     std::string sensors = toString(device->listSensors(dir, chan));
+00199     \textcolor{keywordflow}{if} (not sensors.empty()) ss << \textcolor{stringliteral}{"  Sensors: "} << sensors << std::endl;
+00200 
+00201     \textcolor{comment}{//settings}
+00202     std::string settings = toString(device->getSettingInfo(dir, chan));
+00203     \textcolor{keywordflow}{if} (not settings.empty()) ss << \textcolor{stringliteral}{"  Other Settings:"} << std::endl << settings;
+00204 
+00205     \textcolor{keywordflow}{return} ss.str();
+00206 \}
+00207 
+00208 std::string SoapySDRDeviceProbe(SoapySDR::Device *device)
+00209 \{
+00210     std::stringstream ss;
+00211 
+00212     \textcolor{comment}{/*******************************************************************}
+00213 \textcolor{comment}{     * Identification info}
+00214 \textcolor{comment}{     ******************************************************************/}
+00215     ss << std::endl;
+00216     ss << \textcolor{stringliteral}{"----------------------------------------------------"} << std::endl;
+00217     ss << \textcolor{stringliteral}{"-- Device identification"} << std::endl;
+00218     ss << \textcolor{stringliteral}{"----------------------------------------------------"} << std::endl;
+00219 
+00220     ss << \textcolor{stringliteral}{"  driver="} << device->getDriverKey() << std::endl;
+00221     ss << \textcolor{stringliteral}{"  hardware="} << device->getHardwareKey() << std::endl;
+00222     \textcolor{keywordflow}{for} (\textcolor{keyword}{const} \textcolor{keyword}{auto} &it : device->getHardwareInfo())
+00223     \{
+00224         ss << \textcolor{stringliteral}{"  "} << it.first << \textcolor{stringliteral}{"="} << it.second << std::endl;
+00225     \}
+00226 
+00227     \textcolor{comment}{/*******************************************************************}
+00228 \textcolor{comment}{     * Available peripherals}
+00229 \textcolor{comment}{     ******************************************************************/}
+00230     ss << std::endl;
+00231     ss << \textcolor{stringliteral}{"----------------------------------------------------"} << std::endl;
+00232     ss << \textcolor{stringliteral}{"-- Peripheral summary"} << std::endl;
+00233     ss << \textcolor{stringliteral}{"----------------------------------------------------"} << std::endl;
+00234 
+00235     \textcolor{keywordtype}{size\_t} numRxChans = device->getNumChannels(SOAPY_SDR_RX);
+00236     \textcolor{keywordtype}{size\_t} numTxChans = device->getNumChannels(SOAPY_SDR_TX);
+00237     ss << \textcolor{stringliteral}{"  Channels: "} << numRxChans << \textcolor{stringliteral}{" Rx, "} << numTxChans << \textcolor{stringliteral}{" Tx"} << std::endl;
+00238 
+00239     ss << \textcolor{stringliteral}{"  Timestamps: "} << (device->hasHardwareTime()?\textcolor{stringliteral}{"YES"}:\textcolor{stringliteral}{"NO"}) << std::endl;
+00240 
+00241     std::string clockSources = toString(device->listClockSources());
+00242     \textcolor{keywordflow}{if} (not clockSources.empty()) ss << \textcolor{stringliteral}{"  Clock sources: "} << clockSources << std::endl;
+00243 
+00244     std::string timeSources = toString(device->listTimeSources());
+00245     \textcolor{keywordflow}{if} (not timeSources.empty()) ss << \textcolor{stringliteral}{"  Time sources: "} << timeSources << std::endl;
+00246 
+00247     std::string sensors = toString(device->listSensors());
+00248     \textcolor{keywordflow}{if} (not sensors.empty()) ss << \textcolor{stringliteral}{"  Sensors: "} << sensors << std::endl;
+00249 
+00250     std::string registers = toString(device->listRegisterInterfaces());
+00251     \textcolor{keywordflow}{if} (not registers.empty()) ss << \textcolor{stringliteral}{"  Registers: "} << registers << std::endl;
+00252 
+00253     std::string settings = toString(device->getSettingInfo());
+00254     \textcolor{keywordflow}{if} (not settings.empty()) ss << \textcolor{stringliteral}{"  Other Settings:"} << std::endl << settings;
+00255 
+00256     std::string gpios = toString(device->listGPIOBanks());
+00257     \textcolor{keywordflow}{if} (not gpios.empty()) ss << \textcolor{stringliteral}{"  GPIOs: "} << gpios << std::endl;
+00258 
+00259     std::string uarts = toString(device->listUARTs());
+00260     \textcolor{keywordflow}{if} (not uarts.empty()) ss << \textcolor{stringliteral}{"  UARTs: "} << uarts << std::endl;
+00261 
+00262     \textcolor{comment}{/*******************************************************************}
+00263 \textcolor{comment}{     * Per-channel info}
+00264 \textcolor{comment}{     ******************************************************************/}
+00265     \textcolor{keywordflow}{for} (\textcolor{keywordtype}{size\_t} chan = 0; chan < numRxChans; chan++)
+00266     \{
+00267         ss << probeChannel(device, SOAPY_SDR_RX, chan);
+00268     \}
+00269     \textcolor{keywordflow}{for} (\textcolor{keywordtype}{size\_t} chan = 0; chan < numTxChans; chan++)
+00270     \{
+00271         ss << probeChannel(device, SOAPY_SDR_TX, chan);
+00272     \}
+00273 
+00274     \textcolor{keywordflow}{return} ss.str();
+00275 \}
+\end{DoxyCode}

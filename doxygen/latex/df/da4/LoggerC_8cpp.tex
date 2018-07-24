@@ -1,0 +1,403 @@
+\subsection{/home/erik/prefix/default/src/soapysdr/lib/\+LoggerC.cpp File Reference}
+\label{LoggerC_8cpp}\index{/home/erik/prefix/default/src/soapysdr/lib/\+Logger\+C.\+cpp@{/home/erik/prefix/default/src/soapysdr/lib/\+Logger\+C.\+cpp}}
+{\ttfamily \#include $<$Soapy\+S\+D\+R/\+Logger.\+h$>$}\\*
+{\ttfamily \#include $<$cstdio$>$}\\*
+{\ttfamily \#include $<$cstdlib$>$}\\*
+{\ttfamily \#include $<$string$>$}\\*
+{\ttfamily \#include $<$iostream$>$}\\*
+Include dependency graph for Logger\+C.\+cpp\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{d1/dd6/LoggerC_8cpp__incl}
+\end{center}
+\end{figure}
+\subsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define {\bf check\+Log\+Level\+Env\+Str}(level)~{\bf if} (log\+Level\+Env\+Str == \#level) return S\+O\+A\+P\+Y\+\_\+\+S\+D\+R\+\_\+ \#\# level
+\item 
+\#define {\bf A\+N\+S\+I\+\_\+\+C\+O\+L\+O\+R\+\_\+\+R\+ED}~\char`\"{}\textbackslash{}x1b[31m\char`\"{}
+\item 
+\#define {\bf A\+N\+S\+I\+\_\+\+C\+O\+L\+O\+R\+\_\+\+G\+R\+E\+EN}~\char`\"{}\textbackslash{}x1b[32m\char`\"{}
+\item 
+\#define {\bf A\+N\+S\+I\+\_\+\+C\+O\+L\+O\+R\+\_\+\+Y\+E\+L\+L\+OW}~\char`\"{}\textbackslash{}x1b[33m\char`\"{}
+\item 
+\#define {\bf A\+N\+S\+I\+\_\+\+C\+O\+L\+O\+R\+\_\+\+B\+L\+UE}~\char`\"{}\textbackslash{}x1b[34m\char`\"{}
+\item 
+\#define {\bf A\+N\+S\+I\+\_\+\+C\+O\+L\+O\+R\+\_\+\+M\+A\+G\+E\+N\+TA}~\char`\"{}\textbackslash{}x1b[35m\char`\"{}
+\item 
+\#define {\bf A\+N\+S\+I\+\_\+\+C\+O\+L\+O\+R\+\_\+\+C\+Y\+AN}~\char`\"{}\textbackslash{}x1b[36m\char`\"{}
+\item 
+\#define {\bf A\+N\+S\+I\+\_\+\+C\+O\+L\+O\+R\+\_\+\+R\+E\+S\+ET}~\char`\"{}\textbackslash{}x1b[0m\char`\"{}
+\item 
+\#define {\bf A\+N\+S\+I\+\_\+\+C\+O\+L\+O\+R\+\_\+\+B\+O\+LD}~\char`\"{}\textbackslash{}x1b[1m\char`\"{}
+\end{DoxyCompactItemize}
+\subsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+{\bf std\+::string} {\bf get\+Env\+Impl} (const char $\ast${\bf name})
+\item 
+static {\bf Soapy\+S\+D\+R\+Log\+Level} {\bf get\+Default\+Log\+Level} ({\bf void})
+\item 
+{\bf void} {\bf default\+Log\+Handler} (const {\bf Soapy\+S\+D\+R\+Log\+Level} log\+Level, const char $\ast${\bf message})
+\item 
+{\bf void} {\bf Soapy\+S\+D\+R\+\_\+log} (const {\bf Soapy\+S\+D\+R\+Log\+Level} log\+Level, const char $\ast${\bf message})
+\item 
+{\bf void} {\bf Soapy\+S\+D\+R\+\_\+vlogf} (const {\bf Soapy\+S\+D\+R\+Log\+Level} log\+Level, const char $\ast${\bf format}, va\+\_\+list arg\+List)
+\item 
+{\bf void} {\bf Soapy\+S\+D\+R\+\_\+register\+Log\+Handler} (const {\bf Soapy\+S\+D\+R\+Log\+Handler} handler)
+\item 
+{\bf void} {\bf Soapy\+S\+D\+R\+\_\+set\+Log\+Level} (const {\bf Soapy\+S\+D\+R\+Log\+Level} log\+Level)
+\end{DoxyCompactItemize}
+\subsubsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+static {\bf Soapy\+S\+D\+R\+Log\+Handler} {\bf registered\+Log\+Handler} = \&{\bf default\+Log\+Handler}
+\item 
+static {\bf Soapy\+S\+D\+R\+Log\+Level} {\bf registered\+Log\+Level} = {\bf get\+Default\+Log\+Level}()
+\end{DoxyCompactItemize}
+
+
+\subsubsection{Macro Definition Documentation}
+\index{Logger\+C.\+cpp@{Logger\+C.\+cpp}!A\+N\+S\+I\+\_\+\+C\+O\+L\+O\+R\+\_\+\+B\+L\+UE@{A\+N\+S\+I\+\_\+\+C\+O\+L\+O\+R\+\_\+\+B\+L\+UE}}
+\index{A\+N\+S\+I\+\_\+\+C\+O\+L\+O\+R\+\_\+\+B\+L\+UE@{A\+N\+S\+I\+\_\+\+C\+O\+L\+O\+R\+\_\+\+B\+L\+UE}!Logger\+C.\+cpp@{Logger\+C.\+cpp}}
+\paragraph[{A\+N\+S\+I\+\_\+\+C\+O\+L\+O\+R\+\_\+\+B\+L\+UE}]{\setlength{\rightskip}{0pt plus 5cm}\#define A\+N\+S\+I\+\_\+\+C\+O\+L\+O\+R\+\_\+\+B\+L\+UE~\char`\"{}\textbackslash{}x1b[34m\char`\"{}}\label{LoggerC_8cpp_aca16e6a49eb51333c5fd3eee19487315}
+
+
+Definition at line {\bf 58} of file {\bf Logger\+C.\+cpp}.
+
+\index{Logger\+C.\+cpp@{Logger\+C.\+cpp}!A\+N\+S\+I\+\_\+\+C\+O\+L\+O\+R\+\_\+\+B\+O\+LD@{A\+N\+S\+I\+\_\+\+C\+O\+L\+O\+R\+\_\+\+B\+O\+LD}}
+\index{A\+N\+S\+I\+\_\+\+C\+O\+L\+O\+R\+\_\+\+B\+O\+LD@{A\+N\+S\+I\+\_\+\+C\+O\+L\+O\+R\+\_\+\+B\+O\+LD}!Logger\+C.\+cpp@{Logger\+C.\+cpp}}
+\paragraph[{A\+N\+S\+I\+\_\+\+C\+O\+L\+O\+R\+\_\+\+B\+O\+LD}]{\setlength{\rightskip}{0pt plus 5cm}\#define A\+N\+S\+I\+\_\+\+C\+O\+L\+O\+R\+\_\+\+B\+O\+LD~\char`\"{}\textbackslash{}x1b[1m\char`\"{}}\label{LoggerC_8cpp_a192df37d7dfa835971480d2a1ca01d14}
+
+
+Definition at line {\bf 62} of file {\bf Logger\+C.\+cpp}.
+
+
+
+Referenced by {\bf default\+Log\+Handler()}.
+
+\index{Logger\+C.\+cpp@{Logger\+C.\+cpp}!A\+N\+S\+I\+\_\+\+C\+O\+L\+O\+R\+\_\+\+C\+Y\+AN@{A\+N\+S\+I\+\_\+\+C\+O\+L\+O\+R\+\_\+\+C\+Y\+AN}}
+\index{A\+N\+S\+I\+\_\+\+C\+O\+L\+O\+R\+\_\+\+C\+Y\+AN@{A\+N\+S\+I\+\_\+\+C\+O\+L\+O\+R\+\_\+\+C\+Y\+AN}!Logger\+C.\+cpp@{Logger\+C.\+cpp}}
+\paragraph[{A\+N\+S\+I\+\_\+\+C\+O\+L\+O\+R\+\_\+\+C\+Y\+AN}]{\setlength{\rightskip}{0pt plus 5cm}\#define A\+N\+S\+I\+\_\+\+C\+O\+L\+O\+R\+\_\+\+C\+Y\+AN~\char`\"{}\textbackslash{}x1b[36m\char`\"{}}\label{LoggerC_8cpp_a8d0b0043e152438bb39b918a1f98c65f}
+
+
+Definition at line {\bf 60} of file {\bf Logger\+C.\+cpp}.
+
+\index{Logger\+C.\+cpp@{Logger\+C.\+cpp}!A\+N\+S\+I\+\_\+\+C\+O\+L\+O\+R\+\_\+\+G\+R\+E\+EN@{A\+N\+S\+I\+\_\+\+C\+O\+L\+O\+R\+\_\+\+G\+R\+E\+EN}}
+\index{A\+N\+S\+I\+\_\+\+C\+O\+L\+O\+R\+\_\+\+G\+R\+E\+EN@{A\+N\+S\+I\+\_\+\+C\+O\+L\+O\+R\+\_\+\+G\+R\+E\+EN}!Logger\+C.\+cpp@{Logger\+C.\+cpp}}
+\paragraph[{A\+N\+S\+I\+\_\+\+C\+O\+L\+O\+R\+\_\+\+G\+R\+E\+EN}]{\setlength{\rightskip}{0pt plus 5cm}\#define A\+N\+S\+I\+\_\+\+C\+O\+L\+O\+R\+\_\+\+G\+R\+E\+EN~\char`\"{}\textbackslash{}x1b[32m\char`\"{}}\label{LoggerC_8cpp_a966c72d8d733c7734c6c784753d894c7}
+
+
+Definition at line {\bf 56} of file {\bf Logger\+C.\+cpp}.
+
+
+
+Referenced by {\bf default\+Log\+Handler()}.
+
+\index{Logger\+C.\+cpp@{Logger\+C.\+cpp}!A\+N\+S\+I\+\_\+\+C\+O\+L\+O\+R\+\_\+\+M\+A\+G\+E\+N\+TA@{A\+N\+S\+I\+\_\+\+C\+O\+L\+O\+R\+\_\+\+M\+A\+G\+E\+N\+TA}}
+\index{A\+N\+S\+I\+\_\+\+C\+O\+L\+O\+R\+\_\+\+M\+A\+G\+E\+N\+TA@{A\+N\+S\+I\+\_\+\+C\+O\+L\+O\+R\+\_\+\+M\+A\+G\+E\+N\+TA}!Logger\+C.\+cpp@{Logger\+C.\+cpp}}
+\paragraph[{A\+N\+S\+I\+\_\+\+C\+O\+L\+O\+R\+\_\+\+M\+A\+G\+E\+N\+TA}]{\setlength{\rightskip}{0pt plus 5cm}\#define A\+N\+S\+I\+\_\+\+C\+O\+L\+O\+R\+\_\+\+M\+A\+G\+E\+N\+TA~\char`\"{}\textbackslash{}x1b[35m\char`\"{}}\label{LoggerC_8cpp_acb30614ba1535da5b9d0c490b3c10515}
+
+
+Definition at line {\bf 59} of file {\bf Logger\+C.\+cpp}.
+
+\index{Logger\+C.\+cpp@{Logger\+C.\+cpp}!A\+N\+S\+I\+\_\+\+C\+O\+L\+O\+R\+\_\+\+R\+ED@{A\+N\+S\+I\+\_\+\+C\+O\+L\+O\+R\+\_\+\+R\+ED}}
+\index{A\+N\+S\+I\+\_\+\+C\+O\+L\+O\+R\+\_\+\+R\+ED@{A\+N\+S\+I\+\_\+\+C\+O\+L\+O\+R\+\_\+\+R\+ED}!Logger\+C.\+cpp@{Logger\+C.\+cpp}}
+\paragraph[{A\+N\+S\+I\+\_\+\+C\+O\+L\+O\+R\+\_\+\+R\+ED}]{\setlength{\rightskip}{0pt plus 5cm}\#define A\+N\+S\+I\+\_\+\+C\+O\+L\+O\+R\+\_\+\+R\+ED~\char`\"{}\textbackslash{}x1b[31m\char`\"{}}\label{LoggerC_8cpp_a34995b955465f6bbb37c359173d50477}
+
+
+Definition at line {\bf 55} of file {\bf Logger\+C.\+cpp}.
+
+
+
+Referenced by {\bf default\+Log\+Handler()}.
+
+\index{Logger\+C.\+cpp@{Logger\+C.\+cpp}!A\+N\+S\+I\+\_\+\+C\+O\+L\+O\+R\+\_\+\+R\+E\+S\+ET@{A\+N\+S\+I\+\_\+\+C\+O\+L\+O\+R\+\_\+\+R\+E\+S\+ET}}
+\index{A\+N\+S\+I\+\_\+\+C\+O\+L\+O\+R\+\_\+\+R\+E\+S\+ET@{A\+N\+S\+I\+\_\+\+C\+O\+L\+O\+R\+\_\+\+R\+E\+S\+ET}!Logger\+C.\+cpp@{Logger\+C.\+cpp}}
+\paragraph[{A\+N\+S\+I\+\_\+\+C\+O\+L\+O\+R\+\_\+\+R\+E\+S\+ET}]{\setlength{\rightskip}{0pt plus 5cm}\#define A\+N\+S\+I\+\_\+\+C\+O\+L\+O\+R\+\_\+\+R\+E\+S\+ET~\char`\"{}\textbackslash{}x1b[0m\char`\"{}}\label{LoggerC_8cpp_a92a364c2b863dde1a024a77eac2a5b3b}
+
+
+Definition at line {\bf 61} of file {\bf Logger\+C.\+cpp}.
+
+
+
+Referenced by {\bf default\+Log\+Handler()}.
+
+\index{Logger\+C.\+cpp@{Logger\+C.\+cpp}!A\+N\+S\+I\+\_\+\+C\+O\+L\+O\+R\+\_\+\+Y\+E\+L\+L\+OW@{A\+N\+S\+I\+\_\+\+C\+O\+L\+O\+R\+\_\+\+Y\+E\+L\+L\+OW}}
+\index{A\+N\+S\+I\+\_\+\+C\+O\+L\+O\+R\+\_\+\+Y\+E\+L\+L\+OW@{A\+N\+S\+I\+\_\+\+C\+O\+L\+O\+R\+\_\+\+Y\+E\+L\+L\+OW}!Logger\+C.\+cpp@{Logger\+C.\+cpp}}
+\paragraph[{A\+N\+S\+I\+\_\+\+C\+O\+L\+O\+R\+\_\+\+Y\+E\+L\+L\+OW}]{\setlength{\rightskip}{0pt plus 5cm}\#define A\+N\+S\+I\+\_\+\+C\+O\+L\+O\+R\+\_\+\+Y\+E\+L\+L\+OW~\char`\"{}\textbackslash{}x1b[33m\char`\"{}}\label{LoggerC_8cpp_a5a123b382640b3aa65dd5db386002fbc}
+
+
+Definition at line {\bf 57} of file {\bf Logger\+C.\+cpp}.
+
+
+
+Referenced by {\bf default\+Log\+Handler()}.
+
+\index{Logger\+C.\+cpp@{Logger\+C.\+cpp}!check\+Log\+Level\+Env\+Str@{check\+Log\+Level\+Env\+Str}}
+\index{check\+Log\+Level\+Env\+Str@{check\+Log\+Level\+Env\+Str}!Logger\+C.\+cpp@{Logger\+C.\+cpp}}
+\paragraph[{check\+Log\+Level\+Env\+Str}]{\setlength{\rightskip}{0pt plus 5cm}\#define check\+Log\+Level\+Env\+Str(
+\begin{DoxyParamCaption}
+\item[{}]{level}
+\end{DoxyParamCaption}
+)~{\bf if} (log\+Level\+Env\+Str == \#level) return S\+O\+A\+P\+Y\+\_\+\+S\+D\+R\+\_\+ \#\# level}\label{LoggerC_8cpp_a60ad9d1c7808d23da132713c4323d53c}
+
+
+Referenced by {\bf get\+Default\+Log\+Level()}.
+
+
+
+\subsubsection{Function Documentation}
+\index{Logger\+C.\+cpp@{Logger\+C.\+cpp}!default\+Log\+Handler@{default\+Log\+Handler}}
+\index{default\+Log\+Handler@{default\+Log\+Handler}!Logger\+C.\+cpp@{Logger\+C.\+cpp}}
+\paragraph[{default\+Log\+Handler(const Soapy\+S\+D\+R\+Log\+Level log\+Level, const char $\ast$message)}]{\setlength{\rightskip}{0pt plus 5cm}{\bf void} default\+Log\+Handler (
+\begin{DoxyParamCaption}
+\item[{const {\bf Soapy\+S\+D\+R\+Log\+Level}}]{log\+Level, }
+\item[{const char $\ast$}]{message}
+\end{DoxyParamCaption}
+)}\label{LoggerC_8cpp_aabbcb3b1fec0221fc963a4f49311dcff}
+
+
+Definition at line {\bf 67} of file {\bf Logger\+C.\+cpp}.
+
+
+
+References {\bf A\+N\+S\+I\+\_\+\+C\+O\+L\+O\+R\+\_\+\+B\+O\+LD}, {\bf A\+N\+S\+I\+\_\+\+C\+O\+L\+O\+R\+\_\+\+G\+R\+E\+EN}, {\bf A\+N\+S\+I\+\_\+\+C\+O\+L\+O\+R\+\_\+\+R\+ED}, {\bf A\+N\+S\+I\+\_\+\+C\+O\+L\+O\+R\+\_\+\+R\+E\+S\+ET}, {\bf A\+N\+S\+I\+\_\+\+C\+O\+L\+O\+R\+\_\+\+Y\+E\+L\+L\+OW}, {\bf S\+O\+A\+P\+Y\+\_\+\+S\+D\+R\+\_\+\+C\+R\+I\+T\+I\+C\+AL}, {\bf S\+O\+A\+P\+Y\+\_\+\+S\+D\+R\+\_\+\+D\+E\+B\+UG}, {\bf S\+O\+A\+P\+Y\+\_\+\+S\+D\+R\+\_\+\+E\+R\+R\+OR}, {\bf S\+O\+A\+P\+Y\+\_\+\+S\+D\+R\+\_\+\+F\+A\+T\+AL}, {\bf S\+O\+A\+P\+Y\+\_\+\+S\+D\+R\+\_\+\+I\+N\+FO}, {\bf S\+O\+A\+P\+Y\+\_\+\+S\+D\+R\+\_\+\+N\+O\+T\+I\+CE}, {\bf S\+O\+A\+P\+Y\+\_\+\+S\+D\+R\+\_\+\+S\+SI}, {\bf S\+O\+A\+P\+Y\+\_\+\+S\+D\+R\+\_\+\+T\+R\+A\+CE}, and {\bf S\+O\+A\+P\+Y\+\_\+\+S\+D\+R\+\_\+\+W\+A\+R\+N\+I\+NG}.
+
+\index{Logger\+C.\+cpp@{Logger\+C.\+cpp}!get\+Default\+Log\+Level@{get\+Default\+Log\+Level}}
+\index{get\+Default\+Log\+Level@{get\+Default\+Log\+Level}!Logger\+C.\+cpp@{Logger\+C.\+cpp}}
+\paragraph[{get\+Default\+Log\+Level(void)}]{\setlength{\rightskip}{0pt plus 5cm}static {\bf Soapy\+S\+D\+R\+Log\+Level} get\+Default\+Log\+Level (
+\begin{DoxyParamCaption}
+\item[{{\bf void}}]{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [static]}}\label{LoggerC_8cpp_a027e750c11dd6eba39536141075cbed9}
+
+
+Definition at line {\bf 15} of file {\bf Logger\+C.\+cpp}.
+
+
+
+References {\bf ap}, {\bf check\+Log\+Level\+Env\+Str}, {\bf E\+R\+R\+OR}, {\bf get\+Env\+Impl()}, {\bf calc\+\_\+fmcw\+\_\+peaks\+::r}, {\bf S\+O\+A\+P\+Y\+\_\+\+S\+D\+R\+\_\+\+F\+A\+T\+AL}, {\bf S\+O\+A\+P\+Y\+\_\+\+S\+D\+R\+\_\+\+I\+N\+FO}, {\bf S\+O\+A\+P\+Y\+\_\+\+S\+D\+R\+\_\+\+T\+R\+A\+CE}, and {\bf string()}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{df/da4/LoggerC_8cpp_a027e750c11dd6eba39536141075cbed9_cgraph}
+\end{center}
+\end{figure}
+
+
+\index{Logger\+C.\+cpp@{Logger\+C.\+cpp}!get\+Env\+Impl@{get\+Env\+Impl}}
+\index{get\+Env\+Impl@{get\+Env\+Impl}!Logger\+C.\+cpp@{Logger\+C.\+cpp}}
+\paragraph[{get\+Env\+Impl(const char $\ast$name)}]{\setlength{\rightskip}{0pt plus 5cm}{\bf std\+::string} get\+Env\+Impl (
+\begin{DoxyParamCaption}
+\item[{const char $\ast$}]{name}
+\end{DoxyParamCaption}
+)}\label{LoggerC_8cpp_aa515d0f19e269024c2610104d65f04c5}
+
+
+Definition at line {\bf 23} of file {\bf Modules.\+cpp}.
+
+
+
+References {\bf buffer}, {\bf get\+Env\+Impl()}, {\bf Soapy\+S\+D\+R\+::get\+Root\+Path}, {\bf len}, and {\bf string()}.
+
+
+
+Referenced by {\bf get\+Default\+Log\+Level()}, {\bf get\+Env\+Impl()}, and {\bf search\+Module\+Path()}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=346pt]{df/da4/LoggerC_8cpp_aa515d0f19e269024c2610104d65f04c5_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=283pt]{df/da4/LoggerC_8cpp_aa515d0f19e269024c2610104d65f04c5_icgraph}
+\end{center}
+\end{figure}
+
+
+\index{Logger\+C.\+cpp@{Logger\+C.\+cpp}!Soapy\+S\+D\+R\+\_\+log@{Soapy\+S\+D\+R\+\_\+log}}
+\index{Soapy\+S\+D\+R\+\_\+log@{Soapy\+S\+D\+R\+\_\+log}!Logger\+C.\+cpp@{Logger\+C.\+cpp}}
+\paragraph[{Soapy\+S\+D\+R\+\_\+log(const Soapy\+S\+D\+R\+Log\+Level log\+Level, const char $\ast$message)}]{\setlength{\rightskip}{0pt plus 5cm}{\bf void} Soapy\+S\+D\+R\+\_\+log (
+\begin{DoxyParamCaption}
+\item[{const {\bf Soapy\+S\+D\+R\+Log\+Level}}]{log\+Level, }
+\item[{const char $\ast$}]{message}
+\end{DoxyParamCaption}
+)}\label{LoggerC_8cpp_af1034a3e3d26fae99545bd86aa01cb2d}
+Send a message to the registered logger. 
+\begin{DoxyParams}{Parameters}
+{\em log\+Level} & a possible logging level \\
+\hline
+{\em message} & a logger message string \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line {\bf 88} of file {\bf Logger\+C.\+cpp}.
+
+
+
+References {\bf registered\+Log\+Handler}, {\bf registered\+Log\+Level}, and {\bf S\+O\+A\+P\+Y\+\_\+\+S\+D\+R\+\_\+\+S\+SI}.
+
+
+
+Referenced by {\bf Soapy\+S\+D\+R\+\_\+vlogf()}.
+
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{df/da4/LoggerC_8cpp_af1034a3e3d26fae99545bd86aa01cb2d_icgraph}
+\end{center}
+\end{figure}
+
+
+\index{Logger\+C.\+cpp@{Logger\+C.\+cpp}!Soapy\+S\+D\+R\+\_\+register\+Log\+Handler@{Soapy\+S\+D\+R\+\_\+register\+Log\+Handler}}
+\index{Soapy\+S\+D\+R\+\_\+register\+Log\+Handler@{Soapy\+S\+D\+R\+\_\+register\+Log\+Handler}!Logger\+C.\+cpp@{Logger\+C.\+cpp}}
+\paragraph[{Soapy\+S\+D\+R\+\_\+register\+Log\+Handler(const Soapy\+S\+D\+R\+Log\+Handler handler)}]{\setlength{\rightskip}{0pt plus 5cm}{\bf void} Soapy\+S\+D\+R\+\_\+register\+Log\+Handler (
+\begin{DoxyParamCaption}
+\item[{const {\bf Soapy\+S\+D\+R\+Log\+Handler}}]{handler}
+\end{DoxyParamCaption}
+)}\label{LoggerC_8cpp_a839e1ce30acff3b3c63564e832adeb58}
+Register a new system log handler. Platforms should call this to replace the default stdio handler. 
+
+Definition at line {\bf 105} of file {\bf Logger\+C.\+cpp}.
+
+
+
+References {\bf registered\+Log\+Handler}.
+
+
+
+Referenced by {\bf Soapy\+S\+D\+R\+::register\+Log\+Handler()}.
+
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{df/da4/LoggerC_8cpp_a839e1ce30acff3b3c63564e832adeb58_icgraph}
+\end{center}
+\end{figure}
+
+
+\index{Logger\+C.\+cpp@{Logger\+C.\+cpp}!Soapy\+S\+D\+R\+\_\+set\+Log\+Level@{Soapy\+S\+D\+R\+\_\+set\+Log\+Level}}
+\index{Soapy\+S\+D\+R\+\_\+set\+Log\+Level@{Soapy\+S\+D\+R\+\_\+set\+Log\+Level}!Logger\+C.\+cpp@{Logger\+C.\+cpp}}
+\paragraph[{Soapy\+S\+D\+R\+\_\+set\+Log\+Level(const Soapy\+S\+D\+R\+Log\+Level log\+Level)}]{\setlength{\rightskip}{0pt plus 5cm}{\bf void} Soapy\+S\+D\+R\+\_\+set\+Log\+Level (
+\begin{DoxyParamCaption}
+\item[{const {\bf Soapy\+S\+D\+R\+Log\+Level}}]{log\+Level}
+\end{DoxyParamCaption}
+)}\label{LoggerC_8cpp_aeab38478fb7b152b03b8b19feb129809}
+Set the log level threshold. Log messages with lower priority are dropped. 
+
+Definition at line {\bf 110} of file {\bf Logger\+C.\+cpp}.
+
+
+
+References {\bf registered\+Log\+Level}.
+
+\index{Logger\+C.\+cpp@{Logger\+C.\+cpp}!Soapy\+S\+D\+R\+\_\+vlogf@{Soapy\+S\+D\+R\+\_\+vlogf}}
+\index{Soapy\+S\+D\+R\+\_\+vlogf@{Soapy\+S\+D\+R\+\_\+vlogf}!Logger\+C.\+cpp@{Logger\+C.\+cpp}}
+\paragraph[{Soapy\+S\+D\+R\+\_\+vlogf(const Soapy\+S\+D\+R\+Log\+Level log\+Level, const char $\ast$format, va\+\_\+list arg\+List)}]{\setlength{\rightskip}{0pt plus 5cm}{\bf void} Soapy\+S\+D\+R\+\_\+vlogf (
+\begin{DoxyParamCaption}
+\item[{const {\bf Soapy\+S\+D\+R\+Log\+Level}}]{log\+Level, }
+\item[{const char $\ast$}]{format, }
+\item[{va\+\_\+list}]{arg\+List}
+\end{DoxyParamCaption}
+)}\label{LoggerC_8cpp_a248420cecff1110e0d9d374ece35f61f}
+Send a message to the registered logger. 
+\begin{DoxyParams}{Parameters}
+{\em log\+Level} & a possible logging level \\
+\hline
+{\em format} & a printf style format string \\
+\hline
+{\em arg\+List} & an argument list for the formatter \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line {\bf 94} of file {\bf Logger\+C.\+cpp}.
+
+
+
+References {\bf message()}, {\bf registered\+Log\+Level}, and {\bf Soapy\+S\+D\+R\+\_\+log()}.
+
+
+
+Referenced by {\bf Soapy\+S\+D\+R\+\_\+logf()}, and {\bf Soapy\+S\+D\+R\+::vlogf()}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=292pt]{df/da4/LoggerC_8cpp_a248420cecff1110e0d9d374ece35f61f_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{df/da4/LoggerC_8cpp_a248420cecff1110e0d9d374ece35f61f_icgraph}
+\end{center}
+\end{figure}
+
+
+
+
+\subsubsection{Variable Documentation}
+\index{Logger\+C.\+cpp@{Logger\+C.\+cpp}!registered\+Log\+Handler@{registered\+Log\+Handler}}
+\index{registered\+Log\+Handler@{registered\+Log\+Handler}!Logger\+C.\+cpp@{Logger\+C.\+cpp}}
+\paragraph[{registered\+Log\+Handler}]{\setlength{\rightskip}{0pt plus 5cm}{\bf Soapy\+S\+D\+R\+Log\+Handler} registered\+Log\+Handler = \&{\bf default\+Log\+Handler}\hspace{0.3cm}{\ttfamily [static]}}\label{LoggerC_8cpp_a6ef5b5fad65ea225c8402479c85179d1}
+
+
+Definition at line {\bf 83} of file {\bf Logger\+C.\+cpp}.
+
+
+
+Referenced by {\bf Soapy\+S\+D\+R\+\_\+log()}, and {\bf Soapy\+S\+D\+R\+\_\+register\+Log\+Handler()}.
+
+\index{Logger\+C.\+cpp@{Logger\+C.\+cpp}!registered\+Log\+Level@{registered\+Log\+Level}}
+\index{registered\+Log\+Level@{registered\+Log\+Level}!Logger\+C.\+cpp@{Logger\+C.\+cpp}}
+\paragraph[{registered\+Log\+Level}]{\setlength{\rightskip}{0pt plus 5cm}{\bf Soapy\+S\+D\+R\+Log\+Level} registered\+Log\+Level = {\bf get\+Default\+Log\+Level}()\hspace{0.3cm}{\ttfamily [static]}}\label{LoggerC_8cpp_afb71b465835eeba746c68498b61e6cb5}
+
+
+Definition at line {\bf 84} of file {\bf Logger\+C.\+cpp}.
+
+
+
+Referenced by {\bf Soapy\+S\+D\+R\+\_\+log()}, {\bf Soapy\+S\+D\+R\+\_\+set\+Log\+Level()}, and {\bf Soapy\+S\+D\+R\+\_\+vlogf()}.
+

@@ -1,0 +1,35 @@
+\subsection{Logger.\+hpp}
+\label{Logger_8hpp_source}\index{/home/erik/prefix/default/src/soapysdr/include/\+Soapy\+S\+D\+R/\+Logger.\+hpp@{/home/erik/prefix/default/src/soapysdr/include/\+Soapy\+S\+D\+R/\+Logger.\+hpp}}
+
+\begin{DoxyCode}
+00001 
+00013 \textcolor{preprocessor}{#pragma once}
+00014 \textcolor{preprocessor}{#include <SoapySDR/Logger.h>}
+00015 \textcolor{preprocessor}{#include <string>}
+00016 \textcolor{preprocessor}{#include <cstdarg>}
+00017 
+00018 \textcolor{keyword}{namespace }SoapySDR
+00019 \{
+00020 
+00021 \textcolor{keyword}{typedef} SoapySDRLogLevel LogLevel;
+00022 
+00028 SOAPY_SDR_API \textcolor{keywordtype}{void} log(\textcolor{keyword}{const} LogLevel logLevel, \textcolor{keyword}{const} std::string &message);
+00029 
+00036 SOAPY_SDR_API \textcolor{keywordtype}{void} vlogf(\textcolor{keyword}{const} SoapySDRLogLevel logLevel, \textcolor{keyword}{const} \textcolor{keywordtype}{char} *format, va\_list argList);
+00037 
+00043 \textcolor{keyword}{static} \textcolor{keyword}{inline} \textcolor{keywordtype}{void} logf(\textcolor{keyword}{const} SoapySDRLogLevel logLevel, \textcolor{keyword}{const} \textcolor{keywordtype}{char} *format, ...)
+00044 \{
+00045     va\_list argList;
+00046     va\_start(argList, format);
+00047     SoapySDR::vlogf(logLevel, format, argList);
+00048     va\_end(argList);
+00049 \}
+00050 
+00054 \textcolor{keyword}{typedef} SoapySDRLogHandler LogHandler;
+00055 
+00060 SOAPY_SDR_API \textcolor{keywordtype}{void} registerLogHandler(\textcolor{keyword}{const} LogHandler &handler);
+00061 
+00066 SOAPY_SDR_API \textcolor{keywordtype}{void} setLogLevel(\textcolor{keyword}{const} LogLevel logLevel);
+00067 
+00068 \}
+\end{DoxyCode}

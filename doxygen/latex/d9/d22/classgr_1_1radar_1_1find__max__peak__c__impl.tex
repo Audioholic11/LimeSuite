@@ -1,0 +1,396 @@
+\subsection{gr\+:\+:radar\+:\+:find\+\_\+max\+\_\+peak\+\_\+c\+\_\+impl Class Reference}
+\label{classgr_1_1radar_1_1find__max__peak__c__impl}\index{gr\+::radar\+::find\+\_\+max\+\_\+peak\+\_\+c\+\_\+impl@{gr\+::radar\+::find\+\_\+max\+\_\+peak\+\_\+c\+\_\+impl}}
+
+
+{\ttfamily \#include $<$find\+\_\+max\+\_\+peak\+\_\+c\+\_\+impl.\+h$>$}
+
+
+
+Inheritance diagram for gr\+:\+:radar\+:\+:find\+\_\+max\+\_\+peak\+\_\+c\+\_\+impl\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=550pt]{da/df5/classgr_1_1radar_1_1find__max__peak__c__impl__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for gr\+:\+:radar\+:\+:find\+\_\+max\+\_\+peak\+\_\+c\+\_\+impl\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{da/d2a/classgr_1_1radar_1_1find__max__peak__c__impl__coll__graph}
+\end{center}
+\end{figure}
+\subsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+{\bf find\+\_\+max\+\_\+peak\+\_\+c\+\_\+impl} ({\bf int} samp\+\_\+rate, float threshold, {\bf int} samp\+\_\+protect, {\bf std\+::vector}$<$ float $>$ max\+\_\+freq, bool cut\+\_\+max\+\_\+freq, const {\bf std\+::string} \&len\+\_\+key)
+\item 
+{\bf $\sim$find\+\_\+max\+\_\+peak\+\_\+c\+\_\+impl} ()
+\item 
+{\bf void} {\bf set\+\_\+threshold} (float threshold)
+\item 
+{\bf void} {\bf set\+\_\+samp\+\_\+protect} ({\bf int} samp)
+\item 
+{\bf void} {\bf set\+\_\+max\+\_\+freq} ({\bf std\+::vector}$<$ float $>$ {\bf freq})
+\item 
+{\bf int} {\bf work} ({\bf int} noutput\+\_\+items, gr\+\_\+vector\+\_\+int \&ninput\+\_\+items, gr\+\_\+vector\+\_\+const\+\_\+void\+\_\+star \&input\+\_\+items, gr\+\_\+vector\+\_\+void\+\_\+star \&output\+\_\+items)
+\end{DoxyCompactItemize}
+\subsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+{\bf int} {\bf d\+\_\+samp\+\_\+rate}
+\item 
+float {\bf d\+\_\+threshold}
+\item 
+{\bf int} {\bf d\+\_\+samp\+\_\+protect}
+\item 
+{\bf std\+::vector}$<$ float $>$ {\bf d\+\_\+max\+\_\+freq}
+\item 
+bool {\bf d\+\_\+cut\+\_\+max\+\_\+freq}
+\item 
+{\bf std\+::vector}$<$ float $>$ {\bf d\+\_\+pks}
+\item 
+{\bf std\+::vector}$<$ float $>$ {\bf d\+\_\+freq}
+\item 
+{\bf std\+::vector}$<$ float $>$ {\bf d\+\_\+angle}
+\item 
+pmt\+::pmt\+\_\+t {\bf d\+\_\+port\+\_\+id}
+\item 
+pmt\+::pmt\+\_\+t {\bf d\+\_\+ptimestamp}
+\item 
+pmt\+::pmt\+\_\+t {\bf d\+\_\+pfreq}
+\item 
+pmt\+::pmt\+\_\+t {\bf d\+\_\+ppks}
+\item 
+pmt\+::pmt\+\_\+t {\bf d\+\_\+pangle}
+\item 
+pmt\+::pmt\+\_\+t {\bf d\+\_\+value}
+\item 
+{\bf std\+::vector}$<$ tag\+\_\+t $>$ {\bf d\+\_\+tags}
+\end{DoxyCompactItemize}
+\subsubsection*{Protected Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+{\bf int} {\bf calculate\+\_\+output\+\_\+stream\+\_\+length} (const gr\+\_\+vector\+\_\+int \&ninput\+\_\+items)
+\end{DoxyCompactItemize}
+\subsubsection*{Additional Inherited Members}
+
+
+\subsubsection{Detailed Description}
+
+
+Definition at line {\bf 29} of file {\bf find\+\_\+max\+\_\+peak\+\_\+c\+\_\+impl.\+h}.
+
+
+
+\subsubsection{Constructor \& Destructor Documentation}
+\index{gr\+::radar\+::find\+\_\+max\+\_\+peak\+\_\+c\+\_\+impl@{gr\+::radar\+::find\+\_\+max\+\_\+peak\+\_\+c\+\_\+impl}!find\+\_\+max\+\_\+peak\+\_\+c\+\_\+impl@{find\+\_\+max\+\_\+peak\+\_\+c\+\_\+impl}}
+\index{find\+\_\+max\+\_\+peak\+\_\+c\+\_\+impl@{find\+\_\+max\+\_\+peak\+\_\+c\+\_\+impl}!gr\+::radar\+::find\+\_\+max\+\_\+peak\+\_\+c\+\_\+impl@{gr\+::radar\+::find\+\_\+max\+\_\+peak\+\_\+c\+\_\+impl}}
+\paragraph[{find\+\_\+max\+\_\+peak\+\_\+c\+\_\+impl(int samp\+\_\+rate, float threshold, int samp\+\_\+protect, std\+::vector$<$ float $>$ max\+\_\+freq, bool cut\+\_\+max\+\_\+freq, const std\+::string \&len\+\_\+key)}]{\setlength{\rightskip}{0pt plus 5cm}gr\+::radar\+::find\+\_\+max\+\_\+peak\+\_\+c\+\_\+impl\+::find\+\_\+max\+\_\+peak\+\_\+c\+\_\+impl (
+\begin{DoxyParamCaption}
+\item[{{\bf int}}]{samp\+\_\+rate, }
+\item[{float}]{threshold, }
+\item[{{\bf int}}]{samp\+\_\+protect, }
+\item[{{\bf std\+::vector}$<$ float $>$}]{max\+\_\+freq, }
+\item[{bool}]{cut\+\_\+max\+\_\+freq, }
+\item[{const {\bf std\+::string} \&}]{len\+\_\+key}
+\end{DoxyParamCaption}
+)}\label{classgr_1_1radar_1_1find__max__peak__c__impl_a5450f7d067290d45d04036737763bb5f}
+
+
+Definition at line {\bf 41} of file {\bf find\+\_\+max\+\_\+peak\+\_\+c\+\_\+impl.\+cc}.
+
+
+
+References {\bf d\+\_\+cut\+\_\+max\+\_\+freq}, {\bf d\+\_\+max\+\_\+freq}, {\bf d\+\_\+port\+\_\+id}, {\bf d\+\_\+samp\+\_\+protect}, {\bf d\+\_\+samp\+\_\+rate}, {\bf d\+\_\+threshold}, and {\bf calc\+\_\+fmcw\+\_\+peaks\+::samp\+\_\+rate}.
+
+\index{gr\+::radar\+::find\+\_\+max\+\_\+peak\+\_\+c\+\_\+impl@{gr\+::radar\+::find\+\_\+max\+\_\+peak\+\_\+c\+\_\+impl}!````~find\+\_\+max\+\_\+peak\+\_\+c\+\_\+impl@{$\sim$find\+\_\+max\+\_\+peak\+\_\+c\+\_\+impl}}
+\index{````~find\+\_\+max\+\_\+peak\+\_\+c\+\_\+impl@{$\sim$find\+\_\+max\+\_\+peak\+\_\+c\+\_\+impl}!gr\+::radar\+::find\+\_\+max\+\_\+peak\+\_\+c\+\_\+impl@{gr\+::radar\+::find\+\_\+max\+\_\+peak\+\_\+c\+\_\+impl}}
+\paragraph[{$\sim$find\+\_\+max\+\_\+peak\+\_\+c\+\_\+impl()}]{\setlength{\rightskip}{0pt plus 5cm}gr\+::radar\+::find\+\_\+max\+\_\+peak\+\_\+c\+\_\+impl\+::$\sim$find\+\_\+max\+\_\+peak\+\_\+c\+\_\+impl (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}\label{classgr_1_1radar_1_1find__max__peak__c__impl_afeef41ce9727b5536344189f34ad4409}
+
+
+Definition at line {\bf 60} of file {\bf find\+\_\+max\+\_\+peak\+\_\+c\+\_\+impl.\+cc}.
+
+
+
+\subsubsection{Member Function Documentation}
+\index{gr\+::radar\+::find\+\_\+max\+\_\+peak\+\_\+c\+\_\+impl@{gr\+::radar\+::find\+\_\+max\+\_\+peak\+\_\+c\+\_\+impl}!calculate\+\_\+output\+\_\+stream\+\_\+length@{calculate\+\_\+output\+\_\+stream\+\_\+length}}
+\index{calculate\+\_\+output\+\_\+stream\+\_\+length@{calculate\+\_\+output\+\_\+stream\+\_\+length}!gr\+::radar\+::find\+\_\+max\+\_\+peak\+\_\+c\+\_\+impl@{gr\+::radar\+::find\+\_\+max\+\_\+peak\+\_\+c\+\_\+impl}}
+\paragraph[{calculate\+\_\+output\+\_\+stream\+\_\+length(const gr\+\_\+vector\+\_\+int \&ninput\+\_\+items)}]{\setlength{\rightskip}{0pt plus 5cm}{\bf int} gr\+::radar\+::find\+\_\+max\+\_\+peak\+\_\+c\+\_\+impl\+::calculate\+\_\+output\+\_\+stream\+\_\+length (
+\begin{DoxyParamCaption}
+\item[{const gr\+\_\+vector\+\_\+int \&}]{ninput\+\_\+items}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [protected]}}\label{classgr_1_1radar_1_1find__max__peak__c__impl_a62a188ef972ad513332dfb8bc4e77e66}
+
+
+Definition at line {\bf 65} of file {\bf find\+\_\+max\+\_\+peak\+\_\+c\+\_\+impl.\+cc}.
+
+\index{gr\+::radar\+::find\+\_\+max\+\_\+peak\+\_\+c\+\_\+impl@{gr\+::radar\+::find\+\_\+max\+\_\+peak\+\_\+c\+\_\+impl}!set\+\_\+max\+\_\+freq@{set\+\_\+max\+\_\+freq}}
+\index{set\+\_\+max\+\_\+freq@{set\+\_\+max\+\_\+freq}!gr\+::radar\+::find\+\_\+max\+\_\+peak\+\_\+c\+\_\+impl@{gr\+::radar\+::find\+\_\+max\+\_\+peak\+\_\+c\+\_\+impl}}
+\paragraph[{set\+\_\+max\+\_\+freq(std\+::vector$<$ float $>$ freq)}]{\setlength{\rightskip}{0pt plus 5cm}{\bf void} gr\+::radar\+::find\+\_\+max\+\_\+peak\+\_\+c\+\_\+impl\+::set\+\_\+max\+\_\+freq (
+\begin{DoxyParamCaption}
+\item[{{\bf std\+::vector}$<$ float $>$}]{freq}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [virtual]}}\label{classgr_1_1radar_1_1find__max__peak__c__impl_a831fdc228c728c13ba4225e90306bf14}
+
+
+Implements {\bf gr\+::radar\+::find\+\_\+max\+\_\+peak\+\_\+c} \doxyref{}{p.}{d1/d3d/classgr_1_1radar_1_1find__max__peak__c_a85faea414a4ed5966fb7240bc82f2826}.
+
+
+
+Definition at line {\bf 84} of file {\bf find\+\_\+max\+\_\+peak\+\_\+c\+\_\+impl.\+cc}.
+
+
+
+References {\bf d\+\_\+max\+\_\+freq}, and {\bf freq}.
+
+\index{gr\+::radar\+::find\+\_\+max\+\_\+peak\+\_\+c\+\_\+impl@{gr\+::radar\+::find\+\_\+max\+\_\+peak\+\_\+c\+\_\+impl}!set\+\_\+samp\+\_\+protect@{set\+\_\+samp\+\_\+protect}}
+\index{set\+\_\+samp\+\_\+protect@{set\+\_\+samp\+\_\+protect}!gr\+::radar\+::find\+\_\+max\+\_\+peak\+\_\+c\+\_\+impl@{gr\+::radar\+::find\+\_\+max\+\_\+peak\+\_\+c\+\_\+impl}}
+\paragraph[{set\+\_\+samp\+\_\+protect(int samp)}]{\setlength{\rightskip}{0pt plus 5cm}{\bf void} gr\+::radar\+::find\+\_\+max\+\_\+peak\+\_\+c\+\_\+impl\+::set\+\_\+samp\+\_\+protect (
+\begin{DoxyParamCaption}
+\item[{{\bf int}}]{samp}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [virtual]}}\label{classgr_1_1radar_1_1find__max__peak__c__impl_ad43be71ddea1d2a5ccf0039b232fd0a1}
+
+
+Implements {\bf gr\+::radar\+::find\+\_\+max\+\_\+peak\+\_\+c} \doxyref{}{p.}{d1/d3d/classgr_1_1radar_1_1find__max__peak__c_abaf4240cdb5dcd4af0a88821221861e7}.
+
+
+
+Definition at line {\bf 78} of file {\bf find\+\_\+max\+\_\+peak\+\_\+c\+\_\+impl.\+cc}.
+
+
+
+References {\bf d\+\_\+samp\+\_\+protect}.
+
+\index{gr\+::radar\+::find\+\_\+max\+\_\+peak\+\_\+c\+\_\+impl@{gr\+::radar\+::find\+\_\+max\+\_\+peak\+\_\+c\+\_\+impl}!set\+\_\+threshold@{set\+\_\+threshold}}
+\index{set\+\_\+threshold@{set\+\_\+threshold}!gr\+::radar\+::find\+\_\+max\+\_\+peak\+\_\+c\+\_\+impl@{gr\+::radar\+::find\+\_\+max\+\_\+peak\+\_\+c\+\_\+impl}}
+\paragraph[{set\+\_\+threshold(float threshold)}]{\setlength{\rightskip}{0pt plus 5cm}{\bf void} gr\+::radar\+::find\+\_\+max\+\_\+peak\+\_\+c\+\_\+impl\+::set\+\_\+threshold (
+\begin{DoxyParamCaption}
+\item[{float}]{threshold}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [virtual]}}\label{classgr_1_1radar_1_1find__max__peak__c__impl_a86f8f41f1c632cd79a43eb2d597908d3}
+
+
+Implements {\bf gr\+::radar\+::find\+\_\+max\+\_\+peak\+\_\+c} \doxyref{}{p.}{d1/d3d/classgr_1_1radar_1_1find__max__peak__c_adc7673c9ed04bf49b1ef7e9cb60db989}.
+
+
+
+Definition at line {\bf 72} of file {\bf find\+\_\+max\+\_\+peak\+\_\+c\+\_\+impl.\+cc}.
+
+
+
+References {\bf d\+\_\+threshold}.
+
+\index{gr\+::radar\+::find\+\_\+max\+\_\+peak\+\_\+c\+\_\+impl@{gr\+::radar\+::find\+\_\+max\+\_\+peak\+\_\+c\+\_\+impl}!work@{work}}
+\index{work@{work}!gr\+::radar\+::find\+\_\+max\+\_\+peak\+\_\+c\+\_\+impl@{gr\+::radar\+::find\+\_\+max\+\_\+peak\+\_\+c\+\_\+impl}}
+\paragraph[{work(int noutput\+\_\+items, gr\+\_\+vector\+\_\+int \&ninput\+\_\+items, gr\+\_\+vector\+\_\+const\+\_\+void\+\_\+star \&input\+\_\+items, gr\+\_\+vector\+\_\+void\+\_\+star \&output\+\_\+items)}]{\setlength{\rightskip}{0pt plus 5cm}{\bf int} gr\+::radar\+::find\+\_\+max\+\_\+peak\+\_\+c\+\_\+impl\+::work (
+\begin{DoxyParamCaption}
+\item[{{\bf int}}]{noutput\+\_\+items, }
+\item[{gr\+\_\+vector\+\_\+int \&}]{ninput\+\_\+items, }
+\item[{gr\+\_\+vector\+\_\+const\+\_\+void\+\_\+star \&}]{input\+\_\+items, }
+\item[{gr\+\_\+vector\+\_\+void\+\_\+star \&}]{output\+\_\+items}
+\end{DoxyParamCaption}
+)}\label{classgr_1_1radar_1_1find__max__peak__c__impl_abc7cc518ef44f68a52f6a0237bebcb31}
+
+
+Definition at line {\bf 89} of file {\bf find\+\_\+max\+\_\+peak\+\_\+c\+\_\+impl.\+cc}.
+
+
+
+References {\bf d\+\_\+angle}, {\bf d\+\_\+cut\+\_\+max\+\_\+freq}, {\bf d\+\_\+freq}, {\bf d\+\_\+max\+\_\+freq}, {\bf d\+\_\+pangle}, {\bf d\+\_\+pfreq}, {\bf d\+\_\+pks}, {\bf d\+\_\+port\+\_\+id}, {\bf d\+\_\+ppks}, {\bf d\+\_\+ptimestamp}, {\bf d\+\_\+samp\+\_\+protect}, {\bf d\+\_\+samp\+\_\+rate}, {\bf d\+\_\+tags}, {\bf d\+\_\+threshold}, {\bf d\+\_\+value}, {\bf k}, and {\bf p()}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=249pt]{d9/d22/classgr_1_1radar_1_1find__max__peak__c__impl_abc7cc518ef44f68a52f6a0237bebcb31_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+\subsubsection{Member Data Documentation}
+\index{gr\+::radar\+::find\+\_\+max\+\_\+peak\+\_\+c\+\_\+impl@{gr\+::radar\+::find\+\_\+max\+\_\+peak\+\_\+c\+\_\+impl}!d\+\_\+angle@{d\+\_\+angle}}
+\index{d\+\_\+angle@{d\+\_\+angle}!gr\+::radar\+::find\+\_\+max\+\_\+peak\+\_\+c\+\_\+impl@{gr\+::radar\+::find\+\_\+max\+\_\+peak\+\_\+c\+\_\+impl}}
+\paragraph[{d\+\_\+angle}]{\setlength{\rightskip}{0pt plus 5cm}{\bf std\+::vector}$<$float$>$ gr\+::radar\+::find\+\_\+max\+\_\+peak\+\_\+c\+\_\+impl\+::d\+\_\+angle}\label{classgr_1_1radar_1_1find__max__peak__c__impl_a25f6237a39dee23a1ad597439d9431b6}
+
+
+Definition at line {\bf 50} of file {\bf find\+\_\+max\+\_\+peak\+\_\+c\+\_\+impl.\+h}.
+
+
+
+Referenced by {\bf work()}.
+
+\index{gr\+::radar\+::find\+\_\+max\+\_\+peak\+\_\+c\+\_\+impl@{gr\+::radar\+::find\+\_\+max\+\_\+peak\+\_\+c\+\_\+impl}!d\+\_\+cut\+\_\+max\+\_\+freq@{d\+\_\+cut\+\_\+max\+\_\+freq}}
+\index{d\+\_\+cut\+\_\+max\+\_\+freq@{d\+\_\+cut\+\_\+max\+\_\+freq}!gr\+::radar\+::find\+\_\+max\+\_\+peak\+\_\+c\+\_\+impl@{gr\+::radar\+::find\+\_\+max\+\_\+peak\+\_\+c\+\_\+impl}}
+\paragraph[{d\+\_\+cut\+\_\+max\+\_\+freq}]{\setlength{\rightskip}{0pt plus 5cm}bool gr\+::radar\+::find\+\_\+max\+\_\+peak\+\_\+c\+\_\+impl\+::d\+\_\+cut\+\_\+max\+\_\+freq}\label{classgr_1_1radar_1_1find__max__peak__c__impl_a4f4ad3b550e1b1cd4ae19e77ced20190}
+
+
+Definition at line {\bf 48} of file {\bf find\+\_\+max\+\_\+peak\+\_\+c\+\_\+impl.\+h}.
+
+
+
+Referenced by {\bf find\+\_\+max\+\_\+peak\+\_\+c\+\_\+impl()}, and {\bf work()}.
+
+\index{gr\+::radar\+::find\+\_\+max\+\_\+peak\+\_\+c\+\_\+impl@{gr\+::radar\+::find\+\_\+max\+\_\+peak\+\_\+c\+\_\+impl}!d\+\_\+freq@{d\+\_\+freq}}
+\index{d\+\_\+freq@{d\+\_\+freq}!gr\+::radar\+::find\+\_\+max\+\_\+peak\+\_\+c\+\_\+impl@{gr\+::radar\+::find\+\_\+max\+\_\+peak\+\_\+c\+\_\+impl}}
+\paragraph[{d\+\_\+freq}]{\setlength{\rightskip}{0pt plus 5cm}{\bf std\+::vector}$<$float$>$ gr\+::radar\+::find\+\_\+max\+\_\+peak\+\_\+c\+\_\+impl\+::d\+\_\+freq}\label{classgr_1_1radar_1_1find__max__peak__c__impl_a465232431d90bcbc957864b68ad9cad3}
+
+
+Definition at line {\bf 50} of file {\bf find\+\_\+max\+\_\+peak\+\_\+c\+\_\+impl.\+h}.
+
+
+
+Referenced by {\bf work()}.
+
+\index{gr\+::radar\+::find\+\_\+max\+\_\+peak\+\_\+c\+\_\+impl@{gr\+::radar\+::find\+\_\+max\+\_\+peak\+\_\+c\+\_\+impl}!d\+\_\+max\+\_\+freq@{d\+\_\+max\+\_\+freq}}
+\index{d\+\_\+max\+\_\+freq@{d\+\_\+max\+\_\+freq}!gr\+::radar\+::find\+\_\+max\+\_\+peak\+\_\+c\+\_\+impl@{gr\+::radar\+::find\+\_\+max\+\_\+peak\+\_\+c\+\_\+impl}}
+\paragraph[{d\+\_\+max\+\_\+freq}]{\setlength{\rightskip}{0pt plus 5cm}{\bf std\+::vector}$<$float$>$ gr\+::radar\+::find\+\_\+max\+\_\+peak\+\_\+c\+\_\+impl\+::d\+\_\+max\+\_\+freq}\label{classgr_1_1radar_1_1find__max__peak__c__impl_a66ee73648e8ec44525d338b296989aa2}
+
+
+Definition at line {\bf 47} of file {\bf find\+\_\+max\+\_\+peak\+\_\+c\+\_\+impl.\+h}.
+
+
+
+Referenced by {\bf find\+\_\+max\+\_\+peak\+\_\+c\+\_\+impl()}, {\bf set\+\_\+max\+\_\+freq()}, and {\bf work()}.
+
+\index{gr\+::radar\+::find\+\_\+max\+\_\+peak\+\_\+c\+\_\+impl@{gr\+::radar\+::find\+\_\+max\+\_\+peak\+\_\+c\+\_\+impl}!d\+\_\+pangle@{d\+\_\+pangle}}
+\index{d\+\_\+pangle@{d\+\_\+pangle}!gr\+::radar\+::find\+\_\+max\+\_\+peak\+\_\+c\+\_\+impl@{gr\+::radar\+::find\+\_\+max\+\_\+peak\+\_\+c\+\_\+impl}}
+\paragraph[{d\+\_\+pangle}]{\setlength{\rightskip}{0pt plus 5cm}pmt\+::pmt\+\_\+t gr\+::radar\+::find\+\_\+max\+\_\+peak\+\_\+c\+\_\+impl\+::d\+\_\+pangle}\label{classgr_1_1radar_1_1find__max__peak__c__impl_a0db1e3bd3a9fd8845358726f8f45e751}
+
+
+Definition at line {\bf 53} of file {\bf find\+\_\+max\+\_\+peak\+\_\+c\+\_\+impl.\+h}.
+
+
+
+Referenced by {\bf work()}.
+
+\index{gr\+::radar\+::find\+\_\+max\+\_\+peak\+\_\+c\+\_\+impl@{gr\+::radar\+::find\+\_\+max\+\_\+peak\+\_\+c\+\_\+impl}!d\+\_\+pfreq@{d\+\_\+pfreq}}
+\index{d\+\_\+pfreq@{d\+\_\+pfreq}!gr\+::radar\+::find\+\_\+max\+\_\+peak\+\_\+c\+\_\+impl@{gr\+::radar\+::find\+\_\+max\+\_\+peak\+\_\+c\+\_\+impl}}
+\paragraph[{d\+\_\+pfreq}]{\setlength{\rightskip}{0pt plus 5cm}pmt\+::pmt\+\_\+t gr\+::radar\+::find\+\_\+max\+\_\+peak\+\_\+c\+\_\+impl\+::d\+\_\+pfreq}\label{classgr_1_1radar_1_1find__max__peak__c__impl_a90cb280396de1d52cc940843c170280b}
+
+
+Definition at line {\bf 53} of file {\bf find\+\_\+max\+\_\+peak\+\_\+c\+\_\+impl.\+h}.
+
+
+
+Referenced by {\bf work()}.
+
+\index{gr\+::radar\+::find\+\_\+max\+\_\+peak\+\_\+c\+\_\+impl@{gr\+::radar\+::find\+\_\+max\+\_\+peak\+\_\+c\+\_\+impl}!d\+\_\+pks@{d\+\_\+pks}}
+\index{d\+\_\+pks@{d\+\_\+pks}!gr\+::radar\+::find\+\_\+max\+\_\+peak\+\_\+c\+\_\+impl@{gr\+::radar\+::find\+\_\+max\+\_\+peak\+\_\+c\+\_\+impl}}
+\paragraph[{d\+\_\+pks}]{\setlength{\rightskip}{0pt plus 5cm}{\bf std\+::vector}$<$float$>$ gr\+::radar\+::find\+\_\+max\+\_\+peak\+\_\+c\+\_\+impl\+::d\+\_\+pks}\label{classgr_1_1radar_1_1find__max__peak__c__impl_a0ca10829e672a3b4edb298a4858eae44}
+
+
+Definition at line {\bf 50} of file {\bf find\+\_\+max\+\_\+peak\+\_\+c\+\_\+impl.\+h}.
+
+
+
+Referenced by {\bf work()}.
+
+\index{gr\+::radar\+::find\+\_\+max\+\_\+peak\+\_\+c\+\_\+impl@{gr\+::radar\+::find\+\_\+max\+\_\+peak\+\_\+c\+\_\+impl}!d\+\_\+port\+\_\+id@{d\+\_\+port\+\_\+id}}
+\index{d\+\_\+port\+\_\+id@{d\+\_\+port\+\_\+id}!gr\+::radar\+::find\+\_\+max\+\_\+peak\+\_\+c\+\_\+impl@{gr\+::radar\+::find\+\_\+max\+\_\+peak\+\_\+c\+\_\+impl}}
+\paragraph[{d\+\_\+port\+\_\+id}]{\setlength{\rightskip}{0pt plus 5cm}pmt\+::pmt\+\_\+t gr\+::radar\+::find\+\_\+max\+\_\+peak\+\_\+c\+\_\+impl\+::d\+\_\+port\+\_\+id}\label{classgr_1_1radar_1_1find__max__peak__c__impl_a19f0f1c6e64f2aa57963fca62a224f69}
+
+
+Definition at line {\bf 52} of file {\bf find\+\_\+max\+\_\+peak\+\_\+c\+\_\+impl.\+h}.
+
+
+
+Referenced by {\bf find\+\_\+max\+\_\+peak\+\_\+c\+\_\+impl()}, and {\bf work()}.
+
+\index{gr\+::radar\+::find\+\_\+max\+\_\+peak\+\_\+c\+\_\+impl@{gr\+::radar\+::find\+\_\+max\+\_\+peak\+\_\+c\+\_\+impl}!d\+\_\+ppks@{d\+\_\+ppks}}
+\index{d\+\_\+ppks@{d\+\_\+ppks}!gr\+::radar\+::find\+\_\+max\+\_\+peak\+\_\+c\+\_\+impl@{gr\+::radar\+::find\+\_\+max\+\_\+peak\+\_\+c\+\_\+impl}}
+\paragraph[{d\+\_\+ppks}]{\setlength{\rightskip}{0pt plus 5cm}pmt\+::pmt\+\_\+t gr\+::radar\+::find\+\_\+max\+\_\+peak\+\_\+c\+\_\+impl\+::d\+\_\+ppks}\label{classgr_1_1radar_1_1find__max__peak__c__impl_a62f6a0ee60cd398f40d796c96700000f}
+
+
+Definition at line {\bf 53} of file {\bf find\+\_\+max\+\_\+peak\+\_\+c\+\_\+impl.\+h}.
+
+
+
+Referenced by {\bf work()}.
+
+\index{gr\+::radar\+::find\+\_\+max\+\_\+peak\+\_\+c\+\_\+impl@{gr\+::radar\+::find\+\_\+max\+\_\+peak\+\_\+c\+\_\+impl}!d\+\_\+ptimestamp@{d\+\_\+ptimestamp}}
+\index{d\+\_\+ptimestamp@{d\+\_\+ptimestamp}!gr\+::radar\+::find\+\_\+max\+\_\+peak\+\_\+c\+\_\+impl@{gr\+::radar\+::find\+\_\+max\+\_\+peak\+\_\+c\+\_\+impl}}
+\paragraph[{d\+\_\+ptimestamp}]{\setlength{\rightskip}{0pt plus 5cm}pmt\+::pmt\+\_\+t gr\+::radar\+::find\+\_\+max\+\_\+peak\+\_\+c\+\_\+impl\+::d\+\_\+ptimestamp}\label{classgr_1_1radar_1_1find__max__peak__c__impl_af0147f99953631687860e93c33da00a0}
+
+
+Definition at line {\bf 53} of file {\bf find\+\_\+max\+\_\+peak\+\_\+c\+\_\+impl.\+h}.
+
+
+
+Referenced by {\bf work()}.
+
+\index{gr\+::radar\+::find\+\_\+max\+\_\+peak\+\_\+c\+\_\+impl@{gr\+::radar\+::find\+\_\+max\+\_\+peak\+\_\+c\+\_\+impl}!d\+\_\+samp\+\_\+protect@{d\+\_\+samp\+\_\+protect}}
+\index{d\+\_\+samp\+\_\+protect@{d\+\_\+samp\+\_\+protect}!gr\+::radar\+::find\+\_\+max\+\_\+peak\+\_\+c\+\_\+impl@{gr\+::radar\+::find\+\_\+max\+\_\+peak\+\_\+c\+\_\+impl}}
+\paragraph[{d\+\_\+samp\+\_\+protect}]{\setlength{\rightskip}{0pt plus 5cm}{\bf int} gr\+::radar\+::find\+\_\+max\+\_\+peak\+\_\+c\+\_\+impl\+::d\+\_\+samp\+\_\+protect}\label{classgr_1_1radar_1_1find__max__peak__c__impl_aac17c7ab64dc330f73aa1de5542d6296}
+
+
+Definition at line {\bf 46} of file {\bf find\+\_\+max\+\_\+peak\+\_\+c\+\_\+impl.\+h}.
+
+
+
+Referenced by {\bf find\+\_\+max\+\_\+peak\+\_\+c\+\_\+impl()}, {\bf set\+\_\+samp\+\_\+protect()}, and {\bf work()}.
+
+\index{gr\+::radar\+::find\+\_\+max\+\_\+peak\+\_\+c\+\_\+impl@{gr\+::radar\+::find\+\_\+max\+\_\+peak\+\_\+c\+\_\+impl}!d\+\_\+samp\+\_\+rate@{d\+\_\+samp\+\_\+rate}}
+\index{d\+\_\+samp\+\_\+rate@{d\+\_\+samp\+\_\+rate}!gr\+::radar\+::find\+\_\+max\+\_\+peak\+\_\+c\+\_\+impl@{gr\+::radar\+::find\+\_\+max\+\_\+peak\+\_\+c\+\_\+impl}}
+\paragraph[{d\+\_\+samp\+\_\+rate}]{\setlength{\rightskip}{0pt plus 5cm}{\bf int} gr\+::radar\+::find\+\_\+max\+\_\+peak\+\_\+c\+\_\+impl\+::d\+\_\+samp\+\_\+rate}\label{classgr_1_1radar_1_1find__max__peak__c__impl_ada1c6043c04820491bebad92a4723fd7}
+
+
+Definition at line {\bf 44} of file {\bf find\+\_\+max\+\_\+peak\+\_\+c\+\_\+impl.\+h}.
+
+
+
+Referenced by {\bf find\+\_\+max\+\_\+peak\+\_\+c\+\_\+impl()}, and {\bf work()}.
+
+\index{gr\+::radar\+::find\+\_\+max\+\_\+peak\+\_\+c\+\_\+impl@{gr\+::radar\+::find\+\_\+max\+\_\+peak\+\_\+c\+\_\+impl}!d\+\_\+tags@{d\+\_\+tags}}
+\index{d\+\_\+tags@{d\+\_\+tags}!gr\+::radar\+::find\+\_\+max\+\_\+peak\+\_\+c\+\_\+impl@{gr\+::radar\+::find\+\_\+max\+\_\+peak\+\_\+c\+\_\+impl}}
+\paragraph[{d\+\_\+tags}]{\setlength{\rightskip}{0pt plus 5cm}{\bf std\+::vector}$<$ tag\+\_\+t $>$ gr\+::radar\+::find\+\_\+max\+\_\+peak\+\_\+c\+\_\+impl\+::d\+\_\+tags}\label{classgr_1_1radar_1_1find__max__peak__c__impl_a94abffbb64dfc5ae085507f16788f1ad}
+
+
+Definition at line {\bf 54} of file {\bf find\+\_\+max\+\_\+peak\+\_\+c\+\_\+impl.\+h}.
+
+
+
+Referenced by {\bf work()}.
+
+\index{gr\+::radar\+::find\+\_\+max\+\_\+peak\+\_\+c\+\_\+impl@{gr\+::radar\+::find\+\_\+max\+\_\+peak\+\_\+c\+\_\+impl}!d\+\_\+threshold@{d\+\_\+threshold}}
+\index{d\+\_\+threshold@{d\+\_\+threshold}!gr\+::radar\+::find\+\_\+max\+\_\+peak\+\_\+c\+\_\+impl@{gr\+::radar\+::find\+\_\+max\+\_\+peak\+\_\+c\+\_\+impl}}
+\paragraph[{d\+\_\+threshold}]{\setlength{\rightskip}{0pt plus 5cm}float gr\+::radar\+::find\+\_\+max\+\_\+peak\+\_\+c\+\_\+impl\+::d\+\_\+threshold}\label{classgr_1_1radar_1_1find__max__peak__c__impl_a7920d1761cb2e0d194f2449141c0a52e}
+
+
+Definition at line {\bf 45} of file {\bf find\+\_\+max\+\_\+peak\+\_\+c\+\_\+impl.\+h}.
+
+
+
+Referenced by {\bf find\+\_\+max\+\_\+peak\+\_\+c\+\_\+impl()}, {\bf set\+\_\+threshold()}, and {\bf work()}.
+
+\index{gr\+::radar\+::find\+\_\+max\+\_\+peak\+\_\+c\+\_\+impl@{gr\+::radar\+::find\+\_\+max\+\_\+peak\+\_\+c\+\_\+impl}!d\+\_\+value@{d\+\_\+value}}
+\index{d\+\_\+value@{d\+\_\+value}!gr\+::radar\+::find\+\_\+max\+\_\+peak\+\_\+c\+\_\+impl@{gr\+::radar\+::find\+\_\+max\+\_\+peak\+\_\+c\+\_\+impl}}
+\paragraph[{d\+\_\+value}]{\setlength{\rightskip}{0pt plus 5cm}pmt\+::pmt\+\_\+t gr\+::radar\+::find\+\_\+max\+\_\+peak\+\_\+c\+\_\+impl\+::d\+\_\+value}\label{classgr_1_1radar_1_1find__max__peak__c__impl_a0865ce9a014560be3f87a01528d4aa60}
+
+
+Definition at line {\bf 53} of file {\bf find\+\_\+max\+\_\+peak\+\_\+c\+\_\+impl.\+h}.
+
+
+
+Referenced by {\bf work()}.
+
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+/home/erik/prefix/default/src/gr-\/radar-\/dev/lib/{\bf find\+\_\+max\+\_\+peak\+\_\+c\+\_\+impl.\+h}\item 
+/home/erik/prefix/default/src/gr-\/radar-\/dev/lib/{\bf find\+\_\+max\+\_\+peak\+\_\+c\+\_\+impl.\+cc}\end{DoxyCompactItemize}

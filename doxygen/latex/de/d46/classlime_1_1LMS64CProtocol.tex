@@ -77,9 +77,9 @@ virtual {\bf Device\+Info} {\bf Get\+Device\+Info} ({\bf void})
 \begin{DoxyCompactList}\small\item\em Device\+Reset implemented by L\+M\+S64C. \end{DoxyCompactList}\item 
 {\bf int} {\bf Transact\+S\+PI} (const {\bf int} addr, const uint32\+\_\+t $\ast$write\+Data, uint32\+\_\+t $\ast$read\+Data, const size\+\_\+t {\bf size}) override
 \begin{DoxyCompactList}\small\item\em Transact\+S\+PI implemented by L\+M\+S64C. \end{DoxyCompactList}\item 
-{\bf int} {\bf Write\+I2C} (const {\bf int} addr, const std\+::string \&{\bf data})
+{\bf int} {\bf Write\+I2C} (const {\bf int} addr, const {\bf std\+::string} \&{\bf data})
 \begin{DoxyCompactList}\small\item\em Write\+I2C implemented by L\+M\+S64C. \end{DoxyCompactList}\item 
-{\bf int} {\bf Read\+I2C} (const {\bf int} addr, const size\+\_\+t num\+Bytes, std\+::string \&{\bf data})
+{\bf int} {\bf Read\+I2C} (const {\bf int} addr, const size\+\_\+t num\+Bytes, {\bf std\+::string} \&{\bf data})
 \begin{DoxyCompactList}\small\item\em Read\+I2C implemented by L\+M\+S64C. \end{DoxyCompactList}\item 
 {\bf int} {\bf Write\+Registers} (const uint32\+\_\+t $\ast$addrs, const uint32\+\_\+t $\ast${\bf data}, const size\+\_\+t {\bf size})
 \begin{DoxyCompactList}\small\item\em Write\+Registers (B\+R\+D\+S\+PI) implemented by L\+M\+S64C. \end{DoxyCompactList}\item 
@@ -103,9 +103,9 @@ virtual {\bf int} {\bf Read} (unsigned char $\ast${\bf buffer}, {\bf int} {\bf l
 \begin{DoxyCompactList}\small\item\em virtual read function to be implemented by the base class \end{DoxyCompactList}\item 
 virtual {\bf int} {\bf Program\+Write} (const char $\ast${\bf buffer}, const size\+\_\+t {\bf length}, const {\bf int} programming\+Mode, const {\bf int} {\bf device}, {\bf Programming\+Callback} {\bf callback}=nullptr)
 \begin{DoxyCompactList}\small\item\em Uploads program to selected device. \end{DoxyCompactList}\item 
-virtual {\bf int} {\bf Custom\+Parameter\+Read} (const uint8\+\_\+t $\ast${\bf ids}, double $\ast$values, const size\+\_\+t {\bf count}, std\+::string $\ast${\bf units}) override
+virtual {\bf int} {\bf Custom\+Parameter\+Read} (const uint8\+\_\+t $\ast${\bf ids}, double $\ast$values, const size\+\_\+t {\bf count}, {\bf std\+::string} $\ast${\bf units}) override
 \begin{DoxyCompactList}\small\item\em Returns value of custom on board control. \end{DoxyCompactList}\item 
-virtual {\bf int} {\bf Custom\+Parameter\+Write} (const uint8\+\_\+t $\ast${\bf ids}, const double $\ast$values, const size\+\_\+t {\bf count}, const std\+::string \&{\bf units}) override
+virtual {\bf int} {\bf Custom\+Parameter\+Write} (const uint8\+\_\+t $\ast${\bf ids}, const double $\ast$values, const size\+\_\+t {\bf count}, const {\bf std\+::string} \&{\bf units}) override
 \begin{DoxyCompactList}\small\item\em Sets custom on board control to given value units. \end{DoxyCompactList}\item 
 virtual {\bf int} {\bf G\+P\+I\+O\+Write} (const uint8\+\_\+t $\ast${\bf buffer}, const size\+\_\+t buf\+Length) override
 \begin{DoxyCompactList}\small\item\em Writes G\+P\+IO values to device. \end{DoxyCompactList}\item 
@@ -124,9 +124,9 @@ virtual {\bf int} {\bf G\+P\+I\+O\+Dir\+Read} (uint8\+\_\+t $\ast${\bf buffer}, 
 \subsubsection*{Private Member Functions}
 \begin{DoxyCompactItemize}
 \item 
-{\bf int} {\bf Write\+Si5351\+I2C} (const std\+::string \&{\bf data})
+{\bf int} {\bf Write\+Si5351\+I2C} (const {\bf std\+::string} \&{\bf data})
 \item 
-{\bf int} {\bf Read\+Si5351\+I2C} (const size\+\_\+t num\+Bytes, std\+::string \&{\bf data})
+{\bf int} {\bf Read\+Si5351\+I2C} (const size\+\_\+t num\+Bytes, {\bf std\+::string} \&{\bf data})
 \item 
 {\bf int} {\bf Write\+A\+D\+F4002\+S\+PI} (const uint32\+\_\+t $\ast$write\+Data, const size\+\_\+t {\bf size})
 \item 
@@ -261,7 +261,7 @@ Definition at line {\bf 48} of file {\bf L\+M\+S64\+C\+Protocol.\+cpp}.
 \item[{const uint8\+\_\+t $\ast$}]{ids, }
 \item[{double $\ast$}]{values, }
 \item[{const size\+\_\+t}]{count, }
-\item[{std\+::string $\ast$}]{units}
+\item[{{\bf std\+::string} $\ast$}]{units}
 \end{DoxyParamCaption}
 )\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [virtual]}}\label{classlime_1_1LMS64CProtocol_a5c865b7d0d0c10a26266f5a28461dea6}
 
@@ -313,7 +313,7 @@ Here is the call graph for this function\+:
 \item[{const uint8\+\_\+t $\ast$}]{ids, }
 \item[{const double $\ast$}]{values, }
 \item[{const size\+\_\+t}]{count, }
-\item[{const std\+::string \&}]{units}
+\item[{const {\bf std\+::string} \&}]{units}
 \end{DoxyParamCaption}
 )\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [virtual]}}\label{classlime_1_1LMS64CProtocol_a177087728724bd3c3b2b1f83580c2e23}
 
@@ -852,7 +852,7 @@ Definition at line {\bf 474} of file {\bf L\+M\+S64\+C\+Protocol.\+cpp}.
 
 
 
-References {\bf buffer}, {\bf lime\+::\+L\+M\+S64\+C\+Protocol\+::\+Generic\+Packet\+::cmd}, {\bf lime\+::\+L\+M\+S64\+C\+Protocol\+::\+Protocol\+L\+M\+S64\+C\+::cmd}, {\bf lime\+::\+C\+M\+D\+\_\+\+A\+D\+F4002\+\_\+\+WR}, {\bf lime\+::\+C\+M\+D\+\_\+\+A\+N\+A\+L\+O\+G\+\_\+\+V\+A\+L\+\_\+\+RD}, {\bf lime\+::\+C\+M\+D\+\_\+\+A\+N\+A\+L\+O\+G\+\_\+\+V\+A\+L\+\_\+\+WR}, {\bf lime\+::\+C\+M\+D\+\_\+\+B\+R\+D\+S\+P\+I8\+\_\+\+RD}, {\bf lime\+::\+C\+M\+D\+\_\+\+B\+R\+D\+S\+P\+I\+\_\+\+RD}, {\bf lime\+::\+C\+M\+D\+\_\+\+B\+R\+D\+S\+P\+I\+\_\+\+WR}, {\bf lime\+::\+C\+M\+D\+\_\+\+G\+E\+T\+\_\+\+I\+N\+FO}, {\bf lime\+::\+C\+M\+D\+\_\+\+L\+M\+S7002\+\_\+\+RD}, {\bf lime\+::\+C\+M\+D\+\_\+\+L\+M\+S7002\+\_\+\+R\+ST}, {\bf lime\+::\+C\+M\+D\+\_\+\+L\+M\+S7002\+\_\+\+WR}, {\bf lime\+::\+C\+M\+D\+\_\+\+P\+R\+O\+G\+\_\+\+M\+CU}, {\bf lime\+::\+C\+M\+D\+\_\+\+S\+I5351\+\_\+\+RD}, {\bf lime\+::\+C\+M\+D\+\_\+\+S\+I5351\+\_\+\+WR}, {\bf lime\+::\+C\+M\+D\+\_\+\+S\+I5356\+\_\+\+RD}, {\bf lime\+::\+C\+M\+D\+\_\+\+S\+I5356\+\_\+\+WR}, {\bf i}, {\bf L\+M\+S\+\_\+\+P\+R\+O\+T\+O\+C\+O\+L\+\_\+\+L\+M\+S64C}, {\bf L\+M\+S\+\_\+\+P\+R\+O\+T\+O\+C\+O\+L\+\_\+\+N\+O\+V\+E\+NA}, {\bf L\+M\+S\+\_\+\+P\+R\+O\+T\+O\+C\+O\+L\+\_\+\+U\+N\+D\+E\+F\+I\+N\+ED}, {\bf lime\+::\+L\+M\+S64\+C\+Protocol\+::\+Protocol\+L\+M\+S64\+C\+::max\+Data\+Length}, {\bf lime\+::\+L\+M\+S64\+C\+Protocol\+::\+Generic\+Packet\+::out\+Buffer}, {\bf lime\+::\+L\+M\+S64\+C\+Protocol\+::\+Generic\+Packet\+::periph\+ID}, {\bf lime\+::\+L\+M\+S64\+C\+Protocol\+::\+Protocol\+L\+M\+S64\+C\+::periph\+ID}, {\bf lime\+::\+L\+M\+S64\+C\+Protocol\+::\+Protocol\+L\+M\+S64\+C\+::pkt\+Length}, {\bf lime\+::\+L\+M\+S64\+C\+Protocol\+::\+Protocol\+L\+M\+S64\+C\+::reserved}, {\bf lime\+::\+L\+M\+S64\+C\+Protocol\+::\+Generic\+Packet\+::status}, and {\bf lime\+::\+L\+M\+S64\+C\+Protocol\+::\+Protocol\+L\+M\+S64\+C\+::status}.
+References {\bf buffer}, {\bf lime\+::\+L\+M\+S64\+C\+Protocol\+::\+Generic\+Packet\+::cmd}, {\bf lime\+::\+L\+M\+S64\+C\+Protocol\+::\+Protocol\+L\+M\+S64\+C\+::cmd}, {\bf lime\+::\+C\+M\+D\+\_\+\+A\+D\+F4002\+\_\+\+WR}, {\bf lime\+::\+C\+M\+D\+\_\+\+A\+N\+A\+L\+O\+G\+\_\+\+V\+A\+L\+\_\+\+RD}, {\bf lime\+::\+C\+M\+D\+\_\+\+A\+N\+A\+L\+O\+G\+\_\+\+V\+A\+L\+\_\+\+WR}, {\bf lime\+::\+C\+M\+D\+\_\+\+B\+R\+D\+S\+P\+I8\+\_\+\+RD}, {\bf lime\+::\+C\+M\+D\+\_\+\+B\+R\+D\+S\+P\+I\+\_\+\+RD}, {\bf lime\+::\+C\+M\+D\+\_\+\+B\+R\+D\+S\+P\+I\+\_\+\+WR}, {\bf lime\+::\+C\+M\+D\+\_\+\+G\+E\+T\+\_\+\+I\+N\+FO}, {\bf lime\+::\+C\+M\+D\+\_\+\+L\+M\+S7002\+\_\+\+RD}, {\bf lime\+::\+C\+M\+D\+\_\+\+L\+M\+S7002\+\_\+\+R\+ST}, {\bf lime\+::\+C\+M\+D\+\_\+\+L\+M\+S7002\+\_\+\+WR}, {\bf lime\+::\+C\+M\+D\+\_\+\+P\+R\+O\+G\+\_\+\+M\+CU}, {\bf lime\+::\+C\+M\+D\+\_\+\+S\+I5351\+\_\+\+RD}, {\bf lime\+::\+C\+M\+D\+\_\+\+S\+I5351\+\_\+\+WR}, {\bf lime\+::\+C\+M\+D\+\_\+\+S\+I5356\+\_\+\+RD}, {\bf lime\+::\+C\+M\+D\+\_\+\+S\+I5356\+\_\+\+WR}, {\bf i}, {\bf k}, {\bf L\+M\+S\+\_\+\+P\+R\+O\+T\+O\+C\+O\+L\+\_\+\+L\+M\+S64C}, {\bf L\+M\+S\+\_\+\+P\+R\+O\+T\+O\+C\+O\+L\+\_\+\+N\+O\+V\+E\+NA}, {\bf L\+M\+S\+\_\+\+P\+R\+O\+T\+O\+C\+O\+L\+\_\+\+U\+N\+D\+E\+F\+I\+N\+ED}, {\bf lime\+::\+L\+M\+S64\+C\+Protocol\+::\+Protocol\+L\+M\+S64\+C\+::max\+Data\+Length}, {\bf lime\+::\+L\+M\+S64\+C\+Protocol\+::\+Generic\+Packet\+::out\+Buffer}, {\bf lime\+::\+L\+M\+S64\+C\+Protocol\+::\+Generic\+Packet\+::periph\+ID}, {\bf lime\+::\+L\+M\+S64\+C\+Protocol\+::\+Protocol\+L\+M\+S64\+C\+::periph\+ID}, {\bf lime\+::\+L\+M\+S64\+C\+Protocol\+::\+Protocol\+L\+M\+S64\+C\+::pkt\+Length}, {\bf lime\+::\+L\+M\+S64\+C\+Protocol\+::\+Protocol\+L\+M\+S64\+C\+::reserved}, {\bf lime\+::\+L\+M\+S64\+C\+Protocol\+::\+Generic\+Packet\+::status}, and {\bf lime\+::\+L\+M\+S64\+C\+Protocol\+::\+Protocol\+L\+M\+S64\+C\+::status}.
 
 
 
@@ -960,7 +960,7 @@ Definition at line {\bf 104} of file {\bf Connection\+Images.\+cpp}.
 
 
 
-References {\bf callback}, {\bf device}, {\bf lime\+::download\+Image\+Resource()}, {\bf F\+P\+GA}, {\bf F\+X3}, {\bf lime\+::\+Get\+Device\+Name()}, {\bf lime\+::info()}, {\bf lime\+::\+L\+M\+S\+\_\+\+D\+E\+V\+\_\+\+U\+N\+K\+N\+O\+WN}, {\bf lime\+::locate\+Image\+Resource()}, {\bf lookup\+Image\+Entry()}, {\bf programming\+Callback\+Stream()}, {\bf lime\+::\+Report\+Error()}, and {\bf status}.
+References {\bf callback}, {\bf device}, {\bf lime\+::download\+Image\+Resource()}, {\bf file()}, {\bf F\+P\+GA}, {\bf F\+X3}, {\bf lime\+::\+Get\+Device\+Name()}, {\bf lime\+::info()}, {\bf lime\+::\+L\+M\+S\+\_\+\+D\+E\+V\+\_\+\+U\+N\+K\+N\+O\+WN}, {\bf lime\+::locate\+Image\+Resource()}, {\bf lookup\+Image\+Entry()}, {\bf programming\+Callback\+Stream()}, {\bf lime\+::\+Report\+Error()}, {\bf status}, and {\bf string()}.
 
 
 
@@ -1117,7 +1117,7 @@ Here is the caller graph for this function\+:
 \begin{DoxyParamCaption}
 \item[{const {\bf int}}]{addr, }
 \item[{const size\+\_\+t}]{num\+Bytes, }
-\item[{std\+::string \&}]{data}
+\item[{{\bf std\+::string} \&}]{data}
 \end{DoxyParamCaption}
 )\hspace{0.3cm}{\ttfamily [virtual]}}\label{classlime_1_1LMS64CProtocol_a89b06bc220deeec9646d5bd844462bb0}
 
@@ -1240,7 +1240,7 @@ Here is the call graph for this function\+:
 \paragraph[{Read\+Si5351\+I2\+C(const size\+\_\+t num\+Bytes, std\+::string \&data)}]{\setlength{\rightskip}{0pt plus 5cm}{\bf int} L\+M\+S64\+C\+Protocol\+::\+Read\+Si5351\+I2C (
 \begin{DoxyParamCaption}
 \item[{const size\+\_\+t}]{num\+Bytes, }
-\item[{std\+::string \&}]{data}
+\item[{{\bf std\+::string} \&}]{data}
 \end{DoxyParamCaption}
 )\hspace{0.3cm}{\ttfamily [private]}}\label{classlime_1_1LMS64CProtocol_a4713004ea1d9e2c75a05928ec61ef915}
 
@@ -1503,7 +1503,7 @@ Here is the caller graph for this function\+:
 \paragraph[{Write\+I2\+C(const int addr, const std\+::string \&data)}]{\setlength{\rightskip}{0pt plus 5cm}{\bf int} L\+M\+S64\+C\+Protocol\+::\+Write\+I2C (
 \begin{DoxyParamCaption}
 \item[{const {\bf int}}]{addr, }
-\item[{const std\+::string \&}]{data}
+\item[{const {\bf std\+::string} \&}]{data}
 \end{DoxyParamCaption}
 )\hspace{0.3cm}{\ttfamily [virtual]}}\label{classlime_1_1LMS64CProtocol_aa69542373b372efe8a85684466b8c892}
 
@@ -1624,7 +1624,7 @@ Here is the call graph for this function\+:
 \index{Write\+Si5351\+I2C@{Write\+Si5351\+I2C}!lime\+::\+L\+M\+S64\+C\+Protocol@{lime\+::\+L\+M\+S64\+C\+Protocol}}
 \paragraph[{Write\+Si5351\+I2\+C(const std\+::string \&data)}]{\setlength{\rightskip}{0pt plus 5cm}{\bf int} L\+M\+S64\+C\+Protocol\+::\+Write\+Si5351\+I2C (
 \begin{DoxyParamCaption}
-\item[{const std\+::string \&}]{data}
+\item[{const {\bf std\+::string} \&}]{data}
 \end{DoxyParamCaption}
 )\hspace{0.3cm}{\ttfamily [private]}}\label{classlime_1_1LMS64CProtocol_a338017545aba9f0af32edb1a9d3ea0f7}
 

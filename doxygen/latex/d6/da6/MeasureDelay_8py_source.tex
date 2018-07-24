@@ -1,0 +1,195 @@
+\subsection{Measure\+Delay.\+py}
+\label{MeasureDelay_8py_source}\index{/home/erik/prefix/default/src/soapysdr/python/apps/\+Measure\+Delay.\+py@{/home/erik/prefix/default/src/soapysdr/python/apps/\+Measure\+Delay.\+py}}
+
+\begin{DoxyCode}
+00001 \textcolor{comment}{########################################################################}
+00002 \textcolor{comment}{## Measure round trip delay through RF loopback/leakage}
+00003 \textcolor{comment}{########################################################################}
+00004 
+00005 \textcolor{keyword}{import} SoapySDR
+00006 \textcolor{keyword}{from} SoapySDR \textcolor{keyword}{import} * \textcolor{comment}{#SOAPY\_SDR\_ constants}
+00007 \textcolor{keyword}{import} numpy \textcolor{keyword}{as} np
+00008 \textcolor{keyword}{from} scipy \textcolor{keyword}{import} signal
+00009 \textcolor{keyword}{from} optparse \textcolor{keyword}{import} OptionParser
+00010 \textcolor{keyword}{import} time
+00011 \textcolor{keyword}{import} os
+00012 
+00013 \textcolor{keyword}{def }generate_cf32_pulse(numSamps, width=5, scaleFactor=0.3):
+00014     x = np.linspace(-width, width, numSamps)
+00015     pulse = np.sinc(x).astype(np.complex64)
+00016     \textcolor{keywordflow}{return} pulse*scaleFactor
+00017 
+00018 \textcolor{keyword}{def }measure_delay(
+00019     args,
+00020     rate,
+00021     freq=\textcolor{keywordtype}{None},
+00022     rxBw=\textcolor{keywordtype}{None},
+00023     txBw=\textcolor{keywordtype}{None},
+00024     rxChan=0,
+00025     txChan=0,
+00026     rxAnt=\textcolor{keywordtype}{None},
+00027     txAnt=\textcolor{keywordtype}{None},
+00028     rxGain=\textcolor{keywordtype}{None},
+00029     txGain=\textcolor{keywordtype}{None},
+00030     clockRate=\textcolor{keywordtype}{None},
+00031     numTxSamps=200,
+00032     numRxSamps=10000,
+00033     dumpDir=\textcolor{keywordtype}{None},
+00034 ):
+00035     sdr = SoapySDR.Device(args)
+00036     \textcolor{keywordflow}{if} \textcolor{keywordflow}{not} sdr.hasHardwareTime():
+00037         \textcolor{keywordflow}{raise} Exception(\textcolor{stringliteral}{'this device does not support timed streaming'})
+00038 
+00039     \textcolor{comment}{#set clock rate first}
+00040     \textcolor{keywordflow}{if} clockRate \textcolor{keywordflow}{is} \textcolor{keywordflow}{not} \textcolor{keywordtype}{None}: sdr.setMasterClockRate(clockRate)
+00041 
+00042     \textcolor{comment}{#set sample rate}
+00043     sdr.setSampleRate(SOAPY\_SDR\_RX, rxChan, rate)
+00044     sdr.setSampleRate(SOAPY\_SDR\_TX, txChan, rate)
+00045     print(\textcolor{stringliteral}{"Actual Rx Rate %f Msps"}%(sdr.getSampleRate(SOAPY\_SDR\_RX, rxChan)/1e6))
+00046     print(\textcolor{stringliteral}{"Actual Tx Rate %f Msps"}%(sdr.getSampleRate(SOAPY\_SDR\_TX, txChan)/1e6))
+00047 
+00048     \textcolor{comment}{#set antenna}
+00049     \textcolor{keywordflow}{if} rxAnt \textcolor{keywordflow}{is} \textcolor{keywordflow}{not} \textcolor{keywordtype}{None}: sdr.setAntenna(SOAPY\_SDR\_RX, rxChan, rxAnt)
+00050     \textcolor{keywordflow}{if} txAnt \textcolor{keywordflow}{is} \textcolor{keywordflow}{not} \textcolor{keywordtype}{None}: sdr.setAntenna(SOAPY\_SDR\_TX, txChan, txAnt)
+00051 
+00052     \textcolor{comment}{#set overall gain}
+00053     \textcolor{keywordflow}{if} rxGain \textcolor{keywordflow}{is} \textcolor{keywordflow}{not} \textcolor{keywordtype}{None}: sdr.setGain(SOAPY\_SDR\_RX, rxChan, rxGain)
+00054     \textcolor{keywordflow}{if} txGain \textcolor{keywordflow}{is} \textcolor{keywordflow}{not} \textcolor{keywordtype}{None}: sdr.setGain(SOAPY\_SDR\_TX, txChan, txGain)
+00055 
+00056     \textcolor{comment}{#tune frontends}
+00057     \textcolor{keywordflow}{if} freq \textcolor{keywordflow}{is} \textcolor{keywordflow}{not} \textcolor{keywordtype}{None}: sdr.setFrequency(SOAPY\_SDR\_RX, rxChan, freq)
+00058     \textcolor{keywordflow}{if} freq \textcolor{keywordflow}{is} \textcolor{keywordflow}{not} \textcolor{keywordtype}{None}: sdr.setFrequency(SOAPY\_SDR\_TX, txChan, freq)
+00059 
+00060     \textcolor{comment}{#set bandwidth}
+00061     \textcolor{keywordflow}{if} rxBw \textcolor{keywordflow}{is} \textcolor{keywordflow}{not} \textcolor{keywordtype}{None}: sdr.setBandwidth(SOAPY\_SDR\_RX, rxChan, rxBw)
+00062     \textcolor{keywordflow}{if} txBw \textcolor{keywordflow}{is} \textcolor{keywordflow}{not} \textcolor{keywordtype}{None}: sdr.setBandwidth(SOAPY\_SDR\_TX, txChan, txBw)
+00063 
+00064     \textcolor{comment}{#create rx and tx streams}
+00065     print(\textcolor{stringliteral}{"Create Rx and Tx streams"})
+00066     rxStream = sdr.setupStream(SOAPY\_SDR\_RX, \textcolor{stringliteral}{"CF32"}, [rxChan])
+00067     txStream = sdr.setupStream(SOAPY\_SDR\_TX, \textcolor{stringliteral}{"CF32"}, [txChan])
+00068 
+00069     \textcolor{comment}{#let things settle}
+00070     time.sleep(1)
+00071 
+00072     \textcolor{comment}{#transmit a pulse in the near future}
+00073     sdr.activateStream(txStream)
+00074     txPulse = generate_cf32_pulse(numTxSamps)
+00075     txTime0 = sdr.getHardwareTime() + long(0.1e9) \textcolor{comment}{#100ms}
+00076     txFlags = SOAPY\_SDR\_HAS\_TIME | SOAPY\_SDR\_END\_BURST
+00077     sr = sdr.writeStream(txStream, [txPulse], len(txPulse), txFlags, txTime0)
+00078     \textcolor{keywordflow}{if} sr.ret != len(txPulse): \textcolor{keywordflow}{raise} Exception(\textcolor{stringliteral}{'transmit failed %s'}%str(sr))
+00079 
+00080     \textcolor{comment}{#receive slightly before transmit time}
+00081     rxBuffs = np.array([], np.complex64)
+00082     rxFlags = SOAPY\_SDR\_HAS\_TIME | SOAPY\_SDR\_END\_BURST
+00083     \textcolor{comment}{#half of the samples come before the transmit time}
+00084     receiveTime = txTime0 - long((numRxSamps/rate)*1e9)/2
+00085     sdr.activateStream(rxStream, rxFlags, receiveTime, numRxSamps)
+00086     rxTime0 = \textcolor{keywordtype}{None}
+00087 
+00088     \textcolor{comment}{#accumulate receive buffer into large contiguous buffer}
+00089     \textcolor{keywordflow}{while} \textcolor{keyword}{True}:
+00090         rxBuff = np.array([0]*1024, np.complex64)
+00091         timeoutUs = long(5e5) \textcolor{comment}{#500 ms >> stream time}
+00092         sr = sdr.readStream(rxStream, [rxBuff], len(rxBuff), timeoutUs=timeoutUs)
+00093 
+00094         \textcolor{comment}{#stash time on first buffer}
+00095         \textcolor{keywordflow}{if} sr.ret > 0 \textcolor{keywordflow}{and} len(rxBuffs) == 0:
+00096             rxTime0 = sr.timeNs
+00097             \textcolor{keywordflow}{if} (sr.flags & SOAPY\_SDR\_HAS\_TIME) == 0:
+00098                 \textcolor{keywordflow}{raise} Exception(\textcolor{stringliteral}{'receive fail - no timestamp on first readStream %s'}%(str(sr)))
+00099 
+00100         \textcolor{comment}{#accumulate buffer or exit loop}
+00101         \textcolor{keywordflow}{if} sr.ret > 0: rxBuffs = np.concatenate((rxBuffs, rxBuff[:sr.ret]))
+00102         \textcolor{keywordflow}{else}: \textcolor{keywordflow}{break}
+00103 
+00104     \textcolor{comment}{#cleanup streams}
+00105     print(\textcolor{stringliteral}{"Cleanup streams"})
+00106     sdr.deactivateStream(txStream)
+00107     sdr.closeStream(rxStream)
+00108     sdr.closeStream(txStream)
+00109 
+00110     \textcolor{comment}{#check resulting buffer}
+00111     \textcolor{keywordflow}{if} len(rxBuffs) != numRxSamps:
+00112         \textcolor{keywordflow}{raise} Exception(\textcolor{stringliteral}{'receive fail - captured samples %d out of %d'}%(len(rxBuffs), numRxSamps))
+00113     \textcolor{keywordflow}{if} rxTime0 \textcolor{keywordflow}{is} \textcolor{keywordtype}{None}:
+00114         \textcolor{keywordflow}{raise} Exception(\textcolor{stringliteral}{'receive fail - no valid timestamp'})
+00115 
+00116     \textcolor{comment}{#clear initial samples because transients}
+00117     rxMean = np.mean(rxBuffs)
+00118     \textcolor{keywordflow}{for} i \textcolor{keywordflow}{in} range(len(rxBuffs)/100): rxBuffs[i] = rxMean
+00119 
+00120     \textcolor{comment}{#normalize the samples}
+00121     \textcolor{keyword}{def }normalize(samps):
+00122         samps = samps - np.mean(samps) \textcolor{comment}{#remove dc}
+00123         samps = np.absolute(samps) \textcolor{comment}{#magnitude}
+00124         samps = samps/max(samps) \textcolor{comment}{#norm ampl to peak}
+00125         \textcolor{comment}{#print samps[:100]}
+00126         \textcolor{keywordflow}{return} samps
+00127 
+00128     txPulseNorm = normalize(txPulse)
+00129     rxBuffsNorm = normalize(rxBuffs)
+00130 
+00131     \textcolor{comment}{#dump debug samples}
+00132     \textcolor{keywordflow}{if} dumpDir \textcolor{keywordflow}{is} \textcolor{keywordflow}{not} \textcolor{keywordtype}{None}:
+00133         txPulseNorm.tofile(os.path.join(dumpDir, \textcolor{stringliteral}{'txNorm.dat'}))
+00134         rxBuffsNorm.tofile(os.path.join(dumpDir, \textcolor{stringliteral}{'rxNorm.dat'}))
+00135         np.real(rxBuffs).tofile(os.path.join(dumpDir, \textcolor{stringliteral}{'rxRawI.dat'}))
+00136         np.imag(rxBuffs).tofile(os.path.join(dumpDir, \textcolor{stringliteral}{'rxRawQ.dat'}))
+00137 
+00138     \textcolor{comment}{#look for the for peak index for time offsets}
+00139     rxArgmaxIndex = np.argmax(rxBuffsNorm)
+00140     txArgmaxIndex = np.argmax(txPulseNorm)
+00141 
+00142     \textcolor{comment}{#check goodness of peak by comparing argmax and correlation}
+00143     rxCoorIndex = np.argmax(np.correlate(rxBuffsNorm, txPulseNorm))+len(txPulseNorm)/2
+00144     \textcolor{keywordflow}{if} abs(rxCoorIndex-rxArgmaxIndex) > len(txPulseNorm)/4:
+00145         \textcolor{keywordflow}{raise} Exception(\textcolor{stringliteral}{'correlation(%d) does not match argmax(%d), probably bad data'}%(rxCoorIndex, 
+      rxArgmaxIndex))
+00146 
+00147     \textcolor{comment}{#calculate time offset}
+00148     txPeakTime = txTime0 + long((txArgmaxIndex/rate)*1e9)
+00149     rxPeakTime = rxTime0 + long((rxArgmaxIndex/rate)*1e9)
+00150     timeDelta = rxPeakTime - txPeakTime
+00151     print(\textcolor{stringliteral}{'>>> Time delta %f us'}%(timeDelta/1e3))
+00152     print(\textcolor{stringliteral}{"Done!"})
+00153 
+00154 \textcolor{keyword}{def }main():
+00155     parser = OptionParser()
+00156     parser.add\_option(\textcolor{stringliteral}{"--args"}, type=\textcolor{stringliteral}{"string"}, dest=\textcolor{stringliteral}{"args"}, help=\textcolor{stringliteral}{"device factor arguments"}, default=\textcolor{stringliteral}{""})
+00157     parser.add\_option(\textcolor{stringliteral}{"--rate"}, type=\textcolor{stringliteral}{"float"}, dest=\textcolor{stringliteral}{"rate"}, help=\textcolor{stringliteral}{"Tx and Rx sample rate"}, default=1e6)
+00158     parser.add\_option(\textcolor{stringliteral}{"--rxAnt"}, type=\textcolor{stringliteral}{"string"}, dest=\textcolor{stringliteral}{"rxAnt"}, help=\textcolor{stringliteral}{"Optional Rx antenna"}, default=\textcolor{keywordtype}{None})
+00159     parser.add\_option(\textcolor{stringliteral}{"--txAnt"}, type=\textcolor{stringliteral}{"string"}, dest=\textcolor{stringliteral}{"txAnt"}, help=\textcolor{stringliteral}{"Optional Tx antenna"}, default=\textcolor{keywordtype}{None})
+00160     parser.add\_option(\textcolor{stringliteral}{"--rxGain"}, type=\textcolor{stringliteral}{"float"}, dest=\textcolor{stringliteral}{"rxGain"}, help=\textcolor{stringliteral}{"Optional Rx gain (dB)"}, default=\textcolor{keywordtype}{None})
+00161     parser.add\_option(\textcolor{stringliteral}{"--txGain"}, type=\textcolor{stringliteral}{"float"}, dest=\textcolor{stringliteral}{"txGain"}, help=\textcolor{stringliteral}{"Optional Tx gain (dB)"}, default=\textcolor{keywordtype}{None})
+00162     parser.add\_option(\textcolor{stringliteral}{"--rxBw"}, type=\textcolor{stringliteral}{"float"}, dest=\textcolor{stringliteral}{"rxBw"}, help=\textcolor{stringliteral}{"Optional Rx filter bw (Hz)"}, default=\textcolor{keywordtype}{None})
+00163     parser.add\_option(\textcolor{stringliteral}{"--txBw"}, type=\textcolor{stringliteral}{"float"}, dest=\textcolor{stringliteral}{"txBw"}, help=\textcolor{stringliteral}{"Optional Tx filter bw (Hz)"}, default=\textcolor{keywordtype}{None})
+00164     parser.add\_option(\textcolor{stringliteral}{"--rxChan"}, type=\textcolor{stringliteral}{"int"}, dest=\textcolor{stringliteral}{"rxChan"}, help=\textcolor{stringliteral}{"Receiver channel (def=0)"}, default=0)
+00165     parser.add\_option(\textcolor{stringliteral}{"--txChan"}, type=\textcolor{stringliteral}{"int"}, dest=\textcolor{stringliteral}{"txChan"}, help=\textcolor{stringliteral}{"Transmitter channel (def=0)"}, default=0)
+00166     parser.add\_option(\textcolor{stringliteral}{"--freq"}, type=\textcolor{stringliteral}{"float"}, dest=\textcolor{stringliteral}{"freq"}, help=\textcolor{stringliteral}{"Optional Tx and Rx freq (Hz)"}, default=\textcolor{keywordtype}{
+      None})
+00167     parser.add\_option(\textcolor{stringliteral}{"--clockRate"}, type=\textcolor{stringliteral}{"float"}, dest=\textcolor{stringliteral}{"clockRate"}, help=\textcolor{stringliteral}{"Optional clock rate (Hz)"}, 
+      default=\textcolor{keywordtype}{None})
+00168     parser.add\_option(\textcolor{stringliteral}{"--dumpDir"}, type=\textcolor{stringliteral}{"string"}, dest=\textcolor{stringliteral}{"dumpDir"}, help=\textcolor{stringliteral}{"Optional directory to dump debug
+       samples"}, default=\textcolor{keywordtype}{None})
+00169     (options, args) = parser.parse\_args()
+00170     measure_delay(
+00171         args=options.args,
+00172         rate=options.rate,
+00173         freq=options.freq,
+00174         rxBw=options.rxBw,
+00175         txBw=options.txBw,
+00176         rxAnt=options.rxAnt,
+00177         txAnt=options.txAnt,
+00178         rxGain=options.rxGain,
+00179         txGain=options.txGain,
+00180         rxChan=options.rxChan,
+00181         txChan=options.txChan,
+00182         clockRate=options.clockRate,
+00183         dumpDir=options.dumpDir,
+00184     )
+00185 
+00186 \textcolor{keywordflow}{if} \_\_name\_\_ == \textcolor{stringliteral}{'\_\_main\_\_'}: main()
+\end{DoxyCode}

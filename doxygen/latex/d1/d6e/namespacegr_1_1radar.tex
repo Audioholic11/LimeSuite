@@ -1,0 +1,143 @@
+\subsection{gr\+:\+:radar Namespace Reference}
+\label{namespacegr_1_1radar}\index{gr\+::radar@{gr\+::radar}}
+\subsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+class {\bf crop\+\_\+matrix\+\_\+vcvc}
+\begin{DoxyCompactList}\small\item\em This matrix crops a data matrix. A tagged stream combined with vectors as items represent a matrix. crop\+\_\+x and crop\+\_\+y gives the ranges which shall be pushed through. Rest of the matrix is lost. \end{DoxyCompactList}\item 
+class {\bf crop\+\_\+matrix\+\_\+vcvc\+\_\+impl}
+\item 
+class {\bf estimator\+\_\+cw}
+\begin{DoxyCompactList}\small\item\em This block estimates the velocity from given peaks of a CW spectrum. The estimator looks for a f32vector tagged with a \textquotesingle{}frequency\textquotesingle{} identifier (symbol) and calculates the velocity with the doppler formula. The identifier (symbol) of the output data is \textquotesingle{}velocity\textquotesingle{}. Needed identifier (symbols) of the input are \textquotesingle{}frequency\textquotesingle{}. \end{DoxyCompactList}\item 
+class {\bf estimator\+\_\+cw\+\_\+impl}
+\item 
+class {\bf estimator\+\_\+fmcw}
+\begin{DoxyCompactList}\small\item\em This block estimates range and veloicty from peaks of a F\+M\+CW spectrum. Input messages are data with the identifier \textquotesingle{}frequency\textquotesingle{} of the up-\/chirp, down-\/chirp and CW part. If data is available on all three message ports the estimation starts. The velocity is estimated with the frequency information of the CW block and the range is estimated with the up and down chirp. If multiple frequencies are given, the velocity is estimated first and associated with the most likely range from the up-\/ and down-\/chirp. The output identifiers are \textquotesingle{}range\textquotesingle{} and \textquotesingle{}velocity\textquotesingle{}. \end{DoxyCompactList}\item 
+class {\bf estimator\+\_\+fmcw\+\_\+impl}
+\item 
+class {\bf estimator\+\_\+fsk}
+\begin{DoxyCompactList}\small\item\em This block estimates the range with peaks given from a F\+SK spectrum. Needed identifiers (symbols) are \textquotesingle{}frequency\textquotesingle{} and \textquotesingle{}phase\textquotesingle{}. The velocity is calculated with the \textquotesingle{}frequency\textquotesingle{} information and the doppler formula. The phase of the doppler peaks are used to estimate the range. Output identifier are \textquotesingle{}range\textquotesingle{} and \textquotesingle{}velocity\textquotesingle{}. If push\+\_\+power is true the information about the power of the peaks is pushed through. This can be used for estimating the R\+CS of an object. \end{DoxyCompactList}\item 
+class {\bf estimator\+\_\+fsk\+\_\+impl}
+\item 
+class {\bf estimator\+\_\+ofdm}
+\begin{DoxyCompactList}\small\item\em This block evaluates the peaks given from a O\+F\+DM matrix. Input are the bins of the peaks with the identifiers \textquotesingle{}axis\+\_\+x\textquotesingle{} and \textquotesingle{}axis\+\_\+y\textquotesingle{}. The parameters of the block axis\+\_\+x and axis\+\_\+y are vectors which define the mapping of the axis. If two values are given it is assumed a linear progression in between. If four values are given the middle values are set on half of the axis and it is interpolated linear in between. len\+\_\+x and len\+\_\+y gives the length of the axis in number of bins. symbol\+\_\+x and symbol\+\_\+y defines the identifier (symbols) for the output data. merge\+\_\+consecutive toggles merging consecutive peaks. Each peak is compared with peaks in a range of one bin. If there is a peak with a higher power the actual bin is not used for evaluations. If merge\+\_\+consecutive is true data with identifier \textquotesingle{}power\textquotesingle{} is needed. \end{DoxyCompactList}\item 
+class {\bf estimator\+\_\+ofdm\+\_\+impl}
+\item 
+class {\bf estimator\+\_\+rcs}
+\begin{DoxyCompactList}\small\item\em Basic R\+CS block for estimating the R\+CS of a single target. Some hardware specs need to be known for calculating R\+CS values, see parameters for details. The radar equation is used to calculate the R\+CS\+: R\+CS = Pr$\ast$(4pi)$^\wedge$3$\ast$\+R$^\wedge$4/(Pt$\ast$\+Gt$\ast$\+Gr$\ast$lamda$^\wedge$2). The Rx power (Pr) and the distance (R) are being estimated, while the other parameters are given in the flowgraph. It is possible to average a number of samples by setting the num\+\_\+mean value $>$ 1. The R\+CS will be 0 until enough samples are collected to calculate the mean value (be patient). The Tx power (Pt) needs to be calibrated with external hardware. I recommend to calibrate for the wanted power and not to change the parameters in the flowgraph on the Tx side after that. The R\+CS block needs the Rx power, to estimate the R\+CS. For that, the input power of the block needs to be determined analytically and altered via the corr\+\_\+factor and exponent values, to fit the following equation\+: Pr = P\+\_\+input $^\wedge$ (exponent) $\ast$ corr\+\_\+factor / Pt. In addition, the F\+F\+Ts need to be normalized for correct power calculation. \end{DoxyCompactList}\item 
+class {\bf estimator\+\_\+rcs\+\_\+impl}
+\item 
+class {\bf estimator\+\_\+sync\+\_\+pulse\+\_\+c}
+\begin{DoxyCompactList}\small\item\em This block can be used to estimate the shift of a signal on input 1 in relation to an other on input 2. For example the constant number of delay samples due to hardware effect from a signal source can be estimated. The calculation of the shift is done by a cross correlation of the input signals. The number of correlations in samples is given with num\+\_\+xcorr. The output message is the number of delay samples with the identifier (symbol) \textquotesingle{}sync\+\_\+pulse\textquotesingle{}. This can be displayed with the \textquotesingle{}Print Results\textquotesingle{} block. \end{DoxyCompactList}\item 
+class {\bf estimator\+\_\+sync\+\_\+pulse\+\_\+c\+\_\+impl}
+\item 
+class {\bf find\+\_\+max\+\_\+peak\+\_\+c}
+\begin{DoxyCompactList}\small\item\em This block estimates a single peak of a given F\+FT spectrum as tagged stream. Output is a message with the information of frequency, phase and power of the peak as a f32vector with a single item. All data is tagged with the identifiers (symbols) \textquotesingle{}frequency\textquotesingle{}, \textquotesingle{}phase\textquotesingle{} and \textquotesingle{}power\textquotesingle{}. The peak is estimated on the whole spectrum or on the range max\+\_\+freq if cut\+\_\+max\+\_\+freq is true. Furthermore a threshold of the spectrum amplitude can be given with threshold. The DC peak can be cut out with the protected samples samp\+\_\+protect. This value do not evaluate samp\+\_\+protect samples around the DC peak. If no suitable peak is found the block returns empty vectors with the identifiers. \end{DoxyCompactList}\item 
+class {\bf find\+\_\+max\+\_\+peak\+\_\+c\+\_\+impl}
+\item 
+class {\bf gpio\+\_\+source\+\_\+s}
+\begin{DoxyCompactList}\small\item\em $<$+description of block+$>$ \end{DoxyCompactList}\item 
+class {\bf gpio\+\_\+source\+\_\+s\+\_\+impl}
+\item 
+class {\bf msg\+\_\+gate}
+\begin{DoxyCompactList}\small\item\em This block blocks messages whose data is not in range of val\+\_\+min to val\+\_\+max. All parameters are given as vectors. Each index represents a dataset with given identifier (symbol) which should be tested on valid data in given range. All other data is pushed through. \end{DoxyCompactList}\item 
+class {\bf msg\+\_\+gate\+\_\+impl}
+\item 
+class {\bf msg\+\_\+manipulator}
+\begin{DoxyCompactList}\small\item\em This block manipulates data in a msg with given identifier (symbol). All data are given as vectors and each index represents a dataset with identifier which should be processed. All other data is pushed through. The addition is performed before the multiplication. \end{DoxyCompactList}\item 
+class {\bf msg\+\_\+manipulator\+\_\+impl}
+\item 
+class {\bf ofdm\+\_\+cyclic\+\_\+prefix\+\_\+remover\+\_\+cvc}
+\begin{DoxyCompactList}\small\item\em This block removes the cyclic prefix of a O\+F\+DM signal by cut away the cyclic prefix data. cp\+\_\+len gives the length of the cyclic prefix. fft\+\_\+len represents the length of the data before the cyclic prefix. \end{DoxyCompactList}\item 
+class {\bf ofdm\+\_\+cyclic\+\_\+prefix\+\_\+remover\+\_\+cvc\+\_\+impl}
+\item 
+class {\bf ofdm\+\_\+divide\+\_\+vcvc}
+\begin{DoxyCompactList}\small\item\em This block performs a complex complex division with in0/in1. If vlen\+\_\+out $>$ vlen\+\_\+in the additional space is filled with zeros. This can be used for zeropadding. discarded\+\_\+carriers is a vector of the carriers which should be not used and set zero as division result. num\+\_\+sync\+\_\+words gives the number of sync words on which the discarded\+\_\+carriers rule is not applied. \end{DoxyCompactList}\item 
+class {\bf ofdm\+\_\+divide\+\_\+vcvc\+\_\+impl}
+\item 
+class {\bf os\+\_\+cfar\+\_\+2d\+\_\+vc}
+\begin{DoxyCompactList}\small\item\em This block estimates peaks of a given matrix. A matrix can be represented as a combination of vectors and tagged streams. Input has to be a matrix with linear scaled values (N\+OT logarithmic scaled!). Used algorithm is a 2D O\+S-\/\+C\+F\+AR algorithm. The algorithm uses around the cell under test (C\+UT) on each side samp\+\_\+compare samples to estimate the noise floor. samp\+\_\+protect is a protected are around the C\+UT which is not used for acquiring compare samples. Index 0 of a input vector refers to x axis properties and index 1 refers to y axis properties. The relative threshold is defined by the bin of the vector within the sorted samp\+\_\+compare samples. A standard value is rel\+\_\+threshold = 0.\+78. The value of this bin is multiplied by mult\+\_\+threshold and compared with the C\+UT. If the magnitude square of the C\+UT is greater than the threshold the matrix item is accepted. Used identifiers (symbols) for data are \textquotesingle{}axis\+\_\+x\textquotesingle{}, \textquotesingle{}axis\+\_\+y\textquotesingle{} and \textquotesingle{}power\textquotesingle{}. \end{DoxyCompactList}\item 
+class {\bf os\+\_\+cfar\+\_\+2d\+\_\+vc\+\_\+impl}
+\item 
+class {\bf os\+\_\+cfar\+\_\+c}
+\begin{DoxyCompactList}\small\item\em This block estimates peaks of a given F\+FT spectrum as tagged stream. Multi peak detection is implemented with the O\+S-\/\+C\+F\+AR algorithm. The algorithm uses around the cell under test (C\+UT) on each side samp\+\_\+compare samples to estimate the noise floor. This relative threshold is defined by the bin of the vector within the sorted samp\+\_\+compare samples. A standard value is rel\+\_\+threshold = 0.\+78. The value of this bin is multiplied by mult\+\_\+threshold and compared with the C\+UT. samp\+\_\+protect samples are a protected are which is not used for acquiring compare samples. If consecutive bins are detected as valid peaks it is possible to merge these detections with merge\+\_\+consecutive = true. Output data are f32vectors with the information of frequency, power and phase. The identifiers (symbols) are \textquotesingle{}frequency\textquotesingle{}, \textquotesingle{}power\textquotesingle{} and \textquotesingle{}phase\textquotesingle{}. \end{DoxyCompactList}\item 
+class {\bf os\+\_\+cfar\+\_\+c\+\_\+impl}
+\item 
+class {\bf print\+\_\+results}
+\begin{DoxyCompactList}\small\item\em This block prints data of messages filled with data of the structure [ [[symbol\+\_\+0],[data\+\_\+0]], [[symbol\+\_\+1],[data\+\_\+1]], ...] on the command line. Only data of the datatypes f32vector and long, and rx\+\_\+time tuples are displayed. The output can also be stored in a text file. \end{DoxyCompactList}\item 
+class {\bf print\+\_\+results\+\_\+impl}
+\item 
+class {\bf qtgui\+\_\+scatter\+\_\+plot}
+\begin{DoxyCompactList}\small\item\em This block displays a scatter plot of two data sets. The identifiers (symbols) are given with label\+\_\+x and label\+\_\+y. The display range is given with axis\+\_\+x and axis\+\_\+y. Points that are not in range are simply not displayed (there are no errors or warnings). label gives an additional lable to differ multiple scatter plots on the screen by the titles. The update interval is given in milliseconds. \end{DoxyCompactList}\item 
+class {\bf qtgui\+\_\+scatter\+\_\+plot\+\_\+impl}
+\item 
+class {\bf qtgui\+\_\+spectrogram\+\_\+plot}
+\begin{DoxyCompactList}\small\item\em This block displays a spectrogram plot of a tagged stream with vectors. Tagged streams combined with vectors represent a matrix. The value of the matrix elements are displayed within a color plot. The colorbar can be scaled automatically or with a manual scale with axis\+\_\+z. The axis of x and y are set with axis\+\_\+x and axis\+\_\+y. The update rate interval is given in milliseconds. \end{DoxyCompactList}\item 
+class {\bf qtgui\+\_\+spectrogram\+\_\+plot\+\_\+impl}
+\item 
+class {\bf qtgui\+\_\+time\+\_\+plot}
+\begin{DoxyCompactList}\small\item\em This block displays a plot of a value with a given interval in milliseconds. label\+\_\+y represents the identifier (symbol) of the data. The y axis is scaled with axis\+\_\+y. range\+\_\+time gives the shown range of the x axis in seconds. label is an additional label for the title. \end{DoxyCompactList}\item 
+class {\bf qtgui\+\_\+time\+\_\+plot\+\_\+impl}
+\item 
+class {\bf scatter\+\_\+plot}
+\item 
+class {\bf signal\+\_\+generator\+\_\+cw\+\_\+c}
+\begin{DoxyCompactList}\small\item\em This block generates a signal for CW radar in baseband. The waveform consists of one (or sometimes multiple) constant frequency. \end{DoxyCompactList}\item 
+class {\bf signal\+\_\+generator\+\_\+cw\+\_\+c\+\_\+impl}
+\item 
+class {\bf signal\+\_\+generator\+\_\+fmcw\+\_\+c}
+\item 
+class {\bf signal\+\_\+generator\+\_\+fmcw\+\_\+c\+\_\+impl}
+\item 
+class {\bf signal\+\_\+generator\+\_\+fsk\+\_\+c}
+\begin{DoxyCompactList}\small\item\em This block generates a signal for F\+SK radar in baseband. The waveform consists of a signal with an alternating frequency. The packet length for subsequent tagged streams is calculated with two times the samples per single frequency multiplied by the blocks per tag. \end{DoxyCompactList}\item 
+class {\bf signal\+\_\+generator\+\_\+fsk\+\_\+c\+\_\+impl}
+\item 
+class {\bf signal\+\_\+generator\+\_\+sync\+\_\+pulse\+\_\+c}
+\begin{DoxyCompactList}\small\item\em This block generates a signal for the synchronization of the U\+S\+RP Echotimer in baseband. The signal is pulsed with a constant amplitude with various pulse length and wait samples in between. It is structured by alternating wait parts and burst parts and starting with the first wait part. The pulses are full real signals. \end{DoxyCompactList}\item 
+class {\bf signal\+\_\+generator\+\_\+sync\+\_\+pulse\+\_\+c\+\_\+impl}
+\item 
+class {\bf soapysdr\+\_\+echotimer}
+\begin{DoxyCompactList}\small\item\em $<$+description of block+$>$ \end{DoxyCompactList}\item 
+class {\bf soapysdr\+\_\+echotimer\+\_\+impl}
+\item 
+class {\bf soapysdr\+\_\+echotimer\+\_\+stretch}
+\begin{DoxyCompactList}\small\item\em $<$+description of block+$>$ \end{DoxyCompactList}\item 
+class {\bf soapysdr\+\_\+echotimer\+\_\+stretch\+\_\+impl}
+\item 
+class {\bf spectrogram\+\_\+plot}
+\item 
+class {\bf split\+\_\+cc}
+\begin{DoxyCompactList}\small\item\em This block splits a tagged stream into segments. As packet\+\_\+parts you give the structure of the packet, e.\+g. (10, 20, 5). With the packet number you can choose which packet shall be pushed to output. Counting begins on zero. E.\+g. packet\+\_\+num=1 returns 20 items. \end{DoxyCompactList}\item 
+class {\bf split\+\_\+cc\+\_\+impl}
+\item 
+class {\bf split\+\_\+fsk\+\_\+cc}
+\begin{DoxyCompactList}\small\item\em This block splits a F\+SK signal consisting of two separate signals. samp\+\_\+per\+\_\+freq items are taken and pushed alternating to the outputs. Discarded samples are thrown away at the beginning of samp\+\_\+per\+\_\+freq samples and only samp\+\_\+per\+\_\+freq-\/samp\+\_\+discard are pushed to output. \end{DoxyCompactList}\item 
+class {\bf split\+\_\+fsk\+\_\+cc\+\_\+impl}
+\item 
+class {\bf static\+\_\+target\+\_\+simulator\+\_\+cc}
+\item 
+class {\bf static\+\_\+target\+\_\+simulator\+\_\+cc\+\_\+impl}
+\item 
+class {\bf time\+\_\+plot}
+\item 
+class {\bf tracking\+\_\+singletarget}
+\begin{DoxyCompactList}\small\item\em This block tracks a singletarget detection with a particle or kalman filter. As input values with identifiers \textquotesingle{}range\textquotesingle{} and \textquotesingle{}velocity\textquotesingle{} are needed and should hold a f32vector with only one element. All input variables tagged with std gives the standard deviation of the parameter. The threshold\+\_\+track is a value which decides with the likelihood of the data if the new data is accepted as a track. A good starting value is threshold\+\_\+track = 0.\+001. threshold\+\_\+lost is the number of false tracks unitel the track is lost and the tracker begins with a new one. The string filter decides which tracking kernel should be used. \textquotesingle{}kalman\textquotesingle{} or \textquotesingle{}particle\textquotesingle{} are valid. If \textquotesingle{}particle\textquotesingle{} is chosen num\+\_\+particle gives the number of particles for the particle filter. If \textquotesingle{}kalman\textquotesingle{} is chosen there is no effect on the tracker. \end{DoxyCompactList}\item 
+class {\bf tracking\+\_\+singletarget\+\_\+impl}
+\item 
+class {\bf transpose\+\_\+matrix\+\_\+vcvc}
+\begin{DoxyCompactList}\small\item\em This block transposes a matrix. A tagged stream combined with vectors as items represent a matrix. vlen\+\_\+in is the vector length of the input data and vlen\+\_\+out the vector length of the output data. vlen\+\_\+out is equal to the items (vectors) per tagged stream on the input stream. \end{DoxyCompactList}\item 
+class {\bf transpose\+\_\+matrix\+\_\+vcvc\+\_\+impl}
+\item 
+class {\bf trigger\+\_\+command}
+\begin{DoxyCompactList}\small\item\em This block executes a command with the std\+::system() command if a value from a f32vector with a given identifer (symbol) is in a given range. Each index of a vector refers to a identifier. The execution of a command can be blocked for block\+\_\+time milliseconds after the last execution. \end{DoxyCompactList}\item 
+class {\bf trigger\+\_\+command\+\_\+impl}
+\item 
+class {\bf ts\+\_\+fft\+\_\+cc}
+\begin{DoxyCompactList}\small\item\em This blocks takes a tagged stream and returns a F\+FT of the length of the input stream. The output is N\+OT normalized on the number of input items and no window is used. \end{DoxyCompactList}\item 
+class {\bf ts\+\_\+fft\+\_\+cc\+\_\+impl}
+\item 
+class {\bf usrp\+\_\+echotimer\+\_\+cc}
+\begin{DoxyCompactList}\small\item\em $<$+description of block+$>$ \end{DoxyCompactList}\item 
+class {\bf usrp\+\_\+echotimer\+\_\+cc\+\_\+impl}
+\end{DoxyCompactItemize}

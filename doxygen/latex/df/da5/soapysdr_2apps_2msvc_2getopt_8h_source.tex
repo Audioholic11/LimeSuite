@@ -1,0 +1,602 @@
+\subsection{getopt.\+h}
+\label{soapysdr_2apps_2msvc_2getopt_8h_source}\index{/home/erik/prefix/default/src/soapysdr/apps/msvc/getopt.\+h@{/home/erik/prefix/default/src/soapysdr/apps/msvc/getopt.\+h}}
+
+\begin{DoxyCode}
+00001 \textcolor{preprocessor}{#ifndef \_\_GETOPT\_H\_\_}
+00002 
+00013 \textcolor{preprocessor}{#pragma warning(disable:4996)}
+00014 
+00015 \textcolor{preprocessor}{#define \_\_GETOPT\_H\_\_}
+00016 
+00017 \textcolor{comment}{/* All the headers include this file. */}
+00018 \textcolor{preprocessor}{#include <crtdefs.h>}
+00019 \textcolor{preprocessor}{#include <errno.h>}
+00020 \textcolor{preprocessor}{#include <stdlib.h>}
+00021 \textcolor{preprocessor}{#include <string.h>}
+00022 \textcolor{preprocessor}{#include <stdarg.h>}
+00023 \textcolor{preprocessor}{#include <stdio.h>}
+00024 \textcolor{preprocessor}{#include <windows.h>}
+00025 
+00026 \textcolor{preprocessor}{#ifdef \_\_cplusplus}
+00027 \textcolor{keyword}{extern} \textcolor{stringliteral}{"C"} \{
+00028 \textcolor{preprocessor}{#endif}
+00029 
+00030 \textcolor{preprocessor}{#define REPLACE\_GETOPT      }\textcolor{comment}{/* use this getopt as the system getopt(3) */}\textcolor{preprocessor}{}
+00031 
+00032 \textcolor{preprocessor}{#ifdef REPLACE\_GETOPT}
+00033 \textcolor{keywordtype}{int} opterr = 1;     \textcolor{comment}{/* if error message should be printed */}
+00034 \textcolor{keywordtype}{int} optind = 1;     \textcolor{comment}{/* index into parent argv vector */}
+00035 \textcolor{keywordtype}{int} optopt = \textcolor{charliteral}{'?'};       \textcolor{comment}{/* character checked for validity */}
+00036 \textcolor{preprocessor}{#undef  optreset        }\textcolor{comment}{/* see getopt.h */}\textcolor{preprocessor}{}
+00037 \textcolor{preprocessor}{#define optreset        \_\_mingw\_optreset}
+00038 \textcolor{keywordtype}{int} optreset;       \textcolor{comment}{/* reset getopt */}
+00039 \textcolor{keywordtype}{char}    *optarg;        \textcolor{comment}{/* argument associated with option */}
+00040 \textcolor{preprocessor}{#endif}
+00041 
+00042 \textcolor{comment}{//extern int optind;        /* index of first non-option in argv      */}
+00043 \textcolor{comment}{//extern int optopt;        /* single option character, as parsed     */}
+00044 \textcolor{comment}{//extern int opterr;        /* flag to enable built-in diagnostics... */}
+00045 \textcolor{comment}{//              /* (user may set to zero, to suppress)    */}
+00046 \textcolor{comment}{//}
+00047 \textcolor{comment}{//extern char *optarg;      /* pointer to argument of current option  */}
+00048 
+00049 \textcolor{preprocessor}{#define PRINT\_ERROR ((opterr) && (*options != ':'))}
+00050 
+00051 \textcolor{preprocessor}{#define FLAG\_PERMUTE    0x01    }\textcolor{comment}{/* permute non-options to the end of argv */}\textcolor{preprocessor}{}
+00052 \textcolor{preprocessor}{#define FLAG\_ALLARGS    0x02    }\textcolor{comment}{/* treat non-options as args to option "-1" */}\textcolor{preprocessor}{}
+00053 \textcolor{preprocessor}{#define FLAG\_LONGONLY   0x04    }\textcolor{comment}{/* operate as getopt\_long\_only */}\textcolor{preprocessor}{}
+00054 
+00055 \textcolor{comment}{/* return values */}
+00056 \textcolor{preprocessor}{#define BADCH       (int)'?'}
+00057 \textcolor{preprocessor}{#define BADARG      ((*options == ':') ? (int)':' : (int)'?')}
+00058 \textcolor{preprocessor}{#define INORDER     (int)1}
+00059 
+00060 \textcolor{preprocessor}{#ifndef \_\_CYGWIN\_\_}
+00061 \textcolor{preprocessor}{#define \_\_progname \_\_argv[0]}
+00062 \textcolor{preprocessor}{#else}
+00063 \textcolor{keyword}{extern} \textcolor{keywordtype}{char} __declspec(dllimport) *__progname;
+00064 \textcolor{preprocessor}{#endif}
+00065 
+00066 \textcolor{preprocessor}{#ifdef \_\_CYGWIN\_\_}
+00067 \textcolor{keyword}{static} \textcolor{keywordtype}{char} EMSG[] = \textcolor{stringliteral}{""};
+00068 \textcolor{preprocessor}{#else}
+00069 \textcolor{preprocessor}{#define EMSG        ""}
+00070 \textcolor{preprocessor}{#endif}
+00071 
+00072 \textcolor{keyword}{static} \textcolor{keywordtype}{int} getopt_internal(\textcolor{keywordtype}{int}, \textcolor{keywordtype}{char} * \textcolor{keyword}{const} *, \textcolor{keyword}{const} \textcolor{keywordtype}{char} *,
+00073                \textcolor{keyword}{const} \textcolor{keyword}{struct} option *, \textcolor{keywordtype}{int} *, \textcolor{keywordtype}{int});
+00074 \textcolor{keyword}{static} \textcolor{keywordtype}{int} parse_long_options(\textcolor{keywordtype}{char} * \textcolor{keyword}{const} *, \textcolor{keyword}{const} \textcolor{keywordtype}{char} *,
+00075                   \textcolor{keyword}{const} \textcolor{keyword}{struct} option *, \textcolor{keywordtype}{int} *, \textcolor{keywordtype}{int});
+00076 \textcolor{keyword}{static} \textcolor{keywordtype}{int} gcd(\textcolor{keywordtype}{int}, \textcolor{keywordtype}{int});
+00077 \textcolor{keyword}{static} \textcolor{keywordtype}{void} permute_args(\textcolor{keywordtype}{int}, \textcolor{keywordtype}{int}, \textcolor{keywordtype}{int}, \textcolor{keywordtype}{char} * \textcolor{keyword}{const} *);
+00078 
+00079 \textcolor{keyword}{static} \textcolor{keywordtype}{char} *place = EMSG; \textcolor{comment}{/* option letter processing */}
+00080 
+00081 \textcolor{comment}{/* XXX: set optreset to 1 rather than these two */}
+00082 \textcolor{keyword}{static} \textcolor{keywordtype}{int} nonopt_start = -1; \textcolor{comment}{/* first non option argument (for permute) */}
+00083 \textcolor{keyword}{static} \textcolor{keywordtype}{int} nonopt_end = -1;   \textcolor{comment}{/* first option after non options (for permute) */}
+00084 
+00085 \textcolor{comment}{/* Error messages */}
+00086 \textcolor{keyword}{static} \textcolor{keyword}{const} \textcolor{keywordtype}{char} recargchar[] = \textcolor{stringliteral}{"option requires an argument -- %c"};
+00087 \textcolor{keyword}{static} \textcolor{keyword}{const} \textcolor{keywordtype}{char} recargstring[] = \textcolor{stringliteral}{"option requires an argument -- %s"};
+00088 \textcolor{keyword}{static} \textcolor{keyword}{const} \textcolor{keywordtype}{char} ambig[] = \textcolor{stringliteral}{"ambiguous option -- %.*s"};
+00089 \textcolor{keyword}{static} \textcolor{keyword}{const} \textcolor{keywordtype}{char} noarg[] = \textcolor{stringliteral}{"option doesn't take an argument -- %.*s"};
+00090 \textcolor{keyword}{static} \textcolor{keyword}{const} \textcolor{keywordtype}{char} illoptchar[] = \textcolor{stringliteral}{"unknown option -- %c"};
+00091 \textcolor{keyword}{static} \textcolor{keyword}{const} \textcolor{keywordtype}{char} illoptstring[] = \textcolor{stringliteral}{"unknown option -- %s"};
+00092 
+00093 \textcolor{keyword}{static} \textcolor{keywordtype}{void}
+00094 _vwarnx(\textcolor{keyword}{const} \textcolor{keywordtype}{char} *fmt,va\_list ap)
+00095 \{
+00096   (void)fprintf(stderr,\textcolor{stringliteral}{"%s: "},\_\_progname);
+00097   \textcolor{keywordflow}{if} (fmt != NULL)
+00098     (void)vfprintf(stderr,fmt,ap);
+00099   (void)fprintf(stderr,\textcolor{stringliteral}{"\(\backslash\)n"});
+00100 \}
+00101 
+00102 \textcolor{keyword}{static} \textcolor{keywordtype}{void}
+00103 warnx(\textcolor{keyword}{const} \textcolor{keywordtype}{char} *fmt,...)
+00104 \{
+00105   va\_list ap;
+00106   va\_start(ap,fmt);
+00107   _vwarnx(fmt,ap);
+00108   va\_end(ap);
+00109 \}
+00110 
+00111 \textcolor{comment}{/*}
+00112 \textcolor{comment}{ * Compute the greatest common divisor of a and b.}
+00113 \textcolor{comment}{ */}
+00114 \textcolor{keyword}{static} \textcolor{keywordtype}{int}
+00115 gcd(\textcolor{keywordtype}{int} a, \textcolor{keywordtype}{int} b)
+00116 \{
+00117     \textcolor{keywordtype}{int} c;
+00118 
+00119     c = a % b;
+00120     \textcolor{keywordflow}{while} (c != 0) \{
+00121         a = b;
+00122         b = c;
+00123         c = a % b;
+00124     \}
+00125 
+00126     \textcolor{keywordflow}{return} (b);
+00127 \}
+00128 
+00129 \textcolor{comment}{/*}
+00130 \textcolor{comment}{ * Exchange the block from nonopt\_start to nonopt\_end with the block}
+00131 \textcolor{comment}{ * from nonopt\_end to opt\_end (keeping the same order of arguments}
+00132 \textcolor{comment}{ * in each block).}
+00133 \textcolor{comment}{ */}
+00134 \textcolor{keyword}{static} \textcolor{keywordtype}{void}
+00135 permute_args(\textcolor{keywordtype}{int} panonopt\_start, \textcolor{keywordtype}{int} panonopt\_end, \textcolor{keywordtype}{int} opt\_end,
+00136     \textcolor{keywordtype}{char} * \textcolor{keyword}{const} *nargv)
+00137 \{
+00138     \textcolor{keywordtype}{int} cstart, cyclelen, i, j, ncycle, nnonopts, nopts, pos;
+00139     \textcolor{keywordtype}{char} *swap;
+00140 
+00141     \textcolor{comment}{/*}
+00142 \textcolor{comment}{     * compute lengths of blocks and number and size of cycles}
+00143 \textcolor{comment}{     */}
+00144     nnonopts = panonopt\_end - panonopt\_start;
+00145     nopts = opt\_end - panonopt\_end;
+00146     ncycle = gcd(nnonopts, nopts);
+00147     cyclelen = (opt\_end - panonopt\_start) / ncycle;
+00148 
+00149     \textcolor{keywordflow}{for} (i = 0; i < ncycle; i++) \{
+00150         cstart = panonopt\_end+i;
+00151         pos = cstart;
+00152         \textcolor{keywordflow}{for} (j = 0; j < cyclelen; j++) \{
+00153             \textcolor{keywordflow}{if} (pos >= panonopt\_end)
+00154                 pos -= nnonopts;
+00155             \textcolor{keywordflow}{else}
+00156                 pos += nopts;
+00157             swap = nargv[pos];
+00158             \textcolor{comment}{/* LINTED const cast */}
+00159             ((\textcolor{keywordtype}{char} **) nargv)[pos] = nargv[cstart];
+00160             \textcolor{comment}{/* LINTED const cast */}
+00161             ((\textcolor{keywordtype}{char} **)nargv)[cstart] = swap;
+00162         \}
+00163     \}
+00164 \}
+00165 
+00166 \textcolor{preprocessor}{#ifdef REPLACE\_GETOPT}
+00167 \textcolor{comment}{/*}
+00168 \textcolor{comment}{ * getopt --}
+00169 \textcolor{comment}{ *  Parse argc/argv argument vector.}
+00170 \textcolor{comment}{ *}
+00171 \textcolor{comment}{ * [eventually this will replace the BSD getopt]}
+00172 \textcolor{comment}{ */}
+00173 \textcolor{keywordtype}{int}
+00174 getopt(\textcolor{keywordtype}{int} nargc, \textcolor{keywordtype}{char} * \textcolor{keyword}{const} *nargv, \textcolor{keyword}{const} \textcolor{keywordtype}{char} *options)
+00175 \{
+00176 
+00177     \textcolor{comment}{/*}
+00178 \textcolor{comment}{     * We don't pass FLAG\_PERMUTE to getopt\_internal() since}
+00179 \textcolor{comment}{     * the BSD getopt(3) (unlike GNU) has never done this.}
+00180 \textcolor{comment}{     *}
+00181 \textcolor{comment}{     * Furthermore, since many privileged programs call getopt()}
+00182 \textcolor{comment}{     * before dropping privileges it makes sense to keep things}
+00183 \textcolor{comment}{     * as simple (and bug-free) as possible.}
+00184 \textcolor{comment}{     */}
+00185     \textcolor{keywordflow}{return} (getopt_internal(nargc, nargv, options, NULL, NULL, 0));
+00186 \}
+00187 \textcolor{preprocessor}{#endif }\textcolor{comment}{/* REPLACE\_GETOPT */}\textcolor{preprocessor}{}
+00188 
+00189 \textcolor{comment}{//extern int getopt(int nargc, char * const *nargv, const char *options);}
+00190 
+00191 \textcolor{preprocessor}{#ifdef \_BSD\_SOURCE}
+00192 \textcolor{comment}{/*}
+00193 \textcolor{comment}{ * BSD adds the non-standard `optreset' feature, for reinitialisation}
+00194 \textcolor{comment}{ * of `getopt' parsing.  We support this feature, for applications which}
+00195 \textcolor{comment}{ * proclaim their BSD heritage, before including this header; however,}
+00196 \textcolor{comment}{ * to maintain portability, developers are advised to avoid it.}
+00197 \textcolor{comment}{ */}
+00198 \textcolor{preprocessor}{# define optreset  \_\_mingw\_optreset}
+00199 \textcolor{keyword}{extern} \textcolor{keywordtype}{int} optreset;
+00200 \textcolor{preprocessor}{#endif}
+00201 \textcolor{preprocessor}{#ifdef \_\_cplusplus}
+00202 \}
+00203 \textcolor{preprocessor}{#endif}
+00204 \textcolor{comment}{/*}
+00205 \textcolor{comment}{ * POSIX requires the `getopt' API to be specified in `unistd.h';}
+00206 \textcolor{comment}{ * thus, `unistd.h' includes this header.  However, we do not want}
+00207 \textcolor{comment}{ * to expose the `getopt\_long' or `getopt\_long\_only' APIs, when}
+00208 \textcolor{comment}{ * included in this manner.  Thus, close the standard \_\_GETOPT\_H\_\_}
+00209 \textcolor{comment}{ * declarations block, and open an additional \_\_GETOPT\_LONG\_H\_\_}
+00210 \textcolor{comment}{ * specific block, only when *not* \_\_UNISTD\_H\_SOURCED\_\_, in which}
+00211 \textcolor{comment}{ * to declare the extended API.}
+00212 \textcolor{comment}{ */}
+00213 \textcolor{preprocessor}{#endif }\textcolor{comment}{/* !defined(\_\_GETOPT\_H\_\_) */}\textcolor{preprocessor}{}
+00214 
+00215 \textcolor{preprocessor}{#if !defined(\_\_UNISTD\_H\_SOURCED\_\_) && !defined(\_\_GETOPT\_LONG\_H\_\_)}
+00216 \textcolor{preprocessor}{#define \_\_GETOPT\_LONG\_H\_\_}
+00217 
+00218 \textcolor{preprocessor}{#ifdef \_\_cplusplus}
+00219 \textcolor{keyword}{extern} \textcolor{stringliteral}{"C"} \{
+00220 \textcolor{preprocessor}{#endif}
+00221 
+00222 \textcolor{keyword}{struct }option       \textcolor{comment}{/* specification for a long form option...  */}
+00223 \{
+00224   \textcolor{keyword}{const} \textcolor{keywordtype}{char} *name;     \textcolor{comment}{/* option name, without leading hyphens */}
+00225   \textcolor{keywordtype}{int}         has_arg;      \textcolor{comment}{/* does it take an argument?        */}
+00226   \textcolor{keywordtype}{int}        *flag;     \textcolor{comment}{/* where to save its status, or NULL    */}
+00227   \textcolor{keywordtype}{int}         val;      \textcolor{comment}{/* its associated status value      */}
+00228 \};
+00229 
+00230 \textcolor{keyword}{enum}            \textcolor{comment}{/* permitted values for its `has\_arg' field...  */}
+00231 \{
+00232   no_argument = 0,          \textcolor{comment}{/* option never takes an argument   */}
+00233   required_argument,        \textcolor{comment}{/* option always requires an argument   */}
+00234   optional_argument     \textcolor{comment}{/* option may take an argument      */}
+00235 \};
+00236 
+00237 \textcolor{comment}{/*}
+00238 \textcolor{comment}{ * parse\_long\_options --}
+00239 \textcolor{comment}{ *  Parse long options in argc/argv argument vector.}
+00240 \textcolor{comment}{ * Returns -1 if short\_too is set and the option does not match long\_options.}
+00241 \textcolor{comment}{ */}
+00242 \textcolor{keyword}{static} \textcolor{keywordtype}{int}
+00243 parse_long_options(\textcolor{keywordtype}{char} * \textcolor{keyword}{const} *nargv, \textcolor{keyword}{const} \textcolor{keywordtype}{char} *options,
+00244     \textcolor{keyword}{const} \textcolor{keyword}{struct} option *long\_options, \textcolor{keywordtype}{int} *idx, \textcolor{keywordtype}{int} short\_too)
+00245 \{
+00246     \textcolor{keywordtype}{char} *current\_argv, *has\_equal;
+00247     \textcolor{keywordtype}{size\_t} current\_argv\_len;
+00248     \textcolor{keywordtype}{int} i, ambiguous, match;
+00249 
+00250 \textcolor{preprocessor}{#define IDENTICAL\_INTERPRETATION(\_x, \_y)                                \(\backslash\)}
+00251 \textcolor{preprocessor}{    (long\_options[(\_x)].has\_arg == long\_options[(\_y)].has\_arg &&    \(\backslash\)}
+00252 \textcolor{preprocessor}{     long\_options[(\_x)].flag == long\_options[(\_y)].flag &&          \(\backslash\)}
+00253 \textcolor{preprocessor}{     long\_options[(\_x)].val == long\_options[(\_y)].val)}
+00254 
+00255     current\_argv = place;
+00256     match = -1;
+00257     ambiguous = 0;
+00258 
+00259     optind++;
+00260 
+00261     \textcolor{keywordflow}{if} ((has\_equal = strchr(current\_argv, \textcolor{charliteral}{'='})) != NULL) \{
+00262         \textcolor{comment}{/* argument found (--option=arg) */}
+00263         current\_argv\_len = has\_equal - current\_argv;
+00264         has\_equal++;
+00265     \} \textcolor{keywordflow}{else}
+00266         current\_argv\_len = strlen(current\_argv);
+00267 
+00268     \textcolor{keywordflow}{for} (i = 0; long\_options[i].name; i++) \{
+00269         \textcolor{comment}{/* find matching long option */}
+00270         \textcolor{keywordflow}{if} (strncmp(current\_argv, long\_options[i].name,
+00271             current\_argv\_len))
+00272             \textcolor{keywordflow}{continue};
+00273 
+00274         \textcolor{keywordflow}{if} (strlen(long\_options[i].name) == current\_argv\_len) \{
+00275             \textcolor{comment}{/* exact match */}
+00276             match = i;
+00277             ambiguous = 0;
+00278             \textcolor{keywordflow}{break};
+00279         \}
+00280         \textcolor{comment}{/*}
+00281 \textcolor{comment}{         * If this is a known short option, don't allow}
+00282 \textcolor{comment}{         * a partial match of a single character.}
+00283 \textcolor{comment}{         */}
+00284         \textcolor{keywordflow}{if} (short\_too && current\_argv\_len == 1)
+00285             \textcolor{keywordflow}{continue};
+00286 
+00287         \textcolor{keywordflow}{if} (match == -1)    \textcolor{comment}{/* partial match */}
+00288             match = i;
+00289         \textcolor{keywordflow}{else} \textcolor{keywordflow}{if} (!IDENTICAL_INTERPRETATION(i, match))
+00290             ambiguous = 1;
+00291     \}
+00292     \textcolor{keywordflow}{if} (ambiguous) \{
+00293         \textcolor{comment}{/* ambiguous abbreviation */}
+00294         \textcolor{keywordflow}{if} (PRINT_ERROR)
+00295             warnx(ambig, (\textcolor{keywordtype}{int})current\_argv\_len,
+00296                  current\_argv);
+00297         optopt = 0;
+00298         \textcolor{keywordflow}{return} (BADCH);
+00299     \}
+00300     \textcolor{keywordflow}{if} (match != -1) \{      \textcolor{comment}{/* option found */}
+00301         \textcolor{keywordflow}{if} (long\_options[match].has_arg == no_argument
+00302             && has\_equal) \{
+00303             \textcolor{keywordflow}{if} (PRINT_ERROR)
+00304                 warnx(noarg, (\textcolor{keywordtype}{int})current\_argv\_len,
+00305                      current\_argv);
+00306             \textcolor{comment}{/*}
+00307 \textcolor{comment}{             * XXX: GNU sets optopt to val regardless of flag}
+00308 \textcolor{comment}{             */}
+00309             \textcolor{keywordflow}{if} (long\_options[match].flag == NULL)
+00310                 optopt = long\_options[match].val;
+00311             \textcolor{keywordflow}{else}
+00312                 optopt = 0;
+00313             \textcolor{keywordflow}{return} (BADARG);
+00314         \}
+00315         \textcolor{keywordflow}{if} (long\_options[match].has_arg == required_argument ||
+00316             long\_options[match].has_arg == optional_argument) \{
+00317             \textcolor{keywordflow}{if} (has\_equal)
+00318                 optarg = has\_equal;
+00319             \textcolor{keywordflow}{else} \textcolor{keywordflow}{if} (long\_options[match].has_arg ==
+00320                 required_argument) \{
+00321                 \textcolor{comment}{/*}
+00322 \textcolor{comment}{                 * optional argument doesn't use next nargv}
+00323 \textcolor{comment}{                 */}
+00324                 optarg = nargv[optind++];
+00325             \}
+00326         \}
+00327         \textcolor{keywordflow}{if} ((long\_options[match].has_arg == required_argument)
+00328             && (optarg == NULL)) \{
+00329             \textcolor{comment}{/*}
+00330 \textcolor{comment}{             * Missing argument; leading ':' indicates no error}
+00331 \textcolor{comment}{             * should be generated.}
+00332 \textcolor{comment}{             */}
+00333             \textcolor{keywordflow}{if} (PRINT_ERROR)
+00334                 warnx(recargstring,
+00335                     current\_argv);
+00336             \textcolor{comment}{/*}
+00337 \textcolor{comment}{             * XXX: GNU sets optopt to val regardless of flag}
+00338 \textcolor{comment}{             */}
+00339             \textcolor{keywordflow}{if} (long\_options[match].flag == NULL)
+00340                 optopt = long\_options[match].val;
+00341             \textcolor{keywordflow}{else}
+00342                 optopt = 0;
+00343             --optind;
+00344             \textcolor{keywordflow}{return} (BADARG);
+00345         \}
+00346     \} \textcolor{keywordflow}{else} \{            \textcolor{comment}{/* unknown option */}
+00347         \textcolor{keywordflow}{if} (short\_too) \{
+00348             --optind;
+00349             \textcolor{keywordflow}{return} (-1);
+00350         \}
+00351         \textcolor{keywordflow}{if} (PRINT_ERROR)
+00352             warnx(illoptstring, current\_argv);
+00353         optopt = 0;
+00354         \textcolor{keywordflow}{return} (BADCH);
+00355     \}
+00356     \textcolor{keywordflow}{if} (idx)
+00357         *idx = match;
+00358     \textcolor{keywordflow}{if} (long\_options[match].flag) \{
+00359         *long\_options[match].flag = long\_options[match].val;
+00360         \textcolor{keywordflow}{return} (0);
+00361     \} \textcolor{keywordflow}{else}
+00362         \textcolor{keywordflow}{return} (long\_options[match].val);
+00363 \textcolor{preprocessor}{#undef IDENTICAL\_INTERPRETATION}
+00364 \}
+00365 
+00366 \textcolor{comment}{/*}
+00367 \textcolor{comment}{ * getopt\_internal --}
+00368 \textcolor{comment}{ *  Parse argc/argv argument vector.  Called by user level routines.}
+00369 \textcolor{comment}{ */}
+00370 \textcolor{keyword}{static} \textcolor{keywordtype}{int}
+00371 getopt_internal(\textcolor{keywordtype}{int} nargc, \textcolor{keywordtype}{char} * \textcolor{keyword}{const} *nargv, \textcolor{keyword}{const} \textcolor{keywordtype}{char} *options,
+00372     \textcolor{keyword}{const} \textcolor{keyword}{struct} option *long\_options, \textcolor{keywordtype}{int} *idx, \textcolor{keywordtype}{int} flags)
+00373 \{
+00374     \textcolor{keywordtype}{char} *oli;              \textcolor{comment}{/* option letter list index */}
+00375     \textcolor{keywordtype}{int} optchar, short\_too;
+00376     \textcolor{keyword}{static} \textcolor{keywordtype}{int} posixly\_correct = -1;
+00377 
+00378     \textcolor{keywordflow}{if} (options == NULL)
+00379         \textcolor{keywordflow}{return} (-1);
+00380 
+00381     \textcolor{comment}{/*}
+00382 \textcolor{comment}{     * XXX Some GNU programs (like cvs) set optind to 0 instead of}
+00383 \textcolor{comment}{     * XXX using optreset.  Work around this braindamage.}
+00384 \textcolor{comment}{     */}
+00385     \textcolor{keywordflow}{if} (optind == 0)
+00386         optind = optreset = 1;
+00387 
+00388     \textcolor{comment}{/*}
+00389 \textcolor{comment}{     * Disable GNU extensions if POSIXLY\_CORRECT is set or options}
+00390 \textcolor{comment}{     * string begins with a '+'.}
+00391 \textcolor{comment}{     *}
+00392 \textcolor{comment}{     * CV, 2009-12-14: Check POSIXLY\_CORRECT anew if optind == 0 or}
+00393 \textcolor{comment}{     *                 optreset != 0 for GNU compatibility.}
+00394 \textcolor{comment}{     */}
+00395     \textcolor{keywordflow}{if} (posixly\_correct == -1 || optreset != 0)
+00396         posixly\_correct = (getenv(\textcolor{stringliteral}{"POSIXLY\_CORRECT"}) != NULL);
+00397     \textcolor{keywordflow}{if} (*options == \textcolor{charliteral}{'-'})
+00398         flags |= FLAG_ALLARGS;
+00399     \textcolor{keywordflow}{else} \textcolor{keywordflow}{if} (posixly\_correct || *options == \textcolor{charliteral}{'+'})
+00400         flags &= ~FLAG_PERMUTE;
+00401     \textcolor{keywordflow}{if} (*options == \textcolor{charliteral}{'+'} || *options == \textcolor{charliteral}{'-'})
+00402         options++;
+00403 
+00404     optarg = NULL;
+00405     \textcolor{keywordflow}{if} (optreset)
+00406         nonopt_start = nonopt_end = -1;
+00407 start:
+00408     \textcolor{keywordflow}{if} (optreset || !*place) \{      \textcolor{comment}{/* update scanning pointer */}
+00409         optreset = 0;
+00410         \textcolor{keywordflow}{if} (optind >= nargc) \{          \textcolor{comment}{/* end of argument vector */}
+00411             place = EMSG;
+00412             \textcolor{keywordflow}{if} (nonopt_end != -1) \{
+00413                 \textcolor{comment}{/* do permutation, if we have to */}
+00414                 permute_args(nonopt_start, nonopt_end,
+00415                     optind, nargv);
+00416                 optind -= nonopt_end - nonopt_start;
+00417             \}
+00418             \textcolor{keywordflow}{else} \textcolor{keywordflow}{if} (nonopt_start != -1) \{
+00419                 \textcolor{comment}{/*}
+00420 \textcolor{comment}{                 * If we skipped non-options, set optind}
+00421 \textcolor{comment}{                 * to the first of them.}
+00422 \textcolor{comment}{                 */}
+00423                 optind = nonopt_start;
+00424             \}
+00425             nonopt_start = nonopt_end = -1;
+00426             \textcolor{keywordflow}{return} (-1);
+00427         \}
+00428         \textcolor{keywordflow}{if} (*(place = nargv[optind]) != \textcolor{charliteral}{'-'} ||
+00429             (place[1] == \textcolor{charliteral}{'\(\backslash\)0'} && strchr(options, \textcolor{charliteral}{'-'}) == NULL)) \{
+00430             place = EMSG;       \textcolor{comment}{/* found non-option */}
+00431             \textcolor{keywordflow}{if} (flags & FLAG_ALLARGS) \{
+00432                 \textcolor{comment}{/*}
+00433 \textcolor{comment}{                 * GNU extension:}
+00434 \textcolor{comment}{                 * return non-option as argument to option 1}
+00435 \textcolor{comment}{                 */}
+00436                 optarg = nargv[optind++];
+00437                 \textcolor{keywordflow}{return} (INORDER);
+00438             \}
+00439             \textcolor{keywordflow}{if} (!(flags & FLAG_PERMUTE)) \{
+00440                 \textcolor{comment}{/*}
+00441 \textcolor{comment}{                 * If no permutation wanted, stop parsing}
+00442 \textcolor{comment}{                 * at first non-option.}
+00443 \textcolor{comment}{                 */}
+00444                 \textcolor{keywordflow}{return} (-1);
+00445             \}
+00446             \textcolor{comment}{/* do permutation */}
+00447             \textcolor{keywordflow}{if} (nonopt_start == -1)
+00448                 nonopt_start = optind;
+00449             \textcolor{keywordflow}{else} \textcolor{keywordflow}{if} (nonopt_end != -1) \{
+00450                 permute_args(nonopt_start, nonopt_end,
+00451                     optind, nargv);
+00452                 nonopt_start = optind -
+00453                     (nonopt_end - nonopt_start);
+00454                 nonopt_end = -1;
+00455             \}
+00456             optind++;
+00457             \textcolor{comment}{/* process next argument */}
+00458             \textcolor{keywordflow}{goto} start;
+00459         \}
+00460         \textcolor{keywordflow}{if} (nonopt_start != -1 && nonopt_end == -1)
+00461             nonopt_end = optind;
+00462 
+00463         \textcolor{comment}{/*}
+00464 \textcolor{comment}{         * If we have "-" do nothing, if "--" we are done.}
+00465 \textcolor{comment}{         */}
+00466         \textcolor{keywordflow}{if} (place[1] != \textcolor{charliteral}{'\(\backslash\)0'} && *++place == \textcolor{charliteral}{'-'} && place[1] == \textcolor{charliteral}{'\(\backslash\)0'}) \{
+00467             optind++;
+00468             place = EMSG;
+00469             \textcolor{comment}{/*}
+00470 \textcolor{comment}{             * We found an option (--), so if we skipped}
+00471 \textcolor{comment}{             * non-options, we have to permute.}
+00472 \textcolor{comment}{             */}
+00473             \textcolor{keywordflow}{if} (nonopt_end != -1) \{
+00474                 permute_args(nonopt_start, nonopt_end,
+00475                     optind, nargv);
+00476                 optind -= nonopt_end - nonopt_start;
+00477             \}
+00478             nonopt_start = nonopt_end = -1;
+00479             \textcolor{keywordflow}{return} (-1);
+00480         \}
+00481     \}
+00482 
+00483     \textcolor{comment}{/*}
+00484 \textcolor{comment}{     * Check long options if:}
+00485 \textcolor{comment}{     *  1) we were passed some}
+00486 \textcolor{comment}{     *  2) the arg is not just "-"}
+00487 \textcolor{comment}{     *  3) either the arg starts with -- we are getopt\_long\_only()}
+00488 \textcolor{comment}{     */}
+00489     \textcolor{keywordflow}{if} (long\_options != NULL && place != nargv[optind] &&
+00490         (*place == \textcolor{charliteral}{'-'} || (flags & FLAG_LONGONLY))) \{
+00491         short\_too = 0;
+00492         \textcolor{keywordflow}{if} (*place == \textcolor{charliteral}{'-'})
+00493             place++;        \textcolor{comment}{/* --foo long option */}
+00494         \textcolor{keywordflow}{else} \textcolor{keywordflow}{if} (*place != \textcolor{charliteral}{':'} && strchr(options, *place) != NULL)
+00495             short\_too = 1;      \textcolor{comment}{/* could be short option too */}
+00496 
+00497         optchar = parse_long_options(nargv, options, long\_options,
+00498             idx, short\_too);
+00499         \textcolor{keywordflow}{if} (optchar != -1) \{
+00500             place = EMSG;
+00501             \textcolor{keywordflow}{return} (optchar);
+00502         \}
+00503     \}
+00504 
+00505     \textcolor{keywordflow}{if} ((optchar = (\textcolor{keywordtype}{int})*place++) == (\textcolor{keywordtype}{int})\textcolor{charliteral}{':'} ||
+00506         (optchar == (\textcolor{keywordtype}{int})\textcolor{charliteral}{'-'} && *place != \textcolor{charliteral}{'\(\backslash\)0'}) ||
+00507         (oli = (\textcolor{keywordtype}{char}*)strchr(options, optchar)) == NULL) \{
+00508         \textcolor{comment}{/*}
+00509 \textcolor{comment}{         * If the user specified "-" and  '-' isn't listed in}
+00510 \textcolor{comment}{         * options, return -1 (non-option) as per POSIX.}
+00511 \textcolor{comment}{         * Otherwise, it is an unknown option character (or ':').}
+00512 \textcolor{comment}{         */}
+00513         \textcolor{keywordflow}{if} (optchar == (\textcolor{keywordtype}{int})\textcolor{charliteral}{'-'} && *place == \textcolor{charliteral}{'\(\backslash\)0'})
+00514             \textcolor{keywordflow}{return} (-1);
+00515         \textcolor{keywordflow}{if} (!*place)
+00516             ++optind;
+00517         \textcolor{keywordflow}{if} (PRINT_ERROR)
+00518             warnx(illoptchar, optchar);
+00519         optopt = optchar;
+00520         \textcolor{keywordflow}{return} (BADCH);
+00521     \}
+00522     \textcolor{keywordflow}{if} (long\_options != NULL && optchar == \textcolor{charliteral}{'W'} && oli[1] == \textcolor{charliteral}{';'}) \{
+00523         \textcolor{comment}{/* -W long-option */}
+00524         \textcolor{keywordflow}{if} (*place)         \textcolor{comment}{/* no space */}
+00525             \textcolor{comment}{/* NOTHING */};
+00526         \textcolor{keywordflow}{else} \textcolor{keywordflow}{if} (++optind >= nargc) \{   \textcolor{comment}{/* no arg */}
+00527             place = EMSG;
+00528             \textcolor{keywordflow}{if} (PRINT_ERROR)
+00529                 warnx(recargchar, optchar);
+00530             optopt = optchar;
+00531             \textcolor{keywordflow}{return} (BADARG);
+00532         \} \textcolor{keywordflow}{else}              \textcolor{comment}{/* white space */}
+00533             place = nargv[optind];
+00534         optchar = parse_long_options(nargv, options, long\_options,
+00535             idx, 0);
+00536         place = EMSG;
+00537         \textcolor{keywordflow}{return} (optchar);
+00538     \}
+00539     \textcolor{keywordflow}{if} (*++oli != \textcolor{charliteral}{':'}) \{            \textcolor{comment}{/* doesn't take argument */}
+00540         \textcolor{keywordflow}{if} (!*place)
+00541             ++optind;
+00542     \} \textcolor{keywordflow}{else} \{                \textcolor{comment}{/* takes (optional) argument */}
+00543         optarg = NULL;
+00544         \textcolor{keywordflow}{if} (*place)         \textcolor{comment}{/* no white space */}
+00545             optarg = place;
+00546         \textcolor{keywordflow}{else} \textcolor{keywordflow}{if} (oli[1] != \textcolor{charliteral}{':'}) \{   \textcolor{comment}{/* arg not optional */}
+00547             \textcolor{keywordflow}{if} (++optind >= nargc) \{    \textcolor{comment}{/* no arg */}
+00548                 place = EMSG;
+00549                 \textcolor{keywordflow}{if} (PRINT_ERROR)
+00550                     warnx(recargchar, optchar);
+00551                 optopt = optchar;
+00552                 \textcolor{keywordflow}{return} (BADARG);
+00553             \} \textcolor{keywordflow}{else}
+00554                 optarg = nargv[optind];
+00555         \}
+00556         place = EMSG;
+00557         ++optind;
+00558     \}
+00559     \textcolor{comment}{/* dump back option letter */}
+00560     \textcolor{keywordflow}{return} (optchar);
+00561 \}
+00562 
+00563 \textcolor{comment}{/*}
+00564 \textcolor{comment}{ * getopt\_long --}
+00565 \textcolor{comment}{ *  Parse argc/argv argument vector.}
+00566 \textcolor{comment}{ */}
+00567 \textcolor{keywordtype}{int}
+00568 getopt_long(\textcolor{keywordtype}{int} nargc, \textcolor{keywordtype}{char} * \textcolor{keyword}{const} *nargv, \textcolor{keyword}{const} \textcolor{keywordtype}{char} *options,
+00569     \textcolor{keyword}{const} \textcolor{keyword}{struct} option *long\_options, \textcolor{keywordtype}{int} *idx)
+00570 \{
+00571 
+00572     \textcolor{keywordflow}{return} (getopt_internal(nargc, nargv, options, long\_options, idx,
+00573         FLAG_PERMUTE));
+00574 \}
+00575 
+00576 \textcolor{comment}{/*}
+00577 \textcolor{comment}{ * getopt\_long\_only --}
+00578 \textcolor{comment}{ *  Parse argc/argv argument vector.}
+00579 \textcolor{comment}{ */}
+00580 \textcolor{keywordtype}{int}
+00581 getopt_long_only(\textcolor{keywordtype}{int} nargc, \textcolor{keywordtype}{char} * \textcolor{keyword}{const} *nargv, \textcolor{keyword}{const} \textcolor{keywordtype}{char} *options,
+00582     \textcolor{keyword}{const} \textcolor{keyword}{struct} option *long\_options, \textcolor{keywordtype}{int} *idx)
+00583 \{
+00584 
+00585     \textcolor{keywordflow}{return} (getopt_internal(nargc, nargv, options, long\_options, idx,
+00586         FLAG_PERMUTE|FLAG_LONGONLY));
+00587 \}
+00588 
+00589 \textcolor{comment}{//extern int getopt\_long(int nargc, char * const *nargv, const char *options,}
+00590 \textcolor{comment}{//    const struct option *long\_options, int *idx);}
+00591 \textcolor{comment}{//extern int getopt\_long\_only(int nargc, char * const *nargv, const char *options,}
+00592 \textcolor{comment}{//    const struct option *long\_options, int *idx);}
+00593 \textcolor{comment}{/*}
+00594 \textcolor{comment}{ * Previous MinGW implementation had...}
+00595 \textcolor{comment}{ */}
+00596 \textcolor{preprocessor}{#ifndef HAVE\_DECL\_GETOPT}
+00597 \textcolor{comment}{/*}
+00598 \textcolor{comment}{ * ...for the long form API only; keep this for compatibility.}
+00599 \textcolor{comment}{ */}
+00600 \textcolor{preprocessor}{# define HAVE\_DECL\_GETOPT   1}
+00601 \textcolor{preprocessor}{#endif}
+00602 
+00603 \textcolor{preprocessor}{#ifdef \_\_cplusplus}
+00604 \}
+00605 \textcolor{preprocessor}{#endif}
+00606 
+00607 \textcolor{preprocessor}{#endif }\textcolor{comment}{/* !defined(\_\_UNISTD\_H\_SOURCED\_\_) && !defined(\_\_GETOPT\_LONG\_H\_\_) */}\textcolor{preprocessor}{}
+\end{DoxyCode}

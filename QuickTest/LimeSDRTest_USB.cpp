@@ -27,7 +27,7 @@ int LimeSDRTest_USB::ClockNetworkTest()
         UpdateStatus(LMS_TEST_INFO, "  FAILED");
         ret = -1;
     }
-    
+
     UpdateStatus(LMS_TEST_INFO, "->ADF4002 Test");
     if (ADF4002Test() == -1)
     {

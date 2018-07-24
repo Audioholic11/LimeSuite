@@ -1,5 +1,25 @@
 var searchData=
 [
-  ['versioninfo_2eh',['VersionInfo.h',['../d8/d2f/VersionInfo_8h.html',1,'']]],
-  ['versioninfo_2ein_2ecpp',['VersionInfo.in.cpp',['../dc/de5/VersionInfo_8in_8cpp.html',1,'']]]
+  ['radar_5fswig_2epy',['radar_swig.py',['../d6/d81/radar__swig_8py.html',1,'']]],
+  ['radar_5fswig_5fswig_5f2d0df_2ecpp',['radar_swig_swig_2d0df.cpp',['../d3/d89/radar__swig__swig__2d0df_8cpp.html',1,'']]],
+  ['radar_5fswigpython_5fwrap_2ecxx',['radar_swigPYTHON_wrap.cxx',['../dc/d4d/radar__swigPYTHON__wrap_8cxx.html',1,'']]],
+  ['readme_2emd',['README.md',['../d9/dd9/limesuite-dev_2external_2cpp-feather-ini-parser_2README_8md.html',1,'']]],
+  ['readme_2emd',['README.md',['../d0/d34/soapysdr_2ExampleDriver_2README_8md.html',1,'']]],
+  ['readme_2emd',['README.md',['../d7/db9/soapysdr_2python3_2README_8md.html',1,'']]],
+  ['readme_2emd',['README.md',['../df/d18/soapysdr_2README_8md.html',1,'']]],
+  ['readme_2emd',['README.md',['../da/d43/gr-radar-dev_2OLD_2README_8md.html',1,'']]],
+  ['readme_2emd',['README.md',['../da/d99/gr-radar-dev_2README_8md.html',1,'']]],
+  ['readme_2emd',['README.md',['../d5/d52/limesuite-dev_2SoapyLMS7_2README_8md.html',1,'']]],
+  ['recipes_2ec',['recipes.c',['../db/de5/recipes_8c.html',1,'']]],
+  ['recipes_2eh',['recipes.h',['../db/d3b/recipes_8h.html',1,'']]],
+  ['registration_2ecpp',['Registration.cpp',['../da/dc9/Registration_8cpp.html',1,'']]],
+  ['registry_2ecpp',['Registry.cpp',['../d6/d4f/Registry_8cpp.html',1,'']]],
+  ['registry_2ehpp',['Registry.hpp',['../db/dd1/Registry_8hpp.html',1,'']]],
+  ['resize_2ejs',['resize.js',['../da/d95/resize_8js.html',1,'']]],
+  ['rfspark_5fwxgui_2ecpp',['RFSpark_wxgui.cpp',['../d5/d8d/RFSpark__wxgui_8cpp.html',1,'']]],
+  ['rfspark_5fwxgui_2eh',['RFSpark_wxgui.h',['../d3/d09/RFSpark__wxgui_8h.html',1,'']]],
+  ['rounding_2ec',['rounding.c',['../d8/d91/rounding_8c.html',1,'']]],
+  ['rounding_2eh',['rounding.h',['../d2/dbe/rounding_8h.html',1,'']]],
+  ['rx_2em',['rx.m',['../d1/df4/rx_8m.html',1,'']]],
+  ['rx_5f2ch_2em',['rx_2ch.m',['../d7/d92/rx__2ch_8m.html',1,'']]]
 ];

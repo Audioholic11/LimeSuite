@@ -1,0 +1,54 @@
+\subsection{/home/erik/prefix/default/src/limesuite-\/dev/external/cpp-\/feather-\/ini-\/parser/\+R\+E\+A\+D\+ME.md}
+
+\begin{DoxyCode}
+00001 feather-ini-parser
+00002 ==================
+00003 
+00004 Simple like your girlfriend, fast, lightweight, header, portable INI parser for ANSI C++.
+00005 
+00006 Why use feather-ini-parser? It's a fast, intuitive, uses C++, supports native data types, wide char
+       support (enable), converting to data types simply by setting a default value or providing the type as a
+       template parameter.
+00007 
+00008 ##Methods
+00009 
+00010 Statement     | Return Type
+00011 ------------- | -------------
+00012 ini(filename, doParse)|constructor
+00013 ini(data, dataSize, doParse)|constructor
+00014 ini.parse()|bool
+00015 ini.merge(other INI, retainValues)|void
+00016 ini.create(section)|bool
+00017 ini.select(section)|bool
+00018 ini.set(key, value)|bool
+00019 ini.get(key, dvalue = value\_t())|dvalue\_t
+00020 ini.save(filename = "")|bool
+00021 ini.clear()|bool
+00022 ini[section][key]|value\_t&
+00023 ini[section]|keys\_t&
+00024 
+00025 ##Example
+00026 ```
+00027 #include <iostream>
+00028 #include "INI.h"
+00029 
+00030 using namespace std;
+00031 ```
+00032 ...
+00033 ```
+00034 typedef INI<> ini\_t;
+00035 //or
+00036 //typedef INI<section\_t, key\_t, value\_t> ini\_t;
+00037 
+00038 ini\_t ini("filename.ini", true);
+00039 ini.create("section1"); //Create and select section1
+00040 ini.set("key", "value");
+00041 cout << ini.get("keynumeric", -1) << endl;
+00042 ini["section2"]["key"] = "value";
+00043 ini.save();
+00044 ```
+00045 
+00046 ##More
+00047 Please see the example .cpp file and Code::Blocks .cbp project for a compilable GCC and VSC++ example.
+       Additionally includes enabling wide char support and iterating through contents.
+\end{DoxyCode}

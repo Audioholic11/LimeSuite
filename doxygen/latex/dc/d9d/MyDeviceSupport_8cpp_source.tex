@@ -1,0 +1,42 @@
+\subsection{My\+Device\+Support.\+cpp}
+\label{MyDeviceSupport_8cpp_source}\index{/home/erik/prefix/default/src/soapysdr/\+Example\+Driver/\+My\+Device\+Support.\+cpp@{/home/erik/prefix/default/src/soapysdr/\+Example\+Driver/\+My\+Device\+Support.\+cpp}}
+
+\begin{DoxyCode}
+00001 \textcolor{preprocessor}{#include <SoapySDR/Device.hpp>}
+00002 \textcolor{preprocessor}{#include <SoapySDR/Registry.hpp>}
+00003 
+00004 \textcolor{comment}{/***********************************************************************}
+00005 \textcolor{comment}{ * Device interface}
+00006 \textcolor{comment}{ **********************************************************************/}
+00007 \textcolor{keyword}{class }MyDevice : \textcolor{keyword}{public} SoapySDR::Device
+00008 \{
+00009     \textcolor{comment}{//Implement constructor with device specific arguments...}
+00010 
+00011     \textcolor{comment}{//Implement all applicable virtual methods from SoapySDR::Device}
+00012 \};
+00013 
+00014 \textcolor{comment}{/***********************************************************************}
+00015 \textcolor{comment}{ * Find available devices}
+00016 \textcolor{comment}{ **********************************************************************/}
+00017 SoapySDR::KwargsList findMyDevice(\textcolor{keyword}{const} SoapySDR::Kwargs &args)
+00018 \{
+00019     \textcolor{comment}{//locate the device on the system...}
+00020     \textcolor{comment}{//return a list of 0, 1, or more argument maps that each identify a device}
+00021 \}
+00022 
+00023 \textcolor{comment}{/***********************************************************************}
+00024 \textcolor{comment}{ * Make device instance}
+00025 \textcolor{comment}{ **********************************************************************/}
+00026 SoapySDR::Device *makeMyDevice(\textcolor{keyword}{const} SoapySDR::Kwargs &args)
+00027 \{
+00028     \textcolor{comment}{//create an instance of the device object given the args}
+00029     \textcolor{comment}{//here we will translate args into something used in the constructor}
+00030     \textcolor{keywordflow}{return} \textcolor{keyword}{new} MyDevice(...);
+00031 \}
+00032 
+00033 \textcolor{comment}{/***********************************************************************}
+00034 \textcolor{comment}{ * Registration}
+00035 \textcolor{comment}{ **********************************************************************/}
+00036 \textcolor{keyword}{static} SoapySDR::Registry registerMyDevice(\textcolor{stringliteral}{"my\_device"}, &findMyDevice, &
+      makeMyDevice, SOAPY_SDR_ABI_VERSION);
+\end{DoxyCode}

@@ -1,0 +1,45 @@
+\subsection{Install guide}\label{index_install}
+For the actual install guide read the {\ttfamily R\+E\+A\+D\+ME} at the main folder. Please take care of the dependencies. In particular there can be some issues if Qwt is below version 6. Furthermore python-\/matplotlib is used in some testcases. U\+HD must be installed because of the U\+S\+RP interface. This should be done with the G\+NU Radio installation.\subsubsection{Buffer size issues}\label{index_buffer}
+Radar applications often need huge buffer sizes. Therefore you have to do two things to push the maximum buffer size to the maximum. First you have to set the maximum output buffer of all blocks in the flowgraph on two times of the value that you need. With this you can use buffer of about 2$^\wedge$17 float complex items. This number depends on your system. In G\+NU Radio Companion you can set this value in the properties of the blocks or you use the call {\ttfamily $<$+block+$>$.set\+\_\+min\+\_\+output\+\_\+buffer($<$+value+$>$)} in a python flowgraph.
+
+If you need greater buffer sizes you have to increase the limit of a single shared memory segment. The commands are given in a bash script in gr-\/radar/examples/setup/setup\+\_\+core. If you want to set the parameters in gr-\/radar/examples/setup/setup\+\_\+core on every system start, edit /etc/sysctl.conf with following lines.
+
+{\ttfamily \# Updates for G\+NU Radio~\newline
+net.\+core.\+rmem\+\_\+max=50000000~\newline
+net.\+core.\+wmem\+\_\+max=1048576~\newline
+kernel.\+shmmax=2147483648~\newline
+}\subsubsection{Rebuild documentation}\label{index_rebuild_doc}
+If there is any need to rebuild the documentation with doxygen go to gr-\/radar/docs/doxygen and run {\ttfamily doxygen Doxyfile.\+in}. The documentation is not rebuild with every build of the toolbox (unlike the default out-\/of-\/tree module behaviour). The actual documentation shall be included in the repository.\subsection{Basic ideas of the toolbox}\label{index_basic}
+Requirement to read this documentation is a basic idea of G\+NU Radio and its components. If you are not familiar with some terms or definitions please check out the G\+NU Radio documentation and wiki.
+
+The basic flowgraph for many radar applications is shown below. First a signal is generated and send and received with some hardware. TX and RX signal are compared with an estimator and the result is displayed on the screen.
+
+The toolbox uses tagged streams for packaging data and to make sure that corresponding data is processed together in one work function call. In most cases streams are used up to the evaluation of the signal attributes which are used for calculating range, velocity or azimuth. This attributes are most often peaks of a F\+FT spectrum. After this point there is no use for tagged streams and it is practical to switch to the message system of G\+NU Radio. This data is packed as P\+M\+Ts (polymorphic types). Read the subsection \textquotesingle{}Message structure and identifiers\textquotesingle{} for more information.
+
+The send and receive part of the flowgraph is implemented in two ways. First you can use the U\+S\+RP Echotimer. This block takes a tagged stream and ensure that this package is send and received synchronously. Further information in the section \textquotesingle{}U\+S\+RP Echotimer\textquotesingle{}. If you want to test your flowgraphs without the need of hardware you can use a simulator for the propagation effects. A simulator for static targets with constant attributes like range and velocity is implemented. It is possible to emulate a moving target if you use sliders for variables in G\+NU Radio Companion. The static target simulators has implemented a callback that updates the targets attributes in runtime.
+
+\subsubsection{Message structure and identifiers (symbols)}\label{index_msg}
+If the toolbox exchanges messages a standard structure for the data is used. The idea is to tag a dataset with an identifier. This identifier is a string packed as a P\+MT symbol. Then the data is packed together as a list of two items (the identifier and the data). Multiple datasets can be send in one message as a list of these identifier/data pairs. With this structure the order of the datasets is not important and it is easy to enlarge or manipulate a message without have to think about the processing in the following blocks. Used P\+MT functionality are lists to create this structure. For visualisation the data structure looks like this\+:
+
+A single dataset as identifier data pair\+: {\ttfamily [$<$+symbol0+$>$, $<$+data0+$>$]~\newline
+} A whole message with multiple datasets\+: {\ttfamily [ [$<$+symbol0+$>$, $<$+data0+$>$], [$<$+symbol1+$>$, $<$+data1+$>$], ... ]}
+
+Used identifiers (symbols) should be predefined to keep the handling simple. Current used identifiers are following strings.
+
+{\bfseries Signal information\+:}~\newline
+{\ttfamily rx\+\_\+time} \+: Timestamp of the RX signal~\newline
+{\ttfamily frequency} \+: Frequency information of peaks in a F\+FT spectrum~\newline
+{\ttfamily power} \+: Amplitude (magnitude square) of peaks, e. g. in a F\+FT spectrum or within matrix processing~\newline
+{\ttfamily phase} \+: Phase of the complex value of peaks in a F\+FT spectrum~\newline
+{\ttfamily axis\+\_\+x} \+: Number of bin on x axis for matrix processing~\newline
+{\ttfamily axis\+\_\+y} \+: Number of bin on y axis for matrix processing~\newline
+
+
+{\bfseries Target information\+:}~\newline
+{\ttfamily range} \+: Target range~\newline
+{\ttfamily velocity} \+: Target velocity\subsection{U\+S\+R\+P Echotimer}\label{index_echotimer}
+The U\+S\+RP Echotimer is a U\+HD interface for U\+S\+R\+Ps. Known well working devices are N210, B210 and U\+S\+RP 2. Check out www.\+ettus.\+com for more information about the hardware.
+
+Basically the Echotimer bursts a data packet defined as tagged stream. Synchronously a packet with the same length is received. The receive time is given with a stream tag on the first item of the tagged stream with the identifier {\ttfamily rx\+\_\+time}. This is put into practice with a send and receive command on a shared point of time on all U\+S\+R\+Ps. Therefore the time has to be synchronized on all used devices. This can be done with a M\+I\+MO cable or with a G\+PS clock. The strings are {\ttfamily mimo} or {\ttfamily gpsdo} for the time source. Either you can choose the G\+PS clock on both devices or set one clock on {\ttfamily internal} as master and set the clock of the slave device over M\+I\+MO cable.
+
+Look at the G\+NU Radio Companion flowgraph samples in {\ttfamily /examples/usrp} for reference. Mostly all values and strings are push through and used without a change within the U\+HD A\+PI. Therefore the U\+HD A\+PI documentation is also a good reference. 

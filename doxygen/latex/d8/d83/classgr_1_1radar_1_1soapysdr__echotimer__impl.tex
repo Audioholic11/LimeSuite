@@ -1,0 +1,1339 @@
+\subsection{gr\+:\+:radar\+:\+:soapysdr\+\_\+echotimer\+\_\+impl Class Reference}
+\label{classgr_1_1radar_1_1soapysdr__echotimer__impl}\index{gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl@{gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl}}
+
+
+{\ttfamily \#include $<$soapysdr\+\_\+echotimer\+\_\+impl.\+h$>$}
+
+
+
+Inheritance diagram for gr\+:\+:radar\+:\+:soapysdr\+\_\+echotimer\+\_\+impl\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=550pt]{d9/d83/classgr_1_1radar_1_1soapysdr__echotimer__impl__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for gr\+:\+:radar\+:\+:soapysdr\+\_\+echotimer\+\_\+impl\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{d1/d3e/classgr_1_1radar_1_1soapysdr__echotimer__impl__coll__graph}
+\end{center}
+\end{figure}
+\subsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+{\bf soapysdr\+\_\+echotimer\+\_\+impl} ({\bf int} samp\+\_\+rate, float center\+\_\+freq, {\bf int} {\bf num\+\_\+delay\+\_\+samps}, {\bf std\+::string} {\bf args}, {\bf std\+::string} antenna\+\_\+tx, float gain\+\_\+tx, float bw\+\_\+tx, float timeout\+\_\+tx, float {\bf wait\+\_\+tx}, float lo\+\_\+offset\+\_\+tx, {\bf std\+::string} antenna\+\_\+rx, float gain\+\_\+rx, float bw\+\_\+rx, float timeout\+\_\+rx, float {\bf wait\+\_\+rx}, float lo\+\_\+offset\+\_\+rx, const {\bf std\+::string} \&len\+\_\+key)
+\item 
+{\bf $\sim$soapysdr\+\_\+echotimer\+\_\+impl} ()
+\item 
+{\bf void} {\bf send} ()
+\item 
+{\bf void} {\bf receive} ()
+\item 
+{\bf void} {\bf set\+\_\+rx\+\_\+gain} (size\+\_\+t {\bf chan}, float {\bf gain})
+\item 
+{\bf void} {\bf set\+\_\+tx\+\_\+gain} (size\+\_\+t {\bf chan}, float {\bf gain})
+\item 
+{\bf int} {\bf num\+\_\+delay\+\_\+samps} ()
+\item 
+{\bf void} {\bf set\+\_\+num\+\_\+delay\+\_\+samps} ({\bf int} {\bf num\+\_\+delay\+\_\+samps})
+\item 
+float {\bf wait\+\_\+rx} ()
+\item 
+float {\bf wait\+\_\+tx} ()
+\item 
+{\bf void} {\bf set\+\_\+wait} (float {\bf wait\+\_\+rx}, float {\bf wait\+\_\+tx})
+\item 
+{\bf int} {\bf work} ({\bf int} noutput\+\_\+items, gr\+\_\+vector\+\_\+int \&ninput\+\_\+items, gr\+\_\+vector\+\_\+const\+\_\+void\+\_\+star \&input\+\_\+items, gr\+\_\+vector\+\_\+void\+\_\+star \&output\+\_\+items)
+\end{DoxyCompactItemize}
+\subsubsection*{Protected Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+{\bf int} {\bf calculate\+\_\+output\+\_\+stream\+\_\+length} (const gr\+\_\+vector\+\_\+int \&ninput\+\_\+items)
+\end{DoxyCompactItemize}
+\subsubsection*{Private Attributes}
+\begin{DoxyCompactItemize}
+\item 
+volatile long long {\bf d\+\_\+time\+\_\+now\+\_\+tx}
+\item 
+volatile long long {\bf d\+\_\+time\+\_\+now\+\_\+rx}
+\item 
+volatile long long {\bf d\+\_\+time\+\_\+now\+\_\+rx\+\_\+\+HW}
+\item 
+long long {\bf d\+\_\+time\+Ns\+\_\+tx}
+\item 
+long long {\bf d\+\_\+time\+Ns\+\_\+rx}
+\item 
+long long {\bf d\+\_\+time\+Ns\+\_\+rx\+\_\+return}
+\item 
+volatile long long {\bf d\+\_\+wait\+\_\+rx\+\_\+\+T\+E\+ST}
+\item 
+long {\bf d\+\_\+timeout\+Us}
+\item 
+pmt\+::pmt\+\_\+t {\bf d\+\_\+time\+\_\+key}
+\item 
+pmt\+::pmt\+\_\+t {\bf d\+\_\+time\+\_\+val}
+\item 
+pmt\+::pmt\+\_\+t {\bf d\+\_\+srcid}
+\item 
+{\bf int} {\bf d\+\_\+num\+\_\+delay\+\_\+samps}
+\item 
+{\bf std\+::string} {\bf d\+\_\+args}
+\item 
+{\bf Soapy\+S\+D\+R\+::\+Kwargs} {\bf d\+\_\+kw}
+\item 
+{\bf int} {\bf d\+\_\+samp\+\_\+rate}
+\item 
+float {\bf d\+\_\+center\+\_\+freq}
+\item 
+{\bf std\+::vector}$<$ {\bf std\+::string} $>$ {\bf d\+\_\+list\+Reg\+Interfaces}
+\item 
+{\bf std\+::vector}$<$ {\bf std\+::string} $>$ {\bf d\+\_\+\+G\+P\+I\+O\+Banks}
+\item 
+volatile unsigned {\bf d\+\_\+register}
+\item 
+volatile unsigned {\bf d\+\_\+value}
+\item 
+volatile float {\bf d\+\_\+time\+\_\+packet}
+\item 
+long long {\bf d\+\_\+extra\+\_\+work\+\_\+time}
+\item 
+{\bf int} {\bf d\+\_\+work\+Num}
+\item 
+bool {\bf d\+\_\+\+Send\+Packet}
+\item 
+pmt\+::pmt\+\_\+t {\bf Deadtime\+Key} = pmt\+::string\+\_\+to\+\_\+symbol(\char`\"{}Deadtime\char`\"{})
+\item 
+volatile {\bf int} {\bf first\+Packet\+\_\+\+Rx}
+\item 
+volatile {\bf int} {\bf first\+Packet}
+\item 
+{\bf int} {\bf E\+R\+R\+O\+RS}
+\item 
+{\bf int} {\bf Rx\+\_\+\+Skip\+\_\+\+Packets} = 0
+\item 
+bool {\bf Chirp\+\_\+\+Sync}
+\item 
+{\bf std\+::vector}$<$ {\bf std\+::string} $>$ {\bf sensors}
+\item 
+{\bf Soapy\+S\+D\+R\+::\+Device} $\ast$ {\bf d\+\_\+soapysdr\+\_\+tx}
+\item 
+{\bf Soapy\+S\+D\+R\+::\+Device} $\ast$ {\bf d\+\_\+soapysdr\+\_\+rx}
+\item 
+{\bf Soapy\+S\+D\+R\+::\+Device} $\ast$ {\bf d\+\_\+soapysdr}
+\item 
+Soapy\+S\+D\+R\+::\+Stream $\ast$ {\bf d\+\_\+tx\+\_\+stream}
+\item 
+Soapy\+S\+D\+R\+::\+Stream $\ast$ {\bf d\+\_\+rx\+\_\+stream}
+\item 
+size\+\_\+t {\bf d\+\_\+chan\+\_\+tx}
+\item 
+size\+\_\+t {\bf d\+\_\+chan\+\_\+rx}
+\item 
+{\bf int} {\bf d\+\_\+flags\+Tx}
+\item 
+{\bf int} {\bf d\+\_\+flags\+Rx}
+\item 
+{\bf int} {\bf d\+\_\+flags\+Rx\+\_\+return}
+\item 
+float {\bf d\+\_\+timeout\+\_\+tx}
+\item 
+float {\bf d\+\_\+timeout\+\_\+rx}
+\item 
+float {\bf d\+\_\+wait\+\_\+tx}
+\item 
+float {\bf d\+\_\+wait\+\_\+rx}
+\item 
+double {\bf d\+\_\+lo\+\_\+offset\+\_\+tx}
+\item 
+double {\bf d\+\_\+lo\+\_\+offset\+\_\+rx}
+\item 
+{\bf std\+::string} {\bf d\+\_\+antenna\+\_\+tx}
+\item 
+{\bf std\+::string} {\bf d\+\_\+antenna\+\_\+rx}
+\item 
+float {\bf d\+\_\+gain\+\_\+tx}
+\item 
+float {\bf d\+\_\+gain\+\_\+rx}
+\item 
+float {\bf d\+\_\+bw\+\_\+tx}
+\item 
+float {\bf d\+\_\+bw\+\_\+rx}
+\item 
+volatile {\bf int} {\bf d\+\_\+num\+\_\+rx\+\_\+samps}
+\item 
+volatile {\bf int} {\bf d\+\_\+num\+\_\+tx\+\_\+samps}
+\item 
+gr\+::thread\+::thread {\bf d\+\_\+thread\+\_\+recv}
+\item 
+gr\+\_\+vector\+\_\+void\+\_\+star {\bf d\+\_\+out\+\_\+buffer}
+\item 
+gr\+\_\+complex $\ast$ {\bf d\+\_\+out\+\_\+recv}
+\item 
+{\bf int} {\bf d\+\_\+noutput\+\_\+items\+\_\+recv}
+\item 
+gr\+::thread\+::thread {\bf d\+\_\+thread\+\_\+send}
+\item 
+gr\+\_\+vector\+\_\+const\+\_\+void\+\_\+star {\bf d\+\_\+in\+\_\+buffer}
+\item 
+{\bf int} {\bf d\+\_\+noutput\+\_\+items\+\_\+send}
+\end{DoxyCompactItemize}
+\subsubsection*{Additional Inherited Members}
+
+
+\subsubsection{Detailed Description}
+
+
+Definition at line {\bf 41} of file {\bf soapysdr\+\_\+echotimer\+\_\+impl.\+h}.
+
+
+
+\subsubsection{Constructor \& Destructor Documentation}
+\index{gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl@{gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl}!soapysdr\+\_\+echotimer\+\_\+impl@{soapysdr\+\_\+echotimer\+\_\+impl}}
+\index{soapysdr\+\_\+echotimer\+\_\+impl@{soapysdr\+\_\+echotimer\+\_\+impl}!gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl@{gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl}}
+\paragraph[{soapysdr\+\_\+echotimer\+\_\+impl(int samp\+\_\+rate, float center\+\_\+freq, int num\+\_\+delay\+\_\+samps, std\+::string args, std\+::string antenna\+\_\+tx, float gain\+\_\+tx, float bw\+\_\+tx, float timeout\+\_\+tx, float wait\+\_\+tx, float lo\+\_\+offset\+\_\+tx, std\+::string antenna\+\_\+rx, float gain\+\_\+rx, float bw\+\_\+rx, float timeout\+\_\+rx, float wait\+\_\+rx, float lo\+\_\+offset\+\_\+rx, const std\+::string \&len\+\_\+key)}]{\setlength{\rightskip}{0pt plus 5cm}gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl\+::soapysdr\+\_\+echotimer\+\_\+impl (
+\begin{DoxyParamCaption}
+\item[{{\bf int}}]{samp\+\_\+rate, }
+\item[{float}]{center\+\_\+freq, }
+\item[{{\bf int}}]{num\+\_\+delay\+\_\+samps, }
+\item[{{\bf std\+::string}}]{args, }
+\item[{{\bf std\+::string}}]{antenna\+\_\+tx, }
+\item[{float}]{gain\+\_\+tx, }
+\item[{float}]{bw\+\_\+tx, }
+\item[{float}]{timeout\+\_\+tx, }
+\item[{float}]{wait\+\_\+tx, }
+\item[{float}]{lo\+\_\+offset\+\_\+tx, }
+\item[{{\bf std\+::string}}]{antenna\+\_\+rx, }
+\item[{float}]{gain\+\_\+rx, }
+\item[{float}]{bw\+\_\+rx, }
+\item[{float}]{timeout\+\_\+rx, }
+\item[{float}]{wait\+\_\+rx, }
+\item[{float}]{lo\+\_\+offset\+\_\+rx, }
+\item[{const {\bf std\+::string} \&}]{len\+\_\+key}
+\end{DoxyParamCaption}
+)}\label{classgr_1_1radar_1_1soapysdr__echotimer__impl_a7201c3c1eaa9eb86678c183a2480dba7}
+
+
+Definition at line {\bf 53} of file {\bf soapysdr\+\_\+echotimer\+\_\+impl.\+cc}.
+
+
+
+References {\bf Soapy\+S\+D\+R.\+Device\+::activate\+Stream()}, {\bf d\+\_\+antenna\+\_\+rx}, {\bf d\+\_\+antenna\+\_\+tx}, {\bf d\+\_\+args}, {\bf d\+\_\+bw\+\_\+rx}, {\bf d\+\_\+bw\+\_\+tx}, {\bf d\+\_\+center\+\_\+freq}, {\bf d\+\_\+chan\+\_\+rx}, {\bf d\+\_\+chan\+\_\+tx}, {\bf d\+\_\+extra\+\_\+work\+\_\+time}, {\bf d\+\_\+flags\+Rx\+\_\+return}, {\bf d\+\_\+flags\+Tx}, {\bf d\+\_\+gain\+\_\+rx}, {\bf d\+\_\+gain\+\_\+tx}, {\bf d\+\_\+\+G\+P\+I\+O\+Banks}, {\bf d\+\_\+kw}, {\bf d\+\_\+list\+Reg\+Interfaces}, {\bf d\+\_\+out\+\_\+buffer}, {\bf d\+\_\+register}, {\bf d\+\_\+rx\+\_\+stream}, {\bf d\+\_\+samp\+\_\+rate}, {\bf d\+\_\+\+Send\+Packet}, {\bf d\+\_\+soapysdr}, {\bf d\+\_\+srcid}, {\bf d\+\_\+time\+\_\+key}, {\bf d\+\_\+time\+\_\+now\+\_\+rx}, {\bf d\+\_\+time\+\_\+now\+\_\+tx}, {\bf d\+\_\+time\+Ns\+\_\+rx}, {\bf d\+\_\+time\+Ns\+\_\+rx\+\_\+return}, {\bf d\+\_\+time\+Ns\+\_\+tx}, {\bf d\+\_\+timeout\+Us}, {\bf d\+\_\+tx\+\_\+stream}, {\bf d\+\_\+value}, {\bf d\+\_\+work\+Num}, {\bf first\+Packet}, {\bf first\+Packet\+\_\+\+Rx}, {\bf Soapy\+S\+D\+R.\+Device\+::get\+Antenna()}, {\bf Soapy\+S\+D\+R.\+Device\+::get\+Bandwidth()}, {\bf Soapy\+S\+D\+R.\+Device\+::get\+Driver\+Key()}, {\bf Soapy\+S\+D\+R.\+Device\+::get\+Frequency()}, {\bf Soapy\+S\+D\+R.\+Device\+::get\+Hardware\+Info()}, {\bf Soapy\+S\+D\+R.\+Device\+::get\+Hardware\+Key()}, {\bf Soapy\+S\+D\+R.\+Device\+::get\+Master\+Clock\+Rate()}, {\bf Soapy\+S\+D\+R.\+Device\+::get\+Num\+Channels()}, {\bf Soapy\+S\+D\+R.\+Device\+::get\+Sample\+Rate()}, {\bf Soapy\+S\+D\+R.\+Device\+::get\+Stream\+Args\+Info()}, {\bf Soapy\+S\+D\+R.\+Device\+::get\+Stream\+Formats()}, {\bf Soapy\+S\+D\+R.\+Device\+::has\+Hardware\+Time()}, {\bf i}, {\bf Soapy\+S\+D\+R\+::\+Kwargs\+From\+String}, {\bf Soapy\+S\+D\+R\+::\+Kwargs\+To\+String}, {\bf Soapy\+S\+D\+R.\+Device\+::list\+G\+P\+I\+O\+Banks()}, {\bf Soapy\+S\+D\+R.\+Device\+::list\+Register\+Interfaces()}, {\bf Soapy\+S\+D\+R.\+Device\+::list\+Sensors()}, {\bf Soapy\+S\+D\+R.\+Device\+::make}, {\bf Soapy\+S\+D\+R.\+Device\+::read\+Register()}, {\bf sensors}, {\bf set\+\_\+rx\+\_\+gain()}, {\bf set\+\_\+tx\+\_\+gain()}, {\bf Soapy\+S\+D\+R.\+Device\+::set\+Antenna()}, {\bf Soapy\+S\+D\+R.\+Device\+::set\+Bandwidth()}, {\bf Soapy\+S\+D\+R.\+Device\+::set\+Frequency()}, {\bf Soapy\+S\+D\+R.\+Device\+::set\+Hardware\+Time()}, {\bf Soapy\+S\+D\+R.\+Device\+::set\+Sample\+Rate()}, {\bf Soapy\+S\+D\+R.\+Device\+::setup\+Stream()}, {\bf sleep()}, {\bf S\+O\+A\+P\+Y\+\_\+\+S\+D\+R\+\_\+\+H\+A\+S\+\_\+\+T\+I\+ME}, {\bf S\+O\+A\+P\+Y\+\_\+\+S\+D\+R\+\_\+\+RX}, {\bf S\+O\+A\+P\+Y\+\_\+\+S\+D\+R\+\_\+\+TX}, {\bf Soapy\+S\+D\+R.\+Device\+::write\+G\+P\+I\+O()}, {\bf Soapy\+S\+D\+R.\+Device\+::write\+G\+P\+I\+O\+Dir()}, and {\bf Soapy\+S\+D\+R.\+Device\+::write\+Register()}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=550pt]{d8/d83/classgr_1_1radar_1_1soapysdr__echotimer__impl_a7201c3c1eaa9eb86678c183a2480dba7_cgraph}
+\end{center}
+\end{figure}
+
+
+\index{gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl@{gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl}!````~soapysdr\+\_\+echotimer\+\_\+impl@{$\sim$soapysdr\+\_\+echotimer\+\_\+impl}}
+\index{````~soapysdr\+\_\+echotimer\+\_\+impl@{$\sim$soapysdr\+\_\+echotimer\+\_\+impl}!gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl@{gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl}}
+\paragraph[{$\sim$soapysdr\+\_\+echotimer\+\_\+impl()}]{\setlength{\rightskip}{0pt plus 5cm}gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl\+::$\sim$soapysdr\+\_\+echotimer\+\_\+impl (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}\label{classgr_1_1radar_1_1soapysdr__echotimer__impl_ae72c960d7b81205e18b58003a9685c10}
+
+
+Definition at line {\bf 286} of file {\bf soapysdr\+\_\+echotimer\+\_\+impl.\+cc}.
+
+
+
+References {\bf Soapy\+S\+D\+R.\+Device\+::close\+Stream()}, {\bf d\+\_\+list\+Reg\+Interfaces}, {\bf d\+\_\+rx\+\_\+stream}, {\bf d\+\_\+soapysdr}, {\bf d\+\_\+tx\+\_\+stream}, {\bf Soapy\+S\+D\+R.\+Device\+::deactivate\+Stream()}, and {\bf Soapy\+S\+D\+R.\+Device\+::write\+Register()}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{d8/d83/classgr_1_1radar_1_1soapysdr__echotimer__impl_ae72c960d7b81205e18b58003a9685c10_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+\subsubsection{Member Function Documentation}
+\index{gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl@{gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl}!calculate\+\_\+output\+\_\+stream\+\_\+length@{calculate\+\_\+output\+\_\+stream\+\_\+length}}
+\index{calculate\+\_\+output\+\_\+stream\+\_\+length@{calculate\+\_\+output\+\_\+stream\+\_\+length}!gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl@{gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl}}
+\paragraph[{calculate\+\_\+output\+\_\+stream\+\_\+length(const gr\+\_\+vector\+\_\+int \&ninput\+\_\+items)}]{\setlength{\rightskip}{0pt plus 5cm}{\bf int} gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl\+::calculate\+\_\+output\+\_\+stream\+\_\+length (
+\begin{DoxyParamCaption}
+\item[{const gr\+\_\+vector\+\_\+int \&}]{ninput\+\_\+items}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [protected]}}\label{classgr_1_1radar_1_1soapysdr__echotimer__impl_ae5561c7b68cb567b991900d7a65efd3e}
+
+
+Definition at line {\bf 298} of file {\bf soapysdr\+\_\+echotimer\+\_\+impl.\+cc}.
+
+\index{gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl@{gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl}!num\+\_\+delay\+\_\+samps@{num\+\_\+delay\+\_\+samps}}
+\index{num\+\_\+delay\+\_\+samps@{num\+\_\+delay\+\_\+samps}!gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl@{gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl}}
+\paragraph[{num\+\_\+delay\+\_\+samps()}]{\setlength{\rightskip}{0pt plus 5cm}{\bf int} gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl\+::num\+\_\+delay\+\_\+samps (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}\label{classgr_1_1radar_1_1soapysdr__echotimer__impl_a60e8e0819ac954b6cb8e6ced35f8d97e}
+
+
+Implements {\bf gr\+::radar\+::soapysdr\+\_\+echotimer} \doxyref{}{p.}{d4/dc4/classgr_1_1radar_1_1soapysdr__echotimer_ad97f0ff1696054ee27f033334305f542}.
+
+
+
+Definition at line {\bf 134} of file {\bf soapysdr\+\_\+echotimer\+\_\+impl.\+h}.
+
+
+
+References {\bf d\+\_\+num\+\_\+delay\+\_\+samps}.
+
+
+
+Referenced by {\bf set\+\_\+num\+\_\+delay\+\_\+samps()}.
+
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=336pt]{d8/d83/classgr_1_1radar_1_1soapysdr__echotimer__impl_a60e8e0819ac954b6cb8e6ced35f8d97e_icgraph}
+\end{center}
+\end{figure}
+
+
+\index{gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl@{gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl}!receive@{receive}}
+\index{receive@{receive}!gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl@{gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl}}
+\paragraph[{receive()}]{\setlength{\rightskip}{0pt plus 5cm}{\bf void} gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl\+::receive (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}\label{classgr_1_1radar_1_1soapysdr__echotimer__impl_a1f4a50f22f668ca16aeb97267a25c75c}
+
+
+Definition at line {\bf 387} of file {\bf soapysdr\+\_\+echotimer\+\_\+impl.\+cc}.
+
+
+
+References {\bf Soapy\+S\+D\+R.\+Device\+::activate\+Stream()}, {\bf d\+\_\+flags\+Rx}, {\bf d\+\_\+noutput\+\_\+items\+\_\+recv}, {\bf d\+\_\+num\+\_\+rx\+\_\+samps}, {\bf d\+\_\+out\+\_\+buffer}, {\bf d\+\_\+rx\+\_\+stream}, {\bf d\+\_\+soapysdr}, {\bf d\+\_\+time\+\_\+now\+\_\+rx}, {\bf d\+\_\+time\+Ns\+\_\+rx}, {\bf d\+\_\+time\+Ns\+\_\+rx\+\_\+return}, {\bf d\+\_\+timeout\+\_\+rx}, {\bf d\+\_\+timeout\+Us}, {\bf d\+\_\+wait\+\_\+rx}, {\bf Soapy\+S\+D\+R.\+Device\+::read\+Stream()}, {\bf S\+O\+A\+P\+Y\+\_\+\+S\+D\+R\+\_\+\+E\+N\+D\+\_\+\+B\+U\+R\+ST}, and {\bf S\+O\+A\+P\+Y\+\_\+\+S\+D\+R\+\_\+\+H\+A\+S\+\_\+\+T\+I\+ME}.
+
+
+
+Referenced by {\bf work()}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{d8/d83/classgr_1_1radar_1_1soapysdr__echotimer__impl_a1f4a50f22f668ca16aeb97267a25c75c_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{d8/d83/classgr_1_1radar_1_1soapysdr__echotimer__impl_a1f4a50f22f668ca16aeb97267a25c75c_icgraph}
+\end{center}
+\end{figure}
+
+
+\index{gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl@{gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl}!send@{send}}
+\index{send@{send}!gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl@{gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl}}
+\paragraph[{send()}]{\setlength{\rightskip}{0pt plus 5cm}{\bf void} gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl\+::send (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}\label{classgr_1_1radar_1_1soapysdr__echotimer__impl_addcdc62171057dfbf8223ad9a24cf35e}
+
+
+Definition at line {\bf 344} of file {\bf soapysdr\+\_\+echotimer\+\_\+impl.\+cc}.
+
+
+
+References {\bf d\+\_\+flags\+Tx}, {\bf d\+\_\+in\+\_\+buffer}, {\bf d\+\_\+noutput\+\_\+items\+\_\+send}, {\bf d\+\_\+num\+\_\+tx\+\_\+samps}, {\bf d\+\_\+soapysdr}, {\bf d\+\_\+time\+\_\+now\+\_\+tx}, {\bf d\+\_\+time\+Ns\+\_\+tx}, {\bf d\+\_\+timeout\+\_\+tx}, {\bf d\+\_\+timeout\+Us}, {\bf d\+\_\+tx\+\_\+stream}, {\bf d\+\_\+wait\+\_\+tx}, {\bf S\+O\+A\+P\+Y\+\_\+\+S\+D\+R\+\_\+\+E\+N\+D\+\_\+\+B\+U\+R\+ST}, {\bf S\+O\+A\+P\+Y\+\_\+\+S\+D\+R\+\_\+\+H\+A\+S\+\_\+\+T\+I\+ME}, and {\bf Soapy\+S\+D\+R.\+Device\+::write\+Stream()}.
+
+
+
+Referenced by {\bf work()}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{d8/d83/classgr_1_1radar_1_1soapysdr__echotimer__impl_addcdc62171057dfbf8223ad9a24cf35e_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{d8/d83/classgr_1_1radar_1_1soapysdr__echotimer__impl_addcdc62171057dfbf8223ad9a24cf35e_icgraph}
+\end{center}
+\end{figure}
+
+
+\index{gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl@{gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl}!set\+\_\+num\+\_\+delay\+\_\+samps@{set\+\_\+num\+\_\+delay\+\_\+samps}}
+\index{set\+\_\+num\+\_\+delay\+\_\+samps@{set\+\_\+num\+\_\+delay\+\_\+samps}!gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl@{gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl}}
+\paragraph[{set\+\_\+num\+\_\+delay\+\_\+samps(int num\+\_\+delay\+\_\+samps)}]{\setlength{\rightskip}{0pt plus 5cm}{\bf void} gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl\+::set\+\_\+num\+\_\+delay\+\_\+samps (
+\begin{DoxyParamCaption}
+\item[{{\bf int}}]{num\+\_\+delay\+\_\+samps}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}\label{classgr_1_1radar_1_1soapysdr__echotimer__impl_a810e22f417a296665776ca074bbb7d01}
+
+
+Implements {\bf gr\+::radar\+::soapysdr\+\_\+echotimer} \doxyref{}{p.}{d4/dc4/classgr_1_1radar_1_1soapysdr__echotimer_ae89031159e0f57c37c0ea84d7a993c66}.
+
+
+
+Definition at line {\bf 135} of file {\bf soapysdr\+\_\+echotimer\+\_\+impl.\+h}.
+
+
+
+References {\bf num\+\_\+delay\+\_\+samps()}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=336pt]{d8/d83/classgr_1_1radar_1_1soapysdr__echotimer__impl_a810e22f417a296665776ca074bbb7d01_cgraph}
+\end{center}
+\end{figure}
+
+
+\index{gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl@{gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl}!set\+\_\+rx\+\_\+gain@{set\+\_\+rx\+\_\+gain}}
+\index{set\+\_\+rx\+\_\+gain@{set\+\_\+rx\+\_\+gain}!gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl@{gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl}}
+\paragraph[{set\+\_\+rx\+\_\+gain(size\+\_\+t chan, float gain)}]{\setlength{\rightskip}{0pt plus 5cm}{\bf void} gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl\+::set\+\_\+rx\+\_\+gain (
+\begin{DoxyParamCaption}
+\item[{size\+\_\+t}]{chan, }
+\item[{float}]{gain}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [virtual]}}\label{classgr_1_1radar_1_1soapysdr__echotimer__impl_a04632c1ff5d2dbdf2666a92e5b1b3435}
+
+
+Implements {\bf gr\+::radar\+::soapysdr\+\_\+echotimer} \doxyref{}{p.}{d4/dc4/classgr_1_1radar_1_1soapysdr__echotimer_a3c44dc66c73b1961f38757e89fd6595b}.
+
+
+
+Definition at line {\bf 328} of file {\bf soapysdr\+\_\+echotimer\+\_\+impl.\+cc}.
+
+
+
+References {\bf d\+\_\+soapysdr}, {\bf Soapy\+S\+D\+R.\+Device\+::get\+Gain()}, {\bf Soapy\+S\+D\+R.\+Device\+::set\+Gain()}, and {\bf S\+O\+A\+P\+Y\+\_\+\+S\+D\+R\+\_\+\+RX}.
+
+
+
+Referenced by {\bf soapysdr\+\_\+echotimer\+\_\+impl()}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{d8/d83/classgr_1_1radar_1_1soapysdr__echotimer__impl_a04632c1ff5d2dbdf2666a92e5b1b3435_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{d8/d83/classgr_1_1radar_1_1soapysdr__echotimer__impl_a04632c1ff5d2dbdf2666a92e5b1b3435_icgraph}
+\end{center}
+\end{figure}
+
+
+\index{gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl@{gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl}!set\+\_\+tx\+\_\+gain@{set\+\_\+tx\+\_\+gain}}
+\index{set\+\_\+tx\+\_\+gain@{set\+\_\+tx\+\_\+gain}!gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl@{gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl}}
+\paragraph[{set\+\_\+tx\+\_\+gain(size\+\_\+t chan, float gain)}]{\setlength{\rightskip}{0pt plus 5cm}{\bf void} gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl\+::set\+\_\+tx\+\_\+gain (
+\begin{DoxyParamCaption}
+\item[{size\+\_\+t}]{chan, }
+\item[{float}]{gain}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [virtual]}}\label{classgr_1_1radar_1_1soapysdr__echotimer__impl_ae2aed867fadba9bce42ecf5f1e8ba7fd}
+
+
+Implements {\bf gr\+::radar\+::soapysdr\+\_\+echotimer} \doxyref{}{p.}{d4/dc4/classgr_1_1radar_1_1soapysdr__echotimer_a176b4853b25474f773e2a8e2a15afe3c}.
+
+
+
+Definition at line {\bf 336} of file {\bf soapysdr\+\_\+echotimer\+\_\+impl.\+cc}.
+
+
+
+References {\bf d\+\_\+soapysdr}, {\bf Soapy\+S\+D\+R.\+Device\+::get\+Gain()}, {\bf Soapy\+S\+D\+R.\+Device\+::set\+Gain()}, and {\bf S\+O\+A\+P\+Y\+\_\+\+S\+D\+R\+\_\+\+TX}.
+
+
+
+Referenced by {\bf soapysdr\+\_\+echotimer\+\_\+impl()}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{d8/d83/classgr_1_1radar_1_1soapysdr__echotimer__impl_ae2aed867fadba9bce42ecf5f1e8ba7fd_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{d8/d83/classgr_1_1radar_1_1soapysdr__echotimer__impl_ae2aed867fadba9bce42ecf5f1e8ba7fd_icgraph}
+\end{center}
+\end{figure}
+
+
+\index{gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl@{gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl}!set\+\_\+wait@{set\+\_\+wait}}
+\index{set\+\_\+wait@{set\+\_\+wait}!gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl@{gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl}}
+\paragraph[{set\+\_\+wait(float wait\+\_\+rx, float wait\+\_\+tx)}]{\setlength{\rightskip}{0pt plus 5cm}{\bf void} gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl\+::set\+\_\+wait (
+\begin{DoxyParamCaption}
+\item[{float}]{wait\+\_\+rx, }
+\item[{float}]{wait\+\_\+tx}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}\label{classgr_1_1radar_1_1soapysdr__echotimer__impl_ab4f3ec608cfc0358256980457cd35b2a}
+
+
+Implements {\bf gr\+::radar\+::soapysdr\+\_\+echotimer} \doxyref{}{p.}{d4/dc4/classgr_1_1radar_1_1soapysdr__echotimer_a594ab8e38c3b6980f02ac11e7c798839}.
+
+
+
+Definition at line {\bf 139} of file {\bf soapysdr\+\_\+echotimer\+\_\+impl.\+h}.
+
+
+
+References {\bf wait\+\_\+rx()}, {\bf wait\+\_\+tx()}, and {\bf work()}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{d8/d83/classgr_1_1radar_1_1soapysdr__echotimer__impl_ab4f3ec608cfc0358256980457cd35b2a_cgraph}
+\end{center}
+\end{figure}
+
+
+\index{gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl@{gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl}!wait\+\_\+rx@{wait\+\_\+rx}}
+\index{wait\+\_\+rx@{wait\+\_\+rx}!gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl@{gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl}}
+\paragraph[{wait\+\_\+rx()}]{\setlength{\rightskip}{0pt plus 5cm}float gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl\+::wait\+\_\+rx (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}\label{classgr_1_1radar_1_1soapysdr__echotimer__impl_afa1b52620300a6674d7c98c90638d12c}
+
+
+Implements {\bf gr\+::radar\+::soapysdr\+\_\+echotimer} \doxyref{}{p.}{d4/dc4/classgr_1_1radar_1_1soapysdr__echotimer_a69f6cfdd08bb25ca27ad45f778e8dd1f}.
+
+
+
+Definition at line {\bf 137} of file {\bf soapysdr\+\_\+echotimer\+\_\+impl.\+h}.
+
+
+
+References {\bf d\+\_\+wait\+\_\+rx}.
+
+
+
+Referenced by {\bf set\+\_\+wait()}.
+
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{d8/d83/classgr_1_1radar_1_1soapysdr__echotimer__impl_afa1b52620300a6674d7c98c90638d12c_icgraph}
+\end{center}
+\end{figure}
+
+
+\index{gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl@{gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl}!wait\+\_\+tx@{wait\+\_\+tx}}
+\index{wait\+\_\+tx@{wait\+\_\+tx}!gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl@{gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl}}
+\paragraph[{wait\+\_\+tx()}]{\setlength{\rightskip}{0pt plus 5cm}float gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl\+::wait\+\_\+tx (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}\label{classgr_1_1radar_1_1soapysdr__echotimer__impl_aa3679263ed4384c4216498c3084f3ef7}
+
+
+Implements {\bf gr\+::radar\+::soapysdr\+\_\+echotimer} \doxyref{}{p.}{d4/dc4/classgr_1_1radar_1_1soapysdr__echotimer_a89fd6475633d364fe809b3f89ee46058}.
+
+
+
+Definition at line {\bf 138} of file {\bf soapysdr\+\_\+echotimer\+\_\+impl.\+h}.
+
+
+
+References {\bf d\+\_\+wait\+\_\+tx}.
+
+
+
+Referenced by {\bf set\+\_\+wait()}.
+
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{d8/d83/classgr_1_1radar_1_1soapysdr__echotimer__impl_aa3679263ed4384c4216498c3084f3ef7_icgraph}
+\end{center}
+\end{figure}
+
+
+\index{gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl@{gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl}!work@{work}}
+\index{work@{work}!gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl@{gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl}}
+\paragraph[{work(int noutput\+\_\+items, gr\+\_\+vector\+\_\+int \&ninput\+\_\+items, gr\+\_\+vector\+\_\+const\+\_\+void\+\_\+star \&input\+\_\+items, gr\+\_\+vector\+\_\+void\+\_\+star \&output\+\_\+items)}]{\setlength{\rightskip}{0pt plus 5cm}{\bf int} gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl\+::work (
+\begin{DoxyParamCaption}
+\item[{{\bf int}}]{noutput\+\_\+items, }
+\item[{gr\+\_\+vector\+\_\+int \&}]{ninput\+\_\+items, }
+\item[{gr\+\_\+vector\+\_\+const\+\_\+void\+\_\+star \&}]{input\+\_\+items, }
+\item[{gr\+\_\+vector\+\_\+void\+\_\+star \&}]{output\+\_\+items}
+\end{DoxyParamCaption}
+)}\label{classgr_1_1radar_1_1soapysdr__echotimer__impl_a4a1a61b33aa48a719652e36aff54bf20}
+
+
+Definition at line {\bf 411} of file {\bf soapysdr\+\_\+echotimer\+\_\+impl.\+cc}.
+
+
+
+References {\bf Chirp\+\_\+\+Sync}, {\bf d\+\_\+\+G\+P\+I\+O\+Banks}, {\bf d\+\_\+in\+\_\+buffer}, {\bf d\+\_\+noutput\+\_\+items\+\_\+recv}, {\bf d\+\_\+noutput\+\_\+items\+\_\+send}, {\bf d\+\_\+num\+\_\+delay\+\_\+samps}, {\bf d\+\_\+out\+\_\+buffer}, {\bf d\+\_\+out\+\_\+recv}, {\bf d\+\_\+samp\+\_\+rate}, {\bf d\+\_\+\+Send\+Packet}, {\bf d\+\_\+soapysdr}, {\bf d\+\_\+srcid}, {\bf d\+\_\+thread\+\_\+recv}, {\bf d\+\_\+thread\+\_\+send}, {\bf d\+\_\+time\+\_\+key}, {\bf d\+\_\+time\+\_\+now\+\_\+rx}, {\bf d\+\_\+time\+\_\+now\+\_\+tx}, {\bf d\+\_\+time\+\_\+packet}, {\bf d\+\_\+time\+\_\+val}, {\bf Deadtime\+Key}, {\bf first\+Packet}, {\bf first\+Packet\+\_\+\+Rx}, {\bf Soapy\+S\+D\+R.\+Device\+::get\+Hardware\+Time()}, {\bf Soapy\+S\+D\+R.\+Device\+::read\+G\+P\+I\+O()}, {\bf Soapy\+S\+D\+R.\+Device\+::read\+Sensor()}, {\bf receive()}, {\bf Rx\+\_\+\+Skip\+\_\+\+Packets}, and {\bf send()}.
+
+
+
+Referenced by {\bf set\+\_\+wait()}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{d8/d83/classgr_1_1radar_1_1soapysdr__echotimer__impl_a4a1a61b33aa48a719652e36aff54bf20_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{d8/d83/classgr_1_1radar_1_1soapysdr__echotimer__impl_a4a1a61b33aa48a719652e36aff54bf20_icgraph}
+\end{center}
+\end{figure}
+
+
+
+
+\subsubsection{Member Data Documentation}
+\index{gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl@{gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl}!Chirp\+\_\+\+Sync@{Chirp\+\_\+\+Sync}}
+\index{Chirp\+\_\+\+Sync@{Chirp\+\_\+\+Sync}!gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl@{gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl}}
+\paragraph[{Chirp\+\_\+\+Sync}]{\setlength{\rightskip}{0pt plus 5cm}bool gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl\+::\+Chirp\+\_\+\+Sync\hspace{0.3cm}{\ttfamily [private]}}\label{classgr_1_1radar_1_1soapysdr__echotimer__impl_a673c877a5d5dae8aa8810bf8e3d75d36}
+
+
+Definition at line {\bf 78} of file {\bf soapysdr\+\_\+echotimer\+\_\+impl.\+h}.
+
+
+
+Referenced by {\bf work()}.
+
+\index{gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl@{gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl}!d\+\_\+antenna\+\_\+rx@{d\+\_\+antenna\+\_\+rx}}
+\index{d\+\_\+antenna\+\_\+rx@{d\+\_\+antenna\+\_\+rx}!gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl@{gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl}}
+\paragraph[{d\+\_\+antenna\+\_\+rx}]{\setlength{\rightskip}{0pt plus 5cm}{\bf std\+::string} gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl\+::d\+\_\+antenna\+\_\+rx\hspace{0.3cm}{\ttfamily [private]}}\label{classgr_1_1radar_1_1soapysdr__echotimer__impl_a66deb08bf6bada68d733ab2537c58ef7}
+
+
+Definition at line {\bf 95} of file {\bf soapysdr\+\_\+echotimer\+\_\+impl.\+h}.
+
+
+
+Referenced by {\bf soapysdr\+\_\+echotimer\+\_\+impl()}.
+
+\index{gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl@{gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl}!d\+\_\+antenna\+\_\+tx@{d\+\_\+antenna\+\_\+tx}}
+\index{d\+\_\+antenna\+\_\+tx@{d\+\_\+antenna\+\_\+tx}!gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl@{gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl}}
+\paragraph[{d\+\_\+antenna\+\_\+tx}]{\setlength{\rightskip}{0pt plus 5cm}{\bf std\+::string} gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl\+::d\+\_\+antenna\+\_\+tx\hspace{0.3cm}{\ttfamily [private]}}\label{classgr_1_1radar_1_1soapysdr__echotimer__impl_a65e4e0f9cf46943bc2e058462824fc1a}
+
+
+Definition at line {\bf 95} of file {\bf soapysdr\+\_\+echotimer\+\_\+impl.\+h}.
+
+
+
+Referenced by {\bf soapysdr\+\_\+echotimer\+\_\+impl()}.
+
+\index{gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl@{gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl}!d\+\_\+args@{d\+\_\+args}}
+\index{d\+\_\+args@{d\+\_\+args}!gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl@{gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl}}
+\paragraph[{d\+\_\+args}]{\setlength{\rightskip}{0pt plus 5cm}{\bf std\+::string} gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl\+::d\+\_\+args\hspace{0.3cm}{\ttfamily [private]}}\label{classgr_1_1radar_1_1soapysdr__echotimer__impl_a139c5189a22ddbf2b25843ae29b22cb0}
+
+
+Definition at line {\bf 60} of file {\bf soapysdr\+\_\+echotimer\+\_\+impl.\+h}.
+
+
+
+Referenced by {\bf soapysdr\+\_\+echotimer\+\_\+impl()}.
+
+\index{gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl@{gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl}!d\+\_\+bw\+\_\+rx@{d\+\_\+bw\+\_\+rx}}
+\index{d\+\_\+bw\+\_\+rx@{d\+\_\+bw\+\_\+rx}!gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl@{gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl}}
+\paragraph[{d\+\_\+bw\+\_\+rx}]{\setlength{\rightskip}{0pt plus 5cm}float gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl\+::d\+\_\+bw\+\_\+rx\hspace{0.3cm}{\ttfamily [private]}}\label{classgr_1_1radar_1_1soapysdr__echotimer__impl_a596680d235597108c93ffdd53310c9b6}
+
+
+Definition at line {\bf 97} of file {\bf soapysdr\+\_\+echotimer\+\_\+impl.\+h}.
+
+
+
+Referenced by {\bf soapysdr\+\_\+echotimer\+\_\+impl()}.
+
+\index{gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl@{gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl}!d\+\_\+bw\+\_\+tx@{d\+\_\+bw\+\_\+tx}}
+\index{d\+\_\+bw\+\_\+tx@{d\+\_\+bw\+\_\+tx}!gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl@{gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl}}
+\paragraph[{d\+\_\+bw\+\_\+tx}]{\setlength{\rightskip}{0pt plus 5cm}float gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl\+::d\+\_\+bw\+\_\+tx\hspace{0.3cm}{\ttfamily [private]}}\label{classgr_1_1radar_1_1soapysdr__echotimer__impl_a8c100c044f4974281ef35fb29174ee3c}
+
+
+Definition at line {\bf 97} of file {\bf soapysdr\+\_\+echotimer\+\_\+impl.\+h}.
+
+
+
+Referenced by {\bf soapysdr\+\_\+echotimer\+\_\+impl()}.
+
+\index{gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl@{gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl}!d\+\_\+center\+\_\+freq@{d\+\_\+center\+\_\+freq}}
+\index{d\+\_\+center\+\_\+freq@{d\+\_\+center\+\_\+freq}!gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl@{gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl}}
+\paragraph[{d\+\_\+center\+\_\+freq}]{\setlength{\rightskip}{0pt plus 5cm}float gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl\+::d\+\_\+center\+\_\+freq\hspace{0.3cm}{\ttfamily [private]}}\label{classgr_1_1radar_1_1soapysdr__echotimer__impl_a774aa5322f095c9477bb56a2e85d52f8}
+
+
+Definition at line {\bf 63} of file {\bf soapysdr\+\_\+echotimer\+\_\+impl.\+h}.
+
+
+
+Referenced by {\bf soapysdr\+\_\+echotimer\+\_\+impl()}.
+
+\index{gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl@{gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl}!d\+\_\+chan\+\_\+rx@{d\+\_\+chan\+\_\+rx}}
+\index{d\+\_\+chan\+\_\+rx@{d\+\_\+chan\+\_\+rx}!gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl@{gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl}}
+\paragraph[{d\+\_\+chan\+\_\+rx}]{\setlength{\rightskip}{0pt plus 5cm}size\+\_\+t gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl\+::d\+\_\+chan\+\_\+rx\hspace{0.3cm}{\ttfamily [private]}}\label{classgr_1_1radar_1_1soapysdr__echotimer__impl_ab74f9949dc728c8b285632db6196f8f6}
+
+
+Definition at line {\bf 89} of file {\bf soapysdr\+\_\+echotimer\+\_\+impl.\+h}.
+
+
+
+Referenced by {\bf soapysdr\+\_\+echotimer\+\_\+impl()}.
+
+\index{gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl@{gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl}!d\+\_\+chan\+\_\+tx@{d\+\_\+chan\+\_\+tx}}
+\index{d\+\_\+chan\+\_\+tx@{d\+\_\+chan\+\_\+tx}!gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl@{gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl}}
+\paragraph[{d\+\_\+chan\+\_\+tx}]{\setlength{\rightskip}{0pt plus 5cm}size\+\_\+t gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl\+::d\+\_\+chan\+\_\+tx\hspace{0.3cm}{\ttfamily [private]}}\label{classgr_1_1radar_1_1soapysdr__echotimer__impl_a8ec5bbe08f9d50b9ef90d9be3e0ee203}
+
+
+Definition at line {\bf 89} of file {\bf soapysdr\+\_\+echotimer\+\_\+impl.\+h}.
+
+
+
+Referenced by {\bf soapysdr\+\_\+echotimer\+\_\+impl()}.
+
+\index{gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl@{gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl}!d\+\_\+extra\+\_\+work\+\_\+time@{d\+\_\+extra\+\_\+work\+\_\+time}}
+\index{d\+\_\+extra\+\_\+work\+\_\+time@{d\+\_\+extra\+\_\+work\+\_\+time}!gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl@{gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl}}
+\paragraph[{d\+\_\+extra\+\_\+work\+\_\+time}]{\setlength{\rightskip}{0pt plus 5cm}long long gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl\+::d\+\_\+extra\+\_\+work\+\_\+time\hspace{0.3cm}{\ttfamily [private]}}\label{classgr_1_1radar_1_1soapysdr__echotimer__impl_ab35b98530618c84a54adae659a03a2b4}
+
+
+Definition at line {\bf 70} of file {\bf soapysdr\+\_\+echotimer\+\_\+impl.\+h}.
+
+
+
+Referenced by {\bf soapysdr\+\_\+echotimer\+\_\+impl()}.
+
+\index{gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl@{gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl}!d\+\_\+flags\+Rx@{d\+\_\+flags\+Rx}}
+\index{d\+\_\+flags\+Rx@{d\+\_\+flags\+Rx}!gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl@{gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl}}
+\paragraph[{d\+\_\+flags\+Rx}]{\setlength{\rightskip}{0pt plus 5cm}{\bf int} gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl\+::d\+\_\+flags\+Rx\hspace{0.3cm}{\ttfamily [private]}}\label{classgr_1_1radar_1_1soapysdr__echotimer__impl_a54f34f6408112f4d84c26b407528d8ea}
+
+
+Definition at line {\bf 90} of file {\bf soapysdr\+\_\+echotimer\+\_\+impl.\+h}.
+
+
+
+Referenced by {\bf receive()}.
+
+\index{gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl@{gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl}!d\+\_\+flags\+Rx\+\_\+return@{d\+\_\+flags\+Rx\+\_\+return}}
+\index{d\+\_\+flags\+Rx\+\_\+return@{d\+\_\+flags\+Rx\+\_\+return}!gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl@{gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl}}
+\paragraph[{d\+\_\+flags\+Rx\+\_\+return}]{\setlength{\rightskip}{0pt plus 5cm}{\bf int} gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl\+::d\+\_\+flags\+Rx\+\_\+return\hspace{0.3cm}{\ttfamily [private]}}\label{classgr_1_1radar_1_1soapysdr__echotimer__impl_a723121b341d385b900b83dc0c62367ec}
+
+
+Definition at line {\bf 90} of file {\bf soapysdr\+\_\+echotimer\+\_\+impl.\+h}.
+
+
+
+Referenced by {\bf soapysdr\+\_\+echotimer\+\_\+impl()}.
+
+\index{gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl@{gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl}!d\+\_\+flags\+Tx@{d\+\_\+flags\+Tx}}
+\index{d\+\_\+flags\+Tx@{d\+\_\+flags\+Tx}!gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl@{gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl}}
+\paragraph[{d\+\_\+flags\+Tx}]{\setlength{\rightskip}{0pt plus 5cm}{\bf int} gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl\+::d\+\_\+flags\+Tx\hspace{0.3cm}{\ttfamily [private]}}\label{classgr_1_1radar_1_1soapysdr__echotimer__impl_a34d4b1a23e7bd7041307debf87406e1c}
+
+
+Definition at line {\bf 90} of file {\bf soapysdr\+\_\+echotimer\+\_\+impl.\+h}.
+
+
+
+Referenced by {\bf send()}, and {\bf soapysdr\+\_\+echotimer\+\_\+impl()}.
+
+\index{gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl@{gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl}!d\+\_\+gain\+\_\+rx@{d\+\_\+gain\+\_\+rx}}
+\index{d\+\_\+gain\+\_\+rx@{d\+\_\+gain\+\_\+rx}!gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl@{gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl}}
+\paragraph[{d\+\_\+gain\+\_\+rx}]{\setlength{\rightskip}{0pt plus 5cm}float gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl\+::d\+\_\+gain\+\_\+rx\hspace{0.3cm}{\ttfamily [private]}}\label{classgr_1_1radar_1_1soapysdr__echotimer__impl_a7074bf6693c35cd9b2c26fc5691dee84}
+
+
+Definition at line {\bf 96} of file {\bf soapysdr\+\_\+echotimer\+\_\+impl.\+h}.
+
+
+
+Referenced by {\bf soapysdr\+\_\+echotimer\+\_\+impl()}.
+
+\index{gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl@{gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl}!d\+\_\+gain\+\_\+tx@{d\+\_\+gain\+\_\+tx}}
+\index{d\+\_\+gain\+\_\+tx@{d\+\_\+gain\+\_\+tx}!gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl@{gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl}}
+\paragraph[{d\+\_\+gain\+\_\+tx}]{\setlength{\rightskip}{0pt plus 5cm}float gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl\+::d\+\_\+gain\+\_\+tx\hspace{0.3cm}{\ttfamily [private]}}\label{classgr_1_1radar_1_1soapysdr__echotimer__impl_a520ccd45f195a69cc51ad0ed163e8249}
+
+
+Definition at line {\bf 96} of file {\bf soapysdr\+\_\+echotimer\+\_\+impl.\+h}.
+
+
+
+Referenced by {\bf soapysdr\+\_\+echotimer\+\_\+impl()}.
+
+\index{gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl@{gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl}!d\+\_\+\+G\+P\+I\+O\+Banks@{d\+\_\+\+G\+P\+I\+O\+Banks}}
+\index{d\+\_\+\+G\+P\+I\+O\+Banks@{d\+\_\+\+G\+P\+I\+O\+Banks}!gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl@{gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl}}
+\paragraph[{d\+\_\+\+G\+P\+I\+O\+Banks}]{\setlength{\rightskip}{0pt plus 5cm}{\bf std\+::vector}$<${\bf std\+::string}$>$ gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl\+::d\+\_\+\+G\+P\+I\+O\+Banks\hspace{0.3cm}{\ttfamily [private]}}\label{classgr_1_1radar_1_1soapysdr__echotimer__impl_a9c18301354c340b5f076acca9c0f93a8}
+
+
+Definition at line {\bf 66} of file {\bf soapysdr\+\_\+echotimer\+\_\+impl.\+h}.
+
+
+
+Referenced by {\bf soapysdr\+\_\+echotimer\+\_\+impl()}, and {\bf work()}.
+
+\index{gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl@{gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl}!d\+\_\+in\+\_\+buffer@{d\+\_\+in\+\_\+buffer}}
+\index{d\+\_\+in\+\_\+buffer@{d\+\_\+in\+\_\+buffer}!gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl@{gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl}}
+\paragraph[{d\+\_\+in\+\_\+buffer}]{\setlength{\rightskip}{0pt plus 5cm}gr\+\_\+vector\+\_\+const\+\_\+void\+\_\+star gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl\+::d\+\_\+in\+\_\+buffer\hspace{0.3cm}{\ttfamily [private]}}\label{classgr_1_1radar_1_1soapysdr__echotimer__impl_aaeefca4508cb92c1bcfc3ce18421afa1}
+
+
+Definition at line {\bf 110} of file {\bf soapysdr\+\_\+echotimer\+\_\+impl.\+h}.
+
+
+
+Referenced by {\bf send()}, and {\bf work()}.
+
+\index{gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl@{gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl}!d\+\_\+kw@{d\+\_\+kw}}
+\index{d\+\_\+kw@{d\+\_\+kw}!gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl@{gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl}}
+\paragraph[{d\+\_\+kw}]{\setlength{\rightskip}{0pt plus 5cm}{\bf Soapy\+S\+D\+R\+::\+Kwargs} gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl\+::d\+\_\+kw\hspace{0.3cm}{\ttfamily [private]}}\label{classgr_1_1radar_1_1soapysdr__echotimer__impl_a356c97b795c72a118518aab4a380a5ab}
+
+
+Definition at line {\bf 61} of file {\bf soapysdr\+\_\+echotimer\+\_\+impl.\+h}.
+
+
+
+Referenced by {\bf soapysdr\+\_\+echotimer\+\_\+impl()}.
+
+\index{gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl@{gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl}!d\+\_\+list\+Reg\+Interfaces@{d\+\_\+list\+Reg\+Interfaces}}
+\index{d\+\_\+list\+Reg\+Interfaces@{d\+\_\+list\+Reg\+Interfaces}!gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl@{gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl}}
+\paragraph[{d\+\_\+list\+Reg\+Interfaces}]{\setlength{\rightskip}{0pt plus 5cm}{\bf std\+::vector}$<${\bf std\+::string}$>$ gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl\+::d\+\_\+list\+Reg\+Interfaces\hspace{0.3cm}{\ttfamily [private]}}\label{classgr_1_1radar_1_1soapysdr__echotimer__impl_ad5e7fb06a362c600f225300ef0e9845c}
+
+
+Definition at line {\bf 65} of file {\bf soapysdr\+\_\+echotimer\+\_\+impl.\+h}.
+
+
+
+Referenced by {\bf soapysdr\+\_\+echotimer\+\_\+impl()}, and {\bf $\sim$soapysdr\+\_\+echotimer\+\_\+impl()}.
+
+\index{gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl@{gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl}!d\+\_\+lo\+\_\+offset\+\_\+rx@{d\+\_\+lo\+\_\+offset\+\_\+rx}}
+\index{d\+\_\+lo\+\_\+offset\+\_\+rx@{d\+\_\+lo\+\_\+offset\+\_\+rx}!gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl@{gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl}}
+\paragraph[{d\+\_\+lo\+\_\+offset\+\_\+rx}]{\setlength{\rightskip}{0pt plus 5cm}double gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl\+::d\+\_\+lo\+\_\+offset\+\_\+rx\hspace{0.3cm}{\ttfamily [private]}}\label{classgr_1_1radar_1_1soapysdr__echotimer__impl_a3422a16bbc55079e7a11a6711fb8d650}
+
+
+Definition at line {\bf 94} of file {\bf soapysdr\+\_\+echotimer\+\_\+impl.\+h}.
+
+\index{gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl@{gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl}!d\+\_\+lo\+\_\+offset\+\_\+tx@{d\+\_\+lo\+\_\+offset\+\_\+tx}}
+\index{d\+\_\+lo\+\_\+offset\+\_\+tx@{d\+\_\+lo\+\_\+offset\+\_\+tx}!gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl@{gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl}}
+\paragraph[{d\+\_\+lo\+\_\+offset\+\_\+tx}]{\setlength{\rightskip}{0pt plus 5cm}double gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl\+::d\+\_\+lo\+\_\+offset\+\_\+tx\hspace{0.3cm}{\ttfamily [private]}}\label{classgr_1_1radar_1_1soapysdr__echotimer__impl_a2802ee4595772f937184c38e40fdcf5b}
+
+
+Definition at line {\bf 94} of file {\bf soapysdr\+\_\+echotimer\+\_\+impl.\+h}.
+
+\index{gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl@{gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl}!d\+\_\+noutput\+\_\+items\+\_\+recv@{d\+\_\+noutput\+\_\+items\+\_\+recv}}
+\index{d\+\_\+noutput\+\_\+items\+\_\+recv@{d\+\_\+noutput\+\_\+items\+\_\+recv}!gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl@{gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl}}
+\paragraph[{d\+\_\+noutput\+\_\+items\+\_\+recv}]{\setlength{\rightskip}{0pt plus 5cm}{\bf int} gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl\+::d\+\_\+noutput\+\_\+items\+\_\+recv\hspace{0.3cm}{\ttfamily [private]}}\label{classgr_1_1radar_1_1soapysdr__echotimer__impl_a14cb2aec092e313dcbdced0458a4e8cc}
+
+
+Definition at line {\bf 106} of file {\bf soapysdr\+\_\+echotimer\+\_\+impl.\+h}.
+
+
+
+Referenced by {\bf receive()}, and {\bf work()}.
+
+\index{gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl@{gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl}!d\+\_\+noutput\+\_\+items\+\_\+send@{d\+\_\+noutput\+\_\+items\+\_\+send}}
+\index{d\+\_\+noutput\+\_\+items\+\_\+send@{d\+\_\+noutput\+\_\+items\+\_\+send}!gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl@{gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl}}
+\paragraph[{d\+\_\+noutput\+\_\+items\+\_\+send}]{\setlength{\rightskip}{0pt plus 5cm}{\bf int} gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl\+::d\+\_\+noutput\+\_\+items\+\_\+send\hspace{0.3cm}{\ttfamily [private]}}\label{classgr_1_1radar_1_1soapysdr__echotimer__impl_afb65e6833db4c38a3f4ef200b811c493}
+
+
+Definition at line {\bf 111} of file {\bf soapysdr\+\_\+echotimer\+\_\+impl.\+h}.
+
+
+
+Referenced by {\bf send()}, and {\bf work()}.
+
+\index{gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl@{gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl}!d\+\_\+num\+\_\+delay\+\_\+samps@{d\+\_\+num\+\_\+delay\+\_\+samps}}
+\index{d\+\_\+num\+\_\+delay\+\_\+samps@{d\+\_\+num\+\_\+delay\+\_\+samps}!gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl@{gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl}}
+\paragraph[{d\+\_\+num\+\_\+delay\+\_\+samps}]{\setlength{\rightskip}{0pt plus 5cm}{\bf int} gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl\+::d\+\_\+num\+\_\+delay\+\_\+samps\hspace{0.3cm}{\ttfamily [private]}}\label{classgr_1_1radar_1_1soapysdr__echotimer__impl_afd919967fee8e8f048078c9a907541c8}
+
+
+Definition at line {\bf 58} of file {\bf soapysdr\+\_\+echotimer\+\_\+impl.\+h}.
+
+
+
+Referenced by {\bf num\+\_\+delay\+\_\+samps()}, and {\bf work()}.
+
+\index{gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl@{gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl}!d\+\_\+num\+\_\+rx\+\_\+samps@{d\+\_\+num\+\_\+rx\+\_\+samps}}
+\index{d\+\_\+num\+\_\+rx\+\_\+samps@{d\+\_\+num\+\_\+rx\+\_\+samps}!gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl@{gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl}}
+\paragraph[{d\+\_\+num\+\_\+rx\+\_\+samps}]{\setlength{\rightskip}{0pt plus 5cm}volatile {\bf int} gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl\+::d\+\_\+num\+\_\+rx\+\_\+samps\hspace{0.3cm}{\ttfamily [private]}}\label{classgr_1_1radar_1_1soapysdr__echotimer__impl_a3b1bc3ceb12ea60fe522e219c707288b}
+
+
+Definition at line {\bf 99} of file {\bf soapysdr\+\_\+echotimer\+\_\+impl.\+h}.
+
+
+
+Referenced by {\bf receive()}.
+
+\index{gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl@{gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl}!d\+\_\+num\+\_\+tx\+\_\+samps@{d\+\_\+num\+\_\+tx\+\_\+samps}}
+\index{d\+\_\+num\+\_\+tx\+\_\+samps@{d\+\_\+num\+\_\+tx\+\_\+samps}!gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl@{gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl}}
+\paragraph[{d\+\_\+num\+\_\+tx\+\_\+samps}]{\setlength{\rightskip}{0pt plus 5cm}volatile {\bf int} gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl\+::d\+\_\+num\+\_\+tx\+\_\+samps\hspace{0.3cm}{\ttfamily [private]}}\label{classgr_1_1radar_1_1soapysdr__echotimer__impl_aacedb74dda8de2167a4bd43382a52e36}
+
+
+Definition at line {\bf 99} of file {\bf soapysdr\+\_\+echotimer\+\_\+impl.\+h}.
+
+
+
+Referenced by {\bf send()}.
+
+\index{gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl@{gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl}!d\+\_\+out\+\_\+buffer@{d\+\_\+out\+\_\+buffer}}
+\index{d\+\_\+out\+\_\+buffer@{d\+\_\+out\+\_\+buffer}!gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl@{gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl}}
+\paragraph[{d\+\_\+out\+\_\+buffer}]{\setlength{\rightskip}{0pt plus 5cm}gr\+\_\+vector\+\_\+void\+\_\+star gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl\+::d\+\_\+out\+\_\+buffer\hspace{0.3cm}{\ttfamily [private]}}\label{classgr_1_1radar_1_1soapysdr__echotimer__impl_aadd7ef14f11375b96f5b18900572501e}
+
+
+Definition at line {\bf 103} of file {\bf soapysdr\+\_\+echotimer\+\_\+impl.\+h}.
+
+
+
+Referenced by {\bf receive()}, {\bf soapysdr\+\_\+echotimer\+\_\+impl()}, and {\bf work()}.
+
+\index{gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl@{gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl}!d\+\_\+out\+\_\+recv@{d\+\_\+out\+\_\+recv}}
+\index{d\+\_\+out\+\_\+recv@{d\+\_\+out\+\_\+recv}!gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl@{gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl}}
+\paragraph[{d\+\_\+out\+\_\+recv}]{\setlength{\rightskip}{0pt plus 5cm}gr\+\_\+complex$\ast$ gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl\+::d\+\_\+out\+\_\+recv\hspace{0.3cm}{\ttfamily [private]}}\label{classgr_1_1radar_1_1soapysdr__echotimer__impl_a696bc21778819e3092235507699c014f}
+
+
+Definition at line {\bf 105} of file {\bf soapysdr\+\_\+echotimer\+\_\+impl.\+h}.
+
+
+
+Referenced by {\bf work()}.
+
+\index{gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl@{gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl}!d\+\_\+register@{d\+\_\+register}}
+\index{d\+\_\+register@{d\+\_\+register}!gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl@{gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl}}
+\paragraph[{d\+\_\+register}]{\setlength{\rightskip}{0pt plus 5cm}volatile unsigned gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl\+::d\+\_\+register\hspace{0.3cm}{\ttfamily [private]}}\label{classgr_1_1radar_1_1soapysdr__echotimer__impl_a7e18d4a932611147263960180670ae29}
+
+
+Definition at line {\bf 67} of file {\bf soapysdr\+\_\+echotimer\+\_\+impl.\+h}.
+
+
+
+Referenced by {\bf soapysdr\+\_\+echotimer\+\_\+impl()}.
+
+\index{gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl@{gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl}!d\+\_\+rx\+\_\+stream@{d\+\_\+rx\+\_\+stream}}
+\index{d\+\_\+rx\+\_\+stream@{d\+\_\+rx\+\_\+stream}!gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl@{gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl}}
+\paragraph[{d\+\_\+rx\+\_\+stream}]{\setlength{\rightskip}{0pt plus 5cm}Soapy\+S\+D\+R\+::\+Stream $\ast$ gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl\+::d\+\_\+rx\+\_\+stream\hspace{0.3cm}{\ttfamily [private]}}\label{classgr_1_1radar_1_1soapysdr__echotimer__impl_a06009933d7f9d387d50a09e4cfd7adbd}
+
+
+Definition at line {\bf 87} of file {\bf soapysdr\+\_\+echotimer\+\_\+impl.\+h}.
+
+
+
+Referenced by {\bf receive()}, {\bf soapysdr\+\_\+echotimer\+\_\+impl()}, and {\bf $\sim$soapysdr\+\_\+echotimer\+\_\+impl()}.
+
+\index{gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl@{gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl}!d\+\_\+samp\+\_\+rate@{d\+\_\+samp\+\_\+rate}}
+\index{d\+\_\+samp\+\_\+rate@{d\+\_\+samp\+\_\+rate}!gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl@{gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl}}
+\paragraph[{d\+\_\+samp\+\_\+rate}]{\setlength{\rightskip}{0pt plus 5cm}{\bf int} gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl\+::d\+\_\+samp\+\_\+rate\hspace{0.3cm}{\ttfamily [private]}}\label{classgr_1_1radar_1_1soapysdr__echotimer__impl_aa6bff15b64d8ffecb370847b9b97785f}
+
+
+Definition at line {\bf 62} of file {\bf soapysdr\+\_\+echotimer\+\_\+impl.\+h}.
+
+
+
+Referenced by {\bf soapysdr\+\_\+echotimer\+\_\+impl()}, and {\bf work()}.
+
+\index{gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl@{gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl}!d\+\_\+\+Send\+Packet@{d\+\_\+\+Send\+Packet}}
+\index{d\+\_\+\+Send\+Packet@{d\+\_\+\+Send\+Packet}!gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl@{gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl}}
+\paragraph[{d\+\_\+\+Send\+Packet}]{\setlength{\rightskip}{0pt plus 5cm}bool gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl\+::d\+\_\+\+Send\+Packet\hspace{0.3cm}{\ttfamily [private]}}\label{classgr_1_1radar_1_1soapysdr__echotimer__impl_ae7d2b69d2fe43ab319b3166d8c60570a}
+
+
+Definition at line {\bf 72} of file {\bf soapysdr\+\_\+echotimer\+\_\+impl.\+h}.
+
+
+
+Referenced by {\bf soapysdr\+\_\+echotimer\+\_\+impl()}, and {\bf work()}.
+
+\index{gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl@{gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl}!d\+\_\+soapysdr@{d\+\_\+soapysdr}}
+\index{d\+\_\+soapysdr@{d\+\_\+soapysdr}!gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl@{gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl}}
+\paragraph[{d\+\_\+soapysdr}]{\setlength{\rightskip}{0pt plus 5cm}{\bf Soapy\+S\+D\+R\+::\+Device} $\ast$ gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl\+::d\+\_\+soapysdr\hspace{0.3cm}{\ttfamily [private]}}\label{classgr_1_1radar_1_1soapysdr__echotimer__impl_ae910556f98b644fc81c8c4b0f630c4d3}
+
+
+Definition at line {\bf 86} of file {\bf soapysdr\+\_\+echotimer\+\_\+impl.\+h}.
+
+
+
+Referenced by {\bf receive()}, {\bf send()}, {\bf set\+\_\+rx\+\_\+gain()}, {\bf set\+\_\+tx\+\_\+gain()}, {\bf soapysdr\+\_\+echotimer\+\_\+impl()}, {\bf work()}, and {\bf $\sim$soapysdr\+\_\+echotimer\+\_\+impl()}.
+
+\index{gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl@{gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl}!d\+\_\+soapysdr\+\_\+rx@{d\+\_\+soapysdr\+\_\+rx}}
+\index{d\+\_\+soapysdr\+\_\+rx@{d\+\_\+soapysdr\+\_\+rx}!gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl@{gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl}}
+\paragraph[{d\+\_\+soapysdr\+\_\+rx}]{\setlength{\rightskip}{0pt plus 5cm}{\bf Soapy\+S\+D\+R\+::\+Device} $\ast$ gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl\+::d\+\_\+soapysdr\+\_\+rx\hspace{0.3cm}{\ttfamily [private]}}\label{classgr_1_1radar_1_1soapysdr__echotimer__impl_a660fa2152166ae8c24df1ed9f4d999d2}
+
+
+Definition at line {\bf 86} of file {\bf soapysdr\+\_\+echotimer\+\_\+impl.\+h}.
+
+\index{gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl@{gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl}!d\+\_\+soapysdr\+\_\+tx@{d\+\_\+soapysdr\+\_\+tx}}
+\index{d\+\_\+soapysdr\+\_\+tx@{d\+\_\+soapysdr\+\_\+tx}!gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl@{gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl}}
+\paragraph[{d\+\_\+soapysdr\+\_\+tx}]{\setlength{\rightskip}{0pt plus 5cm}{\bf Soapy\+S\+D\+R\+::\+Device}$\ast$ gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl\+::d\+\_\+soapysdr\+\_\+tx\hspace{0.3cm}{\ttfamily [private]}}\label{classgr_1_1radar_1_1soapysdr__echotimer__impl_a34b87205d598269c9e2d5ad597b8c7eb}
+
+
+Definition at line {\bf 86} of file {\bf soapysdr\+\_\+echotimer\+\_\+impl.\+h}.
+
+\index{gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl@{gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl}!d\+\_\+srcid@{d\+\_\+srcid}}
+\index{d\+\_\+srcid@{d\+\_\+srcid}!gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl@{gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl}}
+\paragraph[{d\+\_\+srcid}]{\setlength{\rightskip}{0pt plus 5cm}pmt\+::pmt\+\_\+t gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl\+::d\+\_\+srcid\hspace{0.3cm}{\ttfamily [private]}}\label{classgr_1_1radar_1_1soapysdr__echotimer__impl_a2e9c070fc094e124153c576e4123f5f2}
+
+
+Definition at line {\bf 56} of file {\bf soapysdr\+\_\+echotimer\+\_\+impl.\+h}.
+
+
+
+Referenced by {\bf soapysdr\+\_\+echotimer\+\_\+impl()}, and {\bf work()}.
+
+\index{gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl@{gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl}!d\+\_\+thread\+\_\+recv@{d\+\_\+thread\+\_\+recv}}
+\index{d\+\_\+thread\+\_\+recv@{d\+\_\+thread\+\_\+recv}!gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl@{gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl}}
+\paragraph[{d\+\_\+thread\+\_\+recv}]{\setlength{\rightskip}{0pt plus 5cm}gr\+::thread\+::thread gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl\+::d\+\_\+thread\+\_\+recv\hspace{0.3cm}{\ttfamily [private]}}\label{classgr_1_1radar_1_1soapysdr__echotimer__impl_a6f8ef889c924ef64e0b931f6bc877943}
+
+
+Definition at line {\bf 102} of file {\bf soapysdr\+\_\+echotimer\+\_\+impl.\+h}.
+
+
+
+Referenced by {\bf work()}.
+
+\index{gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl@{gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl}!d\+\_\+thread\+\_\+send@{d\+\_\+thread\+\_\+send}}
+\index{d\+\_\+thread\+\_\+send@{d\+\_\+thread\+\_\+send}!gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl@{gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl}}
+\paragraph[{d\+\_\+thread\+\_\+send}]{\setlength{\rightskip}{0pt plus 5cm}gr\+::thread\+::thread gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl\+::d\+\_\+thread\+\_\+send\hspace{0.3cm}{\ttfamily [private]}}\label{classgr_1_1radar_1_1soapysdr__echotimer__impl_a283e6f5b5d899fbfc712032b9f7125bf}
+
+
+Definition at line {\bf 109} of file {\bf soapysdr\+\_\+echotimer\+\_\+impl.\+h}.
+
+
+
+Referenced by {\bf work()}.
+
+\index{gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl@{gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl}!d\+\_\+time\+\_\+key@{d\+\_\+time\+\_\+key}}
+\index{d\+\_\+time\+\_\+key@{d\+\_\+time\+\_\+key}!gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl@{gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl}}
+\paragraph[{d\+\_\+time\+\_\+key}]{\setlength{\rightskip}{0pt plus 5cm}pmt\+::pmt\+\_\+t gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl\+::d\+\_\+time\+\_\+key\hspace{0.3cm}{\ttfamily [private]}}\label{classgr_1_1radar_1_1soapysdr__echotimer__impl_ac6457146e266c1936dce8ee468190568}
+
+
+Definition at line {\bf 56} of file {\bf soapysdr\+\_\+echotimer\+\_\+impl.\+h}.
+
+
+
+Referenced by {\bf soapysdr\+\_\+echotimer\+\_\+impl()}, and {\bf work()}.
+
+\index{gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl@{gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl}!d\+\_\+time\+\_\+now\+\_\+rx@{d\+\_\+time\+\_\+now\+\_\+rx}}
+\index{d\+\_\+time\+\_\+now\+\_\+rx@{d\+\_\+time\+\_\+now\+\_\+rx}!gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl@{gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl}}
+\paragraph[{d\+\_\+time\+\_\+now\+\_\+rx}]{\setlength{\rightskip}{0pt plus 5cm}volatile long long gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl\+::d\+\_\+time\+\_\+now\+\_\+rx\hspace{0.3cm}{\ttfamily [private]}}\label{classgr_1_1radar_1_1soapysdr__echotimer__impl_a712d8e97484eac44d54a43bb3090683e}
+
+
+Definition at line {\bf 51} of file {\bf soapysdr\+\_\+echotimer\+\_\+impl.\+h}.
+
+
+
+Referenced by {\bf receive()}, {\bf soapysdr\+\_\+echotimer\+\_\+impl()}, and {\bf work()}.
+
+\index{gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl@{gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl}!d\+\_\+time\+\_\+now\+\_\+rx\+\_\+\+HW@{d\+\_\+time\+\_\+now\+\_\+rx\+\_\+\+HW}}
+\index{d\+\_\+time\+\_\+now\+\_\+rx\+\_\+\+HW@{d\+\_\+time\+\_\+now\+\_\+rx\+\_\+\+HW}!gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl@{gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl}}
+\paragraph[{d\+\_\+time\+\_\+now\+\_\+rx\+\_\+\+HW}]{\setlength{\rightskip}{0pt plus 5cm}volatile long long gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl\+::d\+\_\+time\+\_\+now\+\_\+rx\+\_\+\+HW\hspace{0.3cm}{\ttfamily [private]}}\label{classgr_1_1radar_1_1soapysdr__echotimer__impl_a811ce00a1d5f93af9956152e495668e5}
+
+
+Definition at line {\bf 51} of file {\bf soapysdr\+\_\+echotimer\+\_\+impl.\+h}.
+
+\index{gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl@{gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl}!d\+\_\+time\+\_\+now\+\_\+tx@{d\+\_\+time\+\_\+now\+\_\+tx}}
+\index{d\+\_\+time\+\_\+now\+\_\+tx@{d\+\_\+time\+\_\+now\+\_\+tx}!gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl@{gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl}}
+\paragraph[{d\+\_\+time\+\_\+now\+\_\+tx}]{\setlength{\rightskip}{0pt plus 5cm}volatile long long gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl\+::d\+\_\+time\+\_\+now\+\_\+tx\hspace{0.3cm}{\ttfamily [private]}}\label{classgr_1_1radar_1_1soapysdr__echotimer__impl_a75ae6570f863f6d28fdec64b09054491}
+
+
+Definition at line {\bf 51} of file {\bf soapysdr\+\_\+echotimer\+\_\+impl.\+h}.
+
+
+
+Referenced by {\bf send()}, {\bf soapysdr\+\_\+echotimer\+\_\+impl()}, and {\bf work()}.
+
+\index{gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl@{gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl}!d\+\_\+time\+\_\+packet@{d\+\_\+time\+\_\+packet}}
+\index{d\+\_\+time\+\_\+packet@{d\+\_\+time\+\_\+packet}!gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl@{gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl}}
+\paragraph[{d\+\_\+time\+\_\+packet}]{\setlength{\rightskip}{0pt plus 5cm}volatile float gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl\+::d\+\_\+time\+\_\+packet\hspace{0.3cm}{\ttfamily [private]}}\label{classgr_1_1radar_1_1soapysdr__echotimer__impl_a34cce8f012431b90d2723d55ac6b6a0c}
+
+
+Definition at line {\bf 69} of file {\bf soapysdr\+\_\+echotimer\+\_\+impl.\+h}.
+
+
+
+Referenced by {\bf work()}.
+
+\index{gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl@{gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl}!d\+\_\+time\+\_\+val@{d\+\_\+time\+\_\+val}}
+\index{d\+\_\+time\+\_\+val@{d\+\_\+time\+\_\+val}!gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl@{gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl}}
+\paragraph[{d\+\_\+time\+\_\+val}]{\setlength{\rightskip}{0pt plus 5cm}pmt\+::pmt\+\_\+t gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl\+::d\+\_\+time\+\_\+val\hspace{0.3cm}{\ttfamily [private]}}\label{classgr_1_1radar_1_1soapysdr__echotimer__impl_aeab83dce5b967b428a59aa564f9ffbf4}
+
+
+Definition at line {\bf 56} of file {\bf soapysdr\+\_\+echotimer\+\_\+impl.\+h}.
+
+
+
+Referenced by {\bf work()}.
+
+\index{gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl@{gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl}!d\+\_\+time\+Ns\+\_\+rx@{d\+\_\+time\+Ns\+\_\+rx}}
+\index{d\+\_\+time\+Ns\+\_\+rx@{d\+\_\+time\+Ns\+\_\+rx}!gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl@{gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl}}
+\paragraph[{d\+\_\+time\+Ns\+\_\+rx}]{\setlength{\rightskip}{0pt plus 5cm}long long gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl\+::d\+\_\+time\+Ns\+\_\+rx\hspace{0.3cm}{\ttfamily [private]}}\label{classgr_1_1radar_1_1soapysdr__echotimer__impl_a05f0f98f63837b33cd043aa1a4cf2cfe}
+
+
+Definition at line {\bf 52} of file {\bf soapysdr\+\_\+echotimer\+\_\+impl.\+h}.
+
+
+
+Referenced by {\bf receive()}, and {\bf soapysdr\+\_\+echotimer\+\_\+impl()}.
+
+\index{gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl@{gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl}!d\+\_\+time\+Ns\+\_\+rx\+\_\+return@{d\+\_\+time\+Ns\+\_\+rx\+\_\+return}}
+\index{d\+\_\+time\+Ns\+\_\+rx\+\_\+return@{d\+\_\+time\+Ns\+\_\+rx\+\_\+return}!gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl@{gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl}}
+\paragraph[{d\+\_\+time\+Ns\+\_\+rx\+\_\+return}]{\setlength{\rightskip}{0pt plus 5cm}long long gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl\+::d\+\_\+time\+Ns\+\_\+rx\+\_\+return\hspace{0.3cm}{\ttfamily [private]}}\label{classgr_1_1radar_1_1soapysdr__echotimer__impl_a0103490e45c6339a74bfa67c892804c3}
+
+
+Definition at line {\bf 53} of file {\bf soapysdr\+\_\+echotimer\+\_\+impl.\+h}.
+
+
+
+Referenced by {\bf receive()}, and {\bf soapysdr\+\_\+echotimer\+\_\+impl()}.
+
+\index{gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl@{gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl}!d\+\_\+time\+Ns\+\_\+tx@{d\+\_\+time\+Ns\+\_\+tx}}
+\index{d\+\_\+time\+Ns\+\_\+tx@{d\+\_\+time\+Ns\+\_\+tx}!gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl@{gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl}}
+\paragraph[{d\+\_\+time\+Ns\+\_\+tx}]{\setlength{\rightskip}{0pt plus 5cm}long long gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl\+::d\+\_\+time\+Ns\+\_\+tx\hspace{0.3cm}{\ttfamily [private]}}\label{classgr_1_1radar_1_1soapysdr__echotimer__impl_ae4be2a66b8cfa25edfaa9c46c691f8f7}
+
+
+Definition at line {\bf 52} of file {\bf soapysdr\+\_\+echotimer\+\_\+impl.\+h}.
+
+
+
+Referenced by {\bf send()}, and {\bf soapysdr\+\_\+echotimer\+\_\+impl()}.
+
+\index{gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl@{gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl}!d\+\_\+timeout\+\_\+rx@{d\+\_\+timeout\+\_\+rx}}
+\index{d\+\_\+timeout\+\_\+rx@{d\+\_\+timeout\+\_\+rx}!gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl@{gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl}}
+\paragraph[{d\+\_\+timeout\+\_\+rx}]{\setlength{\rightskip}{0pt plus 5cm}float gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl\+::d\+\_\+timeout\+\_\+rx\hspace{0.3cm}{\ttfamily [private]}}\label{classgr_1_1radar_1_1soapysdr__echotimer__impl_aa9d0189b547c23b4d0a62d6c47a99742}
+
+
+Definition at line {\bf 92} of file {\bf soapysdr\+\_\+echotimer\+\_\+impl.\+h}.
+
+
+
+Referenced by {\bf receive()}.
+
+\index{gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl@{gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl}!d\+\_\+timeout\+\_\+tx@{d\+\_\+timeout\+\_\+tx}}
+\index{d\+\_\+timeout\+\_\+tx@{d\+\_\+timeout\+\_\+tx}!gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl@{gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl}}
+\paragraph[{d\+\_\+timeout\+\_\+tx}]{\setlength{\rightskip}{0pt plus 5cm}float gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl\+::d\+\_\+timeout\+\_\+tx\hspace{0.3cm}{\ttfamily [private]}}\label{classgr_1_1radar_1_1soapysdr__echotimer__impl_a46000c4ba437df8364785b1835cf64e4}
+
+
+Definition at line {\bf 92} of file {\bf soapysdr\+\_\+echotimer\+\_\+impl.\+h}.
+
+
+
+Referenced by {\bf send()}.
+
+\index{gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl@{gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl}!d\+\_\+timeout\+Us@{d\+\_\+timeout\+Us}}
+\index{d\+\_\+timeout\+Us@{d\+\_\+timeout\+Us}!gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl@{gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl}}
+\paragraph[{d\+\_\+timeout\+Us}]{\setlength{\rightskip}{0pt plus 5cm}long gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl\+::d\+\_\+timeout\+Us\hspace{0.3cm}{\ttfamily [private]}}\label{classgr_1_1radar_1_1soapysdr__echotimer__impl_a74d1b4d1dc54400ebf00653bb046b453}
+
+
+Definition at line {\bf 55} of file {\bf soapysdr\+\_\+echotimer\+\_\+impl.\+h}.
+
+
+
+Referenced by {\bf receive()}, {\bf send()}, and {\bf soapysdr\+\_\+echotimer\+\_\+impl()}.
+
+\index{gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl@{gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl}!d\+\_\+tx\+\_\+stream@{d\+\_\+tx\+\_\+stream}}
+\index{d\+\_\+tx\+\_\+stream@{d\+\_\+tx\+\_\+stream}!gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl@{gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl}}
+\paragraph[{d\+\_\+tx\+\_\+stream}]{\setlength{\rightskip}{0pt plus 5cm}Soapy\+S\+D\+R\+::\+Stream$\ast$ gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl\+::d\+\_\+tx\+\_\+stream\hspace{0.3cm}{\ttfamily [private]}}\label{classgr_1_1radar_1_1soapysdr__echotimer__impl_a0b8e4bb800a233a5afe1396a4c9d0fa6}
+
+
+Definition at line {\bf 87} of file {\bf soapysdr\+\_\+echotimer\+\_\+impl.\+h}.
+
+
+
+Referenced by {\bf send()}, {\bf soapysdr\+\_\+echotimer\+\_\+impl()}, and {\bf $\sim$soapysdr\+\_\+echotimer\+\_\+impl()}.
+
+\index{gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl@{gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl}!d\+\_\+value@{d\+\_\+value}}
+\index{d\+\_\+value@{d\+\_\+value}!gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl@{gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl}}
+\paragraph[{d\+\_\+value}]{\setlength{\rightskip}{0pt plus 5cm}volatile unsigned gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl\+::d\+\_\+value\hspace{0.3cm}{\ttfamily [private]}}\label{classgr_1_1radar_1_1soapysdr__echotimer__impl_a93f0be58587645b23b3bb6d81669f046}
+
+
+Definition at line {\bf 68} of file {\bf soapysdr\+\_\+echotimer\+\_\+impl.\+h}.
+
+
+
+Referenced by {\bf soapysdr\+\_\+echotimer\+\_\+impl()}.
+
+\index{gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl@{gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl}!d\+\_\+wait\+\_\+rx@{d\+\_\+wait\+\_\+rx}}
+\index{d\+\_\+wait\+\_\+rx@{d\+\_\+wait\+\_\+rx}!gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl@{gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl}}
+\paragraph[{d\+\_\+wait\+\_\+rx}]{\setlength{\rightskip}{0pt plus 5cm}float gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl\+::d\+\_\+wait\+\_\+rx\hspace{0.3cm}{\ttfamily [private]}}\label{classgr_1_1radar_1_1soapysdr__echotimer__impl_a4c80fc6c7cbf133e02111d3e606348af}
+
+
+Definition at line {\bf 93} of file {\bf soapysdr\+\_\+echotimer\+\_\+impl.\+h}.
+
+
+
+Referenced by {\bf receive()}, and {\bf wait\+\_\+rx()}.
+
+\index{gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl@{gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl}!d\+\_\+wait\+\_\+rx\+\_\+\+T\+E\+ST@{d\+\_\+wait\+\_\+rx\+\_\+\+T\+E\+ST}}
+\index{d\+\_\+wait\+\_\+rx\+\_\+\+T\+E\+ST@{d\+\_\+wait\+\_\+rx\+\_\+\+T\+E\+ST}!gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl@{gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl}}
+\paragraph[{d\+\_\+wait\+\_\+rx\+\_\+\+T\+E\+ST}]{\setlength{\rightskip}{0pt plus 5cm}volatile long long gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl\+::d\+\_\+wait\+\_\+rx\+\_\+\+T\+E\+ST\hspace{0.3cm}{\ttfamily [private]}}\label{classgr_1_1radar_1_1soapysdr__echotimer__impl_afb75c9eebf4768e7f67a1e4d7fe0472c}
+
+
+Definition at line {\bf 54} of file {\bf soapysdr\+\_\+echotimer\+\_\+impl.\+h}.
+
+\index{gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl@{gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl}!d\+\_\+wait\+\_\+tx@{d\+\_\+wait\+\_\+tx}}
+\index{d\+\_\+wait\+\_\+tx@{d\+\_\+wait\+\_\+tx}!gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl@{gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl}}
+\paragraph[{d\+\_\+wait\+\_\+tx}]{\setlength{\rightskip}{0pt plus 5cm}float gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl\+::d\+\_\+wait\+\_\+tx\hspace{0.3cm}{\ttfamily [private]}}\label{classgr_1_1radar_1_1soapysdr__echotimer__impl_a60ee0c1517faf0973d08082226ac2503}
+
+
+Definition at line {\bf 93} of file {\bf soapysdr\+\_\+echotimer\+\_\+impl.\+h}.
+
+
+
+Referenced by {\bf send()}, and {\bf wait\+\_\+tx()}.
+
+\index{gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl@{gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl}!d\+\_\+work\+Num@{d\+\_\+work\+Num}}
+\index{d\+\_\+work\+Num@{d\+\_\+work\+Num}!gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl@{gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl}}
+\paragraph[{d\+\_\+work\+Num}]{\setlength{\rightskip}{0pt plus 5cm}{\bf int} gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl\+::d\+\_\+work\+Num\hspace{0.3cm}{\ttfamily [private]}}\label{classgr_1_1radar_1_1soapysdr__echotimer__impl_a1b01fd3fbdef0afa4a5a78c516c3ed0d}
+
+
+Definition at line {\bf 71} of file {\bf soapysdr\+\_\+echotimer\+\_\+impl.\+h}.
+
+
+
+Referenced by {\bf soapysdr\+\_\+echotimer\+\_\+impl()}.
+
+\index{gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl@{gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl}!Deadtime\+Key@{Deadtime\+Key}}
+\index{Deadtime\+Key@{Deadtime\+Key}!gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl@{gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl}}
+\paragraph[{Deadtime\+Key}]{\setlength{\rightskip}{0pt plus 5cm}pmt\+::pmt\+\_\+t gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl\+::\+Deadtime\+Key = pmt\+::string\+\_\+to\+\_\+symbol(\char`\"{}Deadtime\char`\"{})\hspace{0.3cm}{\ttfamily [private]}}\label{classgr_1_1radar_1_1soapysdr__echotimer__impl_a918e14bf24b282b2d02b198bfd25620c}
+
+
+Definition at line {\bf 73} of file {\bf soapysdr\+\_\+echotimer\+\_\+impl.\+h}.
+
+
+
+Referenced by {\bf work()}.
+
+\index{gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl@{gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl}!E\+R\+R\+O\+RS@{E\+R\+R\+O\+RS}}
+\index{E\+R\+R\+O\+RS@{E\+R\+R\+O\+RS}!gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl@{gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl}}
+\paragraph[{E\+R\+R\+O\+RS}]{\setlength{\rightskip}{0pt plus 5cm}{\bf int} gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl\+::\+E\+R\+R\+O\+RS\hspace{0.3cm}{\ttfamily [private]}}\label{classgr_1_1radar_1_1soapysdr__echotimer__impl_a0a11ef2ccb5a4b35306d851d9289e2bf}
+
+
+Definition at line {\bf 76} of file {\bf soapysdr\+\_\+echotimer\+\_\+impl.\+h}.
+
+\index{gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl@{gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl}!first\+Packet@{first\+Packet}}
+\index{first\+Packet@{first\+Packet}!gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl@{gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl}}
+\paragraph[{first\+Packet}]{\setlength{\rightskip}{0pt plus 5cm}volatile {\bf int} gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl\+::first\+Packet\hspace{0.3cm}{\ttfamily [private]}}\label{classgr_1_1radar_1_1soapysdr__echotimer__impl_aa7e510f01f5f5caacab8ee390cc5383a}
+
+
+Definition at line {\bf 75} of file {\bf soapysdr\+\_\+echotimer\+\_\+impl.\+h}.
+
+
+
+Referenced by {\bf soapysdr\+\_\+echotimer\+\_\+impl()}, and {\bf work()}.
+
+\index{gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl@{gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl}!first\+Packet\+\_\+\+Rx@{first\+Packet\+\_\+\+Rx}}
+\index{first\+Packet\+\_\+\+Rx@{first\+Packet\+\_\+\+Rx}!gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl@{gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl}}
+\paragraph[{first\+Packet\+\_\+\+Rx}]{\setlength{\rightskip}{0pt plus 5cm}volatile {\bf int} gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl\+::first\+Packet\+\_\+\+Rx\hspace{0.3cm}{\ttfamily [private]}}\label{classgr_1_1radar_1_1soapysdr__echotimer__impl_a7f723ad32fdc7561631a32e65662a858}
+
+
+Definition at line {\bf 74} of file {\bf soapysdr\+\_\+echotimer\+\_\+impl.\+h}.
+
+
+
+Referenced by {\bf soapysdr\+\_\+echotimer\+\_\+impl()}, and {\bf work()}.
+
+\index{gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl@{gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl}!Rx\+\_\+\+Skip\+\_\+\+Packets@{Rx\+\_\+\+Skip\+\_\+\+Packets}}
+\index{Rx\+\_\+\+Skip\+\_\+\+Packets@{Rx\+\_\+\+Skip\+\_\+\+Packets}!gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl@{gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl}}
+\paragraph[{Rx\+\_\+\+Skip\+\_\+\+Packets}]{\setlength{\rightskip}{0pt plus 5cm}{\bf int} gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl\+::\+Rx\+\_\+\+Skip\+\_\+\+Packets = 0\hspace{0.3cm}{\ttfamily [private]}}\label{classgr_1_1radar_1_1soapysdr__echotimer__impl_a5a43c8290eceff88c1573366d1f3e68f}
+
+
+Definition at line {\bf 77} of file {\bf soapysdr\+\_\+echotimer\+\_\+impl.\+h}.
+
+
+
+Referenced by {\bf work()}.
+
+\index{gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl@{gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl}!sensors@{sensors}}
+\index{sensors@{sensors}!gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl@{gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl}}
+\paragraph[{sensors}]{\setlength{\rightskip}{0pt plus 5cm}{\bf std\+::vector}$<${\bf std\+::string}$>$ gr\+::radar\+::soapysdr\+\_\+echotimer\+\_\+impl\+::sensors\hspace{0.3cm}{\ttfamily [private]}}\label{classgr_1_1radar_1_1soapysdr__echotimer__impl_ae865d45beb19322ef5d19c84d9f0afe0}
+
+
+Definition at line {\bf 79} of file {\bf soapysdr\+\_\+echotimer\+\_\+impl.\+h}.
+
+
+
+Referenced by {\bf soapysdr\+\_\+echotimer\+\_\+impl()}.
+
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+/home/erik/prefix/default/src/gr-\/radar-\/dev/lib/{\bf soapysdr\+\_\+echotimer\+\_\+impl.\+h}\item 
+/home/erik/prefix/default/src/gr-\/radar-\/dev/lib/{\bf soapysdr\+\_\+echotimer\+\_\+impl.\+cc}\end{DoxyCompactItemize}

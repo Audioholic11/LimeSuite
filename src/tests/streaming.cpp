@@ -505,7 +505,7 @@ TEST_F (StreamingFixture, DISABLED_Rx2TxLoopback)
     config.isTx = true;
     serPort->SetupStream(streamIds[1], config);
 
-    const int streamsize = 16*1360;
+    const int streamsize = 16*samples12InPkt;
     complex16_t buffers[streamsize];
 
     auto status = serPort->ControlStream(streamIds[0], true);

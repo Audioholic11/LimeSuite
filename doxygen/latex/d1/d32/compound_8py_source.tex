@@ -1,0 +1,532 @@
+\subsection{compound.\+py}
+\label{compound_8py_source}\index{/home/erik/prefix/default/src/gr-\/radar-\/dev/docs/doxygen/doxyxml/generated/compound.\+py@{/home/erik/prefix/default/src/gr-\/radar-\/dev/docs/doxygen/doxyxml/generated/compound.\+py}}
+
+\begin{DoxyCode}
+00001 \textcolor{comment}{#!/usr/bin/env python2}
+00002 
+00003 \textcolor{stringliteral}{"""}
+00004 \textcolor{stringliteral}{Generated Mon Feb  9 19:08:05 2009 by generateDS.py.}
+00005 \textcolor{stringliteral}{"""}
+00006 
+00007 \textcolor{keyword}{from} string \textcolor{keyword}{import} lower \textcolor{keyword}{as} str\_lower
+00008 \textcolor{keyword}{from} xml.dom \textcolor{keyword}{import} minidom
+00009 \textcolor{keyword}{from} xml.dom \textcolor{keyword}{import} Node
+00010 
+00011 \textcolor{keyword}{import} sys
+00012 
+00013 \textcolor{keyword}{import} compoundsuper \textcolor{keyword}{as} supermod
+00014 \textcolor{keyword}{from} compoundsuper \textcolor{keyword}{import} MixedContainer
+00015 
+00016 
+00017 \textcolor{keyword}{class }DoxygenTypeSub(supermod.DoxygenType):
+00018     \textcolor{keyword}{def }__init__(self, version=None, compounddef=None):
+00019         supermod.DoxygenType.\_\_init\_\_(self, version, compounddef)
+00020 
+00021     \textcolor{keyword}{def }find(self, details):
+00022 
+00023         \textcolor{keywordflow}{return} self.compounddef.find(details)
+00024 
+00025 supermod.DoxygenType.subclass = DoxygenTypeSub
+00026 \textcolor{comment}{# end class DoxygenTypeSub}
+00027 
+00028 
+00029 \textcolor{keyword}{class }compounddefTypeSub(supermod.compounddefType):
+00030     \textcolor{keyword}{def }__init__(self, kind=None, prot=None, id=None, compoundname='', title='', basecompoundref=None, 
+      derivedcompoundref=None, includes=None, includedby=None, incdepgraph=None, invincdepgraph=None, innerdir=None, 
+      innerfile=None, innerclass=None, innernamespace=None, innerpage=None, innergroup=None, 
+      templateparamlist=None, sectiondef=None, briefdescription=None, detaileddescription=None, inheritancegraph=None, 
+      collaborationgraph=None, programlisting=None, location=None, listofallmembers=None):
+00031         supermod.compounddefType.\_\_init\_\_(self, kind, prot, id, compoundname, title, basecompoundref, 
+      derivedcompoundref, includes, includedby, incdepgraph, invincdepgraph, innerdir, innerfile, innerclass, 
+      innernamespace, innerpage, innergroup, templateparamlist, sectiondef, briefdescription, detaileddescription, 
+      inheritancegraph, collaborationgraph, programlisting, location, listofallmembers)
+00032 
+00033     \textcolor{keyword}{def }find(self, details):
+00034 
+00035         \textcolor{keywordflow}{if} self.id == details.refid:
+00036             \textcolor{keywordflow}{return} self
+00037 
+00038         \textcolor{keywordflow}{for} sectiondef \textcolor{keywordflow}{in} self.sectiondef:
+00039             result = sectiondef.find(details)
+00040             \textcolor{keywordflow}{if} result:
+00041                 \textcolor{keywordflow}{return} result
+00042 
+00043 
+00044 supermod.compounddefType.subclass = compounddefTypeSub
+00045 \textcolor{comment}{# end class compounddefTypeSub}
+00046 
+00047 
+00048 \textcolor{keyword}{class }listofallmembersTypeSub(supermod.listofallmembersType):
+00049     \textcolor{keyword}{def }__init__(self, member=None):
+00050         supermod.listofallmembersType.\_\_init\_\_(self, member)
+00051 supermod.listofallmembersType.subclass = listofallmembersTypeSub
+00052 \textcolor{comment}{# end class listofallmembersTypeSub}
+00053 
+00054 
+00055 \textcolor{keyword}{class }memberRefTypeSub(supermod.memberRefType):
+00056     \textcolor{keyword}{def }__init__(self, virt=None, prot=None, refid=None, ambiguityscope=None, scope='', name=''):
+00057         supermod.memberRefType.\_\_init\_\_(self, virt, prot, refid, ambiguityscope, scope, name)
+00058 supermod.memberRefType.subclass = memberRefTypeSub
+00059 \textcolor{comment}{# end class memberRefTypeSub}
+00060 
+00061 
+00062 \textcolor{keyword}{class }compoundRefTypeSub(supermod.compoundRefType):
+00063     \textcolor{keyword}{def }__init__(self, virt=None, prot=None, refid=None, valueOf\_='', mixedclass\_=None, content\_=None):
+00064         supermod.compoundRefType.\_\_init\_\_(self, mixedclass\_, content\_)
+00065 supermod.compoundRefType.subclass = compoundRefTypeSub
+00066 \textcolor{comment}{# end class compoundRefTypeSub}
+00067 
+00068 
+00069 \textcolor{keyword}{class }reimplementTypeSub(supermod.reimplementType):
+00070     \textcolor{keyword}{def }__init__(self, refid=None, valueOf\_='', mixedclass\_=None, content\_=None):
+00071         supermod.reimplementType.\_\_init\_\_(self, mixedclass\_, content\_)
+00072 supermod.reimplementType.subclass = reimplementTypeSub
+00073 \textcolor{comment}{# end class reimplementTypeSub}
+00074 
+00075 
+00076 \textcolor{keyword}{class }incTypeSub(supermod.incType):
+00077     \textcolor{keyword}{def }__init__(self, local=None, refid=None, valueOf\_='', mixedclass\_=None, content\_=None):
+00078         supermod.incType.\_\_init\_\_(self, mixedclass\_, content\_)
+00079 supermod.incType.subclass = incTypeSub
+00080 \textcolor{comment}{# end class incTypeSub}
+00081 
+00082 
+00083 \textcolor{keyword}{class }refTypeSub(supermod.refType):
+00084     \textcolor{keyword}{def }__init__(self, prot=None, refid=None, valueOf\_='', mixedclass\_=None, content\_=None):
+00085         supermod.refType.\_\_init\_\_(self, mixedclass\_, content\_)
+00086 supermod.refType.subclass = refTypeSub
+00087 \textcolor{comment}{# end class refTypeSub}
+00088 
+00089 
+00090 
+00091 \textcolor{keyword}{class }refTextTypeSub(supermod.refTextType):
+00092     \textcolor{keyword}{def }__init__(self, refid=None, kindref=None, external=None, valueOf\_='', mixedclass\_=None, 
+      content\_=None):
+00093         supermod.refTextType.\_\_init\_\_(self, mixedclass\_, content\_)
+00094 
+00095 supermod.refTextType.subclass = refTextTypeSub
+00096 \textcolor{comment}{# end class refTextTypeSub}
+00097 
+00098 \textcolor{keyword}{class }sectiondefTypeSub(supermod.sectiondefType):
+00099 
+00100 
+00101     \textcolor{keyword}{def }__init__(self, kind=None, header='', description=None, memberdef=None):
+00102         supermod.sectiondefType.\_\_init\_\_(self, kind, header, description, memberdef)
+00103 
+00104     \textcolor{keyword}{def }find(self, details):
+00105 
+00106         \textcolor{keywordflow}{for} memberdef \textcolor{keywordflow}{in} self.memberdef:
+00107             \textcolor{keywordflow}{if} memberdef.id == details.refid:
+00108                 \textcolor{keywordflow}{return} memberdef
+00109 
+00110         \textcolor{keywordflow}{return} \textcolor{keywordtype}{None}
+00111 
+00112 
+00113 supermod.sectiondefType.subclass = sectiondefTypeSub
+00114 \textcolor{comment}{# end class sectiondefTypeSub}
+00115 
+00116 
+00117 \textcolor{keyword}{class }memberdefTypeSub(supermod.memberdefType):
+00118     \textcolor{keyword}{def }__init__(self, initonly=None, kind=None, volatile=None, const=None, raise\_=None, virt=None, 
+      readable=None, prot=None, explicit=None, new=None, final=None, writable=None, add=None, static=None, remove=None, 
+      sealed=None, mutable=None, gettable=None, inline=None, settable=None, id=None, templateparamlist=None, 
+      type\_=None, definition='', argsstring='', name='', read='', write='', bitfield='', reimplements=None, 
+      reimplementedby=None, param=None, enumvalue=None, initializer=None, exceptions=None, briefdescription=None, 
+      detaileddescription=None, inbodydescription=None, location=None, references=None, referencedby=None):
+00119         supermod.memberdefType.\_\_init\_\_(self, initonly, kind, volatile, const, raise\_, virt, readable, prot
+      , explicit, new, final, writable, add, static, remove, sealed, mutable, gettable, inline, settable, id, 
+      templateparamlist, type\_, definition, argsstring, name, read, write, bitfield, reimplements, reimplementedby, 
+      param, enumvalue, initializer, exceptions, briefdescription, detaileddescription, inbodydescription, location,
+       references, referencedby)
+00120 supermod.memberdefType.subclass = memberdefTypeSub
+00121 \textcolor{comment}{# end class memberdefTypeSub}
+00122 
+00123 
+00124 \textcolor{keyword}{class }descriptionTypeSub(supermod.descriptionType):
+00125     \textcolor{keyword}{def }__init__(self, title='', para=None, sect1=None, internal=None, mixedclass\_=None, content\_=None):
+00126         supermod.descriptionType.\_\_init\_\_(self, mixedclass\_, content\_)
+00127 supermod.descriptionType.subclass = descriptionTypeSub
+00128 \textcolor{comment}{# end class descriptionTypeSub}
+00129 
+00130 
+00131 \textcolor{keyword}{class }enumvalueTypeSub(supermod.enumvalueType):
+00132     \textcolor{keyword}{def }__init__(self, prot=None, id=None, name='', initializer=None, briefdescription=None, 
+      detaileddescription=None, mixedclass\_=None, content\_=None):
+00133         supermod.enumvalueType.\_\_init\_\_(self, mixedclass\_, content\_)
+00134 supermod.enumvalueType.subclass = enumvalueTypeSub
+00135 \textcolor{comment}{# end class enumvalueTypeSub}
+00136 
+00137 
+00138 \textcolor{keyword}{class }templateparamlistTypeSub(supermod.templateparamlistType):
+00139     \textcolor{keyword}{def }__init__(self, param=None):
+00140         supermod.templateparamlistType.\_\_init\_\_(self, param)
+00141 supermod.templateparamlistType.subclass = templateparamlistTypeSub
+00142 \textcolor{comment}{# end class templateparamlistTypeSub}
+00143 
+00144 
+00145 \textcolor{keyword}{class }paramTypeSub(supermod.paramType):
+00146     \textcolor{keyword}{def }__init__(self, type\_=None, declname='', defname='', array='', defval=None, briefdescription=None):
+00147         supermod.paramType.\_\_init\_\_(self, type\_, declname, defname, array, defval, briefdescription)
+00148 supermod.paramType.subclass = paramTypeSub
+00149 \textcolor{comment}{# end class paramTypeSub}
+00150 
+00151 
+00152 \textcolor{keyword}{class }linkedTextTypeSub(supermod.linkedTextType):
+00153     \textcolor{keyword}{def }__init__(self, ref=None, mixedclass\_=None, content\_=None):
+00154         supermod.linkedTextType.\_\_init\_\_(self, mixedclass\_, content\_)
+00155 supermod.linkedTextType.subclass = linkedTextTypeSub
+00156 \textcolor{comment}{# end class linkedTextTypeSub}
+00157 
+00158 
+00159 \textcolor{keyword}{class }graphTypeSub(supermod.graphType):
+00160     \textcolor{keyword}{def }__init__(self, node=None):
+00161         supermod.graphType.\_\_init\_\_(self, node)
+00162 supermod.graphType.subclass = graphTypeSub
+00163 \textcolor{comment}{# end class graphTypeSub}
+00164 
+00165 
+00166 \textcolor{keyword}{class }nodeTypeSub(supermod.nodeType):
+00167     \textcolor{keyword}{def }__init__(self, id=None, label='', link=None, childnode=None):
+00168         supermod.nodeType.\_\_init\_\_(self, id, label, link, childnode)
+00169 supermod.nodeType.subclass = nodeTypeSub
+00170 \textcolor{comment}{# end class nodeTypeSub}
+00171 
+00172 
+00173 \textcolor{keyword}{class }childnodeTypeSub(supermod.childnodeType):
+00174     \textcolor{keyword}{def }__init__(self, relation=None, refid=None, edgelabel=None):
+00175         supermod.childnodeType.\_\_init\_\_(self, relation, refid, edgelabel)
+00176 supermod.childnodeType.subclass = childnodeTypeSub
+00177 \textcolor{comment}{# end class childnodeTypeSub}
+00178 
+00179 
+00180 \textcolor{keyword}{class }linkTypeSub(supermod.linkType):
+00181     \textcolor{keyword}{def }__init__(self, refid=None, external=None, valueOf\_=''):
+00182         supermod.linkType.\_\_init\_\_(self, refid, external)
+00183 supermod.linkType.subclass = linkTypeSub
+00184 \textcolor{comment}{# end class linkTypeSub}
+00185 
+00186 
+00187 \textcolor{keyword}{class }listingTypeSub(supermod.listingType):
+00188     \textcolor{keyword}{def }__init__(self, codeline=None):
+00189         supermod.listingType.\_\_init\_\_(self, codeline)
+00190 supermod.listingType.subclass = listingTypeSub
+00191 \textcolor{comment}{# end class listingTypeSub}
+00192 
+00193 
+00194 \textcolor{keyword}{class }codelineTypeSub(supermod.codelineType):
+00195     \textcolor{keyword}{def }__init__(self, external=None, lineno=None, refkind=None, refid=None, highlight=None):
+00196         supermod.codelineType.\_\_init\_\_(self, external, lineno, refkind, refid, highlight)
+00197 supermod.codelineType.subclass = codelineTypeSub
+00198 \textcolor{comment}{# end class codelineTypeSub}
+00199 
+00200 
+00201 \textcolor{keyword}{class }highlightTypeSub(supermod.highlightType):
+00202     \textcolor{keyword}{def }__init__(self, class\_=None, sp=None, ref=None, mixedclass\_=None, content\_=None):
+00203         supermod.highlightType.\_\_init\_\_(self, mixedclass\_, content\_)
+00204 supermod.highlightType.subclass = highlightTypeSub
+00205 \textcolor{comment}{# end class highlightTypeSub}
+00206 
+00207 
+00208 \textcolor{keyword}{class }referenceTypeSub(supermod.referenceType):
+00209     \textcolor{keyword}{def }__init__(self, endline=None, startline=None, refid=None, compoundref=None, valueOf\_='', 
+      mixedclass\_=None, content\_=None):
+00210         supermod.referenceType.\_\_init\_\_(self, mixedclass\_, content\_)
+00211 supermod.referenceType.subclass = referenceTypeSub
+00212 \textcolor{comment}{# end class referenceTypeSub}
+00213 
+00214 
+00215 \textcolor{keyword}{class }locationTypeSub(supermod.locationType):
+00216     \textcolor{keyword}{def }__init__(self, bodystart=None, line=None, bodyend=None, bodyfile=None, file=None, valueOf\_=''):
+00217         supermod.locationType.\_\_init\_\_(self, bodystart, line, bodyend, bodyfile, file)
+00218 supermod.locationType.subclass = locationTypeSub
+00219 \textcolor{comment}{# end class locationTypeSub}
+00220 
+00221 
+00222 \textcolor{keyword}{class }docSect1TypeSub(supermod.docSect1Type):
+00223     \textcolor{keyword}{def }__init__(self, id=None, title='', para=None, sect2=None, internal=None, mixedclass\_=None, 
+      content\_=None):
+00224         supermod.docSect1Type.\_\_init\_\_(self, mixedclass\_, content\_)
+00225 supermod.docSect1Type.subclass = docSect1TypeSub
+00226 \textcolor{comment}{# end class docSect1TypeSub}
+00227 
+00228 
+00229 \textcolor{keyword}{class }docSect2TypeSub(supermod.docSect2Type):
+00230     \textcolor{keyword}{def }__init__(self, id=None, title='', para=None, sect3=None, internal=None, mixedclass\_=None, 
+      content\_=None):
+00231         supermod.docSect2Type.\_\_init\_\_(self, mixedclass\_, content\_)
+00232 supermod.docSect2Type.subclass = docSect2TypeSub
+00233 \textcolor{comment}{# end class docSect2TypeSub}
+00234 
+00235 
+00236 \textcolor{keyword}{class }docSect3TypeSub(supermod.docSect3Type):
+00237     \textcolor{keyword}{def }__init__(self, id=None, title='', para=None, sect4=None, internal=None, mixedclass\_=None, 
+      content\_=None):
+00238         supermod.docSect3Type.\_\_init\_\_(self, mixedclass\_, content\_)
+00239 supermod.docSect3Type.subclass = docSect3TypeSub
+00240 \textcolor{comment}{# end class docSect3TypeSub}
+00241 
+00242 
+00243 \textcolor{keyword}{class }docSect4TypeSub(supermod.docSect4Type):
+00244     \textcolor{keyword}{def }__init__(self, id=None, title='', para=None, internal=None, mixedclass\_=None, content\_=None):
+00245         supermod.docSect4Type.\_\_init\_\_(self, mixedclass\_, content\_)
+00246 supermod.docSect4Type.subclass = docSect4TypeSub
+00247 \textcolor{comment}{# end class docSect4TypeSub}
+00248 
+00249 
+00250 \textcolor{keyword}{class }docInternalTypeSub(supermod.docInternalType):
+00251     \textcolor{keyword}{def }__init__(self, para=None, sect1=None, mixedclass\_=None, content\_=None):
+00252         supermod.docInternalType.\_\_init\_\_(self, mixedclass\_, content\_)
+00253 supermod.docInternalType.subclass = docInternalTypeSub
+00254 \textcolor{comment}{# end class docInternalTypeSub}
+00255 
+00256 
+00257 \textcolor{keyword}{class }docInternalS1TypeSub(supermod.docInternalS1Type):
+00258     \textcolor{keyword}{def }__init__(self, para=None, sect2=None, mixedclass\_=None, content\_=None):
+00259         supermod.docInternalS1Type.\_\_init\_\_(self, mixedclass\_, content\_)
+00260 supermod.docInternalS1Type.subclass = docInternalS1TypeSub
+00261 \textcolor{comment}{# end class docInternalS1TypeSub}
+00262 
+00263 
+00264 \textcolor{keyword}{class }docInternalS2TypeSub(supermod.docInternalS2Type):
+00265     \textcolor{keyword}{def }__init__(self, para=None, sect3=None, mixedclass\_=None, content\_=None):
+00266         supermod.docInternalS2Type.\_\_init\_\_(self, mixedclass\_, content\_)
+00267 supermod.docInternalS2Type.subclass = docInternalS2TypeSub
+00268 \textcolor{comment}{# end class docInternalS2TypeSub}
+00269 
+00270 
+00271 \textcolor{keyword}{class }docInternalS3TypeSub(supermod.docInternalS3Type):
+00272     \textcolor{keyword}{def }__init__(self, para=None, sect3=None, mixedclass\_=None, content\_=None):
+00273         supermod.docInternalS3Type.\_\_init\_\_(self, mixedclass\_, content\_)
+00274 supermod.docInternalS3Type.subclass = docInternalS3TypeSub
+00275 \textcolor{comment}{# end class docInternalS3TypeSub}
+00276 
+00277 
+00278 \textcolor{keyword}{class }docInternalS4TypeSub(supermod.docInternalS4Type):
+00279     \textcolor{keyword}{def }__init__(self, para=None, mixedclass\_=None, content\_=None):
+00280         supermod.docInternalS4Type.\_\_init\_\_(self, mixedclass\_, content\_)
+00281 supermod.docInternalS4Type.subclass = docInternalS4TypeSub
+00282 \textcolor{comment}{# end class docInternalS4TypeSub}
+00283 
+00284 
+00285 \textcolor{keyword}{class }docURLLinkSub(supermod.docURLLink):
+00286     \textcolor{keyword}{def }__init__(self, url=None, valueOf\_='', mixedclass\_=None, content\_=None):
+00287         supermod.docURLLink.\_\_init\_\_(self, mixedclass\_, content\_)
+00288 supermod.docURLLink.subclass = docURLLinkSub
+00289 \textcolor{comment}{# end class docURLLinkSub}
+00290 
+00291 
+00292 \textcolor{keyword}{class }docAnchorTypeSub(supermod.docAnchorType):
+00293     \textcolor{keyword}{def }__init__(self, id=None, valueOf\_='', mixedclass\_=None, content\_=None):
+00294         supermod.docAnchorType.\_\_init\_\_(self, mixedclass\_, content\_)
+00295 supermod.docAnchorType.subclass = docAnchorTypeSub
+00296 \textcolor{comment}{# end class docAnchorTypeSub}
+00297 
+00298 
+00299 \textcolor{keyword}{class }docFormulaTypeSub(supermod.docFormulaType):
+00300     \textcolor{keyword}{def }__init__(self, id=None, valueOf\_='', mixedclass\_=None, content\_=None):
+00301         supermod.docFormulaType.\_\_init\_\_(self, mixedclass\_, content\_)
+00302 supermod.docFormulaType.subclass = docFormulaTypeSub
+00303 \textcolor{comment}{# end class docFormulaTypeSub}
+00304 
+00305 
+00306 \textcolor{keyword}{class }docIndexEntryTypeSub(supermod.docIndexEntryType):
+00307     \textcolor{keyword}{def }__init__(self, primaryie='', secondaryie=''):
+00308         supermod.docIndexEntryType.\_\_init\_\_(self, primaryie, secondaryie)
+00309 supermod.docIndexEntryType.subclass = docIndexEntryTypeSub
+00310 \textcolor{comment}{# end class docIndexEntryTypeSub}
+00311 
+00312 
+00313 \textcolor{keyword}{class }docListTypeSub(supermod.docListType):
+00314     \textcolor{keyword}{def }__init__(self, listitem=None):
+00315         supermod.docListType.\_\_init\_\_(self, listitem)
+00316 supermod.docListType.subclass = docListTypeSub
+00317 \textcolor{comment}{# end class docListTypeSub}
+00318 
+00319 
+00320 \textcolor{keyword}{class }docListItemTypeSub(supermod.docListItemType):
+00321     \textcolor{keyword}{def }__init__(self, para=None):
+00322         supermod.docListItemType.\_\_init\_\_(self, para)
+00323 supermod.docListItemType.subclass = docListItemTypeSub
+00324 \textcolor{comment}{# end class docListItemTypeSub}
+00325 
+00326 
+00327 \textcolor{keyword}{class }docSimpleSectTypeSub(supermod.docSimpleSectType):
+00328     \textcolor{keyword}{def }__init__(self, kind=None, title=None, para=None):
+00329         supermod.docSimpleSectType.\_\_init\_\_(self, kind, title, para)
+00330 supermod.docSimpleSectType.subclass = docSimpleSectTypeSub
+00331 \textcolor{comment}{# end class docSimpleSectTypeSub}
+00332 
+00333 
+00334 \textcolor{keyword}{class }docVarListEntryTypeSub(supermod.docVarListEntryType):
+00335     \textcolor{keyword}{def }__init__(self, term=None):
+00336         supermod.docVarListEntryType.\_\_init\_\_(self, term)
+00337 supermod.docVarListEntryType.subclass = docVarListEntryTypeSub
+00338 \textcolor{comment}{# end class docVarListEntryTypeSub}
+00339 
+00340 
+00341 \textcolor{keyword}{class }docRefTextTypeSub(supermod.docRefTextType):
+00342     \textcolor{keyword}{def }__init__(self, refid=None, kindref=None, external=None, valueOf\_='', mixedclass\_=None, 
+      content\_=None):
+00343         supermod.docRefTextType.\_\_init\_\_(self, mixedclass\_, content\_)
+00344 supermod.docRefTextType.subclass = docRefTextTypeSub
+00345 \textcolor{comment}{# end class docRefTextTypeSub}
+00346 
+00347 
+00348 \textcolor{keyword}{class }docTableTypeSub(supermod.docTableType):
+00349     \textcolor{keyword}{def }__init__(self, rows=None, cols=None, row=None, caption=None):
+00350         supermod.docTableType.\_\_init\_\_(self, rows, cols, row, caption)
+00351 supermod.docTableType.subclass = docTableTypeSub
+00352 \textcolor{comment}{# end class docTableTypeSub}
+00353 
+00354 
+00355 \textcolor{keyword}{class }docRowTypeSub(supermod.docRowType):
+00356     \textcolor{keyword}{def }__init__(self, entry=None):
+00357         supermod.docRowType.\_\_init\_\_(self, entry)
+00358 supermod.docRowType.subclass = docRowTypeSub
+00359 \textcolor{comment}{# end class docRowTypeSub}
+00360 
+00361 
+00362 \textcolor{keyword}{class }docEntryTypeSub(supermod.docEntryType):
+00363     \textcolor{keyword}{def }__init__(self, thead=None, para=None):
+00364         supermod.docEntryType.\_\_init\_\_(self, thead, para)
+00365 supermod.docEntryType.subclass = docEntryTypeSub
+00366 \textcolor{comment}{# end class docEntryTypeSub}
+00367 
+00368 
+00369 \textcolor{keyword}{class }docHeadingTypeSub(supermod.docHeadingType):
+00370     \textcolor{keyword}{def }__init__(self, level=None, valueOf\_='', mixedclass\_=None, content\_=None):
+00371         supermod.docHeadingType.\_\_init\_\_(self, mixedclass\_, content\_)
+00372 supermod.docHeadingType.subclass = docHeadingTypeSub
+00373 \textcolor{comment}{# end class docHeadingTypeSub}
+00374 
+00375 
+00376 \textcolor{keyword}{class }docImageTypeSub(supermod.docImageType):
+00377     \textcolor{keyword}{def }__init__(self, width=None, type\_=None, name=None, height=None, valueOf\_='', mixedclass\_=None, 
+      content\_=None):
+00378         supermod.docImageType.\_\_init\_\_(self, mixedclass\_, content\_)
+00379 supermod.docImageType.subclass = docImageTypeSub
+00380 \textcolor{comment}{# end class docImageTypeSub}
+00381 
+00382 
+00383 \textcolor{keyword}{class }docDotFileTypeSub(supermod.docDotFileType):
+00384     \textcolor{keyword}{def }__init__(self, name=None, valueOf\_='', mixedclass\_=None, content\_=None):
+00385         supermod.docDotFileType.\_\_init\_\_(self, mixedclass\_, content\_)
+00386 supermod.docDotFileType.subclass = docDotFileTypeSub
+00387 \textcolor{comment}{# end class docDotFileTypeSub}
+00388 
+00389 
+00390 \textcolor{keyword}{class }docTocItemTypeSub(supermod.docTocItemType):
+00391     \textcolor{keyword}{def }__init__(self, id=None, valueOf\_='', mixedclass\_=None, content\_=None):
+00392         supermod.docTocItemType.\_\_init\_\_(self, mixedclass\_, content\_)
+00393 supermod.docTocItemType.subclass = docTocItemTypeSub
+00394 \textcolor{comment}{# end class docTocItemTypeSub}
+00395 
+00396 
+00397 \textcolor{keyword}{class }docTocListTypeSub(supermod.docTocListType):
+00398     \textcolor{keyword}{def }__init__(self, tocitem=None):
+00399         supermod.docTocListType.\_\_init\_\_(self, tocitem)
+00400 supermod.docTocListType.subclass = docTocListTypeSub
+00401 \textcolor{comment}{# end class docTocListTypeSub}
+00402 
+00403 
+00404 \textcolor{keyword}{class }docLanguageTypeSub(supermod.docLanguageType):
+00405     \textcolor{keyword}{def }__init__(self, langid=None, para=None):
+00406         supermod.docLanguageType.\_\_init\_\_(self, langid, para)
+00407 supermod.docLanguageType.subclass = docLanguageTypeSub
+00408 \textcolor{comment}{# end class docLanguageTypeSub}
+00409 
+00410 
+00411 \textcolor{keyword}{class }docParamListTypeSub(supermod.docParamListType):
+00412     \textcolor{keyword}{def }__init__(self, kind=None, parameteritem=None):
+00413         supermod.docParamListType.\_\_init\_\_(self, kind, parameteritem)
+00414 supermod.docParamListType.subclass = docParamListTypeSub
+00415 \textcolor{comment}{# end class docParamListTypeSub}
+00416 
+00417 
+00418 \textcolor{keyword}{class }docParamListItemSub(supermod.docParamListItem):
+00419     \textcolor{keyword}{def }__init__(self, parameternamelist=None, parameterdescription=None):
+00420         supermod.docParamListItem.\_\_init\_\_(self, parameternamelist, parameterdescription)
+00421 supermod.docParamListItem.subclass = docParamListItemSub
+00422 \textcolor{comment}{# end class docParamListItemSub}
+00423 
+00424 
+00425 \textcolor{keyword}{class }docParamNameListSub(supermod.docParamNameList):
+00426     \textcolor{keyword}{def }__init__(self, parametername=None):
+00427         supermod.docParamNameList.\_\_init\_\_(self, parametername)
+00428 supermod.docParamNameList.subclass = docParamNameListSub
+00429 \textcolor{comment}{# end class docParamNameListSub}
+00430 
+00431 
+00432 \textcolor{keyword}{class }docParamNameSub(supermod.docParamName):
+00433     \textcolor{keyword}{def }__init__(self, direction=None, ref=None, mixedclass\_=None, content\_=None):
+00434         supermod.docParamName.\_\_init\_\_(self, mixedclass\_, content\_)
+00435 supermod.docParamName.subclass = docParamNameSub
+00436 \textcolor{comment}{# end class docParamNameSub}
+00437 
+00438 
+00439 \textcolor{keyword}{class }docXRefSectTypeSub(supermod.docXRefSectType):
+00440     \textcolor{keyword}{def }__init__(self, id=None, xreftitle=None, xrefdescription=None):
+00441         supermod.docXRefSectType.\_\_init\_\_(self, id, xreftitle, xrefdescription)
+00442 supermod.docXRefSectType.subclass = docXRefSectTypeSub
+00443 \textcolor{comment}{# end class docXRefSectTypeSub}
+00444 
+00445 
+00446 \textcolor{keyword}{class }docCopyTypeSub(supermod.docCopyType):
+00447     \textcolor{keyword}{def }__init__(self, link=None, para=None, sect1=None, internal=None):
+00448         supermod.docCopyType.\_\_init\_\_(self, link, para, sect1, internal)
+00449 supermod.docCopyType.subclass = docCopyTypeSub
+00450 \textcolor{comment}{# end class docCopyTypeSub}
+00451 
+00452 
+00453 \textcolor{keyword}{class }docCharTypeSub(supermod.docCharType):
+00454     \textcolor{keyword}{def }__init__(self, char=None, valueOf\_=''):
+00455         supermod.docCharType.\_\_init\_\_(self, char)
+00456 supermod.docCharType.subclass = docCharTypeSub
+00457 \textcolor{comment}{# end class docCharTypeSub}
+00458 
+00459 \textcolor{keyword}{class }docParaTypeSub(supermod.docParaType):
+00460     \textcolor{keyword}{def }__init__(self, char=None, valueOf\_=''):
+00461         supermod.docParaType.\_\_init\_\_(self, char)
+00462 
+00463         self.parameterlist = []
+00464         self.simplesects = []
+00465         self.content = []
+00466 
+00467     \textcolor{keyword}{def }buildChildren(self, child\_, nodeName\_):
+00468         supermod.docParaType.buildChildren(self, child\_, nodeName\_)
+00469 
+00470         \textcolor{keywordflow}{if} child\_.nodeType == Node.TEXT\_NODE:
+00471             obj\_ = self.mixedclass\_(MixedContainer.CategoryText,
+00472                 MixedContainer.TypeNone, \textcolor{stringliteral}{''}, child\_.nodeValue)
+00473             self.content.append(obj\_)
+00474         \textcolor{keywordflow}{elif} child\_.nodeType == Node.ELEMENT\_NODE \textcolor{keywordflow}{and} \(\backslash\)
+00475                 nodeName\_ == \textcolor{stringliteral}{"ref"}:
+00476             obj\_ = supermod.docRefTextType.factory()
+00477             obj\_.build(child\_)
+00478             self.content.append(obj\_)
+00479         \textcolor{keywordflow}{elif} child\_.nodeType == Node.ELEMENT\_NODE \textcolor{keywordflow}{and} \(\backslash\)
+00480                 nodeName\_ == \textcolor{stringliteral}{'parameterlist'}:
+00481             obj\_ = supermod.docParamListType.factory()
+00482             obj\_.build(child\_)
+00483             self.parameterlist.append(obj\_)
+00484         \textcolor{keywordflow}{elif} child\_.nodeType == Node.ELEMENT\_NODE \textcolor{keywordflow}{and} \(\backslash\)
+00485                 nodeName\_ == \textcolor{stringliteral}{'simplesect'}:
+00486             obj\_ = supermod.docSimpleSectType.factory()
+00487             obj\_.build(child\_)
+00488             self.simplesects.append(obj\_)
+00489 
+00490 
+00491 supermod.docParaType.subclass = docParaTypeSub
+00492 \textcolor{comment}{# end class docParaTypeSub}
+00493 
+00494 
+00495 
+00496 \textcolor{keyword}{def }parse(inFilename):
+00497     doc = minidom.parse(inFilename)
+00498     rootNode = doc.documentElement
+00499     rootObj = supermod.DoxygenType.factory()
+00500     rootObj.build(rootNode)
+00501     \textcolor{keywordflow}{return} rootObj
+00502 
+00503 
+\end{DoxyCode}

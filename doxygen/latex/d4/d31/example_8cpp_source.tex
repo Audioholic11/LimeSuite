@@ -1,0 +1,135 @@
+\subsection{example.\+cpp}
+\label{example_8cpp_source}\index{/home/erik/prefix/default/src/limesuite-\/dev/external/cpp-\/feather-\/ini-\/parser/example/example.\+cpp@{/home/erik/prefix/default/src/limesuite-\/dev/external/cpp-\/feather-\/ini-\/parser/example/example.\+cpp}}
+
+\begin{DoxyCode}
+00001 \textcolor{preprocessor}{#include <iostream>}
+00002 \textcolor{preprocessor}{#include <cstring>}
+00003 \textcolor{preprocessor}{#include <stdint.h>}
+00004 \textcolor{preprocessor}{#include "../INI.h"}
+00005 
+00006 \textcolor{keyword}{using namespace }std;
+00007 
+00008 \textcolor{keywordtype}{void} centerString(\textcolor{keywordtype}{string} str); \textcolor{comment}{//Printing to console}
+00009 std::string getStringFromFile(\textcolor{keyword}{const} std::string& path); \textcolor{comment}{//Source for data loading from memory.}
+00010 
+00011 \textcolor{keywordtype}{int} main()
+00012 \{
+00014    \textcolor{keyword}{typedef} INI<> ini\_t;  \textcolor{comment}{//Makes things shorter/easier to write <Section, Key, Value>}
+00015    \textcolor{comment}{//or}
+00016    \textcolor{comment}{//typedef INI<string, string, string> ini\_t;  //Equivelant to previous line when wide characters are
+       disabled}
+00017    ini\_t ini(\textcolor{stringliteral}{"file.ini"}, \textcolor{keyword}{true});  \textcolor{comment}{//File to open/default save filename. The constuctor is set to parse by
+       default, unless specified as false}
+00018 
+00020    centerString(\textcolor{stringliteral}{"########## Access & Manipulate Contents ##########"});
+00021 
+00022    \textcolor{comment}{//Common usage}
+00023    ini.create(\textcolor{stringliteral}{"Section 1"});
+00024    ini.create(\textcolor{stringliteral}{"Section 2"});
+00025    ini.get(\textcolor{stringliteral}{"Key1"}, \textcolor{stringliteral}{"DefaultValue"});
+00026    ini.select(\textcolor{stringliteral}{"Section 1"});
+00027    ini.set(\textcolor{stringliteral}{"Key2"}, \textcolor{stringliteral}{"Value"});
+00028    ini.save(); \textcolor{comment}{//Save contents to file, optional filename parameter available}
+00029    ini.clear(); \textcolor{comment}{//Clear INI contents from memory}
+00030 
+00031    \textcolor{comment}{//Extended usage}
+00032    ini[\textcolor{stringliteral}{"Section Name"}][\textcolor{stringliteral}{"Key"}] = \textcolor{stringliteral}{"Value"};  \textcolor{comment}{//You are not required to create a section first}
+00033 
+00034    ini.create(\textcolor{stringliteral}{"Section1"});  \textcolor{comment}{//Also selects as current section}
+00035    ini.create(\textcolor{stringliteral}{"Section2"});  \textcolor{comment}{//Current}
+00036 
+00037    ini.set(\textcolor{stringliteral}{"Key1"}, \textcolor{stringliteral}{"Value1"});  \textcolor{comment}{//Added pair under section "Section2"}
+00038 
+00039    ini.select(\textcolor{stringliteral}{"Section1"});  \textcolor{comment}{//Current}
+00040    cout << ini.get(\textcolor{stringliteral}{"Key1"}, \textcolor{stringliteral}{"-1"}) << endl;  \textcolor{comment}{//Returns "-1" as no key exists, no default will return NULL for
+       data type, eg int() is 0}
+00041 
+00042    ini.select(\textcolor{stringliteral}{"Section2"});
+00043    ini.set(\textcolor{stringliteral}{"Key1"}, \textcolor{stringliteral}{"1.123"});
+00044    cout << ini.get(\textcolor{stringliteral}{"Key1"}, -1.0) << endl;  \textcolor{comment}{//Return value as double}
+00045    ini.set(123, 123);  \textcolor{comment}{//Will convert to provided INI data type for key/value, in this case string for both}
+00046 
+00047    ini.save();
+00048    ini.clear();
+00049    ini.parse();  \textcolor{comment}{//Parses file into objects in memory}
+00050 
+00051    cout << ini[\textcolor{stringliteral}{"Section2"}][\textcolor{stringliteral}{"Key1"}] << endl;  \textcolor{comment}{//Returns "Value1", slightly more overhead involved seeking
+       section, avoid using excessively}
+00052 
+00054    centerString(\textcolor{stringliteral}{"########## Iterate Contents ##########"});
+00055 
+00056 \textcolor{preprocessor}{#ifdef FINI\_CPP11}
+00057    \textcolor{keywordflow}{for}(\textcolor{keyword}{auto} i: ini.sections)
+00058    \{
+00059       cout << \textcolor{stringliteral}{"["} << i.first << \textcolor{stringliteral}{"]"} << endl;
+00060 
+00061       \textcolor{comment}{//for(auto j = i.second->begin(); j != i.second->end(); j++)}
+00062       \textcolor{keywordflow}{for}(\textcolor{keyword}{auto} j: *i.second)
+00063       \{
+00064          cout << \textcolor{stringliteral}{" "} << j.first << \textcolor{stringliteral}{"="} << j.second << endl;
+00065       \}
+00066    \}
+00067 \textcolor{preprocessor}{#else}
+00068    \textcolor{keywordflow}{for}(ini\_t::sectionsit\_t i = ini.sections.begin(); i != ini.sections.end(); i++)
+00069    \{
+00070       \textcolor{comment}{//Section name as ini\_t::section\_t}
+00071       cout << i->first << endl;
+00072 
+00073       \textcolor{keywordflow}{if} (i->second->size() == 0)  \textcolor{comment}{//No keys/values in section, skip to next}
+00074          \textcolor{keywordflow}{continue};
+00075 
+00076       \textcolor{keywordflow}{for}(ini\_t::keysit\_t j = i->second->begin(); j != i->second->end(); j++)
+00077       \{
+00078          \textcolor{comment}{//Name as ini\_t::key\_t & Value as ini\_t::key\_t}
+00079          cout << \textcolor{stringliteral}{" "} << j->first << \textcolor{stringliteral}{"="} << j->second << endl;
+00080       \}
+00081    \}
+00082 \textcolor{preprocessor}{#endif}
+00083 
+00085    \textcolor{keyword}{typedef} INI <unsigned char, string, float> ini\_int\_t;  \textcolor{comment}{//Makes things shorter/easier to write <Section,
+       Key, Value>}
+00086    ini\_int\_t ini\_int(\textcolor{stringliteral}{"file\_ints.ini"}, \textcolor{keyword}{false});  \textcolor{comment}{//File to open/default save filename. The constuctor is set
+       to parse by default, unless specified as false}
+00087    \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} i = 1; i <= 200; i++)
+00088    \{
+00089       ini\_int.create(i); \textcolor{comment}{//Section}
+00090       ini\_int.set(\textcolor{stringliteral}{"Key"}, i / 2.f);
+00091    \}
+00092 
+00093    ini\_int.save();
+00094 
+00096    \textcolor{comment}{/*}
+00097 \textcolor{comment}{   ini\_t ini\_w("file.ini", true);}
+00098 \textcolor{comment}{   wcout << ini\_w[L"Section2"][L"Key1"] << endl;}
+00099 \textcolor{comment}{   */}
+00100 
+00102    std::string str = getStringFromFile(\textcolor{stringliteral}{"config/test.ini"}); \textcolor{comment}{//Allows us to tap into a source for the purpose
+       of this example}
+00103 
+00104    ini\_t ini\_mem((\textcolor{keywordtype}{void}*)str.c\_str(), str.size(), \textcolor{keyword}{true}); \textcolor{comment}{//This is the line which parses data from memory}
+00105 
+00107    ini\_t inid(\textcolor{stringliteral}{"file.ini"}, \textcolor{keyword}{true});
+00108    ini\_t inis(\textcolor{stringliteral}{"merge.ini"}, \textcolor{keyword}{true});
+00109    inid.merge(inis, \textcolor{keyword}{true});
+00110    inid.save(\textcolor{stringliteral}{"merged.ini"});
+00111 
+00112    \textcolor{keywordflow}{return} EXIT\_SUCCESS;
+00113 \}
+00114 
+00115 \textcolor{keywordtype}{void} centerString(\textcolor{keywordtype}{string} str)
+00116 \{
+00117    \textcolor{keyword}{const} \textcolor{keywordtype}{char}* s = str.c\_str();
+00118    \textcolor{keywordtype}{int} l = strlen(s);
+00119    \textcolor{keywordtype}{int} pos = (int)((80 - l) / 2);
+00120    \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} i = 0; i < pos; i++)
+00121    cout << \textcolor{stringliteral}{" "};
+00122    cout << s << endl;
+00123 \}
+00124 
+00125 std::string getStringFromFile(\textcolor{keyword}{const} std::string& path) \{
+00126   std::ostringstream buf;
+00127   std::ifstream input (path.c\_str());
+00128   buf << input.rdbuf();
+00129   \textcolor{keywordflow}{return} buf.str();
+00130 \}
+\end{DoxyCode}

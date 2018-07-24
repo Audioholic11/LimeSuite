@@ -1,0 +1,51 @@
+\subsection{Test\+Format\+Parser.\+cpp}
+\label{TestFormatParser_8cpp_source}\index{/home/erik/prefix/default/src/soapysdr/tests/\+Test\+Format\+Parser.\+cpp@{/home/erik/prefix/default/src/soapysdr/tests/\+Test\+Format\+Parser.\+cpp}}
+
+\begin{DoxyCode}
+00001 \textcolor{comment}{// Copyright (c) 2015-2015 Josh Blum}
+00002 \textcolor{comment}{// SPDX-License-Identifier: BSL-1.0}
+00003 
+00004 \textcolor{preprocessor}{#include <SoapySDR/Formats.hpp>}
+00005 \textcolor{preprocessor}{#include <cstdlib>}
+00006 \textcolor{preprocessor}{#include <cstdio>}
+00007 
+00008 \textcolor{keywordtype}{int} main(\textcolor{keywordtype}{void})
+00009 \{
+00010 \textcolor{preprocessor}{    #define formatCheck(formatStr, expectedSize) \(\backslash\)}
+00011 \textcolor{preprocessor}{    \{ \(\backslash\)}
+00012 \textcolor{preprocessor}{        size\_t bytes = SoapySDR::formatToSize(formatStr); \(\backslash\)}
+00013 \textcolor{preprocessor}{        printf("%s -> %d bytes/element\(\backslash\)t", formatStr, int(bytes)); \(\backslash\)}
+00014 \textcolor{preprocessor}{        if (bytes != expectedSize) \(\backslash\)}
+00015 \textcolor{preprocessor}{        \{ \(\backslash\)}
+00016 \textcolor{preprocessor}{            printf("FAIL: expected %d bytes!\(\backslash\)n", int(expectedSize)); \(\backslash\)}
+00017 \textcolor{preprocessor}{            return EXIT\_FAILURE; \(\backslash\)}
+00018 \textcolor{preprocessor}{        \} \(\backslash\)}
+00019 \textcolor{preprocessor}{        else printf("OK\(\backslash\)n"); \(\backslash\)}
+00020 \textcolor{preprocessor}{    \}}
+00021 
+00022     formatCheck(SOAPY_SDR_CF64, 16);
+00023     formatCheck(SOAPY_SDR_CF32, 8);
+00024     formatCheck(SOAPY_SDR_CS32, 8);
+00025     formatCheck(SOAPY_SDR_CU32, 8);
+00026     formatCheck(SOAPY_SDR_CS16, 4);
+00027     formatCheck(SOAPY_SDR_CU16, 4);
+00028     formatCheck(SOAPY_SDR_CS12, 3);
+00029     formatCheck(SOAPY_SDR_CU12, 3);
+00030     formatCheck(SOAPY_SDR_CS8, 2);
+00031     formatCheck(SOAPY_SDR_CU8, 2);
+00032     formatCheck(SOAPY_SDR_CS4, 1);
+00033     formatCheck(SOAPY_SDR_CU4, 1);
+00034 
+00035     formatCheck(SOAPY_SDR_F64, 8);
+00036     formatCheck(SOAPY_SDR_F32, 4);
+00037     formatCheck(SOAPY_SDR_S32, 4);
+00038     formatCheck(SOAPY_SDR_U32, 4);
+00039     formatCheck(SOAPY_SDR_S16, 2);
+00040     formatCheck(SOAPY_SDR_U16, 2);
+00041     formatCheck(SOAPY_SDR_S8, 1);
+00042     formatCheck(SOAPY_SDR_U8, 1);
+00043 
+00044     printf(\textcolor{stringliteral}{"DONE!\(\backslash\)n"});
+00045     \textcolor{keywordflow}{return} EXIT\_SUCCESS;
+00046 \}
+\end{DoxyCode}

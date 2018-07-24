@@ -42,8 +42,8 @@ SoapyLMS7::SoapyLMS7(const ConnectionHandle &handle, const SoapySDR::Kwargs &arg
     lms7Device = LMS7_Device::CreateDevice(handle);
     if (lms7Device == nullptr) throw std::runtime_error(
         "Failed to make connection with '" + handle.serialize() + "'");
-    
-    const auto devInfo = lms7Device->GetInfo();  
+
+    const auto devInfo = lms7Device->GetInfo();
     //quick summary
     SoapySDR::logf(SOAPY_SDR_INFO, "Device name: %s", devInfo->deviceName);
     SoapySDR::logf(SOAPY_SDR_INFO, "Reference: %g MHz", lms7Device->GetClockFreq(LMS_CLOCK_REF)/1e6);
@@ -53,7 +53,7 @@ SoapyLMS7::SoapyLMS7(const ConnectionHandle &handle, const SoapySDR::Kwargs &arg
     //enable all channels
     for (size_t channel = 0; channel < lms7Device->GetNumChannels(); channel++)
     {
-        lms7Device->EnableChannel(true, channel, true);   
+        lms7Device->EnableChannel(true, channel, true);
         lms7Device->EnableChannel(false, channel, true);
     }
 
@@ -83,7 +83,7 @@ SoapyLMS7::~SoapyLMS7(void)
     //power down all channels
     for (size_t channel = 0; channel < lms7Device->GetNumChannels(); channel++)
     {
-        lms7Device->EnableChannel(true, channel, false);   
+        lms7Device->EnableChannel(true, channel, false);
         lms7Device->EnableChannel(false, channel, false);
     }
     delete lms7Device;
@@ -146,9 +146,9 @@ std::vector<std::string> SoapyLMS7::listAntennas(const int direction, const size
 void SoapyLMS7::setAntenna(const int direction, const size_t channel, const std::string &name)
 {
     std::unique_lock<std::recursive_mutex> lock(_accessMutex);
-    
+
     SoapySDR::logf(SOAPY_SDR_DEBUG, "SoapyLMS7::setAntenna(%s, %d, %s)", dirName, int(channel), name.c_str());
-    
+
     bool tx = direction == SOAPY_SDR_TX;
     std::vector<std::string> nameList = lms7Device->GetPathNames(tx);
     for (unsigned path = 0; path < nameList.size(); path++)
@@ -158,7 +158,7 @@ void SoapyLMS7::setAntenna(const int direction, const size_t channel, const std:
             _channelsToCal.emplace(direction, channel);
             return;
         }
-    
+
     throw std::runtime_error("SoapyLMS7::setAntenna(TX, "+name+") - unknown antenna name");
 }
 
@@ -169,7 +169,7 @@ std::string SoapyLMS7::getAntenna(const int direction, const size_t channel) con
     int path = lms7Device->GetPath(tx,channel);
     if (path < 0)
         return "";
-   
+
     std::vector<std::string> nameList = lms7Device->GetPathNames(tx);
     return (unsigned)path < nameList.size() ? nameList[path] : "";
 }
@@ -192,7 +192,7 @@ void SoapyLMS7::setDCOffsetMode(const int direction, const size_t channel, const
 
 bool SoapyLMS7::getDCOffsetMode(const int direction, const size_t channel) const
 {
-    std::unique_lock<std::recursive_mutex> lock(_accessMutex); 
+    std::unique_lock<std::recursive_mutex> lock(_accessMutex);
     if (direction == SOAPY_SDR_RX)
         return lms7Device->ReadParam(LMS7param(DC_BYP_RXTSP),channel) == 0;
     return false;
@@ -246,7 +246,7 @@ void SoapyLMS7::setGain(const int direction, const size_t channel, const std::st
 {
     std::unique_lock<std::recursive_mutex> lock(_accessMutex);
     SoapySDR::logf(SOAPY_SDR_DEBUG, "SoapyLMS7::setGain(%s, %d, %s, %g dB)", dirName, int(channel), name.c_str(), value);
-    
+
     lms7Device->SetGain(direction==SOAPY_SDR_TX, channel, value, name);
 
     SoapySDR::logf(SOAPY_SDR_DEBUG, "Actual %s%s[%d] gain %g dB", dirName, name.c_str(), int(channel), this->getGain(direction, channel, name));
@@ -299,7 +299,7 @@ void SoapyLMS7::setFrequency(const int direction, const size_t channel, const st
     }
 
     if (name == "BB")
-    {     
+    {
         lms7Device->SetNCOFreq(isTx, channel, 0, direction == SOAPY_SDR_TX ? frequency : -frequency);
         return;
     }
@@ -409,7 +409,7 @@ void SoapyLMS7::setBandwidth(const int direction, const size_t channel, const do
     _actualBw[direction][channel] = bw;
 
     if (direction == SOAPY_SDR_RX)
-    {        
+    {
         if (lms7Device->SetLPF(false,channel,true,bw) != 0)
         {
             SoapySDR::logf(SOAPY_SDR_ERROR, "setBandwidth(Rx, %d, %g MHz) Failed - %s", int(channel), bw/1e6, lime::GetLastErrorMessage());
@@ -535,6 +535,8 @@ std::vector<std::string> SoapyLMS7::listSensors(void) const
     std::vector<std::string> sensors;
     sensors.push_back("clock_locked");
     sensors.push_back("lms7_temp");
+    sensors.push_back("chirp_period");
+    sensors.push_back("chirp_time");
     return sensors;
 }
 
@@ -558,6 +560,24 @@ SoapySDR::ArgInfo SoapyLMS7::getSensorInfo(const std::string &name) const
         info.units = "C";
         info.description = "The temperature of the LMS7002M in degrees C.";
     }
+    else if (name == "chirp_period")
+    {
+        info.key = "chirp_period";
+        info.name = "Chirp Period";
+        info.type = SoapySDR::ArgInfo::INT;
+        info.value = "0";
+        info.units = "ns";
+        info.description = "The length in nanoseconds of an external chirp signal. Period of external function generators sync signal.";
+    }
+    else if (name == "chirp_time")
+    {
+        info.key = "chirp_time";
+        info.name = "Chirp Timestamp";
+        info.type = SoapySDR::ArgInfo::INT;
+        info.value = "0";
+        info.units = "ns";
+        info.description = "The timestamp of last chirp start";
+    }
     return info;
 }
 
@@ -572,6 +592,30 @@ std::string SoapyLMS7::readSensor(const std::string &name) const
     if (name == "lms7_temp")
     {
         return std::to_string(lms7Device->GetChipTemperature());
+    }
+    if (name == "chirp_period")
+    {
+      if (sampleRate == 0)
+      {
+        throw std::runtime_error("SoapyLMS7::readSensor (chirp_period) sample rate unset");
+      }
+      else
+      {
+        auto ticks = lms7Device->GetChirpTimePeriod();
+        return std::to_string(SoapySDR::ticksToTimeNs(ticks, sampleRate));
+      }
+    }
+    if (name == "chirp_time")
+    {
+      if (sampleRate == 0)
+      {
+        throw std::runtime_error("SoapyLMS7::readSensor (chirp_time) sample rate unset");
+      }
+      else
+      {
+        auto ticks = lms7Device->GetChirpTimeStamp();
+        return std::to_string(SoapySDR::ticksToTimeNs(ticks, sampleRate));
+      }
     }
 
     throw std::runtime_error("SoapyLMS7::readSensor("+name+") - unknown sensor name");
@@ -629,7 +673,7 @@ std::vector<std::string> SoapyLMS7::listRegisterInterfaces(void) const
 void SoapyLMS7::writeRegister(const std::string &name, const unsigned addr, const unsigned value)
 {
     if (name == "BBIC") return this->writeRegister(addr, value);
-    if ("RFIC" != name.substr(0,4))  
+    if ("RFIC" != name.substr(0,4))
         throw std::runtime_error("SoapyLMS7::readRegister("+name+") unknown interface");
 
     int st = lms7Device->WriteLMSReg(addr, value, name[4]-'0');
@@ -641,9 +685,9 @@ void SoapyLMS7::writeRegister(const std::string &name, const unsigned addr, cons
 unsigned SoapyLMS7::readRegister(const std::string &name, const unsigned addr) const
 {
     if (name == "BBIC") return this->readRegister(addr);
-    if ("RFIC" != name.substr(0,4))  
+    if ("RFIC" != name.substr(0,4))
         throw std::runtime_error("SoapyLMS7::readRegister("+name+") unknown interface");
-    
+
     return lms7Device->ReadLMSReg(addr, name[4]-'0');
 }
 
@@ -867,13 +911,13 @@ std::string SoapyLMS7::readSetting(const std::string &key) const
 {
     return readSetting(SOAPY_SDR_TX, 0, key);
 }
-    
+
 std::string SoapyLMS7::readSetting(const int direction, const size_t channel, const std::string &key) const
 {
     int val = lms7Device->ReadParam(key,channel);
     if ( val !=-1)
         return std::to_string(val);
-    
+
     throw std::runtime_error("unknown setting key: "+key);
 }
 /******************************************************************

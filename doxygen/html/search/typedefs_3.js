@@ -1,9 +1,14 @@
 var searchData=
 [
   ['data',['data',['../db/d82/wglew_8h.html#a465dec1ce63d00e7ee74e136a178c031',1,'wglew.h']]],
+  ['data_5ft',['data_t',['../d4/d92/classINI.html#a611e44f4d3abb28d901f7e2aaf183811',1,'INI']]],
   ['datatype',['dataType',['../db/d82/wglew_8h.html#a9798df3a48c4765477ecd49b3383c0f8',1,'wglew.h']]],
   ['denominator',['denominator',['../db/d82/wglew_8h.html#a39c8938d48dd25ea293b00ec2f0fb3cc',1,'wglew.h']]],
   ['depth',['depth',['../db/d82/wglew_8h.html#ada6e480a6a74d7ec54bf8f34626976bb',1,'wglew.h']]],
+  ['devicecounts',['DeviceCounts',['../d8/d5f/Factory_8cpp.html#ad118f894372d184ea5ccdc3390307703',1,'Factory.cpp']]],
+  ['devicetable',['DeviceTable',['../d8/d5f/Factory_8cpp.html#ad724465b1715731b76a8f7841826f2ce',1,'Factory.cpp']]],
+  ['dict_5ft',['dict_t',['../d9/d9a/arg__helpers_8h.html#a4a394422d1a6e956a5cbf8c02c9c99f9',1,'arg_helpers.h']]],
+  ['difference_5ftype',['difference_type',['../d1/d3a/structswig_1_1SwigPySequence__InputIterator.html#af5e5d3f2d1906ceaf05c2215ee388096',1,'swig::SwigPySequence_InputIterator::difference_type()'],['../d5/d64/structswig_1_1SwigPySequence__Cont.html#a016875541fce2f04f396da8057a190f9',1,'swig::SwigPySequence_Cont::difference_type()'],['../d1/d3a/structswig_1_1SwigPySequence__InputIterator.html#af5e5d3f2d1906ceaf05c2215ee388096',1,'swig::SwigPySequence_InputIterator::difference_type()'],['../d5/d64/structswig_1_1SwigPySequence__Cont.html#a016875541fce2f04f396da8057a190f9',1,'swig::SwigPySequence_Cont::difference_type()']]],
   ['divisor',['divisor',['../db/d82/wglew_8h.html#a3c52243718c17289294081550b5a758a',1,'wglew.h']]],
   ['dstlevel',['dstLevel',['../db/d82/wglew_8h.html#a5ddced50c53f700a1a4722d9871d2c1e',1,'wglew.h']]],
   ['dstname',['dstName',['../db/d82/wglew_8h.html#a6c7a086a4645803ec6623e4bfdff4bd9',1,'wglew.h']]],

@@ -1,0 +1,97 @@
+\subsection{Registry.\+cpp}
+\label{Registry_8cpp_source}\index{/home/erik/prefix/default/src/soapysdr/lib/\+Registry.\+cpp@{/home/erik/prefix/default/src/soapysdr/lib/\+Registry.\+cpp}}
+
+\begin{DoxyCode}
+00001 \textcolor{comment}{// Copyright (c) 2014-2016 Josh Blum}
+00002 \textcolor{comment}{// SPDX-License-Identifier: BSL-1.0}
+00003 
+00004 \textcolor{preprocessor}{#include <SoapySDR/Registry.hpp>}
+00005 
+00006 \textcolor{comment}{/***********************************************************************}
+00007 \textcolor{comment}{ * Function table holds all registration entries by name}
+00008 \textcolor{comment}{ **********************************************************************/}
+00009 \textcolor{keyword}{struct }FunctionsEntry
+00010 \{
+00011     std::string modulePath;
+00012     SoapySDR::FindFunction find;
+00013     SoapySDR::MakeFunction make;
+00014 \};
+00015 
+00016 \textcolor{keyword}{typedef} std::map<std::string, FunctionsEntry> FunctionTable;
+00017 
+00018 \textcolor{keyword}{static} FunctionTable &getFunctionTable(\textcolor{keywordtype}{void})
+00019 \{
+00020     \textcolor{keyword}{static} FunctionTable table;
+00021     \textcolor{keywordflow}{return} table;
+00022 \}
+00023 
+00024 \textcolor{comment}{/***********************************************************************}
+00025 \textcolor{comment}{ * Module loader shared data structures}
+00026 \textcolor{comment}{ **********************************************************************/}
+00027 std::string &getModuleLoading(\textcolor{keywordtype}{void});
+00028 
+00029 std::map<std::string, SoapySDR::Kwargs> &getLoaderResults(\textcolor{keywordtype}{void});
+00030 
+00031 \textcolor{comment}{/***********************************************************************}
+00032 \textcolor{comment}{ * Registry entry-point implementation}
+00033 \textcolor{comment}{ **********************************************************************/}
+00034 SoapySDR::Registry::Registry(\textcolor{keyword}{const} std::string &name, \textcolor{keyword}{const} FindFunction &find, \textcolor{keyword}{const} 
+      MakeFunction &make, \textcolor{keyword}{const} std::string &abi)
+00035 \{
+00036     \textcolor{comment}{//create an entry for the loader result}
+00037     std::string &errorMsg = getLoaderResults()[getModuleLoading()][name];
+00038 
+00039     \textcolor{comment}{//abi check}
+00040     \textcolor{keywordflow}{if} (abi != SOAPY_SDR_ABI_VERSION)
+00041     \{
+00042         errorMsg = name + \textcolor{stringliteral}{" failed ABI check: Library ABI="} 
+      SOAPY_SDR_ABI_VERSION \textcolor{stringliteral}{", Module ABI="}+abi;
+00043         \textcolor{keywordflow}{return};
+00044     \}
+00045 
+00046     \textcolor{comment}{//duplicate check}
+00047     \textcolor{keywordflow}{if} (getFunctionTable().count(name) != 0)
+00048     \{
+00049         errorMsg = \textcolor{stringliteral}{"duplicate entry for "} + name + \textcolor{stringliteral}{" ("}+getFunctionTable()[name].modulePath + \textcolor{stringliteral}{")"};
+00050         \textcolor{keywordflow}{return};
+00051     \}
+00052 
+00053     \textcolor{comment}{//register functions}
+00054     FunctionsEntry entry;
+00055     entry.modulePath = getModuleLoading();
+00056     entry.find = find;
+00057     entry.make = make;
+00058     getFunctionTable()[name] = entry;
+00059     \_name = name;
+00060 \}
+00061 
+00062 SoapySDR::Registry::~Registry(\textcolor{keywordtype}{void})
+00063 \{
+00064     \textcolor{comment}{//erase entry}
+00065     \textcolor{keywordflow}{if} (\_name.empty()) \textcolor{keywordflow}{return};
+00066     getFunctionTable().erase(\_name);
+00067 \}
+00068 
+00069 \textcolor{comment}{/***********************************************************************}
+00070 \textcolor{comment}{ * Registry access API}
+00071 \textcolor{comment}{ **********************************************************************/}
+00072 SoapySDR::FindFunctions SoapySDR::Registry::listFindFunctions(\textcolor{keywordtype}{void})
+00073 \{
+00074     FindFunctions functions;
+00075     \textcolor{keywordflow}{for} (\textcolor{keyword}{const} \textcolor{keyword}{auto} &it : getFunctionTable())
+00076     \{
+00077         functions[it.first] = it.second.find;
+00078     \}
+00079     \textcolor{keywordflow}{return} functions;
+00080 \}
+00081 
+00082 SoapySDR::MakeFunctions SoapySDR::Registry::listMakeFunctions(\textcolor{keywordtype}{void})
+00083 \{
+00084     MakeFunctions functions;
+00085     \textcolor{keywordflow}{for} (\textcolor{keyword}{const} \textcolor{keyword}{auto} &it : getFunctionTable())
+00086     \{
+00087         functions[it.first] = it.second.make;
+00088     \}
+00089     \textcolor{keywordflow}{return} functions;
+00090 \}
+\end{DoxyCode}

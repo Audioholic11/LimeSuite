@@ -1,0 +1,430 @@
+\subsection{kiss\+\_\+fft.\+c}
+\label{kiss__fft_8c_source}\index{/home/erik/prefix/default/src/limesuite-\/dev/external/kiss\+F\+F\+T/kiss\+\_\+fft.\+c@{/home/erik/prefix/default/src/limesuite-\/dev/external/kiss\+F\+F\+T/kiss\+\_\+fft.\+c}}
+
+\begin{DoxyCode}
+00001 \textcolor{comment}{/*}
+00002 \textcolor{comment}{Copyright (c) 2003-2010, Mark Borgerding}
+00003 \textcolor{comment}{}
+00004 \textcolor{comment}{All rights reserved.}
+00005 \textcolor{comment}{}
+00006 \textcolor{comment}{Redistribution and use in source and binary forms, with or without modification, are permitted provided
+       that the following conditions are met:}
+00007 \textcolor{comment}{}
+00008 \textcolor{comment}{    * Redistributions of source code must retain the above copyright notice, this list of conditions and
+       the following disclaimer.}
+00009 \textcolor{comment}{    * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
+       the following disclaimer in the documentation and/or other materials provided with the distribution.}
+00010 \textcolor{comment}{    * Neither the author nor the names of any contributors may be used to endorse or promote products
+       derived from this software without specific prior written permission.}
+00011 \textcolor{comment}{}
+00012 \textcolor{comment}{THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
+       WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
+       PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
+       INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT
+       OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED
+       AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+       OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.}
+00013 \textcolor{comment}{*/}
+00014 
+00015 
+00016 \textcolor{preprocessor}{#include "_kiss_fft_guts.h"}
+00017 \textcolor{comment}{/* The guts header contains all the multiplication and addition macros that are defined for}
+00018 \textcolor{comment}{ fixed or floating point complex numbers.  It also delares the kf\_ internal functions.}
+00019 \textcolor{comment}{ */}
+00020 
+00021 \textcolor{keyword}{static} \textcolor{keywordtype}{void} kf_bfly2(
+00022         kiss_fft_cpx * Fout,
+00023         \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} fstride,
+00024         \textcolor{keyword}{const} kiss_fft_cfg st,
+00025         \textcolor{keywordtype}{int} m
+00026         )
+00027 \{
+00028     kiss_fft_cpx * Fout2;
+00029     kiss_fft_cpx * tw1 = st->twiddles;
+00030     kiss_fft_cpx t;
+00031     Fout2 = Fout + m;
+00032     \textcolor{keywordflow}{do}\{
+00033         C_FIXDIV(*Fout,2); C_FIXDIV(*Fout2,2);
+00034 
+00035         C_MUL (t,  *Fout2 , *tw1);
+00036         tw1 += fstride;
+00037         C_SUB( *Fout2 ,  *Fout , t );
+00038         C_ADDTO( *Fout ,  t );
+00039         ++Fout2;
+00040         ++Fout;
+00041     \}\textcolor{keywordflow}{while} (--m);
+00042 \}
+00043 
+00044 \textcolor{keyword}{static} \textcolor{keywordtype}{void} kf_bfly4(
+00045         kiss_fft_cpx * Fout,
+00046         \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} fstride,
+00047         \textcolor{keyword}{const} kiss_fft_cfg st,
+00048         \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} m
+00049         )
+00050 \{
+00051     kiss_fft_cpx *tw1,*tw2,*tw3;
+00052     kiss_fft_cpx scratch[6];
+00053     \textcolor{keywordtype}{size\_t} k=m;
+00054     \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} m2=2*m;
+00055     \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} m3=3*m;
+00056 
+00057 
+00058     tw3 = tw2 = tw1 = st->twiddles;
+00059 
+00060     \textcolor{keywordflow}{do} \{
+00061         C_FIXDIV(*Fout,4); C_FIXDIV(Fout[m],4); C_FIXDIV(Fout[m2],4); C_FIXDIV(Fout[m3],4);
+00062 
+00063         C_MUL(scratch[0],Fout[m] , *tw1 );
+00064         C_MUL(scratch[1],Fout[m2] , *tw2 );
+00065         C_MUL(scratch[2],Fout[m3] , *tw3 );
+00066 
+00067         C_SUB( scratch[5] , *Fout, scratch[1] );
+00068         C_ADDTO(*Fout, scratch[1]);
+00069         C_ADD( scratch[3] , scratch[0] , scratch[2] );
+00070         C_SUB( scratch[4] , scratch[0] , scratch[2] );
+00071         C_SUB( Fout[m2], *Fout, scratch[3] );
+00072         tw1 += fstride;
+00073         tw2 += fstride*2;
+00074         tw3 += fstride*3;
+00075         C_ADDTO( *Fout , scratch[3] );
+00076 
+00077         \textcolor{keywordflow}{if}(st->inverse) \{
+00078             Fout[m].r = scratch[5].r - scratch[4].i;
+00079             Fout[m].i = scratch[5].i + scratch[4].r;
+00080             Fout[m3].r = scratch[5].r + scratch[4].i;
+00081             Fout[m3].i = scratch[5].i - scratch[4].r;
+00082         \}\textcolor{keywordflow}{else}\{
+00083             Fout[m].r = scratch[5].r + scratch[4].i;
+00084             Fout[m].i = scratch[5].i - scratch[4].r;
+00085             Fout[m3].r = scratch[5].r - scratch[4].i;
+00086             Fout[m3].i = scratch[5].i + scratch[4].r;
+00087         \}
+00088         ++Fout;
+00089     \}\textcolor{keywordflow}{while}(--k);
+00090 \}
+00091 
+00092 \textcolor{keyword}{static} \textcolor{keywordtype}{void} kf_bfly3(
+00093          kiss_fft_cpx * Fout,
+00094          \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} fstride,
+00095          \textcolor{keyword}{const} kiss_fft_cfg st,
+00096          \textcolor{keywordtype}{size\_t} m
+00097          )
+00098 \{
+00099      \textcolor{keywordtype}{size\_t} k=m;
+00100      \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} m2 = 2*m;
+00101      kiss_fft_cpx *tw1,*tw2;
+00102      kiss_fft_cpx scratch[5];
+00103      kiss_fft_cpx epi3;
+00104      epi3 = st->twiddles[fstride*m];
+00105 
+00106      tw1=tw2=st->twiddles;
+00107 
+00108      \textcolor{keywordflow}{do}\{
+00109          C_FIXDIV(*Fout,3); C_FIXDIV(Fout[m],3); C_FIXDIV(Fout[m2],3);
+00110 
+00111          C_MUL(scratch[1],Fout[m] , *tw1);
+00112          C_MUL(scratch[2],Fout[m2] , *tw2);
+00113 
+00114          C_ADD(scratch[3],scratch[1],scratch[2]);
+00115          C_SUB(scratch[0],scratch[1],scratch[2]);
+00116          tw1 += fstride;
+00117          tw2 += fstride*2;
+00118 
+00119          Fout[m].r = Fout->r - HALF_OF(scratch[3].r);
+00120          Fout[m].i = Fout->i - HALF_OF(scratch[3].i);
+00121 
+00122          C_MULBYSCALAR( scratch[0] , epi3.i );
+00123 
+00124          C_ADDTO(*Fout,scratch[3]);
+00125 
+00126          Fout[m2].r = Fout[m].r + scratch[0].i;
+00127          Fout[m2].i = Fout[m].i - scratch[0].r;
+00128 
+00129          Fout[m].r -= scratch[0].i;
+00130          Fout[m].i += scratch[0].r;
+00131 
+00132          ++Fout;
+00133      \}\textcolor{keywordflow}{while}(--k);
+00134 \}
+00135 
+00136 \textcolor{keyword}{static} \textcolor{keywordtype}{void} kf_bfly5(
+00137         kiss_fft_cpx * Fout,
+00138         \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} fstride,
+00139         \textcolor{keyword}{const} kiss_fft_cfg st,
+00140         \textcolor{keywordtype}{int} m
+00141         )
+00142 \{
+00143     kiss_fft_cpx *Fout0,*Fout1,*Fout2,*Fout3,*Fout4;
+00144     \textcolor{keywordtype}{int} u;
+00145     kiss_fft_cpx scratch[13];
+00146     kiss_fft_cpx * twiddles = st->twiddles;
+00147     kiss_fft_cpx *tw;
+00148     kiss_fft_cpx ya,yb;
+00149     ya = twiddles[fstride*m];
+00150     yb = twiddles[fstride*2*m];
+00151 
+00152     Fout0=Fout;
+00153     Fout1=Fout0+m;
+00154     Fout2=Fout0+2*m;
+00155     Fout3=Fout0+3*m;
+00156     Fout4=Fout0+4*m;
+00157 
+00158     tw=st->twiddles;
+00159     \textcolor{keywordflow}{for} ( u=0; u<m; ++u ) \{
+00160         C_FIXDIV( *Fout0,5); C_FIXDIV( *Fout1,5); C_FIXDIV( *Fout2,5); C_FIXDIV( *Fout3,5); 
+      C_FIXDIV( *Fout4,5);
+00161         scratch[0] = *Fout0;
+00162 
+00163         C_MUL(scratch[1] ,*Fout1, tw[u*fstride]);
+00164         C_MUL(scratch[2] ,*Fout2, tw[2*u*fstride]);
+00165         C_MUL(scratch[3] ,*Fout3, tw[3*u*fstride]);
+00166         C_MUL(scratch[4] ,*Fout4, tw[4*u*fstride]);
+00167 
+00168         C_ADD( scratch[7],scratch[1],scratch[4]);
+00169         C_SUB( scratch[10],scratch[1],scratch[4]);
+00170         C_ADD( scratch[8],scratch[2],scratch[3]);
+00171         C_SUB( scratch[9],scratch[2],scratch[3]);
+00172 
+00173         Fout0->r += scratch[7].r + scratch[8].r;
+00174         Fout0->i += scratch[7].i + scratch[8].i;
+00175 
+00176         scratch[5].r = scratch[0].r + S_MUL(scratch[7].r,ya.r) + S_MUL(scratch[8].r,yb.
+      r);
+00177         scratch[5].i = scratch[0].i + S_MUL(scratch[7].i,ya.r) + S_MUL(scratch[8].i,yb.
+      r);
+00178 
+00179         scratch[6].r =  S_MUL(scratch[10].i,ya.i) + S_MUL(scratch[9].i,yb.i);
+00180         scratch[6].i = -S_MUL(scratch[10].r,ya.i) - S_MUL(scratch[9].r,yb.i);
+00181 
+00182         C_SUB(*Fout1,scratch[5],scratch[6]);
+00183         C_ADD(*Fout4,scratch[5],scratch[6]);
+00184 
+00185         scratch[11].r = scratch[0].r + S_MUL(scratch[7].r,yb.r) + S_MUL(scratch[8].r,ya.
+      r);
+00186         scratch[11].i = scratch[0].i + S_MUL(scratch[7].i,yb.r) + S_MUL(scratch[8].i,ya.
+      r);
+00187         scratch[12].r = - S_MUL(scratch[10].i,yb.i) + S_MUL(scratch[9].i,ya.i);
+00188         scratch[12].i = S_MUL(scratch[10].r,yb.i) - S_MUL(scratch[9].r,ya.i);
+00189 
+00190         C_ADD(*Fout2,scratch[11],scratch[12]);
+00191         C_SUB(*Fout3,scratch[11],scratch[12]);
+00192 
+00193         ++Fout0;++Fout1;++Fout2;++Fout3;++Fout4;
+00194     \}
+00195 \}
+00196 
+00197 \textcolor{comment}{/* perform the butterfly for one stage of a mixed radix FFT */}
+00198 \textcolor{keyword}{static} \textcolor{keywordtype}{void} kf_bfly_generic(
+00199         kiss_fft_cpx * Fout,
+00200         \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} fstride,
+00201         \textcolor{keyword}{const} kiss_fft_cfg st,
+00202         \textcolor{keywordtype}{int} m,
+00203         \textcolor{keywordtype}{int} p
+00204         )
+00205 \{
+00206     \textcolor{keywordtype}{int} u,k,q1,q;
+00207     kiss_fft_cpx * twiddles = st->twiddles;
+00208     kiss_fft_cpx t;
+00209     \textcolor{keywordtype}{int} Norig = st->nfft;
+00210 
+00211     kiss_fft_cpx * scratch = (kiss_fft_cpx*)KISS_FFT_TMP_ALLOC(\textcolor{keyword}{sizeof}(
+      kiss_fft_cpx)*p);
+00212 
+00213     \textcolor{keywordflow}{for} ( u=0; u<m; ++u ) \{
+00214         k=u;
+00215         \textcolor{keywordflow}{for} ( q1=0 ; q1<p ; ++q1 ) \{
+00216             scratch[q1] = Fout[ k  ];
+00217             C_FIXDIV(scratch[q1],p);
+00218             k += m;
+00219         \}
+00220 
+00221         k=u;
+00222         \textcolor{keywordflow}{for} ( q1=0 ; q1<p ; ++q1 ) \{
+00223             \textcolor{keywordtype}{int} twidx=0;
+00224             Fout[ k ] = scratch[0];
+00225             \textcolor{keywordflow}{for} (q=1;q<p;++q ) \{
+00226                 twidx += fstride * k;
+00227                 \textcolor{keywordflow}{if} (twidx>=Norig) twidx-=Norig;
+00228                 C_MUL(t,scratch[q] , twiddles[twidx] );
+00229                 C_ADDTO( Fout[ k ] ,t);
+00230             \}
+00231             k += m;
+00232         \}
+00233     \}
+00234     KISS_FFT_TMP_FREE(scratch);
+00235 \}
+00236 
+00237 \textcolor{keyword}{static}
+00238 \textcolor{keywordtype}{void} kf_work(
+00239         kiss_fft_cpx * Fout,
+00240         \textcolor{keyword}{const} kiss_fft_cpx * f,
+00241         \textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} fstride,
+00242         \textcolor{keywordtype}{int} in\_stride,
+00243         \textcolor{keywordtype}{int} * factors,
+00244         \textcolor{keyword}{const} kiss_fft_cfg st
+00245         )
+00246 \{
+00247     kiss_fft_cpx * Fout\_beg=Fout;
+00248     \textcolor{keyword}{const} \textcolor{keywordtype}{int} p=*factors++; \textcolor{comment}{/* the radix  */}
+00249     \textcolor{keyword}{const} \textcolor{keywordtype}{int} m=*factors++; \textcolor{comment}{/* stage's fft length/p */}
+00250     \textcolor{keyword}{const} kiss_fft_cpx * Fout\_end = Fout + p*m;
+00251 
+00252 \textcolor{preprocessor}{#ifdef \_OPENMP}
+00253     \textcolor{comment}{// use openmp extensions at the }
+00254     \textcolor{comment}{// top-level (not recursive)}
+00255     \textcolor{keywordflow}{if} (fstride==1 && p<=5)
+00256     \{
+00257         \textcolor{keywordtype}{int} k;
+00258 
+00259         \textcolor{comment}{// execute the p different work units in different threads}
+00260 \textcolor{preprocessor}{#       pragma omp parallel for}
+00261         \textcolor{keywordflow}{for} (k=0;k<p;++k) 
+00262             kf_work( Fout +k*m, f+ fstride*in\_stride*k,fstride*p,in\_stride,factors,st);
+00263         \textcolor{comment}{// all threads have joined by this point}
+00264 
+00265         \textcolor{keywordflow}{switch} (p) \{
+00266             \textcolor{keywordflow}{case} 2: kf_bfly2(Fout,fstride,st,m); \textcolor{keywordflow}{break};
+00267             \textcolor{keywordflow}{case} 3: kf_bfly3(Fout,fstride,st,m); \textcolor{keywordflow}{break}; 
+00268             \textcolor{keywordflow}{case} 4: kf_bfly4(Fout,fstride,st,m); \textcolor{keywordflow}{break};
+00269             \textcolor{keywordflow}{case} 5: kf_bfly5(Fout,fstride,st,m); \textcolor{keywordflow}{break}; 
+00270             \textcolor{keywordflow}{default}: kf_bfly_generic(Fout,fstride,st,m,p); \textcolor{keywordflow}{break};
+00271         \}
+00272         \textcolor{keywordflow}{return};
+00273     \}
+00274 \textcolor{preprocessor}{#endif}
+00275 
+00276     \textcolor{keywordflow}{if} (m==1) \{
+00277         \textcolor{keywordflow}{do}\{
+00278             *Fout = *f;
+00279             f += fstride*in\_stride;
+00280         \}\textcolor{keywordflow}{while}(++Fout != Fout\_end );
+00281     \}\textcolor{keywordflow}{else}\{
+00282         \textcolor{keywordflow}{do}\{
+00283             \textcolor{comment}{// recursive call:}
+00284             \textcolor{comment}{// DFT of size m*p performed by doing}
+00285             \textcolor{comment}{// p instances of smaller DFTs of size m, }
+00286             \textcolor{comment}{// each one takes a decimated version of the input}
+00287             kf_work( Fout , f, fstride*p, in\_stride, factors,st);
+00288             f += fstride*in\_stride;
+00289         \}\textcolor{keywordflow}{while}( (Fout += m) != Fout\_end );
+00290     \}
+00291 
+00292     Fout=Fout\_beg;
+00293 
+00294     \textcolor{comment}{// recombine the p smaller DFTs }
+00295     \textcolor{keywordflow}{switch} (p) \{
+00296         \textcolor{keywordflow}{case} 2: kf_bfly2(Fout,fstride,st,m); \textcolor{keywordflow}{break};
+00297         \textcolor{keywordflow}{case} 3: kf_bfly3(Fout,fstride,st,m); \textcolor{keywordflow}{break}; 
+00298         \textcolor{keywordflow}{case} 4: kf_bfly4(Fout,fstride,st,m); \textcolor{keywordflow}{break};
+00299         \textcolor{keywordflow}{case} 5: kf_bfly5(Fout,fstride,st,m); \textcolor{keywordflow}{break}; 
+00300         \textcolor{keywordflow}{default}: kf_bfly_generic(Fout,fstride,st,m,p); \textcolor{keywordflow}{break};
+00301     \}
+00302 \}
+00303 
+00304 \textcolor{comment}{/*  facbuf is populated by p1,m1,p2,m2, ...}
+00305 \textcolor{comment}{    where }
+00306 \textcolor{comment}{    p[i] * m[i] = m[i-1]}
+00307 \textcolor{comment}{    m0 = n                  */}
+00308 \textcolor{keyword}{static} 
+00309 \textcolor{keywordtype}{void} kf_factor(\textcolor{keywordtype}{int} n,\textcolor{keywordtype}{int} * facbuf)
+00310 \{
+00311     \textcolor{keywordtype}{int} p=4;
+00312     \textcolor{keywordtype}{double} floor\_sqrt;
+00313     floor\_sqrt = floor( sqrt((\textcolor{keywordtype}{double})n) );
+00314 
+00315     \textcolor{comment}{/*factor out powers of 4, powers of 2, then any remaining primes */}
+00316     \textcolor{keywordflow}{do} \{
+00317         \textcolor{keywordflow}{while} (n % p) \{
+00318             \textcolor{keywordflow}{switch} (p) \{
+00319                 \textcolor{keywordflow}{case} 4: p = 2; \textcolor{keywordflow}{break};
+00320                 \textcolor{keywordflow}{case} 2: p = 3; \textcolor{keywordflow}{break};
+00321                 \textcolor{keywordflow}{default}: p += 2; \textcolor{keywordflow}{break};
+00322             \}
+00323             \textcolor{keywordflow}{if} (p > floor\_sqrt)
+00324                 p = n;          \textcolor{comment}{/* no more factors, skip to end */}
+00325         \}
+00326         n /= p;
+00327         *facbuf++ = p;
+00328         *facbuf++ = n;
+00329     \} \textcolor{keywordflow}{while} (n > 1);
+00330 \}
+00331 
+00332 \textcolor{comment}{/*}
+00333 \textcolor{comment}{ *}
+00334 \textcolor{comment}{ * User-callable function to allocate all necessary storage space for the fft.}
+00335 \textcolor{comment}{ *}
+00336 \textcolor{comment}{ * The return value is a contiguous block of memory, allocated with malloc.  As such,}
+00337 \textcolor{comment}{ * It can be freed with free(), rather than a kiss\_fft-specific function.}
+00338 \textcolor{comment}{ * */}
+00339 kiss_fft_cfg kiss_fft_alloc(\textcolor{keywordtype}{int} nfft,\textcolor{keywordtype}{int} inverse\_fft,\textcolor{keywordtype}{void} * mem,\textcolor{keywordtype}{size\_t} * lenmem )
+00340 \{
+00341     kiss_fft_cfg st=NULL;
+00342     \textcolor{keywordtype}{size\_t} memneeded = \textcolor{keyword}{sizeof}(\textcolor{keyword}{struct }kiss_fft_state)
+00343         + sizeof(kiss\_fft\_cpx)*(nfft-1); \textcolor{comment}{/* twiddle factors*/}
+00344 
+00345     \textcolor{keywordflow}{if} ( lenmem==NULL ) \{
+00346         st = ( kiss_fft_cfg)KISS_FFT_MALLOC( memneeded );
+00347     \}\textcolor{keywordflow}{else}\{
+00348         \textcolor{keywordflow}{if} (mem != NULL && *lenmem >= memneeded)
+00349             st = (kiss_fft_cfg)mem;
+00350         *lenmem = memneeded;
+00351     \}
+00352     \textcolor{keywordflow}{if} (st) \{
+00353         \textcolor{keywordtype}{int} i;
+00354         st->nfft=nfft;
+00355         st->inverse = inverse\_fft;
+00356 
+00357         \textcolor{keywordflow}{for} (i=0;i<nfft;++i) \{
+00358             \textcolor{keyword}{const} \textcolor{keywordtype}{double} pi=3.141592653589793238462643383279502884197169399375105820974944;
+00359             \textcolor{keywordtype}{double} phase = -2*pi*i / nfft;
+00360             \textcolor{keywordflow}{if} (st->inverse)
+00361                 phase *= -1;
+00362             kf_cexp(st->twiddles+i, phase );
+00363         \}
+00364 
+00365         kf_factor(nfft,st->factors);
+00366     \}
+00367     \textcolor{keywordflow}{return} st;
+00368 \}
+00369 
+00370 
+00371 \textcolor{keywordtype}{void} kiss_fft_stride(kiss_fft_cfg st,\textcolor{keyword}{const} kiss_fft_cpx *fin,kiss_fft_cpx *fout,\textcolor{keywordtype}{int} in\_stride)
+00372 \{
+00373     \textcolor{keywordflow}{if} (fin == fout) \{
+00374         \textcolor{comment}{//NOTE: this is not really an in-place FFT algorithm.}
+00375         \textcolor{comment}{//It just performs an out-of-place FFT into a temp buffer}
+00376         kiss_fft_cpx * tmpbuf = (kiss_fft_cpx*)KISS_FFT_TMP_ALLOC( \textcolor{keyword}{sizeof}(
+      kiss_fft_cpx)*st->nfft);
+00377         kf_work(tmpbuf,fin,1,in\_stride, st->factors,st);
+00378         memcpy(fout,tmpbuf,\textcolor{keyword}{sizeof}(kiss_fft_cpx)*st->nfft);
+00379         KISS_FFT_TMP_FREE(tmpbuf);
+00380     \}\textcolor{keywordflow}{else}\{
+00381         kf_work( fout, fin, 1,in\_stride, st->factors,st );
+00382     \}
+00383 \}
+00384 
+00385 \textcolor{keywordtype}{void} kiss_fft(kiss_fft_cfg cfg,\textcolor{keyword}{const} kiss_fft_cpx *fin,kiss_fft_cpx *fout)
+00386 \{
+00387     kiss_fft_stride(cfg,fin,fout,1);
+00388 \}
+00389 
+00390 
+00391 \textcolor{keywordtype}{void} kiss_fft_cleanup(\textcolor{keywordtype}{void})
+00392 \{
+00393     \textcolor{comment}{// nothing needed any more}
+00394 \}
+00395 
+00396 \textcolor{keywordtype}{int} kiss_fft_next_fast_size(\textcolor{keywordtype}{int} n)
+00397 \{
+00398     \textcolor{keywordflow}{while}(1) \{
+00399         \textcolor{keywordtype}{int} m=n;
+00400         \textcolor{keywordflow}{while} ( (m%2) == 0 ) m/=2;
+00401         \textcolor{keywordflow}{while} ( (m%3) == 0 ) m/=3;
+00402         \textcolor{keywordflow}{while} ( (m%5) == 0 ) m/=5;
+00403         \textcolor{keywordflow}{if} (m<=1)
+00404             \textcolor{keywordflow}{break}; \textcolor{comment}{/* n is completely factorable by twos, threes, and fives */}
+00405         n++;
+00406     \}
+00407     \textcolor{keywordflow}{return} n;
+00408 \}
+\end{DoxyCode}

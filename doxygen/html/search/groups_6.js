@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['sample_20streaming_20functions',['Sample Streaming functions',['../d1/dd8/group__FN__STREAM.html',1,'']]]
+  ['message_20logging_20level',['Message logging level',['../d2/d60/group__LMS__LOG__LEVEL.html',1,'']]]
 ];

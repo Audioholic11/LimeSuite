@@ -552,5 +552,6 @@ var searchData=
   ['id_5fver',['ID_VER',['../db/d70/classpnlLimeLightPAD__view.html#a7f85ba04e5372cffc9e90e1fe1c03e61aeae8ddb4ff501e4f80c54375ec979f5d',1,'pnlLimeLightPAD_view']]],
   ['id_5fvgcas_5ftxpad_5ftrf',['ID_VGCAS_TXPAD_TRF',['../d3/db8/classpnlTRF__view.html#a18fc0fc75d989d59b52b7e26fe5a9a5aa5255ba67b99175ad66a3bb6adbc3cba9',1,'pnlTRF_view']]],
   ['idmenuabout',['idMenuAbout',['../d7/d5c/classAppFrame__view.html#af7b1450746c224c317904eb5be0cd2c1a364ead193b501738a871bcd1cd60779d',1,'AppFrame_view']]],
-  ['idmenuquit',['idMenuQuit',['../d7/d5c/classAppFrame__view.html#af7b1450746c224c317904eb5be0cd2c1a8ddb60855701e3e0c18e04dcb0174471',1,'AppFrame_view']]]
+  ['idmenuquit',['idMenuQuit',['../d7/d5c/classAppFrame__view.html#af7b1450746c224c317904eb5be0cd2c1a8ddb60855701e3e0c18e04dcb0174471',1,'AppFrame_view']]],
+  ['int',['INT',['../d9/dee/classSoapySDR_1_1ArgInfo.html#acf2322d6142ab0ae1f137730b6b54aedab5f71f7cee563b851eb20adcfb86b63c',1,'SoapySDR::ArgInfo']]]
 ];

@@ -1,0 +1,447 @@
+\subsection{gr\+:\+:radar\+:\+:gpio\+\_\+source\+\_\+s\+\_\+impl Class Reference}
+\label{classgr_1_1radar_1_1gpio__source__s__impl}\index{gr\+::radar\+::gpio\+\_\+source\+\_\+s\+\_\+impl@{gr\+::radar\+::gpio\+\_\+source\+\_\+s\+\_\+impl}}
+
+
+{\ttfamily \#include $<$gpio\+\_\+source\+\_\+s\+\_\+impl.\+h$>$}
+
+
+
+Inheritance diagram for gr\+:\+:radar\+:\+:gpio\+\_\+source\+\_\+s\+\_\+impl\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=204pt]{db/dc9/classgr_1_1radar_1_1gpio__source__s__impl__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for gr\+:\+:radar\+:\+:gpio\+\_\+source\+\_\+s\+\_\+impl\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{d5/dc7/classgr_1_1radar_1_1gpio__source__s__impl__coll__graph}
+\end{center}
+\end{figure}
+\subsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+{\bf gpio\+\_\+source\+\_\+s\+\_\+impl} ({\bf std\+::string} device\+\_\+args, {\bf int} pins, {\bf int} sample\+\_\+rate)
+\item 
+{\bf $\sim$gpio\+\_\+source\+\_\+s\+\_\+impl} ()
+\item 
+{\bf void} {\bf read\+G\+P\+IO} ()
+\item 
+{\bf int} {\bf work} ({\bf int} noutput\+\_\+items, gr\+\_\+vector\+\_\+const\+\_\+void\+\_\+star \&input\+\_\+items, gr\+\_\+vector\+\_\+void\+\_\+star \&output\+\_\+items)
+\end{DoxyCompactItemize}
+\subsubsection*{Private Attributes}
+\begin{DoxyCompactItemize}
+\item 
+{\bf std\+::string} {\bf d\+\_\+device\+\_\+args}
+\item 
+{\bf int} {\bf d\+\_\+pins}
+\item 
+{\bf int} {\bf d\+\_\+samp\+\_\+rate}
+\item 
+{\bf Soapy\+S\+D\+R\+::\+Kwargs} {\bf d\+\_\+kw}
+\item 
+{\bf Soapy\+S\+D\+R\+::\+Device} $\ast$ {\bf d\+\_\+soapysdr}
+\item 
+{\bf std\+::vector}$<$ {\bf std\+::string} $>$ {\bf d\+\_\+list\+Reg\+Interfaces}
+\item 
+{\bf std\+::vector}$<$ {\bf std\+::string} $>$ {\bf d\+\_\+\+G\+P\+I\+O\+Banks}
+\item 
+unsigned {\bf d\+\_\+register}
+\item 
+int16\+\_\+t {\bf d\+\_\+value}
+\item 
+{\bf std\+::vector}$<$ int16\+\_\+t $>$ {\bf Chirp\+\_\+\+Sync}
+\item 
+volatile int16\+\_\+t {\bf d\+\_\+read\+Value}
+\item 
+long long {\bf d\+\_\+delta\+Time\+\_\+\+Total}
+\item 
+float {\bf d\+\_\+delta\+Time\+\_\+\+Average} = 0
+\item 
+float {\bf d\+\_\+delta\+Time\+\_\+\+Average\+\_\+\+Running} = 0
+\item 
+{\bf int} {\bf d\+\_\+num\+\_\+works} = 1
+\item 
+bool {\bf first\+Packet}
+\item 
+std\+::chrono\+::steady\+\_\+clock\+::time\+\_\+point {\bf t1}
+\item 
+std\+::chrono\+::steady\+\_\+clock\+::time\+\_\+point {\bf t2}
+\item 
+{\bf int} {\bf d\+\_\+noutput\+\_\+items}
+\item 
+gr\+::thread\+::thread {\bf d\+\_\+thread\+\_\+read\+G\+P\+IO}
+\end{DoxyCompactItemize}
+\subsubsection*{Additional Inherited Members}
+
+
+\subsubsection{Detailed Description}
+
+
+Definition at line {\bf 42} of file {\bf gpio\+\_\+source\+\_\+s\+\_\+impl.\+h}.
+
+
+
+\subsubsection{Constructor \& Destructor Documentation}
+\index{gr\+::radar\+::gpio\+\_\+source\+\_\+s\+\_\+impl@{gr\+::radar\+::gpio\+\_\+source\+\_\+s\+\_\+impl}!gpio\+\_\+source\+\_\+s\+\_\+impl@{gpio\+\_\+source\+\_\+s\+\_\+impl}}
+\index{gpio\+\_\+source\+\_\+s\+\_\+impl@{gpio\+\_\+source\+\_\+s\+\_\+impl}!gr\+::radar\+::gpio\+\_\+source\+\_\+s\+\_\+impl@{gr\+::radar\+::gpio\+\_\+source\+\_\+s\+\_\+impl}}
+\paragraph[{gpio\+\_\+source\+\_\+s\+\_\+impl(std\+::string device\+\_\+args, int pins, int sample\+\_\+rate)}]{\setlength{\rightskip}{0pt plus 5cm}gr\+::radar\+::gpio\+\_\+source\+\_\+s\+\_\+impl\+::gpio\+\_\+source\+\_\+s\+\_\+impl (
+\begin{DoxyParamCaption}
+\item[{{\bf std\+::string}}]{device\+\_\+args, }
+\item[{{\bf int}}]{pins, }
+\item[{{\bf int}}]{sample\+\_\+rate}
+\end{DoxyParamCaption}
+)}\label{classgr_1_1radar_1_1gpio__source__s__impl_a9ee4f94a2c95ed1d1c7ce8a19d9f788c}
+
+
+Definition at line {\bf 41} of file {\bf gpio\+\_\+source\+\_\+s\+\_\+impl.\+cc}.
+
+
+
+References {\bf d\+\_\+delta\+Time\+\_\+\+Average}, {\bf d\+\_\+delta\+Time\+\_\+\+Average\+\_\+\+Running}, {\bf d\+\_\+device\+\_\+args}, {\bf d\+\_\+\+G\+P\+I\+O\+Banks}, {\bf d\+\_\+kw}, {\bf d\+\_\+list\+Reg\+Interfaces}, {\bf d\+\_\+num\+\_\+works}, {\bf d\+\_\+register}, {\bf d\+\_\+soapysdr}, {\bf d\+\_\+value}, {\bf first\+Packet}, {\bf i}, {\bf Soapy\+S\+D\+R\+::\+Kwargs\+From\+String}, {\bf Soapy\+S\+D\+R.\+Device\+::list\+G\+P\+I\+O\+Banks()}, {\bf Soapy\+S\+D\+R.\+Device\+::list\+Register\+Interfaces()}, {\bf Soapy\+S\+D\+R.\+Device\+::make}, {\bf Soapy\+S\+D\+R.\+Device\+::read\+Register()}, {\bf t1}, {\bf t2}, {\bf Soapy\+S\+D\+R.\+Device\+::write\+G\+P\+I\+O()}, {\bf Soapy\+S\+D\+R.\+Device\+::write\+G\+P\+I\+O\+Dir()}, and {\bf Soapy\+S\+D\+R.\+Device\+::write\+Register()}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{da/d97/classgr_1_1radar_1_1gpio__source__s__impl_a9ee4f94a2c95ed1d1c7ce8a19d9f788c_cgraph}
+\end{center}
+\end{figure}
+
+
+\index{gr\+::radar\+::gpio\+\_\+source\+\_\+s\+\_\+impl@{gr\+::radar\+::gpio\+\_\+source\+\_\+s\+\_\+impl}!````~gpio\+\_\+source\+\_\+s\+\_\+impl@{$\sim$gpio\+\_\+source\+\_\+s\+\_\+impl}}
+\index{````~gpio\+\_\+source\+\_\+s\+\_\+impl@{$\sim$gpio\+\_\+source\+\_\+s\+\_\+impl}!gr\+::radar\+::gpio\+\_\+source\+\_\+s\+\_\+impl@{gr\+::radar\+::gpio\+\_\+source\+\_\+s\+\_\+impl}}
+\paragraph[{$\sim$gpio\+\_\+source\+\_\+s\+\_\+impl()}]{\setlength{\rightskip}{0pt plus 5cm}gr\+::radar\+::gpio\+\_\+source\+\_\+s\+\_\+impl\+::$\sim$gpio\+\_\+source\+\_\+s\+\_\+impl (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}\label{classgr_1_1radar_1_1gpio__source__s__impl_a589bcc636c4bf2c13cf6785c0455a3c2}
+
+
+Definition at line {\bf 106} of file {\bf gpio\+\_\+source\+\_\+s\+\_\+impl.\+cc}.
+
+
+
+References {\bf d\+\_\+list\+Reg\+Interfaces}, {\bf d\+\_\+soapysdr}, and {\bf Soapy\+S\+D\+R.\+Device\+::write\+Register()}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{da/d97/classgr_1_1radar_1_1gpio__source__s__impl_a589bcc636c4bf2c13cf6785c0455a3c2_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+\subsubsection{Member Function Documentation}
+\index{gr\+::radar\+::gpio\+\_\+source\+\_\+s\+\_\+impl@{gr\+::radar\+::gpio\+\_\+source\+\_\+s\+\_\+impl}!read\+G\+P\+IO@{read\+G\+P\+IO}}
+\index{read\+G\+P\+IO@{read\+G\+P\+IO}!gr\+::radar\+::gpio\+\_\+source\+\_\+s\+\_\+impl@{gr\+::radar\+::gpio\+\_\+source\+\_\+s\+\_\+impl}}
+\paragraph[{read\+G\+P\+I\+O()}]{\setlength{\rightskip}{0pt plus 5cm}{\bf void} gr\+::radar\+::gpio\+\_\+source\+\_\+s\+\_\+impl\+::read\+G\+P\+IO (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}\label{classgr_1_1radar_1_1gpio__source__s__impl_a90319a6ec659f256bca43c557d43cd4d}
+
+
+Definition at line {\bf 112} of file {\bf gpio\+\_\+source\+\_\+s\+\_\+impl.\+cc}.
+
+
+
+References {\bf Chirp\+\_\+\+Sync}, {\bf d\+\_\+delta\+Time\+\_\+\+Average}, {\bf d\+\_\+delta\+Time\+\_\+\+Total}, {\bf d\+\_\+\+G\+P\+I\+O\+Banks}, {\bf d\+\_\+noutput\+\_\+items}, {\bf d\+\_\+read\+Value}, {\bf d\+\_\+samp\+\_\+rate}, {\bf d\+\_\+soapysdr}, {\bf first\+Packet}, {\bf i}, {\bf Soapy\+S\+D\+R.\+Device\+::read\+G\+P\+I\+O()}, {\bf t1}, and {\bf t2}.
+
+
+
+Referenced by {\bf work()}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{da/d97/classgr_1_1radar_1_1gpio__source__s__impl_a90319a6ec659f256bca43c557d43cd4d_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=338pt]{da/d97/classgr_1_1radar_1_1gpio__source__s__impl_a90319a6ec659f256bca43c557d43cd4d_icgraph}
+\end{center}
+\end{figure}
+
+
+\index{gr\+::radar\+::gpio\+\_\+source\+\_\+s\+\_\+impl@{gr\+::radar\+::gpio\+\_\+source\+\_\+s\+\_\+impl}!work@{work}}
+\index{work@{work}!gr\+::radar\+::gpio\+\_\+source\+\_\+s\+\_\+impl@{gr\+::radar\+::gpio\+\_\+source\+\_\+s\+\_\+impl}}
+\paragraph[{work(int noutput\+\_\+items, gr\+\_\+vector\+\_\+const\+\_\+void\+\_\+star \&input\+\_\+items, gr\+\_\+vector\+\_\+void\+\_\+star \&output\+\_\+items)}]{\setlength{\rightskip}{0pt plus 5cm}{\bf int} gr\+::radar\+::gpio\+\_\+source\+\_\+s\+\_\+impl\+::work (
+\begin{DoxyParamCaption}
+\item[{{\bf int}}]{noutput\+\_\+items, }
+\item[{gr\+\_\+vector\+\_\+const\+\_\+void\+\_\+star \&}]{input\+\_\+items, }
+\item[{gr\+\_\+vector\+\_\+void\+\_\+star \&}]{output\+\_\+items}
+\end{DoxyParamCaption}
+)}\label{classgr_1_1radar_1_1gpio__source__s__impl_ac5b36b540ac5aec53df8fac626051c7a}
+
+
+Definition at line {\bf 167} of file {\bf gpio\+\_\+source\+\_\+s\+\_\+impl.\+cc}.
+
+
+
+References {\bf Chirp\+\_\+\+Sync}, {\bf d\+\_\+delta\+Time\+\_\+\+Average}, {\bf d\+\_\+delta\+Time\+\_\+\+Average\+\_\+\+Running}, {\bf d\+\_\+noutput\+\_\+items}, {\bf d\+\_\+num\+\_\+works}, {\bf d\+\_\+thread\+\_\+read\+G\+P\+IO}, and {\bf read\+G\+P\+I\+O()}.
+
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{da/d97/classgr_1_1radar_1_1gpio__source__s__impl_ac5b36b540ac5aec53df8fac626051c7a_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+\subsubsection{Member Data Documentation}
+\index{gr\+::radar\+::gpio\+\_\+source\+\_\+s\+\_\+impl@{gr\+::radar\+::gpio\+\_\+source\+\_\+s\+\_\+impl}!Chirp\+\_\+\+Sync@{Chirp\+\_\+\+Sync}}
+\index{Chirp\+\_\+\+Sync@{Chirp\+\_\+\+Sync}!gr\+::radar\+::gpio\+\_\+source\+\_\+s\+\_\+impl@{gr\+::radar\+::gpio\+\_\+source\+\_\+s\+\_\+impl}}
+\paragraph[{Chirp\+\_\+\+Sync}]{\setlength{\rightskip}{0pt plus 5cm}{\bf std\+::vector}$<$int16\+\_\+t$>$ gr\+::radar\+::gpio\+\_\+source\+\_\+s\+\_\+impl\+::\+Chirp\+\_\+\+Sync\hspace{0.3cm}{\ttfamily [private]}}\label{classgr_1_1radar_1_1gpio__source__s__impl_a13abd157c1281b5a69a52db410088627}
+
+
+Definition at line {\bf 58} of file {\bf gpio\+\_\+source\+\_\+s\+\_\+impl.\+h}.
+
+
+
+Referenced by {\bf read\+G\+P\+I\+O()}, and {\bf work()}.
+
+\index{gr\+::radar\+::gpio\+\_\+source\+\_\+s\+\_\+impl@{gr\+::radar\+::gpio\+\_\+source\+\_\+s\+\_\+impl}!d\+\_\+delta\+Time\+\_\+\+Average@{d\+\_\+delta\+Time\+\_\+\+Average}}
+\index{d\+\_\+delta\+Time\+\_\+\+Average@{d\+\_\+delta\+Time\+\_\+\+Average}!gr\+::radar\+::gpio\+\_\+source\+\_\+s\+\_\+impl@{gr\+::radar\+::gpio\+\_\+source\+\_\+s\+\_\+impl}}
+\paragraph[{d\+\_\+delta\+Time\+\_\+\+Average}]{\setlength{\rightskip}{0pt plus 5cm}float gr\+::radar\+::gpio\+\_\+source\+\_\+s\+\_\+impl\+::d\+\_\+delta\+Time\+\_\+\+Average = 0\hspace{0.3cm}{\ttfamily [private]}}\label{classgr_1_1radar_1_1gpio__source__s__impl_ad49f4b919fe86c68bc3b04f329c6d37d}
+
+
+Definition at line {\bf 62} of file {\bf gpio\+\_\+source\+\_\+s\+\_\+impl.\+h}.
+
+
+
+Referenced by {\bf gpio\+\_\+source\+\_\+s\+\_\+impl()}, {\bf read\+G\+P\+I\+O()}, and {\bf work()}.
+
+\index{gr\+::radar\+::gpio\+\_\+source\+\_\+s\+\_\+impl@{gr\+::radar\+::gpio\+\_\+source\+\_\+s\+\_\+impl}!d\+\_\+delta\+Time\+\_\+\+Average\+\_\+\+Running@{d\+\_\+delta\+Time\+\_\+\+Average\+\_\+\+Running}}
+\index{d\+\_\+delta\+Time\+\_\+\+Average\+\_\+\+Running@{d\+\_\+delta\+Time\+\_\+\+Average\+\_\+\+Running}!gr\+::radar\+::gpio\+\_\+source\+\_\+s\+\_\+impl@{gr\+::radar\+::gpio\+\_\+source\+\_\+s\+\_\+impl}}
+\paragraph[{d\+\_\+delta\+Time\+\_\+\+Average\+\_\+\+Running}]{\setlength{\rightskip}{0pt plus 5cm}float gr\+::radar\+::gpio\+\_\+source\+\_\+s\+\_\+impl\+::d\+\_\+delta\+Time\+\_\+\+Average\+\_\+\+Running = 0\hspace{0.3cm}{\ttfamily [private]}}\label{classgr_1_1radar_1_1gpio__source__s__impl_a68856e4cd13e8334831580695df418ee}
+
+
+Definition at line {\bf 63} of file {\bf gpio\+\_\+source\+\_\+s\+\_\+impl.\+h}.
+
+
+
+Referenced by {\bf gpio\+\_\+source\+\_\+s\+\_\+impl()}, and {\bf work()}.
+
+\index{gr\+::radar\+::gpio\+\_\+source\+\_\+s\+\_\+impl@{gr\+::radar\+::gpio\+\_\+source\+\_\+s\+\_\+impl}!d\+\_\+delta\+Time\+\_\+\+Total@{d\+\_\+delta\+Time\+\_\+\+Total}}
+\index{d\+\_\+delta\+Time\+\_\+\+Total@{d\+\_\+delta\+Time\+\_\+\+Total}!gr\+::radar\+::gpio\+\_\+source\+\_\+s\+\_\+impl@{gr\+::radar\+::gpio\+\_\+source\+\_\+s\+\_\+impl}}
+\paragraph[{d\+\_\+delta\+Time\+\_\+\+Total}]{\setlength{\rightskip}{0pt plus 5cm}long long gr\+::radar\+::gpio\+\_\+source\+\_\+s\+\_\+impl\+::d\+\_\+delta\+Time\+\_\+\+Total\hspace{0.3cm}{\ttfamily [private]}}\label{classgr_1_1radar_1_1gpio__source__s__impl_a3b14188516e1a124d1f04c3c371f58b2}
+
+
+Definition at line {\bf 61} of file {\bf gpio\+\_\+source\+\_\+s\+\_\+impl.\+h}.
+
+
+
+Referenced by {\bf read\+G\+P\+I\+O()}.
+
+\index{gr\+::radar\+::gpio\+\_\+source\+\_\+s\+\_\+impl@{gr\+::radar\+::gpio\+\_\+source\+\_\+s\+\_\+impl}!d\+\_\+device\+\_\+args@{d\+\_\+device\+\_\+args}}
+\index{d\+\_\+device\+\_\+args@{d\+\_\+device\+\_\+args}!gr\+::radar\+::gpio\+\_\+source\+\_\+s\+\_\+impl@{gr\+::radar\+::gpio\+\_\+source\+\_\+s\+\_\+impl}}
+\paragraph[{d\+\_\+device\+\_\+args}]{\setlength{\rightskip}{0pt plus 5cm}{\bf std\+::string} gr\+::radar\+::gpio\+\_\+source\+\_\+s\+\_\+impl\+::d\+\_\+device\+\_\+args\hspace{0.3cm}{\ttfamily [private]}}\label{classgr_1_1radar_1_1gpio__source__s__impl_a1340f7d86c9e11e614b21d678ef61998}
+
+
+Definition at line {\bf 45} of file {\bf gpio\+\_\+source\+\_\+s\+\_\+impl.\+h}.
+
+
+
+Referenced by {\bf gpio\+\_\+source\+\_\+s\+\_\+impl()}.
+
+\index{gr\+::radar\+::gpio\+\_\+source\+\_\+s\+\_\+impl@{gr\+::radar\+::gpio\+\_\+source\+\_\+s\+\_\+impl}!d\+\_\+\+G\+P\+I\+O\+Banks@{d\+\_\+\+G\+P\+I\+O\+Banks}}
+\index{d\+\_\+\+G\+P\+I\+O\+Banks@{d\+\_\+\+G\+P\+I\+O\+Banks}!gr\+::radar\+::gpio\+\_\+source\+\_\+s\+\_\+impl@{gr\+::radar\+::gpio\+\_\+source\+\_\+s\+\_\+impl}}
+\paragraph[{d\+\_\+\+G\+P\+I\+O\+Banks}]{\setlength{\rightskip}{0pt plus 5cm}{\bf std\+::vector}$<${\bf std\+::string}$>$ gr\+::radar\+::gpio\+\_\+source\+\_\+s\+\_\+impl\+::d\+\_\+\+G\+P\+I\+O\+Banks\hspace{0.3cm}{\ttfamily [private]}}\label{classgr_1_1radar_1_1gpio__source__s__impl_a726ad639c839798d0b0aff26d47798ea}
+
+
+Definition at line {\bf 54} of file {\bf gpio\+\_\+source\+\_\+s\+\_\+impl.\+h}.
+
+
+
+Referenced by {\bf gpio\+\_\+source\+\_\+s\+\_\+impl()}, and {\bf read\+G\+P\+I\+O()}.
+
+\index{gr\+::radar\+::gpio\+\_\+source\+\_\+s\+\_\+impl@{gr\+::radar\+::gpio\+\_\+source\+\_\+s\+\_\+impl}!d\+\_\+kw@{d\+\_\+kw}}
+\index{d\+\_\+kw@{d\+\_\+kw}!gr\+::radar\+::gpio\+\_\+source\+\_\+s\+\_\+impl@{gr\+::radar\+::gpio\+\_\+source\+\_\+s\+\_\+impl}}
+\paragraph[{d\+\_\+kw}]{\setlength{\rightskip}{0pt plus 5cm}{\bf Soapy\+S\+D\+R\+::\+Kwargs} gr\+::radar\+::gpio\+\_\+source\+\_\+s\+\_\+impl\+::d\+\_\+kw\hspace{0.3cm}{\ttfamily [private]}}\label{classgr_1_1radar_1_1gpio__source__s__impl_ab2563d5b4b6c8d78eeeeba9d2cf44160}
+
+
+Definition at line {\bf 49} of file {\bf gpio\+\_\+source\+\_\+s\+\_\+impl.\+h}.
+
+
+
+Referenced by {\bf gpio\+\_\+source\+\_\+s\+\_\+impl()}.
+
+\index{gr\+::radar\+::gpio\+\_\+source\+\_\+s\+\_\+impl@{gr\+::radar\+::gpio\+\_\+source\+\_\+s\+\_\+impl}!d\+\_\+list\+Reg\+Interfaces@{d\+\_\+list\+Reg\+Interfaces}}
+\index{d\+\_\+list\+Reg\+Interfaces@{d\+\_\+list\+Reg\+Interfaces}!gr\+::radar\+::gpio\+\_\+source\+\_\+s\+\_\+impl@{gr\+::radar\+::gpio\+\_\+source\+\_\+s\+\_\+impl}}
+\paragraph[{d\+\_\+list\+Reg\+Interfaces}]{\setlength{\rightskip}{0pt plus 5cm}{\bf std\+::vector}$<${\bf std\+::string}$>$ gr\+::radar\+::gpio\+\_\+source\+\_\+s\+\_\+impl\+::d\+\_\+list\+Reg\+Interfaces\hspace{0.3cm}{\ttfamily [private]}}\label{classgr_1_1radar_1_1gpio__source__s__impl_ade0116fc86fba65bff7802990f801b04}
+
+
+Definition at line {\bf 53} of file {\bf gpio\+\_\+source\+\_\+s\+\_\+impl.\+h}.
+
+
+
+Referenced by {\bf gpio\+\_\+source\+\_\+s\+\_\+impl()}, and {\bf $\sim$gpio\+\_\+source\+\_\+s\+\_\+impl()}.
+
+\index{gr\+::radar\+::gpio\+\_\+source\+\_\+s\+\_\+impl@{gr\+::radar\+::gpio\+\_\+source\+\_\+s\+\_\+impl}!d\+\_\+noutput\+\_\+items@{d\+\_\+noutput\+\_\+items}}
+\index{d\+\_\+noutput\+\_\+items@{d\+\_\+noutput\+\_\+items}!gr\+::radar\+::gpio\+\_\+source\+\_\+s\+\_\+impl@{gr\+::radar\+::gpio\+\_\+source\+\_\+s\+\_\+impl}}
+\paragraph[{d\+\_\+noutput\+\_\+items}]{\setlength{\rightskip}{0pt plus 5cm}{\bf int} gr\+::radar\+::gpio\+\_\+source\+\_\+s\+\_\+impl\+::d\+\_\+noutput\+\_\+items\hspace{0.3cm}{\ttfamily [private]}}\label{classgr_1_1radar_1_1gpio__source__s__impl_a94e308fe49d3067614d95d8f929876a7}
+
+
+Definition at line {\bf 71} of file {\bf gpio\+\_\+source\+\_\+s\+\_\+impl.\+h}.
+
+
+
+Referenced by {\bf read\+G\+P\+I\+O()}, and {\bf work()}.
+
+\index{gr\+::radar\+::gpio\+\_\+source\+\_\+s\+\_\+impl@{gr\+::radar\+::gpio\+\_\+source\+\_\+s\+\_\+impl}!d\+\_\+num\+\_\+works@{d\+\_\+num\+\_\+works}}
+\index{d\+\_\+num\+\_\+works@{d\+\_\+num\+\_\+works}!gr\+::radar\+::gpio\+\_\+source\+\_\+s\+\_\+impl@{gr\+::radar\+::gpio\+\_\+source\+\_\+s\+\_\+impl}}
+\paragraph[{d\+\_\+num\+\_\+works}]{\setlength{\rightskip}{0pt plus 5cm}{\bf int} gr\+::radar\+::gpio\+\_\+source\+\_\+s\+\_\+impl\+::d\+\_\+num\+\_\+works = 1\hspace{0.3cm}{\ttfamily [private]}}\label{classgr_1_1radar_1_1gpio__source__s__impl_ac695358621f7c7ba84d1e2583ce29e0f}
+
+
+Definition at line {\bf 65} of file {\bf gpio\+\_\+source\+\_\+s\+\_\+impl.\+h}.
+
+
+
+Referenced by {\bf gpio\+\_\+source\+\_\+s\+\_\+impl()}, and {\bf work()}.
+
+\index{gr\+::radar\+::gpio\+\_\+source\+\_\+s\+\_\+impl@{gr\+::radar\+::gpio\+\_\+source\+\_\+s\+\_\+impl}!d\+\_\+pins@{d\+\_\+pins}}
+\index{d\+\_\+pins@{d\+\_\+pins}!gr\+::radar\+::gpio\+\_\+source\+\_\+s\+\_\+impl@{gr\+::radar\+::gpio\+\_\+source\+\_\+s\+\_\+impl}}
+\paragraph[{d\+\_\+pins}]{\setlength{\rightskip}{0pt plus 5cm}{\bf int} gr\+::radar\+::gpio\+\_\+source\+\_\+s\+\_\+impl\+::d\+\_\+pins\hspace{0.3cm}{\ttfamily [private]}}\label{classgr_1_1radar_1_1gpio__source__s__impl_a33e83fd51daca45ecc23bb28dc011a71}
+
+
+Definition at line {\bf 46} of file {\bf gpio\+\_\+source\+\_\+s\+\_\+impl.\+h}.
+
+\index{gr\+::radar\+::gpio\+\_\+source\+\_\+s\+\_\+impl@{gr\+::radar\+::gpio\+\_\+source\+\_\+s\+\_\+impl}!d\+\_\+read\+Value@{d\+\_\+read\+Value}}
+\index{d\+\_\+read\+Value@{d\+\_\+read\+Value}!gr\+::radar\+::gpio\+\_\+source\+\_\+s\+\_\+impl@{gr\+::radar\+::gpio\+\_\+source\+\_\+s\+\_\+impl}}
+\paragraph[{d\+\_\+read\+Value}]{\setlength{\rightskip}{0pt plus 5cm}volatile int16\+\_\+t gr\+::radar\+::gpio\+\_\+source\+\_\+s\+\_\+impl\+::d\+\_\+read\+Value\hspace{0.3cm}{\ttfamily [private]}}\label{classgr_1_1radar_1_1gpio__source__s__impl_a00117737730af06cc9291b6feb6d96c3}
+
+
+Definition at line {\bf 60} of file {\bf gpio\+\_\+source\+\_\+s\+\_\+impl.\+h}.
+
+
+
+Referenced by {\bf read\+G\+P\+I\+O()}.
+
+\index{gr\+::radar\+::gpio\+\_\+source\+\_\+s\+\_\+impl@{gr\+::radar\+::gpio\+\_\+source\+\_\+s\+\_\+impl}!d\+\_\+register@{d\+\_\+register}}
+\index{d\+\_\+register@{d\+\_\+register}!gr\+::radar\+::gpio\+\_\+source\+\_\+s\+\_\+impl@{gr\+::radar\+::gpio\+\_\+source\+\_\+s\+\_\+impl}}
+\paragraph[{d\+\_\+register}]{\setlength{\rightskip}{0pt plus 5cm}unsigned gr\+::radar\+::gpio\+\_\+source\+\_\+s\+\_\+impl\+::d\+\_\+register\hspace{0.3cm}{\ttfamily [private]}}\label{classgr_1_1radar_1_1gpio__source__s__impl_a2fd4df7022866ebfcdfc68b69f90fba7}
+
+
+Definition at line {\bf 56} of file {\bf gpio\+\_\+source\+\_\+s\+\_\+impl.\+h}.
+
+
+
+Referenced by {\bf gpio\+\_\+source\+\_\+s\+\_\+impl()}.
+
+\index{gr\+::radar\+::gpio\+\_\+source\+\_\+s\+\_\+impl@{gr\+::radar\+::gpio\+\_\+source\+\_\+s\+\_\+impl}!d\+\_\+samp\+\_\+rate@{d\+\_\+samp\+\_\+rate}}
+\index{d\+\_\+samp\+\_\+rate@{d\+\_\+samp\+\_\+rate}!gr\+::radar\+::gpio\+\_\+source\+\_\+s\+\_\+impl@{gr\+::radar\+::gpio\+\_\+source\+\_\+s\+\_\+impl}}
+\paragraph[{d\+\_\+samp\+\_\+rate}]{\setlength{\rightskip}{0pt plus 5cm}{\bf int} gr\+::radar\+::gpio\+\_\+source\+\_\+s\+\_\+impl\+::d\+\_\+samp\+\_\+rate\hspace{0.3cm}{\ttfamily [private]}}\label{classgr_1_1radar_1_1gpio__source__s__impl_a4f757340d6662b01f3cff5a968837cbc}
+
+
+Definition at line {\bf 47} of file {\bf gpio\+\_\+source\+\_\+s\+\_\+impl.\+h}.
+
+
+
+Referenced by {\bf read\+G\+P\+I\+O()}.
+
+\index{gr\+::radar\+::gpio\+\_\+source\+\_\+s\+\_\+impl@{gr\+::radar\+::gpio\+\_\+source\+\_\+s\+\_\+impl}!d\+\_\+soapysdr@{d\+\_\+soapysdr}}
+\index{d\+\_\+soapysdr@{d\+\_\+soapysdr}!gr\+::radar\+::gpio\+\_\+source\+\_\+s\+\_\+impl@{gr\+::radar\+::gpio\+\_\+source\+\_\+s\+\_\+impl}}
+\paragraph[{d\+\_\+soapysdr}]{\setlength{\rightskip}{0pt plus 5cm}{\bf Soapy\+S\+D\+R\+::\+Device}$\ast$ gr\+::radar\+::gpio\+\_\+source\+\_\+s\+\_\+impl\+::d\+\_\+soapysdr\hspace{0.3cm}{\ttfamily [private]}}\label{classgr_1_1radar_1_1gpio__source__s__impl_a4428c8a14f93a91cb5294c10dfd43f9f}
+
+
+Definition at line {\bf 50} of file {\bf gpio\+\_\+source\+\_\+s\+\_\+impl.\+h}.
+
+
+
+Referenced by {\bf gpio\+\_\+source\+\_\+s\+\_\+impl()}, {\bf read\+G\+P\+I\+O()}, and {\bf $\sim$gpio\+\_\+source\+\_\+s\+\_\+impl()}.
+
+\index{gr\+::radar\+::gpio\+\_\+source\+\_\+s\+\_\+impl@{gr\+::radar\+::gpio\+\_\+source\+\_\+s\+\_\+impl}!d\+\_\+thread\+\_\+read\+G\+P\+IO@{d\+\_\+thread\+\_\+read\+G\+P\+IO}}
+\index{d\+\_\+thread\+\_\+read\+G\+P\+IO@{d\+\_\+thread\+\_\+read\+G\+P\+IO}!gr\+::radar\+::gpio\+\_\+source\+\_\+s\+\_\+impl@{gr\+::radar\+::gpio\+\_\+source\+\_\+s\+\_\+impl}}
+\paragraph[{d\+\_\+thread\+\_\+read\+G\+P\+IO}]{\setlength{\rightskip}{0pt plus 5cm}gr\+::thread\+::thread gr\+::radar\+::gpio\+\_\+source\+\_\+s\+\_\+impl\+::d\+\_\+thread\+\_\+read\+G\+P\+IO\hspace{0.3cm}{\ttfamily [private]}}\label{classgr_1_1radar_1_1gpio__source__s__impl_aa185f8bf6a4d3d2d21021814976ba308}
+
+
+Definition at line {\bf 72} of file {\bf gpio\+\_\+source\+\_\+s\+\_\+impl.\+h}.
+
+
+
+Referenced by {\bf work()}.
+
+\index{gr\+::radar\+::gpio\+\_\+source\+\_\+s\+\_\+impl@{gr\+::radar\+::gpio\+\_\+source\+\_\+s\+\_\+impl}!d\+\_\+value@{d\+\_\+value}}
+\index{d\+\_\+value@{d\+\_\+value}!gr\+::radar\+::gpio\+\_\+source\+\_\+s\+\_\+impl@{gr\+::radar\+::gpio\+\_\+source\+\_\+s\+\_\+impl}}
+\paragraph[{d\+\_\+value}]{\setlength{\rightskip}{0pt plus 5cm}int16\+\_\+t gr\+::radar\+::gpio\+\_\+source\+\_\+s\+\_\+impl\+::d\+\_\+value\hspace{0.3cm}{\ttfamily [private]}}\label{classgr_1_1radar_1_1gpio__source__s__impl_a52c4c1ab72b8e2f67295a9fc68bccfce}
+
+
+Definition at line {\bf 57} of file {\bf gpio\+\_\+source\+\_\+s\+\_\+impl.\+h}.
+
+
+
+Referenced by {\bf gpio\+\_\+source\+\_\+s\+\_\+impl()}.
+
+\index{gr\+::radar\+::gpio\+\_\+source\+\_\+s\+\_\+impl@{gr\+::radar\+::gpio\+\_\+source\+\_\+s\+\_\+impl}!first\+Packet@{first\+Packet}}
+\index{first\+Packet@{first\+Packet}!gr\+::radar\+::gpio\+\_\+source\+\_\+s\+\_\+impl@{gr\+::radar\+::gpio\+\_\+source\+\_\+s\+\_\+impl}}
+\paragraph[{first\+Packet}]{\setlength{\rightskip}{0pt plus 5cm}bool gr\+::radar\+::gpio\+\_\+source\+\_\+s\+\_\+impl\+::first\+Packet\hspace{0.3cm}{\ttfamily [private]}}\label{classgr_1_1radar_1_1gpio__source__s__impl_ac48cca1cf569cd20dc45618c3f72d3f1}
+
+
+Definition at line {\bf 66} of file {\bf gpio\+\_\+source\+\_\+s\+\_\+impl.\+h}.
+
+
+
+Referenced by {\bf gpio\+\_\+source\+\_\+s\+\_\+impl()}, and {\bf read\+G\+P\+I\+O()}.
+
+\index{gr\+::radar\+::gpio\+\_\+source\+\_\+s\+\_\+impl@{gr\+::radar\+::gpio\+\_\+source\+\_\+s\+\_\+impl}!t1@{t1}}
+\index{t1@{t1}!gr\+::radar\+::gpio\+\_\+source\+\_\+s\+\_\+impl@{gr\+::radar\+::gpio\+\_\+source\+\_\+s\+\_\+impl}}
+\paragraph[{t1}]{\setlength{\rightskip}{0pt plus 5cm}std\+::chrono\+::steady\+\_\+clock\+::time\+\_\+point gr\+::radar\+::gpio\+\_\+source\+\_\+s\+\_\+impl\+::t1\hspace{0.3cm}{\ttfamily [private]}}\label{classgr_1_1radar_1_1gpio__source__s__impl_aa47920479e4d6d0346d961046113996b}
+
+
+Definition at line {\bf 68} of file {\bf gpio\+\_\+source\+\_\+s\+\_\+impl.\+h}.
+
+
+
+Referenced by {\bf gpio\+\_\+source\+\_\+s\+\_\+impl()}, and {\bf read\+G\+P\+I\+O()}.
+
+\index{gr\+::radar\+::gpio\+\_\+source\+\_\+s\+\_\+impl@{gr\+::radar\+::gpio\+\_\+source\+\_\+s\+\_\+impl}!t2@{t2}}
+\index{t2@{t2}!gr\+::radar\+::gpio\+\_\+source\+\_\+s\+\_\+impl@{gr\+::radar\+::gpio\+\_\+source\+\_\+s\+\_\+impl}}
+\paragraph[{t2}]{\setlength{\rightskip}{0pt plus 5cm}std\+::chrono\+::steady\+\_\+clock\+::time\+\_\+point gr\+::radar\+::gpio\+\_\+source\+\_\+s\+\_\+impl\+::t2\hspace{0.3cm}{\ttfamily [private]}}\label{classgr_1_1radar_1_1gpio__source__s__impl_a3963ca484b8b1f58879656960e597c76}
+
+
+Definition at line {\bf 69} of file {\bf gpio\+\_\+source\+\_\+s\+\_\+impl.\+h}.
+
+
+
+Referenced by {\bf gpio\+\_\+source\+\_\+s\+\_\+impl()}, and {\bf read\+G\+P\+I\+O()}.
+
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+/home/erik/prefix/default/src/gr-\/radar-\/dev/lib/{\bf gpio\+\_\+source\+\_\+s\+\_\+impl.\+h}\item 
+/home/erik/prefix/default/src/gr-\/radar-\/dev/lib/{\bf gpio\+\_\+source\+\_\+s\+\_\+impl.\+cc}\end{DoxyCompactItemize}

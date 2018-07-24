@@ -1,0 +1,65 @@
+\subsection{estimator\+\_\+fsk\+\_\+impl.\+h}
+\label{estimator__fsk__impl_8h_source}\index{/home/erik/prefix/default/src/gr-\/radar-\/dev/lib/estimator\+\_\+fsk\+\_\+impl.\+h@{/home/erik/prefix/default/src/gr-\/radar-\/dev/lib/estimator\+\_\+fsk\+\_\+impl.\+h}}
+
+\begin{DoxyCode}
+00001 \textcolor{comment}{/* -*- c++ -*- */}
+00002 \textcolor{comment}{/* }
+00003 \textcolor{comment}{ * Copyright 2014 Communications Engineering Lab, KIT.}
+00004 \textcolor{comment}{ * }
+00005 \textcolor{comment}{ * This is free software; you can redistribute it and/or modify}
+00006 \textcolor{comment}{ * it under the terms of the GNU General Public License as published by}
+00007 \textcolor{comment}{ * the Free Software Foundation; either version 3, or (at your option)}
+00008 \textcolor{comment}{ * any later version.}
+00009 \textcolor{comment}{ * }
+00010 \textcolor{comment}{ * This software is distributed in the hope that it will be useful,}
+00011 \textcolor{comment}{ * but WITHOUT ANY WARRANTY; without even the implied warranty of}
+00012 \textcolor{comment}{ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the}
+00013 \textcolor{comment}{ * GNU General Public License for more details.}
+00014 \textcolor{comment}{ * }
+00015 \textcolor{comment}{ * You should have received a copy of the GNU General Public License}
+00016 \textcolor{comment}{ * along with this software; see the file COPYING.  If not, write to}
+00017 \textcolor{comment}{ * the Free Software Foundation, Inc., 51 Franklin Street,}
+00018 \textcolor{comment}{ * Boston, MA 02110-1301, USA.}
+00019 \textcolor{comment}{ */}
+00020  
+00021 \textcolor{preprocessor}{#ifndef INCLUDED\_RADAR\_ESTIMATOR\_FSK\_IMPL\_H}
+00022 \textcolor{preprocessor}{#define INCLUDED\_RADAR\_ESTIMATOR\_FSK\_IMPL\_H}
+00023 
+00024 \textcolor{preprocessor}{#include <radar/estimator_fsk.h>}
+00025 
+00026 \textcolor{keyword}{namespace }gr \{
+00027   \textcolor{keyword}{namespace }radar \{
+00028 
+00029     \textcolor{keyword}{class }estimator_fsk_impl : \textcolor{keyword}{public} estimator_fsk
+00030     \{
+00031      \textcolor{keyword}{private}:
+00032       \textcolor{comment}{// Nothing to declare in this block.}
+00033 
+00034      \textcolor{keyword}{public}:
+00035       estimator_fsk_impl(\textcolor{keywordtype}{float} center_freq, \textcolor{keywordtype}{float} delta\_freq, \textcolor{keywordtype}{bool} push\_power);
+00036       ~estimator_fsk_impl();
+00037       \textcolor{keywordtype}{void} handle_msg(pmt::pmt\_t msg);
+00038       
+00039       \textcolor{keywordtype}{float} d_center_freq, d_delta_freq;
+00040       \textcolor{keywordtype}{bool} d_push_power;
+00041       pmt::pmt\_t d_port_id_in, d_port_id_out;
+00042       
+00043       std::vector<float> d_freq, d_phase;
+00044       pmt::pmt\_t d_ptimestamp, d_pfreq, d_pphase, d_ppower;
+00045       
+00046       std::vector<float> d_vel;
+00047       pmt::pmt\_t d_value;
+00048       pmt::pmt\_t d_vel_key, d_vel_value, d_vel_pack;
+00049       std::vector<float> d_range;
+00050       pmt::pmt\_t d_range_key, d_range_value, d_range_pack;
+00051       
+00052       constexpr \textcolor{keyword}{static} \textcolor{keywordtype}{float} c_light = 3e8;
+00053       
+00054     \};
+00055 
+00056   \} \textcolor{comment}{// namespace radar}
+00057 \} \textcolor{comment}{// namespace gr}
+00058 
+00059 \textcolor{preprocessor}{#endif }\textcolor{comment}{/* INCLUDED\_RADAR\_ESTIMATOR\_FSK\_IMPL\_H */}\textcolor{preprocessor}{}
+00060 
+\end{DoxyCode}

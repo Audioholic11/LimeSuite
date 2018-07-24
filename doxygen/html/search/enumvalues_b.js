@@ -1,12 +1,22 @@
 var searchData=
 [
-  ['path_5frfe_5flb1',['PATH_RFE_LB1',['../db/d1d/classlime_1_1LMS7002M.html#af9f2522e013ccfd5f4093e3e848219aba5844d7b8d47a25789dc347911a7e8b50',1,'lime::LMS7002M']]],
-  ['path_5frfe_5flb2',['PATH_RFE_LB2',['../db/d1d/classlime_1_1LMS7002M.html#af9f2522e013ccfd5f4093e3e848219aba69ef5094e164fd64f5f7666f69290da4',1,'lime::LMS7002M']]],
-  ['path_5frfe_5flnah',['PATH_RFE_LNAH',['../db/d1d/classlime_1_1LMS7002M.html#af9f2522e013ccfd5f4093e3e848219abaf0fee9a50556e499a7dacdb417c85390',1,'lime::LMS7002M']]],
-  ['path_5frfe_5flnal',['PATH_RFE_LNAL',['../db/d1d/classlime_1_1LMS7002M.html#af9f2522e013ccfd5f4093e3e848219aba8d491b14e232016991f98c3ba046747e',1,'lime::LMS7002M']]],
-  ['path_5frfe_5flnaw',['PATH_RFE_LNAW',['../db/d1d/classlime_1_1LMS7002M.html#af9f2522e013ccfd5f4093e3e848219aba0f2ff3892f268e5f65408a8139a3c339',1,'lime::LMS7002M']]],
-  ['path_5frfe_5fnone',['PATH_RFE_NONE',['../db/d1d/classlime_1_1LMS7002M.html#af9f2522e013ccfd5f4093e3e848219aba0f024a5eebca4fc656b9dc87bc98a4a4',1,'lime::LMS7002M']]],
-  ['pcie_5fport',['PCIE_PORT',['../de/d46/classlime_1_1LMS64CProtocol.html#ad5fb599a04aa53bb2bf295c6b272f5aba836bee64b583dddd00e2b778422f28af',1,'lime::LMS64CProtocol']]],
-  ['power',['POWER',['../d5/d6c/namespacelime.html#a328d4103048fe1b747432e38973f5b3caf5fb05d054539ad5816b26dc199700b5',1,'lime']]],
-  ['program_5fwrite_5ftarget_5fcount',['PROGRAM_WRITE_TARGET_COUNT',['../de/d46/classlime_1_1LMS64CProtocol.html#a92c37d03920ab9c67c33babc3b0c2d19ae971be57e459a003a67d41151979032e',1,'lime::LMS64CProtocol']]]
+  ['oglg_5fadd_5fmark',['OGLG_ADD_MARK',['../da/dc7/OpenGLGraph_8h.html#aaf8fd5f0e57d456151c951e0f3715fc4a513ca2252e1cb61182cc488c890e10f5',1,'OpenGLGraph.h']]],
+  ['oglg_5fadd_5fmarker',['OGLG_ADD_MARKER',['../da/dc7/OpenGLGraph_8h.html#af5dafb05f9810c03e974a4eb15b85968a9d7e3c988824b129467139c8061e48cd',1,'OpenGLGraph.h']]],
+  ['oglg_5ffit',['OGLG_FIT',['../da/dc7/OpenGLGraph_8h.html#aaf8fd5f0e57d456151c951e0f3715fc4a734f82033f7c79abef99241fa4d283a0',1,'OpenGLGraph.h']]],
+  ['oglg_5fhelp_5fmouse',['OGLG_HELP_MOUSE',['../da/dc7/OpenGLGraph_8h.html#aaf8fd5f0e57d456151c951e0f3715fc4a3679ef92d78df83ce90897d4db6f1eda',1,'OpenGLGraph.h']]],
+  ['oglg_5fidle',['OGLG_IDLE',['../da/dc7/OpenGLGraph_8h.html#af5dafb05f9810c03e974a4eb15b85968a931d12cd9984ae7770bbe90ba2858d91',1,'OpenGLGraph.h']]],
+  ['oglg_5fleft',['OGLG_LEFT',['../da/dc7/OpenGLGraph_8h.html#abd047d4499530d8738cfbd6e855ffc60a25a38c20f1684ab794bf3c9fb74d5923',1,'OpenGLGraph.h']]],
+  ['oglg_5flockaspect',['OGLG_LOCKASPECT',['../da/dc7/OpenGLGraph_8h.html#aaf8fd5f0e57d456151c951e0f3715fc4ae3306b17b0e3b654964ce6e877cb0c32',1,'OpenGLGraph.h']]],
+  ['oglg_5fmiddle',['OGLG_MIDDLE',['../da/dc7/OpenGLGraph_8h.html#abd047d4499530d8738cfbd6e855ffc60a7084c02a0a3fe0a3fc22d31d4cb5d861',1,'OpenGLGraph.h']]],
+  ['oglg_5fmove_5fmarker',['OGLG_MOVE_MARKER',['../da/dc7/OpenGLGraph_8h.html#af5dafb05f9810c03e974a4eb15b85968ab2d9ebc68a8ce7152c583c7db5fb6bea',1,'OpenGLGraph.h']]],
+  ['oglg_5fpan',['OGLG_PAN',['../da/dc7/OpenGLGraph_8h.html#af5dafb05f9810c03e974a4eb15b85968a5a1cf2f1e002a996702b296c89597843',1,'OpenGLGraph.h']]],
+  ['oglg_5fremove_5fmarker',['OGLG_REMOVE_MARKER',['../da/dc7/OpenGLGraph_8h.html#af5dafb05f9810c03e974a4eb15b85968ab69041b6daf5d1625fe8b91dec995dc2',1,'OpenGLGraph.h']]],
+  ['oglg_5freset',['OGLG_RESET',['../da/dc7/OpenGLGraph_8h.html#aaf8fd5f0e57d456151c951e0f3715fc4a6304b0566bb18f5fd45fc64c96d70966',1,'OpenGLGraph.h']]],
+  ['oglg_5fright',['OGLG_RIGHT',['../da/dc7/OpenGLGraph_8h.html#abd047d4499530d8738cfbd6e855ffc60a025cf5ce4c7aa7cd543d5c349ec881a8',1,'OpenGLGraph.h']]],
+  ['oglg_5fscale',['OGLG_SCALE',['../da/dc7/OpenGLGraph_8h.html#af5dafb05f9810c03e974a4eb15b85968ac899fa20d0a20abb913cae347c0586ea',1,'OpenGLGraph.h']]],
+  ['oglg_5fsearch_5fpeak',['OGLG_SEARCH_PEAK',['../da/dc7/OpenGLGraph_8h.html#af5dafb05f9810c03e974a4eb15b85968ad1909cfd1299b8a2eba7ef68d0cdb205',1,'OpenGLGraph.h']]],
+  ['oglg_5fshow_5fmarkers_5fmenu',['OGLG_SHOW_MARKERS_MENU',['../da/dc7/OpenGLGraph_8h.html#aaf8fd5f0e57d456151c951e0f3715fc4aff729c3b89b3268f3deb59da87de23dc',1,'OpenGLGraph.h']]],
+  ['oglg_5fzoomin',['OGLG_ZOOMIN',['../da/dc7/OpenGLGraph_8h.html#af5dafb05f9810c03e974a4eb15b85968ac54cf3c5c9b7710d10b27e2ea5026385',1,'OpenGLGraph.h']]],
+  ['optional_5fargument',['optional_argument',['../d5/ded/limesuite-dev_2external_2msvc_2getopt_8h.html#a7ff5f2dff38e7639981794c43dc9167bab78b2ae97087d17f362530b184e3217b',1,'optional_argument():&#160;getopt.h'],['../df/da5/soapysdr_2apps_2msvc_2getopt_8h.html#aabfcbcb5ac86a1edac4035264bc7d2b8ab78b2ae97087d17f362530b184e3217b',1,'optional_argument():&#160;getopt.h']]],
+  ['overwrite_5fold',['OVERWRITE_OLD',['../d2/d97/classlime_1_1RingFIFO.html#a404bc48120694e3484f7fd3376847df7a58614fcef3995f535744660a59ace5e3',1,'lime::RingFIFO']]]
 ];

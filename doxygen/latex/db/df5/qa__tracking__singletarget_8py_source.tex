@@ -1,0 +1,158 @@
+\subsection{qa\+\_\+tracking\+\_\+singletarget.\+py}
+\label{qa__tracking__singletarget_8py_source}\index{/home/erik/prefix/default/src/gr-\/radar-\/dev/python/qa\+\_\+tracking\+\_\+singletarget.\+py@{/home/erik/prefix/default/src/gr-\/radar-\/dev/python/qa\+\_\+tracking\+\_\+singletarget.\+py}}
+
+\begin{DoxyCode}
+00001 \textcolor{comment}{#!/usr/bin/env python}
+00002 \textcolor{comment}{# -*- coding: utf-8 -*-}
+00003 \textcolor{comment}{# }
+00004 \textcolor{comment}{# Copyright 2014 Communications Engineering Lab, KIT.}
+00005 \textcolor{comment}{# }
+00006 \textcolor{comment}{# This is free software; you can redistribute it and/or modify}
+00007 \textcolor{comment}{# it under the terms of the GNU General Public License as published by}
+00008 \textcolor{comment}{# the Free Software Foundation; either version 3, or (at your option)}
+00009 \textcolor{comment}{# any later version.}
+00010 \textcolor{comment}{# }
+00011 \textcolor{comment}{# This software is distributed in the hope that it will be useful,}
+00012 \textcolor{comment}{# but WITHOUT ANY WARRANTY; without even the implied warranty of}
+00013 \textcolor{comment}{# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the}
+00014 \textcolor{comment}{# GNU General Public License for more details.}
+00015 \textcolor{comment}{# }
+00016 \textcolor{comment}{# You should have received a copy of the GNU General Public License}
+00017 \textcolor{comment}{# along with this software; see the file COPYING.  If not, write to}
+00018 \textcolor{comment}{# the Free Software Foundation, Inc., 51 Franklin Street,}
+00019 \textcolor{comment}{# Boston, MA 02110-1301, USA.}
+00020 \textcolor{comment}{# }
+00021 
+00022 \textcolor{keyword}{from} gnuradio \textcolor{keyword}{import} gr, gr\_unittest
+00023 \textcolor{keyword}{from} gnuradio \textcolor{keyword}{import} blocks
+00024 \textcolor{keyword}{import} radar\_swig \textcolor{keyword}{as} radar
+00025 \textcolor{keyword}{from} time \textcolor{keyword}{import} sleep
+00026 \textcolor{keyword}{import} pmt
+00027 \textcolor{keyword}{import} numpy \textcolor{keyword}{as} np
+00028 \textcolor{keyword}{from} matplotlib \textcolor{keyword}{import} pyplot \textcolor{keyword}{as} plt
+00029 \textcolor{keyword}{import} random
+00030 
+00031 \textcolor{keyword}{class }qa_tracking_singletarget (gr\_unittest.TestCase):
+00032 
+00033     \textcolor{keyword}{def }setUp (self):
+00034         self.tb = gr.top\_block ()
+00035 
+00036     \textcolor{keyword}{def }tearDown (self):
+00037         self.tb = \textcolor{keywordtype}{None}
+00038 
+00039     \textcolor{keyword}{def }test_001_t (self):
+00040         \textcolor{comment}{# create input data}
+00041         steps = 200
+00042         vec\_time = np.linspace(0,20,steps);
+00043         vec\_velocity = np.linspace(5,5,steps)
+00044         vec\_range = np.linspace(100,1,steps)
+00045         vec\_velocity\_real = [0]*steps
+00046         vec\_range\_real = [0]*steps
+00047         \textcolor{keywordflow}{for} k \textcolor{keywordflow}{in} range(steps):
+00048             vec\_velocity\_real[k] = vec\_velocity[k]
+00049             vec\_range\_real[k] = vec\_range[k]
+00050         
+00051         \textcolor{comment}{# random data on trajectory}
+00052         mu = 0
+00053         sigma\_vel = 0.5
+00054         sigma\_rge = 7
+00055         \textcolor{keywordflow}{for} k \textcolor{keywordflow}{in} range(len(vec\_velocity)):
+00056             vec\_velocity[k] = vec\_velocity[k] + random.gauss(mu,sigma\_vel)
+00057             vec\_range[k] = vec\_range[k] + random.gauss(mu,sigma\_rge)
+00058         
+00059         \textcolor{comment}{# set up pmts with zero points}
+00060         target\_pmts = [0]*len(vec\_velocity)
+00061         \textcolor{comment}{#zero\_points = (5,12,17)}
+00062         zero\_points = ()
+00063         \textcolor{keywordflow}{for} k \textcolor{keywordflow}{in} range(len(vec\_velocity)):
+00064             pmt\_time = pmt.list2(pmt.string\_to\_symbol(\textcolor{stringliteral}{"rx\_time"}),pmt.make\_tuple(pmt.from\_long(
+      int(vec\_time[k])),pmt.from\_double(vec\_time[k]-int(vec\_time[k]))))
+00065             \textcolor{keywordflow}{if} k \textcolor{keywordflow}{in} zero\_points:
+00066                 vec = [0]
+00067                 pmt\_velocity = pmt.list2(pmt.string\_to\_symbol(\textcolor{stringliteral}{"velocity"}),pmt.init\_f32vector(1,vec))
+00068                 pmt\_range = pmt.list2(pmt.string\_to\_symbol(\textcolor{stringliteral}{"range"}),pmt.init\_f32vector(1,vec))
+00069             \textcolor{keywordflow}{else}:
+00070                 pmt\_velocity = pmt.list2(pmt.string\_to\_symbol(\textcolor{stringliteral}{"velocity"}),pmt.init\_f32vector(1,(
+      vec\_velocity[k],)))
+00071                 pmt\_range = pmt.list2(pmt.string\_to\_symbol(\textcolor{stringliteral}{"range"}),pmt.init\_f32vector(1,(vec\_range[k],)))
+00072             target\_pmts[k] = pmt.list3(pmt\_time,pmt\_velocity,pmt\_range)
+00073         
+00074         \textcolor{comment}{# set up fg}
+00075         test\_duration = 1000 \textcolor{comment}{# ms, do not change!}
+00076         
+00077         num\_particle = 300
+00078         std\_range\_meas = sigma\_rge
+00079         std\_velocity\_meas = sigma\_vel
+00080         std\_accel\_sys = 0.1
+00081         threshold\_track = 0.001
+00082         threshold\_lost = 4
+00083         tracking\_filter = \textcolor{stringliteral}{"particle"}
+00084         \textcolor{comment}{#tracking\_filter = "kalman"}
+00085         
+00086         \textcolor{comment}{# connect multiple strobes for different msgs}
+00087         src = [0]*len(target\_pmts)
+00088         \textcolor{keywordflow}{for} k \textcolor{keywordflow}{in} range(len(target\_pmts)):
+00089             src[k] = blocks.message\_strobe(target\_pmts[k], test\_duration-400+400/
+      len(target\_pmts)*k)
+00090         tracking = radar.tracking\_singletarget(num\_particle, std\_range\_meas, std\_velocity\_meas, 
+      std\_accel\_sys, threshold\_track, threshold\_lost, tracking\_filter)
+00091         snk = blocks.message\_debug()
+00092         
+00093         \textcolor{keywordflow}{for} k \textcolor{keywordflow}{in} range(len(target\_pmts)):
+00094             self.tb.msg\_connect(src[k],\textcolor{stringliteral}{"strobe"},tracking,\textcolor{stringliteral}{"Msg in"})
+00095         self.tb.msg\_connect(tracking,\textcolor{stringliteral}{"Msg out"},snk,\textcolor{stringliteral}{"store"})
+00096         
+00097         self.tb.start()
+00098         sleep(test\_duration/1000.0)
+00099         self.tb.stop()
+00100         self.tb.wait
+00101         ()
+00102         \textcolor{comment}{# check data}
+00103 \textcolor{comment}{#       show\_data = False # Toggle visibility of single messages # broken}
+00104         msg\_num = snk.num\_messages()
+00105         vec\_out\_range = []
+00106         vec\_out\_velocity = []
+00107         \textcolor{keywordflow}{for} k \textcolor{keywordflow}{in} range(msg\_num):
+00108             msg\_part = snk.get\_message(k)
+00109             tme = pmt.nth(0,msg\_part) \textcolor{comment}{# not used}
+00110             vel = pmt.nth(1,msg\_part)
+00111             rgn = pmt.nth(2,msg\_part)
+00112             vec\_out\_range.append(pmt.f32vector\_elements(pmt.nth(1,rgn))[0])
+00113             vec\_out\_velocity.append(pmt.f32vector\_elements(pmt.nth(1,vel))[0])
+00114 \textcolor{comment}{#           if show\_data:}
+00115 \textcolor{comment}{#               print "msg:", k}
+00116 \textcolor{comment}{#               print pmt.symbol\_to\_string(pmt.nth(0,vel)), pmt.f32vector\_elements(pmt.nth(1,vel))[0]}
+00117 \textcolor{comment}{#               print pmt.symbol\_to\_string(pmt.nth(0,rgn)), pmt.f32vector\_elements(pmt.nth(1,rgn))[0]}
+00118 \textcolor{comment}{#               print }
+00119 \textcolor{comment}{#       print "RANGE:"}
+00120 \textcolor{comment}{#       print vec\_out\_range}
+00121 \textcolor{comment}{#       print "VELOCITY:"}
+00122 \textcolor{comment}{#       print vec\_out\_velocity}
+00123         
+00124         \textcolor{comment}{# make plots}
+00125         show\_plots = \textcolor{keyword}{False} \textcolor{comment}{# Toggle visibility of plots}
+00126         \textcolor{keywordflow}{if} show\_plots:
+00127             time = range(len(vec\_range))
+00128             time\_out = range(len(vec\_out\_range))
+00129             plt.figure(1)
+00130             
+00131             plt.subplot(211)
+00132             marker = \textcolor{stringliteral}{'-o'}
+00133             p1 = plt.plot(time,vec\_velocity\_real,marker,time,vec\_velocity,marker,time\_out,vec\_out\_velocity,
+      marker)
+00134             plt.legend(p1,[\textcolor{stringliteral}{"IN velocity real"}, \textcolor{stringliteral}{"IN velocity"}, \textcolor{stringliteral}{"OUT velocity"}])
+00135             plt.title(\textcolor{stringliteral}{"VELOCITY"})
+00136             plt.xlabel(\textcolor{stringliteral}{'time'})
+00137             
+00138             plt.subplot(212)
+00139             marker = \textcolor{stringliteral}{'-o'}
+00140             p1 = plt.plot(time,vec\_range\_real,marker,time,vec\_range,marker,time\_out,vec\_out\_range,marker)
+00141             plt.legend(p1,[\textcolor{stringliteral}{"IN range real"},\textcolor{stringliteral}{"IN range"},\textcolor{stringliteral}{"OUT range"}])
+00142             plt.title(\textcolor{stringliteral}{"RANGE"})
+00143             plt.xlabel(\textcolor{stringliteral}{'time'})
+00144             
+00145             plt.show()
+00146 
+00147 \textcolor{keywordflow}{if} \_\_name\_\_ == \textcolor{stringliteral}{'\_\_main\_\_'}:
+00148     gr\_unittest.run(qa\_tracking\_singletarget)\textcolor{comment}{#, "qa\_tracking\_singletarget.xml")}
+\end{DoxyCode}

@@ -1,6 +1,5 @@
 var searchData=
 [
-  ['status',['Status',['../d2/d61/classlime_1_1Si5351C.html#a232443a12bd02c1607bc10bcb1216126',1,'lime::Si5351C']]],
-  ['streamdataformat',['StreamDataFormat',['../d4/d52/structlime_1_1StreamConfig.html#aeba178b2150eaa53f383c88befcd4bc9',1,'lime::StreamConfig']]],
-  ['streamflags',['StreamFlags',['../d2/d97/classlime_1_1RingFIFO.html#a404bc48120694e3484f7fd3376847df7',1,'lime::RingFIFO']]]
+  ['pathrfe',['PathRFE',['../db/d1d/classlime_1_1LMS7002M.html#af9f2522e013ccfd5f4093e3e848219ab',1,'lime::LMS7002M']]],
+  ['programwritetarget',['ProgramWriteTarget',['../de/d46/classlime_1_1LMS64CProtocol.html#a92c37d03920ab9c67c33babc3b0c2d19',1,'lime::LMS64CProtocol']]]
 ];

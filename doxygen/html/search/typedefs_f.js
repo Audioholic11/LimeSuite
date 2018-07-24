@@ -1,6 +1,8 @@
 var searchData=
 [
-  ['target_5fmsc',['target_msc',['../db/d82/wglew_8h.html#a9c267838ba784fae2da343628260bf77',1,'wglew.h']]],
-  ['target_5fsbc',['target_sbc',['../db/d82/wglew_8h.html#a803ea7cb0dc5a61d3cff625e086fc8be',1,'wglew.h']]],
-  ['type',['type',['../db/d82/wglew_8h.html#adef6e62b57cfeb2a6221fa6bc6c311a3',1,'wglew.h']]]
+  ['rangelist',['RangeList',['../d6/d17/namespaceSoapySDR.html#af1307f1413a5ec526191be9d1e4cb602',1,'SoapySDR']]],
+  ['readbufferproc',['readbufferproc',['../d0/d19/SoapySDRPYTHON__wrap_8cxx.html#a4fb5dde22554b2e8cbf604eaf6b8fc53',1,'readbufferproc():&#160;SoapySDRPYTHON_wrap.cxx'],['../dc/d4d/radar__swigPYTHON__wrap_8cxx.html#a4fb5dde22554b2e8cbf604eaf6b8fc53',1,'readbufferproc():&#160;radar_swigPYTHON_wrap.cxx']]],
+  ['reference',['reference',['../d1/d3a/structswig_1_1SwigPySequence__InputIterator.html#a75f82d558aaa6781b77d34914eb0f455',1,'swig::SwigPySequence_InputIterator::reference()'],['../d5/d64/structswig_1_1SwigPySequence__Cont.html#a4108668900abc99b72844a3a880b3638',1,'swig::SwigPySequence_Cont::reference()'],['../d1/d3a/structswig_1_1SwigPySequence__InputIterator.html#a75f82d558aaa6781b77d34914eb0f455',1,'swig::SwigPySequence_InputIterator::reference()'],['../d5/d64/structswig_1_1SwigPySequence__Cont.html#a4108668900abc99b72844a3a880b3638',1,'swig::SwigPySequence_Cont::reference()']]],
+  ['remainder',['remainder',['../db/d82/wglew_8h.html#a226a3effbf4b18fa52a40406d23ab396',1,'wglew.h']]],
+  ['result_5ftype',['result_type',['../dc/d03/structswig_1_1from__oper.html#aceed5a894a65b69078106cda841f6021',1,'swig::from_oper::result_type()'],['../d2/dbe/structswig_1_1from__key__oper.html#ae5b8af422665141a9736faf34791725b',1,'swig::from_key_oper::result_type()'],['../d1/d3e/structswig_1_1from__value__oper.html#a2599f8d784c6f2cdbe22b72611c367a9',1,'swig::from_value_oper::result_type()'],['../dc/d03/structswig_1_1from__oper.html#aceed5a894a65b69078106cda841f6021',1,'swig::from_oper::result_type()']]]
 ];

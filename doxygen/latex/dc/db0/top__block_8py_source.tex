@@ -1,0 +1,558 @@
+\subsection{top\+\_\+block.\+py}
+\label{top__block_8py_source}\index{/home/erik/prefix/default/src/gr-\/radar-\/dev/examples/usrp/top\+\_\+block.\+py@{/home/erik/prefix/default/src/gr-\/radar-\/dev/examples/usrp/top\+\_\+block.\+py}}
+
+\begin{DoxyCode}
+00001 \textcolor{comment}{#!/usr/bin/env python}
+00002 \textcolor{comment}{##################################################}
+00003 \textcolor{comment}{# Gnuradio Python Flow Graph}
+00004 \textcolor{comment}{# Title: Top Block}
+00005 \textcolor{comment}{# Generated: Mon Oct 13 13:03:15 2014}
+00006 \textcolor{comment}{##################################################}
+00007 
+00008 \textcolor{keyword}{from} PyQt4 \textcolor{keyword}{import} Qt
+00009 \textcolor{keyword}{from} PyQt4.QtCore \textcolor{keyword}{import} QObject, pyqtSlot
+00010 \textcolor{keyword}{from} gnuradio \textcolor{keyword}{import} blocks
+00011 \textcolor{keyword}{from} gnuradio \textcolor{keyword}{import} eng\_notation
+00012 \textcolor{keyword}{from} gnuradio \textcolor{keyword}{import} filter
+00013 \textcolor{keyword}{from} gnuradio \textcolor{keyword}{import} gr
+00014 \textcolor{keyword}{from} gnuradio \textcolor{keyword}{import} qtgui
+00015 \textcolor{keyword}{from} gnuradio.eng\_option \textcolor{keyword}{import} eng\_option
+00016 \textcolor{keyword}{from} gnuradio.filter \textcolor{keyword}{import} firdes
+00017 \textcolor{keyword}{from} optparse \textcolor{keyword}{import} OptionParser
+00018 \textcolor{keyword}{import} PyQt4.Qwt5 \textcolor{keyword}{as} Qwt
+00019 \textcolor{keyword}{import} radar
+00020 \textcolor{keyword}{import} sip
+00021 \textcolor{keyword}{import} sys
+00022 
+00023 \textcolor{keyword}{from} distutils.version \textcolor{keyword}{import} StrictVersion
+00024 \textcolor{keyword}{class }top_block(gr.top\_block, Qt.QWidget):
+00025 
+00026     \textcolor{keyword}{def }__init__(self):
+00027         gr.top\_block.\_\_init\_\_(self, \textcolor{stringliteral}{"Top Block"})
+00028         Qt.QWidget.\_\_init\_\_(self)
+00029         self.setWindowTitle(\textcolor{stringliteral}{"Top Block"})
+00030         \textcolor{keywordflow}{try}:
+00031              self.setWindowIcon(Qt.QIcon.fromTheme(\textcolor{stringliteral}{'gnuradio-grc'}))
+00032         \textcolor{keywordflow}{except}:
+00033              \textcolor{keywordflow}{pass}
+00034         self.top_scroll_layout = Qt.QVBoxLayout()
+00035         self.setLayout(self.top_scroll_layout)
+00036         self.top_scroll = Qt.QScrollArea()
+00037         self.top\_scroll.setFrameStyle(Qt.QFrame.NoFrame)
+00038         self.top\_scroll\_layout.addWidget(self.top_scroll)
+00039         self.top\_scroll.setWidgetResizable(\textcolor{keyword}{True})
+00040         self.top_widget = Qt.QWidget()
+00041         self.top\_scroll.setWidget(self.top_widget)
+00042         self.top_layout = Qt.QVBoxLayout(self.top_widget)
+00043         self.top_grid_layout = Qt.QGridLayout()
+00044         self.top\_layout.addLayout(self.top_grid_layout)
+00045 
+00046         self.settings = Qt.QSettings(\textcolor{stringliteral}{"GNU Radio"}, \textcolor{stringliteral}{"top\_block"})
+00047         self.restoreGeometry(self.settings.value(\textcolor{stringliteral}{"geometry"}).toByteArray())
+00048 
+00049 
+00050         \textcolor{comment}{##################################################}
+00051         \textcolor{comment}{# Variables}
+00052         \textcolor{comment}{##################################################}
+00053         self.samp_rate = samp\_rate = 14250000
+00054         self.packet_len = packet\_len = 2**21
+00055         self.freq_res = freq\_res = samp\_rate/float(packet\_len)
+00056         self.freq = freq = (-6000000,6000000)
+00057         self.center_freq = center\_freq = 2.45e9
+00058         self.v_res = v\_res = freq\_res*3e8/2/center\_freq
+00059         self.time_res = time\_res = packet\_len/float(samp\_rate)
+00060         self.threshold = threshold = -50
+00061         self.samp_protect = samp\_protect = 1
+00062         self.range_time = range\_time = 30
+00063         self.range_res = range\_res = 3e8/2/float((freq[1]-freq[0]))
+00064         self.range_add = range\_add = -1
+00065         self.min_output_buffer = min\_output\_buffer = int(packet\_len*2)
+00066         self.max_output_buffer = max\_output\_buffer = 0
+00067         self.gain_tx = gain\_tx = 40
+00068         self.gain_rx = gain\_rx = 20
+00069         self.delay_samp = delay\_samp = 28
+00070         self.decim_fac = decim\_fac = 2**10
+00071         self.amplitude = amplitude = 0.5
+00072 
+00073         \textcolor{comment}{##################################################}
+00074         \textcolor{comment}{# Blocks}
+00075         \textcolor{comment}{##################################################}
+00076         self._threshold_layout = Qt.QVBoxLayout()
+00077         self._threshold_tool_bar = Qt.QToolBar(self)
+00078         self.\_threshold\_layout.addWidget(self._threshold_tool_bar)
+00079         self.\_threshold\_tool\_bar.addWidget(Qt.QLabel(\textcolor{stringliteral}{"Find peak threshold"}+\textcolor{stringliteral}{": "}))
+00080         \textcolor{keyword}{class }qwt\_counter\_pyslot(Qwt.QwtCounter):
+00081             \textcolor{keyword}{def }__init__(self, parent=None):
+00082                 Qwt.QwtCounter.\_\_init\_\_(self, parent)
+00083             @pyqtSlot(\textcolor{stringliteral}{'double'})
+00084             \textcolor{keyword}{def }setValue(self, value):
+00085                 super(Qwt.QwtCounter, self).setValue(value)
+00086         self._threshold_counter = qwt\_counter\_pyslot()
+00087         self.\_threshold\_counter.setRange(-200, 100, 1)
+00088         self.\_threshold\_counter.setNumButtons(2)
+00089         self.\_threshold\_counter.setValue(self.threshold)
+00090         self.\_threshold\_tool\_bar.addWidget(self._threshold_counter)
+00091         self.\_threshold\_counter.valueChanged.connect(self.set_threshold)
+00092         self._threshold_slider = Qwt.QwtSlider(\textcolor{keywordtype}{None}, Qt.Qt.Horizontal, Qwt.QwtSlider.BottomScale, 
+      Qwt.QwtSlider.BgSlot)
+00093         self.\_threshold\_slider.setRange(-200, 100, 1)
+00094         self.\_threshold\_slider.setValue(self.threshold)
+00095         self.\_threshold\_slider.setMinimumWidth(200)
+00096         self.\_threshold\_slider.valueChanged.connect(self.set_threshold)
+00097         self.\_threshold\_layout.addWidget(self._threshold_slider)
+00098         self.top\_grid\_layout.addLayout(self._threshold_layout, 1,0)
+00099         self._samp_protect_layout = Qt.QVBoxLayout()
+00100         self._samp_protect_tool_bar = Qt.QToolBar(self)
+00101         self.\_samp\_protect\_layout.addWidget(self._samp_protect_tool_bar)
+00102         self.\_samp\_protect\_tool\_bar.addWidget(Qt.QLabel(\textcolor{stringliteral}{"Find peak protected samples"}+\textcolor{stringliteral}{": "}))
+00103         \textcolor{keyword}{class }qwt\_counter\_pyslot(Qwt.QwtCounter):
+00104             \textcolor{keyword}{def }__init__(self, parent=None):
+00105                 Qwt.QwtCounter.\_\_init\_\_(self, parent)
+00106             @pyqtSlot(\textcolor{stringliteral}{'double'})
+00107             \textcolor{keyword}{def }setValue(self, value):
+00108                 super(Qwt.QwtCounter, self).setValue(value)
+00109         self._samp_protect_counter = qwt\_counter\_pyslot()
+00110         self.\_samp\_protect\_counter.setRange(0, 10, 1)
+00111         self.\_samp\_protect\_counter.setNumButtons(2)
+00112         self.\_samp\_protect\_counter.setValue(self.samp_protect)
+00113         self.\_samp\_protect\_tool\_bar.addWidget(self._samp_protect_counter)
+00114         self.\_samp\_protect\_counter.valueChanged.connect(self.set_samp_protect)
+00115         self._samp_protect_slider = Qwt.QwtSlider(\textcolor{keywordtype}{None}, Qt.Qt.Horizontal, Qwt.QwtSlider.BottomScale, 
+      Qwt.QwtSlider.BgSlot)
+00116         self.\_samp\_protect\_slider.setRange(0, 10, 1)
+00117         self.\_samp\_protect\_slider.setValue(self.samp_protect)
+00118         self.\_samp\_protect\_slider.setMinimumWidth(200)
+00119         self.\_samp\_protect\_slider.valueChanged.connect(self.set_samp_protect)
+00120         self.\_samp\_protect\_layout.addWidget(self._samp_protect_slider)
+00121         self.top\_grid\_layout.addLayout(self._samp_protect_layout, 1,1)
+00122         self._range_add_layout = Qt.QVBoxLayout()
+00123         self._range_add_tool_bar = Qt.QToolBar(self)
+00124         self.\_range\_add\_layout.addWidget(self._range_add_tool_bar)
+00125         self.\_range\_add\_tool\_bar.addWidget(Qt.QLabel(\textcolor{stringliteral}{"Add range"}+\textcolor{stringliteral}{": "}))
+00126         \textcolor{keyword}{class }qwt\_counter\_pyslot(Qwt.QwtCounter):
+00127             \textcolor{keyword}{def }__init__(self, parent=None):
+00128                 Qwt.QwtCounter.\_\_init\_\_(self, parent)
+00129             @pyqtSlot(\textcolor{stringliteral}{'double'})
+00130             \textcolor{keyword}{def }setValue(self, value):
+00131                 super(Qwt.QwtCounter, self).setValue(value)
+00132         self._range_add_counter = qwt\_counter\_pyslot()
+00133         self.\_range\_add\_counter.setRange(-range\_res, range\_res, 0.1)
+00134         self.\_range\_add\_counter.setNumButtons(2)
+00135         self.\_range\_add\_counter.setValue(self.range_add)
+00136         self.\_range\_add\_tool\_bar.addWidget(self._range_add_counter)
+00137         self.\_range\_add\_counter.valueChanged.connect(self.set_range_add)
+00138         self._range_add_slider = Qwt.QwtSlider(\textcolor{keywordtype}{None}, Qt.Qt.Horizontal, Qwt.QwtSlider.BottomScale, 
+      Qwt.QwtSlider.BgSlot)
+00139         self.\_range\_add\_slider.setRange(-range\_res, range\_res, 0.1)
+00140         self.\_range\_add\_slider.setValue(self.range_add)
+00141         self.\_range\_add\_slider.setMinimumWidth(200)
+00142         self.\_range\_add\_slider.valueChanged.connect(self.set_range_add)
+00143         self.\_range\_add\_layout.addWidget(self._range_add_slider)
+00144         self.top\_grid\_layout.addLayout(self._range_add_layout, 2,1)
+00145         self._gain_tx_layout = Qt.QVBoxLayout()
+00146         self._gain_tx_tool_bar = Qt.QToolBar(self)
+00147         self.\_gain\_tx\_layout.addWidget(self._gain_tx_tool_bar)
+00148         self.\_gain\_tx\_tool\_bar.addWidget(Qt.QLabel(\textcolor{stringliteral}{"TX gain"}+\textcolor{stringliteral}{": "}))
+00149         \textcolor{keyword}{class }qwt\_counter\_pyslot(Qwt.QwtCounter):
+00150             \textcolor{keyword}{def }__init__(self, parent=None):
+00151                 Qwt.QwtCounter.\_\_init\_\_(self, parent)
+00152             @pyqtSlot(\textcolor{stringliteral}{'double'})
+00153             \textcolor{keyword}{def }setValue(self, value):
+00154                 super(Qwt.QwtCounter, self).setValue(value)
+00155         self._gain_tx_counter = qwt\_counter\_pyslot()
+00156         self.\_gain\_tx\_counter.setRange(0, 100, 1)
+00157         self.\_gain\_tx\_counter.setNumButtons(2)
+00158         self.\_gain\_tx\_counter.setValue(self.gain_tx)
+00159         self.\_gain\_tx\_tool\_bar.addWidget(self._gain_tx_counter)
+00160         self.\_gain\_tx\_counter.valueChanged.connect(self.set_gain_tx)
+00161         self._gain_tx_slider = Qwt.QwtSlider(\textcolor{keywordtype}{None}, Qt.Qt.Horizontal, Qwt.QwtSlider.BottomScale, 
+      Qwt.QwtSlider.BgSlot)
+00162         self.\_gain\_tx\_slider.setRange(0, 100, 1)
+00163         self.\_gain\_tx\_slider.setValue(self.gain_tx)
+00164         self.\_gain\_tx\_slider.setMinimumWidth(200)
+00165         self.\_gain\_tx\_slider.valueChanged.connect(self.set_gain_tx)
+00166         self.\_gain\_tx\_layout.addWidget(self._gain_tx_slider)
+00167         self.top\_grid\_layout.addLayout(self._gain_tx_layout, 0,0)
+00168         self._gain_rx_layout = Qt.QVBoxLayout()
+00169         self._gain_rx_tool_bar = Qt.QToolBar(self)
+00170         self.\_gain\_rx\_layout.addWidget(self._gain_rx_tool_bar)
+00171         self.\_gain\_rx\_tool\_bar.addWidget(Qt.QLabel(\textcolor{stringliteral}{"RX gain"}+\textcolor{stringliteral}{": "}))
+00172         \textcolor{keyword}{class }qwt\_counter\_pyslot(Qwt.QwtCounter):
+00173             \textcolor{keyword}{def }__init__(self, parent=None):
+00174                 Qwt.QwtCounter.\_\_init\_\_(self, parent)
+00175             @pyqtSlot(\textcolor{stringliteral}{'double'})
+00176             \textcolor{keyword}{def }setValue(self, value):
+00177                 super(Qwt.QwtCounter, self).setValue(value)
+00178         self._gain_rx_counter = qwt\_counter\_pyslot()
+00179         self.\_gain\_rx\_counter.setRange(0, 100, 1)
+00180         self.\_gain\_rx\_counter.setNumButtons(2)
+00181         self.\_gain\_rx\_counter.setValue(self.gain_rx)
+00182         self.\_gain\_rx\_tool\_bar.addWidget(self._gain_rx_counter)
+00183         self.\_gain\_rx\_counter.valueChanged.connect(self.set_gain_rx)
+00184         self._gain_rx_slider = Qwt.QwtSlider(\textcolor{keywordtype}{None}, Qt.Qt.Horizontal, Qwt.QwtSlider.BottomScale, 
+      Qwt.QwtSlider.BgSlot)
+00185         self.\_gain\_rx\_slider.setRange(0, 100, 1)
+00186         self.\_gain\_rx\_slider.setValue(self.gain_rx)
+00187         self.\_gain\_rx\_slider.setMinimumWidth(200)
+00188         self.\_gain\_rx\_slider.valueChanged.connect(self.set_gain_rx)
+00189         self.\_gain\_rx\_layout.addWidget(self._gain_rx_slider)
+00190         self.top\_grid\_layout.addLayout(self._gain_rx_layout, 0,1)
+00191         self._delay_samp_layout = Qt.QVBoxLayout()
+00192         self._delay_samp_tool_bar = Qt.QToolBar(self)
+00193         self.\_delay\_samp\_layout.addWidget(self._delay_samp_tool_bar)
+00194         self.\_delay\_samp\_tool\_bar.addWidget(Qt.QLabel(\textcolor{stringliteral}{"Number delay samples"}+\textcolor{stringliteral}{": "}))
+00195         \textcolor{keyword}{class }qwt\_counter\_pyslot(Qwt.QwtCounter):
+00196             \textcolor{keyword}{def }__init__(self, parent=None):
+00197                 Qwt.QwtCounter.\_\_init\_\_(self, parent)
+00198             @pyqtSlot(\textcolor{stringliteral}{'double'})
+00199             \textcolor{keyword}{def }setValue(self, value):
+00200                 super(Qwt.QwtCounter, self).setValue(value)
+00201         self._delay_samp_counter = qwt\_counter\_pyslot()
+00202         self.\_delay\_samp\_counter.setRange(0, 100, 1)
+00203         self.\_delay\_samp\_counter.setNumButtons(2)
+00204         self.\_delay\_samp\_counter.setValue(self.delay_samp)
+00205         self.\_delay\_samp\_tool\_bar.addWidget(self._delay_samp_counter)
+00206         self.\_delay\_samp\_counter.valueChanged.connect(self.set_delay_samp)
+00207         self._delay_samp_slider = Qwt.QwtSlider(\textcolor{keywordtype}{None}, Qt.Qt.Horizontal, Qwt.QwtSlider.BottomScale, 
+      Qwt.QwtSlider.BgSlot)
+00208         self.\_delay\_samp\_slider.setRange(0, 100, 1)
+00209         self.\_delay\_samp\_slider.setValue(self.delay_samp)
+00210         self.\_delay\_samp\_slider.setMinimumWidth(200)
+00211         self.\_delay\_samp\_slider.valueChanged.connect(self.set_delay_samp)
+00212         self.\_delay\_samp\_layout.addWidget(self._delay_samp_slider)
+00213         self.top\_grid\_layout.addLayout(self._delay_samp_layout, 2,0)
+00214         self.rational_resampler_xxx_0_0 = filter.rational\_resampler\_ccc(
+00215                 interpolation=1,
+00216                 decimation=decim\_fac,
+00217                 taps=\textcolor{keywordtype}{None},
+00218                 fractional\_bw=\textcolor{keywordtype}{None},
+00219         )
+00220         self.rational_resampler_xxx_0 = filter.rational\_resampler\_ccc(
+00221                 interpolation=1,
+00222                 decimation=decim\_fac,
+00223                 taps=\textcolor{keywordtype}{None},
+00224                 fractional\_bw=\textcolor{keywordtype}{None},
+00225         )
+00226         self.radar_usrp_echotimer_cc_0 = radar.usrp\_echotimer\_cc(samp\_rate, center\_freq, 
+      int(delay\_samp), \textcolor{stringliteral}{'addr=192.168.10.4'}, \textcolor{stringliteral}{''}, \textcolor{stringliteral}{'internal'}, \textcolor{stringliteral}{'none'}, \textcolor{stringliteral}{'J1'}, gain\_tx, 0.1, 0.05, 0, \textcolor{stringliteral}{'
+      addr=192.168.10.6'}, \textcolor{stringliteral}{''}, \textcolor{stringliteral}{'mimo'}, \textcolor{stringliteral}{'mimo'}, \textcolor{stringliteral}{'J1'}, gain\_rx, 0.1, 0.05, 0, \textcolor{stringliteral}{"packet\_len"})
+00227         (self.radar_usrp_echotimer_cc_0).set_min_output_buffer(4194304)
+00228         self.radar_ts_fft_cc_0_0 = radar.ts\_fft\_cc(packet\_len/decim\_fac,  \textcolor{stringliteral}{"packet\_len"})
+00229         (self.radar_ts_fft_cc_0_0).set_min_output_buffer(4194304)
+00230         self.radar_ts_fft_cc_0 = radar.ts\_fft\_cc(packet\_len/decim\_fac,  \textcolor{stringliteral}{"packet\_len"})
+00231         (self.radar_ts_fft_cc_0).set_min_output_buffer(4194304)
+00232         self.radar_tracking_singletarget_0 = radar.tracking\_singletarget(300, 0.5, 0.3, 0.1, 0.001, 1, \textcolor{stringliteral}{'
+      particle'})
+00233         self.radar_signal_generator_cw_c_0_0 = radar.signal\_generator\_cw\_c(packet\_len, samp\_rate, (freq[1],
+       ), amplitude, \textcolor{stringliteral}{"packet\_len"})
+00234         (self.radar_signal_generator_cw_c_0_0).set_min_output_buffer(4194304)
+00235         self.radar_signal_generator_cw_c_0 = radar.signal\_generator\_cw\_c(packet\_len, samp\_rate, (freq[0], )
+      , amplitude, \textcolor{stringliteral}{"packet\_len"})
+00236         (self.radar_signal_generator_cw_c_0).set_min_output_buffer(4194304)
+00237         self.radar_qtgui_time_plot_1_0 = radar.qtgui\_time\_plot(100, \textcolor{stringliteral}{'velocity'}, (-3,3), range\_time, \textcolor{stringliteral}{'
+      TRACKING'})
+00238         self.radar_qtgui_time_plot_1 = radar.qtgui\_time\_plot(100, \textcolor{stringliteral}{'velocity'}, (-3,3), range\_time, \textcolor{stringliteral}{""})
+00239         self.radar_qtgui_time_plot_0_0 = radar.qtgui\_time\_plot(100, \textcolor{stringliteral}{'range'}, (0,range\_res), range\_time, \textcolor{stringliteral}{'
+      TRACKING'})
+00240         self.radar_qtgui_time_plot_0 = radar.qtgui\_time\_plot(100, \textcolor{stringliteral}{'range'}, (0,range\_res), range\_time, \textcolor{stringliteral}{""})
+00241         self.radar_print_results_0 = radar.print\_results(\textcolor{keyword}{False}, \textcolor{stringliteral}{""})
+00242         self.radar_msg_manipulator_0 = radar.msg\_manipulator((\textcolor{stringliteral}{'range'},), (range\_add, ), (1, ))
+00243         self.radar_find_max_peak_c_0 = radar.find\_max\_peak\_c(samp\_rate/decim\_fac, threshold, 
+      int(samp\_protect), ((-300,300)), \textcolor{keyword}{True}, \textcolor{stringliteral}{"packet\_len"})
+00244         self.radar_estimator_fsk_0 = radar.estimator\_fsk(center\_freq, (freq[1]-freq[0]), \textcolor{keyword}{False})
+00245         self.qtgui_freq_sink_x_0 = qtgui.freq\_sink\_c(
+00246             packet\_len/decim\_fac, \textcolor{comment}{#size}
+00247             firdes.WIN\_BLACKMAN\_hARRIS, \textcolor{comment}{#wintype}
+00248             0, \textcolor{comment}{#fc}
+00249             samp\_rate/decim\_fac, \textcolor{comment}{#bw}
+00250             \textcolor{stringliteral}{"QT GUI Plot"}, \textcolor{comment}{#name}
+00251             2 \textcolor{comment}{#number of inputs}
+00252         )
+00253         self.qtgui\_freq\_sink\_x\_0.set\_update\_time(0.10)
+00254         self.qtgui\_freq\_sink\_x\_0.set\_y\_axis(-140, 10)
+00255         self.qtgui\_freq\_sink\_x\_0.enable\_autoscale(\textcolor{keyword}{False})
+00256         self.qtgui\_freq\_sink\_x\_0.enable\_grid(\textcolor{keyword}{False})
+00257         self.qtgui\_freq\_sink\_x\_0.set\_fft\_average(1.0)
+00258         
+00259         labels = [\textcolor{stringliteral}{""}, \textcolor{stringliteral}{""}, \textcolor{stringliteral}{""}, \textcolor{stringliteral}{""}, \textcolor{stringliteral}{""},
+00260                   \textcolor{stringliteral}{""}, \textcolor{stringliteral}{""}, \textcolor{stringliteral}{""}, \textcolor{stringliteral}{""}, \textcolor{stringliteral}{""}]
+00261         widths = [1, 1, 1, 1, 1,
+00262                   1, 1, 1, 1, 1]
+00263         colors = [\textcolor{stringliteral}{"blue"}, \textcolor{stringliteral}{"red"}, \textcolor{stringliteral}{"green"}, \textcolor{stringliteral}{"black"}, \textcolor{stringliteral}{"cyan"},
+00264                   \textcolor{stringliteral}{"magenta"}, \textcolor{stringliteral}{"yellow"}, \textcolor{stringliteral}{"dark red"}, \textcolor{stringliteral}{"dark green"}, \textcolor{stringliteral}{"dark blue"}]
+00265         alphas = [1.0, 1.0, 1.0, 1.0, 1.0,
+00266                   1.0, 1.0, 1.0, 1.0, 1.0]
+00267         \textcolor{keywordflow}{for} i \textcolor{keywordflow}{in} xrange(2):
+00268             \textcolor{keywordflow}{if} len(labels[i]) == 0:
+00269                 self.qtgui\_freq\_sink\_x\_0.set\_line\_label(i, \textcolor{stringliteral}{"Data \{0\}"}.format(i))
+00270             \textcolor{keywordflow}{else}:
+00271                 self.qtgui\_freq\_sink\_x\_0.set\_line\_label(i, labels[i])
+00272             self.qtgui\_freq\_sink\_x\_0.set\_line\_width(i, widths[i])
+00273             self.qtgui\_freq\_sink\_x\_0.set\_line\_color(i, colors[i])
+00274             self.qtgui\_freq\_sink\_x\_0.set\_line\_alpha(i, alphas[i])
+00275         
+00276         self._qtgui_freq_sink_x_0_win = sip.wrapinstance(self.qtgui\_freq\_sink\_x\_0.pyqwidget(), Qt.QWidget)
+00277         self.top\_layout.addWidget(self._qtgui_freq_sink_x_0_win)
+00278         self.blocks_tagged_stream_multiply_length_0_0 = blocks.tagged\_stream\_multiply\_length(
+      gr.sizeof\_gr\_complex*1, \textcolor{stringliteral}{"packet\_len"}, 1.0/float(decim\_fac))
+00279         (self.blocks_tagged_stream_multiply_length_0_0).set_min_output_buffer(4194304)
+00280         self.blocks_tagged_stream_multiply_length_0 = blocks.tagged\_stream\_multiply\_length(
+      gr.sizeof\_gr\_complex*1, \textcolor{stringliteral}{"packet\_len"}, 1.0/float(decim\_fac))
+00281         (self.blocks_tagged_stream_multiply_length_0).set_min_output_buffer(4194304)
+00282         self.blocks_multiply_conjugate_cc_1 = blocks.multiply\_conjugate\_cc(1)
+00283         (self.blocks_multiply_conjugate_cc_1).set_min_output_buffer(4194304)
+00284         self.blocks_multiply_conjugate_cc_0_0 = blocks.multiply\_conjugate\_cc(1)
+00285         (self.blocks_multiply_conjugate_cc_0_0).set_min_output_buffer(4194304)
+00286         self.blocks_multiply_conjugate_cc_0 = blocks.multiply\_conjugate\_cc(1)
+00287         (self.blocks_multiply_conjugate_cc_0).set_min_output_buffer(4194304)
+00288         self.blocks_add_xx_1 = blocks.add\_vcc(1)
+00289         (self.blocks_add_xx_1).set_min_output_buffer(4194304)
+00290 
+00291         \textcolor{comment}{##################################################}
+00292         \textcolor{comment}{# Connections}
+00293         \textcolor{comment}{##################################################}
+00294         self.connect((self.blocks_multiply_conjugate_cc_0, 0), (self.
+      rational_resampler_xxx_0, 0))
+00295         self.connect((self.blocks_multiply_conjugate_cc_0_0, 0), (self.
+      rational_resampler_xxx_0_0, 0))
+00296         self.connect((self.blocks_tagged_stream_multiply_length_0, 0), (self.
+      radar_ts_fft_cc_0, 0))
+00297         self.connect((self.rational_resampler_xxx_0, 0), (self.
+      blocks_tagged_stream_multiply_length_0, 0))
+00298         self.connect((self.blocks_tagged_stream_multiply_length_0_0, 0), (self.
+      radar_ts_fft_cc_0_0, 0))
+00299         self.connect((self.rational_resampler_xxx_0_0, 0), (self.
+      blocks_tagged_stream_multiply_length_0_0, 0))
+00300         self.connect((self.rational_resampler_xxx_0, 0), (self.
+      qtgui_freq_sink_x_0, 0))
+00301         self.connect((self.rational_resampler_xxx_0_0, 0), (self.
+      qtgui_freq_sink_x_0, 1))
+00302         self.connect((self.blocks_multiply_conjugate_cc_1, 0), (self.
+      radar_find_max_peak_c_0, 0))
+00303         self.connect((self.blocks_add_xx_1, 0), (self.radar_usrp_echotimer_cc_0, 0))
+00304         self.connect((self.radar_usrp_echotimer_cc_0, 0), (self.
+      blocks_multiply_conjugate_cc_0, 0))
+00305         self.connect((self.radar_usrp_echotimer_cc_0, 0), (self.
+      blocks_multiply_conjugate_cc_0_0, 0))
+00306         self.connect((self.radar_signal_generator_cw_c_0, 0), (self.
+      blocks_multiply_conjugate_cc_0, 1))
+00307         self.connect((self.radar_signal_generator_cw_c_0_0, 0), (self.
+      blocks_multiply_conjugate_cc_0_0, 1))
+00308         self.connect((self.radar_signal_generator_cw_c_0, 0), (self.
+      blocks_add_xx_1, 0))
+00309         self.connect((self.radar_signal_generator_cw_c_0_0, 0), (self.
+      blocks_add_xx_1, 1))
+00310         self.connect((self.radar_ts_fft_cc_0, 0), (self.
+      blocks_multiply_conjugate_cc_1, 0))
+00311         self.connect((self.radar_ts_fft_cc_0_0, 0), (self.
+      blocks_multiply_conjugate_cc_1, 1))
+00312 
+00313         \textcolor{comment}{##################################################}
+00314         \textcolor{comment}{# Asynch Message Connections}
+00315         \textcolor{comment}{##################################################}
+00316         self.msg\_connect(self.radar_find_max_peak_c_0, \textcolor{stringliteral}{"Msg out"}, self.
+      radar_estimator_fsk_0, \textcolor{stringliteral}{"Msg in"})
+00317         self.msg\_connect(self.radar_estimator_fsk_0, \textcolor{stringliteral}{"Msg out"}, self.
+      radar_msg_manipulator_0, \textcolor{stringliteral}{"Msg in"})
+00318         self.msg\_connect(self.radar_msg_manipulator_0, \textcolor{stringliteral}{"Msg out"}, self.
+      radar_print_results_0, \textcolor{stringliteral}{"Msg in"})
+00319         self.msg\_connect(self.radar_msg_manipulator_0, \textcolor{stringliteral}{"Msg out"}, self.
+      radar_qtgui_time_plot_0, \textcolor{stringliteral}{"Msg in"})
+00320         self.msg\_connect(self.radar_msg_manipulator_0, \textcolor{stringliteral}{"Msg out"}, self.
+      radar_qtgui_time_plot_1, \textcolor{stringliteral}{"Msg in"})
+00321         self.msg\_connect(self.radar_tracking_singletarget_0, \textcolor{stringliteral}{"Msg out"}, self.
+      radar_qtgui_time_plot_0_0, \textcolor{stringliteral}{"Msg in"})
+00322         self.msg\_connect(self.radar_tracking_singletarget_0, \textcolor{stringliteral}{"Msg out"}, self.
+      radar_qtgui_time_plot_1_0, \textcolor{stringliteral}{"Msg in"})
+00323         self.msg\_connect(self.radar_msg_manipulator_0, \textcolor{stringliteral}{"Msg out"}, self.
+      radar_tracking_singletarget_0, \textcolor{stringliteral}{"Msg in"})
+00324 
+00325     \textcolor{keyword}{def }closeEvent(self, event):
+00326         self.settings = Qt.QSettings(\textcolor{stringliteral}{"GNU Radio"}, \textcolor{stringliteral}{"top\_block"})
+00327         self.settings.setValue(\textcolor{stringliteral}{"geometry"}, self.saveGeometry())
+00328         event.accept()
+00329 
+00330     \textcolor{keyword}{def }get_samp_rate(self):
+00331         \textcolor{keywordflow}{return} self.samp_rate
+00332 
+00333     \textcolor{keyword}{def }set_samp_rate(self, samp\_rate):
+00334         self.samp_rate = samp\_rate
+00335         self.set_freq_res(self.samp_rate/float(self.packet_len))
+00336         self.set_time_res(self.packet_len/float(self.samp_rate))
+00337         self.qtgui\_freq\_sink\_x\_0.set\_frequency\_range(0, self.samp_rate/self.
+      decim_fac)
+00338 
+00339     \textcolor{keyword}{def }get_packet_len(self):
+00340         \textcolor{keywordflow}{return} self.packet_len
+00341 
+00342     \textcolor{keyword}{def }set_packet_len(self, packet\_len):
+00343         self.packet_len = packet\_len
+00344         self.set_min_output_buffer(int(self.packet_len*2))
+00345         self.set_freq_res(self.samp_rate/float(self.packet_len))
+00346         self.set_time_res(self.packet_len/float(self.samp_rate))
+00347 
+00348     \textcolor{keyword}{def }get_freq_res(self):
+00349         \textcolor{keywordflow}{return} self.freq_res
+00350 
+00351     \textcolor{keyword}{def }set_freq_res(self, freq\_res):
+00352         self.freq_res = freq\_res
+00353         self.set_v_res(self.freq_res*3e8/2/self.center_freq)
+00354 
+00355     \textcolor{keyword}{def }get_freq(self):
+00356         \textcolor{keywordflow}{return} self.freq
+00357 
+00358     \textcolor{keyword}{def }set_freq(self, freq):
+00359         self.freq = freq
+00360         self.set_range_res(3e8/2/float((self.freq[1]-self.freq[0])))
+00361 
+00362     \textcolor{keyword}{def }get_center_freq(self):
+00363         \textcolor{keywordflow}{return} self.center_freq
+00364 
+00365     \textcolor{keyword}{def }set_center_freq(self, center\_freq):
+00366         self.center_freq = center\_freq
+00367         self.set_v_res(self.freq_res*3e8/2/self.center_freq)
+00368 
+00369     \textcolor{keyword}{def }get_v_res(self):
+00370         \textcolor{keywordflow}{return} self.v_res
+00371 
+00372     \textcolor{keyword}{def }set_v_res(self, v\_res):
+00373         self.v_res = v\_res
+00374 
+00375     \textcolor{keyword}{def }get_time_res(self):
+00376         \textcolor{keywordflow}{return} self.time_res
+00377 
+00378     \textcolor{keyword}{def }set_time_res(self, time\_res):
+00379         self.time_res = time\_res
+00380 
+00381     \textcolor{keyword}{def }get_threshold(self):
+00382         \textcolor{keywordflow}{return} self.threshold
+00383 
+00384     \textcolor{keyword}{def }set_threshold(self, threshold):
+00385         self.threshold = threshold
+00386         self.radar\_find\_max\_peak\_c\_0.set\_threshold(self.threshold)
+00387         Qt.QMetaObject.invokeMethod(self._threshold_counter, \textcolor{stringliteral}{"setValue"}, Qt.Q\_ARG(\textcolor{stringliteral}{"double"}, self.
+      threshold))
+00388         Qt.QMetaObject.invokeMethod(self._threshold_slider, \textcolor{stringliteral}{"setValue"}, Qt.Q\_ARG(\textcolor{stringliteral}{"double"}, self.
+      threshold))
+00389 
+00390     \textcolor{keyword}{def }get_samp_protect(self):
+00391         \textcolor{keywordflow}{return} self.samp_protect
+00392 
+00393     \textcolor{keyword}{def }set_samp_protect(self, samp\_protect):
+00394         self.samp_protect = samp\_protect
+00395         self.radar\_find\_max\_peak\_c\_0.set\_samp\_protect(int(self.samp_protect))
+00396         Qt.QMetaObject.invokeMethod(self._samp_protect_counter, \textcolor{stringliteral}{"setValue"}, Qt.Q\_ARG(\textcolor{stringliteral}{"double"}, self.
+      samp_protect))
+00397         Qt.QMetaObject.invokeMethod(self._samp_protect_slider, \textcolor{stringliteral}{"setValue"}, Qt.Q\_ARG(\textcolor{stringliteral}{"double"}, self.
+      samp_protect))
+00398 
+00399     \textcolor{keyword}{def }get_range_time(self):
+00400         \textcolor{keywordflow}{return} self.range_time
+00401 
+00402     \textcolor{keyword}{def }set_range_time(self, range\_time):
+00403         self.range_time = range\_time
+00404 
+00405     \textcolor{keyword}{def }get_range_res(self):
+00406         \textcolor{keywordflow}{return} self.range_res
+00407 
+00408     \textcolor{keyword}{def }set_range_res(self, range\_res):
+00409         self.range_res = range\_res
+00410 
+00411     \textcolor{keyword}{def }get_range_add(self):
+00412         \textcolor{keywordflow}{return} self.range_add
+00413 
+00414     \textcolor{keyword}{def }set_range_add(self, range\_add):
+00415         self.range_add = range\_add
+00416         Qt.QMetaObject.invokeMethod(self._range_add_counter, \textcolor{stringliteral}{"setValue"}, Qt.Q\_ARG(\textcolor{stringliteral}{"double"}, self.
+      range_add))
+00417         Qt.QMetaObject.invokeMethod(self._range_add_slider, \textcolor{stringliteral}{"setValue"}, Qt.Q\_ARG(\textcolor{stringliteral}{"double"}, self.
+      range_add))
+00418         self.radar\_msg\_manipulator\_0.set\_const\_add((self.range_add, ))
+00419 
+00420     \textcolor{keyword}{def }get_min_output_buffer(self):
+00421         \textcolor{keywordflow}{return} self.min_output_buffer
+00422 
+00423     \textcolor{keyword}{def }set_min_output_buffer(self, min\_output\_buffer):
+00424         self.min_output_buffer = min\_output\_buffer
+00425 
+00426     \textcolor{keyword}{def }get_max_output_buffer(self):
+00427         \textcolor{keywordflow}{return} self.max_output_buffer
+00428 
+00429     \textcolor{keyword}{def }set_max_output_buffer(self, max\_output\_buffer):
+00430         self.max_output_buffer = max\_output\_buffer
+00431 
+00432     \textcolor{keyword}{def }get_gain_tx(self):
+00433         \textcolor{keywordflow}{return} self.gain_tx
+00434 
+00435     \textcolor{keyword}{def }set_gain_tx(self, gain\_tx):
+00436         self.gain_tx = gain\_tx
+00437         Qt.QMetaObject.invokeMethod(self._gain_tx_counter, \textcolor{stringliteral}{"setValue"}, Qt.Q\_ARG(\textcolor{stringliteral}{"double"}, self.
+      gain_tx))
+00438         Qt.QMetaObject.invokeMethod(self._gain_tx_slider, \textcolor{stringliteral}{"setValue"}, Qt.Q\_ARG(\textcolor{stringliteral}{"double"}, self.
+      gain_tx))
+00439         self.radar\_usrp\_echotimer\_cc\_0.set\_tx\_gain(self.gain_tx)
+00440 
+00441     \textcolor{keyword}{def }get_gain_rx(self):
+00442         \textcolor{keywordflow}{return} self.gain_rx
+00443 
+00444     \textcolor{keyword}{def }set_gain_rx(self, gain\_rx):
+00445         self.gain_rx = gain\_rx
+00446         Qt.QMetaObject.invokeMethod(self._gain_rx_counter, \textcolor{stringliteral}{"setValue"}, Qt.Q\_ARG(\textcolor{stringliteral}{"double"}, self.
+      gain_rx))
+00447         Qt.QMetaObject.invokeMethod(self._gain_rx_slider, \textcolor{stringliteral}{"setValue"}, Qt.Q\_ARG(\textcolor{stringliteral}{"double"}, self.
+      gain_rx))
+00448         self.radar\_usrp\_echotimer\_cc\_0.set\_rx\_gain(self.gain_rx)
+00449 
+00450     \textcolor{keyword}{def }get_delay_samp(self):
+00451         \textcolor{keywordflow}{return} self.delay_samp
+00452 
+00453     \textcolor{keyword}{def }set_delay_samp(self, delay\_samp):
+00454         self.delay_samp = delay\_samp
+00455         Qt.QMetaObject.invokeMethod(self._delay_samp_counter, \textcolor{stringliteral}{"setValue"}, Qt.Q\_ARG(\textcolor{stringliteral}{"double"}, self.
+      delay_samp))
+00456         Qt.QMetaObject.invokeMethod(self._delay_samp_slider, \textcolor{stringliteral}{"setValue"}, Qt.Q\_ARG(\textcolor{stringliteral}{"double"}, self.
+      delay_samp))
+00457         self.radar\_usrp\_echotimer\_cc\_0.set\_num\_delay\_samps(int(self.delay_samp))
+00458 
+00459     \textcolor{keyword}{def }get_decim_fac(self):
+00460         \textcolor{keywordflow}{return} self.decim_fac
+00461 
+00462     \textcolor{keyword}{def }set_decim_fac(self, decim\_fac):
+00463         self.decim_fac = decim\_fac
+00464         self.blocks\_tagged\_stream\_multiply\_length\_0.set\_scalar(1.0/float(self.
+      decim_fac))
+00465         self.blocks\_tagged\_stream\_multiply\_length\_0\_0.set\_scalar(1.0/float(self.
+      decim_fac))
+00466         self.qtgui\_freq\_sink\_x\_0.set\_frequency\_range(0, self.samp_rate/self.
+      decim_fac)
+00467 
+00468     \textcolor{keyword}{def }get_amplitude(self):
+00469         \textcolor{keywordflow}{return} self.amplitude
+00470 
+00471     \textcolor{keyword}{def }set_amplitude(self, amplitude):
+00472         self.amplitude = amplitude
+00473 
+00474 \textcolor{keywordflow}{if} \_\_name\_\_ == \textcolor{stringliteral}{'\_\_main\_\_'}:
+00475     \textcolor{keyword}{import} ctypes
+00476     \textcolor{keyword}{import} sys
+00477     \textcolor{keywordflow}{if} sys.platform.startswith(\textcolor{stringliteral}{'linux'}):
+00478         \textcolor{keywordflow}{try}:
+00479             x11 = ctypes.cdll.LoadLibrary(\textcolor{stringliteral}{'libX11.so'})
+00480             x11.XInitThreads()
+00481         \textcolor{keywordflow}{except}:
+00482             \textcolor{keywordflow}{print} \textcolor{stringliteral}{"Warning: failed to XInitThreads()"}
+00483     parser = OptionParser(option\_class=eng\_option, usage=\textcolor{stringliteral}{"%prog: [options]"})
+00484     (options, args) = parser.parse\_args()
+00485     if(StrictVersion(Qt.qVersion()) >= StrictVersion(\textcolor{stringliteral}{"4.5.0"})):
+00486         Qt.QApplication.setGraphicsSystem(gr.prefs().get\_string(\textcolor{stringliteral}{'qtgui'},\textcolor{stringliteral}{'style'},\textcolor{stringliteral}{'raster'}))
+00487     qapp = Qt.QApplication(sys.argv)
+00488     tb = top_block()
+00489     tb.start()
+00490     tb.show()
+00491     \textcolor{keyword}{def }quitting():
+00492         tb.stop()
+00493         tb.wait()
+00494     qapp.connect(qapp, Qt.SIGNAL(\textcolor{stringliteral}{"aboutToQuit()"}), quitting)
+00495     qapp.exec\_()
+00496     tb = \textcolor{keywordtype}{None} \textcolor{comment}{#to clean up Qt widgets}
+\end{DoxyCode}

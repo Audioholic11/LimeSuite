@@ -1,0 +1,159 @@
+\subsection{Converter\+Registry.\+cpp}
+\label{ConverterRegistry_8cpp_source}\index{/home/erik/prefix/default/src/soapysdr/lib/\+Converter\+Registry.\+cpp@{/home/erik/prefix/default/src/soapysdr/lib/\+Converter\+Registry.\+cpp}}
+
+\begin{DoxyCode}
+00001 \textcolor{comment}{// Copyright (c) 2017-2017 Coburn Wightman}
+00002 \textcolor{comment}{// SPDX-License-Identifier: BSL-1.0}
+00003 
+00004 \textcolor{preprocessor}{#include <SoapySDR/ConverterRegistry.hpp>}
+00005 \textcolor{preprocessor}{#include <algorithm>}
+00006 \textcolor{preprocessor}{#include <stdexcept>}
+00007 
+00008 \textcolor{keyword}{static} SoapySDR::ConverterRegistry::FormatConverters formatConverters;
+00009 
+00010 SoapySDR::ConverterRegistry::ConverterRegistry(\textcolor{keyword}{const} std::string &sourceFormat, \textcolor{keyword}{const} 
+      std::string &targetFormat, \textcolor{keyword}{const} FunctionPriority &priority, ConverterFunction converterFunction)
+00011 \{
+00012   \textcolor{keywordflow}{if} (formatConverters.count(sourceFormat) == 0)
+00013     ;
+00014   \textcolor{keywordflow}{else} \textcolor{keywordflow}{if} (formatConverters[sourceFormat].count(targetFormat) == 0)
+00015     ;
+00016   \textcolor{keywordflow}{else} \textcolor{keywordflow}{if} (formatConverters[sourceFormat][targetFormat].count(priority) != 0)
+00017     \{
+00018       SoapySDR::logf(SOAPY_SDR_ERROR, \textcolor{stringliteral}{"SoapySDR::ConverterRegistry(%s, %s, %s) duplicate registration"}, 
+      sourceFormat.c\_str(), targetFormat.c\_str(), std::to\_string(priority).c\_str());
+00019       \textcolor{keywordflow}{return};
+00020     \}
+00021   
+00022   formatConverters[sourceFormat][targetFormat][priority] = converterFunction;
+00023 
+00024   \textcolor{keywordflow}{return};
+00025 \}
+00026 
+00027 std::vector<std::string> SoapySDR::ConverterRegistry::listTargetFormats(\textcolor{keyword}{const} 
+      std::string &sourceFormat)
+00028 \{
+00029   std::vector<std::string> targets;
+00030 
+00031   \textcolor{keywordflow}{if} (formatConverters.count(sourceFormat) == 0)
+00032     \textcolor{keywordflow}{return} targets;
+00033 
+00034   \textcolor{keywordflow}{for}(\textcolor{keyword}{const} \textcolor{keyword}{auto} &it:formatConverters[sourceFormat])
+00035     \{
+00036       std::string targetFormat = it.first;
+00037       targets.push\_back(targetFormat);
+00038     \}
+00039   
+00040   std::sort(targets.begin(), targets.end());
+00041   \textcolor{keywordflow}{return} targets;
+00042 \}
+00043 
+00044 std::vector<std::string> SoapySDR::ConverterRegistry::listSourceFormats(\textcolor{keyword}{const} 
+      std::string &targetFormat)
+00045 \{
+00046   std::vector<std::string> sources;
+00047 
+00048   \textcolor{keywordflow}{for}(\textcolor{keyword}{const} \textcolor{keyword}{auto} &it:formatConverters)
+00049     \{
+00050       std::string sourceFormat = it.first;
+00051       \textcolor{keywordflow}{if} (formatConverters[sourceFormat].count(targetFormat) > 0)
+00052         sources.push\_back(sourceFormat);
+00053     \}
+00054   
+00055   std::sort(sources.begin(), sources.end());
+00056   \textcolor{keywordflow}{return} sources;
+00057 \}
+00058 
+00059 std::vector<SoapySDR::ConverterRegistry::FunctionPriority> 
+      SoapySDR::ConverterRegistry::listPriorities(\textcolor{keyword}{const} std::string &sourceFormat, \textcolor{keyword}{const} 
+      std::string &targetFormat)
+00060 \{
+00061   std::vector<FunctionPriority> priorities;
+00062   
+00063   \textcolor{keywordflow}{if} (formatConverters.count(sourceFormat) == 0)
+00064     ;
+00065   \textcolor{keywordflow}{else} \textcolor{keywordflow}{if} (formatConverters[sourceFormat].count(targetFormat) == 0)
+00066     ;
+00067   \textcolor{keywordflow}{else} \textcolor{keywordflow}{if} (formatConverters[sourceFormat][targetFormat].size() == 0)
+00068     ;
+00069   \textcolor{keywordflow}{else}
+00070     \{
+00071       \textcolor{keywordflow}{for}(\textcolor{keyword}{const} \textcolor{keyword}{auto} &it:formatConverters[sourceFormat][targetFormat])
+00072     \{
+00073       FunctionPriority priority = it.first;
+00074       priorities.push\_back(priority);
+00075     \}
+00076     \}
+00077   
+00078   \textcolor{keywordflow}{return} priorities;
+00079   
+00080 \}
+00081 
+00082 SoapySDR::ConverterRegistry::ConverterFunction 
+      SoapySDR::ConverterRegistry::getFunction(\textcolor{keyword}{const} std::string &sourceFormat, \textcolor{keyword}{const} 
+      std::string &targetFormat)
+00083 \{
+00084   \textcolor{keywordflow}{if} (formatConverters.count(sourceFormat) == 0)
+00085     \{
+00086       \textcolor{keywordflow}{throw} std::runtime\_error(\textcolor{stringliteral}{"ConverterRegistry::getFunction() conversion source not registered; "}
+00087                    \textcolor{stringliteral}{"sourceFormat="}+sourceFormat+\textcolor{stringliteral}{", targetFormat="}+targetFormat);
+00088     \}
+00089   
+00090   \textcolor{keywordflow}{if} (formatConverters[sourceFormat].count(targetFormat) == 0)
+00091     \{
+00092       \textcolor{keywordflow}{throw} std::runtime\_error(\textcolor{stringliteral}{"ConverterRegistry::getFunction() conversion target not registered; "}
+00093                    \textcolor{stringliteral}{"sourceFormat="}+sourceFormat+\textcolor{stringliteral}{", targetFormat="}+targetFormat);
+00094     \}
+00095 
+00096   \textcolor{keywordflow}{if} (formatConverters[sourceFormat][targetFormat].size() == 0)
+00097     \{
+00098       \textcolor{keywordflow}{throw} std::runtime\_error(\textcolor{stringliteral}{"ConverterRegistry::getFunction() no functions found for registered
+       conversion; "}
+00099                    \textcolor{stringliteral}{"sourceFormat="}+sourceFormat+\textcolor{stringliteral}{", targetFormat="}+targetFormat);
+00100     \}
+00101 
+00102   \textcolor{keywordflow}{return} formatConverters[sourceFormat][targetFormat].rbegin()->second;
+00103 \}
+00104 
+00105 SoapySDR::ConverterRegistry::ConverterFunction 
+      SoapySDR::ConverterRegistry::getFunction(\textcolor{keyword}{const} std::string &sourceFormat, \textcolor{keyword}{const} 
+      std::string &targetFormat, \textcolor{keyword}{const} FunctionPriority &priority)
+00106 \{
+00107   \textcolor{keywordflow}{if} (formatConverters.count(sourceFormat) == 0)
+00108     \{
+00109       \textcolor{keywordflow}{throw} std::runtime\_error(\textcolor{stringliteral}{"ConverterRegistry::getFunction() conversion source not registered; "}
+00110                    \textcolor{stringliteral}{"sourceFormat="}+sourceFormat+\textcolor{stringliteral}{", targetFormat="}+targetFormat+\textcolor{stringliteral}{", priority="}+std::to\_string
+      (priority));
+00111     \}
+00112 
+00113   \textcolor{keywordflow}{if} (formatConverters[sourceFormat].count(targetFormat) == 0)
+00114     \{
+00115       \textcolor{keywordflow}{throw} std::runtime\_error(\textcolor{stringliteral}{"ConverterRegistry::getFunction() conversion target not registered; "}
+00116                    \textcolor{stringliteral}{"sourceFormat="}+sourceFormat+\textcolor{stringliteral}{", targetFormat="}+targetFormat+\textcolor{stringliteral}{", priority="}+std::to\_string
+      (priority));
+00117     \}
+00118 
+00119   \textcolor{keywordflow}{if} (formatConverters[sourceFormat][targetFormat].count(priority) == 0)
+00120     \{
+00121       \textcolor{keywordflow}{throw} std::runtime\_error(\textcolor{stringliteral}{"ConverterRegistry::getFunction() conversion priority not registered; "}
+00122                    \textcolor{stringliteral}{"sourceFormat="}+sourceFormat+\textcolor{stringliteral}{", targetFormat="}+targetFormat+\textcolor{stringliteral}{", priority="}+std::to\_string
+      (priority));
+00123     \}
+00124 
+00125   \textcolor{keywordflow}{return} formatConverters[sourceFormat][targetFormat][priority];
+00126 \}
+00127 
+00128 std::vector<std::string> SoapySDR::ConverterRegistry::listAvailableSourceFormats(\textcolor{keywordtype}{void})
+00129 \{
+00130     std::vector<std::string> sources;
+00131     \textcolor{keywordflow}{for} (\textcolor{keyword}{const} \textcolor{keyword}{auto} &it : formatConverters)
+00132     \{
+00133         \textcolor{keywordflow}{if} (std::find(sources.begin(), sources.end(), it.first) == sources.end())
+00134         \{
+00135             sources.push\_back(it.first);
+00136         \}
+00137     \}
+00138     std::sort(sources.begin(), sources.end());
+00139     \textcolor{keywordflow}{return} sources;
+00140 \}
+\end{DoxyCode}
