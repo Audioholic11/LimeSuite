@@ -693,16 +693,15 @@ unsigned SoapyLMS7::readRegister(const std::string &name, const unsigned addr) c
 
 void SoapyLMS7::writeRegister(const unsigned addr, const unsigned value)
 {
-    auto st = lms7Device->GetConnection()->WriteRegister(addr, value);
+    auto st = lms7Device->WriteFPGAReg(addr, value);
     if (st != 0) throw std::runtime_error(
         "SoapyLMS7::WriteRegister("+std::to_string(addr)+") FAIL");
 }
 
 unsigned SoapyLMS7::readRegister(const unsigned addr) const
 {
-    unsigned readbackData = 0;
-    auto st = lms7Device->GetConnection()->ReadRegister(addr, readbackData);
-    if (st != 0) throw std::runtime_error(
+    int readbackData = lms7Device->ReadFPGAReg(addr);
+    if (readbackData < 0) throw std::runtime_error(
         "SoapyLMS7::ReadRegister("+std::to_string(addr)+") FAIL");
     return readbackData;
 }
