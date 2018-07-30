@@ -70,12 +70,14 @@ int StreamChannel::Write(const void* samples, const uint32_t count, const Metada
         const complex16_t* ptr = (const complex16_t*)samplesShort ;
         pushed = fifo->push_samples(ptr, count, 1, meta->timestamp, timeout_ms, meta->flags, meta->lastchirp_timestamp,meta->chirptime);
         delete[] samplesShort;
+        lime::warning("EGM: StreamChannel::Write: count: %u pushed: %u Tx: %u", count, pushed,config.isTx);
     }
     else
     {
         const complex16_t* ptr = (const complex16_t*)samples;
         pushed = fifo->push_samples(ptr, count, 1, meta->timestamp, timeout_ms, meta->flags, meta->lastchirp_timestamp,meta->chirptime);
     }
+    //lime::warning("EGM: StreamChannel::Write: count: %u pushed: %u Tx: %u", count, pushed,config.isTx);
     return pushed;
 }
 
@@ -91,12 +93,15 @@ int StreamChannel::Read(void* samples, const uint32_t count, Metadata* meta, con
         popped = fifo->pop_samples(ptr, count, 1, &meta->timestamp, timeout_ms, &meta->flags, &meta->lastchirp_timestamp, &meta->chirptime);
         for(int i=2*popped-1; i>=0; --i)
             samplesFloat[i] = (float)samplesShort[i]/32767.0f;
+
+    lime::warning("EGM: StreamChannel::Read: count: %u popped: %u Tx: %u", count, popped,config.isTx);
     }
     else
     {
         complex16_t* ptr = (complex16_t*)samples;
-        popped = fifo->pop_samples(ptr, count, 1, &meta->timestamp, timeout_ms, &meta->flags);
+        popped = fifo->pop_samples(ptr, count, 1, &meta->timestamp, timeout_ms, &meta->flags, &meta->lastchirp_timestamp, &meta->chirptime);
     }
+    //lime::warning("EGM: StreamChannel::Read: count: %u popped: %u Tx: %u", count, popped,config.isTx);
     return popped;
 }
 
@@ -606,7 +611,7 @@ int Streamer::UpdateThreads(bool stopAll)
         dataLinkFormat = StreamConfig::FMT_INT12;
         //by default use 12 bit compressed, adjust link format for stream
 
-        for(auto &i : mRxStreams)
+        /*for(auto &i : mRxStreams)
             if(i.used && i.config.format != StreamConfig::FMT_INT12)
             {
                 dataLinkFormat = StreamConfig::FMT_INT16;
@@ -619,7 +624,7 @@ int Streamer::UpdateThreads(bool stopAll)
                 dataLinkFormat = StreamConfig::FMT_INT16;
                 break;
             }
-
+            */
         for(auto &i : mRxStreams)
             if (i.used)
                 i.config.linkFormat = dataLinkFormat;
@@ -766,6 +771,7 @@ void Streamer::TransmitPacketsLoop()
                 break;
 
             end_burst = (meta.flags & RingFIFO::END_BURST);
+            lime::warning("EGM: End Burst? %u  chCount: %u", end_burst, streamSize);
             pkt[i].counter = meta.timestamp;
             pkt[i].reserved[0] = 0;
             //by default ignore timestamps

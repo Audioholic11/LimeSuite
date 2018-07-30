@@ -31,7 +31,7 @@ struct complex16_t
 //const int samples12InPkt = 672;
 const int samples12InPkt = dataLength*8/12/2;
 //const int samples16InPkt = 1020;
-const int samples16InPkt = dataLength*8/16/2;
+const int samples16InPkt = dataLength/sizeof(complex16_t);
 
 class SamplesPacket
 {

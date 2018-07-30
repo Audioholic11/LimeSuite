@@ -424,6 +424,11 @@ int SoapyLMS7::writeStream(
     metadata.timestamp = SoapySDR::timeNsToTicks(timeNs, sampleRate);
     metadata.flags = (flags & SOAPY_SDR_HAS_TIME) ? lime::RingFIFO::SYNC_TIMESTAMP : 0;
     metadata.flags |= (flags & SOAPY_SDR_END_BURST) ? lime::RingFIFO::END_BURST : 0;
+    metadata.lastchirp_timestamp = 0;
+    metadata.chirptime = 0;
+
+    SoapySDR::logf(SOAPY_SDR_ERROR, "EGM: META->flags = %u",metadata.flags);
+
 
     //write the 0th channel: get number of samples written
     int status = streamID[0]->Write(buffs[0], numElems, &metadata, timeoutUs/1000);
