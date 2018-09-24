@@ -601,8 +601,8 @@ std::string SoapyLMS7::readSensor(const std::string &name) const
       }
       else
       {
-        auto ticks = lms7Device->GetChirpTimePeriod();
-        return std::to_string(SoapySDR::ticksToTimeNs(ticks, sampleRate));
+        auto ticks_chirptimePeriod = lms7Device->GetChirpTimePeriod();
+        return std::to_string(SoapySDR::ticksToTimeNs(ticks_chirptimePeriod, sampleRate));
       }
     }
     if (name == "chirp_time")
@@ -613,8 +613,8 @@ std::string SoapyLMS7::readSensor(const std::string &name) const
       }
       else
       {
-        auto ticks = lms7Device->GetChirpTimeStamp();
-        return std::to_string(SoapySDR::ticksToTimeNs(ticks, sampleRate));
+        auto ticks_chirptimestamp = lms7Device->GetChirpTimeStamp();
+        return std::to_string(SoapySDR::ticksToTimeNs(ticks_chirptimestamp, sampleRate));
       }
     }
 

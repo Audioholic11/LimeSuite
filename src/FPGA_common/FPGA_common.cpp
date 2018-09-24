@@ -557,14 +557,17 @@ int FPGA::FPGAPacketPayload2Samples(const uint8_t* buffer, int bufLen, bool mimo
 
 int FPGA::Samples2FPGAPacketPayload(const complex16_t* const* samples, int samplesCount, bool mimo, bool compressed, uint8_t* buffer)
 {
+  complex16_t sample;
     if(compressed)
     {
         int b=0;
         for(int src=0; src<samplesCount; ++src)
         {
-            buffer[b++] = samples[0][src].i;
-            buffer[b++] = ((samples[0][src].i >> 8) & 0x0F) | (samples[0][src].q << 4);
-            buffer[b++] = samples[0][src].q >> 4;
+            sample.i = samples[0][src].i;
+            sample.q = samples[0][src].q;//if need to move 12 bit to MSB?
+            buffer[b++] = sample.i;
+            buffer[b++] = ((sample.i >> 8) & 0x0F) | (sample.q << 4);
+            buffer[b++] = sample.q >> 4;
             if (mimo)
             {
                 buffer[b++] = samples[1][src].i;

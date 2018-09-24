@@ -82,8 +82,8 @@ public:
     {
         uint64_t timestamp;
         uint32_t flags;
-        uint64_t lastchirp_timestamp;
-        uint64_t chirptime;
+        uint64_t chirptimePeriod;
+        uint64_t chirptimeStamp;
     };
 
     struct Info

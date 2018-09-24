@@ -355,7 +355,10 @@ int SoapyLMS7::readStream(
     }
 
     StreamChannel::Metadata metadata;
-    const uint64_t cmdTicks = ((icstream->flags & SOAPY_SDR_HAS_TIME) != 0)?SoapySDR::timeNsToTicks(icstream->timeNs, sampleRate):0;
+    const auto &streamID = icstream->streamID;
+    long long tickOffset = streamID[0]->mStreamer->mTimestampOffset;
+    //SoapySDR::logf(SOAPY_SDR_NOTICE, "EGM: tickOffset  = %lli",tickOffset);
+    const uint64_t cmdTicks = ((icstream->flags & SOAPY_SDR_HAS_TIME) != 0)?SoapySDR::timeNsToTicks(icstream->timeNs, sampleRate) - tickOffset:0;
     int status = _readStreamAligned(icstream, (char * const *)buffs, numElems, cmdTicks, metadata, timeoutUs/1000);
     if (status < 0) return status;
 
@@ -365,6 +368,12 @@ int SoapyLMS7::readStream(
         //our request time is now late, clear command and return error code
         if (cmdTicks < metadata.timestamp)
         {
+          //SoapySDR::logf(SOAPY_SDR_NOTICE, "EGM: cmdTicks        = %u",cmdTicks);
+          //SoapySDR::logf(SOAPY_SDR_NOTICE, "EGM: META->timestamp = %u",metadata.timestamp);
+          //SoapySDR::logf(SOAPY_SDR_NOTICE, "EGM: difference      = %u",metadata.timestamp - cmdTicks);
+          //SoapySDR::logf(SOAPY_SDR_NOTICE, "EGM: numElems = %u",icstream->numElems);
+          //SoapySDR::logf(SOAPY_SDR_NOTICE, "EGM: numRead  = %u",status);
+          timeNs = SoapySDR::ticksToTimeNs(metadata.timestamp + tickOffset, sampleRate);
             icstream->hasCmd = false;
             return SOAPY_SDR_TIME_ERROR;
         }
@@ -402,7 +411,21 @@ int SoapyLMS7::readStream(
     flags = 0;
     if ((metadata.flags & RingFIFO::END_BURST) != 0) flags |= SOAPY_SDR_END_BURST;
     if ((metadata.flags & RingFIFO::SYNC_TIMESTAMP) != 0) flags |= SOAPY_SDR_HAS_TIME;
-    timeNs = SoapySDR::ticksToTimeNs(metadata.timestamp, sampleRate);
+    timeNs = SoapySDR::ticksToTimeNs(metadata.timestamp + tickOffset, sampleRate);
+
+    iterator++;
+    //debug
+    if(iterator ==1)
+    {
+    //SoapySDR::logf(SOAPY_SDR_NOTICE, "EGM: cmdTicks = %u",cmdTicks);
+    //SoapySDR::logf(SOAPY_SDR_NOTICE, "EGM: META->flags = %u",metadata.flags);
+    //SoapySDR::logf(SOAPY_SDR_NOTICE, "EGM: META->timestamp = %u",metadata.timestamp);
+    //SoapySDR::logf(SOAPY_SDR_NOTICE, "EGM: chirptimeStamp = %u",SoapySDR::ticksToTimeNs(metadata.chirptimeStamp, sampleRate));
+    //SoapySDR::logf(SOAPY_SDR_NOTICE, "EGM: timeNs         = %u",timeNs);
+    //SoapySDR::logf(SOAPY_SDR_NOTICE, "EGM: numElems = %u",icstream->numElems);
+    //SoapySDR::logf(SOAPY_SDR_NOTICE, "EGM: numRead = %u",status);
+    iterator = 0;
+    }
 
     //return num read or error code
     return (status >= 0) ? status : SOAPY_SDR_STREAM_ERROR;
@@ -424,10 +447,14 @@ int SoapyLMS7::writeStream(
     metadata.timestamp = SoapySDR::timeNsToTicks(timeNs, sampleRate);
     metadata.flags = (flags & SOAPY_SDR_HAS_TIME) ? lime::RingFIFO::SYNC_TIMESTAMP : 0;
     metadata.flags |= (flags & SOAPY_SDR_END_BURST) ? lime::RingFIFO::END_BURST : 0;
-    metadata.lastchirp_timestamp = 0;
-    metadata.chirptime = 0;
+    metadata.chirptimeStamp = 0;
+    metadata.chirptimePeriod = 0;
 
-    SoapySDR::logf(SOAPY_SDR_ERROR, "EGM: META->flags = %u",metadata.flags);
+    //SoapySDR::logf(SOAPY_SDR_NOTICE, "EGM: META->flags = %u",metadata.flags);
+    //SoapySDR::logf(SOAPY_SDR_NOTICE, "EGM: META->timestamp = %u",metadata.timestamp);
+    //SoapySDR::logf(SOAPY_SDR_NOTICE, "EGM: timeNs = %u",timeNs);
+    //SoapySDR::logf(SOAPY_SDR_NOTICE, "EGM: numElems = %u",numElems);
+
 
 
     //write the 0th channel: get number of samples written

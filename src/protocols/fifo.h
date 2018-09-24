@@ -61,7 +61,7 @@ public:
     @param flags optional flags associated with the samples
     @return number of items inserted
     */
-    uint32_t push_samples(const complex16_t *buffer, const uint32_t samplesCount, const uint8_t channelsCount, uint64_t timestamp, const uint32_t timeout_ms, const uint32_t flags = 0, uint64_t lastchirp_timestamp = 0, uint64_t chirptime  = 0)
+    uint32_t push_samples(const complex16_t *buffer, const uint32_t samplesCount, const uint8_t channelsCount, uint64_t timestamp, const uint32_t timeout_ms, const uint32_t flags = 0, uint64_t chirptimeStamp = 0, uint64_t chirptimePeriod  = 0)
     {
         assert(buffer != nullptr);
         uint32_t samplesTaken = 0;
@@ -88,8 +88,8 @@ public:
             else
             {
                 mBuffer[mTail].timestamp = timestamp + samplesTaken;
-                mBuffer[mTail].lastchirp_timestamp = lastchirp_timestamp;
-                mBuffer[mTail].chirptime = chirptime;
+                mBuffer[mTail].chirptimeStamp = chirptimeStamp;
+                mBuffer[mTail].chirptimePeriod = chirptimePeriod;
                 int cnt = samplesCount-samplesTaken;
                 if (cnt > SamplesPacket::maxSamplesInPacket)
                 {
@@ -120,7 +120,7 @@ public:
         @param flags optional flags associated with the samples
         @return number of samples popped
     */
-    uint32_t pop_samples(complex16_t* buffer, const uint32_t samplesCount, const uint8_t channelsCount, uint64_t *timestamp, const uint32_t timeout_ms, uint32_t *flags = nullptr,uint64_t *lastchirp_timestamp = 0, uint64_t *chirptime = 0)
+    uint32_t pop_samples(complex16_t* buffer, const uint32_t samplesCount, const uint8_t channelsCount, uint64_t *timestamp, const uint32_t timeout_ms, uint32_t *flags = nullptr,uint64_t *chirptimeStamp = 0, uint64_t *chirptimePeriod = 0)
     {
         assert(buffer != nullptr);
         uint32_t samplesFilled = 0;
@@ -138,11 +138,11 @@ public:
             if(samplesFilled == 0 && timestamp != nullptr)
                 *timestamp = mBuffer[mHead].timestamp + mBuffer[mHead].first;
 
-            if(samplesFilled == 0 && lastchirp_timestamp != nullptr)
-                    *lastchirp_timestamp = mBuffer[mHead].lastchirp_timestamp + mBuffer[mHead].first;
+            if(samplesFilled == 0 && chirptimeStamp != nullptr)
+                    *chirptimeStamp = mBuffer[mHead].chirptimeStamp + mBuffer[mHead].first;
 
-            if(samplesFilled == 0 && chirptime != nullptr)
-                    *chirptime = mBuffer[mHead].chirptime;
+            if(samplesFilled == 0 && chirptimePeriod != nullptr)
+                    *chirptimePeriod = mBuffer[mHead].chirptimePeriod;
 
 
             while(mElementsFilled > 0 && samplesFilled < samplesCount)

@@ -276,6 +276,7 @@ public:
     unsigned readGPIODir(const std::string &bank) const;
 
 private:
+    long iterator = 0;
     const SoapySDR::Kwargs _deviceArgs; //!< stash of constructor arguments
     const std::string _moduleName;
     lime::LMS7_Device * lms7Device;

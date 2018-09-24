@@ -16,8 +16,8 @@ struct FPGA_DataPacket
     uint64_t counter;
     uint8_t data[dataLength];
     //uint8_t data[2016];
-    uint64_t ftr0;//lastchirp_timestamp
-    uint64_t ftr1;//chirptime
+    uint64_t ftr0;//chirptimePeriod
+    uint64_t ftr1;//chirptimeStamp
 };
 
 struct complex16_t
@@ -31,20 +31,21 @@ struct complex16_t
 //const int samples12InPkt = 672;
 const int samples12InPkt = dataLength*8/12/2;
 //const int samples16InPkt = 1020;
+//const int samples16InPkt = 504;
 const int samples16InPkt = dataLength/sizeof(complex16_t);
 
 class SamplesPacket
 {
 public:
-    static const int16_t maxSamplesInPacket = samples12InPkt; //total number of samples in all channels combined
+    static const int16_t maxSamplesInPacket = samples16InPkt; //total number of samples in all channels combined
     uint64_t timestamp; //timestamp of the packet
     uint16_t first; //index of first unused sample in samples
     uint16_t last; //end index of samples
     complex16_t samples[maxSamplesInPacket];
     uint32_t flags;
 
-    uint64_t lastchirp_timestamp;
-    uint64_t chirptime;
+    uint64_t chirptimePeriod;
+    uint64_t chirptimeStamp;
 
     SamplesPacket()
     {
@@ -52,8 +53,9 @@ public:
         first = 0;
         last = 0;
         flags = 0;
-        lastchirp_timestamp = 0;
-        chirptime = 0;
+        chirptimePeriod = 0;
+        chirptimeStamp = 0;
+
     }
 };
 

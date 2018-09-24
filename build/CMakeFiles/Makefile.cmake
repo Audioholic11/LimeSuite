@@ -30,13 +30,13 @@ set(CMAKE_MAKEFILE_DEPENDS
   "../cmake/Modules/LimeSuiteConfigVersion.in.cmake"
   "../cmake/cmake_uninstall.cmake.in"
   "../docs/doxygen/Doxyfile.in"
-  "../docs/doxygen/DoxyfileAPI.in"
   "../mcu_program/CMakeLists.txt"
   "../src/CMakeLists.txt"
   "../src/ConnectionEVB7COM/CMakeLists.txt"
   "../src/ConnectionFTDI/CMakeLists.txt"
   "../src/ConnectionFX3/CMakeLists.txt"
   "../src/ConnectionRegistry/BuiltinConnections.in.cpp"
+  "../src/ConnectionRemote/CMakeLists.txt"
   "../src/ConnectionSTREAM_UNITE/CMakeLists.txt"
   "../src/ConnectionXillybus/CMakeLists.txt"
   "../src/GFIR/CMakeLists.txt"
@@ -163,7 +163,6 @@ set(CMAKE_MAKEFILE_PRODUCTS
   "CMakeFiles/git-data/HEAD"
   "CMakeFiles/git-data/grabRef.cmake"
   "CMakeFiles/git-data/head-ref"
-  "doc/Doxyfile"
   "Doxyfile"
   "LimeSuiteConfigVersion.cmake"
   "cmake_uninstall.cmake"
@@ -183,9 +182,8 @@ set(CMAKE_MAKEFILE_PRODUCTS
 
 # Dependency information for all targets:
 set(CMAKE_DEPEND_INFO_FILES
-  "CMakeFiles/docAPI.dir/DependInfo.cmake"
-  "CMakeFiles/uninstall.dir/DependInfo.cmake"
   "CMakeFiles/doc.dir/DependInfo.cmake"
+  "CMakeFiles/uninstall.dir/DependInfo.cmake"
   "src/CMakeFiles/LimeSuite.dir/DependInfo.cmake"
   "src/CMakeFiles/LimeSuiteGUI.dir/DependInfo.cmake"
   "src/CMakeFiles/boardEmulator.dir/DependInfo.cmake"

@@ -155,17 +155,17 @@ depend:
 .PHONY : depend
 
 #=============================================================================
-# Target rules for targets named docAPI
+# Target rules for targets named doc
 
 # Build rule for target.
-docAPI: cmake_check_build_system
-	$(MAKE) -f CMakeFiles/Makefile2 docAPI
-.PHONY : docAPI
+doc: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 doc
+.PHONY : doc
 
 # fast build rule for target.
-docAPI/fast:
-	$(MAKE) -f CMakeFiles/docAPI.dir/build.make CMakeFiles/docAPI.dir/build
-.PHONY : docAPI/fast
+doc/fast:
+	$(MAKE) -f CMakeFiles/doc.dir/build.make CMakeFiles/doc.dir/build
+.PHONY : doc/fast
 
 #=============================================================================
 # Target rules for targets named uninstall
@@ -179,19 +179,6 @@ uninstall: cmake_check_build_system
 uninstall/fast:
 	$(MAKE) -f CMakeFiles/uninstall.dir/build.make CMakeFiles/uninstall.dir/build
 .PHONY : uninstall/fast
-
-#=============================================================================
-# Target rules for targets named doc
-
-# Build rule for target.
-doc: cmake_check_build_system
-	$(MAKE) -f CMakeFiles/Makefile2 doc
-.PHONY : doc
-
-# fast build rule for target.
-doc/fast:
-	$(MAKE) -f CMakeFiles/doc.dir/build.make CMakeFiles/doc.dir/build
-.PHONY : doc/fast
 
 #=============================================================================
 # Target rules for targets named LimeSuite
@@ -359,9 +346,8 @@ help:
 	@echo "... list_install_components"
 	@echo "... rebuild_cache"
 	@echo "... edit_cache"
-	@echo "... docAPI"
-	@echo "... uninstall"
 	@echo "... doc"
+	@echo "... uninstall"
 	@echo "... install/local"
 	@echo "... install/strip"
 	@echo "... LimeSuite"

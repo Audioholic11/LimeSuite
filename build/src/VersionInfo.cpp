@@ -12,12 +12,12 @@
 
 std::string lime::GetLibraryVersion(void)
 {
-    return "18.06.1-g2a6f2ddd";
+    return "18.06.1-g241eed61";
 }
 
 std::string lime::GetBuildTimestamp(void)
 {
-    return "2018-07-29";
+    return "2018-08-14";
 }
 
 std::string lime::GetAPIVersion(void)

@@ -1,5 +1,5 @@
 set(PACKAGE_FIND_NAME "LimeSuite")
-set(PACKAGE_VERSION "18.06.1-g2a6f2ddd")
+set(PACKAGE_VERSION "18.06.1-g241eed61")
 
 # Check whether the requested PACKAGE_FIND_VERSION is compatible
 if("${PACKAGE_VERSION}" VERSION_LESS "${PACKAGE_FIND_VERSION}")
